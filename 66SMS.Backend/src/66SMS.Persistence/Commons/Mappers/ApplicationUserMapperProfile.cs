@@ -1,6 +1,4 @@
-﻿using _66SMS.Domain.Entities;
-using _66SMS.Persistence.Configurations.Identity;
-using AutoMapper;
+﻿using AutoMapper;
 
 namespace _66SMS.Persistence.Commons.Mappers
 {
@@ -8,10 +6,7 @@ namespace _66SMS.Persistence.Commons.Mappers
     {
         public ApplicationUserMapperProfile()
         {
-            CreateMap<ApplicationUser, User>()
-                .ConvertUsing(new NullValueIgnoringConverter<ApplicationUser, User>());
-            CreateMap<User, ApplicationUser>()
-                .ConvertUsing(new NullValueIgnoringConverter<User, ApplicationUser>());
+            
         }
     }
 }

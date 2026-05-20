@@ -2,50 +2,54 @@ using _66SMS.Application.Abstractions.Security;
 using _66SMS.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
+using System.Runtime;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace _66SMS.Infrastructure.Security.Jwt
 {
-    /// <summary>
-    /// Implementation của IJwtTokenService.
-    /// Chịu trách nhiệm duy nhất: tạo và ký JWT access token.
-    /// Logic này được di chuyển từ UserService (Application layer) để đảm bảo SRP.
-    /// </summary>
     public class JwtTokenService : IJwtTokenService
     {
-        private readonly JwtSettings _settings;
+        private readonly JwtSettings settings;
 
         public JwtTokenService(IOptions<JwtSettings> options)
         {
-            _settings = options.Value;
+            this.settings = options.Value;
         }
 
-        public string GenerateAccessToken(User user, IList<string> roles)
+        public string GenerateAccessToken(User user, IList<string> permissons)
         {
+            // Tao claim (body jwt)
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email ?? ""),
-                new Claim(ClaimTypes.Name, user.UserName ?? "")
+                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new(ClaimTypes.Name, user.UserName),
+                new(ClaimTypes.Email, user.Email),
+                new("permissions",JsonConvert.SerializeObject(permissons))
             };
 
-            // Add role claims
-            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            // Tao key
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.SecretKey));
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.SecretKey));
+            // Tao chu ky Credentials
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var tokenDescriptor = new JwtSecurityToken(
-                issuer: _settings.Issuer,
-                audience: _settings.Audience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_settings.AccessTokenExpirationMinutes),
-                signingCredentials: creds
-            );
+            // Tao token
 
-            return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+            var token = new JwtSecurityToken(
+                issuer: settings.Issuer,
+                audience: settings.Audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(settings.AccessTokenExpirationMinutes),
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public string GenerateRefreshToken()
+            => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
     }
 }

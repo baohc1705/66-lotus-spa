@@ -1,4 +1,5 @@
 using _66SMS.Application.Abstractions.Behaviors;
+using _66SMS.Application.Commons.Mappers;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +18,11 @@ namespace _66SMS.Application.DependencyInjection
             });
 
             services.AddValidatorsFromAssembly(assembly);
+
+            services.AddAutoMapper(cfg =>
+            {
+                cfg.AddProfile(typeof(ApplicationMappingProfiles));
+            });
 
             return services;
         }

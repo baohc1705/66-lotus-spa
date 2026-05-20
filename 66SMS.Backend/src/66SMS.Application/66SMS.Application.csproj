@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Commons\" />
-    <Folder Include="Features\Users\Commands\" />
+    <Folder Include="Features\Auth\Commands\Logout\" />
+    <Folder Include="Features\Auth\Commands\Register\" />
     <Folder Include="Features\Users\Queries\" />
   </ItemGroup>
 

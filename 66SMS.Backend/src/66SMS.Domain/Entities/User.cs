@@ -2,17 +2,18 @@ using _66SMS.Domain.Abstractions.Entities;
 
 namespace _66SMS.Domain.Entities
 {
-    public class User : EntityAuditTable<Guid>
+    public class User : EntityAuditTable<int>
     {
-        public string? UserName { get; set; } = null!;
-        public string? Email { get; set; } = null!;
+        public string UserName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string PasswordHash { get; set; } = string.Empty;
         public bool IsEmailConfirmed { get; set; }
-        public bool IsActive { get; set; }
-        public string? PhoneNumber { get; set; }
-        public string? FullName { get; set; }
-        public DateTime? DoB {  get; set; }
-        public string? ProfilePhotoUrl { get; set; }
+        public int AccessFailedCount { get; set; }
+        public bool LogoutEnabled { get; set; }
+        public DateTime? LogoutEnd { get; set; }
         public DateTime? LastLoginAt { get; set; }
-        public List<Address> Addresses { get; set; } = new();
+
+        public List<UserRole> UserRoles { get; set; } = [];
+        public List<RefreshToken> RefreshTokens { get; set; } = [];
     }
 }

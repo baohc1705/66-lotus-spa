@@ -43,7 +43,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var query = AsQueryable(asNoTracking);
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             if (includes != null && includes.Any())
                 query = includes.Aggregate(query, (current, include) => current.Include(include));
@@ -51,14 +51,32 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             return await query.FirstOrDefaultAsync(x => x.Id!.Equals(id), ct);
         }
 
-        public async Task<TDto?> FindByIdAsync<TDto>(TKey id, Expression<Func<TEntity, TDto>> selector, bool IsNotDeleted = true, CancellationToken ct = default)
+        public async Task<TEntity?> FindByIdAsync(TKey id, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include, bool asNoTracking = true, bool IsNotDeleted = true, CancellationToken ct = default)
+        {
+            var query = AsQueryable(asNoTracking);
+
+            if (IsNotDeleted)
+                query = query.Where(x => !x.IsDeleted  );
+
+            if (include != null)
+                query = include(query);
+
+            return await query.FirstOrDefaultAsync(x => x.Id!.Equals(id), ct);
+        }
+
+        public async Task<TDto?> FindByIdAsync<TDto>(TKey id, Expression<Func<TEntity, TDto>> selector, bool IsNotDeleted = true, CancellationToken ct = default, params Expression<Func<TEntity, object>>[]? includes)
         {
             var query = AsQueryable(true);
 
-            if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+            query = query.Where(x => x.Id!.Equals(id));
 
-            return await query.Where(x => x.Id!.Equals(id)).Select(selector).FirstOrDefaultAsync(ct);
+            if (IsNotDeleted)
+                query = query.Where(x => !x.IsDeleted  );
+
+            if (includes != null && includes.Any())
+                query = includes.Aggregate(query, (current, include) => current.Include(include));
+
+            return await query.Select(selector).FirstOrDefaultAsync(ct);
         }
 
         #endregion
@@ -70,10 +88,23 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var query = AsQueryable(asNoTracking);
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             if (includes != null && includes.Any())
                 query = includes.Aggregate(query, (current, include) => current.Include(include));
+
+            return await query.SingleOrDefaultAsync(predicate, ct);
+        }
+
+        public async Task<TEntity?> FindSingleAsync(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include, bool asNoTracking = true, bool IsNotDeleted = true, CancellationToken ct = default)
+        {
+            var query = AsQueryable(asNoTracking);
+
+            if (IsNotDeleted)
+                query = query.Where(x => !x.IsDeleted  );
+
+            if (include != null)
+                query = include(query);
 
             return await query.SingleOrDefaultAsync(predicate, ct);
         }
@@ -83,7 +114,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var query = SpecificationEvaluator.Apply(AsQueryable(specification.AsNoTracking ?? asNoTracking), specification);
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             return await query.SingleOrDefaultAsync(ct);
         }
@@ -93,7 +124,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var query = AsQueryable(true);
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             return await query.Where(predicate).Select(selector).SingleOrDefaultAsync(ct);
         }
@@ -103,7 +134,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var query = SpecificationEvaluator.Apply(AsQueryable(specification.AsNoTracking ?? true), specification);
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             return await query.Select(selector).SingleOrDefaultAsync(ct);
         }
@@ -117,7 +148,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var query = AsQueryable(asNoTracking);
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             if (predicate != null)
                 query = query.Where(predicate);
@@ -128,12 +159,28 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             return await query.ToListAsync(ct);
         }
 
+        public async Task<IReadOnlyList<TEntity>> GetListAsync(Expression<Func<TEntity, bool>>? predicate, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include, bool asNoTracking = true, bool IsNotDeleted = true, CancellationToken ct = default)
+        {
+            var query = AsQueryable(asNoTracking);
+
+            if (IsNotDeleted)
+                query = query.Where(x => !x.IsDeleted  );
+
+            if (predicate != null)
+                query = query.Where(predicate);
+
+            if (include != null)
+                query = include(query);
+
+            return await query.ToListAsync(ct);
+        }
+
         public async Task<IReadOnlyList<TEntity>> GetListAsync(Specification<TEntity> specification, bool asNoTracking = true, bool IsNotDeleted = true, CancellationToken ct = default)
         {
             var query = SpecificationEvaluator.Apply(AsQueryable(specification.AsNoTracking ?? asNoTracking), specification);
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             return await query.ToListAsync(ct);
         }
@@ -143,7 +190,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var query = AsQueryable(true);
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             if (predicate != null)
                 query = query.Where(predicate);
@@ -156,7 +203,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var query = SpecificationEvaluator.Apply(AsQueryable(specification!.AsNoTracking ?? true), specification);
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             return await query.Select(selector).ToListAsync(ct);
         }
@@ -170,7 +217,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var query = AsQueryable(asNoTracking);
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             if (predicate != null)
                 query = query.Where(predicate);
@@ -203,12 +250,50 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             };
         }
 
-        public async Task<PagedResult<TDto>> GetPagedAsync<TDto>(int pageIndex, int pageSize, Expression<Func<TEntity, TDto>> selector, Expression<Func<TEntity, bool>>? predicate = null, Expression<Func<TEntity, object>>? orderBy = null, bool isDescending = false, bool IsNotDeleted = true, CancellationToken ct = default) where TDto : class
+        public async Task<PagedResult<TEntity>> GetPagedAsync(int pageIndex, int pageSize, Expression<Func<TEntity, bool>>? predicate, Expression<Func<TEntity, object>>? orderBy, bool isDescending, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include, bool asNoTracking = true, bool IsNotDeleted = true, CancellationToken ct = default)
+        {
+            var query = AsQueryable(asNoTracking);
+
+            if (IsNotDeleted)
+                query = query.Where(x => !x.IsDeleted  );
+
+            if (predicate != null)
+                query = query.Where(predicate);
+
+            if (include != null)
+                query = include(query);
+
+            int totalCount = await query.CountAsync(ct);
+
+            if (totalCount == 0)
+            {
+                return new PagedResult<TEntity>
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                };
+            }
+
+            if (orderBy != null)
+                query = isDescending ? query.OrderByDescending(orderBy) : query.OrderBy(orderBy);
+
+            var items = await query.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync(ct);
+
+            return new PagedResult<TEntity>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+            };
+        }
+
+        public async Task<PagedResult<TDto>> GetPagedAsync<TDto>(int pageIndex, int pageSize, Expression<Func<TEntity, TDto>> selector, Expression<Func<TEntity, bool>>? predicate = null, Expression<Func<TEntity, object>>? orderBy = null, bool isDescending = false, bool IsNotDeleted = true, CancellationToken ct = default, params Expression<Func<TEntity, object>>[] includesProperties) where TDto : class
         {
             var query = AsQueryable(true);
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             if (predicate != null)
                 query = query.Where(predicate);
@@ -218,8 +303,13 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             if (totalCount == 0)
                 return new PagedResult<TDto> { PageIndex = pageIndex, PageSize = pageSize };
 
+            if (includesProperties != null && includesProperties.Any())
+                query = includesProperties.Aggregate(query, (current, include) => current.Include(include));
+
             if (orderBy != null)
                 query = isDescending ? query.OrderByDescending(orderBy) : query.OrderBy(orderBy);
+
+
 
             var items = await query.Skip((pageIndex - 1) * pageSize).Take(pageSize).Select(selector).ToListAsync(ct);
 
@@ -242,7 +332,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var query = SpecificationEvaluator.Apply(AsQueryable(specification.AsNoTracking ?? asNoTracking), specification);
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             return new PagedResult<TEntity>
             {
@@ -263,7 +353,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var query = SpecificationEvaluator.Apply(AsQueryable(specification.AsNoTracking ?? true), specification);
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             return new PagedResult<TDto>
             {
@@ -283,7 +373,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var query = Entities.AsNoTracking();
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             foreach (var condition in spec.Conditions)
                 query = query.Where(condition);
@@ -296,7 +386,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var query = AsQueryable(true);
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             if (predicate != null)
                 query = query.Where(predicate);
@@ -309,7 +399,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var query = AsQueryable(true);
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             foreach (var predicate in predicates)
                 query = query.Where(predicate);
@@ -326,7 +416,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var query = AsQueryable(true);
 
             if (IsNotDeleted)
-                query = query.Where(x => !x.IsDeleted && x.DeletedAt == null);
+                query = query.Where(x => !x.IsDeleted  );
 
             if (predicate != null)
                 query = query.Where(predicate);
@@ -336,22 +426,42 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
         #endregion
 
         #region Write side
-        public void Add(TEntity entity) => Entities.Add(entity);
-        public void AddRange(IEnumerable<TEntity> entities) => Entities.AddRange(entities);
-        
-
-        public void Remove(TEntity entity)
+        public void Add(TEntity entity)
         {
-            entity.DeletedAt = DateTime.UtcNow;
-            entity.IsDeleted = true;
-            Entities.Update(entity);
+            entity.CreatedAt = DateTime.UtcNow;
+            Entities.Add(entity);
+        }
+        public void AddRange(IEnumerable<TEntity> entities)
+        {
+            foreach (var entity in entities)
+            {
+                entity.CreatedAt = DateTime.UtcNow;
+            }
+            Entities.AddRange(entities);
+        }
+
+        public void Remove (TEntity entity)
+        {
+            Entities.Remove(entity);
         }
 
         public void RemoveRange(IEnumerable<TEntity> entities)
         {
+            Entities.RemoveRange(entities);
+        }
+        public void SoftRemove(TEntity entity)
+        {
+            entity.IsDeleted = true;
+            entity.ModifiedAt = DateTime.UtcNow;
+            Entities.Update(entity);
+        }
+
+        public void SoftRemoveRange(IEnumerable<TEntity> entities)
+        {
             foreach (var entity in entities)
             {
-                Remove(entity);
+                entity.IsDeleted = true;
+                entity.ModifiedAt = DateTime.UtcNow;
             }
             Entities.UpdateRange(entities);
         }
