@@ -1,5 +1,4 @@
 ﻿using _66SMS.Contracts.Shared;
-using _66SMS.Domain.Entities;
 using MediatR;
 
 namespace _66SMS.Application.Features.Users.Commands.CreateUser

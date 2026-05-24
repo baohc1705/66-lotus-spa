@@ -9,7 +9,7 @@ namespace _66SMS.Domain.Entities
         public DateTime AssignedAt { get; set; }
         public int AssignedBy { get; set; }
 
-        public User User { get; set; } = new();
-        public Role Role { get; set; } = new();
+        public User? User { get; set; }
+        public Role? Role { get; set; }
     }
 }

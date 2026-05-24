@@ -35,7 +35,17 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
         {
             return asNoTracking ? Entities.AsNoTracking() : Entities;
         }
-
+        public IQueryable<TEntity> FindAll(Expression<Func<TEntity, bool>>? predicate, bool asNoTracking = true, Func<IQueryable<TEntity>, IQueryable<TEntity>>? includes = null)
+        {
+            var query = AsQueryable(asNoTracking);
+            if (predicate != null)
+                query = query.Where(predicate);
+            if (includes != null)
+            {
+                query = includes(query);
+            }
+            return query;
+        }
         #region Find by id async
 
         public async Task<TEntity?> FindByIdAsync(TKey id, bool asNoTracking = true, bool IsNotDeleted = true, CancellationToken ct = default, params Expression<Func<TEntity, object>>[]? includes)
@@ -250,7 +260,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             };
         }
 
-        public async Task<PagedResult<TEntity>> GetPagedAsync(int pageIndex, int pageSize, Expression<Func<TEntity, bool>>? predicate, Expression<Func<TEntity, object>>? orderBy, bool isDescending, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include, bool asNoTracking = true, bool IsNotDeleted = true, CancellationToken ct = default)
+        public async Task<PagedResult<TEntity>> GetPagedIncludeAsync(int pageIndex, int pageSize, Expression<Func<TEntity, bool>>? predicate, Expression<Func<TEntity, object>>? orderBy, bool isDescending, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include, bool asNoTracking = true, bool IsNotDeleted = true, CancellationToken ct = default)
         {
             var query = AsQueryable(asNoTracking);
 
@@ -453,7 +463,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
         {
             entity.IsDeleted = true;
             entity.ModifiedAt = DateTime.UtcNow;
-            Entities.Update(entity);
+            context.Entry(entity).State = EntityState.Modified;
         }
 
         public void SoftRemoveRange(IEnumerable<TEntity> entities)
@@ -462,14 +472,14 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             {
                 entity.IsDeleted = true;
                 entity.ModifiedAt = DateTime.UtcNow;
+                context.Entry(entity).State = EntityState.Modified;
             }
-            Entities.UpdateRange(entities);
         }
 
         public void Update(TEntity entity)
         {
             entity.ModifiedAt = DateTime.UtcNow;
-            Entities.Update(entity);
+            context.Entry(entity).State = EntityState.Modified;
         }
         #endregion
 
@@ -484,6 +494,8 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
             return transaction.GetDbTransaction();
         }
+
+       
 
         #endregion
 

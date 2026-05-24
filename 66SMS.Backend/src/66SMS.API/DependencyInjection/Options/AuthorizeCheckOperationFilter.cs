@@ -9,26 +9,12 @@ namespace _66SMS.API.DependencyInjection.Options
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             // Check cả controller lẫn action
-            var hasAuthorize =
-                context.MethodInfo.DeclaringType!
-                    .GetCustomAttributes(true)
-                    .OfType<AuthorizeAttribute>()
-                    .Any()
-                || context.MethodInfo
-                    .GetCustomAttributes(true)
-                    .OfType<AuthorizeAttribute>()
-                    .Any();
+            var hasAuthorize = context.MethodInfo.DeclaringType!.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any() || 
+                context.MethodInfo.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any();
 
             // Check [AllowAnonymous] để loại trừ
-            var hasAllowAnonymous =
-                context.MethodInfo.DeclaringType!
-                    .GetCustomAttributes(true)
-                    .OfType<AllowAnonymousAttribute>()
-                    .Any()
-                || context.MethodInfo
-                    .GetCustomAttributes(true)
-                    .OfType<AllowAnonymousAttribute>()
-                    .Any();
+            var hasAllowAnonymous = context.MethodInfo.DeclaringType!.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any() || 
+                context.MethodInfo.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any();
 
             if (!hasAuthorize || hasAllowAnonymous) return;
 

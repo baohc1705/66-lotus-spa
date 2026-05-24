@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace _66SMS.Application.DTOs.Users
+﻿namespace _66SMS.Application.DTOs.Users
 {
-    internal class UserDto
+    public class UserDto
     {
+        public int Id { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public bool IsEmailConfirmed { get; set; }
+        public bool LogoutEnabled { get; set; }
+        public DateTime? LogoutEnd { get; set; }
+        public DateTime? LastLoginAt { get; set; }
+
     }
 }

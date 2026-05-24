@@ -8,7 +8,7 @@ namespace _66SMS.Domain.Entities
         public string? Description { get; set; }
         public bool IsActived { get; set; }
 
-        public List<UserRole> UserRoles { get; set; } = [];
-        public List<RolePermission> RolePermissions { get; set; } = [];
+        public List<UserRole>? UserRoles { get; set; }
+        public List<RolePermission>? RolePermissions { get; set; }
     }
 }

@@ -18,8 +18,7 @@ namespace _66SMS.API.DependencyInjection.Extensions
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
-                var provider = app.Services
-                    .GetRequiredService<IApiVersionDescriptionProvider>();
+                var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
 
                 foreach (var description in provider.ApiVersionDescriptions)
                 {

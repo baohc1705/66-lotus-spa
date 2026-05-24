@@ -18,10 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\66SMS.Application\66SMS.Application.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Abstractions\" />
+    <ProjectReference Include="..\66SMS.Infrastructure\66SMS.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

@@ -8,7 +8,7 @@ namespace _66SMS.Domain.Entities
         public string Resource { get; set; } = string.Empty;
         public string Action { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-
-        public List<RolePermission> RolePermissions { get; set; } = [];
+        public string PermissionKey => $"{Resource}:{Action}";
+        public List<RolePermission>? RolePermissions { get; set; }
     }
 }

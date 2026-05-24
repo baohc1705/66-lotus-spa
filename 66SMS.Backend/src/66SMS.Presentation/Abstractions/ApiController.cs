@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using _66SMS.Contracts.Shared;
 
-namespace _66SMS.Presentation.Controllers
+namespace _66SMS.Presentation.Abstractions
 {
     /// <summary>
     /// Base controller class with common properties and methods for all API controllers.
@@ -14,12 +14,12 @@ namespace _66SMS.Presentation.Controllers
     [Route("api/v{version:apiVersion}/[controller]")]
     public abstract class ApiController<T> : ControllerBase
     {
-        private ILogger<T>? _logger;
+        private ILogger<T>? logger;
 
         /// <summary>
         /// Gets the strongly-typed logger instance from the DI container.
         /// </summary>
-        protected ILogger<T> Logger => _logger ??= HttpContext.RequestServices.GetRequiredService<ILogger<T>>();
+        protected ILogger<T> Logger => logger ??= HttpContext.RequestServices.GetRequiredService<ILogger<T>>();
 
         /// <summary>
         /// Translates a generic Result<T> into a standard HTTP response.

@@ -10,7 +10,7 @@ namespace _66SMS.Persistence.Configurations.Sql
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.HasKey(x => x.Id);
-            builder.Property(x => x.UserName).HasColumnName(UserConst.FIELD_USERNAME);
+            builder.Property(x => x.Username).HasColumnName(UserConst.FIELD_USERNAME);
             builder.Property(x => x.Email).HasColumnName(UserConst.FIELD_EMAIL);
             builder.Property(x => x.PasswordHash).HasColumnName(UserConst.FIELD_PASSWORD_HASH);
             builder.Property(x => x.IsEmailConfirmed).HasColumnName(UserConst.FIELD_IS_EMAIL_CONFIRMED);

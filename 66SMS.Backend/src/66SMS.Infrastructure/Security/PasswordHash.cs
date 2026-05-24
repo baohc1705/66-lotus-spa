@@ -10,9 +10,9 @@ namespace _66SMS.Infrastructure.Security
             return Argon2.Hash(password);
         }
 
-        public bool Verify(string password, string hash)
+        public bool Verify(string passwordHash, string rawPassword)
         {
-            return Argon2.Verify(password, hash);
+            return Argon2.Verify(passwordHash, rawPassword);
         }
     }
 }

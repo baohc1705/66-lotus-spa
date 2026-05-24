@@ -10,6 +10,7 @@ public interface IGenericSqlRepository<TEntity, TKey> where TEntity : class, IAu
 {
     #region Read side
     IQueryable<TEntity> AsQueryable(bool asNoTracking = true);
+    IQueryable<TEntity> FindAll(Expression<Func<TEntity, bool>>? predicate, bool asNoTracking = true, Func<IQueryable<TEntity>, IQueryable<TEntity>>? includes = null);
     Task<TEntity?> FindByIdAsync(TKey id, bool asNoTracking = true, bool IsNotDeleted = true, CancellationToken ct = default, params Expression<Func<TEntity, object>>[]? includes);
     Task<TEntity?> FindByIdAsync(TKey id, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include, bool asNoTracking = true, bool IsNotDeleted = true, CancellationToken ct = default);
     Task<TDto?> FindByIdAsync<TDto>(TKey id, Expression<Func<TEntity, TDto>> selector, bool IsNotDeleted = true, CancellationToken ct = default, params Expression<Func<TEntity, object>>[]? includes);
@@ -33,7 +34,7 @@ public interface IGenericSqlRepository<TEntity, TKey> where TEntity : class, IAu
                                              CancellationToken ct = default,
                                              params Expression<Func<TEntity, object>>[] includes);
 
-    Task<PagedResult<TEntity>> GetPagedAsync(int pageIndex,
+    Task<PagedResult<TEntity>> GetPagedIncludeAsync(int pageIndex,
                                              int pageSize,
                                              Expression<Func<TEntity, bool>>? predicate,
                                              Expression<Func<TEntity, object>>? orderBy,

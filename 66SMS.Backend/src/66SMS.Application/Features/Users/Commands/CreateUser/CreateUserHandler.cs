@@ -25,7 +25,7 @@ namespace _66SMS.Application.Features.Users.Commands.CreateUser
         public async Task<Result<object>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
 
-            var userExisted = await userSqlRepository.ExistsAsync(x => x.Email.Equals(request.Email) || x.UserName.Equals(request.UserName), ct: cancellationToken);
+            var userExisted = await userSqlRepository.ExistsAsync(x => x.Email.Equals(request.Email) || x.Username.Equals(request.UserName), ct: cancellationToken);
             if (userExisted)
                 return Result<object>.BadRequest("User and email existed");
 

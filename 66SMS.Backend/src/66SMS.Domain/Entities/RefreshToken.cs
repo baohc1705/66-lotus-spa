@@ -14,6 +14,6 @@ namespace _66SMS.Domain.Entities
         public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
         public bool IsActive => RevokedAt == null && !IsExpired;
 
-        public User User { get; set; } = new(); 
+        public User? User { get; set; }
     }
 }
