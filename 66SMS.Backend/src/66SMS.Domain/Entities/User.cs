@@ -17,5 +17,7 @@ namespace _66SMS.Domain.Entities
         public DateTime? PasswordResetTokenExpiry { get; set; }
         public List<UserRole>? UserRoles { get; set; }
         public List<RefreshToken>? RefreshTokens { get; set; }
+
+        public Customer? Customer { get; set; }
     }
 }

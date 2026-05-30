@@ -25,9 +25,9 @@ namespace _66SMS.Application.Features.Users.Queries.GetAllUsers
             var query = userSqlRepository.Query();
 
             // Search keyword
-            if (!string.IsNullOrEmpty(request.SearchKeyword))
-                query = query.Where(x => x.Username.Contains(request.SearchKeyword) ||
-                                    x.Email.Contains(request.SearchKeyword));
+            if (!string.IsNullOrEmpty(request.Filter))
+                query = query.Where(x => x.Username.Contains(request.Filter) ||
+                                    x.Email.Contains(request.Filter));
             // Order by
             query = request.OrderBy?.ToLower() switch
             {

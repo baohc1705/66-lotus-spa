@@ -84,6 +84,7 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
                 CreatedByIp = request.IpAddress ?? "",
             };
             refreshTokenSqlRepository.Add(newRefreshToken);
+
             if (user.UserRoles == null)
                 return Result<TokenResponseDTO>.NotFound("User has no role");
             List<string> permissions = user.UserRoles
@@ -92,8 +93,9 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
                 .Select(rp => rp.Permission.PermissionKey)
                 .Distinct()
                 .ToList();
+            string role = user.UserRoles.Select(x => x.Role.Name).First();
 
-            string accessToken = jwtService.GenerateAccessToken(user, permissions);
+            string accessToken = jwtService.GenerateAccessToken(user, role, permissions);
             await refreshTokenSqlRepository.SaveChangeAsync(cancellationToken);
             return Result<TokenResponseDTO>.Success(new TokenResponseDTO { AccessToken = accessToken , RefreshToken = newRawToken, UserId = user.Id });
         }

@@ -39,5 +39,14 @@ namespace _66SMS.Persistence.Repositories.Sql
             entity.ModifiedAt = DateTimeHelper.UtcNow();
             base.Update(entity);
         }
+
+        public async Task<Role?> GetRoleByUserIdAsync(int id, CancellationToken cancellationToken)
+        {
+            return await Entities
+                  .AsNoTracking()
+                  .Where(x => x.UserId == id)
+                  .Select(x => x.Role)
+                  .FirstOrDefaultAsync(cancellationToken);
+        }
     }
 }

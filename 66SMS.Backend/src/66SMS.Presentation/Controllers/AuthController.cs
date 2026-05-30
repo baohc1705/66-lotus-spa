@@ -1,5 +1,7 @@
-﻿using _66SMS.Application.Features.Auth.Commands.ChangePassword;
+﻿using _66SMS.Application.Features.Auth.Commands.AssignPermissions;
+using _66SMS.Application.Features.Auth.Commands.ChangePassword;
 using _66SMS.Application.Features.Auth.Commands.CreatePermission;
+using _66SMS.Application.Features.Auth.Commands.CreateRole;
 using _66SMS.Application.Features.Auth.Commands.ForgotPassword;
 using _66SMS.Application.Features.Auth.Commands.Login;
 using _66SMS.Application.Features.Auth.Commands.Logout;
@@ -8,6 +10,7 @@ using _66SMS.Application.Features.Auth.Commands.ResetPassword;
 using _66SMS.Application.Features.Auth.Queries.GetAllRoles;
 using _66SMS.Application.Features.Users.Commands.CreateUser;
 using _66SMS.Contracts.Abstractions;
+using _66SMS.Infrastructure.Security;
 using _66SMS.Presentation.Abstractions;
 using Asp.Versioning;
 using MediatR;
@@ -76,16 +79,32 @@ namespace _66SMS.Presentation.Controllers
             return HandleResult(result);
         }
 
+       
+        [HttpPost("permission")]
         [Authorize]
-        [HttpPost]
         public async Task<IActionResult> CreatePermission([FromBody] CreatePermissionCommand command)
         {
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
 
+        [HttpPost("role")]
         [Authorize]
-        [HttpGet("roles")]
+        public async Task<IActionResult> CreateRole([FromBody] CreateRoleCommand command)
+        {
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [Authorize]
+        [HttpPost("role/assign-permisison")]
+        public async Task<IActionResult> AssignPermission([FromBody] AssignPermissionsCommand command)
+        {
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+        [Authorize]
+        [HttpGet("role")]
         public async Task<IActionResult> GetAllRole([FromQuery]GetAllRoleQuery query)
         {
             var result = await mediator.Send(query);

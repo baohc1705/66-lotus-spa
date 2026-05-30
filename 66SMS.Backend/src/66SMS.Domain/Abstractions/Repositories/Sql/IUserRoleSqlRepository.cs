@@ -6,5 +6,6 @@ namespace _66SMS.Domain.Abstractions.Repositories.Sql
     public interface IUserRoleSqlRepository : IGenericSqlRepository<UserRole, int>
     {
         Task<List<string>?> GetPermissionKeysByUserIdAsync(int userId, CancellationToken cancellationToken);
+        Task<Role?> GetRoleByUserIdAsync(int id, CancellationToken cancellationToken);
     }
 }

@@ -53,8 +53,8 @@ namespace _66SMS.Application.Features.Auth.Commands.Login
                 userExisted.AccessFailedCount++;
 
                 // Lock if greater than max failed attempts
-                if (userExisted.AccessFailedCount >= jwtOptions.Value.MaxFailedAttempts) 
-                { 
+                if (userExisted.AccessFailedCount >= jwtOptions.Value.MaxFailedAttempts)
+                {
                     userExisted.Status = UserStatus.LOCKED;
                     userExisted.LogoutEnd = DateTime.UtcNow.AddMinutes(jwtOptions.Value.AccessTokenExpiryMinutes);
                 }
@@ -72,13 +72,17 @@ namespace _66SMS.Application.Features.Auth.Commands.Login
             userExisted.LastLoginAt = DateTime.UtcNow;
             userSqlRepository.Update(userExisted);
 
-            // Get list permission then add to jwt
+            // Get role and list permission then add to jwt
+            Role? role = await userRoleSqlRepository.GetRoleByUserIdAsync(userExisted.Id, cancellationToken);
+            if (role == null)
+                return Result<TokenResponseDTO>.NotFound("Account has no role");
+
             List<string>? premissions = await userRoleSqlRepository.GetPermissionKeysByUserIdAsync(userExisted.Id, cancellationToken);
             if (premissions == null)
                 return Result<TokenResponseDTO>.NotFound("Account has no permission");
 
-            // Generate token
-            var accessToken = jwtService.GenerateAccessToken(userExisted, premissions);
+            // Generate token 
+            var accessToken = jwtService.GenerateAccessToken(userExisted, role.Name, premissions);
             var rawRefreshToken = jwtService.GenerateRefreshToken();
 
             // Add refresh token in db

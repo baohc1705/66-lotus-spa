@@ -22,11 +22,11 @@ namespace _66SMS.Application.Features.Auth.Commands.CreatePermission
             if (permissionNameExsited)
                 return Result<object>.BadRequest("Permission name exsited");
 
-            Permission? permission = mapper.Map<Permission>(permissionNameExsited);
+            Permission? permission = mapper.Map<Permission>(request);
             permission.Status = PermissionStatus.ACTIVE;
             permissionSqlRepository.Add(permission);
             await permissionSqlRepository.SaveChangeAsync(cancellationToken);
-            return Result<object>.Success(permission);
+            return Result<object>.Created(permission);
         }
     }
 }

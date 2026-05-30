@@ -10,6 +10,7 @@ namespace _66SMS.Persistence.Configurations.Sql
         public void Configure(EntityTypeBuilder<Permission> builder)
         {
             builder.HasKey(x => x.Id);
+            builder.Property(x => x.Id).HasColumnName(PermissionConst.FIELD_ID);
             builder.Property(x => x.Name).HasColumnName(PermissionConst.FIELD_NAME).HasMaxLength(PermissionConst.NAME_MAX_LENGTH);
             builder.Property(x => x.Resource).HasColumnName(PermissionConst.FIELD_RESOURCE).HasMaxLength(PermissionConst.RESOURCE_MAX_LENGTH);
             builder.Property(x => x.Action).HasColumnName(PermissionConst.FIELD_ACTION).HasMaxLength(PermissionConst.ACTION_MAX_LENGTH);

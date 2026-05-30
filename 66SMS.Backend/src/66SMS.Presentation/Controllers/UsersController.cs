@@ -34,6 +34,7 @@ namespace _66SMS.Presentation.Controllers
             return HandleResult(result);
         }
         [HttpGet]
+        [Authorize(Roles = "admin")]
         [PermissionAuthorize("users", "read")]
         public async Task<IActionResult> GetAll([FromQuery] GetAllUserQuery query)
         {

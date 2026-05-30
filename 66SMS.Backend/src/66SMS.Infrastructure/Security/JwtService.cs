@@ -13,7 +13,7 @@ namespace _66SMS.Infrastructure.Security
 {
     public class JwtService(IOptions<JwtSettings> options, IHttpContextAccessor httpContextAccessor) : IJwtService
     {
-        public string GenerateAccessToken<TEntity>(TEntity entity, IList<string> permissions)
+        public string GenerateAccessToken<TEntity>(TEntity entity, string role, IList<string> permissions)
         {
             // Create claim
             var claims = new List<Claim>();
@@ -28,7 +28,8 @@ namespace _66SMS.Infrastructure.Security
             var usernameProp = type.GetProperty("Username");
             if (usernameProp != null)
                 claims.Add(new Claim(ClaimTypes.Name, usernameProp.GetValue(entity)?.ToString() ?? ""));
-
+            // Add role
+            claims.Add(new Claim(ClaimTypes.Role, role));
             // Add permission
             claims.Add(new Claim("permissions", JsonConvert.SerializeObject(permissions)));
 

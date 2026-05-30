@@ -25,7 +25,7 @@ namespace _66SMS.Application.Features.Auth.Commands.CreateRole
             role.Status = RoleStatus.ACTIVE;
             roleSqlRepository.Add(role);
             await roleSqlRepository.SaveChangeAsync(cancellationToken);
-            return Result<object>.Success(role);
+            return Result<object>.Created(role);
                 
         }
     }
