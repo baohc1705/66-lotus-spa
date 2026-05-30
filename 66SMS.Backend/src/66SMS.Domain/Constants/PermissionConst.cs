@@ -8,6 +8,7 @@
         public const string FIELD_NAME = "Name";
         public const string FIELD_RESOURCE = "Resource";
         public const string FIELD_ACTION = "Action";
+        public const string FIELD_STATUS = "Status";
         public const string FIELD_DESCRIPTION = "Description";
         public const string FIELD_CREATED_AT = "CreatedAt";
         public const string FIELD_MODIFIED_AT = "ModifiedAt";

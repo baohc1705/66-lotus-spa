@@ -1,9 +1,10 @@
-﻿using _66SMS.Application.DTOs.Identity;
+﻿using _66SMS.Application.DTOs.Auth;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Constants;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Entities;
+using _66SMS.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -28,7 +29,9 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
         public async Task<Result<TokenResponseDTO>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
             // Tim token trong refresh token db
-            var stored = await refreshTokenSqlRepository.FindSingleAsync(x => x.Token.Equals(request.Token), asNoTracking: false, ct: cancellationToken);
+            RefreshToken? stored = await refreshTokenSqlRepository.Query(asNoTracking: false)
+                .Where(x => x.Token.Equals(request.Token))
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (stored == null)
                 return Result<TokenResponseDTO>.BadRequest("Token khong hop le");
@@ -36,7 +39,7 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
             // Phat hien reuse attack
             if (stored.IsRevoked)
             {
-                var allToken = await refreshTokenSqlRepository.GetListAsync(x => x.UserId == stored.UserId, asNoTracking: false, ct: cancellationToken);
+                IReadOnlyList<RefreshToken>? allToken = await refreshTokenSqlRepository.Query(asNoTracking: false).Where(x => x.UserId.Equals(stored.Id)).ToListAsync(cancellationToken);
                 foreach (var token in allToken.Where(x => x.IsActive))
                 {
                     token.IsRevoked = true;
@@ -54,17 +57,15 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
                 return Result<TokenResponseDTO>.BadRequest("Refresh token da het han");
 
             // Kiem tra user co hop le
-            var user = await userSqlRepository.FindSingleAsync(
-                predicate: x => x.Id == stored.UserId,
-                include: q => q
-                .Include(u => u.UserRoles)
-                    .ThenInclude(ur => ur.Role)
-                        .ThenInclude(r => r.RolePermissions)
-                            .ThenInclude(rp => rp.Permission),
-                asNoTracking: false,
-                ct: cancellationToken);
+            User? user = await userSqlRepository.Query(asNoTracking: false)
+                .Where(x => x.Id == stored.UserId)
+                .Include(x => x
+                    .Include(ur => ur.UserRoles!)
+                        .ThenInclude(ur => ur.Role!.RolePermissions!)
+                            .ThenInclude(rp => rp.Permission))
+                .FirstOrDefaultAsync(cancellationToken);
 
-            if (user == null || user.LogoutEnabled)
+            if (user == null || user.Status == UserStatus.LOCKED)
                 return Result<TokenResponseDTO>.BadRequest("Tai khoan khong hop le");
 
             // Rotate token
@@ -73,27 +74,28 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
             stored.RevokedByIp = request.IpAddress;
             refreshTokenSqlRepository.Update(stored);
 
-            var newRawToken = jwtService.GenerateRefreshToken();
+            string newRawToken = jwtService.GenerateRefreshToken();
             // create new token
-            var newRefreshToken = new RefreshToken
+            RefreshToken newRefreshToken = new RefreshToken
             {
                 UserId = user.Id,
                 Token = newRawToken,
                 ExpiresAt = DateTime.UtcNow.AddDays(jwtOptions.Value.RefreshTokenExpiryDays),
-                CreatedByIp = request.IpAddress,
+                CreatedByIp = request.IpAddress ?? "",
             };
             refreshTokenSqlRepository.Add(newRefreshToken);
-
-            var permissions = user.UserRoles
-                .Where(ur => ur.Role.IsActived)
+            if (user.UserRoles == null)
+                return Result<TokenResponseDTO>.NotFound("User has no role");
+            List<string> permissions = user.UserRoles
+                .Where(ur => ur.Role.Status == RoleStatus.ACTIVE)
                 .SelectMany(ur => ur.Role.RolePermissions)
                 .Select(rp => rp.Permission.PermissionKey)
                 .Distinct()
                 .ToList();
-            var accessToken = jwtService.GenerateAccessToken(user, permissions);
+
+            string accessToken = jwtService.GenerateAccessToken(user, permissions);
             await refreshTokenSqlRepository.SaveChangeAsync(cancellationToken);
             return Result<TokenResponseDTO>.Success(new TokenResponseDTO { AccessToken = accessToken , RefreshToken = newRawToken, UserId = user.Id });
-
         }
     }
 }

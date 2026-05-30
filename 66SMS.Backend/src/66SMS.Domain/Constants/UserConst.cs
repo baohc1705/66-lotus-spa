@@ -10,12 +10,14 @@
         public const string FIELD_PASSWORD_HASH = "PasswordHash";
         public const string FIELD_IS_EMAIL_CONFIRMED = "IsEmailConfirmed";
         public const string FIELD_ACCESS_FAILED_COUNT = "AccessFailedCount";
-        public const string FIELD_LOCKOUT_ENABLED = "LockoutEnabled";
+        public const string FIELD_STATUS= "Status";
         public const string FIELD_LOCKOUT_END = "LockoutEnd";
         public const string FIELD_LAST_LOGIN_AT = "LastLoginAt";
         public const string FIELD_CREATED_AT = "CreatedAt";
         public const string FIELD_MODIFIED_AT = "ModifiedAt";
         public const string FIELD_IS_DELETED = "IsDeleted";
+        public const string FIELD_PASSWORD_RESET_TOKEN = "PasswordResetToken";
+        public const string FIELD_PASSWORD_RESET_TOKEN_EXPIRY = "PasswordResetTokenExpiry";
         #endregion
 
         #region Constraint

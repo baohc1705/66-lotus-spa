@@ -1,4 +1,5 @@
 ﻿using _66SMS.Domain.Abstractions.Entities;
+using _66SMS.Domain.Enums;
 
 namespace _66SMS.Domain.Entities
 {
@@ -6,7 +7,7 @@ namespace _66SMS.Domain.Entities
     {
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
-        public bool IsActived { get; set; }
+        public RoleStatus Status { get; set; }
 
         public List<UserRole>? UserRoles { get; set; }
         public List<RolePermission>? RolePermissions { get; set; }

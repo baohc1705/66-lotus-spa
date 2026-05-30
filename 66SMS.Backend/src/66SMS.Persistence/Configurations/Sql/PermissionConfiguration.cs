@@ -14,6 +14,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.Resource).HasColumnName(PermissionConst.FIELD_RESOURCE).HasMaxLength(PermissionConst.RESOURCE_MAX_LENGTH);
             builder.Property(x => x.Action).HasColumnName(PermissionConst.FIELD_ACTION).HasMaxLength(PermissionConst.ACTION_MAX_LENGTH);
             builder.Property(x => x.Description).HasColumnName(PermissionConst.FIELD_DESCRIPTION).HasMaxLength(PermissionConst.DESCRIPTION_MAX_LENGTH);
+            builder.Property(x => x.Status).HasColumnName(PermissionConst.FIELD_STATUS).HasConversion<int>();
             builder.Property(x => x.CreatedAt).HasColumnName(PermissionConst.FIELD_CREATED_AT);
             builder.Property(x => x.ModifiedAt).HasColumnName(PermissionConst.FIELD_MODIFIED_AT);
             builder.Property(x => x.IsDeleted).HasColumnName(PermissionConst.FIELD_IS_DELETED);

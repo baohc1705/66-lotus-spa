@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Application.DTOs.Identity
+﻿namespace _66SMS.Application.DTOs.Auth
 {
     public class TokenResponseDTO
     {

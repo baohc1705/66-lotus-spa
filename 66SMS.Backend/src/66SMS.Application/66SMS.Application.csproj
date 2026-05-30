@@ -19,4 +19,8 @@
     <ProjectReference Include="..\66SMS.Domain\66SMS.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Auth\Queries\GetDetailRoles\" />
+  </ItemGroup>
+
 </Project>

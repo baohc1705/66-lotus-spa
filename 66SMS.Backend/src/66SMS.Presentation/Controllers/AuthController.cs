@@ -1,6 +1,8 @@
-﻿using _66SMS.Application.Features.Auth.Commands.Login;
+﻿using _66SMS.Application.Features.Auth.Commands.CreatePermission;
+using _66SMS.Application.Features.Auth.Commands.Login;
 using _66SMS.Application.Features.Auth.Commands.Logout;
 using _66SMS.Application.Features.Auth.Commands.RefreshTokens;
+using _66SMS.Application.Features.Auth.Queries.GetAllRoles;
 using _66SMS.Application.Features.Users.Commands.CreateUser;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Presentation.Abstractions;
@@ -28,6 +30,7 @@ namespace _66SMS.Presentation.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register(CreateUserCommand createUserCommand)
         {
+            //createUserCommand.CreatedBy = jwtService.GetUserId();
             var result = await mediator.Send(createUserCommand);
             return HandleResult(result);
         }
@@ -70,6 +73,22 @@ namespace _66SMS.Presentation.Controllers
             return HandleResult(result);
         }
 
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> CreatePermission([FromBody] CreatePermissionCommand command)
+        {
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [Authorize]
+        [HttpGet("roles")]
+        public async Task<IActionResult> GetAllRole([FromQuery]GetAllRoleQuery query)
+        {
+            var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
         private void SetRefreshTokenCookies(string token)
         {
             Response.Cookies.Append("refreshToken", token, new CookieOptions
@@ -77,7 +96,7 @@ namespace _66SMS.Presentation.Controllers
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddDays(7)
+                Expires = DateTime.UtcNow.AddDays(7)
             });
         }
         private string GetIpAddress() => Request.Headers.TryGetValue("X-Forwarded-For", out var ip)

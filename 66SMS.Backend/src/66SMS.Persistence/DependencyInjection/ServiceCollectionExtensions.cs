@@ -1,7 +1,7 @@
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
-using _66SMS.Persistence.Commons.Mappers;
 using _66SMS.Persistence.Repositories.Sql;
 using _66SMS.Persistence.Repositories.Sql.Base;
 using Microsoft.EntityFrameworkCore;
@@ -16,18 +16,14 @@ namespace _66SMS.Persistence.DependencyInjection
         {
             var connectionString = configuration.GetConnectionString(DatabaseConst.CONN_SQL_SERVER);
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
-
-            services.AddAutoMapper(config =>
-            {
-                config.AddProfile(typeof(ApplicationUserMapperProfile));
-            });
-
+            services.AddScoped(typeof(IQuery<>), typeof(EntityQuery<>));
             services.RegisterRepositories();
             return services;
         }
 
         private static IServiceCollection RegisterRepositories(this IServiceCollection services)
         {
+            
             services.AddScoped(typeof(IGenericSqlRepository<,>), typeof(GenericSqlRepository<,>));
             services.AddScoped<ISqlUnitOfWork, SqlUnitOfWork>();
             services.AddScoped<IUserSqlRepository, UserSqlRepository>();

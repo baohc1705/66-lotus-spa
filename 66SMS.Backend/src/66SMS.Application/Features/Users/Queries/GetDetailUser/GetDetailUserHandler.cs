@@ -20,7 +20,7 @@ namespace _66SMS.Application.Features.Users.Queries.GetDetailUser
 
         public async Task<Result<UserDto>> Handle(GetDetailUserQuery request, CancellationToken cancellationToken)
         {
-            User? user = await userSqlRepository.FindByIdAsync(request.Id, ct:cancellationToken);
+            User? user = await userSqlRepository.Query().Where(x => x.Id == request.Id).FirstOrDefaultAsync(cancellationToken);
             if (user == null)
                 return Result<UserDto>.NotFound("User not found");
             return Result<UserDto>.Success(mapper.Map<UserDto>(user));

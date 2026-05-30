@@ -16,7 +16,9 @@ namespace _66SMS.Application.Features.Auth.Commands.Logout
         public async Task<Result<object>> Handle(LogoutCommand request, CancellationToken cancellationToken)
         {
             // Tim refreshtoken 
-            var stored = await refreshTokenSqlRepository.FindSingleAsync(x => x.Token.Equals(request.Token), asNoTracking: false, ct: cancellationToken);
+            var stored = await refreshTokenSqlRepository.Query(asNoTracking: false)
+                .Where(x => x.Token.Equals(request.Token))
+                .FirstOrDefaultAsync(cancellationToken);
             // kiem tra token
             if (stored == null || !stored.IsActive)
                 return Result<object>.BadRequest("Token khong hop le");

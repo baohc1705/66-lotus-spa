@@ -532,3 +532,5 @@ ai/
 # Local settings
 **/appsettings.Development.json
 src/66SMS.API/appsettings.Development.json
+
+*.zip

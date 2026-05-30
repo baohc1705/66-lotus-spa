@@ -1,6 +1,9 @@
-﻿using _66SMS.Application.Features.Users.Queries.GetAllUsers;
+﻿using _66SMS.Application.Features.Users.Commands.DeleteUser;
+using _66SMS.Application.Features.Users.Commands.UpdateUser;
+using _66SMS.Application.Features.Users.Queries.GetAllUsers;
 using _66SMS.Application.Features.Users.Queries.GetDetailUser;
 using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Shared;
 using _66SMS.Infrastructure.Security;
 using _66SMS.Presentation.Abstractions;
 using Asp.Versioning;
@@ -31,11 +34,28 @@ namespace _66SMS.Presentation.Controllers
             return HandleResult(result);
         }
         [HttpGet]
-        [PermissionAuthorize("users", "list")]
+        [PermissionAuthorize("users", "read")]
         public async Task<IActionResult> GetAll([FromQuery] GetAllUserQuery query)
         {
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
+
+        [HttpDelete]
+        [PermissionAuthorize("users", "delete")]
+        public async Task<IActionResult> DeleteUser([FromBody] DeleteUserCommand command)
+        {
+            Result<object> result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpPut]
+        [PermissionAuthorize("users", "update")]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserCommand command)
+        {
+            Result<object> result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
     }
 }

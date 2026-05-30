@@ -12,8 +12,6 @@ namespace _66SMS.Application.Features.Users.Commands.CreateUser
             RuleFor(x => x.Email).NotEmpty().MaximumLength(UserConst.EMAIL_MAX_LENGTH).Matches(RegexConst.EMAIL_REGEX);
             RuleFor(x => x.Password).NotEmpty().Matches(RegexConst.PASSWORD_REGEX);
             RuleFor(x => x.ConfirmPassword).NotEmpty().Equal(x => x.Password);
-
-           
         }
     }
 }

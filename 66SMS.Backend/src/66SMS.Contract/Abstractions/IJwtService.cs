@@ -14,7 +14,5 @@ namespace _66SMS.Contracts.Abstractions
         string GetUsername();
         string GetEmail();
         IList<string> GetPermissions();
-
-        
     }
 }
