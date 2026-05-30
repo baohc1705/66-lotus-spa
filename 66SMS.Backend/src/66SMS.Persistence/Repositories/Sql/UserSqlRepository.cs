@@ -1,6 +1,6 @@
-using _66SMS.Contracts.Constants;
 using _66SMS.Contracts.Exceptions;
 using _66SMS.Contracts.Helpers;
+using _66SMS.Contracts.Settings;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Entities;
 using _66SMS.Persistence.Repositories.Sql.Base;

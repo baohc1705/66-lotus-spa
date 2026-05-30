@@ -1,6 +1,6 @@
 ﻿using _66SMS.Application.DTOs.Auth;
 using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Constants;
+using _66SMS.Contracts.Settings;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Entities;

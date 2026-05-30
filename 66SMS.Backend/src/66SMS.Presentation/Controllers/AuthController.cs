@@ -1,7 +1,10 @@
-﻿using _66SMS.Application.Features.Auth.Commands.CreatePermission;
+﻿using _66SMS.Application.Features.Auth.Commands.ChangePassword;
+using _66SMS.Application.Features.Auth.Commands.CreatePermission;
+using _66SMS.Application.Features.Auth.Commands.ForgotPassword;
 using _66SMS.Application.Features.Auth.Commands.Login;
 using _66SMS.Application.Features.Auth.Commands.Logout;
 using _66SMS.Application.Features.Auth.Commands.RefreshTokens;
+using _66SMS.Application.Features.Auth.Commands.ResetPassword;
 using _66SMS.Application.Features.Auth.Queries.GetAllRoles;
 using _66SMS.Application.Features.Users.Commands.CreateUser;
 using _66SMS.Contracts.Abstractions;
@@ -86,6 +89,31 @@ namespace _66SMS.Presentation.Controllers
         public async Task<IActionResult> GetAllRole([FromQuery]GetAllRoleQuery query)
         {
             var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        [HttpPost("forgot-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordCommand command)
+        {
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpPost("reset-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
+        {
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command)
+        {
+            command.Id = jwtService.GetUserId();
+            var result = await mediator.Send(command);
             return HandleResult(result);
         }
 

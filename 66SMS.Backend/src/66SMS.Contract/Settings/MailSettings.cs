@@ -1,10 +1,11 @@
-namespace _66SMS.Infrastructure.Mails
+﻿namespace _66SMS.Contracts.Settings
 {
-    public class MailSetting
+    public class MailSettings
     {
         public const string SectionName = "MailSettings";
+
         public string Host { get; set; } = string.Empty;
-        public int Port { get; set; }
+        public int Port { get; set; } = 587;
         public string User { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public string FromName { get; set; } = string.Empty;

@@ -1,12 +1,12 @@
 ﻿using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Constants;
+using _66SMS.Contracts.Helpers;
+using _66SMS.Contracts.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace _66SMS.Infrastructure.Security
@@ -48,7 +48,7 @@ namespace _66SMS.Infrastructure.Security
 
         public string GenerateRefreshToken()
         {
-            return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+            return GenerateTokenHelper.Generate();
         }
 
         public TEntity? GetClaim<TEntity>(string claimType)

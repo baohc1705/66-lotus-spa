@@ -1,7 +1,7 @@
 using _66SMS.API.DependencyInjection.Extensions;
 using _66SMS.API.Middleware;
 using _66SMS.Application.DependencyInjection;
-using _66SMS.Infrastructure.DependencyInjection;
+using _66SMS.Infrastructure.DependencyInjection.Extensions;
 using _66SMS.Persistence.DependencyInjection;
 using _66SMS.Presentation.Abstractions;
 using _66SMS.Presentation.Commons;
