@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 
 namespace _66SMS.Persistence.Repositories.Sql.Base
 {
-    public class GenericSqlRepository<TEntity, TKey> : IGenericSqlRepository<TEntity, TKey> where TEntity : EntityAuditTable<TKey>
+    public class GenericSqlRepository<TEntity, TKey> : IGenericSqlRepository<TEntity, TKey> where TEntity : EntityBase<TKey>
     {
         private readonly ApplicationDbContext context;
         private DbSet<TEntity>? entities;
@@ -36,13 +36,11 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
                 query = query.Where(x => !x.IsDeleted);
             return new EntityQuery<TEntity>(query);
         }
-        public async Task<TEntity?> GetByIdAsync(TKey id, bool asNoTracking = true, bool isDeleted = true, CancellationToken cancellationToken = default)
+        public async Task<TEntity?> GetByIdAsync(TKey id, bool asNoTracking = true, CancellationToken cancellationToken = default)
         {
             var query = Entities.AsQueryable();
             if (asNoTracking)
                 query = query.AsNoTracking();
-            if (!isDeleted)
-                query = query.Where(x => !x.IsDeleted);
             query = query.Where(x => x.Id.Equals(id));
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
@@ -74,21 +72,6 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
         public void RemoveRange(List<TEntity> entities)
         {
             Entities.RemoveRange(entities);
-        }
-        public void SoftRemove(TEntity entity)
-        {
-            entity.IsDeleted = true;
-            entity.ModifiedAt = DateTime.UtcNow;
-            context.Entry(entity).State = EntityState.Modified;
-        }
-        public void SoftRemoveRange(List<TEntity> entities)
-        {
-            foreach (TEntity entity in entities)
-            {
-                entity.IsDeleted = true;
-                entity.ModifiedAt = DateTime.UtcNow;
-                context.Entry(entity).State = EntityState.Modified;
-            }
         }
 
         #endregion

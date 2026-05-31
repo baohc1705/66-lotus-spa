@@ -9,7 +9,7 @@ namespace _66SMS.Domain.Abstractions.Repositories.Sql.Base
         // Fluent query entry point
         IQuery<TEntity> Query(bool asNoTracking = true, bool isDeleted = false);
 
-        Task<TEntity?> GetByIdAsync(TKey id, bool asNoTracking = true, bool isDeleted = true, CancellationToken cancellationToken = default);
+        Task<TEntity?> GetByIdAsync(TKey id, bool asNoTracking = true, CancellationToken cancellationToken = default);
         Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
 
         #region Write
@@ -18,8 +18,6 @@ namespace _66SMS.Domain.Abstractions.Repositories.Sql.Base
         void Update(TEntity entity);
         void Remove(TEntity entity);
         void RemoveRange(List<TEntity> entity);
-        void SoftRemove(TEntity entity);
-        void SoftRemoveRange(List<TEntity> entities);
         #endregion
 
         #region Transaction

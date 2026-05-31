@@ -5,10 +5,6 @@ using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace _66SMS.Application.Features.Customers.Queries.GetAllCustomer
 {
