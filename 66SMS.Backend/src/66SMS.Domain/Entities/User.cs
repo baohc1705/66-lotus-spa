@@ -19,5 +19,6 @@ namespace _66SMS.Domain.Entities
         public List<RefreshToken>? RefreshTokens { get; set; }
 
         public Customer? Customer { get; set; }
+        public Employee? Employee { get; set; }
     }
 }

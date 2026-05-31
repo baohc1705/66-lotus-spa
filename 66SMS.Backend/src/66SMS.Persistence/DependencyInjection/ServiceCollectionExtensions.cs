@@ -33,6 +33,7 @@ namespace _66SMS.Persistence.DependencyInjection
             services.AddScoped<IRoleSqlRepository, RoleSqlRepository>();
             services.AddScoped<IUserRoleSqlRepository, UserRoleSqlRepository>();
             services.AddScoped<ICustomerSqlRepository, CustomerSqlRepository>();
+            services.AddScoped<IEmployeeSqlRepository, EmployeeSqlRepository>();
 
             return services;
         }
