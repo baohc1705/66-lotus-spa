@@ -1,0 +1,42 @@
+using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Constants;
+using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Persistence.Repositories.Sql;
+using _66SMS.Persistence.Repositories.Sql.Base;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace _66SMS.Persistence.DependencyInjection
+{
+    public static class ServiceCollectionExtensions
+    {
+        public static IServiceCollection AddPersistence(this IServiceCollection services,IConfiguration configuration)
+        {
+            var connectionString = configuration.GetConnectionString(DatabaseConst.CONN_SQL_SERVER);
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddScoped(typeof(IQuery<>), typeof(EntityQuery<>));
+            services.RegisterRepositories();
+            return services;
+        }
+
+        private static IServiceCollection RegisterRepositories(this IServiceCollection services)
+        {
+            
+            services.AddScoped(typeof(IGenericSqlRepository<,>), typeof(GenericSqlRepository<,>));
+            services.AddScoped<ISqlUnitOfWork, SqlUnitOfWork>();
+            services.AddScoped<IUserSqlRepository, UserSqlRepository>();
+            services.AddScoped<IPermissionSqlRepository, PermissionSqlRepository>();
+            services.AddScoped<IRefreshTokenSqlRepository, RefreshTokenSqlRepository>();
+            services.AddScoped<IRolePermissionSqlRepository, RolePermissionSqlRepository>();
+            services.AddScoped<IRoleSqlRepository, RoleSqlRepository>();
+            services.AddScoped<IUserRoleSqlRepository, UserRoleSqlRepository>();
+            services.AddScoped<ICustomerSqlRepository, CustomerSqlRepository>();
+            services.AddScoped<IEmployeeSqlRepository, EmployeeSqlRepository>();
+
+            return services;
+        }
+    }
+}
+

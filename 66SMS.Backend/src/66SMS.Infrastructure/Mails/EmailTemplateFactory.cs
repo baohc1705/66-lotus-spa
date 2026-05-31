@@ -1,0 +1,21 @@
+﻿using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Shared;
+
+
+namespace _66SMS.Infrastructure.Mails
+{
+    public class EmailTemplateFactory : IEmailTemplateFactory
+    {
+        public MailMessage CreatePasswordReset(string toEmail, string userName, string resetLink)
+             => new PasswordResetTemplate(toEmail, userName, resetLink).Render();
+
+        public MailMessage CreateEmailConfirmation(string toEmail, string userName, string confirmationLink)
+            => new EmailConfimationTemplate(toEmail, userName, confirmationLink).Render();
+
+        public MailMessage CreateWelcome(string toEmail, string userName)
+            => new WelcomeEmailTemplate(toEmail, userName).Render();
+
+        public MailMessage CreateAppointmentReminder(string toEmail,string customerName, string serviceName,DateTime appointmentTime,string? cancelLink = null)
+            => new AppointmentReminderTemplate(toEmail, customerName, serviceName, appointmentTime, cancelLink).Render();
+    }
+}

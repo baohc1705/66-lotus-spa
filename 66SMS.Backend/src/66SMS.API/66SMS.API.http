@@ -1,0 +1,6 @@
+@_66SMS.API_HostAddress = http://localhost:5232
+
+GET {{_66SMS.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
