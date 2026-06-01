@@ -22,6 +22,22 @@ namespace _66SMS.Persistence.Repositories.Sql
                 .Distinct()
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<List<string>?> GetPermissionKeysByUserIdAndRoleIdAsync(int userId, int roleId, CancellationToken cancellationToken)
+        {
+            return await Entities
+                .AsNoTracking()
+                .Where(ur =>
+                    ur.UserId == userId &&
+                    ur.RoleId == roleId &&
+                    !ur.IsDeleted &&
+                    ur.Role.Status == RoleStatus.ACTIVE)
+                .SelectMany(ur => ur.Role.RolePermissions.Where(rp => !rp.IsDeleted))
+                .Select(rp => rp.Permission.PermissionKey)
+                .Distinct()
+                .ToListAsync(cancellationToken);
+        }
+
         public void Add(UserRole entity)
         {
             entity.CreatedAt = DateTimeHelper.UtcNow();
@@ -44,7 +60,7 @@ namespace _66SMS.Persistence.Repositories.Sql
         {
             return await Entities
                   .AsNoTracking()
-                  .Where(x => x.UserId == id)
+                  .Where(x => x.UserId == id && !x.IsDeleted && x.Role.Status == RoleStatus.ACTIVE)
                   .Select(x => x.Role)
                   .FirstOrDefaultAsync(cancellationToken);
         }

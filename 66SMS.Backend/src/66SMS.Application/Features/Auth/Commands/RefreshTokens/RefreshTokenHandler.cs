@@ -61,8 +61,7 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
                 .Where(x => x.Id == stored.UserId)
                 .Include(x => x
                     .Include(ur => ur.UserRoles!)
-                        .ThenInclude(ur => ur.Role!.RolePermissions!)
-                            .ThenInclude(rp => rp.Permission))
+                        .ThenInclude(ur => ur.Role))
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user == null || user.Status == UserStatus.LOCKED)
@@ -87,15 +86,9 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
 
             if (user.UserRoles == null)
                 return Result<TokenResponseDTO>.NotFound("User has no role");
-            List<string> permissions = user.UserRoles
-                .Where(ur => ur.Role.Status == RoleStatus.ACTIVE)
-                .SelectMany(ur => ur.Role.RolePermissions)
-                .Select(rp => rp.Permission.PermissionKey)
-                .Distinct()
-                .ToList();
             string role = user.UserRoles.Select(x => x.Role.Name).First();
 
-            string accessToken = jwtService.GenerateAccessToken(user, role, permissions);
+            string accessToken = jwtService.GenerateAccessToken(user, role);
             await refreshTokenSqlRepository.SaveChangeAsync(cancellationToken);
             return Result<TokenResponseDTO>.Success(new TokenResponseDTO { AccessToken = accessToken , RefreshToken = newRawToken, UserId = user.Id });
         }

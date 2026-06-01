@@ -1,8 +1,8 @@
-﻿using _66SMS.Application.DTOs.Users;
+using _66SMS.Application.DTOs.Users;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Entities;
-using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,33 +11,40 @@ namespace _66SMS.Application.Features.Users.Queries.GetDetailUser
     public class GetDetailUserHandler : IRequestHandler<GetDetailUserQuery, Result<UserDto>>
     {
         private readonly IUserSqlRepository userSqlRepository;
-        private readonly IMapper mapper;
+        private readonly IUserRoleSqlRepository userRoleSqlRepository;
 
-        public GetDetailUserHandler(IUserSqlRepository userSqlRepository, IMapper mapper)
+        public GetDetailUserHandler(IUserSqlRepository userSqlRepository, IUserRoleSqlRepository userRoleSqlRepository)
         {
             this.userSqlRepository = userSqlRepository;
-            this.mapper = mapper;
+            this.userRoleSqlRepository = userRoleSqlRepository;
         }
 
         public async Task<Result<UserDto>> Handle(GetDetailUserQuery request, CancellationToken cancellationToken)
         {
-            var query = userSqlRepository.Query();
-
-            // Search keyword
-            query = query.Where(x => x.Id == request.Id);
-
-            //Include
-            query = query.Include(x => x
-            .Include(ur => ur.UserRoles)
-                .ThenInclude(ur => ur.Role.RolePermissions)
-                    .ThenInclude(rp => rp.Permission));
-            User user = await query.FirstOrDefaultAsync(cancellationToken);
+            User? user = await userSqlRepository.Query()
+                .Where(x => x.Id == request.Id)
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (user == null)
                 return Result<UserDto>.NotFound("User not found");
-            UserDto userDto = mapper.Map<UserDto>(user);
-            userDto.Roles = user.UserRoles.Select(x => x.Role.Name).ToList();
-            userDto.Permissions = user.UserRoles.SelectMany(x => x.Role.RolePermissions.Select(p => p.Permission.PermissionKey)).ToList();
+
+            Role? role = await userRoleSqlRepository.GetRoleByUserIdAsync(user.Id, cancellationToken);
+            List<string>? permissions = role == null
+                ? []
+                : await userRoleSqlRepository.GetPermissionKeysByUserIdAndRoleIdAsync(user.Id, role.Id, cancellationToken);
+
+            UserDto userDto = new()
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                IsEmailConfirmed = user.IsEmailConfirmed,
+                Status = user.Status.ToString(),
+                LogoutEnd = user.LogoutEnd.ToVietnamTimeString(),
+                LastLoginAt = user.LastLoginAt.ToVietnamTimeString(),
+                Roles = role == null ? [] : [role.Name],
+                Permissions = permissions ?? [],
+            };
 
             return Result<UserDto>.Success(userDto);
         }

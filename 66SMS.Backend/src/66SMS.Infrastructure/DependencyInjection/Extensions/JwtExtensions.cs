@@ -37,7 +37,7 @@ namespace _66SMS.Infrastructure.DependencyInjection.Extensions
             services.AddAuthorization(options => options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
             // DI permission
             services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
-            services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
+            services.AddScoped<IAuthorizationHandler, PermissionHandler>();
             services.AddHttpContextAccessor();
             return services;
         }

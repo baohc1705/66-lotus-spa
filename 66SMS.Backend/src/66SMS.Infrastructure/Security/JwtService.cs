@@ -4,7 +4,6 @@ using _66SMS.Contracts.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -13,7 +12,7 @@ namespace _66SMS.Infrastructure.Security
 {
     public class JwtService(IOptions<JwtSettings> options, IHttpContextAccessor httpContextAccessor) : IJwtService
     {
-        public string GenerateAccessToken<TEntity>(TEntity entity, string role, IList<string> permissions)
+        public string GenerateAccessToken<TEntity>(TEntity entity, string role)
         {
             // Create claim
             var claims = new List<Claim>();
@@ -30,8 +29,6 @@ namespace _66SMS.Infrastructure.Security
                 claims.Add(new Claim(ClaimTypes.Name, usernameProp.GetValue(entity)?.ToString() ?? ""));
             // Add role
             claims.Add(new Claim(ClaimTypes.Role, role));
-            // Add permission
-            claims.Add(new Claim("permissions", JsonConvert.SerializeObject(permissions)));
 
             // Create key and cred
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.Value.SecretKey));
@@ -69,12 +66,6 @@ namespace _66SMS.Infrastructure.Security
         public string GetUsername() => GetClaim<string>(ClaimTypes.Name);
         public string GetEmail() => GetClaim<string>(ClaimTypes.Email);
 
-        public IList<string> GetPermissions()
-        {
-            var raw = GetClaim<string>("permissions");
-            if (string.IsNullOrEmpty(raw)) return [];
-            return JsonConvert.DeserializeObject<IList<string>>(raw) ?? [];
-        }
         public ClaimsPrincipal? ValidateToken(string token)
         {
             throw new NotImplementedException();
