@@ -16,17 +16,11 @@ namespace _66SMS.Infrastructure.Security
         {
             // Create claim
             var claims = new List<Claim>();
-            // Get info entity
+            // Get user id
             var type = typeof(TEntity);
             var idProp = type.GetProperty("Id");
             if (idProp != null)
                 claims.Add(new Claim(ClaimTypes.NameIdentifier, idProp.GetValue(entity)?.ToString() ?? ""));
-            var emailProp = type.GetProperty("Email");
-            if (emailProp != null)
-                claims.Add(new Claim(ClaimTypes.Email, emailProp.GetValue(entity)?.ToString() ?? ""));
-            var usernameProp = type.GetProperty("Username");
-            if (usernameProp != null)
-                claims.Add(new Claim(ClaimTypes.Name, usernameProp.GetValue(entity)?.ToString() ?? ""));
             // Add role
             claims.Add(new Claim(ClaimTypes.Role, role));
 
@@ -63,8 +57,6 @@ namespace _66SMS.Infrastructure.Security
             }
         }
         public int GetUserId() => GetClaim<int>(ClaimTypes.NameIdentifier);
-        public string GetUsername() => GetClaim<string>(ClaimTypes.Name);
-        public string GetEmail() => GetClaim<string>(ClaimTypes.Email);
 
         public ClaimsPrincipal? ValidateToken(string token)
         {

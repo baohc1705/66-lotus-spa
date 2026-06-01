@@ -9,7 +9,5 @@ namespace _66SMS.Contracts.Abstractions
         ClaimsPrincipal? ValidateToken(string token);
         TEntity? GetClaim<TEntity>(string claimType);
         int GetUserId();
-        string GetUsername();
-        string GetEmail();
     }
 }
