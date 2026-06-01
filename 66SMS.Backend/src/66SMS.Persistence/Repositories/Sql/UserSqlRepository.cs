@@ -35,9 +35,9 @@ namespace _66SMS.Persistence.Repositories.Sql
             base.Update(entity);
         }
 
-        public async Task<User?> GetByIdAsync(int id, bool asNoTracking = true, bool isDeleted = true, CancellationToken cancellationToken = default)
+        public async Task<User?> GetByIdAsync(int id, bool asNoTracking = true, CancellationToken cancellationToken = default)
         {
-            User? user = await base.GetByIdAsync(id, asNoTracking, isDeleted, cancellationToken);
+            User? user = await base.GetByIdAsync(id, asNoTracking, cancellationToken);
             if (user == null)
                 throw GlobalException.NotFound("User not found id");
             return user;

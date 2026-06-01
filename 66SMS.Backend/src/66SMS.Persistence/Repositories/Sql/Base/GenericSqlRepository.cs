@@ -1,5 +1,6 @@
 ﻿using _66SMS.Contracts.Abstractions;
 using _66SMS.Domain.Abstractions.Entities;
+using _66SMS.Domain.Abstractions.Entities.Base;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -9,7 +10,7 @@ using System.Linq.Expressions;
 
 namespace _66SMS.Persistence.Repositories.Sql.Base
 {
-    public class GenericSqlRepository<TEntity, TKey> : IGenericSqlRepository<TEntity, TKey> where TEntity : EntityBase<TKey>
+    public class GenericSqlRepository<TEntity, TKey> : IGenericSqlRepository<TEntity, TKey> where TEntity : class, IEntityBase<TKey>
     {
         private readonly ApplicationDbContext context;
         private DbSet<TEntity>? entities;
@@ -32,8 +33,8 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var query = Entities.AsQueryable();
             if (asNoTracking)
                 query = query.AsNoTracking();
-            if (!isDeleted)
-                query = query.Where(x => !x.IsDeleted);
+            // if (!isDeleted)
+            //     query = query.Where(x => !x.IsDeleted);
             return new EntityQuery<TEntity>(query);
         }
         public async Task<TEntity?> GetByIdAsync(TKey id, bool asNoTracking = true, CancellationToken cancellationToken = default)

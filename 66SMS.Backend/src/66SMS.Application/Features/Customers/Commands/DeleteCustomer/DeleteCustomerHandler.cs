@@ -29,17 +29,17 @@ namespace _66SMS.Application.Features.Customers.Commands.DeleteCustomer
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                customerSqlRepository.SoftRemove(customer);
+                customerSqlRepository.Remove(customer);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 User? user = await userSqlRepository.GetByIdAsync(customer.UserId, false);
-                userSqlRepository.SoftRemove(user);
+                userSqlRepository.Remove(user);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 UserRole? userRole = await userRoleSqlRepository.Query()
                     .Where(x => x.UserId == user.Id)
                     .FirstOrDefaultAsync(cancellationToken);
-                userRoleSqlRepository.SoftRemove(userRole);
+                userRoleSqlRepository.Remove(userRole);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 transaction.Commit();

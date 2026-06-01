@@ -40,14 +40,14 @@ namespace _66SMS.Application.Features.Employees.Commands.DeleteEmployee
             try
             {
                 // Soft remove employee
-                employeeSqlRepository.SoftRemove(employee);
+                employeeSqlRepository.Remove(employee);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 // Soft remove associated user
                 User? user = await userSqlRepository.GetByIdAsync(employee.UserId, false);
                 if (user != null)
                 {
-                    userSqlRepository.SoftRemove(user);
+                    userSqlRepository.Remove(user);
                     await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                     // Soft remove user role relationship
@@ -57,7 +57,7 @@ namespace _66SMS.Application.Features.Employees.Commands.DeleteEmployee
 
                     if (userRole != null)
                     {
-                        userRoleSqlRepository.SoftRemove(userRole);
+                        userRoleSqlRepository.Remove(userRole);
                         await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                     }
                 }
