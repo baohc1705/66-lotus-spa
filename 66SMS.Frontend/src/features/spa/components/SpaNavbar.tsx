@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown, LogOut, Menu, Phone, User as UserIcon, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+
 import { Logo } from "@/shared/components/Logo";
 import { Button } from "@/shared/components/ui/button";
 import { useAuthStore } from "@/features/auth/stores/authStore";
@@ -39,12 +39,7 @@ export function SpaNavbar({ light = false }: SpaNavbarProps) {
 
   return (
     <header
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        scrolled
-          ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-[var(--spa-border)]"
-          : "bg-transparent",
-      )}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-[var(--spa-border)]" : "bg-transparent"}`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
@@ -55,12 +50,7 @@ export function SpaNavbar({ light = false }: SpaNavbarProps) {
               <a
                 key={link.label}
                 href={link.href}
-                className={cn(
-                  "flex items-center gap-1 text-sm font-medium transition-colors duration-200",
-                  isDarkText
-                    ? "text-[var(--spa-text)] hover:text-[var(--spa-rose)]"
-                    : "text-white/90 hover:text-white",
-                )}
+                className={`flex items-center gap-1 text-sm font-medium transition-colors duration-200 ${isDarkText ? "text-[var(--spa-text)] hover:text-[var(--spa-rose)]" : "text-white/90 hover:text-white"}`}
               >
                 {link.label}
                 {"hasDropdown" in link && link.hasDropdown && <ChevronDown className="w-3 h-3" />}
@@ -71,10 +61,7 @@ export function SpaNavbar({ light = false }: SpaNavbarProps) {
           <div className="hidden lg:flex items-center gap-3">
             <a
               href="tel:19001234"
-              className={cn(
-                "flex items-center gap-2 text-sm font-medium transition-colors",
-                isDarkText ? "text-[var(--spa-text)]" : "text-white",
-              )}
+              className={`flex items-center gap-2 text-sm font-medium transition-colors ${isDarkText ? "text-[var(--spa-text)]" : "text-white"}`}
             >
               <Phone className="w-4 h-4" />
               1900 1234
@@ -85,24 +72,14 @@ export function SpaNavbar({ light = false }: SpaNavbarProps) {
                 {canAccessAdmin && (
                   <Link
                     to="/dashboard"
-                    className={cn(
-                      "text-sm font-medium transition-colors hidden xl:block",
-                      isDarkText
-                        ? "text-[var(--spa-text)] hover:text-[var(--spa-rose)]"
-                        : "text-white/90 hover:text-white",
-                    )}
+                    className={`text-sm font-medium transition-colors hidden xl:block ${isDarkText ? "text-[var(--spa-text)] hover:text-[var(--spa-rose)]" : "text-white/90 hover:text-white"}`}
                   >
                     Quản trị
                   </Link>
                 )}
                 <Link
                   to="/dashboard"
-                  className={cn(
-                    "flex items-center gap-2 text-sm font-medium transition-colors",
-                    isDarkText
-                      ? "text-[var(--spa-text)] hover:text-[var(--spa-rose)]"
-                      : "text-white/90 hover:text-white",
-                  )}
+                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${isDarkText ? "text-[var(--spa-text)] hover:text-[var(--spa-rose)]" : "text-white/90 hover:text-white"}`}
                 >
                   <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-[var(--spa-rose-light)] bg-[var(--spa-blush)] flex items-center justify-center text-[var(--spa-rose)]">
                     <UserIcon className="w-4 h-4" />
@@ -112,10 +89,7 @@ export function SpaNavbar({ light = false }: SpaNavbarProps) {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className={cn(
-                    "p-2 rounded-full hover:bg-gray-100 transition-colors",
-                    isDarkText ? "text-gray-500" : "text-white/70 hover:bg-white/10",
-                  )}
+                  className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${isDarkText ? "text-gray-500" : "text-white/70 hover:bg-white/10"}`}
                   title="Đăng xuất"
                 >
                   <LogOut className="w-4 h-4" />
@@ -134,7 +108,7 @@ export function SpaNavbar({ light = false }: SpaNavbarProps) {
 
           <button
             type="button"
-            className={cn("lg:hidden p-2 rounded-lg", isDarkText ? "text-[var(--spa-text)]" : "text-white")}
+            className={`lg:hidden p-2 rounded-lg ${isDarkText ? "text-[var(--spa-text)]" : "text-white"}`}
             onClick={() => setMobileOpen((v) => !v)}
             aria-label="Mở menu"
           >
@@ -144,10 +118,7 @@ export function SpaNavbar({ light = false }: SpaNavbarProps) {
       </div>
 
       <div
-        className={cn(
-          "lg:hidden bg-white border-t border-[var(--spa-border)] transition-all duration-300 overflow-hidden",
-          mobileOpen ? "max-h-[520px]" : "max-h-0",
-        )}
+        className={`lg:hidden bg-white border-t border-[var(--spa-border)] transition-all duration-300 overflow-hidden ${mobileOpen ? "max-h-[520px]" : "max-h-0"}`}
       >
         <div className="px-4 py-4 space-y-3">
           {isLoggedIn && me && (

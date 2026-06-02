@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Avatar as AvatarPrimitive } from "radix-ui"
-import { cn } from "@/lib/utils"
+
 
 function Avatar({
   className,
@@ -13,14 +13,7 @@ function Avatar({
     <AvatarPrimitive.Root
       data-slot="avatar"
       data-size={size}
-      className={cn(
-        "relative flex shrink-0 rounded-full select-none overflow-hidden",
-        "border-2 border-[var(--spa-rose-light)]",
-        size === "sm" && "size-8",
-        size === "default" && "size-10",
-        size === "lg" && "size-12",
-        className,
-      )}
+      className={`relative flex shrink-0 rounded-full select-none overflow-hidden border-2 border-[var(--spa-rose-light)] ${size === "sm" ? "size-8" : ""} ${size === "default" ? "size-10" : ""} ${size === "lg" ? "size-12" : ""} ${className || ''}`.trim()}
       {...props}
     />
   )
@@ -33,7 +26,7 @@ function AvatarImage({
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
-      className={cn("aspect-square size-full object-cover", className)}
+      className={`aspect-square size-full object-cover ${className || ''}`.trim()}
       {...props}
     />
   )
@@ -46,12 +39,7 @@ function AvatarFallback({
   return (
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
-      className={cn(
-        "flex size-full items-center justify-center rounded-full",
-        "bg-[var(--spa-blush)] text-[var(--spa-rose)]",
-        "text-sm font-semibold",
-        className,
-      )}
+      className={`flex size-full items-center justify-center rounded-full bg-[var(--spa-blush)] text-[var(--spa-rose)] text-sm font-semibold ${className || ''}`.trim()}
       {...props}
     />
   )

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { cn } from '@/lib/utils';
 import { Calendar, Menu, X, Phone } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import logoUrl from '@/assets/logo-home.png';
@@ -26,12 +25,7 @@ export const Navbar = () => {
     <>
       <nav
         id="main-nav"
-        className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
-          scrolled
-            ? 'bg-lotus-background shadow-jade border-b border-lotus-primary/10 h-[68px]'
-            : 'bg-transparent h-[80px]'
-        )}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-lotus-background shadow-jade border-b border-lotus-primary/10 h-[68px]' : 'bg-transparent h-[80px]'}`}
       >
         <div className="max-w-7xl mx-auto h-full px-6 lg:px-10 flex items-center justify-between">
           
@@ -40,22 +34,13 @@ export const Navbar = () => {
             <img
               src={logoUrl}
               alt="Hoa Sen Spa Logo"
-              className={cn(
-                "h-10 w-auto object-contain shrink-0 filter drop-shadow-sm transition-transform duration-500 ease-out group-hover:scale-105",
-                !scrolled && "brightness-0 invert opacity-90"
-              )}
+              className={`h-10 w-auto object-contain shrink-0 filter drop-shadow-sm transition-transform duration-500 ease-out group-hover:scale-105 ${!scrolled ? "brightness-0 invert opacity-90" : ""}`.trim()}
             />
             <div className="flex flex-col leading-none justify-center">
-              <span className={cn(
-                'font-display font-semibold text-lg tracking-wide transition-colors duration-500',
-                scrolled ? 'text-lotus-primary' : 'text-white'
-              )}>
+              <span className={`font-display font-semibold text-lg tracking-wide transition-colors duration-500 ${scrolled ? 'text-lotus-primary' : 'text-white'}`}>
                 HOA SEN SPA
               </span>
-              <span className={cn(
-                'text-[8px] tracking-[0.28em] uppercase font-sans transition-colors duration-500 mt-0.5',
-                scrolled ? 'text-lotus-accent' : 'text-white/60'
-              )}>
+              <span className={`text-[8px] tracking-[0.28em] uppercase font-sans transition-colors duration-500 mt-0.5 ${scrolled ? 'text-lotus-accent' : 'text-white/60'}`}>
                 Đồng Tháp
               </span>
             </div>
@@ -67,18 +52,10 @@ export const Navbar = () => {
               <a
                 key={item.href}
                 href={item.href}
-                className={cn(
-                  'nav-link relative font-sans text-[13px] font-medium tracking-wide transition-colors duration-300 group',
-                  scrolled
-                    ? 'text-lotus-foreground hover:text-lotus-primary'
-                    : 'text-white/80 hover:text-white'
-                )}
+                className={`nav-link relative font-sans text-[13px] font-medium tracking-wide transition-colors duration-300 group ${scrolled ? 'text-lotus-foreground hover:text-lotus-primary' : 'text-white/80 hover:text-white'}`}
               >
                 {item.label}
-                <span className={cn(
-                  'absolute -bottom-0.5 left-0 h-[1.5px] w-0 group-hover:w-full transition-all duration-300 rounded-full',
-                  scrolled ? 'bg-lotus-primary' : 'bg-white'
-                )} />
+                <span className={`absolute -bottom-0.5 left-0 h-[1.5px] w-0 group-hover:w-full transition-all duration-300 rounded-full ${scrolled ? 'bg-lotus-primary' : 'bg-white'}`} />
               </a>
             ))}
           </div>
@@ -87,10 +64,7 @@ export const Navbar = () => {
           <div className="hidden lg:flex items-center gap-3">
             <a
               href="tel:09079593951"
-              className={cn(
-                'flex items-center gap-1.5 font-sans text-[13px] font-medium transition-colors duration-300',
-                scrolled ? 'text-lotus-foreground/70 hover:text-lotus-primary' : 'text-white/70 hover:text-white'
-              )}
+              className={`flex items-center gap-1.5 font-sans text-[13px] font-medium transition-colors duration-300 ${scrolled ? 'text-lotus-foreground/70 hover:text-lotus-primary' : 'text-white/70 hover:text-white'}`}
             >
               <Phone className="w-3.5 h-3.5" />
               0907 95 93 95
@@ -107,10 +81,7 @@ export const Navbar = () => {
           {/* Mobile Hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className={cn(
-              'lg:hidden p-2 rounded-lg transition-colors',
-              scrolled ? 'text-lotus-foreground' : 'text-white'
-            )}
+            className={`lg:hidden p-2 rounded-lg transition-colors ${scrolled ? 'text-lotus-foreground' : 'text-white'}`}
             aria-label="Mở menu"
           >
             {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

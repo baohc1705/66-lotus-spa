@@ -4,7 +4,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useReducedMotion } from 'motion/react';
 import { Section } from '@/shared/components/layout/Section';
 import { Eyebrow, Heading, Body } from '@/shared/components/ui/Typography';
-import { cn } from '@/lib/utils';
 import spaFacial from '@/assets/spa_facial.png';
 import spaMassage from '@/assets/spa_massage.png';
 import spaProducts from '@/assets/spa_products.png';
@@ -88,18 +87,15 @@ export const ServicesStickyStack = () => {
         {services.map((svc, i) => (
           <div
             key={i}
-            className={cn(
-              "stack-card sticky top-0 min-h-[100dvh] flex items-center justify-center w-full px-6 md:px-12",
-              i % 2 === 0 ? "bg-white" : "bg-lotus-background"
-            )}
+            className={`stack-card sticky top-0 min-h-[100dvh] flex items-center justify-center w-full px-6 md:px-12 ${i % 2 === 0 ? "bg-white" : "bg-lotus-background"}`}
           >
             <div className="max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24 items-center pt-20 pb-12">
-              <div className={cn("order-2", i % 2 !== 0 && "md:order-1")}>
+              <div className={`order-2 ${i % 2 !== 0 ? "md:order-1" : ""}`.trim()}>
                 <Eyebrow className="mb-4 block">{svc.duration}</Eyebrow>
                 <Heading as="h3" className="mb-6">{svc.title}</Heading>
                 <Body className="max-w-md">{svc.desc}</Body>
               </div>
-              <div className={cn("order-1 h-[40vh] md:h-[70vh] rounded-2xl overflow-hidden", i % 2 !== 0 && "md:order-2")}>
+              <div className={`order-1 h-[40vh] md:h-[70vh] rounded-2xl overflow-hidden ${i % 2 !== 0 ? "md:order-2" : ""}`.trim()}>
                 <img src={svc.img} alt={svc.title} className="w-full h-full object-cover" />
               </div>
             </div>

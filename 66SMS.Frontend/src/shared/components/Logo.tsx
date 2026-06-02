@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { cn } from "@/lib/utils";
 import logoUrl from "@/assets/logo-home.png";
 
 interface LogoProps {
@@ -35,37 +34,23 @@ export function Logo({
   return (
     <Link
       to="/"
-      className={cn(
-        "flex items-center gap-3 select-none group cursor-pointer",
-        className,
-      )}
+      className={`flex items-center gap-3 select-none group cursor-pointer ${className || ''}`.trim()}
     >
       <img
         src={logoUrl}
         alt="Lotus Spa Logo"
-        className={cn(
-          "object-contain shrink-0 filter drop-shadow-md transition-transform duration-500 ease-out group-hover:scale-105",
-          s.img,
-        )}
+        className={`object-contain shrink-0 filter drop-shadow-md transition-transform duration-500 ease-out group-hover:scale-105 ${s.img}`.trim()}
       />
       <div className="flex flex-col leading-none justify-center">
         <span
-          className={cn(
-            "font-bold tracking-tight transition-colors duration-300 font-serif",
-            s.text,
-            c.name,
-          )}
+          className={`font-bold tracking-tight transition-colors duration-300 font-serif ${s.text} ${c.name}`.trim()}
           style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
         >
           Lotus <span className="font-light italic">Spa</span>
         </span>
         {showTagline && (
           <span
-            className={cn(
-              "font-semibold mt-1 uppercase opacity-90 transition-colors duration-300",
-              s.tagline,
-              c.tagline,
-            )}
+            className={`font-semibold mt-1 uppercase opacity-90 transition-colors duration-300 ${s.tagline} ${c.tagline}`.trim()}
           >
             {taglineText || "Beauty & Wellness"}
           </span>

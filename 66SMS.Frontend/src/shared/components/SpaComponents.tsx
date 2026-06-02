@@ -1,5 +1,4 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
 import { Eyebrow, Heading, Body } from './ui/Typography';
 
 // ── Badge ─────────────────────────────────────────────────────────────────
@@ -26,12 +25,7 @@ const sizeStyles = {
 export function Badge({ children, variant = 'secondary', size = 'md', dot = false, className }: BadgeProps) {
   return (
     <span
-      className={cn(
-        'inline-flex items-center gap-1.5 rounded-full font-sans font-medium tracking-wide uppercase',
-        variantStyles[variant],
-        sizeStyles[size],
-        className
-      )}
+      className={`inline-flex items-center gap-1.5 rounded-full font-sans font-medium tracking-wide uppercase ${variantStyles[variant]} ${sizeStyles[size]} ${className || ''}`.trim()}
     >
       {dot && <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />}
       {children}
@@ -58,13 +52,13 @@ export function SectionHeader({
   className,
 }: SectionHeaderProps) {
   return (
-    <div className={cn('space-y-4', align === 'center' ? 'text-center' : 'text-left', className)}>
+    <div className={`space-y-4 ${align === 'center' ? 'text-center' : 'text-left'} ${className || ''}`.trim()}>
       {badge && <Badge variant={light ? 'white' : 'secondary'}>{badge}</Badge>}
-      <Heading as="h2" className={cn(light && 'text-white')}>
+      <Heading as="h2" className={light ? 'text-white' : undefined}>
         {title}
       </Heading>
       {subtitle && (
-        <Body className={cn('max-w-2xl', align === 'center' && 'mx-auto', light ? 'text-white/80' : 'text-lotus-foreground/70')}>
+        <Body className={`max-w-2xl ${align === 'center' ? 'mx-auto' : ''} ${light ? 'text-white/80' : 'text-lotus-foreground/70'}`.trim()}>
           {subtitle}
         </Body>
       )}
@@ -143,7 +137,7 @@ export function ProductCard({ image, name, category, price, originalPrice, ratin
         
         <div className="flex mb-4">
           {Array.from({ length: 5 }).map((_, i) => (
-            <svg key={i} className={cn('w-3.5 h-3.5', i < rating ? 'text-lotus-highlight' : 'text-lotus-muted/30')} fill="currentColor" viewBox="0 0 20 20">
+            <svg key={i} className={`w-3.5 h-3.5 ${i < rating ? 'text-lotus-highlight' : 'text-lotus-muted/30'}`} fill="currentColor" viewBox="0 0 20 20">
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
             </svg>
           ))}

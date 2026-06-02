@@ -1,7 +1,7 @@
 import React from 'react';
 import { Section } from '@/shared/components/layout/Section';
 import { Eyebrow, Heading, Body } from '@/shared/components/ui/Typography';
-import { cn } from '@/lib/utils';
+
 import spaFacial from '@/assets/spa_facial.png';
 import spaMassage from '@/assets/spa_massage.png';
 import spaProducts from '@/assets/spa_products.png';
@@ -17,10 +17,7 @@ interface TreatmentProps {
 }
 
 const TreatmentCard = ({ title, duration, description, price, imageUrl, isWide = false }: TreatmentProps) => (
-  <div className={cn(
-    "flex-none flex flex-col snap-center group border border-lotus-muted bg-white transition-colors duration-500 hover:border-lotus-secondary",
-    isWide ? "w-[85vw] md:w-[600px] aspect-[4/3] md:aspect-[16/9]" : "w-[75vw] md:w-[400px] aspect-[3/4] md:aspect-[3/4]"
-  )}>
+  <div className={`flex-none flex flex-col snap-center group border border-lotus-muted bg-white transition-colors duration-500 hover:border-lotus-secondary ${isWide ? "w-[85vw] md:w-[600px] aspect-[4/3] md:aspect-[16/9]" : "w-[75vw] md:w-[400px] aspect-[3/4] md:aspect-[3/4]"}`}>
     <div className="flex-1 overflow-hidden">
       <img 
         src={imageUrl} 

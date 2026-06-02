@@ -1,7 +1,7 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
-import { cn } from "@/lib/utils"
+
 
 const buttonVariants = cva(
   [
@@ -137,7 +137,7 @@ function Button({
     <Comp
       data-slot="button"
       disabled={disabled || loading}
-      className={cn(buttonVariants({ variant, size }), className)}
+      className={`${buttonVariants({ variant, size })} ${className || ''}`.trim()}
       {...props}
     >
       {asChild ? children : (

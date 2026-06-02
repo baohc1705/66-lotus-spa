@@ -1,0 +1,256 @@
+/* ═══════════════════════════════════════════════════════
+   Hoa Sen Spa — Design Tokens
+   Nguồn duy nhất cho màu sắc, font, và animation
+   Fonts đã khai báo tại src/fonts.css (local woff2)
+   ═══════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Brand Colors (logo-home.png) ──
+     Chỉ 3 gam chính: hồng sen, vàng gold, xanh lá sen
+     + cream/deep cho background/text                    */
+  --lotus-rose:        #D4547E;
+  --lotus-rose-light:  #FAF0F4;
+  --lotus-gold:        #B8976A;
+  --lotus-leaf:        #3E7A3E;
+  --lotus-cream:       #FBF7F2;
+  --lotus-deep:        #2A1F1A;
+  --lotus-stone:       #8A7E76;
+  --lotus-surface:     #FFFFFF;
+  --lotus-error:       #EF4444;
+
+  /* ── Typography ── */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'Be Vietnam Pro', system-ui, sans-serif;
+
+  /* ── Transitions ── */
+  --transition-base:   300ms ease;
+  --transition-panel:  500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ═══ Scroll Reveal (IntersectionObserver fallback) ═══ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 500ms ease-out, transform 500ms ease-out;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger cho list items */
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 400ms ease-out, transform 400ms ease-out;
+}
+.reveal-stagger.is-visible > *:nth-child(1) { transition-delay:   0ms; opacity: 1; transform: none; }
+.reveal-stagger.is-visible > *:nth-child(2) { transition-delay:  80ms; opacity: 1; transform: none; }
+.reveal-stagger.is-visible > *:nth-child(3) { transition-delay: 160ms; opacity: 1; transform: none; }
+.reveal-stagger.is-visible > *:nth-child(4) { transition-delay: 240ms; opacity: 1; transform: none; }
+.reveal-stagger.is-visible > *:nth-child(5) { transition-delay: 320ms; opacity: 1; transform: none; }
+.reveal-stagger.is-visible > *:nth-child(6) { transition-delay: 400ms; opacity: 1; transform: none; }
+
+/* ═══ Services Hover Panel (desktop) ═══ */
+
+.services-panel-container {
+  display: flex;
+  gap: 2px;
+  height: 520px;
+}
+
+.service-panel {
+  flex: 1;
+  overflow: hidden;
+  cursor: pointer;
+  transition: flex var(--transition-panel);
+  position: relative;
+}
+.service-panel:hover,
+.service-panel:focus-within {
+  flex: 2.5;
+}
+
+.service-panel__content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24px;
+  background: linear-gradient(
+    to top,
+    rgba(42, 31, 26, 0.9) 0%,
+    transparent 100%
+  );
+  color: white;
+}
+
+.service-panel__detail {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 300ms ease 100ms, transform 300ms ease 100ms;
+  max-height: 0;
+  overflow: hidden;
+}
+.service-panel:hover .service-panel__detail,
+.service-panel:focus-within .service-panel__detail {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 200px;
+}
+
+/* ═══ Hero ═══ */
+
+.hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(42, 31, 26, 0.6) 0%,
+    rgba(42, 31, 26, 0.1) 15%,
+    rgba(42, 31, 26, 0.2) 60%,
+    rgba(42, 31, 26, 0.8) 100%
+  );
+}
+
+.hero-bg {
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+}
+@supports (-webkit-touch-callout: none) {
+  .hero-bg {
+    background-attachment: scroll;
+  }
+}
+
+/* ═══ Marquee ═══ */
+
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.marquee__inner {
+  display: inline-block;
+  animation: marquee 20s linear infinite;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ═══ Navbar Scrolled ═══ */
+
+.nav--scrolled {
+  background: rgba(251, 247, 242, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 1px 0 rgba(42, 31, 26, 0.08);
+}
+
+/* ═══ Falling Lotus Petals ═══ */
+
+@keyframes petal-fall {
+  0% {
+    transform: translateY(-10vh) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(110vh) translateX(80px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes petal-sway {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(15px); }
+  75%      { transform: translateX(-15px); }
+}
+
+.petal {
+  position: absolute;
+  top: -40px;
+  pointer-events: none;
+  z-index: 5;
+  animation: petal-fall linear infinite;
+  will-change: transform, opacity;
+}
+
+.petal svg {
+  animation: petal-sway 3s ease-in-out infinite;
+}
+
+/* ═══ Golden Glow Hover (Cards) ═══ */
+
+.card-glow {
+  transition: transform 350ms ease, box-shadow 350ms ease;
+}
+.card-glow:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 32px 0 rgba(184, 151, 106, 0.25);
+}
+
+/* ═══ Process Timeline ═══ */
+
+.timeline-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    var(--lotus-gold) 0%,
+    var(--lotus-rose) 100%
+  );
+  transform: translateY(-50%);
+}
+
+.timeline-step {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.timeline-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--lotus-cream);
+  border: 2px solid var(--lotus-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lotus-gold);
+  transition: all 350ms ease;
+}
+
+.timeline-step:hover .timeline-icon {
+  background: var(--lotus-gold);
+  color: white;
+  box-shadow: 0 4px 20px rgba(184, 151, 106, 0.35);
+}
+
+/* ═══ Quiz Progress Bar ═══ */
+
+.quiz-progress {
+  height: 4px;
+  background: var(--lotus-rose-light);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.quiz-progress__bar {
+  height: 100%;
+  background: var(--lotus-rose);
+  border-radius: 2px;
+  transition: width 400ms ease;
+}

@@ -3,6 +3,7 @@ import { HomePage } from '@/pages/home/HomePage';
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { UsersPage } from '@/pages/users/UsersPage';
 import { ProtectedRoute } from './ProtectedRoute';
+import { AdminLayout, AdminDashboard } from '@/features/admin';
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +25,17 @@ export const router = createBrowserRouter([
         path: '/users',
         element: <UsersPage />,
       },
+    ],
+  },
+  {
+    path: '/admin',
+    element: <AdminLayout />,
+    children: [
+      {
+        index: true,
+        element: <AdminDashboard />,
+      },
+      // Placeholders for other admin routes
     ],
   },
   {

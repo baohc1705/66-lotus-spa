@@ -10,7 +10,6 @@ import {
 } from "@/features/auth/schemas/loginSchema";
 import { Label } from "@/shared/components/ui/label";
 import { Input } from "@/shared/components/ui/input";
-import { cn } from "@/lib/utils";
 
 export const LoginForm = () => {
   const navigate = useNavigate();
@@ -98,14 +97,7 @@ export const LoginForm = () => {
       <button
         type="submit"
         disabled={login.isPending}
-        className={cn(
-          "w-full flex items-center justify-center gap-2 rounded-xl px-6 py-3.5",
-          "text-white font-semibold text-sm transition-all duration-200",
-          "focus:outline-none focus:ring-4 focus:ring-pink-200",
-          login.isPending
-            ? "opacity-70 cursor-not-allowed"
-            : "hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0",
-        )}
+        className={`w-full flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-white font-semibold text-sm transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-pink-200 ${login.isPending ? "opacity-70 cursor-not-allowed" : "hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"}`}
         style={{
           background: login.isPending
             ? "#6B7280"

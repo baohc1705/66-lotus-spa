@@ -60,6 +60,16 @@ export default {
         'lotus-highlight':  'var(--lotus-highlight)',
         'lotus-muted':      'var(--lotus-muted)',
         'lotus-surface':    'var(--lotus-surface)',
+
+        /* ── Brand Identity Tokens (landing page) ── */
+        'lotus-rose':       'var(--lotus-rose)',
+        'lotus-gold':       'var(--lotus-gold)',
+        'lotus-leaf':       'var(--lotus-leaf)',
+        'lotus-cream':      'var(--lotus-cream)',
+        'lotus-deep':       'var(--lotus-deep)',
+        'lotus-stone':      'var(--lotus-stone)',
+        'lotus-rose-light': 'var(--lotus-rose-light)',
+        'lotus-error':      'var(--lotus-error)',
       },
       boxShadow: {
         jade:      '0 4px 24px 0 rgba(210, 91, 124, 0.12)', /* shadow hồng sen nhạt */
