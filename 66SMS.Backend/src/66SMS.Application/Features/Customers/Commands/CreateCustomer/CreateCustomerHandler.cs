@@ -1,4 +1,4 @@
-﻿using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -6,6 +6,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace _66SMS.Application.Features.Customers.Commands.CreateCustomer
@@ -34,7 +35,7 @@ namespace _66SMS.Application.Features.Customers.Commands.CreateCustomer
         public async Task<Result<object>> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
         {
             // Kiem tra trung email va username
-            bool emailOrUsernameExisted = await userSqlRepository.Query()
+            bool emailOrUsernameExisted = await userSqlRepository.AsQueryable()
                 .Where(x => x.Email.Equals(request.Email) || x.Username.Equals(request.UserName))
                 .AnyAsync();
             if (emailOrUsernameExisted)
@@ -58,7 +59,7 @@ namespace _66SMS.Application.Features.Customers.Commands.CreateCustomer
 
                 // Save role
                 string roleRequest = request.Role ?? "customer";
-                Role? role = await roleSqlRepository.Query()
+                Role? role = await roleSqlRepository.AsQueryable()
                     .Where(x => x.Name.Equals(roleRequest))
                     .FirstOrDefaultAsync(cancellationToken);
                 if (role == null)

@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Application.DTOs.Users
+namespace _66SMS.Application.DTOs.Users
 {
     public class UserDto
     {

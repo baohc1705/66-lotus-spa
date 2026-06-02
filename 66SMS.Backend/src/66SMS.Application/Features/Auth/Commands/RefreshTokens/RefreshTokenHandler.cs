@@ -1,4 +1,4 @@
-﻿using _66SMS.Application.DTOs.Auth;
+using _66SMS.Application.DTOs.Auth;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Settings;
 using _66SMS.Contracts.Shared;
@@ -29,7 +29,7 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
         public async Task<Result<TokenResponseDTO>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
             // Tim token trong refresh token db
-            RefreshToken? stored = await refreshTokenSqlRepository.Query(asNoTracking: false)
+            RefreshToken? stored = await refreshTokenSqlRepository.AsQueryable(asNoTracking: false)
                 .Where(x => x.Token.Equals(request.Token))
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -39,7 +39,7 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
             // Phat hien reuse attack
             if (stored.IsRevoked)
             {
-                IReadOnlyList<RefreshToken>? allToken = await refreshTokenSqlRepository.Query(asNoTracking: false).Where(x => x.UserId.Equals(stored.Id)).ToListAsync(cancellationToken);
+                IReadOnlyList<RefreshToken>? allToken = await refreshTokenSqlRepository.AsQueryable(asNoTracking: false).Where(x => x.UserId.Equals(stored.Id)).ToListAsync(cancellationToken);
                 foreach (var token in allToken.Where(x => x.IsActive))
                 {
                     token.IsRevoked = true;
@@ -57,12 +57,12 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
                 return Result<TokenResponseDTO>.BadRequest("Refresh token da het han");
 
             // Kiem tra user co hop le
-            User? user = await userSqlRepository.Query(asNoTracking: false)
-                .Where(x => x.Id == stored.UserId)
-                .Include(x => x
-                    .Include(ur => ur.UserRoles!)
-                        .ThenInclude(ur => ur.Role))
-                .FirstOrDefaultAsync(cancellationToken);
+            User? user = await userSqlRepository.AsQueryable(asNoTracking: false)
+               .AsQueryable()
+               .Where(x => x.Id == stored.UserId)
+               .Include(x => x.UserRoles!)
+                   .ThenInclude(ur => ur.Role)
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (user == null || user.Status == UserStatus.LOCKED)
                 return Result<TokenResponseDTO>.BadRequest("Tai khoan khong hop le");

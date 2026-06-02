@@ -1,4 +1,4 @@
-﻿using _66SMS.Application.DTOs.Auth;
+using _66SMS.Application.DTOs.Auth;
 using _66SMS.Contracts.Shared;
 using MediatR;
 using System.Text.Json.Serialization;

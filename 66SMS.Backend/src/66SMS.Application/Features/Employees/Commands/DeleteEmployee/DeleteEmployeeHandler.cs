@@ -51,7 +51,7 @@ namespace _66SMS.Application.Features.Employees.Commands.DeleteEmployee
                     await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                     // Soft remove user role relationship
-                    UserRole? userRole = await userRoleSqlRepository.Query()
+                    UserRole? userRole = await userRoleSqlRepository.AsQueryable()
                         .Where(x => x.UserId == user.Id)
                         .FirstOrDefaultAsync(cancellationToken);
 

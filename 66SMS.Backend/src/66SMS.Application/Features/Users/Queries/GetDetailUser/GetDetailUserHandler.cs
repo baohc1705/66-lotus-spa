@@ -21,7 +21,7 @@ namespace _66SMS.Application.Features.Users.Queries.GetDetailUser
 
         public async Task<Result<UserDto>> Handle(GetDetailUserQuery request, CancellationToken cancellationToken)
         {
-            User? user = await userSqlRepository.Query()
+            User? user = await userSqlRepository.AsQueryable()
                 .Where(x => x.Id == request.Id)
                 .FirstOrDefaultAsync(cancellationToken);
 

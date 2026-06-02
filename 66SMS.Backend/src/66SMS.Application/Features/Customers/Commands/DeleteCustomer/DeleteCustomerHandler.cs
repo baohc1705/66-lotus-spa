@@ -1,8 +1,9 @@
-﻿using _66SMS.Contracts.Shared;
+using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace _66SMS.Application.Features.Customers.Commands.DeleteCustomer
@@ -36,7 +37,7 @@ namespace _66SMS.Application.Features.Customers.Commands.DeleteCustomer
                 userSqlRepository.Remove(user);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                UserRole? userRole = await userRoleSqlRepository.Query()
+                UserRole? userRole = await userRoleSqlRepository.AsQueryable()
                     .Where(x => x.UserId == user.Id)
                     .FirstOrDefaultAsync(cancellationToken);
                 userRoleSqlRepository.Remove(userRole);

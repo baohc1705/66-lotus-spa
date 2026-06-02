@@ -1,4 +1,4 @@
-﻿using _66SMS.Application.DTOs.Auth;
+using _66SMS.Application.DTOs.Auth;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Settings;
 using _66SMS.Contracts.Shared;
@@ -7,6 +7,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Entities;
 using _66SMS.Domain.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace _66SMS.Application.Features.Auth.Commands.Login
@@ -35,7 +36,7 @@ namespace _66SMS.Application.Features.Auth.Commands.Login
         public async Task<Result<TokenResponseDTO>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
             // Validate user with username and email 
-            var userExisted = await userSqlRepository.Query(asNoTracking: false)
+            var userExisted = await userSqlRepository.AsQueryable(asNoTracking: false)
                 .Where(x => x.Username.Equals(request.UsernameOrEmail) || x.Email.Equals(request.UsernameOrEmail))
                 .FirstOrDefaultAsync(cancellationToken);
 

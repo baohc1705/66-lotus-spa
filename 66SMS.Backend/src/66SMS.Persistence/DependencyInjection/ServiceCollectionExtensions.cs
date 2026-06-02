@@ -1,4 +1,3 @@
-using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -16,7 +15,6 @@ namespace _66SMS.Persistence.DependencyInjection
         {
             var connectionString = configuration.GetConnectionString(DatabaseConst.CONN_SQL_SERVER);
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddScoped(typeof(IQuery<>), typeof(EntityQuery<>));
             services.RegisterRepositories();
             return services;
         }

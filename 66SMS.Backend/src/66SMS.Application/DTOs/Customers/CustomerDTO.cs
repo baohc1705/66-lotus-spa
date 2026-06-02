@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Application.DTOs.Customers
+namespace _66SMS.Application.DTOs.Customers
 {
     public class CustomerDTO
     {

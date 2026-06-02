@@ -1,10 +1,11 @@
-﻿using _66SMS.Contracts.Exceptions;
+using _66SMS.Contracts.Exceptions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Entities;
 using _66SMS.Domain.Exceptions;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace _66SMS.Application.Features.Users.Commands.DeleteUser
@@ -35,7 +36,7 @@ namespace _66SMS.Application.Features.Users.Commands.DeleteUser
                 if (request.Ids != null)
                 {
                     List<int> distinctIds = request.Ids.Distinct().ToList();
-                    List<User> users = await userSqlRepository.Query().Where(x => distinctIds.Contains(x.Id)).ToListAsync(cancellationToken);
+                    List<User> users = await userSqlRepository.AsQueryable().Where(x => distinctIds.Contains(x.Id)).ToListAsync(cancellationToken);
                     if (users.Count == 0)
                         throw GlobalException.NotFound("User was not found with id");
                     userSqlRepository.RemoveRange(users);

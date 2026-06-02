@@ -1,4 +1,4 @@
-﻿using _66SMS.Application.DTOs.Customers;
+using _66SMS.Application.DTOs.Customers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Entities;
@@ -21,9 +21,9 @@ namespace _66SMS.Application.Features.Customers.Queries.GetDetailCustomer
 
         public async Task<Result<CustomerDTO>> Handle(GetDetailCustomerQuery request, CancellationToken cancellationToken)
         {
-            Customer? customer = await customerSqlRepository.Query()
+            Customer? customer = await customerSqlRepository.AsQueryable()
                 .Where(x => x.Id == request.Id)
-                .Include(x => x.Include(x => x.User))
+                .Include(x => x.User)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (customer == null) return Result<CustomerDTO>.NotFound();

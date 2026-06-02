@@ -1,4 +1,4 @@
-﻿using _66SMS.Contracts.Constants;
+using _66SMS.Contracts.Constants;
 using FluentValidation;
 
 namespace _66SMS.Application.Features.Auth.Commands.ForgotPassword

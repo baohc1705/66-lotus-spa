@@ -1,4 +1,4 @@
-﻿using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Constants;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
@@ -6,6 +6,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.Features.Auth.Commands.ForgotPassword
 {
@@ -26,7 +27,7 @@ namespace _66SMS.Application.Features.Auth.Commands.ForgotPassword
 
         public async Task<Result<object>> Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
         {
-            User user = await userSqlRepository.Query(false).Where(x => x.Email.Equals(request.Email)).FirstOrDefaultAsync(cancellationToken);
+            User user = await userSqlRepository.AsQueryable(false).Where(x => x.Email.Equals(request.Email)).FirstOrDefaultAsync(cancellationToken);
             // Bao mat thong tin tranh bi spam nhap email
             if (user == null)
                 return Result<object>.Ok();

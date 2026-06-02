@@ -1,11 +1,8 @@
-﻿using _66SMS.Contracts.Abstractions;
-using _66SMS.Domain.Abstractions.Entities;
 using _66SMS.Domain.Abstractions.Entities.Base;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Data;
-using System.Data.Common;
 using System.Linq.Expressions;
 
 namespace _66SMS.Persistence.Repositories.Sql.Base
@@ -28,20 +25,18 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
                 return entities;
             }
         }
-        public IQuery<TEntity> Query(bool asNoTracking = true, bool isDeleted = false)
+        
+        public IQueryable<TEntity> AsQueryable(bool asNoTracking = true)
         {
             var query = Entities.AsQueryable();
             if (asNoTracking)
                 query = query.AsNoTracking();
-            // if (!isDeleted)
-            //     query = query.Where(x => !x.IsDeleted);
-            return new EntityQuery<TEntity>(query);
+            return query;
         }
+
         public async Task<TEntity?> GetByIdAsync(TKey id, bool asNoTracking = true, CancellationToken cancellationToken = default)
         {
-            var query = Entities.AsQueryable();
-            if (asNoTracking)
-                query = query.AsNoTracking();
+            var query = AsQueryable(asNoTracking);
             query = query.Where(x => x.Id.Equals(id));
             return await query.FirstOrDefaultAsync(cancellationToken);
         }

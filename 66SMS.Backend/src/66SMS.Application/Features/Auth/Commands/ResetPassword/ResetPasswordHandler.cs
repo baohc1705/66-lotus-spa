@@ -1,4 +1,4 @@
-﻿using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Exceptions;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
@@ -6,6 +6,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.Features.Auth.Commands.ResetPassword
 {
@@ -23,7 +24,7 @@ namespace _66SMS.Application.Features.Auth.Commands.ResetPassword
 
         public async Task<Result<object>> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
         {
-            User? user = await userSqlRepository.Query(asNoTracking: false).Where(x => x.Email.Equals(request.Email)).FirstOrDefaultAsync(cancellationToken) ?? throw GlobalException.NotFound("User not found");
+            User? user = await userSqlRepository.AsQueryable(asNoTracking: false).Where(x => x.Email.Equals(request.Email)).FirstOrDefaultAsync(cancellationToken) ?? throw GlobalException.NotFound("User not found");
 
             // Kiem tra token
             if (user.PasswordResetToken != request.Token || user.PasswordResetTokenExpiry == null || user.PasswordResetTokenExpiry.IsExpired())

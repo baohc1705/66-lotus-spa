@@ -1,4 +1,5 @@
-﻿using _66SMS.Application.DTOs.Users;
+using _66SMS.Application.DTOs.Users;
+using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -22,7 +23,11 @@ namespace _66SMS.Application.Features.Users.Queries.GetAllUsers
 
         public async Task<Result<PagedResult<UserDto>>> Handle(GetAllUserQuery request, CancellationToken cancellationToken)
         {
-            var query = userSqlRepository.Query();
+            var query = userSqlRepository.AsQueryable();
+            //Include
+            query = query.Include(ur => ur.UserRoles)
+                            .ThenInclude(ur => ur.Role.RolePermissions)
+                                .ThenInclude(rp => rp.Permission);
 
             // Search keyword
             if (!string.IsNullOrEmpty(request.Filter))
@@ -31,16 +36,12 @@ namespace _66SMS.Application.Features.Users.Queries.GetAllUsers
             // Order by
             query = request.OrderBy?.ToLower() switch
             {
-                "email" => query.OrderBy(x => x.Email, request.IsDescending),
-                "createdat" => query.OrderBy(x => x.CreatedAt, request.IsDescending),
-                _ => query.OrderBy(x => x.Username, request.IsDescending)
+                "email" => request.IsDescending ? query.OrderByDescending(x => x.Email) : query.OrderBy(x => x.Email),
+                "createdat" => request.IsDescending ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt),
+                _ => request.IsDescending ? query.OrderByDescending(x => x.Username) : query.OrderBy(x => x.Username)
             };
 
-            //Include
-            query = query.Include(x => x
-            .Include(ur => ur.UserRoles)
-                .ThenInclude(ur => ur.Role.RolePermissions)
-                    .ThenInclude(rp => rp.Permission));
+            
 
             PagedResult<User>? paged = await query.ToPagedAsync(request, cancellationToken);
             PagedResult<UserDto> pageDto = new PagedResult<UserDto>

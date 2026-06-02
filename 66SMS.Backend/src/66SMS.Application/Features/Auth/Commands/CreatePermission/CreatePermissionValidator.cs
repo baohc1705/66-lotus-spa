@@ -1,11 +1,11 @@
-﻿using _66SMS.Domain.Constants;
+using _66SMS.Domain.Constants;
 using FluentValidation;
 
 namespace _66SMS.Application.Features.Auth.Commands.CreatePermission
 {
-    public class CreatePermissionCommandValidator : AbstractValidator<CreatePermissionCommand>
+    public class CreatePermissionValidator : AbstractValidator<CreatePermissionCommand>
     {
-        public CreatePermissionCommandValidator()
+        public CreatePermissionValidator()
         {
             RuleFor(x => x.Name).NotNull().NotEmpty().MaximumLength(PermissionConst.NAME_MAX_LENGTH);
             RuleFor(x => x.Resource).NotNull().NotEmpty().MaximumLength(PermissionConst.RESOURCE_MAX_LENGTH);

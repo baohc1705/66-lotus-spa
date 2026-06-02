@@ -1,9 +1,10 @@
-﻿using _66SMS.Contracts.Shared;
+using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Entities;
 using _66SMS.Domain.Enums;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.Features.Auth.Commands.CreatePermission
 {
@@ -18,7 +19,7 @@ namespace _66SMS.Application.Features.Auth.Commands.CreatePermission
         }
         public async Task<Result<object>> Handle(CreatePermissionCommand request, CancellationToken cancellationToken)
         {
-            bool permissionNameExsited = await permissionSqlRepository.Query().Where(x => x.Name.Equals(request.Name)).AnyAsync(cancellationToken);
+            bool permissionNameExsited = await permissionSqlRepository.AsQueryable().Where(x => x.Name.Equals(request.Name)).AnyAsync(cancellationToken);
             if (permissionNameExsited)
                 return Result<object>.BadRequest("Permission name exsited");
 

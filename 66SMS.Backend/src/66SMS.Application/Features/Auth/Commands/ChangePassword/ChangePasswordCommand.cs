@@ -1,4 +1,4 @@
-﻿using _66SMS.Contracts.Shared;
+using _66SMS.Contracts.Shared;
 using MediatR;
 
 namespace _66SMS.Application.Features.Auth.Commands.ChangePassword

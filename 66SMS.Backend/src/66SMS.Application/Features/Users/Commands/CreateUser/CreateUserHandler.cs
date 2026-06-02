@@ -1,4 +1,4 @@
-﻿using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -6,6 +6,7 @@ using _66SMS.Domain.Entities;
 using _66SMS.Domain.Exceptions;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.Features.Users.Commands.CreateUser
 {
@@ -29,7 +30,7 @@ namespace _66SMS.Application.Features.Users.Commands.CreateUser
         public async Task<Result<object>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             // Check exsited username, email
-            var userExisted = await userSqlRepository.Query()
+            var userExisted = await userSqlRepository.AsQueryable()
                 .Where(x => x.Username.Equals(request.UserName) || x.Email.Equals(request.Email))
                 .AnyAsync();
             if (userExisted)
@@ -51,7 +52,7 @@ namespace _66SMS.Application.Features.Users.Commands.CreateUser
                 if (!string.IsNullOrEmpty(request.Role))
                 {
                     // Check and assign user to role
-                    var role = await roleSqlRepository.Query()
+                    var role = await roleSqlRepository.AsQueryable()
                         .Where(x => x.Name.Equals(request.Role))
                         .FirstOrDefaultAsync(cancellationToken);
                     if (role == null) return Result<object>.BadRequest("Role not found");

@@ -1,6 +1,7 @@
-﻿using _66SMS.Contracts.Shared;
+using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.Features.Auth.Commands.Logout
 {
@@ -16,7 +17,7 @@ namespace _66SMS.Application.Features.Auth.Commands.Logout
         public async Task<Result<object>> Handle(LogoutCommand request, CancellationToken cancellationToken)
         {
             // Tim refreshtoken 
-            var stored = await refreshTokenSqlRepository.Query(asNoTracking: false)
+            var stored = await refreshTokenSqlRepository.AsQueryable(asNoTracking: false)
                 .Where(x => x.Token.Equals(request.Token))
                 .FirstOrDefaultAsync(cancellationToken);
             // kiem tra token

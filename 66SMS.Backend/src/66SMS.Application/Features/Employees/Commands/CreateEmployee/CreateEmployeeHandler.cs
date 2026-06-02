@@ -6,6 +6,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace _66SMS.Application.Features.Employees.Commands.CreateEmployee
@@ -41,7 +42,7 @@ namespace _66SMS.Application.Features.Employees.Commands.CreateEmployee
         public async Task<Result<object>> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
         {
             // Kiểm tra trùng email và username
-            bool emailOrUsernameExisted = await userSqlRepository.Query()
+            bool emailOrUsernameExisted = await userSqlRepository.AsQueryable()
                 .Where(x => x.Email.Equals(request.Email) || x.Username.Equals(request.UserName))
                 .AnyAsync(cancellationToken);
 
@@ -70,7 +71,7 @@ namespace _66SMS.Application.Features.Employees.Commands.CreateEmployee
 
                 // Save role
                 string roleRequest = request.Role ?? "employee";
-                Role? role = await roleSqlRepository.Query()
+                Role? role = await roleSqlRepository.AsQueryable()
                     .Where(x => x.Name.Equals(roleRequest))
                     .FirstOrDefaultAsync(cancellationToken);
 
@@ -101,7 +102,7 @@ namespace _66SMS.Application.Features.Employees.Commands.CreateEmployee
         private async Task<string> GenerateUniqueEmployeeCodeAsync(CancellationToken cancellationToken)
         {
             // Tìm code cuối cùng bắt đầu bằng "LOTUSNV"
-            Employee? employee = await employeeSqlRepository.Query()
+            Employee? employee = await employeeSqlRepository.AsQueryable()
                 .Where(x => x.Code.StartsWith("LOTUSNV"))
                 .OrderBy(x => x.Code)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -126,7 +127,7 @@ namespace _66SMS.Application.Features.Employees.Commands.CreateEmployee
             do
             {
                 newCode = $"LOTUSNV{nextNumber:D4}";
-                bool exists = await employeeSqlRepository.Query()
+                bool exists = await employeeSqlRepository.AsQueryable()
                     .Where(x => x.Code == newCode)
                     .AnyAsync(cancellationToken);
                 if (!exists) 

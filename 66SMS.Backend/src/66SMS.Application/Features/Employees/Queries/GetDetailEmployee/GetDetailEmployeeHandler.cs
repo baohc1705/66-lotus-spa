@@ -23,9 +23,9 @@ namespace _66SMS.Application.Features.Employees.Queries.GetDetailEmployee
 
         public async Task<Result<EmployeeDTO>> Handle(GetDetailEmployeeQuery request, CancellationToken cancellationToken)
         {
-            Employee? employee = await employeeSqlRepository.Query()
+            Employee? employee = await employeeSqlRepository.AsQueryable()
                 .Where(x => x.Id == request.Id)
-                .Include(x => x.Include(x => x.User))
+                .Include(x => x.User)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (employee == null) 

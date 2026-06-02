@@ -1,4 +1,4 @@
-﻿using _66SMS.Application.DTOs.Auth;
+using _66SMS.Application.DTOs.Auth;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
@@ -18,24 +18,23 @@ namespace _66SMS.Application.Features.Auth.Queries.GetAllRoles
         public async Task<Result<List<RoleDTO>>> Handle(GetAllRoleQuery request, CancellationToken cancellationToken)
         {
             // Kiem tra co include gi khong
-            var query = roleSqlRepository.Query();
+            var query = roleSqlRepository.AsQueryable().AsQueryable();
             if (request.Include != null && request.Include.Count() > 0)
             {
                 foreach (string item in request.Include)
                 {
                     query = item.ToLower() switch
                     {
-                        "roleusers" => query.Include(x => x.Include(ur => ur.UserRoles).ThenInclude(r => r.User)),
-                        "rolepermissions" => query.Include(x => x.Include(ur => ur.RolePermissions).ThenInclude(p => p.Permission)),
+                        "roleusers" => query.Include(x => x.UserRoles).ThenInclude(r => r.User),
+                        "rolepermissions" => query.Include(x => x.RolePermissions).ThenInclude(p => p.Permission),
                         _ => query
                     };
                 }
             }
             else
             {
-                query = query.Include(x => x
-                                .Include(ur => ur.UserRoles).ThenInclude(r => r.User)
-                                .Include(rp => rp.RolePermissions).ThenInclude(p => p.Permission));
+                query = query.Include(ur => ur.UserRoles).ThenInclude(r => r.User)
+                             .Include(rp => rp.RolePermissions).ThenInclude(p => p.Permission);
             }
 
             var roles = await query.ToListAsync(cancellationToken);

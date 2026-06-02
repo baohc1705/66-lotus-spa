@@ -1,4 +1,5 @@
 using _66SMS.Application.DTOs.Customers;
+using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Entities;
@@ -21,7 +22,7 @@ namespace _66SMS.Application.Features.Customers.Queries.GetAllCustomer
 
         public async Task<Result<PagedResult<CustomerDTO>>> Handle(GetAllCustomerQuery request, CancellationToken cancellationToken)
         {
-            var query = customerSqlRepository.Query();
+            var query = customerSqlRepository.AsQueryable();
 
             if (!string.IsNullOrEmpty(request.Filter))
             {
@@ -30,12 +31,12 @@ namespace _66SMS.Application.Features.Customers.Queries.GetAllCustomer
 
             query = request.OrderBy?.ToLower() switch
             {
-                "email" => query.OrderBy(x => x.User.Email, request.IsDescending),
-                "fullname" => query.OrderBy(x => x.FullName, request.IsDescending),
-                _ => query.OrderBy(x => x.CreatedAt, request.IsDescending)
+                "email" => request.IsDescending ? query.OrderByDescending(x => x.User.Email) : query.OrderBy(x => x.User.Email),
+                "fullname" => request.IsDescending ? query.OrderByDescending(x => x.FullName) : query.OrderBy(x => x.FullName),
+                _ => request.IsDescending ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt)
             };
 
-            query = query.Include(x => x.Include(x => x.User));
+            query = query.Include(x => x.User);
 
             PagedResult<Customer> paged = await query.ToPagedAsync(request, cancellationToken);
 
