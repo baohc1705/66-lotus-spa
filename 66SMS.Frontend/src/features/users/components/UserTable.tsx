@@ -48,7 +48,7 @@ export const UserTable = ({ onEdit }: Props) => {
       cell: ({ row }) => (
         <Badge
           variant={
-            row.original.status === "ACTIVE" ? "default" : "destructive"
+            row.original.status === "ACTIVE" ? "success" : "error"
           }
         >
           {row.original.status}

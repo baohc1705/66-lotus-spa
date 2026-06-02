@@ -34,7 +34,7 @@ export const UsersPage = () => {
         <PermissionGate resource="users" action="create">
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => setEditingUser(null)}>
+              <Button variant="admin" onClick={() => setEditingUser(null)}>
                 + Thêm người dùng
               </Button>
             </DialogTrigger>

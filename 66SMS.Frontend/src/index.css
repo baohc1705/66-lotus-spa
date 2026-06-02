@@ -1,90 +1,163 @@
+/* Local Fonts definitions */
+@import "fonts.css";
+
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  .theme {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Geist Variable', sans-serif
-  }
   :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
+    /* ── Centralized Typography (Cấu hình phông chữ tập trung) ── */
+    --font-sans:          "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+    --font-display:       "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+    --font-mono:          "DM Mono", ui-monospace, SFMono-Regular, monospace;
+
+    /* ── Shadcn token overrides (Hoa Sen Spa — Đồng Tháp) ── */
+    --background:         253 251 251; /* lotus-background — trắng cánh sen mềm mại */
+    --foreground:         30  23  24;  /* lotus-foreground — đen bùn sen sâu lắng */
+    --card:               255 255 255;
+    --card-foreground:    30  23  24;
+    --popover:            255 255 255;
+    --popover-foreground: 30  23  24;
+
+    --primary:            210 91  124; /* lotus-primary — hồng sen đậm thanh lịch */
+    --primary-foreground: 255 255 255;
+
+    --secondary:          247 229 233; /* lotus-secondary — hồng sen cực nhạt */
+    --secondary-foreground: 30  23  24;
+
+    --muted:              248 240 242;
+    --muted-foreground:   180 160 165; /* lotus-muted */
+
+    --accent:             210 91  124;
+    --accent-foreground:  255 255 255;
+
+    --destructive:        239 68 68;
+    --border:             235 222 225;
+    --input:              235 222 225;
+    --ring:               210 91  124;
+
     --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0)
+
+    /* ── Hoa Sen Spa Brand — Đồng Tháp Palette ── */
+    --lotus-primary:      #D25B7C;  /* hồng sen đậm thanh lịch   */
+    --lotus-secondary:    #EAA9BA;  /* hồng sen nhẹ thanh tao    */
+    --lotus-background:   #FDFBFB;  /* trắng cánh sen mềm mại    */
+    --lotus-foreground:   #1E1718;  /* đen bùn hoa sen sâu lắng  */
+    --lotus-accent:       #B08D57;  /* vàng nhụy sen quý phái    */
+    --lotus-highlight:    #E8C87A;  /* vàng sáng nhị hoa rực rỡ  */
+    --lotus-muted:        #B4A0A5;  /* sương hồng nhạt muted     */
+    --lotus-surface:      #F7E5E9;  /* hồng sen cực nhạt         */
   }
-  .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0)
-  }
+
   * {
-    @apply border-border;
-    outline-color: color-mix(in oklch, var(--ring) 50%, transparent);
+    box-sizing: border-box;
+    border-color: var(--lotus-muted);
   }
-  body {
-    @apply bg-background text-foreground;
-  }
+
   html {
-    @apply font-sans;
+    scroll-behavior: smooth;
+    font-family: var(--font-sans);
+  }
+
+  body {
+    background-color: var(--lotus-background);
+    color: var(--lotus-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
   }
 }
+
+/* ── Custom scrollbar ─────────────────────────────────── */
+::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: var(--lotus-background); }
+::-webkit-scrollbar-thumb  { background: var(--lotus-muted); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--lotus-primary); }
+
+.hide-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.hide-scrollbar,
+.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Hero gradients ────────────────────────────────────── */
+.hero-top-vignette {
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 22, 15, 0.72) 0%,
+    rgba(10, 22, 15, 0.35) 30%,
+    transparent 60%
+  );
+}
+
+.hero-content-gradient {
+  background: linear-gradient(
+    to right,
+    rgba(10, 22, 15, 0.82) 0%,
+    rgba(10, 22, 15, 0.55) 55%,
+    transparent 90%
+  );
+}
+
+/* ── Lotus watermark utility ───────────────────────────── */
+.lotus-bg-pattern {
+  position: relative;
+  overflow: hidden;
+}
+.lotus-bg-pattern::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: none;
+  pointer-events: none;
+  z-index: 0;
+}
+.lotus-bg-pattern > * { position: relative; z-index: 1; }
+
+/* ── Crane watermark utility ───────────────────────────── */
+.crane-bg-mark {
+  position: relative;
+  overflow: hidden;
+}
+.crane-bg-mark::after {
+  content: '';
+  position: absolute;
+  right: -4%;
+  bottom: -4%;
+  width: 45%;
+  aspect-ratio: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300' fill='none'%3E%3Cpath d='M150 230 Q120 200 100 180 Q80 160 90 140 Q100 120 120 125 Q130 128 140 135 Q145 120 155 110 Q165 100 170 110 Q175 120 165 135 Q175 128 185 125 Q205 120 215 140 Q225 160 205 180 Q185 200 175 215 Z' fill='%23D25B7C' opacity='0.04'/%3E%3Ccircle cx='150' cy='82' r='14' fill='%23D25B7C' opacity='0.04'/%3E%3Cpath d='M148 96 L148 120' stroke='%23D25B7C' stroke-width='6' opacity='0.04' stroke-linecap='round'/%3E%3Cpath d='M142 220 L130 270 M158 220 L170 270' stroke='%23D25B7C' stroke-width='5' opacity='0.04' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+  z-index: 0;
+}
+.crane-bg-mark > * { position: relative; z-index: 1; }
+
+/* ── Animations ─────────────────────────────────────────── */
+@keyframes slide-in {
+  from { transform: translateY(-16px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes float-y {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to   { background-position:  200% center; }
+}
+
+.animate-slide-in  { animation: slide-in 0.22s ease-out; }
+.animate-fade-in   { animation: fade-in  0.20s ease-out; }
+.animate-float     { animation: float-y  4s ease-in-out infinite; }
