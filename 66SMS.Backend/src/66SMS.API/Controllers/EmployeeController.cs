@@ -1,3 +1,4 @@
+using _66SMS.API.Abstractions;
 using _66SMS.Application.Features.Employees.Commands.CreateEmployee;
 using _66SMS.Application.Features.Employees.Commands.DeleteEmployee;
 using _66SMS.Application.Features.Employees.Commands.UpdateEmployee;
@@ -5,12 +6,12 @@ using _66SMS.Application.Features.Employees.Queries.GetAllEmployee;
 using _66SMS.Application.Features.Employees.Queries.GetDetailEmployee;
 using _66SMS.Contracts.Shared;
 using _66SMS.Infrastructure.Security;
-using _66SMS.Presentation.Abstractions;
-using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace _66SMS.Presentation.Controllers
+using Asp.Versioning;
+
+namespace _66SMS.API.Controllers
 {
     [ApiVersion("1.0")]
     public class EmployeeController : ApiController<EmployeeController>

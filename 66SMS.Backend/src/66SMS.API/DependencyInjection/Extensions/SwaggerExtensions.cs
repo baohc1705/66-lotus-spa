@@ -1,5 +1,5 @@
-﻿using _66SMS.API.DependencyInjection.Options;
-using _66SMS.Presentation.Commons;
+using _66SMS.API.DependencyInjection.Options;
+using _66SMS.API.Commons;
 using Asp.Versioning.ApiExplorer;
 
 namespace _66SMS.API.DependencyInjection.Extensions

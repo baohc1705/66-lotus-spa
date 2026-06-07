@@ -1,20 +1,21 @@
-﻿using _66SMS.Application.Features.Users.Commands.DeleteUser;
+using _66SMS.API.Abstractions;
+using _66SMS.Application.Features.Users.Commands.DeleteUser;
 using _66SMS.Application.Features.Users.Commands.UpdateUser;
 using _66SMS.Application.Features.Users.Queries.GetAllUsers;
 using _66SMS.Application.Features.Users.Queries.GetDetailUser;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Infrastructure.Security;
-using _66SMS.Presentation.Abstractions;
-using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace _66SMS.Presentation.Controllers
+using Asp.Versioning;
+
+namespace _66SMS.API.Controllers
 {
-    [ApiVersion("1.0")]
     [Authorize]
+    [ApiVersion("1.0")]
     public class UsersController : ApiController<UsersController>
     {
         private readonly IMediator mediator;
@@ -25,6 +26,7 @@ namespace _66SMS.Presentation.Controllers
             this.mediator = mediator;
             this.jwtService = jwtService;
         }
+
         [HttpGet("me")]
         [Authorize]
         public async Task<IActionResult> GetProfile()
@@ -33,6 +35,7 @@ namespace _66SMS.Presentation.Controllers
             var result = await mediator.Send(new GetDetailUserQuery { Id = id });
             return HandleResult(result);
         }
+
         [HttpGet]
         [Authorize(Roles = "admin")]
         [PermissionAuthorize("users", "read")]
@@ -57,6 +60,5 @@ namespace _66SMS.Presentation.Controllers
             Result<object> result = await mediator.Send(command);
             return HandleResult(result);
         }
-
     }
 }

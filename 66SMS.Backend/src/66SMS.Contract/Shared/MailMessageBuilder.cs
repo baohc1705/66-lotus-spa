@@ -1,6 +1,4 @@
-﻿using _66SMS.Contracts.Shared;
-
-namespace _66SMS.Infrastructure.Mails.Builders
+﻿namespace _66SMS.Contracts.Shared
 {
     /// <summary>
     /// Fluent builder để tạo MailMessage tùy chỉnh khi không muốn dùng template có sẵn.

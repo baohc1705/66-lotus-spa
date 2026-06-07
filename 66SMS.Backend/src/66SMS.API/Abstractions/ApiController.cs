@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using _66SMS.Contracts.Shared;
 
-namespace _66SMS.Presentation.Abstractions
+namespace _66SMS.API.Abstractions
 {
     /// <summary>
     /// Base controller class with common properties and methods for all API controllers.

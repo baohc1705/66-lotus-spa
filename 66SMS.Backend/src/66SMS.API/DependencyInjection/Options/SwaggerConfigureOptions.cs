@@ -1,4 +1,4 @@
-﻿using _66SMS.Presentation.Commons;
+using _66SMS.API.Commons;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -42,7 +42,5 @@ namespace _66SMS.API.DependencyInjection.Options
         }
 
         public void Configure(string? name, SwaggerGenOptions options) => Configure(options);
-
-       
     }
 }

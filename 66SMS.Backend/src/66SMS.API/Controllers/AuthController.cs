@@ -1,4 +1,5 @@
-﻿using _66SMS.Application.Features.Auth.Commands.AssignPermissions;
+using _66SMS.API.Abstractions;
+using _66SMS.Application.Features.Auth.Commands.AssignPermissions;
 using _66SMS.Application.Features.Auth.Commands.ChangePassword;
 using _66SMS.Application.Features.Auth.Commands.CreatePermission;
 using _66SMS.Application.Features.Auth.Commands.CreateRole;
@@ -10,15 +11,13 @@ using _66SMS.Application.Features.Auth.Commands.ResetPassword;
 using _66SMS.Application.Features.Auth.Queries.GetAllRoles;
 using _66SMS.Application.Features.Users.Commands.CreateUser;
 using _66SMS.Contracts.Abstractions;
-using _66SMS.Infrastructure.Security;
-using _66SMS.Presentation.Abstractions;
-using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace _66SMS.Presentation.Controllers
+using Asp.Versioning;
+
+namespace _66SMS.API.Controllers
 {
     [ApiVersion("1.0")]
     public class AuthController : ApiController<AuthController>

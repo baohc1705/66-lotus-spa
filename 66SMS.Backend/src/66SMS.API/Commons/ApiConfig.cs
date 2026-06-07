@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Presentation.Commons
+namespace _66SMS.API.Commons
 {
     public class ApiConfig
     {
