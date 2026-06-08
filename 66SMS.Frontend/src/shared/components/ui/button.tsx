@@ -1,6 +1,7 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
+import { cn } from "@/lib/utils"
 
 
 const buttonVariants = cva(
@@ -18,69 +19,64 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: [
-          "bg-[var(--spa-rose)] text-white",
-          "hover:bg-[var(--spa-rose-hover)]",
-          "shadow-rose hover:shadow-rose-lg",
+          "bg-lotus-leaf text-white",
+          "hover:bg-lotus-leaf/90",
+          "shadow-sm",
         ].join(" "),
 
         secondary: [
-          "bg-white text-[var(--spa-rose)]",
-          "border-2 border-[var(--spa-rose)]",
-          "hover:bg-[var(--spa-blush)]",
+          "bg-lotus-cream text-lotus-deep",
+          "hover:bg-lotus-cream/80",
         ].join(" "),
 
         outline: [
-          "bg-transparent text-[var(--spa-text)]",
-          "border border-[var(--spa-border)]",
-          "hover:border-[var(--spa-rose)] hover:text-[var(--spa-rose)]",
+          "bg-transparent text-lotus-deep",
+          "hover:bg-lotus-cream hover:text-lotus-deep",
         ].join(" "),
 
         gold: [
-          "bg-[var(--spa-gold)] text-white",
+          "bg-yellow-500 text-white",
           "hover:opacity-90",
-          "shadow-gold",
+          "shadow-sm",
         ].join(" "),
 
         ghost: [
-          "bg-transparent text-[var(--spa-rose)]",
-          "hover:bg-[var(--spa-blush)]",
+          "bg-transparent text-lotus-stone",
+          "hover:bg-lotus-cream hover:text-lotus-deep",
           "shadow-none",
           "hover:translate-y-0",
         ].join(" "),
 
         dark: [
-          "bg-[var(--spa-text)] text-white",
+          "bg-lotus-deep text-white",
           "hover:opacity-90",
         ].join(" "),
 
         admin: [
-          "bg-[var(--spa-admin-primary)] text-white",
-          "hover:bg-[var(--spa-admin-primary-hover)]",
-          "shadow-sm shadow-blue-500/10",
-          "focus-visible:ring-[var(--spa-admin-primary)]",
+          "bg-lotus-leaf text-white",
+          "hover:bg-lotus-leaf/90",
+          "shadow-sm",
         ].join(" "),
 
         destructive: [
           "bg-red-50 text-red-600",
-          "border border-red-200",
           "hover:bg-red-100",
-          "focus-visible:ring-red-400",
         ].join(" "),
 
         link: [
-          "text-[var(--spa-rose)] underline-offset-4 hover:underline",
+          "text-lotus-leaf underline-offset-4 hover:underline",
           "hover:translate-y-0 shadow-none",
         ].join(" "),
       },
 
       size: {
-        sm: "text-xs px-4 py-2 rounded-lg",
-        default: "text-sm px-6 py-3 rounded-xl",
-        lg: "text-base px-8 py-3.5 rounded-xl",
-        xl: "text-base px-10 py-4 rounded-2xl",
-        icon: "size-10 rounded-xl",
-        "icon-sm": "size-8 rounded-lg",
-        "icon-lg": "size-12 rounded-xl",
+        sm: "text-xs px-3 py-1.5 rounded-sm",
+        default: "text-sm px-4 py-2 rounded-md",
+        lg: "text-base px-6 py-3 rounded-md",
+        xl: "text-base px-8 py-4 rounded-lg",
+        icon: "size-10 rounded-md",
+        "icon-sm": "size-8 rounded-sm",
+        "icon-lg": "size-12 rounded-md",
       },
     },
 
@@ -137,7 +133,7 @@ function Button({
     <Comp
       data-slot="button"
       disabled={disabled || loading}
-      className={`${buttonVariants({ variant, size })} ${className || ''}`.trim()}
+      className={cn(buttonVariants({ variant, size }), className)}
       {...props}
     >
       {asChild ? children : (

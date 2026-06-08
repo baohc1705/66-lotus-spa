@@ -1,11 +1,12 @@
 import * as React from "react"
+import { cn } from "@/lib/utils"
 
 
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="skeleton"
-      className={`animate-pulse rounded-xl bg-[var(--spa-blush)] ${className || ''}`.trim()}
+      className={cn("animate-pulse rounded-xl bg-[var(--spa-blush)]", className)}
       {...props}
     />
   )

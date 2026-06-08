@@ -9,7 +9,7 @@ import { useState } from "react";
 import { useGetUsers } from "@/features/users/hooks/useGetUsers";
 import { useDeleteUser } from "@/features/users/hooks/useDeleteUser";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { type UserDto } from "@/shared/types/user.types";
+import { type UserDto } from "@/features/users/types/user.types";
 import { Button } from "@/shared/components/ui/button";
 import {
   Table,

@@ -1,6 +1,6 @@
 import axiosInstance from '@/shared/api/axiosInstance';
 import type { Result, PagedResult, PageRequest } from '@/shared/types/common.types';
-import type { UserDto, CreateUserRequest, UpdateUserRequest, DeleteUserRequest } from '@/shared/types/user.types';
+import type { UserDto, CreateUserRequest, UpdateUserRequest, DeleteUserRequest } from '@/features/users/types/user.types';
 
 const USERS = '/users';
 

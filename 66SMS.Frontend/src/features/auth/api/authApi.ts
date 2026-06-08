@@ -10,8 +10,8 @@ import type {
   CreateRoleRequest,
   CreatePermissionRequest,
   AssignPermissionsRequest,
-} from '@/shared/types/auth.types';
-import type { CreateUserRequest } from '@/shared/types/user.types';
+} from '@/features/auth/types/auth.types';
+import type { CreateUserRequest } from '@/features/users/types/user.types';
 
 const AUTH = '/auth';
 

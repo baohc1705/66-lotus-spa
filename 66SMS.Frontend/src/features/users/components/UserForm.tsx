@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCreateUser } from "@/features/users/hooks/useCreateUser";
 import { useUpdateUser } from "@/features/users/hooks/useUpdateUser";
-import { type UserDto } from "@/shared/types/user.types";
+import { type UserDto } from "@/features/users/types/user.types";
 import { createSchema, type CreateFromData } from "../schemas/createSchema";
 import { updateSchema, type UpdateFormData } from "../schemas/updateSchema";
 import { Label } from "@/shared/components/ui/label";

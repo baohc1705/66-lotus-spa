@@ -2,7 +2,7 @@ import { useState } from "react";
 import { UserTable } from "@/features/users/components/UserTable";
 import { UserForm } from "@/features/users/components/UserForm";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { type UserDto } from "@/shared/types/user.types";
+import { type UserDto } from "@/features/users/types/user.types";
 import {
   Dialog,
   DialogContent,

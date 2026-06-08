@@ -15,28 +15,26 @@ import {
   CalendarHeart,
   Clock,
   Leaf,
-  Armchair
+  Armchair,
+  Menu
 } from 'lucide-react'
 import { Logo } from '@/shared/components/Logo'
+import { useAuthStore } from '@/features/auth/stores/authStore'
 
-// Simplified role check for UI mockup
-// In production, import { useRole } from '@/features/auth'
-const useRole = () => ({ isAdmin: true, isEmployee: true, isReceptionist: true })
-
-interface SubMenuItem {
+export interface SubMenuItem {
   label: string
   path: string
   icon?: React.ElementType
 }
 
-interface MenuItem {
+export interface MenuItem {
   label: string
   path?: string
   icon: React.ElementType
   children?: SubMenuItem[]
 }
 
-const MENU_ITEMS: MenuItem[] = [
+export const MENU_ITEMS: MenuItem[] = [
   { label: 'Tổng quan', path: '/admin', icon: LayoutDashboard },
   { label: 'Phòng', path: '/admin/rooms', icon: Armchair },
   {
@@ -70,14 +68,18 @@ interface AdminSidebarProps {
   isOpen: boolean
   isMobileOpen: boolean
   setMobileOpen: (val: boolean) => void
+  toggleSidebar: () => void
 }
 
-export function AdminSidebar({ isOpen, isMobileOpen, setMobileOpen }: AdminSidebarProps) {
+export function AdminSidebar({ isOpen, isMobileOpen, setMobileOpen, toggleSidebar }: AdminSidebarProps) {
   const location = useLocation()
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({})
-  const { isAdmin, isEmployee, isReceptionist } = useRole()
-
-  const visibleMenuItems = MENU_ITEMS // Mocked for now, apply filtering in production if needed
+  
+  const { hasRole } = useAuthStore()
+  
+  // Bạn có thể sử dụng hasRole ở đây để lọc MENU_ITEMS nếu cần thiết. 
+  // Ví dụ: const visibleMenuItems = MENU_ITEMS.filter(...)
+  const visibleMenuItems = MENU_ITEMS
 
   const toggleMenu = (label: string) => {
     if (!isOpen) return
@@ -104,10 +106,19 @@ export function AdminSidebar({ isOpen, isMobileOpen, setMobileOpen }: AdminSideb
 
       <motion.aside
         layout
-        className={`fixed top-0 left-0 bottom-0 z-50 flex flex-col bg-lotus-cream/95 backdrop-blur-md border-r border-lotus-gold/20 shadow-xl transition-all duration-500 ease-out ${isOpen ? 'w-64' : 'w-20'} ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
+        className={`fixed top-0 left-0 bottom-0 z-50 flex flex-col bg-lotus-cream/95 backdrop-blur-md shadow-xl transition-all duration-500 ease-out ${isOpen ? 'w-64' : 'w-20'} ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
       >
-        <div className={`h-20 flex items-center shrink-0 px-4 border-b border-lotus-gold/20 overflow-hidden transition-all duration-500 ${isOpen ? 'justify-start' : 'justify-center'}`}>
-          <Logo variant="dark" size={isOpen ? 'md' : 'sm'} showTagline={false} className={!isOpen ? "[&>div:last-child]:hidden" : ""} />
+        <div className={`h-16 flex items-center shrink-0 px-4 overflow-hidden transition-all duration-500 ${isOpen ? 'justify-between' : 'justify-center'}`}>
+          <div className={`transition-opacity duration-300 ${!isOpen ? 'opacity-0 hidden' : 'opacity-100 block'}`}>
+            <Logo variant="dark" size="sm" showTagline={false} />
+          </div>
+          
+          <button
+            onClick={toggleSidebar}
+            className="hidden lg:flex w-10 h-10 rounded-admin text-lotus-leaf items-center justify-center hover:bg-lotus-leaf/10 transition-all duration-300 shrink-0"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
         </div>
 
         <div className="flex-1 overflow-y-auto py-6 px-3 hide-scrollbar">
@@ -129,7 +140,7 @@ export function AdminSidebar({ isOpen, isMobileOpen, setMobileOpen }: AdminSideb
                       <div className="space-y-1">
                         <button
                           onClick={() => toggleMenu(item.label)}
-                          className={`w-full flex items-center justify-between p-3 rounded-2xl transition-all duration-300 group relative ${isActive ? 'bg-lotus-leaf text-white shadow-md' : 'text-lotus-deep/70 hover:bg-lotus-leaf/10 hover:text-lotus-deep'} ${!isOpen ? 'justify-center' : ''}`}
+                          className={`flex items-center rounded-admin transition-all duration-300 group relative ${isActive ? 'bg-lotus-leaf text-white shadow-md' : 'text-lotus-deep/70 hover:bg-lotus-leaf/10 hover:text-lotus-deep'} ${isOpen ? 'w-full p-3 justify-between' : 'w-12 h-12 mx-auto justify-center'}`}
                           title={!isOpen ? item.label : undefined}
                         >
                           <div className="flex items-center gap-3 overflow-hidden">
@@ -159,7 +170,7 @@ export function AdminSidebar({ isOpen, isMobileOpen, setMobileOpen }: AdminSideb
                                     <li key={child.path}>
                                       <Link
                                         to={child.path}
-                                        className={`flex items-center gap-2 py-2 px-3 rounded-xl text-xs transition-all duration-300 relative ${isChildActive ? 'text-lotus-leaf font-semibold bg-lotus-leaf/10 before:content-[""] before:absolute before:-left-[1.35rem] before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-lotus-leaf' : 'text-lotus-deep/60 hover:text-lotus-deep hover:bg-lotus-leaf/5'}`}
+                                        className={`flex items-center gap-2 py-2 px-3 rounded-admin text-xs transition-all duration-300 relative ${isChildActive ? 'text-lotus-leaf font-semibold bg-lotus-leaf/10 before:content-[""] before:absolute before:-left-[1.35rem] before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-lotus-leaf' : 'text-lotus-deep/60 hover:text-lotus-deep hover:bg-lotus-leaf/5'}`}
                                       >
                                         {ChildIcon && <ChildIcon className="w-3.5 h-3.5 shrink-0" />}
                                         <span className="whitespace-nowrap">{child.label}</span>
@@ -175,13 +186,13 @@ export function AdminSidebar({ isOpen, isMobileOpen, setMobileOpen }: AdminSideb
                     ) : (
                       <Link
                         to={item.path!}
-                        className={`flex items-center p-3 rounded-2xl transition-all duration-300 group relative ${isActive ? 'bg-lotus-leaf text-white shadow-md' : 'text-lotus-deep/70 hover:bg-lotus-leaf/10 hover:text-lotus-deep'} ${!isOpen ? 'justify-center' : 'gap-3'}`}
+                        className={`flex items-center rounded-admin transition-all duration-300 group relative ${isActive ? 'bg-lotus-leaf text-white shadow-md' : 'text-lotus-deep/70 hover:bg-lotus-leaf/10 hover:text-lotus-deep'} ${isOpen ? 'w-full p-3 gap-3' : 'w-12 h-12 mx-auto justify-center'}`}
                         title={!isOpen ? item.label : undefined}
                       >
                         <Icon className={`w-[1.125rem] h-[1.125rem] shrink-0 transition-transform duration-300 ${isActive ? 'scale-110' : ''}`} />
                         {isOpen && <span className="font-sans font-medium text-[13px] tracking-wide whitespace-nowrap">{item.label}</span>}
                         {!isOpen && (
-                          <div className="absolute left-full ml-4 px-3 py-1.5 bg-lotus-deep text-lotus-cream text-xs rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 shadow-xl transition-opacity">
+                          <div className="absolute left-full ml-4 px-3 py-1.5 bg-lotus-deep text-lotus-cream text-xs rounded-admin opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 shadow-xl transition-opacity">
                             {item.label}
                           </div>
                         )}

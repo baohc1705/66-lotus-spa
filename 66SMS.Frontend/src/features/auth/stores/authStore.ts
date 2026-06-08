@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { type UserDto } from '@/shared/types/user.types';
+import { type UserDto } from '@/features/users/types/user.types';
 
 interface AuthState {
   accessToken: string | null;
@@ -27,20 +27,34 @@ export const useAuthStore = create<AuthState>()(
 
       // Kiểm tra permission theo format "resource:action" giống backend
       hasPermission: (resource, action) => {
-        const permissions = get().user?.permissions ?? [];
-        console.log(permissions);
-        return permissions.includes(`${resource}:${action}`);
+        const user = get().user;
+        console.log(`[PermissionCheck] Resource: ${resource}, Action: ${action}`, { user });
+        if (!user) return false;
+        
+        // Kiểm tra case-insensitive cho role admin
+        const hasAdmin = user.roles?.some(r => r.toLowerCase() === 'admin');
+        if (hasAdmin) {
+           console.log(`[PermissionCheck] Granted via admin role bypass`);
+           return true;
+        }
+
+        const permissions = user.permissions ?? [];
+        const hasPerm = permissions.includes(`${resource}:${action}`);
+        console.log(`[PermissionCheck] Exact permission match: ${hasPerm}`);
+        return hasPerm;
       },
 
       hasRole: (role) => {
         const roles = get().user?.roles ?? [];
-        return roles.includes(role);
+        const has = roles.some(r => r.toLowerCase() === role.toLowerCase());
+        console.log(`[RoleCheck] Role requested: ${role}, User roles:`, roles, `=> ${has}`);
+        return has;
       },
     }),
     {
       name: 'auth-storage',
-      // Chỉ persist accessToken, không persist user (lấy lại từ /me)
-      partialize: (state) => ({ accessToken: state.accessToken }),
+      // Persist cả accessToken và user để giữ phiên đăng nhập (bao gồm permissions) sau khi F5
+      partialize: (state) => ({ accessToken: state.accessToken, user: state.user }),
     },
   ),
 );

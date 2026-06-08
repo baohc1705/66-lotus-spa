@@ -25,11 +25,7 @@ export const LoginForm = () => {
   });
 
   const onSubmit = (data: LoginFormData) => {
-    login.mutate(data, {
-      onSuccess: ({ data: result }) => {
-        if (result?.isSuccess) navigate("/dashboard");
-      },
-    });
+    login.mutate(data);
   };
 
   return (

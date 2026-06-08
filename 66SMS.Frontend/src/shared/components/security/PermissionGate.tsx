@@ -3,6 +3,7 @@ import { usePermission } from "@/shared/hooks/usePermission";
 interface Props {
   resource: string; // tên tài nguyên (user, product...)
   action: string; // hành động (create, update...)
+  role?: string; // vai trò bắt buộc (VD: admin)
   fallback?: React.ReactNode; // UI thay thế nếu không có quyền
   children: React.ReactNode; // nội dung cần bảo vệ
 }
@@ -10,12 +11,17 @@ interface Props {
 export const PermissionGate = ({
   resource,
   action,
+  role,
   fallback = null,
   children,
 }: Props) => {
-  // Lấy hàm kiểm tra quyền
-  const { hasPermission } = usePermission();
-  console.log(resource, action, hasPermission(resource, action));
+  // Lấy hàm kiểm tra quyền và role
+  const { hasPermission, hasRole } = usePermission();
+
+  // Kiểm tra role bắt buộc (nếu có)
+  if (role && !hasRole(role)) {
+    return <>{fallback}</>;
+  }
 
   // Có quyền -> render children
   // Không có quyền -> render fallback

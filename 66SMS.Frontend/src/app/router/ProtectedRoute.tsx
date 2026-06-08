@@ -6,6 +6,7 @@ import { useGetMe } from '@/features/users/hooks/useGetMe';
 
 export const ProtectedRoute = () => {
   const accessToken = useAuthStore((s) => s.accessToken);
+  const userStore = useAuthStore((s) => s.user);
   const setUser = useAuthStore((s) => s.setUser);
 
   const { data: user, isLoading } = useGetMe();
@@ -20,7 +21,8 @@ export const ProtectedRoute = () => {
     return <Navigate to="/login" replace />;
   }
 
-  if (isLoading) {
+  // Chặn UI với màn hình Loading CHỈ khi store chưa có thông tin user
+  if (!userStore && isLoading) {
     return <div>Loading...</div>;
   }
 

@@ -12,6 +12,7 @@ export default {
         mono:    ['"DM Mono"',        'ui-monospace',  'SFMono-Regular', 'monospace'],
       },
       borderRadius: {
+        admin: 'var(--admin-radius, 10px)',
         lg:   'var(--radius)',
         md:   'calc(var(--radius) - 2px)',
         sm:   'calc(var(--radius) - 4px)',
@@ -65,6 +66,7 @@ export default {
         'lotus-rose':       'var(--lotus-rose)',
         'lotus-gold':       'var(--lotus-gold)',
         'lotus-leaf':       'var(--lotus-leaf)',
+        'lotus-leaf-light': 'var(--lotus-leaf-light)',
         'lotus-cream':      'var(--lotus-cream)',
         'lotus-deep':       'var(--lotus-deep)',
         'lotus-stone':      'var(--lotus-stone)',
