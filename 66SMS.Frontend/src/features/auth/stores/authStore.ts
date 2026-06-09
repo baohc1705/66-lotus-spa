@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { type UserDto } from '@/features/users/types/user.types';
+import { parseJwt } from '@/features/auth/utils/jwt';
 
 interface AuthState {
   accessToken: string | null;
@@ -19,7 +20,20 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       user: null,
 
-      setAccessToken: (token) => set({ accessToken: token }),
+      setAccessToken: (token) => {
+        set({ accessToken: token });
+        const decoded = parseJwt(token);
+        if (decoded) {
+          const roleClaim = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded.role;
+          const roles = roleClaim ? (Array.isArray(roleClaim) ? roleClaim : [roleClaim]) : [];
+          
+          const permClaim = decoded.permission;
+          const permissions = permClaim ? (Array.isArray(permClaim) ? permClaim : [permClaim]) : [];
+
+          const currentUser = get().user || ({} as UserDto);
+          set({ user: { ...currentUser, roles, permissions } });
+        }
+      },
 
       setUser: (user) => set({ user }),
 

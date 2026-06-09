@@ -104,17 +104,13 @@ namespace _66SMS.Application.Features.Employees.Commands.CreateEmployee
             // Tìm code cuối cùng bắt đầu bằng "LOTUSNV"
             Employee? employee = await employeeSqlRepository.AsQueryable()
                 .Where(x => x.Code.StartsWith("LOTUSNV"))
-                .OrderBy(x => x.Code)
+                .OrderByDescending(x => x.Code)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (employee == null)
-                return string.Empty;
-
-            var lastCode = employee.Code;
             int nextNumber = 1;
-            if (!string.IsNullOrEmpty(lastCode) && lastCode.Length > 7)
+            if (employee != null && !string.IsNullOrEmpty(employee.Code) && employee.Code.Length > 7)
             {
-                string numberPart = lastCode.Substring(7);
+                string numberPart = employee.Code.Substring(7);
                 if (int.TryParse(numberPart, out int parsedNumber))
                 {
                     nextNumber = parsedNumber + 1;

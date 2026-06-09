@@ -78,8 +78,13 @@ namespace _66SMS.Application.Features.Auth.Commands.Login
             if (role == null)
                 return Result<TokenResponseDTO>.NotFound("Account has no role");
 
+            List<string> permissions = await userRoleSqlRepository.GetPermissionKeysByUserIdAndRoleIdAsync(
+                userExisted.Id, 
+                role.Id, 
+                cancellationToken) ?? new List<string>();
+
             // Generate token 
-            var accessToken = jwtService.GenerateAccessToken(userExisted, role.Name);
+            var accessToken = jwtService.GenerateAccessToken(userExisted, role.Name, permissions);
             var rawRefreshToken = jwtService.GenerateRefreshToken();
 
             // Add refresh token in db

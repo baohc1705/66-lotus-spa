@@ -1,4 +1,4 @@
-﻿using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Settings;
 using Microsoft.AspNetCore.Http;
@@ -12,7 +12,7 @@ namespace _66SMS.Infrastructure.Security
 {
     public class JwtService(IOptions<JwtSettings> options, IHttpContextAccessor httpContextAccessor) : IJwtService
     {
-        public string GenerateAccessToken<TEntity>(TEntity entity, string role)
+        public string GenerateAccessToken<TEntity>(TEntity entity, string role, List<string> permissions)
         {
             // Create claim
             var claims = new List<Claim>();
@@ -23,6 +23,12 @@ namespace _66SMS.Infrastructure.Security
                 claims.Add(new Claim(ClaimTypes.NameIdentifier, idProp.GetValue(entity)?.ToString() ?? ""));
             // Add role
             claims.Add(new Claim(ClaimTypes.Role, role));
+            
+            // Add permissions
+            foreach (var permission in permissions)
+            {
+                claims.Add(new Claim("permission", permission));
+            }
 
             // Create key and cred
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.Value.SecretKey));

@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using _66SMS.Application.DTOs.Shifts;
+using _66SMS.Contracts.Shared;
+using MediatR;
 
 namespace _66SMS.Application.Features.Shitfs.Queries.GetAllShift
 {
-    internal class GetAllShiftQuery
+    public class GetAllShiftQuery : PageRequest, IRequest<Result<PagedResult<ShiftDTO>>>
     {
     }
 }

@@ -1,5 +1,6 @@
 using _66SMS.Application.DTOs.Customers;
 using _66SMS.Application.DTOs.Employees;
+using _66SMS.Application.DTOs.Shifts;
 using _66SMS.Application.DTOs.Users;
 using _66SMS.Application.Features.Auth.Commands.CreatePermission;
 using _66SMS.Application.Features.Auth.Commands.CreateRole;
@@ -7,10 +8,13 @@ using _66SMS.Application.Features.Customers.Commands.CreateCustomer;
 using _66SMS.Application.Features.Customers.Commands.UpdateCustomer;
 using _66SMS.Application.Features.Employees.Commands.CreateEmployee;
 using _66SMS.Application.Features.Employees.Commands.UpdateEmployee;
+using _66SMS.Application.Features.Shitfs.Commands.CreateShift;
+using _66SMS.Application.Features.Shitfs.Commands.CreateShiftPeriod;
+using _66SMS.Application.Features.Shitfs.Commands.UpdateShift;
 using _66SMS.Application.Features.Users.Commands.CreateUser;
 using _66SMS.Application.Features.Users.Commands.UpdateUser;
+using _66SMS.Application.Features.WorkSchedules.Commands.CreateWorkSchedule;
 using _66SMS.Contracts.Helpers;
-using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 
@@ -78,6 +82,46 @@ namespace _66SMS.Application.Commons.Mappers
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.User != null ? src.User.Username : null))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User != null ? src.User.Email : null))
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
+            // Create shift command to entity
+            CreateMap<CreateShiftCommand, Shift>()
+                .ForMember(dest => dest.ShiftPeriods, opt => opt.Ignore());
+            CreateMap<CreateShiftPeriodDto, ShiftPeriod>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.ShiftId, opt => opt.Ignore())
+                .ForMember(dest => dest.Shift, opt => opt.Ignore())
+                .ForMember(dest => dest.WorkSchedules, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.EffectiveFrom, opt => opt.MapFrom(src => src.EffectiveFrom ?? DateTimeHelper.UtcNow().ToDateOnly()));
+            CreateMap<CreateShiftPeriodCommand, ShiftPeriod>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Shift, opt => opt.Ignore())
+                .ForMember(dest => dest.WorkSchedules, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.EffectiveFrom, opt => opt.MapFrom(src => src.EffectiveFrom ?? DateTimeHelper.UtcNow().ToDateOnly()));
+
+            // Update shift command to entity
+            CreateMap<UpdateShiftCommand, Shift>()
+                .ForMember(dest => dest.ShiftPeriods, opt => opt.Ignore())
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<UpdateShiftPeriodDto, ShiftPeriod>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.ShiftId, opt => opt.Ignore())
+                .ForMember(dest => dest.Shift, opt => opt.Ignore())
+                .ForMember(dest => dest.WorkSchedules, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<ShiftPeriodDTO, ShiftPeriod>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
+            // Projection mapping rules
+            CreateMap<Shift, ShiftDTO>()
+                .ForMember(dest => dest.ShiftPeriodDTOs, opt => opt.MapFrom(src => src.ShiftPeriods));
+            CreateMap<ShiftPeriod, ShiftPeriodDTO>();
+
+            // Create WorkSchedule
+            CreateMap<CreateWorkScheduleCommand, WorkSchedule>()
+                .ForAllMembers(dest => dest.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }

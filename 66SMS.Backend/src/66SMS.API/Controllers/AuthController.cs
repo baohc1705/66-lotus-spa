@@ -55,6 +55,12 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> RefreshToken(RefreshTokenCommand command)
         {
+            var refreshToken = Request.Cookies["refreshToken"];
+            if (!string.IsNullOrEmpty(refreshToken) && string.IsNullOrEmpty(command.Token))
+            {
+                command.Token = refreshToken;
+            }
+
             command.IpAddress = GetIpAddress();
             var result = await mediator.Send(command);
             if (result.Data != null)

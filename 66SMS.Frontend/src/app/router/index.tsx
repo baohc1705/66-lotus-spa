@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { HomePage } from '@/pages/home/HomePage';
-import { LoginPage } from '@/pages/auth/LoginPage';
-import { UsersPage } from '@/pages/users/UsersPage';
+import { HomePage } from '@/features/landing/pages/HomePage';
+import { LoginPage } from '@/features/auth/pages/LoginPage';
+import { UsersPage } from '@/features/users/pages/UsersPage';
 import { ProtectedRoute } from './ProtectedRoute';
 import { AdminLayout, AdminDashboard } from '@/features/admin';
 import { EmployeeListPage } from '@/features/employees/pages/EmployeeListPage';

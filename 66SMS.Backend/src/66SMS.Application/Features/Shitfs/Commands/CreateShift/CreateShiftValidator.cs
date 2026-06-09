@@ -1,4 +1,3 @@
-using _66SMS.Domain.Constants;
 using FluentValidation;
 
 namespace _66SMS.Application.Features.Shitfs.Commands.CreateShift
@@ -7,10 +6,20 @@ namespace _66SMS.Application.Features.Shitfs.Commands.CreateShift
     {
         public CreateShiftValidator()
         {
-            RuleFor(x => x.Name).NotNull().NotEmpty().MaximumLength(ShiftConst.NAME_MAX_LENGTH);
-            RuleFor(x => x.Description).MaximumLength(ShiftConst.DESCRIPTION_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.Description));
-            RuleFor(x => x.EffectiveFrom).NotNull();
-            RuleFor(x => x.EffectiveFrom).NotNull();
+            RuleFor(x => x.Name).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.ShiftPeriod).NotNull();
+
+            When(x => x.ShiftPeriod is not null, () =>
+            {
+                RuleFor(x => x.ShiftPeriod.ShiftStart).NotNull();
+                RuleFor(x => x.ShiftPeriod.ShiftEnd).NotNull()
+                    .GreaterThan(x => x.ShiftPeriod.ShiftStart)
+                    .WithMessage("ShiftEnd phải sau ShiftStart.");
+                RuleFor(x => x.ShiftPeriod.EffectiveTo)
+                    .GreaterThan(x => x.ShiftPeriod.EffectiveFrom)
+                    .When(x => x.ShiftPeriod.EffectiveTo.HasValue)
+                    .WithMessage("EffectiveTo phải sau EffectiveFrom.");
+            });
         }
     }
 }

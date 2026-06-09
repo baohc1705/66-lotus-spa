@@ -1,12 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FluentValidation;
 
 namespace _66SMS.Application.Features.Shitfs.Commands.DeleteShift
 {
-    internal class DeleteShiftValidator
+    public class DeleteShiftValidator : AbstractValidator<DeleteShiftCommand>
     {
+        public DeleteShiftValidator()
+        {
+            RuleFor(x => x.Id).GreaterThan(0);
+        }
     }
 }

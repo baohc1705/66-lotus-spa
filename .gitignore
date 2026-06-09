@@ -8,7 +8,7 @@
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
-
+.vs
 # Local History for Visual Studio Code
 .history/
 
@@ -20,7 +20,9 @@
 .history
 .ionide
 
+
 # End of https://www.toptal.com/developers/gitignore/api/visua
 **.zip
 .env
 fe
+sourcev1

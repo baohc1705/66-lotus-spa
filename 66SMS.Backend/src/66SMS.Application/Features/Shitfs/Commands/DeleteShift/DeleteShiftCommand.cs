@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using _66SMS.Contracts.Shared;
+using MediatR;
 
 namespace _66SMS.Application.Features.Shitfs.Commands.DeleteShift
 {
-    internal class DeleteShiftCommand
+    public record DeleteShiftCommand : IRequest<Result<object>>
     {
+        public int Id { get; set; }
     }
 }

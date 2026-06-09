@@ -13,38 +13,19 @@ namespace _66SMS.Infrastructure.Security
 
     public class PermissionHandler : AuthorizationHandler<RequirePermissionAttribute>
     {
-        private readonly IUserRoleSqlRepository userRoleSqlRepository;
-
-        public PermissionHandler(IUserRoleSqlRepository userRoleSqlRepository)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, RequirePermissionAttribute requirement)
         {
-            this.userRoleSqlRepository = userRoleSqlRepository;
-        }
-
-        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, RequirePermissionAttribute requirement)
-        {
-            var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(userIdClaim, out int userId))
+            // Kiểm tra xem trong JWT payload có chứa permission (có phân biệt hoa/thường)
+            if (context.User.HasClaim(c => c.Type == "permission" && c.Value == requirement.Permission))
             {
-                context.Fail();
-                return;
-            }
-
-            Role? role = await userRoleSqlRepository.GetRoleByUserIdAsync(userId, CancellationToken.None);
-            if (role == null)
-            {
-                context.Fail();
-                return;
-            }
-
-            List<string>? permissions = await userRoleSqlRepository.GetPermissionKeysByUserIdAndRoleIdAsync(
-                userId,
-                role.Id,
-                CancellationToken.None);
-
-            if (permissions != null && permissions.Contains(requirement.Permission))
                 context.Succeed(requirement);
+            }
             else
+            {
                 context.Fail();
+            }
+            
+            return Task.CompletedTask;
         }
     }
 }
