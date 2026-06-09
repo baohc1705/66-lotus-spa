@@ -143,7 +143,6 @@ namespace _66SMS.Application.Commons.Mappers
     {
         /// <summary>
         /// Tự động sinh biểu thức điều kiện (PreCondition) để bỏ qua các trường có giá trị null (cả Value Type Nullable và Reference Type).
-        /// Áp dụng cho toàn bộ các member để không cần lặp lại ForAllMembers hay ForMember riêng lẻ.
         /// </summary>
         public static IMappingExpression<TSource, TDestination> IgnoreNullValueTypes<TSource, TDestination>(
             this IMappingExpression<TSource, TDestination> map)
