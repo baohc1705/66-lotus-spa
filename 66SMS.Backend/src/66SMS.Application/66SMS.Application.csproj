@@ -21,7 +21,6 @@
 
   <ItemGroup>
     <Folder Include="Features\Auth\Queries\GetDetailRoles\" />
-    <Folder Include="Features\WorkSchedules\Queries\" />
   </ItemGroup>
 
 </Project>

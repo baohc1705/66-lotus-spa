@@ -33,15 +33,27 @@
         }
 
         // DateOnly
-        public static string ToDateString(this DateOnly date, string format = DefaultDateOnly) => date.ToString(format);
-        public static string? ToDateString(this DateOnly? date, string format = DefaultDateOnly) => date.HasValue ? date.Value.ToDateString(format) : null;
+        public static string ToDateOnlyString(this DateOnly date, string? format = DefaultDateOnly) => date.ToString(format);
+        public static string? ToDateOnlyString(this DateOnly? date, string? format = DefaultDateOnly) => date.HasValue ? date.Value.ToDateOnlyString(format) : null;
+        public static string ToDateOnlyString(this DateOnly date) => date.ToString(DefaultDateOnly);
+        public static string? ToDateOnlyString(this DateOnly? date) => date.HasValue ? date.Value.ToDateOnlyString() : null;
+
         public static DateOnly ToDateOnly(this DateTime utcTime) => DateOnly.FromDateTime(utcTime.ToVietnamTime());
         public static DateOnly? ToDateOnly(this DateTime? utcTime) => utcTime.HasValue ? utcTime.Value.ToDateOnly() : null;
         public static DateOnly VietnamToday() => DateOnly.FromDateTime(VietnamNow());
         public static bool IsToday(this DateOnly date) => date == VietnamToday();
         public static bool IsPast(this DateOnly date) => date < VietnamToday();
         public static bool IsFuture(this DateOnly date) => date > VietnamToday();
-        public static int Age(this DateOnly dob) { var today = VietnamToday(); var age = today.Year - dob.Year; return dob > today.AddYears(-age) ? age - 1 : age; }
-        public static DateOnly? ParseDateOnly(this string? value, string format = DefaultDateOnly) { if (string.IsNullOrEmpty(value)) return null; return DateOnly.TryParseExact(value, format, out var result) ? result : null; }
+        public static int Age(this DateOnly dob) 
+        { 
+            var today = VietnamToday(); 
+            var age = today.Year - dob.Year; 
+            return dob > today.AddYears(-age) ? age - 1 : age; 
+        }
+        public static DateOnly? ParseDateOnly(this string? value, string? format = DefaultDateOnly) 
+        { 
+            if (string.IsNullOrEmpty(value)) return null; 
+            return DateOnly.TryParseExact(value, format, out var result) ? result : null; 
+        }
     }
 }

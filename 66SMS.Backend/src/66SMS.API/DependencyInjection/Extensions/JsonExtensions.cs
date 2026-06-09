@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace _66SMS.API.DependencyInjection.Extensions
 {
@@ -19,6 +19,9 @@ namespace _66SMS.API.DependencyInjection.Extensions
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 // Cài đặt bỏ qua các field nếu include cycle
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                // Đăng ký converter cho DateOnly và TimeOnly theo format mong muốn
+                //options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter("dd/MM/yyyy"));
+                //options.JsonSerializerOptions.Converters.Add(new TimeOnlyJsonConverter("HH:mm"));
             });
 
             return builder;
