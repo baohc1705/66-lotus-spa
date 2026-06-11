@@ -17,7 +17,8 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.Description).HasColumnName(ServiceConst.FIELD_DESCRIPTION).HasMaxLength(ServiceConst.DESCRIPTION_MAX_LENGTH);
             builder.Property(x => x.Content).HasColumnName(ServiceConst.FIELD_CONTENT);
             builder.Property(x => x.DurationMins).HasColumnName(ServiceConst.FIELD_DURATION_MINS);
-            builder.Property(x => x.Price).HasColumnName(ServiceConst.FIELD_PRICE);
+            builder.Property(x => x.CostPrice).HasColumnName(ServiceConst.FIELD_COST_PRICE);
+            builder.Property(x => x.SellingPrice).HasColumnName(ServiceConst.FIELD_SELLING_PRICE);
             builder.Property(x => x.CommissionRate).HasColumnName(ServiceConst.FIELD_COMMISSION_RATE);
             builder.Property(x => x.SortOrder).HasColumnName(ServiceConst.FIELD_SORT_ORDER);
             builder.Property(x => x.Status).HasColumnName(ServiceConst.FIELD_STATUS);

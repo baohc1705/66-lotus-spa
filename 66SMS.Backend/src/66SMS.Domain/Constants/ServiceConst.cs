@@ -11,7 +11,8 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_DESCRIPTION = "description";
         public const string FIELD_CONTENT = "content";
         public const string FIELD_DURATION_MINS = "duration_mins";
-        public const string FIELD_PRICE = "price";
+        public const string FIELD_COST_PRICE = "cost_price";
+        public const string FIELD_SELLING_PRICE = "selling_price";
         public const string FIELD_COMMISSION_RATE = "commission_rate";
         public const string FIELD_SORT_ORDER = "sort_order";
         public const string FIELD_STATUS = "status";

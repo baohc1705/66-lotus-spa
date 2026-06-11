@@ -13,7 +13,8 @@ namespace _66SMS.Application.Features.Services.Commands.UpdateServices
         public string? Description { get; set; }
         public string? Content { get; set; }
         public int? DurationMins { get; set; }
-        public decimal? Price { get; set; }
+        public decimal? CostPrice { get; set; }
+        public decimal? SellingPrice { get; set; }
         public decimal? CommissionRate { get; set; }
         public int? SortOrder { get; set; }
         public int? Status { get; set; }
