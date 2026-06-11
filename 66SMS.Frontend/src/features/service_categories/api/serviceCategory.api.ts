@@ -1,0 +1,40 @@
+import axiosInstance from "@/shared/api/axiosInstance";
+import type {
+  Result,
+  PagedResult,
+  PageRequest,
+} from "@/shared/types/common.types";
+import type {
+  CreateServiceCategoryPayload,
+  ServiceCategoryDTO,
+  UpdateServiceCategoryPayload,
+} from "../types/service_category.types";
+
+const BASE = "/ServiceCategory";
+
+export const serviceCategoryApi = {
+  // Get All
+  getAll: (params: PageRequest) =>
+    axiosInstance
+      .get<Result<PagedResult<ServiceCategoryDTO>>>(BASE, { params })
+      .then((r) => r.data),
+  // Get Detail
+  getDetail: (id: number) =>
+    axiosInstance
+      .get<Result<ServiceCategoryDTO>>(`${BASE}/${id}`)
+      .then((r) => r.data),
+
+  // Create Category
+  create: (payload: CreateServiceCategoryPayload) =>
+    axiosInstance.post<Result<object>>(BASE, payload).then((r) => r.data),
+
+  // Update category
+  update: (id: number, payload: UpdateServiceCategoryPayload) =>
+    axiosInstance
+      .patch<Result<object>>(`${BASE}/${id}`, payload)
+      .then((r) => r.data),
+
+  // Delete category
+  delete: (id: number) =>
+    axiosInstance.delete<Result<object>>(`${BASE}/${id}`).then((r) => r.data),
+};

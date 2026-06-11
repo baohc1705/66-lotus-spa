@@ -10,6 +10,8 @@ import { ProductListPage } from '@/features/products/pages/ProductListPage';
 import { ProductCategoryListPage } from '@/features/product_categories/pages/ProductCategoryListPage';
 import { ShiftListPage } from '@/features/shifts/pages/ShiftListPage';
 import { WorkSchedulePage } from '@/features/schedules/pages/WorkSchedulePage';
+import { ServiceCategoryListPage } from '@/features/service_categories/pages/ServiceCategoryListPage';
+import { ServiceListPage } from '@/features/services/pages/ServiceListPage';
 
 export const router = createBrowserRouter([
   {
@@ -54,6 +56,14 @@ export const router = createBrowserRouter([
           {
             path: 'products/categories',
             element: <ProductCategoryListPage />,
+          },
+          {
+            path: 'services',
+            element: <ServiceListPage />,
+          },
+          {
+            path: 'services/categories',
+            element: <ServiceCategoryListPage />,
           },
           {
             path: 'shifts',
