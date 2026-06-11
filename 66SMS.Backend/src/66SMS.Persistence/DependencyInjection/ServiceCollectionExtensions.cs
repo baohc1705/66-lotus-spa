@@ -45,6 +45,9 @@ namespace _66SMS.Persistence.DependencyInjection
             services.AddScoped<IServiceImageSqlRepository, ServiceImageSqlRepository>();
             services.AddScoped<IServiceProductSqlRepository, ServiceProductSqlRepository>();
 
+            services.AddScoped<IBookingRoomSqlRepository, BookingRoomSqlRepository>();
+            services.AddScoped<IBookingPositionSqlRepository, BookingPositionSqlRepository>();
+
             return services;
         }
     }

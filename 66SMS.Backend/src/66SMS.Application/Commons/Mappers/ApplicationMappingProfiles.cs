@@ -34,6 +34,12 @@ using _66SMS.Application.Features.Services.Commands.CreateServices;
 using _66SMS.Application.Features.Services.Commands.UpdateServices;
 using _66SMS.Application.Features.ServiceImages.Commands.CreateServiceImages;
 using _66SMS.Application.Features.ServiceImages.Commands.UpdateServiceImages;
+using _66SMS.Application.DTOs.BookingRooms;
+using _66SMS.Application.DTOs.BookingPositions;
+using _66SMS.Application.Features.BookingRooms.Commands.CreateBookingRooms;
+using _66SMS.Application.Features.BookingRooms.Commands.UpdateBookingRooms;
+using _66SMS.Application.Features.BookingPositions.Commands.CreateBookingPositions;
+using _66SMS.Application.Features.BookingPositions.Commands.UpdateBookingPositions;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Entities;
 using AutoMapper;
@@ -225,9 +231,7 @@ namespace _66SMS.Application.Commons.Mappers
             CreateMap<ServiceProduct, ServiceProductResponse>()
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product != null ? src.Product.Name : null))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt != null
-                    ? src.UpdatedAt.Value.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")
-                    : null))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt != null ? src.UpdatedAt.Value.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss") : null))
                 .IgnoreNullValueTypes();
 
             // Service -> ServiceDto
@@ -262,6 +266,29 @@ namespace _66SMS.Application.Commons.Mappers
                 .ForMember(dest => dest.Category, opt => opt.Ignore())
                 .ForMember(dest => dest.Images, opt => opt.Ignore())
                 .ForMember(dest => dest.ServiceProducts, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+
+            // BookingRoom
+            CreateMap<CreateBookingRoomCommand, BookingRoom>()
+                .IgnoreNullValueTypes();
+            CreateMap<UpdateBookingRoomCommand, BookingRoom>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<BookingRoom, BookingRoomDto>()
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt != null ? src.UpdatedAt.Value.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss") : null))
+                .IgnoreNullValueTypes();
+
+            // BookingPosition
+            CreateMap<CreateBookingPositionCommand, BookingPosition>()
+                .IgnoreNullValueTypes();
+            CreateMap<UpdateBookingPositionCommand, BookingPosition>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<BookingPosition, BookingPositionDto>()
+                .ForMember(dest => dest.RoomName, opt => opt.MapFrom(src => src.Room != null ? src.Room.Name : null))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt != null ? src.UpdatedAt.Value.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss") : null))
                 .IgnoreNullValueTypes();
 
         }

@@ -39,5 +39,9 @@ namespace _66SMS.Contracts.Enumerations
         ERR_SERVICE_IMAGE_NOT_FOUND,
         ERR_SERVICE_PRODUCT_NOT_FOUND,
         #endregion
+        #region Booking
+        ERR_BOOKING_ROOM_NOT_FOUND,
+        ERR_BOOKING_POSITION_NOT_FOUND,
+        #endregion
     }
 }
