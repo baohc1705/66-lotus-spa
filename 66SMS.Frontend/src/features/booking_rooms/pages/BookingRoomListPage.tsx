@@ -16,7 +16,7 @@ import {
   ArrowUp,
   ArrowDown,
   X,
-  Activity,
+  DoorOpen,
   Eye,
 } from "lucide-react";
 
@@ -37,14 +37,14 @@ import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Switch } from "@/shared/components/ui/switch";
 
-import { ServiceFormDialog } from "../components/ServiceFormDialog";
-import { ServiceDetailExpanded } from "../components/ServiceDetailExpanded";
+import { BookingRoomFormDialog } from "../components/BookingRoomFormDialog";
+import { BookingRoomDetailExpanded } from "../components/BookingRoomDetailExpanded";
 import {
-  useServices,
-  useDeleteService,
-  useUpdateService,
-} from "../hooks/useServices";
-import type { ServiceDTO } from "../types/service.types";
+  useBookingRooms,
+  useDeleteBookingRoom,
+  useUpdateBookingRoom,
+} from "../hooks/useBookingRooms";
+import type { BookingRoomDTO } from "../types/booking_room.types";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -60,7 +60,7 @@ const itemVariants: Variants = {
   },
 };
 
-export function ServiceListPage() {
+export function BookingRoomListPage() {
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [filter, setFilter] = useState("");
@@ -69,36 +69,35 @@ export function ServiceListPage() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   const [createOpen, setCreateOpen] = useState(false);
-  const [editService, setEditService] = useState<ServiceDTO | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<ServiceDTO | null>(null);
+  const [editBookingRoom, setEditBookingRoom] = useState<BookingRoomDTO | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<BookingRoomDTO | null>(null);
 
   const [selectedRowIds, setSelectedRowIds] = useState<Set<number>>(new Set());
 
   const {
-    data: serviceResult,
+    data: roomResult,
     isLoading,
     isFetching,
-  } = useServices({
+  } = useBookingRooms({
     pageIndex,
     pageSize,
     filter: filter || undefined,
     orderBy,
     isDescending,
   });
-  const deleteMutation = useDeleteService();
-  const updateMutation = useUpdateService();
+  
+  const deleteMutation = useDeleteBookingRoom();
+  const updateMutation = useUpdateBookingRoom();
 
-  const paged = serviceResult?.data;
-  const services = useMemo(() => paged?.items ?? [], [paged?.items]);
+  const paged = roomResult?.data;
+  const rooms = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
 
   const currentPageIds = useMemo(
-    () =>
-      services
-        .map((s) => s.id)
-        .filter((id): id is number => id !== undefined),
-    [services],
+    () => rooms.map((c) => c.id).filter((id): id is number => id !== undefined),
+    [rooms],
   );
+  
   const isAllSelected =
     currentPageIds.length > 0 &&
     currentPageIds.every((id) => selectedRowIds.has(id));
@@ -143,8 +142,7 @@ export function ServiceListPage() {
 
   const SortIcon = useCallback(
     ({ column }: { column: string }) => {
-      if (orderBy !== column)
-        return <ArrowUpDown className="w-3 h-3 opacity-40" />;
+      if (orderBy !== column) return <ArrowUpDown className="w-3 h-3 opacity-40" />;
       return isDescending ? (
         <ArrowDown className="w-3 h-3 text-lotus-leaf" />
       ) : (
@@ -154,7 +152,7 @@ export function ServiceListPage() {
     [orderBy, isDescending],
   );
 
-  const columns = useMemo<ColumnDef<ServiceDTO>[]>(
+  const columns = useMemo<ColumnDef<BookingRoomDTO>[]>(
     () => [
       {
         id: "select",
@@ -205,30 +203,13 @@ export function ServiceListPage() {
         enableResizing: false,
       },
       {
-        accessorKey: "code",
-        header: () => (
-          <button
-            onClick={() => handleSort("code")}
-            className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors"
-          >
-            Mã DV <SortIcon column="code" />
-          </button>
-        ),
-        cell: ({ row }) => (
-          <span className="font-mono text-xs px-2 py-1 bg-stone-100 rounded text-stone-600">
-            {row.original.code ?? "—"}
-          </span>
-        ),
-        size: 100,
-      },
-      {
         accessorKey: "name",
         header: () => (
           <button
             onClick={() => handleSort("name")}
             className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors"
           >
-            Tên dịch vụ <SortIcon column="name" />
+            Tên phòng <SortIcon column="name" />
           </button>
         ),
         cell: ({ row }) => (
@@ -239,58 +220,14 @@ export function ServiceListPage() {
         size: 200,
       },
       {
-        accessorKey: "categoryName",
-        header: "Nhóm dịch vụ",
+        accessorKey: "note",
+        header: "Ghi chú",
         cell: ({ row }) => (
-          <span className="text-stone-600">
-            {row.original.categoryName || "—"}
+          <span className="text-lotus-deep/80 truncate max-w-[300px] inline-block">
+            {row.original.note || "—"}
           </span>
         ),
-        size: 150,
-      },
-      {
-        accessorKey: "costPrice",
-        header: () => (
-          <button
-            onClick={() => handleSort("costPrice")}
-            className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors"
-          >
-            Giá cơ bản <SortIcon column="costPrice" />
-          </button>
-        ),
-        cell: ({ row }) => (
-          <span className="text-stone-600">
-            {row.original.costPrice?.toLocaleString() || "0"} ₫
-          </span>
-        ),
-        size: 110,
-      },
-      {
-        accessorKey: "sellingPrice",
-        header: () => (
-          <button
-            onClick={() => handleSort("sellingPrice")}
-            className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors"
-          >
-            Giá bán <SortIcon column="sellingPrice" />
-          </button>
-        ),
-        cell: ({ row }) => (
-          <span className="text-lotus-deep font-medium">
-            {row.original.sellingPrice?.toLocaleString() || "0"} ₫
-          </span>
-        ),
-        size: 110,
-      },
-      {
-        accessorKey: "durationMins",
-        header: "Thời gian",
-        cell: ({ row }) => (
-          <span className="text-stone-600">
-            {row.original.durationMins ? `${row.original.durationMins} phút` : "—"}
-          </span>
-        ),
-        size: 100,
+        size: 300,
       },
       {
         accessorKey: "status",
@@ -343,16 +280,16 @@ export function ServiceListPage() {
                     <Eye className="w-4 h-4" />
                     {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
                   </DropdownMenuItem>
-                  <PermissionGate resource="services" action="update">
+                  <PermissionGate resource="booking_rooms" action="update">
                     <DropdownMenuItem
-                      onClick={() => setEditService(item)}
+                      onClick={() => setEditBookingRoom(item)}
                     >
                       <Pencil className="w-4 h-4" />
                       Chỉnh sửa
                     </DropdownMenuItem>
                   </PermissionGate>
                   <PermissionGate
-                    resource="services"
+                    resource="booking_rooms"
                     action="delete"
                     role="admin"
                   >
@@ -362,7 +299,7 @@ export function ServiceListPage() {
                       onClick={() => setDeleteTarget(item)}
                     >
                       <Trash2 className="w-4 h-4" />
-                      Xóa dịch vụ
+                      Xóa phòng
                     </DropdownMenuItem>
                   </PermissionGate>
                 </DropdownMenuContent>
@@ -387,7 +324,7 @@ export function ServiceListPage() {
   );
 
   const table = useReactTable({
-    data: services,
+    data: rooms,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
@@ -415,7 +352,7 @@ export function ServiceListPage() {
           <DataTableToolbar
             searchValue={filter}
             onSearchChange={handleSearchChange}
-            searchPlaceholder="Tìm kiếm dịch vụ..."
+            searchPlaceholder="Tìm kiếm phòng..."
           >
             {selectedRowIds.size > 0 && (
               <div className="flex items-center gap-2 mr-auto text-[13px] text-lotus-deep font-medium bg-lotus-cream/50 px-3 py-1.5 rounded-lg border border-stone-200/50">
@@ -433,18 +370,14 @@ export function ServiceListPage() {
             <DataTableViewOptions
               table={table}
               columnLabels={{
-                code: "Mã DV",
-                name: "Tên dịch vụ",
-                categoryName: "Nhóm dịch vụ",
-                costPrice: "Giá cơ bản",
-                sellingPrice: "Giá bán",
-                durationMins: "Thời gian",
+                name: "Tên phòng",
+                note: "Ghi chú",
                 status: "Trạng thái",
               }}
             />
 
             <PermissionGate
-              resource="services"
+              resource="booking_rooms"
               action="create"
               role="admin"
             >
@@ -455,7 +388,7 @@ export function ServiceListPage() {
                 className="text-[12px] gap-1.5"
               >
                 <Plus className="w-3.5 h-3.5" />
-                Thêm dịch vụ
+                Thêm phòng
               </Button>
             </PermissionGate>
           </DataTableToolbar>
@@ -467,23 +400,23 @@ export function ServiceListPage() {
           loadingRows={pageSize > 5 ? 5 : pageSize}
           onRowClick={(row) => row.toggleExpanded()}
           renderSubComponent={({ row }) => (
-            row.original.id ? <ServiceDetailExpanded serviceId={row.original.id} onEdit={(service) => setEditService(service)} /> : null
+            row.original.id ? <BookingRoomDetailExpanded roomId={row.original.id} onEdit={(room) => setEditBookingRoom(room)} /> : null
           )}
           emptyState={
             <div className="flex flex-col items-center gap-3">
               <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
-                <Activity className="w-7 h-7 text-lotus-stone" />
+                <DoorOpen className="w-7 h-7 text-lotus-stone" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-lotus-deep">
-                  Chưa có dịch vụ nào
+                  Chưa có phòng dịch vụ
                 </p>
                 <p className="text-[12px] text-lotus-stone mt-0.5">
-                  Thêm dịch vụ mới để cung cấp cho khách hàng.
+                  Thêm phòng mới để sử dụng dịch vụ.
                 </p>
               </div>
               <PermissionGate
-                resource="services"
+                resource="booking_rooms"
                 action="create"
                 role="admin"
               >
@@ -494,7 +427,7 @@ export function ServiceListPage() {
                   className="mt-1 text-[12px]"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  Thêm dịch vụ
+                  Thêm phòng
                 </Button>
               </PermissionGate>
             </div>
@@ -522,17 +455,17 @@ export function ServiceListPage() {
         )}
       </motion.div>
 
-      <ServiceFormDialog
+      <BookingRoomFormDialog
         open={createOpen}
         onOpenChange={setCreateOpen}
       />
 
-      <ServiceFormDialog
-        open={!!editService}
+      <BookingRoomFormDialog
+        open={!!editBookingRoom}
         onOpenChange={(open) => {
-          if (!open) setEditService(null);
+          if (!open) setEditBookingRoom(null);
         }}
-        service={editService}
+        bookingRoom={editBookingRoom}
       />
 
       <ConfirmDialog
@@ -541,8 +474,8 @@ export function ServiceListPage() {
           if (!open) setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
-        title="Xóa dịch vụ"
-        description={`Bạn có chắc muốn xóa dịch vụ "${deleteTarget?.name ?? ""}"? Hành động này không thể hoàn tác.`}
+        title="Xóa phòng dịch vụ"
+        description={`Bạn có chắc muốn xóa phòng "${deleteTarget?.name ?? ""}"? Hành động này không thể hoàn tác.`}
         confirmLabel="Xóa"
         loading={deleteMutation.isPending}
         variant="danger"

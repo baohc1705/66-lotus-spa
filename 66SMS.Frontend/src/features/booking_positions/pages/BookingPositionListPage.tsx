@@ -3,7 +3,6 @@ import { motion, type Variants } from "motion/react";
 import {
   useReactTable,
   getCoreRowModel,
-  getExpandedRowModel,
   type ColumnDef,
   type VisibilityState,
 } from "@tanstack/react-table";
@@ -16,8 +15,7 @@ import {
   ArrowUp,
   ArrowDown,
   X,
-  Activity,
-  Eye,
+  MapPin,
 } from "lucide-react";
 
 import { DataTable } from "@/shared/components/DataTable/DataTable";
@@ -37,14 +35,13 @@ import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Switch } from "@/shared/components/ui/switch";
 
-import { ServiceFormDialog } from "../components/ServiceFormDialog";
-import { ServiceDetailExpanded } from "../components/ServiceDetailExpanded";
+import { BookingPositionFormDialog } from "../components/BookingPositionFormDialog";
 import {
-  useServices,
-  useDeleteService,
-  useUpdateService,
-} from "../hooks/useServices";
-import type { ServiceDTO } from "../types/service.types";
+  useBookingPositions,
+  useDeleteBookingPosition,
+  useUpdateBookingPosition,
+} from "../hooks/useBookingPositions";
+import type { BookingPositionDTO } from "../types/booking_position.types";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -60,7 +57,7 @@ const itemVariants: Variants = {
   },
 };
 
-export function ServiceListPage() {
+export function BookingPositionListPage() {
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [filter, setFilter] = useState("");
@@ -69,36 +66,35 @@ export function ServiceListPage() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   const [createOpen, setCreateOpen] = useState(false);
-  const [editService, setEditService] = useState<ServiceDTO | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<ServiceDTO | null>(null);
+  const [editBookingPosition, setEditBookingPosition] = useState<BookingPositionDTO | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<BookingPositionDTO | null>(null);
 
   const [selectedRowIds, setSelectedRowIds] = useState<Set<number>>(new Set());
 
   const {
-    data: serviceResult,
+    data: positionResult,
     isLoading,
     isFetching,
-  } = useServices({
+  } = useBookingPositions({
     pageIndex,
     pageSize,
     filter: filter || undefined,
     orderBy,
     isDescending,
   });
-  const deleteMutation = useDeleteService();
-  const updateMutation = useUpdateService();
+  
+  const deleteMutation = useDeleteBookingPosition();
+  const updateMutation = useUpdateBookingPosition();
 
-  const paged = serviceResult?.data;
-  const services = useMemo(() => paged?.items ?? [], [paged?.items]);
+  const paged = positionResult?.data;
+  const positions = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
 
   const currentPageIds = useMemo(
-    () =>
-      services
-        .map((s) => s.id)
-        .filter((id): id is number => id !== undefined),
-    [services],
+    () => positions.map((c) => c.id).filter((id): id is number => id !== undefined),
+    [positions],
   );
+  
   const isAllSelected =
     currentPageIds.length > 0 &&
     currentPageIds.every((id) => selectedRowIds.has(id));
@@ -143,8 +139,7 @@ export function ServiceListPage() {
 
   const SortIcon = useCallback(
     ({ column }: { column: string }) => {
-      if (orderBy !== column)
-        return <ArrowUpDown className="w-3 h-3 opacity-40" />;
+      if (orderBy !== column) return <ArrowUpDown className="w-3 h-3 opacity-40" />;
       return isDescending ? (
         <ArrowDown className="w-3 h-3 text-lotus-leaf" />
       ) : (
@@ -154,7 +149,7 @@ export function ServiceListPage() {
     [orderBy, isDescending],
   );
 
-  const columns = useMemo<ColumnDef<ServiceDTO>[]>(
+  const columns = useMemo<ColumnDef<BookingPositionDTO>[]>(
     () => [
       {
         id: "select",
@@ -205,30 +200,13 @@ export function ServiceListPage() {
         enableResizing: false,
       },
       {
-        accessorKey: "code",
-        header: () => (
-          <button
-            onClick={() => handleSort("code")}
-            className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors"
-          >
-            Mã DV <SortIcon column="code" />
-          </button>
-        ),
-        cell: ({ row }) => (
-          <span className="font-mono text-xs px-2 py-1 bg-stone-100 rounded text-stone-600">
-            {row.original.code ?? "—"}
-          </span>
-        ),
-        size: 100,
-      },
-      {
         accessorKey: "name",
         header: () => (
           <button
             onClick={() => handleSort("name")}
             className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors"
           >
-            Tên dịch vụ <SortIcon column="name" />
+            Tên vị trí <SortIcon column="name" />
           </button>
         ),
         cell: ({ row }) => (
@@ -239,55 +217,28 @@ export function ServiceListPage() {
         size: 200,
       },
       {
-        accessorKey: "categoryName",
-        header: "Nhóm dịch vụ",
+        accessorKey: "roomName",
+        header: "Phòng dịch vụ",
         cell: ({ row }) => (
-          <span className="text-stone-600">
-            {row.original.categoryName || "—"}
+          <span className="text-lotus-deep/80">
+            {row.original.roomName || "—"}
           </span>
         ),
         size: 150,
       },
       {
-        accessorKey: "costPrice",
+        accessorKey: "sortOrder",
         header: () => (
           <button
-            onClick={() => handleSort("costPrice")}
+            onClick={() => handleSort("sortOrder")}
             className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors"
           >
-            Giá cơ bản <SortIcon column="costPrice" />
+            Thứ tự <SortIcon column="sortOrder" />
           </button>
         ),
         cell: ({ row }) => (
-          <span className="text-stone-600">
-            {row.original.costPrice?.toLocaleString() || "0"} ₫
-          </span>
-        ),
-        size: 110,
-      },
-      {
-        accessorKey: "sellingPrice",
-        header: () => (
-          <button
-            onClick={() => handleSort("sellingPrice")}
-            className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors"
-          >
-            Giá bán <SortIcon column="sellingPrice" />
-          </button>
-        ),
-        cell: ({ row }) => (
-          <span className="text-lotus-deep font-medium">
-            {row.original.sellingPrice?.toLocaleString() || "0"} ₫
-          </span>
-        ),
-        size: 110,
-      },
-      {
-        accessorKey: "durationMins",
-        header: "Thời gian",
-        cell: ({ row }) => (
-          <span className="text-stone-600">
-            {row.original.durationMins ? `${row.original.durationMins} phút` : "—"}
+          <span className="text-lotus-deep/80">
+            {row.original.sortOrder ?? "—"}
           </span>
         ),
         size: 100,
@@ -339,20 +290,16 @@ export function ServiceListPage() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => row.toggleExpanded()}>
-                    <Eye className="w-4 h-4" />
-                    {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
-                  </DropdownMenuItem>
-                  <PermissionGate resource="services" action="update">
+                  <PermissionGate resource="booking_positions" action="update">
                     <DropdownMenuItem
-                      onClick={() => setEditService(item)}
+                      onClick={() => setEditBookingPosition(item)}
                     >
                       <Pencil className="w-4 h-4" />
                       Chỉnh sửa
                     </DropdownMenuItem>
                   </PermissionGate>
                   <PermissionGate
-                    resource="services"
+                    resource="booking_positions"
                     action="delete"
                     role="admin"
                   >
@@ -362,7 +309,7 @@ export function ServiceListPage() {
                       onClick={() => setDeleteTarget(item)}
                     >
                       <Trash2 className="w-4 h-4" />
-                      Xóa dịch vụ
+                      Xóa vị trí
                     </DropdownMenuItem>
                   </PermissionGate>
                 </DropdownMenuContent>
@@ -387,11 +334,9 @@ export function ServiceListPage() {
   );
 
   const table = useReactTable({
-    data: services,
+    data: positions,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
-    getRowCanExpand: () => true,
     enableMultiRowSelection: false,
     columnResizeMode: "onChange",
     state: {
@@ -415,7 +360,7 @@ export function ServiceListPage() {
           <DataTableToolbar
             searchValue={filter}
             onSearchChange={handleSearchChange}
-            searchPlaceholder="Tìm kiếm dịch vụ..."
+            searchPlaceholder="Tìm kiếm vị trí..."
           >
             {selectedRowIds.size > 0 && (
               <div className="flex items-center gap-2 mr-auto text-[13px] text-lotus-deep font-medium bg-lotus-cream/50 px-3 py-1.5 rounded-lg border border-stone-200/50">
@@ -433,18 +378,15 @@ export function ServiceListPage() {
             <DataTableViewOptions
               table={table}
               columnLabels={{
-                code: "Mã DV",
-                name: "Tên dịch vụ",
-                categoryName: "Nhóm dịch vụ",
-                costPrice: "Giá cơ bản",
-                sellingPrice: "Giá bán",
-                durationMins: "Thời gian",
+                name: "Tên vị trí",
+                roomName: "Phòng dịch vụ",
+                sortOrder: "Thứ tự",
                 status: "Trạng thái",
               }}
             />
 
             <PermissionGate
-              resource="services"
+              resource="booking_positions"
               action="create"
               role="admin"
             >
@@ -455,7 +397,7 @@ export function ServiceListPage() {
                 className="text-[12px] gap-1.5"
               >
                 <Plus className="w-3.5 h-3.5" />
-                Thêm dịch vụ
+                Thêm vị trí
               </Button>
             </PermissionGate>
           </DataTableToolbar>
@@ -465,25 +407,21 @@ export function ServiceListPage() {
           table={table}
           isLoading={isLoading}
           loadingRows={pageSize > 5 ? 5 : pageSize}
-          onRowClick={(row) => row.toggleExpanded()}
-          renderSubComponent={({ row }) => (
-            row.original.id ? <ServiceDetailExpanded serviceId={row.original.id} onEdit={(service) => setEditService(service)} /> : null
-          )}
           emptyState={
             <div className="flex flex-col items-center gap-3">
               <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
-                <Activity className="w-7 h-7 text-lotus-stone" />
+                <MapPin className="w-7 h-7 text-lotus-stone" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-lotus-deep">
-                  Chưa có dịch vụ nào
+                  Chưa có vị trí dịch vụ
                 </p>
                 <p className="text-[12px] text-lotus-stone mt-0.5">
-                  Thêm dịch vụ mới để cung cấp cho khách hàng.
+                  Thêm vị trí mới để sử dụng dịch vụ.
                 </p>
               </div>
               <PermissionGate
-                resource="services"
+                resource="booking_positions"
                 action="create"
                 role="admin"
               >
@@ -494,7 +432,7 @@ export function ServiceListPage() {
                   className="mt-1 text-[12px]"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  Thêm dịch vụ
+                  Thêm vị trí
                 </Button>
               </PermissionGate>
             </div>
@@ -522,17 +460,17 @@ export function ServiceListPage() {
         )}
       </motion.div>
 
-      <ServiceFormDialog
+      <BookingPositionFormDialog
         open={createOpen}
         onOpenChange={setCreateOpen}
       />
 
-      <ServiceFormDialog
-        open={!!editService}
+      <BookingPositionFormDialog
+        open={!!editBookingPosition}
         onOpenChange={(open) => {
-          if (!open) setEditService(null);
+          if (!open) setEditBookingPosition(null);
         }}
-        service={editService}
+        bookingPosition={editBookingPosition}
       />
 
       <ConfirmDialog
@@ -541,8 +479,8 @@ export function ServiceListPage() {
           if (!open) setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
-        title="Xóa dịch vụ"
-        description={`Bạn có chắc muốn xóa dịch vụ "${deleteTarget?.name ?? ""}"? Hành động này không thể hoàn tác.`}
+        title="Xóa vị trí dịch vụ"
+        description={`Bạn có chắc muốn xóa vị trí "${deleteTarget?.name ?? ""}"? Hành động này không thể hoàn tác.`}
         confirmLabel="Xóa"
         loading={deleteMutation.isPending}
         variant="danger"

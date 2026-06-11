@@ -8,11 +8,12 @@ import {
   Calendar,
   SoapDispenserDroplet,
   Stethoscope,
-  CalendarHeart,
   Clock,
   Leaf,
   Armchair,
   Box,
+  MapPin,
+  CalendarHeart,
 } from "lucide-react";
 
 export interface SubMenuItem {
@@ -30,7 +31,14 @@ export interface MenuItem {
 
 export const MENU_ITEMS: MenuItem[] = [
   { label: "Tổng quan", path: "/admin", icon: LayoutDashboard },
-  { label: "Phòng", path: "/admin/rooms", icon: Armchair },
+  {
+    label: "Phòng",
+    icon: Armchair,
+    children: [
+      { label: "Phòng dịch vụ", path: "/admin/rooms/list", icon: Armchair },
+      { label: "Vị trí dịch vụ", path: "/admin/rooms/positions", icon: MapPin },
+    ],
+  },
   {
     label: "Dịch vụ",
     icon: Leaf,

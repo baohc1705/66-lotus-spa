@@ -1,40 +1,42 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { HomePage } from '@/features/landing/pages/HomePage';
-import { LoginPage } from '@/features/auth/pages/LoginPage';
-import { UsersPage } from '@/features/users/pages/UsersPage';
-import { ProtectedRoute } from './ProtectedRoute';
-import { AdminLayout, AdminDashboard } from '@/features/admin';
-import { EmployeeListPage } from '@/features/employees/pages/EmployeeListPage';
-import { CustomerListPage } from '@/features/customers/pages/CustomerListPage';
-import { ProductListPage } from '@/features/products/pages/ProductListPage';
-import { ProductCategoryListPage } from '@/features/product_categories/pages/ProductCategoryListPage';
-import { ShiftListPage } from '@/features/shifts/pages/ShiftListPage';
-import { WorkSchedulePage } from '@/features/schedules/pages/WorkSchedulePage';
-import { ServiceCategoryListPage } from '@/features/service_categories/pages/ServiceCategoryListPage';
-import { ServiceListPage } from '@/features/services/pages/ServiceListPage';
+import { createBrowserRouter, Navigate } from "react-router-dom";
+import { HomePage } from "@/features/landing/pages/HomePage";
+import { LoginPage } from "@/features/auth/pages/LoginPage";
+import { UsersPage } from "@/features/users/pages/UsersPage";
+import { ProtectedRoute } from "./ProtectedRoute";
+import { AdminLayout, AdminDashboard } from "@/features/admin";
+import { EmployeeListPage } from "@/features/employees/pages/EmployeeListPage";
+import { CustomerListPage } from "@/features/customers/pages/CustomerListPage";
+import { ProductListPage } from "@/features/products/pages/ProductListPage";
+import { ProductCategoryListPage } from "@/features/product_categories/pages/ProductCategoryListPage";
+import { ShiftListPage } from "@/features/shifts/pages/ShiftListPage";
+import { WorkSchedulePage } from "@/features/schedules/pages/WorkSchedulePage";
+import { ServiceCategoryListPage } from "@/features/service_categories/pages/ServiceCategoryListPage";
+import { ServiceListPage } from "@/features/services/pages/ServiceListPage";
+import { BookingRoomListPage } from "@/features/booking_rooms/pages/BookingRoomListPage";
+import { BookingPositionListPage } from "@/features/booking_positions/pages/BookingPositionListPage";
 
 export const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <HomePage />,
   },
   {
-    path: '/login',
+    path: "/login",
     element: <LoginPage />,
   },
   {
     element: <ProtectedRoute />,
     children: [
       {
-        path: '/dashboard',
+        path: "/dashboard",
         element: <div className="p-6">Dashboard</div>,
       },
       {
-        path: '/users',
+        path: "/users",
         element: <UsersPage />,
       },
       {
-        path: '/admin',
+        path: "/admin",
         element: <AdminLayout />,
         children: [
           {
@@ -42,35 +44,43 @@ export const router = createBrowserRouter([
             element: <AdminDashboard />,
           },
           {
-            path: 'staff/list',
+            path: "staff/list",
             element: <EmployeeListPage />,
           },
           {
-            path: 'customers/list',
+            path: "customers/list",
             element: <CustomerListPage />,
           },
           {
-            path: 'products/list',
+            path: "products/list",
             element: <ProductListPage />,
           },
           {
-            path: 'products/categories',
+            path: "products/categories",
             element: <ProductCategoryListPage />,
           },
           {
-            path: 'services',
+            path: "services",
             element: <ServiceListPage />,
           },
           {
-            path: 'services/categories',
+            path: "rooms/list",
+            element: <BookingRoomListPage />,
+          },
+          {
+            path: "rooms/positions",
+            element: <BookingPositionListPage />,
+          },
+          {
+            path: "services/categories",
             element: <ServiceCategoryListPage />,
           },
           {
-            path: 'shifts',
+            path: "shifts",
             element: <ShiftListPage />,
           },
           {
-            path: 'staff/schedule',
+            path: "staff/schedule",
             element: <WorkSchedulePage />,
           },
           // Placeholders for other admin routes
@@ -79,7 +89,7 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: '*',
+    path: "*",
     element: <Navigate to="/" replace />,
   },
 ]);
