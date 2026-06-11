@@ -19,7 +19,7 @@ namespace _66SMS.Application.Features.WorkSchedules.Commands.DeleteWorkSchedule
 
         async Task<Result<object>> IRequestHandler<DeleteWorkScheduleCommand, Result<object>>.Handle(DeleteWorkScheduleCommand request, CancellationToken cancellationToken)
         {
-            WorkSchedule workSchedule = await workScheduleSqlRepository.GetByIdAsync(request.Id, false, cancellationToken);
+            WorkSchedule workSchedule = await workScheduleSqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {

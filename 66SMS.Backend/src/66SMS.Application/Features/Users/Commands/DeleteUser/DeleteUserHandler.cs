@@ -28,7 +28,7 @@ namespace _66SMS.Application.Features.Users.Commands.DeleteUser
             {
                 if (request.Id != null)
                 {
-                    User? user = await userSqlRepository.GetByIdAsync(request.Id.Value);
+                    User? user = await userSqlRepository.FindByIdAsync(request.Id.Value);
                     userSqlRepository.Remove(user);
                     await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 }

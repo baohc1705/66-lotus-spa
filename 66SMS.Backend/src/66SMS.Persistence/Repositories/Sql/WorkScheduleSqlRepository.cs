@@ -30,9 +30,9 @@ namespace _66SMS.Persistence.Repositories.Sql
             base.Update(entity);
         }
 
-        public async Task<WorkSchedule?> GetByIdAsync(int id, bool asNoTracking = true, CancellationToken cancellationToken = default)
+        public async Task<WorkSchedule?> FindByIdAsync(int id, bool asNoTracking = true, CancellationToken cancellationToken = default)
         {
-            WorkSchedule? workSchedule = await base.GetByIdAsync(id, asNoTracking, cancellationToken);
+            WorkSchedule? workSchedule = await base.FindByIdAsync(id, asNoTracking, cancellationToken);
             if (workSchedule == null)
                 throw GlobalException.NotFound("User not found id");
             return workSchedule;

@@ -7,7 +7,7 @@ namespace _66SMS.Domain.Abstractions.Repositories.Sql.Base
     {
         IQueryable<TEntity> AsQueryable(bool asNoTracking = true);
 
-        Task<TEntity?> GetByIdAsync(TKey id, bool asNoTracking = true, CancellationToken cancellationToken = default);
+        Task<TEntity?> FindByIdAsync(TKey id, bool asNoTracking = true, CancellationToken cancellationToken = default);
         Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
 
         #region Write

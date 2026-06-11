@@ -20,14 +20,31 @@ namespace _66SMS.Application.Features.WorkSchedules.Queries.GetAllWorkSchedule
         public async Task<Result<PagedResult<WorkScheduleDTO>>> Handle(GetAllWorkScheduleQuery request, CancellationToken cancellationToken)
         {
             var query = workScheduleSqlRepository.AsQueryable();
+            if (!string.IsNullOrEmpty(request.StartDate))
+            {
+                var startDate = request.StartDate.ParseDateOnly("yyyy-MM-dd");
+                query = query.Where(x => x.WorkDate >= startDate);
+            }
+
+            if (!string.IsNullOrEmpty(request.EndDate))
+            {
+                var endDate = request.EndDate.ParseDateOnly("yyyy-MM-dd");
+                query = query.Where(x => x.WorkDate <= endDate);
+            }
+
+            if (request.EmployeeId.HasValue)
+            {
+                query = query.Where(x => x.EmployeeId == request.EmployeeId.Value);
+            }
+
             if (!string.IsNullOrEmpty(request.Filter))
             {
-                query = query.Where(x => x.WorkDate == request.Filter.ParseDateOnly("yyyy-MM-dd") ||
-                x.Employee.FullName.Contains(request.Filter));
+                query = query.Where(x => x.Employee.FullName.StartsWith(request.Filter));
             }
 
             var result = await query.Select(x => new WorkScheduleDTO
             {
+                Id = x.Id,
                 ShiftPeriodId = x.ShiftPeriodId,
                 EmployeeId = x.EmployeeId,
                 WorkDate = x.WorkDate,

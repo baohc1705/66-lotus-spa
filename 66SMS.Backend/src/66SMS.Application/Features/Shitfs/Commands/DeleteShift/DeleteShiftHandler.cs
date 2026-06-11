@@ -26,7 +26,7 @@ namespace _66SMS.Application.Features.Shitfs.Commands.DeleteShift
 
         public async Task<Result<object>> Handle(DeleteShiftCommand request, CancellationToken cancellationToken)
         {
-            Shift? shift = await shiftSqlRepository.GetByIdAsync(request.Id, false, cancellationToken);
+            Shift? shift = await shiftSqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
             if (shift == null)
             {
                 return Result<object>.NotFound();

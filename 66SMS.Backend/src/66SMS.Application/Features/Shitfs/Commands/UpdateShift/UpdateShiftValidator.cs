@@ -11,7 +11,6 @@ namespace _66SMS.Application.Features.Shitfs.Commands.UpdateShift
 
             When(x => x.ShiftPeriod is not null, () =>
             {
-                RuleFor(x => x.ShiftPeriod!.Id).NotNull().GreaterThan(0);
                 RuleFor(x => x.ShiftPeriod!.ShiftStart).NotNull();
                 RuleFor(x => x.ShiftPeriod!.ShiftEnd).NotNull()
                     .GreaterThan(x => x.ShiftPeriod!.ShiftStart)

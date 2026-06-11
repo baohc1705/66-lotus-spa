@@ -24,7 +24,7 @@ namespace _66SMS.Application.Features.Shitfs.Commands.UpdateShift
 
         public async Task<Result<object>> Handle(UpdateShiftCommand request, CancellationToken cancellationToken)
         {
-            Shift shift = await shiftSqlRepository.GetByIdAsync((int)request.Id, false, cancellationToken);
+            Shift shift = await shiftSqlRepository.FindByIdAsync((int)request.Id, false, cancellationToken);
             mapper.Map(request, shift);
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
@@ -33,10 +33,51 @@ namespace _66SMS.Application.Features.Shitfs.Commands.UpdateShift
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 if (request.ShiftPeriod != null)
                 {
-                    ShiftPeriod shiftPeriod = await shiftPeriodSqlRepository.GetByIdAsync((int)request.ShiftPeriod.Id, false, cancellationToken);
-                    mapper.Map(request.ShiftPeriod, shiftPeriod);
-                    shiftPeriodSqlRepository.Update(shiftPeriod);
-                    await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                    if (request.ShiftPeriod.Id == null || request.ShiftPeriod.Id == 0)
+                    {
+                        var activePeriods = shiftPeriodSqlRepository.AsQueryable(false)
+                            .Where(sp => sp.ShiftId == shift.Id && sp.EffectiveTo == null)
+                            .ToList();
+
+                        bool shouldCreateNew = true;
+
+                        foreach (var activePeriod in activePeriods)
+                        {
+                            if (request.ShiftPeriod.EffectiveFrom.HasValue)
+                            {
+                                if (activePeriod.EffectiveFrom >= request.ShiftPeriod.EffectiveFrom.Value)
+                                {
+                                    // If the old period starts on or after the new period, 
+                                    // we just update it instead of creating a negative duration period
+                                    mapper.Map(request.ShiftPeriod, activePeriod);
+                                    shiftPeriodSqlRepository.Update(activePeriod);
+                                    shouldCreateNew = false;
+                                }
+                                else
+                                {
+                                    activePeriod.EffectiveTo = request.ShiftPeriod.EffectiveFrom.Value.AddDays(-1);
+                                    shiftPeriodSqlRepository.Update(activePeriod);
+                                }
+                            }
+                        }
+
+                        if (shouldCreateNew)
+                        {
+                            ShiftPeriod newShiftPeriod = new ShiftPeriod();
+                            mapper.Map(request.ShiftPeriod, newShiftPeriod);
+                            newShiftPeriod.ShiftId = shift.Id;
+                            shiftPeriodSqlRepository.Add(newShiftPeriod);
+                        }
+                        
+                        await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                    }
+                    else
+                    {
+                        ShiftPeriod shiftPeriod = await shiftPeriodSqlRepository.FindByIdAsync((int)request.ShiftPeriod.Id, false, cancellationToken);
+                        mapper.Map(request.ShiftPeriod, shiftPeriod);
+                        shiftPeriodSqlRepository.Update(shiftPeriod);
+                        await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                    }
                 }
 
                 transaction.Commit();

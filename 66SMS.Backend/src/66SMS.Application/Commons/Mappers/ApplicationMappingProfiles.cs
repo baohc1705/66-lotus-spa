@@ -15,6 +15,25 @@ using _66SMS.Application.Features.Users.Commands.CreateUser;
 using _66SMS.Application.Features.Users.Commands.UpdateUser;
 using _66SMS.Application.Features.WorkSchedules.Commands.CreateWorkSchedule;
 using _66SMS.Application.Features.WorkSchedules.Commands.UpdateWorkSchedule;
+using _66SMS.Application.Features.ProductCategories.Commands.CreateProductCategories;
+using _66SMS.Application.Features.ProductCategories.Commands.UpdateProductCategories;
+using _66SMS.Application.DTOs.ProductCategories;
+using _66SMS.Application.Features.ProductImages.Commands.CreateProductImages;
+using _66SMS.Application.Features.ProductImages.Commands.UpdateProductImages;
+using _66SMS.Application.DTOs.ProductImages;
+using _66SMS.Application.Features.Products.Commands.CreateProducts;
+using _66SMS.Application.Features.Products.Commands.UpdateProducts;
+using _66SMS.Application.DTOs.Products;
+using _66SMS.Application.DTOs.ServiceCategories;
+using _66SMS.Application.DTOs.Services;
+using _66SMS.Application.DTOs.ServiceImages;
+using _66SMS.Application.DTOs.ServiceProducts;
+using _66SMS.Application.Features.ServiceCategories.Commands.CreateServiceCategories;
+using _66SMS.Application.Features.ServiceCategories.Commands.UpdateServiceCategories;
+using _66SMS.Application.Features.Services.Commands.CreateServices;
+using _66SMS.Application.Features.Services.Commands.UpdateServices;
+using _66SMS.Application.Features.ServiceImages.Commands.CreateServiceImages;
+using _66SMS.Application.Features.ServiceImages.Commands.UpdateServiceImages;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Entities;
 using AutoMapper;
@@ -135,7 +154,116 @@ namespace _66SMS.Application.Commons.Mappers
                 .IgnoreNullValueTypes();
 
             // WorkSchedule DTO
-           
+
+            // ProductCategory
+            CreateMap<CreateProductCategoryCommand, ProductCategory>()
+                .IgnoreNullValueTypes();
+            CreateMap<UpdateProductCategoryCommand, ProductCategory>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<ProductCategory, ProductCategoryDto>()
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyy hh:mm:ss")))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt.ToVietnamTimeString("dd/MM/yyy hh:mm:ss")))
+                .IgnoreNullValueTypes();
+
+            // ProductImage
+            CreateMap<CreateProductImageCommand, ProductImage>()
+                .IgnoreNullValueTypes();
+            CreateMap<UpdateProductImageCommand, ProductImage>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<ProductImage, ProductImageDto>()
+                .IgnoreNullValueTypes();
+            CreateMap<ProductImageDto, ProductImage>()
+                .IgnoreNullValueTypes();
+
+            // Product
+            CreateMap<CreateProductCommand, Product>()
+                .ForMember(dest => dest.Category, opt => opt.Ignore())
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<UpdateProductCommand, Product>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Category, opt => opt.Ignore())
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<Product, ProductDto>()
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : string.Empty))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyy hh:mm:ss")))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt.ToVietnamTimeString("dd/MM/yyy hh:mm:ss")))
+                .IgnoreNullValueTypes(); ;
+
+            // ServiceCategory
+            CreateMap<CreateServiceCategoriesCommand, ServiceCategory>()
+                .IgnoreNullValueTypes();
+            CreateMap<UpdateServiceCategoriesCommand, ServiceCategory>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<ServiceCategory, ServiceCategoryDto>()
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt != null
+                    ? src.UpdatedAt.Value.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")
+                    : null))
+                .IgnoreNullValueTypes();
+
+            // ServiceImage
+            CreateMap<CreateServiceImagesCommand, ServiceImage>()
+                .IgnoreNullValueTypes();
+            CreateMap<UpdateServiceImagesCommand, ServiceImage>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<ServiceImage, ServiceImageDto>()
+                .IgnoreNullValueTypes();
+            CreateMap<ServiceImage, ServiceImageResponse>()
+                .IgnoreNullValueTypes();
+
+            // ServiceProduct
+            CreateMap<ServiceProduct, ServiceProductDto>()
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product != null ? src.Product.Name : null))
+                .IgnoreNullValueTypes();
+            CreateMap<ServiceProduct, ServiceProductResponse>()
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product != null ? src.Product.Name : null))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt != null
+                    ? src.UpdatedAt.Value.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")
+                    : null))
+                .IgnoreNullValueTypes();
+
+            // Service -> ServiceDto
+            CreateMap<Service, ServiceDto>()
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt != null
+                    ? src.UpdatedAt.Value.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")
+                    : null))
+                .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images))
+                .ForMember(dest => dest.ServiceProducts, opt => opt.MapFrom(src => src.ServiceProducts))
+                .IgnoreNullValueTypes();
+
+            // CreateService
+            CreateMap<CreateServiceCommand, Service>()
+                .ForMember(dest => dest.Category, opt => opt.Ignore())
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ForMember(dest => dest.ServiceProducts, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<ServiceImageItems, ServiceImage>()
+                .ForMember(dest => dest.Service, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<ServiceProductItems, ServiceProduct>()
+                .ForMember(dest => dest.Product, opt => opt.Ignore())
+                .ForMember(dest => dest.Service, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+
+            // UpdateService
+            CreateMap<UpdateServiceCommand, Service>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Category, opt => opt.Ignore())
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ForMember(dest => dest.ServiceProducts, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+
         }
     }
 
@@ -154,7 +282,7 @@ namespace _66SMS.Application.Commons.Mappers
             foreach (var property in sourceType.GetProperties())
             {
                 var propertyType = property.PropertyType;
-                
+
                 // Tìm thuộc tính tương ứng ở đối tượng đích (Destination) có cùng tên
                 var destProperty = destinationType.GetProperty(property.Name);
 
@@ -162,7 +290,7 @@ namespace _66SMS.Application.Commons.Mappers
                 {
                     // Kiểm tra thuộc tính nguồn có phải là Nullable Value Type (int?, DateOnly?, bool?...) hay không
                     bool isNullableValueType = propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>);
-                    
+
                     // Kiểm tra thuộc tính nguồn có phải là Reference Type (string, class...) hay không
                     bool isReferenceType = !propertyType.IsValueType;
 
@@ -171,19 +299,19 @@ namespace _66SMS.Application.Commons.Mappers
                     {
                         // Khởi tạo tham số đại diện cho đối tượng nguồn: "src => ..."
                         var parameter = Expression.Parameter(sourceType, "src");
-                        
+
                         // Lấy giá trị của thuộc tính: "src.PropertyName"
                         var propertyAccess = Expression.Property(parameter, property);
-                        
+
                         // Định nghĩa hằng số null tương thích với kiểu dữ liệu của thuộc tính
                         var nullConstant = Expression.Constant(null, propertyType);
-                        
+
                         // Tạo so sánh khác null: "src.PropertyName != null"
                         var conditionExpr = Expression.NotEqual(propertyAccess, nullConstant);
 
                         // Xây dựng Lambda Expression dạng: src => src.PropertyName != null
                         var lambda = Expression.Lambda<Func<TSource, bool>>(conditionExpr, parameter);
-                        
+
                         // Biên dịch Lambda Expression thành Delegate để thực thi trong runtime
                         var compiledCondition = lambda.Compile();
 

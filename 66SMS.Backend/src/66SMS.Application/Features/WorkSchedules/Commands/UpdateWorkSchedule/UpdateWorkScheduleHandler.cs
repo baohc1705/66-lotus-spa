@@ -1,4 +1,4 @@
-﻿using _66SMS.Contracts.Shared;
+using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Entities;
@@ -22,8 +22,17 @@ namespace _66SMS.Application.Features.WorkSchedules.Commands.UpdateWorkSchedule
 
         public async Task<Result<object>> Handle(UpdateWorkScheduleCommand request, CancellationToken cancellationToken)
         {
-            WorkSchedule workSchedule = await workScheduleSqlRepository.GetByIdAsync((int)request.Id, false, cancellationToken);
+            WorkSchedule workSchedule = await workScheduleSqlRepository.FindByIdAsync((int)request.Id, false, cancellationToken);
+            if (workSchedule == null) return Result<object>.Conflict("Không tìm thấy ca làm việc");
+
             mapper.Map(request, workSchedule);
+
+            bool isDuplicate = await workScheduleSqlRepository.AnyAsync(x => x.Id != request.Id && x.EmployeeId == workSchedule.EmployeeId && x.ShiftPeriodId == workSchedule.ShiftPeriodId && x.WorkDate == workSchedule.WorkDate, cancellationToken);
+            if (isDuplicate)
+            {
+                return Result<object>.Conflict("Nhân viên này đã được xếp vào ca này trong cùng ngày.");
+            }
+
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {

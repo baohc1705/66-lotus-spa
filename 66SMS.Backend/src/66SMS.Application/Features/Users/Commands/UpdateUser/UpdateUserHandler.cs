@@ -23,7 +23,7 @@ namespace _66SMS.Application.Features.Users.Commands.UpdateUser
 
         public async Task<Result<object>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
-            User user = await userSqlRepository.GetByIdAsync(request.Id.Value, false);
+            User user = await userSqlRepository.FindByIdAsync(request.Id.Value, false);
             // Map ignore null
             mapper.Map(request, user);
 

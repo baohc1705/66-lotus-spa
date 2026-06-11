@@ -35,7 +35,7 @@ namespace _66SMS.Application.Features.Employees.Commands.UpdateEmployee
             try
             {
                 // Update employee
-                Employee? employee = await employeeSqlRepository.GetByIdAsync((int)request.Id!, false);
+                Employee? employee = await employeeSqlRepository.FindByIdAsync((int)request.Id!, false);
                 if (employee == null)
                     return Result<object>.NotFound();
 
@@ -46,7 +46,7 @@ namespace _66SMS.Application.Features.Employees.Commands.UpdateEmployee
                 // Update user if account details are provided
                 if (request.UserName != null || request.Email != null)
                 {
-                    User? user = await userSqlRepository.GetByIdAsync(employee.UserId, false);
+                    User? user = await userSqlRepository.FindByIdAsync(employee.UserId, false);
                     if (user != null)
                     {
                         mapper.Map(request, user);

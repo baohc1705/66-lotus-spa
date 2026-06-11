@@ -24,7 +24,7 @@ namespace _66SMS.Application.Features.Customers.Commands.DeleteCustomer
 
         public async Task<Result<object>> Handle(DeleteCustomerCommand request, CancellationToken cancellationToken)
         {
-            Customer? customer = await customerSqlRepository.GetByIdAsync((int)request.Id, false);
+            Customer? customer = await customerSqlRepository.FindByIdAsync((int)request.Id, false);
             if (customer == null)
                 return Result<object>.NotFound();
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
@@ -33,7 +33,7 @@ namespace _66SMS.Application.Features.Customers.Commands.DeleteCustomer
                 customerSqlRepository.Remove(customer);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                User? user = await userSqlRepository.GetByIdAsync(customer.UserId, false);
+                User? user = await userSqlRepository.FindByIdAsync(customer.UserId, false);
                 userSqlRepository.Remove(user);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 

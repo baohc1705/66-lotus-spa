@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Contracts.Enumerations
+namespace _66SMS.Contracts.Enumerations
 {
     public enum ErrorCodes
     {
@@ -26,6 +26,18 @@
         ERR_USER_INVALID_PASSWORD,
         ERR_USER_ACCOUNT_LOCKED,
         ERR_USER_ACCOUNT_INACTIVE,
+        #endregion
+        #region Product
+        ERR_PRODUCT_NOT_FOUND,
+        ERR_PRODUCT_CATEGORY_NOT_FOUND,
+        ERR_PRODUCT_IMAGE_NOT_FOUND,
+        #endregion
+
+        #region Service
+        ERR_SERVICE_NOT_FOUND,
+        ERR_SERVICE_CATEGORY_NOT_FOUND,
+        ERR_SERVICE_IMAGE_NOT_FOUND,
+        ERR_SERVICE_PRODUCT_NOT_FOUND,
         #endregion
     }
 }

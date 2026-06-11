@@ -30,7 +30,7 @@ namespace _66SMS.Application.Features.Shitfs.Commands.CreateShiftPeriod
 
         public async Task<Result<object>> Handle(CreateShiftPeriodCommand request, CancellationToken cancellationToken)
         {
-            Shift? shift = await shiftSqlRepository.GetByIdAsync((int)request.ShiftId, false, cancellationToken);
+            Shift? shift = await shiftSqlRepository.FindByIdAsync((int)request.ShiftId, false, cancellationToken);
             if (shift == null)
             {
                 return Result<object>.NotFound();

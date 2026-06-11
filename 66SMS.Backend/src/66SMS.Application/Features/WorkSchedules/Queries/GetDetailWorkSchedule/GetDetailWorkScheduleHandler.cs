@@ -23,6 +23,7 @@ namespace _66SMS.Application.Features.WorkSchedules.Queries.GetDetailWorkSchedul
                 .Where(x => x.Id == request.Id)
                 .Select(x => new WorkScheduleDTO
                 {
+                    Id = x.Id,
                     ShiftPeriodId = x.ShiftPeriodId,
                     EmployeeId = x.EmployeeId,
                     WorkDate = x.WorkDate,

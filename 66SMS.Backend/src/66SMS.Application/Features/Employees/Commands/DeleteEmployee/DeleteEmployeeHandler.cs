@@ -32,7 +32,7 @@ namespace _66SMS.Application.Features.Employees.Commands.DeleteEmployee
 
         public async Task<Result<object>> Handle(DeleteEmployeeCommand request, CancellationToken cancellationToken)
         {
-            Employee? employee = await employeeSqlRepository.GetByIdAsync((int)request.Id!, false);
+            Employee? employee = await employeeSqlRepository.FindByIdAsync((int)request.Id!, false);
             if (employee == null)
                 return Result<object>.NotFound();
 
@@ -44,7 +44,7 @@ namespace _66SMS.Application.Features.Employees.Commands.DeleteEmployee
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 // Soft remove associated user
-                User? user = await userSqlRepository.GetByIdAsync(employee.UserId, false);
+                User? user = await userSqlRepository.FindByIdAsync(employee.UserId, false);
                 if (user != null)
                 {
                     userSqlRepository.Remove(user);
