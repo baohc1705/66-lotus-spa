@@ -1,0 +1,65 @@
+using _66SMS.API.Abstractions;
+using _66SMS.Application.Features.Services.Commands.CreateServices;
+using _66SMS.Application.Features.Services.Commands.DeleteServices;
+using _66SMS.Application.Features.Services.Commands.UpdateServices;
+using _66SMS.Application.Features.Services.Queries.GetAllServices;
+using _66SMS.Application.Features.Services.Queries.GetServices;
+using Asp.Versioning;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace _66SMS.API.Controllers
+{
+    [ApiVersion("1.0")]
+    public class ServiceController : ApiController<ServiceController>
+    {
+        private readonly IMediator mediator;
+
+        public ServiceController(IMediator mediator)
+        {
+            this.mediator = mediator;
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAll([FromQuery] GetAllServicesQuery query)
+        {
+            var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await mediator.Send(new GetServicesQuery { Id = id });
+            return HandleResult(result);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> Create([FromBody] CreateServiceCommand command)
+        {
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpPatch("{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateServiceCommand command)
+        {
+            command.Id = id;
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpDelete("{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await mediator.Send(new DeleteServiceCommand { Id = id });
+            return HandleResult(result);
+        }
+    }
+}

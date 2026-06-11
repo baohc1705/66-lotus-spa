@@ -33,6 +33,14 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
+        [HttpPost("bulk")]
+        [AllowAnonymous]
+        public async Task<IActionResult> BulkCreate([FromBody] _66SMS.Application.Features.WorkSchedules.Commands.BulkCreateWorkSchedule.BulkCreateWorkScheduleCommand command)
+        {
+            Result<object> result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
         [HttpPatch("{id:int}")]
         //[PermissionAuthorize("workschedule", "create")]
         [AllowAnonymous]

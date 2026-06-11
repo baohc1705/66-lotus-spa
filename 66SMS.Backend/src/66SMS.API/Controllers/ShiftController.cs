@@ -2,6 +2,7 @@ using _66SMS.API.Abstractions;
 using _66SMS.Application.Features.Shitfs.Commands.CreateShift;
 using _66SMS.Application.Features.Shitfs.Commands.CreateShiftPeriod;
 using _66SMS.Application.Features.Shitfs.Commands.DeleteShift;
+using _66SMS.Application.Features.Shitfs.Commands.UpdateShift;
 using _66SMS.Application.Features.Shitfs.Queries.GetAllShift;
 using _66SMS.Application.DTOs.Shifts;
 using _66SMS.Contracts.Shared;
@@ -44,6 +45,15 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> DeleteShift([FromRoute] int id)
         {
             Result<object> result = await mediator.Send(new DeleteShiftCommand { Id = id });
+            return HandleResult(result);
+        }
+
+        [HttpPatch("{id:int}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateShift([FromRoute] int id, [FromBody] UpdateShiftCommand command)
+        {
+            command.Id = id;
+            Result<object> result = await mediator.Send(command);
             return HandleResult(result);
         }
 
