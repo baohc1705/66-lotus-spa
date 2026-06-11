@@ -55,6 +55,8 @@ export function AdminHeader({
       if (currentTitle === "Sản phẩm") currentTitle = "Quản lý sản phẩm";
       if (currentTitle === "Danh mục sản phẩm")
         currentTitle = "Quản lý danh mục sản phẩm";
+      if (currentTitle === "Phân ca") currentTitle = "Phân ca làm việc";
+      if (currentTitle === "Quản lý ca") currentTitle = "Quản lý ca làm việc";
       break;
     }
   }

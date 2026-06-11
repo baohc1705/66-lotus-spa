@@ -44,7 +44,7 @@ export function ShiftFormDialog({
 
   const form = useForm<CreateShiftFormValues | UpdateShiftFormValues>({
     resolver: zodResolver(
-      isEdit ? updateShiftSchema : createShiftSchema
+      isEdit ? updateShiftSchema : createShiftSchema,
     ) as Resolver<CreateShiftFormValues | UpdateShiftFormValues>,
     defaultValues: getDefaultValues(shift),
   });
@@ -73,6 +73,20 @@ export function ShiftFormDialog({
       // Find current period
       const currentPeriod = shift.shiftPeriodDTOs?.[0];
 
+      // Check if time-related fields have changed
+      const currentShiftStart = currentPeriod?.shiftStart?.substring(0, 5);
+      const currentShiftEnd = currentPeriod?.shiftEnd?.substring(0, 5);
+      const currentEffectiveFrom = currentPeriod?.effectiveFrom;
+      const currentEffectiveTo = currentPeriod?.effectiveTo || "";
+
+      const formEffectiveTo = data.effectiveTo || "";
+
+      const isTimeChanged =
+        data.shiftStart !== currentShiftStart ||
+        data.shiftEnd !== currentShiftEnd ||
+        data.effectiveFrom !== currentEffectiveFrom ||
+        formEffectiveTo !== currentEffectiveTo;
+
       updateMutation.mutate(
         {
           id: shift.id,
@@ -81,7 +95,7 @@ export function ShiftFormDialog({
             name: data.name,
             description: data.description,
             shiftPeriod: {
-              id: currentPeriod?.id,
+              id: isTimeChanged ? undefined : currentPeriod?.id,
               shiftStart: shiftStartStr,
               shiftEnd: shiftEndStr,
               effectiveFrom: data.effectiveFrom,
@@ -93,7 +107,7 @@ export function ShiftFormDialog({
           onSuccess: (result) => {
             if (result.isSuccess) onOpenChange(false);
           },
-        }
+        },
       );
     } else {
       createMutation.mutate(
@@ -111,7 +125,7 @@ export function ShiftFormDialog({
           onSuccess: (result) => {
             if (result.isSuccess) onOpenChange(false);
           },
-        }
+        },
       );
     }
   };
@@ -138,7 +152,6 @@ export function ShiftFormDialog({
                 label="Tên ca"
                 tooltip="Vui lòng nhập tên ca (VD: Ca Sáng)"
                 error={errors.name?.message}
-                required
               >
                 <Input
                   {...register("name")}
@@ -167,7 +180,6 @@ export function ShiftFormDialog({
                 label="Giờ bắt đầu"
                 tooltip="Giờ bắt đầu làm việc"
                 error={errors.shiftStart?.message}
-                required
               >
                 <Input
                   type="time"
@@ -180,7 +192,6 @@ export function ShiftFormDialog({
                 label="Giờ kết thúc"
                 tooltip="Giờ kết thúc làm việc"
                 error={errors.shiftEnd?.message}
-                required
               >
                 <Input
                   type="time"
@@ -193,7 +204,6 @@ export function ShiftFormDialog({
                 label="Ngày bắt đầu áp dụng"
                 tooltip="Ngày ca làm việc này bắt đầu có hiệu lực"
                 error={errors.effectiveFrom?.message}
-                required
               >
                 <Input
                   type="date"
@@ -237,9 +247,7 @@ export function ShiftFormDialog({
 }
 
 // Helper function
-function getDefaultValues(
-  shift?: ShiftDTO | null
-): CreateShiftFormValues {
+function getDefaultValues(shift?: ShiftDTO | null): CreateShiftFormValues {
   if (shift) {
     const currentPeriod = shift.shiftPeriodDTOs?.[0]; // Lấy period mới nhất
     return {

@@ -3,10 +3,11 @@ import { motion, type Variants } from "motion/react";
 import {
   useReactTable,
   getCoreRowModel,
+  getExpandedRowModel,
   type ColumnDef,
   type VisibilityState,
 } from "@tanstack/react-table";
-import { Plus, MoreHorizontal, Pencil, Trash2, Clock } from "lucide-react";
+import { Plus, MoreHorizontal, Pencil, Trash2, Clock, Eye } from "lucide-react";
 import { formatDate } from "@/shared/utils/date.utils";
 
 import { DataTable } from "@/shared/components/DataTable/DataTable";
@@ -25,6 +26,7 @@ import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagi
 import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
 
 import { ShiftFormDialog } from "../components/ShiftFormDialog";
+import { ShiftDetailExpanded } from "../components/ShiftDetailExpanded";
 import { useShifts, useDeleteShift } from "../hooks/useShifts";
 import type { ShiftDTO } from "../types/shift.types";
 
@@ -177,6 +179,10 @@ export function ShiftListPage() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => row.toggleExpanded()}>
+                    <Eye className="w-4 h-4" />
+                    {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
+                  </DropdownMenuItem>
                   {/* Admin only */}
                   <DropdownMenuItem onClick={() => setEditShift(item)}>
                     <Pencil className="w-4 h-4" />
@@ -206,6 +212,8 @@ export function ShiftListPage() {
     data: shifts,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    getRowCanExpand: () => true,
     enableMultiRowSelection: false,
     columnResizeMode: "onChange",
     state: {
@@ -257,6 +265,10 @@ export function ShiftListPage() {
           table={table}
           isLoading={isLoading}
           loadingRows={pageSize > 5 ? 5 : pageSize}
+          onRowClick={(row) => row.toggleExpanded()}
+          renderSubComponent={({ row }) => (
+            <ShiftDetailExpanded shift={row.original} />
+          )}
           emptyState={
             <div className="flex flex-col items-center gap-3">
               <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">

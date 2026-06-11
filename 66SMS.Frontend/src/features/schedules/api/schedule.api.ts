@@ -2,19 +2,20 @@ import axiosInstance from "@/shared/api/axiosInstance";
 import type {
   Result,
   PagedResult,
-  PageRequest,
 } from "@/shared/types/common.types";
 import type {
   WorkScheduleDTO,
   CreateWorkSchedulePayload,
+  BulkCreateWorkSchedulePayload,
   UpdateWorkSchedulePayload,
+  GetWorkSchedulesParams,
 } from "../types/schedule.types";
 
 const BASE = "/WorkerSchedule"; // Path in backend
 
 export const scheduleApi = {
   // Get All
-  getAll: (params: PageRequest) =>
+  getAll: (params: GetWorkSchedulesParams) =>
     axiosInstance
       .get<Result<PagedResult<WorkScheduleDTO>>>(BASE, { params })
       .then((r) => r.data),
@@ -28,6 +29,10 @@ export const scheduleApi = {
   // Create Work Schedule
   create: (payload: CreateWorkSchedulePayload) =>
     axiosInstance.post<Result<object>>(BASE, payload).then((r) => r.data),
+
+  // Bulk Create Work Schedules
+  bulkCreate: (payload: BulkCreateWorkSchedulePayload) =>
+    axiosInstance.post<Result<object>>(`${BASE}/bulk`, payload).then((r) => r.data),
 
   // Update Work Schedule
   update: (id: number, payload: UpdateWorkSchedulePayload) =>

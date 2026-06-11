@@ -1,21 +1,22 @@
 import { scheduleApi } from "@/features/schedules/api/schedule.api";
-import type { PageRequest } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type {
   CreateWorkSchedulePayload,
   UpdateWorkSchedulePayload,
+  GetWorkSchedulesParams,
 } from "../types/schedule.types";
 
 const SCHEDULE_KEYS = {
   all: ["schedules"] as const,
   lists: () => [...SCHEDULE_KEYS.all, "list"] as const,
-  list: (params: PageRequest) => [...SCHEDULE_KEYS.lists(), params] as const,
+  list: (params: GetWorkSchedulesParams) =>
+    [...SCHEDULE_KEYS.lists(), params] as const,
   details: () => [...SCHEDULE_KEYS.all, "detail"] as const,
   detail: (id: number) => [...SCHEDULE_KEYS.details(), id] as const,
 };
 
-export function useWorkSchedules(params: PageRequest) {
+export function useWorkSchedules(params: GetWorkSchedulesParams) {
   return useQuery({
     queryKey: SCHEDULE_KEYS.list(params),
     queryFn: () => scheduleApi.getAll(params),
@@ -45,6 +46,24 @@ export function useCreateWorkSchedule() {
     onError: () => {
       toast.error("Có lỗi xảy ra khi tạo lịch làm việc");
     },
+  });
+}
+
+export function useBulkCreateWorkSchedule() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (
+      payload: import("../types/schedule.types").BulkCreateWorkSchedulePayload,
+    ) => scheduleApi.bulkCreate(payload),
+    onSuccess: (result) => {
+      if (result.isSuccess) {
+        qc.invalidateQueries({ queryKey: SCHEDULE_KEYS.lists() });
+        toast.success("Phân lịch thành công");
+      } else {
+        toast.error(result.message || "Không thể phân ca làm việc");
+      }
+    },
+    onError: () => toast.error("Có lỗi xảy ra khi phân ca làm việc"),
   });
 }
 

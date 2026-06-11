@@ -15,9 +15,21 @@ export interface CreateWorkSchedulePayload {
   workDate?: string;
 }
 
+export interface BulkCreateWorkSchedulePayload {
+  schedules: CreateWorkSchedulePayload[];
+}
+
 export interface UpdateWorkSchedulePayload {
   id?: number;
   shiftPeriodId?: number;
   employeeId?: number;
   workDate?: string;
+}
+
+import type { PageRequest } from "@/shared/types/common.types";
+
+export interface GetWorkSchedulesParams extends PageRequest {
+  startDate?: string;
+  endDate?: string;
+  employeeId?: number;
 }

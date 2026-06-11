@@ -1,30 +1,61 @@
-import { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { ChevronLeft, ChevronRight, Search, Users, Briefcase, User } from "lucide-react";
 import { formatDate } from "@/shared/utils/date.utils";
 
 import { useShifts } from "@/features/shifts/hooks/useShifts";
 import { useWorkSchedules } from "../hooks/useSchedules";
 import { ScheduleTable } from "../components/ScheduleTable";
 import { Button } from "@/shared/components/ui/button";
+import { useEmployees } from "@/features/employees/hooks/useEmployees";
 
 export function WorkSchedulePage() {
-  const [currentDate, setCurrentDate] = useState(formatDate().startOf("isoWeek"));
+  const [currentDate, setCurrentDate] = useState(
+    formatDate().startOf("isoWeek"),
+  );
+  
+  const [viewMode, setViewMode] = useState<"shift" | "staff" | "single">("shift");
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+
+  // Debounce for search query to avoid spamming the database
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const startDateStr = currentDate.format("YYYY-MM-DD");
   const endDateStr = currentDate.endOf("isoWeek").format("YYYY-MM-DD");
 
   const scheduleQueryParams = useMemo(() => {
+    if (debouncedSearchQuery) {
+      return {
+        pageIndex: 1,
+        pageSize: 1000,
+        filter: debouncedSearchQuery,
+        employeeId: selectedEmployeeId || undefined,
+      };
+    }
     return {
       startDate: startDateStr,
       endDate: endDateStr,
       pageIndex: 1,
       pageSize: 1000,
+      employeeId: selectedEmployeeId || undefined,
     };
-  }, [startDateStr, endDateStr]);
+  }, [startDateStr, endDateStr, debouncedSearchQuery, selectedEmployeeId]);
 
   const { data: shiftsData, isLoading: isLoadingShifts } = useShifts({
     pageIndex: 1,
     pageSize: 100,
+  });
+
+  const { data: employeesData, isLoading: isLoadingEmployees } = useEmployees({
+    pageIndex: 1,
+    pageSize: 1000,
+    filter: debouncedSearchQuery || undefined,
   });
 
   const { data: schedulesData, isLoading: isLoadingSchedules } =
@@ -38,22 +69,85 @@ export function WorkSchedulePage() {
   const handleThisWeek = () => setCurrentDate(formatDate().startOf("isoWeek"));
 
   const weekLabel = `Tuần ${currentDate.isoWeek()} (${currentDate.format(
-    "DD/MM/YYYY"
+    "DD/MM/YYYY",
   )} - ${currentDate.endOf("isoWeek").format("DD/MM/YYYY")})`;
 
-  const isPageLoading = isLoadingShifts || isLoadingSchedules;
+  const isPageLoading = isLoadingShifts || isLoadingSchedules || isLoadingEmployees;
+  
+  const employeeList = employeesData?.data?.items || [];
 
   return (
     <div className="space-y-4">
       {/* Header & Controls */}
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-4 rounded-admin border border-stone-200/30">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <h1 className="text-xl font-bold text-lotus-deep whitespace-nowrap font-playfair">
-            Phân công ca làm việc
-          </h1>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full xl:w-auto">
+          <div className="relative w-full sm:w-64">
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-lotus-stone"
+              size={16}
+            />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Tìm kiếm nhân viên..."
+              className="pl-9 pr-4 py-2 bg-white border border-stone-200/50 rounded-lg text-[13px] focus:outline-none focus:ring-1 focus:ring-lotus-leaf w-full transition-shadow placeholder:text-stone-400"
+            />
+          </div>
+
+          <div className="flex bg-stone-100 p-0.5 rounded-lg border border-stone-200/50 h-9">
+            <button
+              onClick={() => setViewMode("shift")}
+              className={`flex items-center gap-1.5 px-3 rounded-md text-[13px] font-semibold transition-colors ${
+                viewMode === "shift"
+                  ? "bg-white text-lotus-leaf shadow-sm"
+                  : "text-lotus-stone hover:text-lotus-deep"
+              }`}
+            >
+              <Briefcase size={14} />
+              <span>Xem theo ca</span>
+            </button>
+            <button
+              onClick={() => setViewMode("staff")}
+              className={`flex items-center gap-1.5 px-3 rounded-md text-[13px] font-semibold transition-colors ${
+                viewMode === "staff"
+                  ? "bg-white text-lotus-leaf shadow-sm"
+                  : "text-lotus-stone hover:text-lotus-deep"
+              }`}
+            >
+              <Users size={14} />
+              <span>Xem theo nhân viên</span>
+            </button>
+            <button
+              onClick={() => setViewMode("single")}
+              className={`flex items-center gap-1.5 px-3 rounded-md text-[13px] font-semibold transition-colors ${
+                viewMode === "single"
+                  ? "bg-white text-lotus-leaf shadow-sm"
+                  : "text-lotus-stone hover:text-lotus-deep"
+              }`}
+            >
+              <User size={14} />
+              <span>Xem cá nhân</span>
+            </button>
+          </div>
+
+          {viewMode === "single" && (
+            <select
+              value={selectedEmployeeId || ""}
+              onChange={(e) => setSelectedEmployeeId(Number(e.target.value) || null)}
+              className="px-3 py-1.5 border border-stone-200/50 rounded-lg bg-white text-[13px] font-semibold h-9 focus:outline-none focus:ring-1 focus:ring-lotus-leaf text-lotus-deep"
+            >
+              <option value="">-- Chọn nhân viên --</option>
+              {employeeList.map((emp) => (
+                <option key={emp.id} value={emp.id}>
+                  {emp.fullName}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto justify-end">
           <div className="flex items-center bg-white border border-stone-200/50 rounded-lg overflow-hidden h-9">
             <button
               onClick={handlePrevWeek}
@@ -85,25 +179,26 @@ export function WorkSchedulePage() {
       </div>
 
       {/* Content */}
-      <div className="bg-white/70 backdrop-blur-md rounded-admin border border-stone-200/30 p-4 min-h-[500px]">
-        {isPageLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-8 h-8 animate-spin rounded-full border-4 border-stone-200 border-t-lotus-sage" />
-              <p className="text-sm text-lotus-stone">
-                Đang tải lịch làm việc...
-              </p>
-            </div>
+      {isPageLoading ? (
+        <div className="flex items-center justify-center py-20 backdrop-blur-md rounded-admin border border-stone-200/30 p-4 min-h-[500px]">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 animate-spin rounded-full border-4 border-stone-200 border-t-lotus-leaf" />
+            <p className="text-sm text-lotus-stone">
+              Đang tải lịch làm việc...
+            </p>
           </div>
-        ) : (
-          <ScheduleTable
-            shifts={shiftsData?.data?.items || []}
-            workSchedules={schedulesData?.data?.items || []}
-            weekStart={currentDate}
-            canEdit={true}
-          />
-        )}
-      </div>
+        </div>
+      ) : (
+        <ScheduleTable
+          shifts={shiftsData?.data?.items || []}
+          workSchedules={schedulesData?.data?.items || []}
+          staffList={employeeList}
+          weekStart={currentDate}
+          viewMode={viewMode}
+          selectedStaffId={selectedEmployeeId}
+          canEdit={true}
+        />
+      )}
     </div>
   );
 }
