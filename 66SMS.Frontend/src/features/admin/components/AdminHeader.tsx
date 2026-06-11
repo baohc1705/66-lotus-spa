@@ -1,46 +1,61 @@
-import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'motion/react'
-import { Menu, ShoppingBag, ShoppingCart, Bell, HelpCircle, Settings, User, ChevronDown, LogOut } from 'lucide-react'
-import { MENU_ITEMS } from './AdminSidebar'
-import { useAuthStore } from '@/features/auth/stores/authStore'
-
-
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  Menu,
+  ShoppingBag,
+  ShoppingCart,
+  Bell,
+  Settings,
+  User,
+  ChevronDown,
+  LogOut,
+} from "lucide-react";
+import { MENU_ITEMS } from "../constants/menu";
+import { useAuthStore } from "@/features/auth/stores/authStore";
 
 interface AdminHeaderProps {
-  toggleSidebar: () => void
-  toggleMobileSidebar: () => void
+  toggleSidebar: () => void;
+  toggleMobileSidebar: () => void;
 }
 
-export function AdminHeader({ toggleSidebar, toggleMobileSidebar }: AdminHeaderProps) {
-  const [isProfileOpen, setIsProfileOpen] = useState(false)
+export function AdminHeader({
+  //toggleSidebar,
+  toggleMobileSidebar,
+}: AdminHeaderProps) {
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  const { user, hasRole, clearAuth } = useAuthStore()
-  const isAdmin = hasRole('Admin')
-  const isReceptionist = hasRole('Receptionist')
-  const navigate = useNavigate()
+  const { user, hasRole, clearAuth } = useAuthStore();
+  const isAdmin = hasRole("Admin");
+  const isReceptionist = hasRole("Receptionist");
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    clearAuth()
-    navigate('/auth/login')
-  }
+    clearAuth();
+    navigate("/auth/login");
+  };
 
-  const location = useLocation()
+  const location = useLocation();
 
-  let currentTitle = 'Tổng quan'
+  let currentTitle = "Tổng quan";
 
-  const allLinks = MENU_ITEMS.flatMap(item =>
-    item.children ? item.children.map(c => ({ path: c.path, label: c.label })) : [{ path: item.path!, label: item.label }]
-  )
+  const allLinks = MENU_ITEMS.flatMap((item) =>
+    item.children
+      ? item.children.map((c) => ({ path: c.path, label: c.label }))
+      : [{ path: item.path!, label: item.label }],
+  );
 
-  allLinks.sort((a, b) => b.path.length - a.path.length)
+  allLinks.sort((a, b) => b.path.length - a.path.length);
 
   for (const link of allLinks) {
     if (location.pathname.startsWith(link.path)) {
-      currentTitle = link.label
-      if (currentTitle === 'Nhân viên') currentTitle = 'Quản lý nhân viên'
-      if (currentTitle === 'Khách hàng') currentTitle = 'Quản lý khách hàng'
-      break
+      currentTitle = link.label;
+      if (currentTitle === "Nhân viên") currentTitle = "Quản lý nhân viên";
+      if (currentTitle === "Khách hàng") currentTitle = "Quản lý khách hàng";
+      if (currentTitle === "Sản phẩm") currentTitle = "Quản lý sản phẩm";
+      if (currentTitle === "Danh mục sản phẩm")
+        currentTitle = "Quản lý danh mục sản phẩm";
+      break;
     }
   }
 
@@ -69,7 +84,10 @@ export function AdminHeader({ toggleSidebar, toggleMobileSidebar }: AdminHeaderP
         )}
 
         {(isAdmin || isReceptionist) && (
-          <Link to="/thu-ngan" className="flex items-center gap-2 px-4 h-10 rounded-admin bg-white/60 text-lotus-deep border border-lotus-gold/20 hover:border-lotus-gold hover:bg-lotus-cream hover:shadow-md transition-all duration-300 font-medium text-xs tracking-wide">
+          <Link
+            to="/thu-ngan"
+            className="flex items-center gap-2 px-4 h-10 rounded-admin bg-white/60 text-lotus-deep border border-lotus-gold/20 hover:border-lotus-gold hover:bg-lotus-cream hover:shadow-md transition-all duration-300 font-medium text-xs tracking-wide"
+          >
             <ShoppingCart className="w-[1.05rem] h-[1.05rem] text-lotus-leaf" />
             <span className="hidden sm:inline">Thu ngân</span>
           </Link>
@@ -98,7 +116,10 @@ export function AdminHeader({ toggleSidebar, toggleMobileSidebar }: AdminHeaderP
             <AnimatePresence>
               {isProfileOpen && (
                 <>
-                  <div className="fixed inset-0 z-40" onClick={() => setIsProfileOpen(false)} />
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setIsProfileOpen(false)}
+                  />
                   <motion.div
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -107,14 +128,24 @@ export function AdminHeader({ toggleSidebar, toggleMobileSidebar }: AdminHeaderP
                     className="absolute right-0 mt-3 w-64 bg-white/90 backdrop-blur-xl rounded-admin shadow-[0_20px_40px_rgba(42,31,26,0.1)] py-3 z-50 border border-lotus-gold/20"
                   >
                     <div className="px-5 py-3 border-b border-lotus-gold/10 mb-2">
-                      <p className="text-[15px] font-semibold text-lotus-deep">{user?.username || 'Tài khoản'}</p>
-                      <p className="text-[13px] text-lotus-stone truncate">{user?.email || ''}</p>
+                      <p className="text-[15px] font-semibold text-lotus-deep">
+                        {user?.username || "Tài khoản"}
+                      </p>
+                      <p className="text-[13px] text-lotus-stone truncate">
+                        {user?.email || ""}
+                      </p>
                     </div>
-                    <Link to="/admin/profile" className="w-full flex items-center gap-3 px-5 py-2.5 text-[13px] font-medium text-lotus-deep/70 hover:bg-lotus-cream hover:text-lotus-leaf transition-colors">
+                    <Link
+                      to="/admin/profile"
+                      className="w-full flex items-center gap-3 px-5 py-2.5 text-[13px] font-medium text-lotus-deep/70 hover:bg-lotus-cream hover:text-lotus-leaf transition-colors"
+                    >
                       <User className="w-4 h-4" />
                       Hồ sơ cá nhân
                     </Link>
-                    <Link to="/admin/profile" className="w-full flex items-center gap-3 px-5 py-2.5 text-[13px] font-medium text-lotus-deep/70 hover:bg-lotus-cream hover:text-lotus-leaf transition-colors">
+                    <Link
+                      to="/admin/profile"
+                      className="w-full flex items-center gap-3 px-5 py-2.5 text-[13px] font-medium text-lotus-deep/70 hover:bg-lotus-cream hover:text-lotus-leaf transition-colors"
+                    >
                       <Settings className="w-4 h-4" />
                       Cài đặt tài khoản
                     </Link>
@@ -134,5 +165,5 @@ export function AdminHeader({ toggleSidebar, toggleMobileSidebar }: AdminHeaderP
         </div>
       </div>
     </header>
-  )
+  );
 }

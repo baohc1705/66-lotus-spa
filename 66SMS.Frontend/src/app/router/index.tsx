@@ -6,6 +6,10 @@ import { ProtectedRoute } from './ProtectedRoute';
 import { AdminLayout, AdminDashboard } from '@/features/admin';
 import { EmployeeListPage } from '@/features/employees/pages/EmployeeListPage';
 import { CustomerListPage } from '@/features/customers/pages/CustomerListPage';
+import { ProductListPage } from '@/features/products/pages/ProductListPage';
+import { ProductCategoryListPage } from '@/features/product_categories/pages/ProductCategoryListPage';
+import { ShiftListPage } from '@/features/shifts/pages/ShiftListPage';
+import { WorkSchedulePage } from '@/features/schedules/pages/WorkSchedulePage';
 
 export const router = createBrowserRouter([
   {
@@ -42,6 +46,22 @@ export const router = createBrowserRouter([
           {
             path: 'customers/list',
             element: <CustomerListPage />,
+          },
+          {
+            path: 'products/list',
+            element: <ProductListPage />,
+          },
+          {
+            path: 'products/categories',
+            element: <ProductCategoryListPage />,
+          },
+          {
+            path: 'shifts',
+            element: <ShiftListPage />,
+          },
+          {
+            path: 'staff/schedule',
+            element: <WorkSchedulePage />,
           },
           // Placeholders for other admin routes
         ],
