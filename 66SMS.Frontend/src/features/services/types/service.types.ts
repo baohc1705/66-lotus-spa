@@ -31,7 +31,9 @@ export interface ServiceDTO {
   sortOrder?: number;
   status?: number;
   createdAt?: string;
+  createdBy?: number;
   updatedAt?: string;
+  updatedBy?: number;
   images?: ServiceImageResponse[];
   serviceProducts?: ServiceProductResponse[];
 }

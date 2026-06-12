@@ -5,7 +5,9 @@ export interface ServiceCategoryDTO {
   sortOrder?: number;
   status?: number;
   createdAt?: string;
+  createdBy?: number;
   updatedAt?: string;
+  updatedBy?: number;
 }
 
 export interface CreateServiceCategoryPayload {

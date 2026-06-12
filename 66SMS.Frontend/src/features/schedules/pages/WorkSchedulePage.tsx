@@ -6,7 +6,7 @@ import { useShifts } from "@/features/shifts/hooks/useShifts";
 import { useWorkSchedules } from "../hooks/useSchedules";
 import { ScheduleTable } from "../components/ScheduleTable";
 import { Button } from "@/shared/components/ui/button";
-import { useEmployees } from "@/features/employees/hooks/useEmployees";
+import { useStaffs } from "@/features/staffs/hooks/useStaffs";
 
 export function WorkSchedulePage() {
   const [currentDate, setCurrentDate] = useState(
@@ -14,7 +14,7 @@ export function WorkSchedulePage() {
   );
   
   const [viewMode, setViewMode] = useState<"shift" | "staff" | "single">("shift");
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null);
+  const [selectedStaffId, setSelectedStaffId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
 
@@ -35,7 +35,7 @@ export function WorkSchedulePage() {
         pageIndex: 1,
         pageSize: 1000,
         filter: debouncedSearchQuery,
-        employeeId: selectedEmployeeId || undefined,
+        staffId: selectedStaffId || undefined,
       };
     }
     return {
@@ -43,16 +43,16 @@ export function WorkSchedulePage() {
       endDate: endDateStr,
       pageIndex: 1,
       pageSize: 1000,
-      employeeId: selectedEmployeeId || undefined,
+      staffId: selectedStaffId || undefined,
     };
-  }, [startDateStr, endDateStr, debouncedSearchQuery, selectedEmployeeId]);
+  }, [startDateStr, endDateStr, debouncedSearchQuery, selectedStaffId]);
 
   const { data: shiftsData, isLoading: isLoadingShifts } = useShifts({
     pageIndex: 1,
     pageSize: 100,
   });
 
-  const { data: employeesData, isLoading: isLoadingEmployees } = useEmployees({
+  const { data: staffsData, isLoading: isLoadingStaffs } = useStaffs({
     pageIndex: 1,
     pageSize: 1000,
     filter: debouncedSearchQuery || undefined,
@@ -72,9 +72,9 @@ export function WorkSchedulePage() {
     "DD/MM/YYYY",
   )} - ${currentDate.endOf("isoWeek").format("DD/MM/YYYY")})`;
 
-  const isPageLoading = isLoadingShifts || isLoadingSchedules || isLoadingEmployees;
+  const isPageLoading = isLoadingShifts || isLoadingSchedules || isLoadingStaffs;
   
-  const employeeList = employeesData?.data?.items || [];
+  const staffList = staffsData?.data?.items || [];
 
   return (
     <div className="space-y-4">
@@ -133,12 +133,12 @@ export function WorkSchedulePage() {
 
           {viewMode === "single" && (
             <select
-              value={selectedEmployeeId || ""}
-              onChange={(e) => setSelectedEmployeeId(Number(e.target.value) || null)}
+              value={selectedStaffId || ""}
+              onChange={(e) => setSelectedStaffId(Number(e.target.value) || null)}
               className="px-3 py-1.5 border border-stone-200/50 rounded-lg bg-white text-[13px] font-semibold h-9 focus:outline-none focus:ring-1 focus:ring-lotus-leaf text-lotus-deep"
             >
               <option value="">-- Chọn nhân viên --</option>
-              {employeeList.map((emp) => (
+              {staffList.map((emp) => (
                 <option key={emp.id} value={emp.id}>
                   {emp.fullName}
                 </option>
@@ -192,10 +192,10 @@ export function WorkSchedulePage() {
         <ScheduleTable
           shifts={shiftsData?.data?.items || []}
           workSchedules={schedulesData?.data?.items || []}
-          staffList={employeeList}
+          staffList={staffList}
           weekStart={currentDate}
           viewMode={viewMode}
-          selectedStaffId={selectedEmployeeId}
+          selectedStaffId={selectedStaffId}
           canEdit={true}
         />
       )}

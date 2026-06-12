@@ -10,18 +10,19 @@ import {
 import {
   Plus,
   MoreHorizontal,
+  Eye,
   Pencil,
   Trash2,
   ArrowUpDown,
-  Package,
+  Users,
   ArrowUp,
   ArrowDown,
   X,
-  Eye,
 } from "lucide-react";
 import { DataTable } from "@/shared/components/DataTable/DataTable";
 import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
 import { Button } from "@/shared/components/ui/button";
+import { Badge } from "@/shared/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,22 +30,30 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
-// import { PermissionGate } from '@/shared/components/security/PermissionGate'
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
 import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
 import { Checkbox } from "@/shared/components/ui/checkbox";
-import { ProductFormDialog } from "../components/ProductFormDialog";
-import { ProductDetailExpanded } from "../components/ProductDetailExpanded";
-import { useProducts, useDeleteProduct } from "../hooks/useProducts";
-import type { ProductDto } from "../types/product.types";
+import { StaffFormDialog } from "../components/StaffFormDialog";
+import { StaffDetailExpanded } from "../components/StaffDetailExpanded";
+import { useStaffs, useDeleteStaff } from "../hooks/useStaffs";
+import type { StaffDto } from "../types/staff.types";
+import { formatDate } from "@/shared/utils/date.utils";
 
 // ---- Constants ----
 
-const PRODUCT_STATUS_MAP: StatusMap = {
-  "0": { label: "Ngừng bán", variant: "error" },
-  "1": { label: "Đang bán", variant: "success", dot: true },
+const STAFF_STATUS_MAP: StatusMap = {
+  "0": { label: "Nghỉ việc", variant: "error" },
+  "1": { label: "Đang làm", variant: "success", dot: true },
+  "2": { label: "Tạm nghỉ", variant: "warning" },
+};
+
+const GENDER_MAP: Record<string, string> = {
+  "0": "Nam",
+  "1": "Nữ",
+  "2": "Khác",
 };
 
 const containerVariants: Variants = {
@@ -61,7 +70,10 @@ const itemVariants: Variants = {
   },
 };
 
-export function ProductListPage() {
+// ---- Page Component ----
+
+export function StaffListPage() {
+  // Table state
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [filter, setFilter] = useState("");
@@ -69,33 +81,37 @@ export function ProductListPage() {
   const [isDescending, setIsDescending] = useState(false);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
+  // Dialog states
   const [createOpen, setCreateOpen] = useState(false);
-  const [editProduct, setEditProduct] = useState<ProductDto | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<ProductDto | null>(null);
+  const [editStaff, setEditStaff] = useState<StaffDto | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<StaffDto | null>(null);
 
+  // Selection state
   const [selectedRowIds, setSelectedRowIds] = useState<Set<number>>(new Set());
 
+  // Data fetching
   const {
-    data: productsResult,
+    data: staffsResult,
     isLoading,
     isFetching,
-  } = useProducts({
+  } = useStaffs({
     pageIndex,
     pageSize,
     filter: filter || undefined,
     orderBy,
     isDescending,
   });
-  const deleteMutation = useDeleteProduct();
+  const deleteMutation = useDeleteStaff();
 
-  const paged = productsResult?.data;
-  const products = useMemo(() => paged?.items ?? [], [paged?.items]);
+  const paged = staffsResult?.data;
+  const staffs = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
 
+  // Selection logic
   const currentPageIds = useMemo(
     () =>
-      products.map((p) => p.id).filter((id): id is number => id !== undefined),
-    [products],
+      staffs.map((e) => e.id).filter((id): id is number => id !== undefined),
+    [staffs],
   );
   const isAllSelected =
     currentPageIds.length > 0 &&
@@ -107,6 +123,7 @@ export function ProductListPage() {
       ? "indeterminate"
       : false;
 
+  // Handlers
   const handleSort = useCallback(
     (column: string) => {
       if (orderBy === column) {
@@ -139,6 +156,15 @@ export function ProductListPage() {
     }
   }, [deleteTarget, deleteMutation]);
 
+  const formatCurrency = (value: number | null) => {
+    if (value === null || value === undefined) return "—";
+    return new Intl.NumberFormat("vi-VN", {
+      notation: "compact",
+      maximumFractionDigits: 1,
+    }).format(value);
+  };
+
+  // Render sort icon
   const SortIcon = useCallback(
     ({ column }: { column: string }) => {
       if (orderBy !== column)
@@ -152,7 +178,8 @@ export function ProductListPage() {
     [orderBy, isDescending],
   );
 
-  const columns = useMemo<ColumnDef<ProductDto>[]>(
+  // --- React Table Definition ---
+  const columns = useMemo<ColumnDef<StaffDto>[]>(
     () => [
       {
         id: "select",
@@ -172,15 +199,15 @@ export function ProductListPage() {
           />
         ),
         cell: ({ row }) => {
-          const prod = row.original;
+          const staff = row.original;
           return (
             <Checkbox
-              checked={prod.id !== undefined && selectedRowIds.has(prod.id)}
+              checked={staff.id !== undefined && selectedRowIds.has(staff.id)}
               onCheckedChange={(checked) => {
-                if (prod.id === undefined) return;
+                if (staff.id === undefined) return;
                 const newSet = new Set(selectedRowIds);
-                if (checked) newSet.add(prod.id);
-                else newSet.delete(prod.id);
+                if (checked) newSet.add(staff.id);
+                else newSet.delete(staff.id);
                 setSelectedRowIds(newSet);
               }}
               aria-label={`Select row`}
@@ -204,101 +231,119 @@ export function ProductListPage() {
       },
       {
         accessorKey: "code",
-        header: "Mã SP",
+        header: () => (
+          <button
+            onClick={() => handleSort("code")}
+            className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors"
+          >
+            Mã NV <SortIcon column="code" />
+          </button>
+        ),
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80 font-medium">
+          <Badge variant="outline" size="sm" className="text-[10px] font-mono">
             {row.original.code ?? "—"}
-          </span>
+          </Badge>
         ),
         size: 100,
       },
       {
-        accessorKey: "name",
+        accessorKey: "fullName",
         header: () => (
           <button
-            onClick={() => handleSort("name")}
+            onClick={() => handleSort("fullname")}
             className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors"
           >
-            Tên sản phẩm <SortIcon column="name" />
+            Nhân viên <SortIcon column="fullname" />
           </button>
         ),
         cell: ({ row }) => {
-          const prod = row.original;
-          const primaryImage = prod.images?.find((img) => img.isPrimary)?.url;
+          const staff = row.original;
           return (
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center shrink-0 overflow-hidden">
-                {primaryImage ? (
+              <div className="w-8 h-8 rounded-lg bg-lotus-leaf/10 flex items-center justify-center shrink-0 overflow-hidden">
+                {staff.image ? (
                   <img
-                    src={primaryImage}
+                    src={staff.image}
                     alt=""
                     className="w-8 h-8 object-cover"
                   />
                 ) : (
-                  <Package className="w-4 h-4 text-stone-400" />
+                  <span className="text-[11px] font-bold text-lotus-leaf">
+                    {(staff.fullName ?? "?").charAt(0).toUpperCase()}
+                  </span>
                 )}
               </div>
-              <span className="text-[13px] font-semibold text-lotus-deep truncate max-w-[180px]">
-                {prod.name ?? "—"}
+              <span className="text-[13px] font-semibold text-lotus-deep truncate max-w-[140px]">
+                {staff.fullName ?? "—"}
               </span>
             </div>
           );
         },
-        size: 250,
+        size: 220,
       },
       {
-        accessorKey: "categoryName",
-        header: "Danh mục",
+        accessorKey: "phone",
+        header: "SĐT",
         cell: ({ row }) => (
-          <span className="text-lotus-deep/70">
-            {row.original.categoryName ?? "—"}
+          <span className="text-lotus-deep/80">
+            {row.original.phone ?? "—"}
           </span>
         ),
-        size: 120,
+        size: 110,
       },
       {
-        accessorKey: "stockQuantity",
+        accessorKey: "email",
         header: () => (
           <button
-            onClick={() => handleSort("stockquantity")}
+            onClick={() => handleSort("email")}
             className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors"
           >
-            Tồn kho <SortIcon column="stockquantity" />
+            Email <SortIcon column="email" />
           </button>
         ),
-        cell: ({ row }) => {
-          const stock = row.original.stockQuantity ?? 0;
-          const minStock = row.original.minStock ?? 0;
-          const isLowStock = stock <= minStock;
-          return (
-            <span
-              className={`font-semibold ${isLowStock ? "text-red-500" : "text-lotus-deep"}`}
-            >
-              {stock}
-            </span>
-          );
-        },
+        cell: ({ row }) => (
+          <span className="text-lotus-deep/70">
+            {row.original.email ?? "—"}
+          </span>
+        ),
+        size: 180,
+      },
+      {
+        accessorKey: "gender",
+        header: "Giới tính",
+        cell: ({ row }) => (
+          <span className="text-lotus-deep/70">
+            {GENDER_MAP[row.original.gender ?? ""] ?? "—"}
+          </span>
+        ),
+        size: 90,
+      },
+      {
+        accessorKey: "contractType",
+        header: "Loại HĐ",
+        cell: ({ row }) => (
+          <span className="text-lotus-deep/70">
+            {row.original.contractType ?? "—"}
+          </span>
+        ),
+        size: 110,
+      },
+      {
+        accessorKey: "basicSalary",
+        header: "Lương",
+        cell: ({ row }) => (
+          <span className="font-semibold text-lotus-deep">
+            {formatCurrency(row.original.basicSalary)}
+          </span>
+        ),
         size: 100,
       },
       {
-        accessorKey: "unit",
-        header: "Đơn vị",
+        accessorKey: "createdAt",
+        header: "Ngày tạo",
         cell: ({ row }) => (
-          <span className="text-lotus-deep/70">{row.original.unit ?? "—"}</span>
-        ),
-        size: 80,
-      },
-      {
-        accessorKey: "sellingPrice",
-        header: "Giá bán",
-        cell: ({ row }) => (
-          <span className="font-semibold text-lotus-deep">
-            {row.original.sellingPrice != null
-              ? new Intl.NumberFormat("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                }).format(row.original.sellingPrice)
-              : "—"}
+          <span className="text-lotus-deep/70">
+            {row.original.createdAt ? formatDate(row.original.createdAt).format("DD/MM/YYYY") : "—"}
           </span>
         ),
         size: 120,
@@ -308,8 +353,8 @@ export function ProductListPage() {
         header: "Trạng thái",
         cell: ({ row }) => (
           <StatusBadge
-            status={row.original.status?.toString()}
-            statusMap={PRODUCT_STATUS_MAP}
+            status={row.original.status}
+            statusMap={STAFF_STATUS_MAP}
           />
         ),
         size: 120,
@@ -318,7 +363,7 @@ export function ProductListPage() {
         id: "actions",
         header: "",
         cell: ({ row }) => {
-          const prod = row.original;
+          const staff = row.original;
           return (
             <div onClick={(e) => e.stopPropagation()}>
               <DropdownMenu>
@@ -336,22 +381,26 @@ export function ProductListPage() {
                     <Eye className="w-4 h-4" />
                     {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
                   </DropdownMenuItem>
-                  {/* <PermissionGate resource="products" action="update"> */}
-                  <DropdownMenuItem onClick={() => setEditProduct(prod)}>
-                    <Pencil className="w-4 h-4" />
-                    Chỉnh sửa
-                  </DropdownMenuItem>
-                  {/* </PermissionGate> */}
-                  {/* <PermissionGate resource="products" action="delete" role="admin"> */}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={() => setDeleteTarget(prod)}
+                  <PermissionGate resource="staffs" action="update">
+                    <DropdownMenuItem onClick={() => setEditStaff(staff)}>
+                      <Pencil className="w-4 h-4" />
+                      Chỉnh sửa
+                    </DropdownMenuItem>
+                  </PermissionGate>
+                  <PermissionGate
+                    resource="staffs"
+                    action="delete"
+                    role="admin"
                   >
-                    <Trash2 className="w-4 h-4" />
-                    Xóa sản phẩm
-                  </DropdownMenuItem>
-                  {/* </PermissionGate> */}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={() => setDeleteTarget(staff)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Xóa nhân viên
+                    </DropdownMenuItem>
+                  </PermissionGate>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -373,7 +422,7 @@ export function ProductListPage() {
   );
 
   const table = useReactTable({
-    data: products,
+    data: staffs,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
@@ -393,15 +442,17 @@ export function ProductListPage() {
       variants={containerVariants}
       className="space-y-4"
     >
+      {/* Main Table Card */}
       <motion.div
         variants={itemVariants}
         className="bg-white/70 backdrop-blur-md rounded-admin border border-stone-200/30 overflow-hidden"
       >
+        {/* Toolbar */}
         <div className="px-4 pt-4">
           <DataTableToolbar
             searchValue={filter}
             onSearchChange={handleSearchChange}
-            searchPlaceholder="Tìm theo tên, mã sản phẩm..."
+            searchPlaceholder="Tìm theo tên, SĐT, email, mã NV..."
           >
             {selectedRowIds.size > 0 && (
               <div className="flex items-center gap-2 mr-auto text-[13px] text-lotus-deep font-medium bg-lotus-cream/50 px-3 py-1.5 rounded-lg border border-stone-200/50">
@@ -416,65 +467,74 @@ export function ProductListPage() {
               </div>
             )}
 
+            {/* Cài đặt hiển thị cột */}
             <DataTableViewOptions
               table={table}
               columnLabels={{
-                code: "Mã SP",
-                name: "Tên sản phẩm",
-                categoryName: "Danh mục",
-                stockQuantity: "Tồn kho",
-                unit: "Đơn vị",
-                sellingPrice: "Giá bán",
+                fullName: "Nhân viên",
+                code: "Mã NV",
+                phone: "SĐT",
+                contractType: "Loại HĐ",
+                basicSalary: "Lương",
+                gender: "Giới tính",
+                createdAt: "Ngày tạo",
                 status: "Trạng thái",
+                email: "Email",
               }}
             />
 
-            {/* <PermissionGate resource="products" action="create"> */}
-            <Button
-              variant="admin"
-              size="sm"
-              onClick={() => setCreateOpen(true)}
-              className="text-[12px] gap-1.5"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Thêm SP
-            </Button>
-            {/* </PermissionGate> */}
+            <PermissionGate resource="staffs" action="create" role="admin">
+              <Button
+                variant="admin"
+                size="sm"
+                onClick={() => setCreateOpen(true)}
+                className="text-[12px] gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Thêm NV
+              </Button>
+            </PermissionGate>
           </DataTableToolbar>
         </div>
 
+        {/* Table */}
         <DataTable
           table={table}
           isLoading={isLoading}
           loadingRows={pageSize > 5 ? 5 : pageSize}
           onRowClick={(row) => row.toggleExpanded()}
-          renderSubComponent={({ row }) => (
-            row.original.id ? <ProductDetailExpanded productId={row.original.id} onEdit={(product) => setEditProduct(product)} /> : null
-          )}
+          renderSubComponent={({ row }) =>
+            row.original.id ? (
+              <StaffDetailExpanded
+                staffId={row.original.id}
+                onEdit={(staff) => setEditStaff(staff)}
+              />
+            ) : null
+          }
           emptyState={
             <div className="flex flex-col items-center gap-3">
               <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
-                <Package className="w-7 h-7 text-lotus-stone" />
+                <Users className="w-7 h-7 text-lotus-stone" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-lotus-deep">
-                  Chưa có sản phẩm
+                  Chưa có nhân viên
                 </p>
                 <p className="text-[12px] text-lotus-stone mt-0.5">
-                  Thêm sản phẩm mới để bắt đầu quản lý kho.
+                  Thêm nhân viên mới để bắt đầu quản lý.
                 </p>
               </div>
-              {/* <PermissionGate resource="products" action="create"> */}
-              <Button
-                variant="admin"
-                size="sm"
-                onClick={() => setCreateOpen(true)}
-                className="mt-1 text-[12px]"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Thêm sản phẩm
-              </Button>
-              {/* </PermissionGate> */}
+              <PermissionGate resource="staffs" action="create" role="admin">
+                <Button
+                  variant="admin"
+                  size="sm"
+                  onClick={() => setCreateOpen(true)}
+                  className="mt-1 text-[12px]"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Thêm nhân viên
+                </Button>
+              </PermissionGate>
             </div>
           }
           pagination={
@@ -493,6 +553,7 @@ export function ProductListPage() {
           }
         />
 
+        {/* Fetch indicator */}
         {isFetching && !isLoading && (
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-lotus-leaf/30 overflow-hidden">
             <div className="h-full w-1/3 bg-lotus-leaf animate-[slide_1s_ease-in-out_infinite]" />
@@ -500,24 +561,29 @@ export function ProductListPage() {
         )}
       </motion.div>
 
-      <ProductFormDialog open={createOpen} onOpenChange={setCreateOpen} />
+      {/* ---- Dialogs & Drawers ---- */}
 
-      <ProductFormDialog
-        open={!!editProduct}
+      {/* Create Dialog */}
+      <StaffFormDialog open={createOpen} onOpenChange={setCreateOpen} />
+
+      {/* Edit Dialog */}
+      <StaffFormDialog
+        open={!!editStaff}
         onOpenChange={(open) => {
-          if (!open) setEditProduct(null);
+          if (!open) setEditStaff(null);
         }}
-        product={editProduct}
+        staff={editStaff}
       />
 
+      {/* Delete Confirm Dialog */}
       <ConfirmDialog
         open={!!deleteTarget}
         onOpenChange={(open) => {
           if (!open) setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
-        title="Xóa sản phẩm"
-        description={`Bạn có chắc muốn xóa sản phẩm "${deleteTarget?.name ?? ""}"? Hành động này không thể hoàn tác.`}
+        title="Xóa nhân viên"
+        description={`Bạn có chắc muốn xóa nhân viên "${deleteTarget?.fullName ?? ""}"? Hành động này không thể hoàn tác.`}
         confirmLabel="Xóa"
         loading={deleteMutation.isPending}
         variant="danger"

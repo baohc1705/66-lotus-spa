@@ -4,7 +4,7 @@ import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { UsersPage } from "@/features/users/pages/UsersPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AdminLayout, AdminDashboard } from "@/features/admin";
-import { EmployeeListPage } from "@/features/employees/pages/EmployeeListPage";
+import { StaffListPage } from "@/features/staffs/pages/StaffListPage";
 import { CustomerListPage } from "@/features/customers/pages/CustomerListPage";
 import { ProductListPage } from "@/features/products/pages/ProductListPage";
 import { ProductCategoryListPage } from "@/features/product_categories/pages/ProductCategoryListPage";
@@ -45,7 +45,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "staff/list",
-            element: <EmployeeListPage />,
+            element: <StaffListPage />,
           },
           {
             path: "customers/list",

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useForm, type Resolver } from "react-hook-form";
+import { useForm, useFieldArray, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { Textarea } from "@/shared/components/ui/textarea";
+import { Switch } from "@/shared/components/ui/switch";
 import {
   useCreateProduct,
   useUpdateProduct,
@@ -36,8 +37,16 @@ import {
   type ProductFormValues,
 } from "../schemas/product.schema";
 
-import type { ProductDto } from "../types/product.types";
-import { Package, Tag, Box } from "lucide-react";
+import type { CreateProductPayload, ProductDto } from "../types/product.types";
+import {
+  Package,
+  Tag,
+  Box,
+  Image as ImageIcon,
+  Link as LinkIcon,
+  Plus,
+  Trash2,
+} from "lucide-react";
 
 interface ProductFormDialogProps {
   open: boolean;
@@ -74,12 +83,22 @@ export function ProductFormDialog({
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
     reset,
     setValue,
     watch,
   } = form;
+
+  const {
+    fields: imageFields,
+    append: appendImage,
+    remove: removeImage,
+  } = useFieldArray({
+    control,
+    name: "images",
+  });
 
   // Reset form when dialog opens/closes or product changes
   useEffect(() => {
@@ -89,9 +108,12 @@ export function ProductFormDialog({
   }, [open, product, reset]);
 
   const onSubmit = (data: ProductFormValues) => {
-    const imagesPayload = data.imageName
-      ? [{ imageUrl: data.imageName, isPrimary: true }]
-      : [];
+    const imagesPayload =
+      data.images?.map((img) => ({
+        id: img.id,
+        url: img.url,
+        isPrimary: img.isPrimary,
+      })) || [];
 
     if (isEdit && product?.id) {
       const payload = {
@@ -111,14 +133,11 @@ export function ProductFormDialog({
         ...data,
         images: imagesPayload,
       };
-      createMutation.mutate(
-        payload as unknown as any, // Cast due to imageName dropping and images adding
-        {
-          onSuccess: (result) => {
-            if (result.isSuccess) onOpenChange(false);
-          },
+      createMutation.mutate(payload as CreateProductPayload, {
+        onSuccess: (result) => {
+          if (result.isSuccess) onOpenChange(false);
         },
-      );
+      });
     }
   };
 
@@ -230,6 +249,89 @@ export function ProductFormDialog({
             </div>
           </FormSection>
 
+          {/* === Section: Hình ảnh sản phẩm === */}
+          <FormSection icon={ImageIcon} title="Hình ảnh sản phẩm">
+            <div className="space-y-4">
+              {imageFields.map((field, index) => {
+                const isPrimary = watch(`images.${index}.isPrimary`);
+                const errorObj = errors.images?.[index];
+                return (
+                  <div
+                    key={field.id}
+                    className="flex gap-3 items-start border p-3 rounded-lg bg-stone-50/50"
+                  >
+                    <div className="flex-1 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <LinkIcon className="w-4 h-4 text-stone-400 shrink-0" />
+                        <div className="flex-1">
+                          <Input
+                            {...register(`images.${index}.url`)}
+                            placeholder="https://example.com/image.jpg"
+                            className="h-9 w-full"
+                          />
+                          {errorObj?.url && (
+                            <p className="text-[11px] text-red-500 mt-1">
+                              {errorObj.url.message}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4 pl-7">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <Switch
+                            checked={isPrimary}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                // If turning this on, turn off others
+                                const currentImages = watch("images") || [];
+                                currentImages.forEach((_, idx) => {
+                                  if (idx !== index) {
+                                    setValue(`images.${idx}.isPrimary`, false);
+                                  }
+                                });
+                              }
+                              setValue(`images.${index}.isPrimary`, checked);
+                            }}
+                          />
+                          <span className="text-[12px] font-medium text-lotus-deep">
+                            Hình ảnh chính
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeImage(index)}
+                      className="text-red-500 hover:text-red-600 hover:bg-red-50 shrink-0"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                );
+              })}
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full border-dashed"
+                onClick={() =>
+                  appendImage({
+                    url: "",
+                    isPrimary: imageFields.length === 0,
+                  })
+                }
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Thêm hình ảnh
+              </Button>
+            </div>
+          </FormSection>
+
           {/* === Section: Trạng thái & Chi tiết === */}
           <FormSection icon={Box} title="Trạng thái & Chi tiết">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
@@ -249,17 +351,6 @@ export function ProductFormDialog({
                     ))}
                   </SelectContent>
                 </Select>
-              </FormField>
-              <FormField
-                label="Hình ảnh"
-                tooltip="Nhập tên tệp hình ảnh (Tạm thời)"
-                error={errors.imageName?.message}
-              >
-                <Input
-                  {...register("imageName")}
-                  placeholder="image123.jpg"
-                  className="h-9 text-[13px]"
-                />
               </FormField>
               <FormField
                 label="Mô tả ngắn"
@@ -374,8 +465,6 @@ function FormField({
 
 function getDefaultValues(product?: ProductDto | null): ProductFormValues {
   if (product) {
-    const primaryImage =
-      product.images?.find((img) => img.isPrimary)?.imageUrl || "";
     return {
       categoryId: product.categoryId ?? 0,
       code: product.code ?? "",
@@ -388,7 +477,12 @@ function getDefaultValues(product?: ProductDto | null): ProductFormValues {
       stockQuantity: product.stockQuantity ?? 0,
       minStock: product.minStock ?? 0,
       status: product.status !== null ? Number(product.status) : 1,
-      imageName: primaryImage,
+      images:
+        product.images?.map((img) => ({
+          id: img.id,
+          url: img.url,
+          isPrimary: img.isPrimary,
+        })) || [],
     };
   }
   return {
@@ -403,6 +497,6 @@ function getDefaultValues(product?: ProductDto | null): ProductFormValues {
     stockQuantity: 0,
     minStock: 0,
     status: 1,
-    imageName: "",
+    images: [],
   };
 }

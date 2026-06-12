@@ -7,7 +7,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
 
 /** Schema gốc chứa tất cả các trường chung */
-const employeeBaseSchema = z.object({
+const staffBaseSchema = z.object({
   // Thông tin cá nhân
   fullName: z.string().min(1, 'Họ tên không được để trống').max(100, 'Tối đa 100 ký tự'),
   phone: z.string().min(1, 'SĐT không được để trống').regex(VIETNAM_PHONE_REGEX, 'SĐT không hợp lệ'),
@@ -36,13 +36,13 @@ const employeeBaseSchema = z.object({
 })
 
 /** Schema validation cho form cập nhật nhân viên (không có password hoặc password rỗng) */
-export const updateEmployeeSchema = employeeBaseSchema.extend({
+export const updateStaffSchema = staffBaseSchema.extend({
   password: z.string().optional().or(z.literal('')),
   confirmPassword: z.string().optional().or(z.literal('')),
 })
 
 /** Schema validation cho form tạo nhân viên (bắt buộc có password) */
-export const createEmployeeSchema = employeeBaseSchema.extend({
+export const createStaffSchema = staffBaseSchema.extend({
   password: z.string().min(1, 'Mật khẩu không được để trống')
     .regex(PASSWORD_REGEX, 'Tối thiểu 8 ký tự, gồm chữ hoa, thường, số và ký tự đặc biệt'),
   confirmPassword: z.string().min(1, 'Xác nhận mật khẩu không được để trống'),
@@ -53,11 +53,11 @@ export const createEmployeeSchema = employeeBaseSchema.extend({
 
 // --- Type Exports ---
 
-export type UpdateEmployeeFormData = z.infer<typeof updateEmployeeSchema>
-export type CreateEmployeeFormData = z.infer<typeof createEmployeeSchema>
+export type UpdateStaffFormData = z.infer<typeof updateStaffSchema>
+export type CreateStaffFormData = z.infer<typeof createStaffSchema>
 
 // Unified type cho Frontend Form State để tránh lỗi TypeScript Union
-export type EmployeeFormValues = UpdateEmployeeFormData & {
+export type StaffFormValues = UpdateStaffFormData & {
   password?: string
   confirmPassword?: string
 }

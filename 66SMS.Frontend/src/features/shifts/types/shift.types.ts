@@ -5,6 +5,9 @@ export interface ShiftPeriodDTO {
   effectiveFrom?: string;
   effectiveTo?: string;
   createdAt?: string;
+  createdBy?: number;
+  updatedAt?: string;
+  updatedBy?: number;
   status?: boolean; // Tương đương "Ca đang hoạt động" trong lịch sử
 }
 
@@ -13,6 +16,10 @@ export interface ShiftDTO {
   name?: string;
   description?: string;
   shiftPeriodDTOs?: ShiftPeriodDTO[];
+  createdAt?: string;
+  createdBy?: number;
+  updatedAt?: string;
+  updatedBy?: number;
 }
 
 export interface CreateShiftPeriodPayload {

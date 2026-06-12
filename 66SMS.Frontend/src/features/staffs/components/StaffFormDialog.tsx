@@ -24,22 +24,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { useCreateEmployee, useUpdateEmployee } from "../hooks/useEmployees";
+import { useCreateStaff, useUpdateStaff } from "../hooks/useStaffs";
 import {
-  createEmployeeSchema,
-  updateEmployeeSchema,
-  type CreateEmployeeFormData,
-  type UpdateEmployeeFormData,
-  type EmployeeFormValues,
-} from "../schemas/employee.schema";
+  createStaffSchema,
+  updateStaffSchema,
+  type CreateStaffFormData,
+  type UpdateStaffFormData,
+  type StaffFormValues,
+} from "../schemas/staff.schema";
 
-import type { EmployeeDto } from "../types/employee.types";
+import type { StaffDto } from "../types/staff.types";
 import { User, Briefcase, KeyRound } from "lucide-react";
 
-interface EmployeeFormDialogProps {
+interface StaffFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  employee?: EmployeeDto | null;
+  staff?: StaffDto | null;
 }
 
 const GENDER_OPTIONS = [
@@ -61,22 +61,22 @@ const STATUS_OPTIONS = [
   { value: "2", label: "Tạm nghỉ" },
 ];
 
-export function EmployeeFormDialog({
+export function StaffFormDialog({
   open,
   onOpenChange,
-  employee,
-}: EmployeeFormDialogProps) {
-  const isEdit = !!employee;
-  const createMutation = useCreateEmployee();
-  const updateMutation = useUpdateEmployee();
+  staff,
+}: StaffFormDialogProps) {
+  const isEdit = !!staff;
+  const createMutation = useCreateStaff();
+  const updateMutation = useUpdateStaff();
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   // Dynamic schema & form based on create vs edit
-  const form = useForm<EmployeeFormValues>({
+  const form = useForm<StaffFormValues>({
     resolver: zodResolver(
-      isEdit ? updateEmployeeSchema : createEmployeeSchema,
-    ) as Resolver<EmployeeFormValues>,
-    defaultValues: getDefaultValues(employee),
+      isEdit ? updateStaffSchema : createStaffSchema,
+    ) as Resolver<StaffFormValues>,
+    defaultValues: getDefaultValues(staff),
   });
 
   const {
@@ -88,17 +88,17 @@ export function EmployeeFormDialog({
     watch,
   } = form;
 
-  // Reset form when dialog opens/closes or employee changes
+  // Reset form when dialog opens/closes or staff changes
   useEffect(() => {
     if (open) {
-      reset(getDefaultValues(employee));
+      reset(getDefaultValues(staff));
     }
-  }, [open, employee, reset]);
+  }, [open, staff, reset]);
 
-  const onSubmit = (data: EmployeeFormValues) => {
-    if (isEdit && employee?.id) {
+  const onSubmit = (data: StaffFormValues) => {
+    if (isEdit && staff?.id) {
       updateMutation.mutate(
-        { id: employee.id, payload: data as UpdateEmployeeFormData },
+        { id: staff.id, payload: data as UpdateStaffFormData },
         {
           onSuccess: (result) => {
             if (result.isSuccess) onOpenChange(false);
@@ -106,7 +106,7 @@ export function EmployeeFormDialog({
         },
       );
     } else {
-      createMutation.mutate(data as CreateEmployeeFormData, {
+      createMutation.mutate(data as CreateStaffFormData, {
         onSuccess: (result) => {
           if (result.isSuccess) onOpenChange(false);
         },
@@ -123,7 +123,7 @@ export function EmployeeFormDialog({
           </DialogTitle>
           <DialogDescription>
             {isEdit
-              ? `Cập nhật thông tin nhân viên ${employee?.fullName ?? ""}`
+              ? `Cập nhật thông tin nhân viên ${staff?.fullName ?? ""}`
               : "Điền thông tin để tạo nhân viên mới"}
           </DialogDescription>
         </DialogHeader>
@@ -432,25 +432,25 @@ function FormField({
 
 // ---- Default Values ----
 
-function getDefaultValues(employee?: EmployeeDto | null): EmployeeFormValues {
-  if (employee) {
+function getDefaultValues(staff?: StaffDto | null): StaffFormValues {
+  if (staff) {
     return {
-      fullName: employee.fullName ?? "",
-      phone: employee.phone ?? "",
-      dob: employee.dob ?? "",
-      gender: employee.gender ? Number(employee.gender) : undefined,
-      nationalId: employee.nationalId ?? "",
-      image: employee.image ?? "",
-      hireDate: employee.hireDate ?? "",
-      contractType: employee.contractType ?? "",
-      basicSalary: employee.basicSalary ?? undefined,
-      status: employee.status ? Number(employee.status) : 1,
-      streetAddress: employee.streetAddress ?? "",
-      provinceCode: employee.provinceCode ?? "",
-      wardCode: employee.wardCode ?? "",
-      fullAddress: employee.fullAddress ?? "",
-      userName: employee.username ?? "",
-      email: employee.email ?? "",
+      fullName: staff.fullName ?? "",
+      phone: staff.phone ?? "",
+      dob: staff.dob ?? "",
+      gender: staff.gender ? Number(staff.gender) : undefined,
+      nationalId: staff.nationalId ?? "",
+      image: staff.image ?? "",
+      hireDate: staff.hireDate ?? "",
+      contractType: staff.contractType ?? "",
+      basicSalary: staff.basicSalary ?? undefined,
+      status: staff.status ? Number(staff.status) : 1,
+      streetAddress: staff.streetAddress ?? "",
+      provinceCode: staff.provinceCode ?? "",
+      wardCode: staff.wardCode ?? "",
+      fullAddress: staff.fullAddress ?? "",
+      userName: staff.username ?? "",
+      email: staff.email ?? "",
     };
   }
   return {

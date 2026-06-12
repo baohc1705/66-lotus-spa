@@ -1,7 +1,7 @@
 export interface ProductImageDto {
   id: number
   productId: number
-  imageUrl: string
+  url: string
   isPrimary: boolean
 }
 
@@ -20,7 +20,9 @@ export interface ProductDto {
   minStock: number | null
   status: number | null
   createdAt: string | null
+  createdBy?: number | null
   updatedAt: string | null
+  updatedBy?: number | null
   images?: ProductImageDto[] | null
 }
 
@@ -36,7 +38,7 @@ export interface CreateProductPayload {
   stockQuantity: number
   minStock: number
   status: number
-  images?: { imageUrl: string; isPrimary: boolean }[]
+  images?: { url: string; isPrimary: boolean }[]
 }
 
 export interface UpdateProductPayload {
@@ -51,7 +53,7 @@ export interface UpdateProductPayload {
   stockQuantity?: number
   minStock?: number
   status?: number
-  images?: { id?: number; imageUrl: string; isPrimary: boolean }[]
+  images?: { id?: number; url: string; isPrimary: boolean }[]
 }
 
 export interface ProductCategoryDto {

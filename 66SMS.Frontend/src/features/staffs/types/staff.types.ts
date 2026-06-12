@@ -1,5 +1,5 @@
-// DTO trả về từ API (match backend EmployeeDTO.cs)
-export interface EmployeeDto {
+// DTO trả về từ API (match backend StaffDto.cs)
+export interface StaffDto {
   id: number | null
   userId: number | null
   code: string | null
@@ -19,10 +19,14 @@ export interface EmployeeDto {
   fullAddress: string | null
   username: string | null
   email: string | null
+  createdAt?: string | null
+  createdBy?: number | null
+  updatedAt?: string | null
+  updatedBy?: number | null
 }
 
-// Payload tạo nhân viên (match CreateEmployeeCommand, bỏ [JsonIgnore] fields)
-export interface CreateEmployeePayload {
+// Payload tạo nhân viên (match CreateStaffCommand, bỏ [JsonIgnore] fields)
+export interface CreateStaffPayload {
   fullName: string
   image?: string
   dob?: string
@@ -44,8 +48,8 @@ export interface CreateEmployeePayload {
   confirmPassword: string
 }
 
-// Payload cập nhật nhân viên (match UpdateEmployeeCommand, bỏ [JsonIgnore] fields, không có password)
-export interface UpdateEmployeePayload {
+// Payload cập nhật nhân viên (match UpdateStaffCommand, bỏ [JsonIgnore] fields, không có password)
+export interface UpdateStaffPayload {
   fullName?: string
   image?: string
   dob?: string

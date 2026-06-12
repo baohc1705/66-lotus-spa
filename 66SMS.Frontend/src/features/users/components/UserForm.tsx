@@ -111,7 +111,7 @@ export const UserForm = ({ editingUser, onSuccess }: Props) => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="admin">Admin</SelectItem>
-            <SelectItem value="employee">Employee</SelectItem>
+            <SelectItem value="staff">Nhân viên</SelectItem>
           </SelectContent>
         </Select>
       </div>

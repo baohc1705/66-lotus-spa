@@ -7,7 +7,9 @@ export interface BookingRoomDTO {
   note?: string;
   status?: number;
   createdAt?: string;
+  createdBy?: number;
   updatedAt?: string;
+  updatedBy?: number;
   positions?: BookingPositionDTO[];
 }
 

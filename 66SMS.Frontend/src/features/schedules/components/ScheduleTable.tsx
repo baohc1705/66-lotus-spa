@@ -5,15 +5,15 @@ import type {
   ShiftPeriodDTO,
 } from "@/features/shifts/types/shift.types";
 import type { WorkScheduleDTO } from "../types/schedule.types";
-import type { EmployeeDto } from "@/features/employees/types/employee.types";
-import { AddEmployeeDialog } from "./AddStaffDialog";
+import type { StaffDto } from "@/features/staffs/types/staff.types";
+import { AddStaffDialog } from "./AddStaffDialog";
 import { useUpdateWorkSchedule } from "../hooks/useSchedules";
 import { toast } from "sonner";
 import { formatDate, DateUtil } from "@/shared/utils/date.utils";
 
 interface ScheduleTableProps {
   shifts: ShiftDTO[];
-  staffList: EmployeeDto[];
+  staffList: StaffDto[];
   workSchedules: WorkScheduleDTO[];
   weekStart: DateUtil;
   viewMode: "shift" | "staff" | "single";
@@ -34,8 +34,8 @@ export function ScheduleTable({
     shift: ShiftDTO;
     shiftPeriod: ShiftPeriodDTO;
     date: string;
-    defaultEmployeeId?: number | null;
-    existingEmployeeIds: number[];
+    defaultStaffId?: number | null;
+    existingStaffIds: number[];
   } | null>(null);
 
   const { mutate: updateWorkSchedule } = useUpdateWorkSchedule();
@@ -57,22 +57,22 @@ export function ScheduleTable({
   };
 
   // Maps
-  const fullMap = new Map<string, WorkScheduleDTO>(); // Key = {shiftPeriodId}_{employeeId}_{date}
+  const fullMap = new Map<string, WorkScheduleDTO>(); // Key = {shiftPeriodId}_{staffId}_{date}
   const shiftDayMap = new Map<string, WorkScheduleDTO[]>(); // Key = {shiftPeriodId}_{date}
-  const staffDayMap = new Map<string, WorkScheduleDTO[]>(); // Key = {employeeId}_{date}
+  const staffDayMap = new Map<string, WorkScheduleDTO[]>(); // Key = {staffId}_{date}
 
   workSchedules.forEach((ws) => {
     const dateStr = formatDate(ws.workDate).format("YYYY-MM-DD");
     
-    if (ws.shiftPeriodId && ws.employeeId) {
-      const keyFull = `${ws.shiftPeriodId}_${ws.employeeId}_${dateStr}`;
+    if (ws.shiftPeriodId && ws.staffId) {
+      const keyFull = `${ws.shiftPeriodId}_${ws.staffId}_${dateStr}`;
       fullMap.set(keyFull, ws);
 
       const keyShift = `${ws.shiftPeriodId}_${dateStr}`;
       const existingShifts = shiftDayMap.get(keyShift) || [];
       shiftDayMap.set(keyShift, [...existingShifts, ws]);
 
-      const keyStaff = `${ws.employeeId}_${dateStr}`;
+      const keyStaff = `${ws.staffId}_${dateStr}`;
       const existingStaff = staffDayMap.get(keyStaff) || [];
       staffDayMap.set(keyStaff, [...existingStaff, ws]);
     }
@@ -100,7 +100,7 @@ export function ScheduleTable({
   // Handlers for Drag and Drop (Only used in Shift View)
   const handleDragStart = (e: React.DragEvent, ws: WorkScheduleDTO) => {
     e.dataTransfer.setData("workScheduleId", ws.id?.toString() || "");
-    e.dataTransfer.setData("employeeId", ws.employeeId?.toString() || "");
+    e.dataTransfer.setData("staffId", ws.staffId?.toString() || "");
     e.dataTransfer.effectAllowed = "move";
   };
 
@@ -116,15 +116,15 @@ export function ScheduleTable({
   ) => {
     e.preventDefault();
     const wsIdStr = e.dataTransfer.getData("workScheduleId");
-    const employeeIdStr = e.dataTransfer.getData("employeeId");
-    if (!wsIdStr || !employeeIdStr) return;
+    const staffIdStr = e.dataTransfer.getData("staffId");
+    if (!wsIdStr || !staffIdStr) return;
 
     const wsId = parseInt(wsIdStr, 10);
-    const employeeId = parseInt(employeeIdStr, 10);
+    const staffId = parseInt(staffIdStr, 10);
 
     const key = `${targetPeriodId}_${targetDateStr}`;
     const cellSchedules = shiftDayMap.get(key) || [];
-    if (cellSchedules.some((ws) => ws.employeeId === employeeId)) {
+    if (cellSchedules.some((ws) => ws.staffId === staffId)) {
       toast.error("Nhân viên này đã được xếp vào ca này trong cùng ngày.");
       return;
     }
@@ -134,7 +134,7 @@ export function ScheduleTable({
         id: wsId,
         payload: {
           shiftPeriodId: targetPeriodId,
-          employeeId: employeeId,
+          staffId: staffId,
           workDate: targetDateStr,
         },
       },
@@ -214,7 +214,7 @@ export function ScheduleTable({
                             onDragStart={(e) => handleDragStart(e, ws)}
                             className="px-2.5 py-1.5 bg-white text-lotus-deep rounded-md text-[12px] font-medium border border-stone-200 shadow-sm truncate cursor-grab active:cursor-grabbing hover:border-lotus-gold transition-colors flex items-center justify-between group/item"
                           >
-                            <span className="truncate">{ws.employeeName}</span>
+                            <span className="truncate">{ws.staffName}</span>
                           </div>
                         ))}
                       </div>
@@ -227,7 +227,7 @@ export function ScheduleTable({
                                 shift,
                                 shiftPeriod: period,
                                 date: dateStr,
-                                existingEmployeeIds: cellSchedules.map(ws => ws.employeeId).filter((id): id is number => id != null),
+                                existingStaffIds: cellSchedules.map(ws => ws.staffId).filter((id): id is number => id != null),
                               })
                             }
                             className="flex items-center gap-1 text-[12px] font-semibold text-lotus-leaf hover:text-lotus-deep bg-lotus-cream hover:bg-lotus-cream/80 px-3 py-1.5 rounded-full transition-colors w-full justify-center border border-lotus-leaf/20"
@@ -377,8 +377,8 @@ export function ScheduleTable({
                                 shift,
                                 shiftPeriod: period,
                                 date: dateStr,
-                                defaultEmployeeId: selectedStaffId,
-                                existingEmployeeIds: [], // Not strictly needed for single view
+                                defaultStaffId: selectedStaffId,
+                                existingStaffIds: [], // Not strictly needed for single view
                               })
                             }
                             className="flex items-center gap-1 text-xs font-semibold text-lotus-leaf hover:text-lotus-deep bg-lotus-cream hover:bg-lotus-cream/80 px-3 py-1.5 rounded-full transition-colors"
@@ -436,12 +436,12 @@ export function ScheduleTable({
       </div>
 
       {addingShift && (
-        <AddEmployeeDialog
+        <AddStaffDialog
           shift={addingShift.shift}
           shiftPeriod={addingShift.shiftPeriod}
           date={addingShift.date}
-          defaultEmployeeId={addingShift.defaultEmployeeId}
-          existingEmployeeIds={addingShift.existingEmployeeIds}
+          defaultStaffId={addingShift.defaultStaffId}
+          existingStaffIds={addingShift.existingStaffIds}
           onClose={() => setAddingShift(null)}
         />
       )}

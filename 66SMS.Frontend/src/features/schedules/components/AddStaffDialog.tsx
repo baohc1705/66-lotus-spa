@@ -5,7 +5,7 @@ import { z } from "zod";
 import { Calendar as CalendarIcon, User, Repeat } from "lucide-react";
 import { toast } from "sonner";
 import { formatDate, DateUtil } from "@/shared/utils/date.utils";
-import { useEmployees } from "@/features/employees/hooks/useEmployees";
+import { useStaffs } from "@/features/staffs/hooks/useStaffs";
 import {
   useCreateWorkSchedule,
   useBulkCreateWorkSchedule,
@@ -31,19 +31,19 @@ import { Input } from "@/shared/components/ui/input";
 import { Switch } from "@/shared/components/ui/switch";
 
 const schema = z.object({
-  employeeId: z
+  staffId: z
     .number({ error: "Vui lòng chọn nhân viên" })
     .min(1, "Vui lòng chọn nhân viên"),
 });
 
 type FormValues = z.infer<typeof schema>;
 
-interface AddEmployeeDialogProps {
+interface AddStaffDialogProps {
   shift?: ShiftDTO | null;
   shiftPeriod?: ShiftPeriodDTO | null;
   date: string | null;
-  defaultEmployeeId?: number | null;
-  existingEmployeeIds?: number[];
+  defaultStaffId?: number | null;
+  existingStaffIds?: number[];
   onClose: () => void;
 }
 
@@ -64,14 +64,14 @@ const WEEKDAYS = [
   { value: 0, label: "Chủ nhật" },
 ];
 
-export function AddEmployeeDialog({
+export function AddStaffDialog({
   shift,
   shiftPeriod,
   date,
-  defaultEmployeeId,
-  existingEmployeeIds = [],
+  defaultStaffId,
+  existingStaffIds = [],
   onClose,
-}: AddEmployeeDialogProps) {
+}: AddStaffDialogProps) {
   const initialRecurringDays = date ? [formatDate(date).day()] : [];
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringDays, setRecurringDays] =
@@ -79,7 +79,7 @@ export function AddEmployeeDialog({
   const [endDate, setEndDate] = useState<string>("");
   const [workOnHolidays, setWorkOnHolidays] = useState(false);
 
-  const { data: employeesData, isLoading: isLoadingEmployees } = useEmployees({
+  const { data: staffsData, isLoading: isLoadingStaffs } = useStaffs({
     pageIndex: 1,
     pageSize: 1000,
   });
@@ -94,7 +94,7 @@ export function AddEmployeeDialog({
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      employeeId: defaultEmployeeId || 0,
+      staffId: defaultStaffId || 0,
     },
   });
 
@@ -115,13 +115,13 @@ export function AddEmployeeDialog({
   };
 
   const generateSchedules = (
-    employeeId: number,
+    staffId: number,
   ): CreateWorkSchedulePayload[] => {
     if (!isRecurring) {
       return [
         {
           workDate: date,
-          employeeId,
+          staffId,
           shiftPeriodId: shiftPeriod.id,
         },
       ];
@@ -144,7 +144,7 @@ export function AddEmployeeDialog({
         }
         schedules.push({
           workDate: d.format("YYYY-MM-DD"),
-          employeeId,
+          staffId,
           shiftPeriodId: shiftPeriod.id,
         });
       }
@@ -154,7 +154,7 @@ export function AddEmployeeDialog({
   };
 
   const onSubmit = (values: FormValues) => {
-    const schedules = generateSchedules(values.employeeId);
+    const schedules = generateSchedules(values.staffId);
 
     if (schedules.length === 0) {
       toast.warning("Không có ngày nào hợp lệ để tạo lịch.");
@@ -210,20 +210,20 @@ export function AddEmployeeDialog({
                 <FormField
                   label="Nhân viên"
                   tooltip="Vui lòng chọn nhân viên để xếp lịch"
-                  error={form.formState.errors.employeeId?.message}
+                  error={form.formState.errors.staffId?.message}
                 >
                   <select
-                    {...form.register("employeeId", { valueAsNumber: true })}
+                    {...form.register("staffId", { valueAsNumber: true })}
                     className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lotus-leaf disabled:bg-stone-50 text-[13px] h-9 bg-white"
-                    disabled={isLoadingEmployees}
+                    disabled={isLoadingStaffs}
                   >
                     <option value={0} disabled>
                       -- Tìm kiếm nhân viên --
                     </option>
-                    {employeesData?.data?.items
-                      ?.filter((s) => !existingEmployeeIds.includes(s.id))
+                    {staffsData?.data?.items
+                      ?.filter((s) => !existingStaffIds.includes(s.id!))
                       .map((s) => (
-                        <option key={s.id} value={s.id}>
+                        <option key={s.id} value={s.id!}>
                           {s.fullName} {s.code ? `(${s.code})` : ""}
                         </option>
                       ))}

@@ -1,42 +1,42 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { employeeApi } from '../api/employee.api'
+import { staffApi } from '../api/staff.api'
 import type { PageRequest } from '@/shared/types/common.types'
-import type { CreateEmployeePayload, UpdateEmployeePayload } from '../types/employee.types'
+import type { CreateStaffPayload, UpdateStaffPayload } from '../types/staff.types'
 
-const EMPLOYEE_KEYS = {
-  all: ['employees'] as const,
-  lists: () => [...EMPLOYEE_KEYS.all, 'list'] as const,
-  list: (params: PageRequest) => [...EMPLOYEE_KEYS.lists(), params] as const,
-  details: () => [...EMPLOYEE_KEYS.all, 'detail'] as const,
-  detail: (id: number) => [...EMPLOYEE_KEYS.details(), id] as const,
+const STAFF_KEYS = {
+  all: ['staffs'] as const,
+  lists: () => [...STAFF_KEYS.all, 'list'] as const,
+  list: (params: PageRequest) => [...STAFF_KEYS.lists(), params] as const,
+  details: () => [...STAFF_KEYS.all, 'detail'] as const,
+  detail: (id: number) => [...STAFF_KEYS.details(), id] as const,
 }
 
 /** Hook lấy danh sách nhân viên (phân trang, search, sort) */
-export function useEmployees(params: PageRequest) {
+export function useStaffs(params: PageRequest) {
   return useQuery({
-    queryKey: EMPLOYEE_KEYS.list(params),
-    queryFn: () => employeeApi.getAll(params),
+    queryKey: STAFF_KEYS.list(params),
+    queryFn: () => staffApi.getAll(params),
   })
 }
 
 /** Hook lấy chi tiết nhân viên */
-export function useEmployeeDetail(id: number | null) {
+export function useStaffDetail(id: number | null) {
   return useQuery({
-    queryKey: EMPLOYEE_KEYS.detail(id!),
-    queryFn: () => employeeApi.getDetail(id!),
+    queryKey: STAFF_KEYS.detail(id!),
+    queryFn: () => staffApi.getDetail(id!),
     enabled: id !== null && id > 0,
   })
 }
 
 /** Hook tạo nhân viên mới */
-export function useCreateEmployee() {
+export function useCreateStaff() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (payload: CreateEmployeePayload) => employeeApi.create(payload),
+    mutationFn: (payload: CreateStaffPayload) => staffApi.create(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: EMPLOYEE_KEYS.lists() })
+        qc.invalidateQueries({ queryKey: STAFF_KEYS.lists() })
         toast.success('Tạo nhân viên thành công')
       } else {
         toast.error(result.message || 'Không thể tạo nhân viên')
@@ -47,14 +47,14 @@ export function useCreateEmployee() {
 }
 
 /** Hook cập nhật nhân viên */
-export function useUpdateEmployee() {
+export function useUpdateStaff() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, payload }: { id: number; payload: UpdateEmployeePayload }) =>
-      employeeApi.update(id, payload),
+    mutationFn: ({ id, payload }: { id: number; payload: UpdateStaffPayload }) =>
+      staffApi.update(id, payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: EMPLOYEE_KEYS.all })
+        qc.invalidateQueries({ queryKey: STAFF_KEYS.all })
         toast.success('Cập nhật nhân viên thành công')
       } else {
         toast.error(result.message || 'Không thể cập nhật nhân viên')
@@ -65,13 +65,13 @@ export function useUpdateEmployee() {
 }
 
 /** Hook xóa nhân viên */
-export function useDeleteEmployee() {
+export function useDeleteStaff() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (id: number) => employeeApi.delete(id),
+    mutationFn: (id: number) => staffApi.delete(id),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: EMPLOYEE_KEYS.lists() })
+        qc.invalidateQueries({ queryKey: STAFF_KEYS.lists() })
         toast.success('Xóa nhân viên thành công')
       } else {
         toast.error(result.message || 'Không thể xóa nhân viên')

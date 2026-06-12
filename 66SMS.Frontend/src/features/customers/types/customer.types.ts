@@ -17,6 +17,10 @@ export interface CustomerDto {
   fullAddreess: string | null
   username: string | null
   email: string | null
+  createdAt?: string | null
+  createdBy?: number | null
+  updatedAt?: string | null
+  updatedBy?: number | null
 }
 
 // Payload tạo khách hàng (match CreateCustomerCommand, bỏ [JsonIgnore] fields: UserId, Role, CreatedBy)
