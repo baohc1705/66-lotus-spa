@@ -1,8 +1,10 @@
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
@@ -50,14 +52,14 @@ namespace _66SMS.Application.Features.Staffs.Commands.CreateStaff
 
             User? user = mapper.Map<User>(request);
             user.PasswordHash = passwordHash.Hash(request.Password!);
-            user.CreatedAt = DateTime.UtcNow;
+            user.CreatedAt = DateTimeHelper.UtcNow();
             user.CreatedBy = request.CreatedBy;
-            user.Status = _66SMS.Domain.Constants.UserConst.STATUS_ACTIVED;
+            user.Status = UserConst.STATUS_ACTIVED;
 
             Staff? staff = mapper.Map<Staff>(request);
-            staff.CreatedAt = DateTime.UtcNow;
+            staff.CreatedAt = DateTimeHelper.UtcNow();
             staff.CreatedBy = request.CreatedBy;
-            staff.Status = _66SMS.Domain.Constants.StaffConst.STATUS_ACTIVED;
+            staff.Status = StaffConst.STATUS_ACTIVED;
 
             staff.Code = await GenerateUniqueStaffCodeAsync(cancellationToken);
 
@@ -83,9 +85,9 @@ namespace _66SMS.Application.Features.Staffs.Commands.CreateStaff
                 {
                     UserId = user.Id,
                     RoleId = role.Id,
-                    AssignedAt = DateTime.UtcNow,
+                    AssignedAt = DateTimeHelper.UtcNow(),
                     AssignedBy = request.CreatedBy ?? 1,
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTimeHelper.UtcNow(),
                     CreatedBy = request.CreatedBy ?? 1
                 };
 
@@ -105,7 +107,7 @@ namespace _66SMS.Application.Features.Staffs.Commands.CreateStaff
         private async Task<string> GenerateUniqueStaffCodeAsync(CancellationToken cancellationToken)
         {
             Staff? staff = await staffSqlRepository.AsQueryable()
-                .Where(x => x.Code.StartsWith("LOTUSNV"))
+                .Where(x => x.Code.StartsWith("SEN"))
                 .OrderByDescending(x => x.Code)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -123,7 +125,7 @@ namespace _66SMS.Application.Features.Staffs.Commands.CreateStaff
             bool isUnique = false;
             do
             {
-                newCode = $"LOTUSNV{nextNumber:D4}";
+                newCode = $"SEN{nextNumber:D4}";
                 bool exists = await staffSqlRepository.AsQueryable()
                     .Where(x => x.Code == newCode)
                     .AnyAsync(cancellationToken);
