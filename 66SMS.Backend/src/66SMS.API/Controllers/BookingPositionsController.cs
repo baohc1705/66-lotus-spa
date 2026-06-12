@@ -4,6 +4,7 @@ using _66SMS.Application.Features.BookingPositions.Commands.DeleteBookingPositio
 using _66SMS.Application.Features.BookingPositions.Commands.UpdateBookingPositions;
 using _66SMS.Application.Features.BookingPositions.Queries.GetAllBookingPositions;
 using _66SMS.Application.Features.BookingPositions.Queries.GetDetailBookingPositions;
+using _66SMS.Contracts.Abstractions;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -15,16 +16,19 @@ namespace _66SMS.API.Controllers
     public class BookingPositionsController : ApiController<BookingPositionsController>
     {
         private readonly IMediator mediator;
+        private readonly IJwtService jwtService;
 
-        public BookingPositionsController(IMediator mediator)
+        public BookingPositionsController(IMediator mediator, IJwtService jwtService)
         {
             this.mediator = mediator;
+            this.jwtService = jwtService;
         }
 
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Create([FromBody] CreateBookingPositionCommand command)
         {
+            command.CreatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -34,6 +38,7 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] UpdateBookingPositionCommand command)
         {
             command.Id = id;
+            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -42,7 +47,9 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await mediator.Send(new DeleteBookingPositionCommand { Id = id });
+            var command = new DeleteBookingPositionCommand { Id = id };
+            command.UpdatedBy = jwtService.GetUserId();
+            var result = await mediator.Send(command);
             return HandleResult(result);
         }
 

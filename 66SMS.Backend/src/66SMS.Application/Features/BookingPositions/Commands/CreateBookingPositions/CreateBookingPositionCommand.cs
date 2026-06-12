@@ -10,5 +10,7 @@ namespace _66SMS.Application.Features.BookingPositions.Commands.CreateBookingPos
         public int? SortOrder { get; set; }
         public string? Note { get; set; }
         public int? Status { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        public int? CreatedBy { get; set; }
     }
 }

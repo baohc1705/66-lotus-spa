@@ -3,6 +3,7 @@ using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Settings;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using _66SMS.Domain.Enums;
 using MediatR;
@@ -66,7 +67,7 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
                            .ThenInclude(rp => rp.Permission)
                .FirstOrDefaultAsync(cancellationToken);
 
-            if (user == null || user.Status == UserStatus.LOCKED)
+            if (user == null || user.Status == UserConst.STATUS_LOCKED)
                 return Result<TokenResponseDTO>.BadRequest("Tai khoan khong hop le");
 
             // Rotate token
@@ -92,7 +93,7 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
             var roleEntity = user.UserRoles.First().Role;
             string role = roleEntity.Name;
             List<string> permissions = roleEntity.RolePermissions?
-                .Where(rp => !rp.IsDeleted && rp.Permission != null)
+                .Where(rp => rp.Permission != null)
                 .Select(rp => rp.Permission.PermissionKey)
                 .Distinct()
                 .ToList() ?? new List<string>();

@@ -4,13 +4,13 @@ using _66SMS.Application.Features.Customers.Commands.DeleteCustomer;
 using _66SMS.Application.Features.Customers.Commands.UpdateCustomer;
 using _66SMS.Application.Features.Customers.Queries.GetAllCustomer;
 using _66SMS.Application.Features.Customers.Queries.GetDetailCustomer;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Infrastructure.Security;
-using MediatR;
+using Asp.Versioning;
+using MediatR;  
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-using Asp.Versioning;
 
 namespace _66SMS.API.Controllers
 {
@@ -18,16 +18,20 @@ namespace _66SMS.API.Controllers
     public class CustomerController : ApiController<CustomerController>
     {
         private readonly IMediator mediator;
+        private readonly IJwtService jwtService;
 
-        public CustomerController(IMediator mediator)
+        public CustomerController(IMediator mediator, IJwtService jwtService)
         {
             this.mediator = mediator;
+            this.jwtService = jwtService;
         }
 
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> CreateCustomer([FromBody] CreateCustomerCommand command)
         {
+            var userId = jwtService.GetUserId();
+            if (userId > 0) command.CreatedBy = userId;
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -36,7 +40,10 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("customers", "delete", Roles = "admin")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
-            Result<object> result = await mediator.Send(new DeleteCustomerCommand { Id = id });
+            var command = new DeleteCustomerCommand { Id = id };
+            var userId = jwtService.GetUserId();
+            if (userId > 0) command.UpdatedBy = userId;
+            Result<object> result = await mediator.Send(command);
             return HandleResult(result);
         }
 
@@ -45,6 +52,8 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> UpdateCustomer(int id, [FromBody] UpdateCustomerCommand command)
         {
             command.Id = id;
+            var userId = jwtService.GetUserId();
+            if (userId > 0) command.UpdatedBy = userId;
             var result = await mediator.Send(command);
             return HandleResult(result);
         }

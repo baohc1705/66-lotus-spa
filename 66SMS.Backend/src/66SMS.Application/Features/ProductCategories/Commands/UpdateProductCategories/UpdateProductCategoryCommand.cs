@@ -13,5 +13,7 @@ namespace _66SMS.Application.Features.ProductCategories.Commands.UpdateProductCa
         public string? Description { get; set; }
         public int? SortOrder { get; set; }
         public int? Status { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        public int? UpdatedBy { get; set; }
     }
 }

@@ -1,40 +1,54 @@
-﻿namespace _66SMS.Domain.Constants
+namespace _66SMS.Domain.Constants
 {
     public class CustomerConst
     {
         #region Database
-        public const string TABLE_NAME = "Customers";
-        public const string FIELD_ID = "Id";
-        public const string FIELD_USER_ID = "UserId";
-        public const string FIELD_FULLNAME = "FullName";
-        public const string FIELD_AVATAR_URL = "AvatarUrl";
-        public const string FIELD_DOB = "DateOfBirth";
-        public const string FIELD_GENDER = "Gender";
-        public const string FIELD_PHONE = "Phone";
-        public const string FIELD_TIER = "Tier";
-        public const string FIELD_LOYALTY_POINT = "LoyaltyPoint";
-        public const string FIELD_FIRST_PURCHASE_AT = "FirstPurchaseAt";
-        public const string FIELD_LAST_PURCHASE_AT = "LastPurchaseAt";
-        public const string FIELD_SOURCE = "Source";
-        public const string FIELD_STATUS = "Status";
-        public const string FIELD_NOTE = "Note";
-        public const string FIELD_STREET_ADDRESS = "StreetAddress";
-        public const string FIELD_PROVINCE_CODE = "ProvinceCode";
-        public const string FIELD_WARD_CODE = "WardCode";
-        public const string FIELD_FULL_ADDRESS = "FullAddress";
-        public const string FIELD_IS_DELETED = "IsDeleted";
-        public const string FIELD_MODIFIED_AT = "ModifiedAt";
-        public const string FIELD_CREATED_AT = "CreatedAt";
+        public const string TABLE_NAME = "customers";
+        public const string FIELD_ID = "id";
+        public const string FIELD_USER_ID = "user_id";
+        public const string FIELD_FULL_NAME = "full_name";
+        public const string FIELD_AVATAR_URL = "avatar_url";
+        public const string FIELD_DATE_OF_BIRTH = "date_of_birth";
+        public const string FIELD_GENDER = "gender";
+        public const string FIELD_PHONE = "phone";
+        public const string FIELD_TIER = "tier";
+        public const string FIELD_LOYALTY_POINT = "loyalty_point";
+        public const string FIELD_FIRST_PURCHASE_AT = "first_purchase_at";
+        public const string FIELD_LAST_PURCHASE_AT = "last_purchase_at";
+        public const string FIELD_SOURCE = "source";
+        public const string FIELD_STATUS = "status";
+        public const string FIELD_NOTE = "note";
+        public const string FIELD_STREET_ADDRESS = "street_address";
+        public const string FIELD_PROVINCE_CODE = "province_code";
+        public const string FIELD_WARD_CODE = "ward_code";
+        public const string FIELD_FULL_ADDRESS = "full_address";
+        public const string FIELD_CREATED_AT = "created_at";
+        public const string FIELD_CREATED_BY = "created_by";
+        public const string FIELD_UPDATED_AT = "updated_at";
+        public const string FIELD_UPDATED_BY = "updated_by";
         #endregion
 
         #region Constraint
-        public const int FULLNAME_MAX_LENGTH = 100;
-        public const int AVATAR_MAX_LENGTH = 500;
+        public const int FULL_NAME_MAX_LENGTH = 100;
+        public const int AVATAR_URL_MAX_LENGTH = 500;
         public const int PHONE_MAX_LENGTH = 20;
         public const int TIER_MAX_LENGTH = 20;
         public const int SOURCE_MAX_LENGTH = 100;
         public const int NOTE_MAX_LENGTH = 500;
-        public const int STREET_MAX_LENGTH = 500;
+        public const int STREET_ADDRESS_MAX_LENGTH = 200;
+        public const int PROVINCE_CODE_MAX_LENGTH = 20;
+        public const int WARD_CODE_MAX_LENGTH = 20;
+        public const int FULL_ADDRESS_MAX_LENGTH = 500;
+        #endregion
+
+        #region Status
+        public const int STATUS_INACTIVED = 0;
+        public const int STATUS_ACTIVED = 1;
+        public const int STATUS_DELETED = 2;
+        #endregion
+
+        #region Message
+        public const string MSG_CUSTOMER_ID_NOT_FOUND = $"{nameof(Entities.Customer)} with id not found";
         #endregion
     }
 }

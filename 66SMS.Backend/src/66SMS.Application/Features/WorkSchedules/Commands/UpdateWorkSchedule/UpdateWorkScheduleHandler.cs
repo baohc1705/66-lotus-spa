@@ -26,8 +26,10 @@ namespace _66SMS.Application.Features.WorkSchedules.Commands.UpdateWorkSchedule
             if (workSchedule == null) return Result<object>.Conflict("Không tìm thấy ca làm việc");
 
             mapper.Map(request, workSchedule);
+            workSchedule.UpdatedAt = DateTime.UtcNow;
+            workSchedule.UpdatedBy = request.UpdatedBy;
 
-            bool isDuplicate = await workScheduleSqlRepository.AnyAsync(x => x.Id != request.Id && x.EmployeeId == workSchedule.EmployeeId && x.ShiftPeriodId == workSchedule.ShiftPeriodId && x.WorkDate == workSchedule.WorkDate, cancellationToken);
+            bool isDuplicate = await workScheduleSqlRepository.AnyAsync(x => x.Id != request.Id && x.StaffId == workSchedule.StaffId && x.ShiftPeriodId == workSchedule.ShiftPeriodId && x.WorkDate == workSchedule.WorkDate, cancellationToken);
             if (isDuplicate)
             {
                 return Result<object>.Conflict("Nhân viên này đã được xếp vào ca này trong cùng ngày.");

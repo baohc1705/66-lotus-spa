@@ -7,5 +7,7 @@ namespace _66SMS.Application.Features.Users.Commands.DeleteUser
     {
         public int? Id { get; set; }
         public List<int>? Ids { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        public int? UpdatedBy { get; set; }
     }
 }

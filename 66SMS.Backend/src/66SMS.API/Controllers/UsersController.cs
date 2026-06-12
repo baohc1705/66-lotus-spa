@@ -49,6 +49,7 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("users", "delete")]
         public async Task<IActionResult> DeleteUser([FromBody] DeleteUserCommand command)
         {
+            command.UpdatedBy = jwtService.GetUserId();
             Result<object> result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -57,6 +58,7 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("users", "update")]
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserCommand command)
         {
+            command.UpdatedBy = jwtService.GetUserId();
             Result<object> result = await mediator.Send(command);
             return HandleResult(result);
         }

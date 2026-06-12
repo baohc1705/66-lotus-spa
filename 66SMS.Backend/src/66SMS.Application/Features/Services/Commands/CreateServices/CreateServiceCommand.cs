@@ -16,6 +16,8 @@ namespace _66SMS.Application.Features.Services.Commands.CreateServices
         public decimal? CommissionRate { get; set; }
         public int? SortOrder { get; set; }
         public int? Status { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        public int? CreatedBy { get; set; }
 
         public List<ServiceProductItems>? ServiceProducts { get; set; }
         public List<ServiceImageItems>? ServiceImages { get; set; }
@@ -30,6 +32,8 @@ namespace _66SMS.Application.Features.Services.Commands.CreateServices
         public int? Status { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        public int? CreatedBy { get; set; }
     }
 
     public class ServiceImageItems

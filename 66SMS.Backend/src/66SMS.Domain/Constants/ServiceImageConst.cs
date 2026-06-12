@@ -10,5 +10,9 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_SORT_ORDER = "sort_order";
         public const string FIELD_IS_PRIMARY = "is_primary";
         #endregion
+
+        #region Message
+        public const string MSG_SERVICE_IMAGE_ID_NOT_FOUND = $"{nameof(Entities.ServiceImage)} with id not found";
+        #endregion
     }
 }

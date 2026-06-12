@@ -25,9 +25,9 @@ namespace _66SMS.Application.Features.WorkSchedules.Queries.GetDetailWorkSchedul
                 {
                     Id = x.Id,
                     ShiftPeriodId = x.ShiftPeriodId,
-                    EmployeeId = x.EmployeeId,
+                    StaffId = x.StaffId,
                     WorkDate = x.WorkDate,
-                    EmployeeName = x.Employee != null ? x.Employee.FullName : null,
+                    StaffName = x.Staff != null ? x.Staff.FullName : null,
                     Shift = x.ShiftPeriod != null && x.ShiftPeriod.Shift != null ? new ShiftDTO
                     {
                         Id = x.ShiftPeriod.Shift.Id,

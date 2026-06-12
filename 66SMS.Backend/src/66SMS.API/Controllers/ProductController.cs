@@ -4,6 +4,7 @@ using _66SMS.Application.Features.Products.Commands.DeleteProducts;
 using _66SMS.Application.Features.Products.Commands.UpdateProducts;
 using _66SMS.Application.Features.Products.Queries.GetAllProducts;
 using _66SMS.Application.Features.Products.Queries.GetDetailProduct;
+using _66SMS.Contracts.Abstractions;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -15,16 +16,19 @@ namespace _66SMS.API.Controllers
     public class ProductController : ApiController<ProductController>
     {
         private readonly IMediator mediator;
+        private readonly IJwtService jwtService;
 
-        public ProductController(IMediator mediator)
+        public ProductController(IMediator mediator, IJwtService jwtService)
         {
             this.mediator = mediator;
+            this.jwtService = jwtService;
         }
 
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Create([FromBody] CreateProductCommand command)
         {
+            command.CreatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -34,6 +38,7 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] UpdateProductCommand command)
         {
             command.Id = id;
+            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -42,7 +47,9 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await mediator.Send(new DeleteProductCommand { Id = id });
+            var command = new DeleteProductCommand { Id = id };
+            command.UpdatedBy = jwtService.GetUserId();
+            var result = await mediator.Send(command);
             return HandleResult(result);
         }
 

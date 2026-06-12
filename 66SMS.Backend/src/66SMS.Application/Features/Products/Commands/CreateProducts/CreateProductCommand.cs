@@ -17,6 +17,8 @@ namespace _66SMS.Application.Features.Products.Commands.CreateProducts
         public int StockQuantity { get; set; }
         public int MinStock { get; set; }
         public int Status { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        public int? CreatedBy { get; set; }
         
         public List<ProductImageDto>? Images { get; set; }
     }

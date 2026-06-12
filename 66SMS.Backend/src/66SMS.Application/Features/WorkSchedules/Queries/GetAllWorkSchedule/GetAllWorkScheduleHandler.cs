@@ -32,23 +32,23 @@ namespace _66SMS.Application.Features.WorkSchedules.Queries.GetAllWorkSchedule
                 query = query.Where(x => x.WorkDate <= endDate);
             }
 
-            if (request.EmployeeId.HasValue)
+            if (request.StaffId.HasValue)
             {
-                query = query.Where(x => x.EmployeeId == request.EmployeeId.Value);
+                query = query.Where(x => x.StaffId == request.StaffId.Value);
             }
 
             if (!string.IsNullOrEmpty(request.Filter))
             {
-                query = query.Where(x => x.Employee.FullName.StartsWith(request.Filter));
+                query = query.Where(x => x.Staff.FullName.StartsWith(request.Filter));
             }
 
             var result = await query.Select(x => new WorkScheduleDTO
             {
                 Id = x.Id,
                 ShiftPeriodId = x.ShiftPeriodId,
-                EmployeeId = x.EmployeeId,
+                StaffId = x.StaffId,
                 WorkDate = x.WorkDate,
-                EmployeeName = x.Employee != null ? x.Employee.FullName : null,
+                StaffName = x.Staff != null ? x.Staff.FullName : null,
                 Shift = x.ShiftPeriod != null && x.ShiftPeriod.Shift != null ? new ShiftDTO
                 {
                     Id = x.ShiftPeriod.Shift.Id,

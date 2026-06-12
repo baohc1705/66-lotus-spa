@@ -36,6 +36,7 @@ namespace _66SMS.Application.Features.BookingPositions.Commands.DeleteBookingPos
 
                 bookingPosition.Status = BookingPositionConst.STATUS_DELETED;
                 bookingPosition.UpdatedAt = DateTimeHelper.UtcNow();
+                bookingPosition.UpdatedBy = request.UpdatedBy;
                 bookingPositionSqlRepository.Update(bookingPosition);
 
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

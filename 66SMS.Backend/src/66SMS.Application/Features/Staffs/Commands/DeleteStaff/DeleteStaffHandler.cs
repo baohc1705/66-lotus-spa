@@ -8,58 +8,52 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System;
 
-namespace _66SMS.Application.Features.Employees.Commands.DeleteEmployee
+namespace _66SMS.Application.Features.Staffs.Commands.DeleteStaff
 {
-    public class DeleteEmployeeHandler : IRequestHandler<DeleteEmployeeCommand, Result<object>>
+    public class DeleteStaffHandler : IRequestHandler<DeleteStaffCommand, Result<object>>
     {
         private readonly IUserSqlRepository userSqlRepository;
-        private readonly IEmployeeSqlRepository employeeSqlRepository;
+        private readonly IStaffSqlRepository staffSqlRepository;
         private readonly IUserRoleSqlRepository userRoleSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
 
-        public DeleteEmployeeHandler(
+        public DeleteStaffHandler(
             IUserSqlRepository userSqlRepository,
             IUserRoleSqlRepository userRoleSqlRepository,
-            IEmployeeSqlRepository employeeSqlRepository,
+            IStaffSqlRepository staffSqlRepository,
             ISqlUnitOfWork sqlUnitOfWork)
         {
             this.userSqlRepository = userSqlRepository;
             this.userRoleSqlRepository = userRoleSqlRepository;
-            this.employeeSqlRepository = employeeSqlRepository;
+            this.staffSqlRepository = staffSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
         }
 
-        public async Task<Result<object>> Handle(DeleteEmployeeCommand request, CancellationToken cancellationToken)
+        public async Task<Result<object>> Handle(DeleteStaffCommand request, CancellationToken cancellationToken)
         {
-            Employee? employee = await employeeSqlRepository.FindByIdAsync((int)request.Id!, false);
-            if (employee == null)
+            Staff? staff = await staffSqlRepository.FindByIdAsync((int)request.Id!, false);
+            if (staff == null)
                 return Result<object>.NotFound();
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Soft remove employee
-                employeeSqlRepository.Remove(employee);
+                staff.Status = _66SMS.Domain.Constants.StaffConst.STATUS_DELETED;
+                staff.UpdatedAt = DateTime.UtcNow;
+                staff.UpdatedBy = request.UpdatedBy;
+                staffSqlRepository.Update(staff);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // Soft remove associated user
-                User? user = await userSqlRepository.FindByIdAsync(employee.UserId, false);
+                User? user = await userSqlRepository.FindByIdAsync(staff.UserId, false);
                 if (user != null)
                 {
-                    userSqlRepository.Remove(user);
+                    user.Status = _66SMS.Domain.Constants.UserConst.STATUS_DELETED;
+                    user.UpdatedAt = DateTime.UtcNow;
+                    user.UpdatedBy = request.UpdatedBy;
+                    userSqlRepository.Update(user);
                     await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-
-                    // Soft remove user role relationship
-                    UserRole? userRole = await userRoleSqlRepository.AsQueryable()
-                        .Where(x => x.UserId == user.Id)
-                        .FirstOrDefaultAsync(cancellationToken);
-
-                    if (userRole != null)
-                    {
-                        userRoleSqlRepository.Remove(userRole);
-                        await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-                    }
                 }
 
                 transaction.Commit();

@@ -12,6 +12,8 @@ namespace _66SMS.Application.Features.Users.Commands.UpdateUser
         public bool? IsEmailConfirmed { get; set; }
         public int? AccessFailedCount { get; set; }
         public int? Status { get; set; }
-        public DateTime? LogoutEnd { get; set; }
+        public DateTime? LockoutEnd { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        public int? UpdatedBy { get; set; }
     }
 }

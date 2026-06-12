@@ -1,13 +1,13 @@
 using _66SMS.Application.DTOs.Customers;
-using _66SMS.Application.DTOs.Employees;
 using _66SMS.Application.DTOs.Shifts;
 using _66SMS.Application.DTOs.Users;
 using _66SMS.Application.Features.Auth.Commands.CreatePermission;
 using _66SMS.Application.Features.Auth.Commands.CreateRole;
 using _66SMS.Application.Features.Customers.Commands.CreateCustomer;
 using _66SMS.Application.Features.Customers.Commands.UpdateCustomer;
-using _66SMS.Application.Features.Employees.Commands.CreateEmployee;
-using _66SMS.Application.Features.Employees.Commands.UpdateEmployee;
+using _66SMS.Application.DTOs.Staffs;
+using _66SMS.Application.Features.Staffs.Commands.CreateStaff;
+using _66SMS.Application.Features.Staffs.Commands.UpdateStaff;
 using _66SMS.Application.Features.Shitfs.Commands.CreateShift;
 using _66SMS.Application.Features.Shitfs.Commands.CreateShiftPeriod;
 using _66SMS.Application.Features.Shitfs.Commands.UpdateShift;
@@ -70,10 +70,10 @@ namespace _66SMS.Application.Commons.Mappers
             CreateMap<CreateCustomerCommand, Customer>()
                 .IgnoreNullValueTypes();
 
-            // Create employee
-            CreateMap<CreateEmployeeCommand, User>()
+            // Create staff
+            CreateMap<CreateStaffCommand, User>()
                 .IgnoreNullValueTypes();
-            CreateMap<CreateEmployeeCommand, Employee>()
+            CreateMap<CreateStaffCommand, Staff>()
                 .IgnoreNullValueTypes();
 
             // Update customer
@@ -85,18 +85,18 @@ namespace _66SMS.Application.Commons.Mappers
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .IgnoreNullValueTypes();
 
-            // Update employee
-            CreateMap<UpdateEmployeeCommand, Employee>()
+            // Update staff
+            CreateMap<UpdateStaffCommand, Staff>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.UserId, opt => opt.Ignore())
                 .IgnoreNullValueTypes();
-            CreateMap<UpdateEmployeeCommand, User>()
+            CreateMap<UpdateStaffCommand, User>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .IgnoreNullValueTypes();
 
             // Customer DTO
             CreateMap<Customer, CustomerDTO>()
-                .ForMember(dest => dest.Dob, opt => opt.MapFrom(src => src.Dob.ToDateOnlyString()))
+                .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.DateOfBirth.ToDateOnlyString()))
                 .ForMember(dest => dest.FirstPurchaseAt, opt => opt.MapFrom(src => src.FirstPurchaseAt.ToVietnamTimeString("dd/MM/yyyy HH:mm")))
                 .ForMember(dest => dest.LastPurchaseAt, opt => opt.MapFrom(src => src.LastPurchaseAt.ToVietnamTimeString("dd/MM/yyyy HH:mm")))
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender.ToString()))
@@ -105,9 +105,9 @@ namespace _66SMS.Application.Commons.Mappers
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User != null ? src.User.Email : null))
                 .IgnoreNullValueTypes();
 
-            // Employee DTO
-            CreateMap<Employee, EmployeeDTO>()
-                .ForMember(dest => dest.Dob, opt => opt.MapFrom(src => src.Dob.ToDateOnlyString("dd/MM/yyyy")))
+            // Staff DTO
+            CreateMap<Staff, StaffDto>()
+                .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.DateOfBirth.ToDateOnlyString("dd/MM/yyyy")))
                 .ForMember(dest => dest.HireDate, opt => opt.MapFrom(src => src.HireDate.ToDateOnlyString("dd/MM/yyyy")))
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender.ToString()))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))

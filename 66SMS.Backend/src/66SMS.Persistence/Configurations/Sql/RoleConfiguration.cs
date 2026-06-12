@@ -14,10 +14,12 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.Description).HasColumnName(RoleConst.FIELD_DESCRIPTION).HasMaxLength(RoleConst.DESCRIPTION_MAX_LENGTH);
             builder.Property(x => x.Status).HasColumnName(RoleConst.FIELD_STATUS).HasConversion<int>();
             builder.Property(x => x.CreatedAt).HasColumnName(RoleConst.FIELD_CREATED_AT);
-            builder.Property(x => x.ModifiedAt).HasColumnName(RoleConst.FIELD_MODIFIED_AT);
-            builder.Property(x => x.IsDeleted).HasColumnName(RoleConst.FIELD_IS_DELETED);
+            builder.Property(x => x.CreatedBy).HasColumnName(RoleConst.FIELD_CREATED_BY);
+            builder.Property(x => x.UpdatedAt).HasColumnName(RoleConst.FIELD_UPDATED_AT);
+            builder.Property(x => x.UpdatedBy).HasColumnName(RoleConst.FIELD_UPDATED_BY);
 
             builder.ToTable(RoleConst.TABLE_NAME);
+            builder.HasQueryFilter(x => x.Status != RoleConst.STATUS_DELETED);
         }
     }
 }

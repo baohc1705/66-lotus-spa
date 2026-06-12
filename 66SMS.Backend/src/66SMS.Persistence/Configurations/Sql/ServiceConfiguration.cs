@@ -23,9 +23,12 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.SortOrder).HasColumnName(ServiceConst.FIELD_SORT_ORDER);
             builder.Property(x => x.Status).HasColumnName(ServiceConst.FIELD_STATUS);
             builder.Property(x => x.CreatedAt).HasColumnName(ServiceConst.FIELD_CREATED_AT);
+            builder.Property(x => x.CreatedBy).HasColumnName(ServiceConst.FIELD_CREATED_BY);
             builder.Property(x => x.UpdatedAt).HasColumnName(ServiceConst.FIELD_UPDATED_AT);
+            builder.Property(x => x.UpdatedBy).HasColumnName(ServiceConst.FIELD_UPDATED_BY);
             builder.HasOne(x => x.Category).WithMany(c => c.Services).HasForeignKey(x => x.CategoryId).IsRequired(false);
             builder.ToTable(ServiceConst.TABLE_NAME);
+            builder.HasQueryFilter(x => x.Status != ServiceConst.STATUS_DELETED);
         }
     }
 }

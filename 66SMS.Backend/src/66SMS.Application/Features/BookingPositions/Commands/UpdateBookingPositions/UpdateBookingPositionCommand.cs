@@ -13,5 +13,7 @@ namespace _66SMS.Application.Features.BookingPositions.Commands.UpdateBookingPos
         public int? SortOrder { get; set; }
         public string? Note { get; set; }
         public int? Status { get; set; }
+        [JsonIgnore]
+        public int? UpdatedBy { get; set; }
     }
 }

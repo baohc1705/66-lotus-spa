@@ -18,5 +18,7 @@ namespace _66SMS.Application.Features.Services.Commands.UpdateServices
         public decimal? CommissionRate { get; set; }
         public int? SortOrder { get; set; }
         public int? Status { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        public int? UpdatedBy { get; set; }
     }
 }

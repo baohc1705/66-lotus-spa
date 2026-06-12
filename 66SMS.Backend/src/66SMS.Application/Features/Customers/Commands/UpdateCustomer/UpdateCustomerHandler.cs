@@ -31,6 +31,8 @@ namespace _66SMS.Application.Features.Customers.Commands.UpdateCustomer
                 Customer? customer = await customerSqlRepository.FindByIdAsync((int)request.Id, false);
                 if (customer == null) return Result<object>.NotFound();
                 mapper.Map(request, customer);
+                customer.UpdatedAt = DateTime.UtcNow;
+                customer.UpdatedBy = request.UpdatedBy;
                 customerSqlRepository.Update(customer);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
@@ -39,6 +41,8 @@ namespace _66SMS.Application.Features.Customers.Commands.UpdateCustomer
                 {
                     User? user = await userSqlRepository.FindByIdAsync(customer.UserId, false);
                     mapper.Map(request, user);
+                    user.UpdatedAt = DateTime.UtcNow;
+                    user.UpdatedBy = request.UpdatedBy;
                     userSqlRepository.Update(user);
                     await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 }

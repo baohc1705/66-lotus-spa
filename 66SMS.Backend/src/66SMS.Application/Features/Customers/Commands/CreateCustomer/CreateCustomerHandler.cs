@@ -8,6 +8,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using _66SMS.Domain.Constants;
 
 namespace _66SMS.Application.Features.Customers.Commands.CreateCustomer
 {
@@ -43,8 +44,14 @@ namespace _66SMS.Application.Features.Customers.Commands.CreateCustomer
 
             User? user = mapper.Map<User>(request);
             user.PasswordHash = passwordHash.Hash(request.Password!);
+            user.CreatedAt = DateTime.UtcNow;
+            user.CreatedBy = request.CreatedBy ?? 1;
+            user.Status = UserConst.STATUS_ACTIVED;
 
-            Customer ? customer = mapper.Map<Customer>(request);
+            Customer? customer = mapper.Map<Customer>(request);
+            customer.CreatedAt = DateTime.UtcNow;
+            customer.CreatedBy = request.CreatedBy ?? 1;
+            customer.Status = CustomerConst.STATUS_ACTIVED;
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
@@ -69,7 +76,9 @@ namespace _66SMS.Application.Features.Customers.Commands.CreateCustomer
                     UserId = user.Id,
                     RoleId = role.Id,
                     AssignedAt = DateTime.UtcNow,
-                    AssignedBy = request.CreatedBy ?? 1
+                    AssignedBy = request.CreatedBy ?? 1,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = request.CreatedBy ?? 1
                 };
 
                 userRoleSqlRepository.Add(userRole);

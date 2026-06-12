@@ -24,7 +24,7 @@ namespace _66SMS.Persistence.Repositories.Sql
         }
         public void Update(RolePermission entity)
         {
-            entity.ModifiedAt = DateTimeHelper.UtcNow();
+            entity.UpdatedAt = DateTimeHelper.UtcNow();
             base.Update(entity);
         }
     }

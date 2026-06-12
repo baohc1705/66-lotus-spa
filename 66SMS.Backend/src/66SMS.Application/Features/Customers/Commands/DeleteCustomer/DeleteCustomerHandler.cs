@@ -5,6 +5,7 @@ using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using _66SMS.Domain.Constants;
 
 namespace _66SMS.Application.Features.Customers.Commands.DeleteCustomer
 {
@@ -30,18 +31,21 @@ namespace _66SMS.Application.Features.Customers.Commands.DeleteCustomer
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                customerSqlRepository.Remove(customer);
+                customer.Status = CustomerConst.STATUS_DELETED;
+                customer.UpdatedAt = DateTime.UtcNow;
+                customer.UpdatedBy = request.UpdatedBy;
+                customerSqlRepository.Update(customer);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 User? user = await userSqlRepository.FindByIdAsync(customer.UserId, false);
-                userSqlRepository.Remove(user);
-                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-
-                UserRole? userRole = await userRoleSqlRepository.AsQueryable()
-                    .Where(x => x.UserId == user.Id)
-                    .FirstOrDefaultAsync(cancellationToken);
-                userRoleSqlRepository.Remove(userRole);
-                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                if (user != null)
+                {
+                    user.Status = UserConst.STATUS_DELETED;
+                    user.UpdatedAt = DateTime.UtcNow;
+                    user.UpdatedBy = request.UpdatedBy;
+                    userSqlRepository.Update(user);
+                    await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                }
 
                 transaction.Commit();
                 return Result<object>.Ok();

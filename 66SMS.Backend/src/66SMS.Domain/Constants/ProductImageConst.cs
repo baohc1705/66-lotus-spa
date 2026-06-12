@@ -14,5 +14,9 @@ namespace _66SMS.Domain.Constants
         #region Constraint
         public const int URL_MAX_LENGTH = 500;
         #endregion
+
+        #region Message
+        public const string MSG_PRODUCT_IMAGE_ID_NOT_FOUND = $"{nameof(Entities.ProductImage)} with id not found";
+        #endregion
     }
 }

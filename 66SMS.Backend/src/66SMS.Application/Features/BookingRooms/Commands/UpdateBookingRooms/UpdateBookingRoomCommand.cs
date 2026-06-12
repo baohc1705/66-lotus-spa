@@ -12,5 +12,7 @@ namespace _66SMS.Application.Features.BookingRooms.Commands.UpdateBookingRooms
         public string? ImageUrl { get; set; }
         public string? Note { get; set; }
         public int? Status { get; set; }
+        [JsonIgnore]
+        public int? UpdatedBy { get; set; }
     }
 }

@@ -8,5 +8,7 @@ namespace _66SMS.Application.Features.WorkSchedules.Commands.BulkCreateWorkSched
     public class BulkCreateWorkScheduleCommand : IRequest<Result<object>>
     {
         public List<CreateWorkScheduleCommand> Schedules { get; set; } = new();
+        [System.Text.Json.Serialization.JsonIgnore]
+        public int? CreatedBy { get; set; }
     }
 }

@@ -36,6 +36,9 @@ namespace _66SMS.Application.Features.Services.Commands.CreateServices
             try
             {
                 Service? service = mapper.Map<Service>(request);
+                service.CreatedAt = DateTimeHelper.UtcNow();
+                service.CreatedBy = request.CreatedBy ?? 1;
+                service.Status = request.Status ?? _66SMS.Domain.Constants.ServiceConst.STATUS_ACTIVED;
                 serviceSqlRepository.Add(service);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 if (request.ServiceImages != null && request.ServiceImages.Any())
@@ -46,7 +49,7 @@ namespace _66SMS.Application.Features.Services.Commands.CreateServices
 
                 if (request.ServiceProducts != null && request.ServiceProducts.Any())
                 {
-                    AddServiceProducts(service.Id, request.ServiceProducts);
+                    AddServiceProducts(service.Id, request.ServiceProducts, request.CreatedBy);
                     await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 }
                 transaction.Commit();
@@ -59,13 +62,15 @@ namespace _66SMS.Application.Features.Services.Commands.CreateServices
             }
         }
 
-        private void AddServiceProducts(int id, List<ServiceProductItems> serviceProductsRequest)
+        private void AddServiceProducts(int id, List<ServiceProductItems> serviceProductsRequest, int? createdBy)
         {
             List<ServiceProduct> serviceProducts = serviceProductsRequest.Select(x =>
             {
                 ServiceProduct serviceProduct = mapper.Map<ServiceProduct>(x);
                 serviceProduct.ServiceId = id;
                 serviceProduct.CreatedAt = DateTimeHelper.UtcNow();
+                serviceProduct.CreatedBy = createdBy ?? 1;
+                serviceProduct.Status = x.Status ?? _66SMS.Domain.Constants.ServiceProductConst.STATUS_ACTIVED;
                 return serviceProduct;
             }).ToList();
             serviceProductSqlRepository.AddRange(serviceProducts);

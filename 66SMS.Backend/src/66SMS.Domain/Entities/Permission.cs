@@ -1,15 +1,20 @@
-﻿using _66SMS.Domain.Abstractions.Entities;
-using _66SMS.Domain.Enums;
+using _66SMS.Domain.Abstractions.Entities;
 
 namespace _66SMS.Domain.Entities
 {
-    public class Permission : EntityAuditTable<int>
+    public class Permission : EntityBase<int>
     {
-        public string Name { get; set; } = string.Empty;
-        public string Resource { get; set; } = string.Empty;
-        public string Action { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public PermissionStatus Status {  get; set; }
+        public string Name { get; set; }
+        public string Resource { get; set; }
+        public string Action { get; set; }
+        public string? Description { get; set; }
+        public int Status {  get; set; }
+        
+        public DateTime CreatedAt { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public int? UpdatedBy { get; set; }
+
         public string PermissionKey => $"{Resource}:{Action}";
         public List<RolePermission>? RolePermissions { get; set; }
     }

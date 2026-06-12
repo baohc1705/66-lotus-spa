@@ -1,5 +1,6 @@
 using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using _66SMS.Domain.Enums;
 using _66SMS.Persistence.Repositories.Sql.Base;
@@ -16,8 +17,8 @@ namespace _66SMS.Persistence.Repositories.Sql
         {
             return await Entities
                 .AsNoTracking()
-                .Where(ur => ur.UserId == userId && !ur.IsDeleted && ur.Role.Status == RoleStatus.ACTIVE)
-                .SelectMany(ur => ur.Role.RolePermissions.Where(rp => !rp.IsDeleted))
+                .Where(ur => ur.UserId == userId && ur.Role.Status == RoleConst.STATUS_ACTIVED)
+                .SelectMany(ur => ur.Role.RolePermissions)
                 .Select(rp => rp.Permission.PermissionKey)
                 .Distinct()
                 .ToListAsync(cancellationToken);
@@ -30,9 +31,8 @@ namespace _66SMS.Persistence.Repositories.Sql
                 .Where(ur =>
                     ur.UserId == userId &&
                     ur.RoleId == roleId &&
-                    !ur.IsDeleted &&
-                    ur.Role.Status == RoleStatus.ACTIVE)
-                .SelectMany(ur => ur.Role.RolePermissions.Where(rp => !rp.IsDeleted))
+                    ur.Role.Status == RoleConst.STATUS_ACTIVED)
+                .SelectMany(ur => ur.Role.RolePermissions)
                 .Select(rp => rp.Permission.PermissionKey)
                 .Distinct()
                 .ToListAsync(cancellationToken);
@@ -52,7 +52,7 @@ namespace _66SMS.Persistence.Repositories.Sql
         }
         public void Update(UserRole entity)
         {
-            entity.ModifiedAt = DateTimeHelper.UtcNow();
+            entity.UpdatedAt = DateTimeHelper.UtcNow();
             base.Update(entity);
         }
 
@@ -60,7 +60,7 @@ namespace _66SMS.Persistence.Repositories.Sql
         {
             return await Entities
                   .AsNoTracking()
-                  .Where(x => x.UserId == id && !x.IsDeleted && x.Role.Status == RoleStatus.ACTIVE)
+                  .Where(x => x.UserId == id &&  x.Role.Status == RoleConst.STATUS_ACTIVED)
                   .Select(x => x.Role)
                   .FirstOrDefaultAsync(cancellationToken);
         }

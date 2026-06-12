@@ -3,16 +3,16 @@ using MediatR;
 using System;
 using System.Text.Json.Serialization;
 
-namespace _66SMS.Application.Features.Employees.Commands.UpdateEmployee
+namespace _66SMS.Application.Features.Staffs.Commands.CreateStaff
 {
-    public class UpdateEmployeeCommand : IRequest<Result<object>>
+    public record CreateStaffCommand : IRequest<Result<object>>
     {
         // Profile
         [JsonIgnore]
-        public int? Id { get; set; }
+        public int? UserId { get; set; }
         public string? FullName { get; set; }
-        public string? Image { get; set; }
-        public DateOnly? Dob { get; set; }
+        public string? AvatarUrl { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
         public int? Gender { get; set; }
         public string? NationalId { get; set; }
         public string? Phone { get; set; }
@@ -28,6 +28,8 @@ namespace _66SMS.Application.Features.Employees.Commands.UpdateEmployee
         // Account
         public string? UserName { get; set; }
         public string? Email { get; set; }
+        public string? Password { get; set; }
+        public string? ConfirmPassword { get; set; }
 
         [JsonIgnore]
         public string? Role { get; set; }

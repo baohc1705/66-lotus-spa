@@ -32,6 +32,7 @@ namespace _66SMS.Application.Features.ProductCategories.Commands.DeleteProductCa
             // Soft delete
             productCategory.Status = ProductCategoryConst.STATUS_DELETED;
             productCategory.UpdatedAt = DateTime.UtcNow;
+            productCategory.UpdatedBy = request.UpdatedBy;
 
             productCategorySqlRepository.Update(productCategory);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

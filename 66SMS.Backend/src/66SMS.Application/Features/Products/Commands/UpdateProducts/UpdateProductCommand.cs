@@ -20,5 +20,7 @@ namespace _66SMS.Application.Features.Products.Commands.UpdateProducts
         public int? StockQuantity { get; set; }
         public int? MinStock { get; set; }
         public int? Status { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        public int? UpdatedBy { get; set; }
     }
 }

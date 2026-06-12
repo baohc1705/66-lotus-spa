@@ -4,6 +4,7 @@ using _66SMS.Contracts.Settings;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using _66SMS.Domain.Enums;
 using MediatR;
@@ -44,8 +45,8 @@ namespace _66SMS.Application.Features.Auth.Commands.Login
                 return Result<TokenResponseDTO>.BadRequest("Username or email wrong");
 
             // Check lock account
-            if (userExisted.Status == UserStatus.LOCKED)
-                return Result<TokenResponseDTO>.BadRequest($"Account is locked. Try again after {userExisted.LogoutEnd:HH:mm dd/MM/yyyy}");
+            if (userExisted.Status == UserConst.STATUS_LOCKED)
+                return Result<TokenResponseDTO>.BadRequest($"Account is locked. Try again after {userExisted.LockoutEnd:HH:mm dd/MM/yyyy}");
 
             // Check password
             if (!passwordHash.Verify(userExisted.PasswordHash, request.Password))
@@ -56,20 +57,20 @@ namespace _66SMS.Application.Features.Auth.Commands.Login
                 // Lock if greater than max failed attempts
                 if (userExisted.AccessFailedCount >= jwtOptions.Value.MaxFailedAttempts)
                 {
-                    userExisted.Status = UserStatus.LOCKED;
-                    userExisted.LogoutEnd = DateTime.UtcNow.AddMinutes(jwtOptions.Value.AccessTokenExpiryMinutes);
+                    userExisted.Status = UserConst.STATUS_LOCKED;
+                    userExisted.LockoutEnd = DateTime.UtcNow.AddMinutes(jwtOptions.Value.AccessTokenExpiryMinutes);
                 }
                 userSqlRepository.Update(userExisted);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                return userExisted.Status == UserStatus.LOCKED
+                return userExisted.Status == UserConst.STATUS_LOCKED
                     ? Result<TokenResponseDTO>.BadRequest("Account has been block because login many time")
                     : Result<TokenResponseDTO>.BadRequest("Password wrong");
             }
             // Reset failed access and unclock account if login success
             userExisted.AccessFailedCount = 0;
-            userExisted.Status = UserStatus.ACTIVE;
-            userExisted.LogoutEnd = null;
+            userExisted.Status = UserConst.STATUS_ACTIVED;
+            userExisted.LockoutEnd = null;
             userExisted.LastLoginAt = DateTime.UtcNow;
             userSqlRepository.Update(userExisted);
 

@@ -34,6 +34,8 @@ namespace _66SMS.Application.Features.Products.Commands.CreateProducts
             {
                 Product product = mapper.Map<Product>(request);
                 product.CreatedAt = DateTime.UtcNow;
+                product.CreatedBy = request.CreatedBy ?? 1;
+                product.Status = request.Status;
 
                 productSqlRepository.Add(product);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

@@ -1,5 +1,6 @@
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using _66SMS.Domain.Enums;
 using AutoMapper;
@@ -22,7 +23,7 @@ namespace _66SMS.Application.Features.Auth.Commands.CreateRole
             bool hasNameExsited = await roleSqlRepository.AnyAsync(x => x.Name.Equals(request.Name), cancellationToken);
             if (hasNameExsited) return Result<object>.BadRequest("Role name existed");
             Role? role = mapper.Map<Role>(request);
-            role.Status = RoleStatus.ACTIVE;
+            role.Status = RoleConst.STATUS_ACTIVED;
             roleSqlRepository.Add(role);
             await roleSqlRepository.SaveChangeAsync(cancellationToken);
             return Result<object>.Created(role);

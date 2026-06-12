@@ -14,8 +14,9 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.PermissionId).HasColumnName(RolePermissionConst.FIELD_PERMISSION_ID);
             builder.Property(x => x.AssignedAt).HasColumnName(RolePermissionConst.FIELD_ASSIGNED_AT);
             builder.Property(x => x.CreatedAt).HasColumnName(RolePermissionConst.FIELD_CREATED_AT);
-            builder.Property(x => x.ModifiedAt).HasColumnName(RolePermissionConst.FIELD_MODIFIED_AT);
-            builder.Property(x => x.IsDeleted).HasColumnName(RolePermissionConst.FIELD_IS_DELETED);
+            builder.Property(x => x.CreatedBy).HasColumnName(RolePermissionConst.FIELD_CREATED_BY);
+            builder.Property(x => x.UpdatedAt).HasColumnName(RolePermissionConst.FIELD_UPDATED_AT);
+            builder.Property(x => x.UpdatedBy).HasColumnName(RolePermissionConst.FIELD_UPDATED_BY);
 
             builder.ToTable(RolePermissionConst.TABLE_NAME);
 

@@ -9,21 +9,21 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
-namespace _66SMS.Application.Features.Employees.Commands.CreateEmployee
+namespace _66SMS.Application.Features.Staffs.Commands.CreateStaff
 {
-    public class CreateEmployeeHandler : IRequestHandler<CreateEmployeeCommand, Result<object>>
+    public class CreateStaffHandler : IRequestHandler<CreateStaffCommand, Result<object>>
     {
         private readonly IUserSqlRepository userSqlRepository;
         private readonly IRoleSqlRepository roleSqlRepository;
         private readonly IUserRoleSqlRepository userRoleSqlRepository;
-        private readonly IEmployeeSqlRepository employeeSqlRepository;
+        private readonly IStaffSqlRepository staffSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
         private readonly IPasswordHash passwordHash;
 
-        public CreateEmployeeHandler(
+        public CreateStaffHandler(
             IUserSqlRepository userSqlRepository,
-            IEmployeeSqlRepository employeeSqlRepository,
+            IStaffSqlRepository staffSqlRepository,
             ISqlUnitOfWork sqlUnitOfWork,
             IMapper mapper,
             IPasswordHash passwordHash,
@@ -31,7 +31,7 @@ namespace _66SMS.Application.Features.Employees.Commands.CreateEmployee
             IUserRoleSqlRepository userRoleSqlRepository)
         {
             this.userSqlRepository = userSqlRepository;
-            this.employeeSqlRepository = employeeSqlRepository;
+            this.staffSqlRepository = staffSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
             this.passwordHash = passwordHash;
@@ -39,9 +39,8 @@ namespace _66SMS.Application.Features.Employees.Commands.CreateEmployee
             this.userRoleSqlRepository = userRoleSqlRepository;
         }
 
-        public async Task<Result<object>> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
+        public async Task<Result<object>> Handle(CreateStaffCommand request, CancellationToken cancellationToken)
         {
-            // Kiểm tra trùng email và username
             bool emailOrUsernameExisted = await userSqlRepository.AsQueryable()
                 .Where(x => x.Email.Equals(request.Email) || x.Username.Equals(request.UserName))
                 .AnyAsync(cancellationToken);
@@ -51,46 +50,50 @@ namespace _66SMS.Application.Features.Employees.Commands.CreateEmployee
 
             User? user = mapper.Map<User>(request);
             user.PasswordHash = passwordHash.Hash(request.Password!);
+            user.CreatedAt = DateTime.UtcNow;
+            user.CreatedBy = request.CreatedBy;
+            user.Status = _66SMS.Domain.Constants.UserConst.STATUS_ACTIVED;
 
-            Employee? employee = mapper.Map<Employee>(request);
+            Staff? staff = mapper.Map<Staff>(request);
+            staff.CreatedAt = DateTime.UtcNow;
+            staff.CreatedBy = request.CreatedBy;
+            staff.Status = _66SMS.Domain.Constants.StaffConst.STATUS_ACTIVED;
 
-            // Tự động generate unique code (ví dụ: LOTUSNV0001, LOTUSNV0002)
-            employee.Code = await GenerateUniqueEmployeeCodeAsync(cancellationToken);
+            staff.Code = await GenerateUniqueStaffCodeAsync(cancellationToken);
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Save user first
                 userSqlRepository.Add(user);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // Save employee
-                employee.UserId = user.Id;
-                employeeSqlRepository.Add(employee);
+                staff.UserId = user.Id;
+                staffSqlRepository.Add(staff);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // Save role
-                string roleRequest = request.Role ?? "employee";
+                string roleRequest = request.Role ?? "staff";
                 Role? role = await roleSqlRepository.AsQueryable()
                     .Where(x => x.Name.Equals(roleRequest))
                     .FirstOrDefaultAsync(cancellationToken);
 
                 if (role == null)
-                    return Result<object>.BadRequest("Invalid role", ErrorCodes.ERR_BAD_REQUEST);
+                    return Result<object>.BadRequest("Invalid role", ErrorCodes.ERR_ROLE_NOT_FOUND);
 
                 UserRole userRole = new()
                 {
                     UserId = user.Id,
                     RoleId = role.Id,
                     AssignedAt = DateTime.UtcNow,
-                    AssignedBy = request.CreatedBy ?? 1
+                    AssignedBy = request.CreatedBy ?? 1,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = request.CreatedBy ?? 1
                 };
 
                 userRoleSqlRepository.Add(userRole);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 transaction.Commit();
-                return Result<object>.Created(employee.Id);
+                return Result<object>.Created(staff.Id);
             }
             catch
             {
@@ -99,31 +102,29 @@ namespace _66SMS.Application.Features.Employees.Commands.CreateEmployee
             }
         }
 
-        private async Task<string> GenerateUniqueEmployeeCodeAsync(CancellationToken cancellationToken)
+        private async Task<string> GenerateUniqueStaffCodeAsync(CancellationToken cancellationToken)
         {
-            // Tìm code cuối cùng bắt đầu bằng "LOTUSNV"
-            Employee? employee = await employeeSqlRepository.AsQueryable()
+            Staff? staff = await staffSqlRepository.AsQueryable()
                 .Where(x => x.Code.StartsWith("LOTUSNV"))
                 .OrderByDescending(x => x.Code)
                 .FirstOrDefaultAsync(cancellationToken);
 
             int nextNumber = 1;
-            if (employee != null && !string.IsNullOrEmpty(employee.Code) && employee.Code.Length > 7)
+            if (staff != null && !string.IsNullOrEmpty(staff.Code) && staff.Code.Length > 7)
             {
-                string numberPart = employee.Code.Substring(7);
+                string numberPart = staff.Code.Substring(7);
                 if (int.TryParse(numberPart, out int parsedNumber))
                 {
                     nextNumber = parsedNumber + 1;
                 }
             }
 
-            // Đảm bảo code là duy nhất bằng cách kiểm tra sự tồn tại trong DB
             string newCode;
             bool isUnique = false;
             do
             {
                 newCode = $"LOTUSNV{nextNumber:D4}";
-                bool exists = await employeeSqlRepository.AsQueryable()
+                bool exists = await staffSqlRepository.AsQueryable()
                     .Where(x => x.Code == newCode)
                     .AnyAsync(cancellationToken);
                 if (!exists) 

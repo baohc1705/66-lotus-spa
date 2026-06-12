@@ -10,8 +10,8 @@ namespace _66SMS.Application.Features.Customers.Commands.UpdateCustomer
         [JsonIgnore]
         public int? Id { get; set; }
         public string? FullName { get; set; }
-        public string? Image { get; set; }
-        public DateOnly? Dob { get; set; }
+        public string? AvatarUrl { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
         public int? Gender { get; set; }
         public string? Phone { get; set; }
         public string? Tier { get; set; }
@@ -24,13 +24,13 @@ namespace _66SMS.Application.Features.Customers.Commands.UpdateCustomer
         public string? StreetAddress { get; set; }
         public string? ProvinceCode { get; set; }
         public string? WardCode { get; set; }
-        public string? FullAddreess { get; set; }
+        public string? FullAddress { get; set; }
         // Account
         public string? UserName { get; set; }
         public string? Email { get; set; }
         [JsonIgnore]
         public string? Role { get; set; }
         [JsonIgnore]
-        public int? CreatedBy { get; set; }
+        public int? UpdatedBy { get; set; }
     }
 }

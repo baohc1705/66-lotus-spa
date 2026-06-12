@@ -1,21 +1,32 @@
-﻿namespace _66SMS.Domain.Constants
+namespace _66SMS.Domain.Constants
 {
     public class RoleConst
     {
         #region Database
-        public const string TABLE_NAME = "Roles";
-        public const string FIELD_ID = "Id";
-        public const string FIELD_NAME = "Name";
-        public const string FIELD_DESCRIPTION = "Description";
-        public const string FIELD_STATUS = "Status";
-        public const string FIELD_CREATED_AT = "CreatedAt";
-        public const string FIELD_MODIFIED_AT = "ModifiedAt";
-        public const string FIELD_IS_DELETED = "IsDeleted";
+        public const string TABLE_NAME = "roles";
+        public const string FIELD_ID = "id";
+        public const string FIELD_NAME = "name";
+        public const string FIELD_DESCRIPTION = "description";
+        public const string FIELD_STATUS = "status";
+        public const string FIELD_CREATED_AT = "created_at";
+        public const string FIELD_CREATED_BY = "created_by";
+        public const string FIELD_UPDATED_AT = "updated_at";
+        public const string FIELD_UPDATED_BY = "updated_by";
         #endregion
 
         #region Constraint
         public const int NAME_MAX_LENGTH = 100;
         public const int DESCRIPTION_MAX_LENGTH = 500;
+        #endregion
+
+        #region Status
+        public const int STATUS_INACTIVED = 0;
+        public const int STATUS_ACTIVED = 1;
+        public const int STATUS_DELETED = 2;
+        #endregion
+
+        #region Message
+        public const string MSG_ROLE_ID_NOT_FOUND = $"{nameof(Entities.Role)} with id not found";
         #endregion
     }
 }

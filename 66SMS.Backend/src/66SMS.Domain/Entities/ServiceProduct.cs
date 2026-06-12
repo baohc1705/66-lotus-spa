@@ -9,8 +9,11 @@ namespace _66SMS.Domain.Entities
         public int QuantityUsed { get; set; }
         public string? Note { get; set; }
         public int Status { get; set; }
+
         public DateTime CreatedAt { get; set; }
+        public int? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public int? UpdatedBy { get; set; }
 
         public Service? Service { get; set; }
         public Product? Product { get; set; }

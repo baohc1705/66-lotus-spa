@@ -4,6 +4,7 @@ using _66SMS.Application.Features.Services.Commands.DeleteServices;
 using _66SMS.Application.Features.Services.Commands.UpdateServices;
 using _66SMS.Application.Features.Services.Queries.GetAllServices;
 using _66SMS.Application.Features.Services.Queries.GetServices;
+using _66SMS.Contracts.Abstractions;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -15,10 +16,12 @@ namespace _66SMS.API.Controllers
     public class ServiceController : ApiController<ServiceController>
     {
         private readonly IMediator mediator;
+        private readonly IJwtService jwtService;
 
-        public ServiceController(IMediator mediator)
+        public ServiceController(IMediator mediator, IJwtService jwtService)
         {
             this.mediator = mediator;
+            this.jwtService = jwtService;
         }
 
         [HttpGet]
@@ -41,6 +44,7 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Create([FromBody] CreateServiceCommand command)
         {
+            command.CreatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -50,6 +54,7 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] UpdateServiceCommand command)
         {
             command.Id = id;
+            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -58,7 +63,9 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await mediator.Send(new DeleteServiceCommand { Id = id });
+            var command = new DeleteServiceCommand { Id = id };
+            command.UpdatedBy = jwtService.GetUserId();
+            var result = await mediator.Send(command);
             return HandleResult(result);
         }
     }

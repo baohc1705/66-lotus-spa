@@ -28,6 +28,8 @@ namespace _66SMS.Application.Features.ServiceCategories.Commands.CreateServiceCa
             {
                 ServiceCategory entity = mapper.Map<ServiceCategory>(request);
                 entity.CreatedAt = DateTime.UtcNow;
+                entity.CreatedBy = request.CreatedBy ?? 1;
+                entity.Status = request.Status;
 
                 serviceCategorySqlRepository.Add(entity);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

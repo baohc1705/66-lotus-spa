@@ -32,6 +32,8 @@ namespace _66SMS.Application.Features.BookingPositions.Commands.CreateBookingPos
             {
                 BookingPosition bookingPosition = mapper.Map<BookingPosition>(request);
                 bookingPosition.CreatedAt = DateTimeHelper.UtcNow();
+                bookingPosition.CreatedBy = request.CreatedBy ?? 1;
+                bookingPosition.Status = request.Status ?? _66SMS.Domain.Constants.BookingPositionConst.STATUS_ACTIVED;
 
                 bookingPositionSqlRepository.Add(bookingPosition);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

@@ -7,7 +7,7 @@ namespace _66SMS.Application.DTOs.Users
         public string Email { get; set; } = string.Empty;
         public bool IsEmailConfirmed { get; set; } = false;
         public string Status { get; set; }
-        public string? LogoutEnd { get; set; }
+        public string? LockoutEnd { get; set; }
         public string? LastLoginAt { get; set; }
         public List<string>? Roles { get; set; }
         public List<string>? Permissions { get; set; }

@@ -44,6 +44,10 @@ namespace _66SMS.Application.Features.Users.Commands.CreateUser
                 // Hash password save in db
                 user.PasswordHash = passwordHash.Hash(request.Password);
 
+                user.CreatedAt = DateTime.UtcNow;
+                user.CreatedBy = request.CreatedBy;
+                user.Status = _66SMS.Domain.Constants.UserConst.STATUS_ACTIVED;
+
                 // Save user and get user id
                 userSqlRepository.Add(user);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
@@ -61,7 +65,9 @@ namespace _66SMS.Application.Features.Users.Commands.CreateUser
                         UserId = user.Id,
                         RoleId = role.Id,
                         AssignedAt = DateTime.UtcNow,
-                        AssignedBy = request.CreatedBy ?? 1
+                        AssignedBy = request.CreatedBy ?? 1,
+                        CreatedAt = DateTime.UtcNow,
+                        CreatedBy = request.CreatedBy ?? 1
                     };
                     userRoleSqlRepository.Add(userRole);
                     await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

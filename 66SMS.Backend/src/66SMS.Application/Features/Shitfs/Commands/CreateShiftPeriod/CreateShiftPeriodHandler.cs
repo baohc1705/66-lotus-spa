@@ -37,6 +37,8 @@ namespace _66SMS.Application.Features.Shitfs.Commands.CreateShiftPeriod
             }
 
             ShiftPeriod shiftPeriod = mapper.Map<ShiftPeriod>(request);
+            shiftPeriod.CreatedAt = DateTime.UtcNow;
+            shiftPeriod.CreatedBy = request.CreatedBy ?? 1;
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try

@@ -12,5 +12,7 @@ namespace _66SMS.Application.Features.Shitfs.Commands.CreateShiftPeriod
         public TimeOnly? ShiftEnd { get; set; }
         public DateOnly? EffectiveFrom { get; set; }
         public DateOnly? EffectiveTo { get; set; }
+        [JsonIgnore]
+        public int? CreatedBy { get; set; }
     }
 }

@@ -5,8 +5,8 @@ using _66SMS.Application.Features.WorkSchedules.Commands.DeleteWorkSchedule;
 using _66SMS.Application.Features.WorkSchedules.Commands.UpdateWorkSchedule;
 using _66SMS.Application.Features.WorkSchedules.Queries.GetAllWorkSchedule;
 using _66SMS.Application.Features.WorkSchedules.Queries.GetDetailWorkSchedule;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
-using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -18,10 +18,12 @@ namespace _66SMS.API.Controllers
     public class WorkerScheduleController : ApiController<WorkerScheduleController>
     {
         private readonly IMediator mediator;
+        private readonly IJwtService jwtService;
 
-        public WorkerScheduleController(IMediator mediator)
+        public WorkerScheduleController(IMediator mediator, IJwtService jwtService)
         {
             this.mediator = mediator;
+            this.jwtService = jwtService;
         }
 
         [HttpPost]
@@ -29,6 +31,7 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Create([FromBody] CreateWorkScheduleCommand command)
         {
+            command.CreatedBy = jwtService.GetUserId();
             Result<object> result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -37,6 +40,7 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> BulkCreate([FromBody] _66SMS.Application.Features.WorkSchedules.Commands.BulkCreateWorkSchedule.BulkCreateWorkScheduleCommand command)
         {
+            command.CreatedBy = jwtService.GetUserId();
             Result<object> result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -47,6 +51,7 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] UpdateWorkScheduleCommand command)
         {
             command.Id = id;
+            command.UpdatedBy = jwtService.GetUserId();
             Result<object> result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -54,9 +59,11 @@ namespace _66SMS.API.Controllers
         [HttpDelete("{id:int}")]
         //[PermissionAuthorize("workschedule", "create")]
         [AllowAnonymous]
-        public async Task<IActionResult> Create(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            Result<object> result = await mediator.Send(new DeleteWorkScheduleCommand { Id = id});
+            var command = new DeleteWorkScheduleCommand { Id = id };
+            command.UpdatedBy = jwtService.GetUserId();
+            Result<object> result = await mediator.Send(command);
             return HandleResult(result);
         }
 

@@ -20,28 +20,66 @@ namespace _66SMS.Contracts.Enumerations
         ERR_AUTH_REFRESH_TOKEN_INVALID,
         #endregion
 
-        #region User
+        #region User & Role & Permission
         ERR_USER_NOT_FOUND,
+        ERR_USER_INVALID,
         ERR_USER_ALREADY_EXISTS,
         ERR_USER_INVALID_PASSWORD,
         ERR_USER_ACCOUNT_LOCKED,
         ERR_USER_ACCOUNT_INACTIVE,
+        ERR_ROLE_NOT_FOUND,
+        ERR_ROLE_INVALID,
+        ERR_PERMISSION_NOT_FOUND,
+        ERR_PERMISSION_INVALID,
+        ERR_USER_ROLE_NOT_FOUND,
+        ERR_USER_ROLE_INVALID,
+        ERR_ROLE_PERMISSION_NOT_FOUND,
+        ERR_ROLE_PERMISSION_INVALID,
+        ERR_REFRESH_TOKEN_NOT_FOUND,
+        ERR_REFRESH_TOKEN_INVALID,
         #endregion
+        
+        #region Customer & Staff
+        ERR_CUSTOMER_NOT_FOUND,
+        ERR_CUSTOMER_INVALID,
+        ERR_STAFF_NOT_FOUND,
+        ERR_STAFF_INVALID,
+        #endregion
+
+        #region Shift & WorkSchedule
+        ERR_SHIFT_NOT_FOUND,
+        ERR_SHIFT_INVALID,
+        ERR_SHIFT_PERIOD_NOT_FOUND,
+        ERR_SHIFT_PERIOD_INVALID,
+        ERR_WORK_SCHEDULE_NOT_FOUND,
+        ERR_WORK_SCHEDULE_INVALID,
+        #endregion
+
         #region Product
         ERR_PRODUCT_NOT_FOUND,
+        ERR_PRODUCT_INVALID,
         ERR_PRODUCT_CATEGORY_NOT_FOUND,
+        ERR_PRODUCT_CATEGORY_INVALID,
         ERR_PRODUCT_IMAGE_NOT_FOUND,
+        ERR_PRODUCT_IMAGE_INVALID,
         #endregion
 
         #region Service
         ERR_SERVICE_NOT_FOUND,
+        ERR_SERVICE_INVALID,
         ERR_SERVICE_CATEGORY_NOT_FOUND,
+        ERR_SERVICE_CATEGORY_INVALID,
         ERR_SERVICE_IMAGE_NOT_FOUND,
+        ERR_SERVICE_IMAGE_INVALID,
         ERR_SERVICE_PRODUCT_NOT_FOUND,
+        ERR_SERVICE_PRODUCT_INVALID,
         #endregion
+
         #region Booking
         ERR_BOOKING_ROOM_NOT_FOUND,
+        ERR_BOOKING_ROOM_INVALID,
         ERR_BOOKING_POSITION_NOT_FOUND,
+        ERR_BOOKING_POSITION_INVALID,
         #endregion
     }
 }

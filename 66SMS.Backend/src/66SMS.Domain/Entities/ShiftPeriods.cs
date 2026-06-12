@@ -9,7 +9,9 @@ namespace _66SMS.Domain.Entities
         public TimeOnly ShiftEnd { get; set; }
         public DateOnly EffectiveFrom { get; set; }
         public DateOnly? EffectiveTo { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        
+        public DateTime CreatedAt { get; set; }
+        public int? CreatedBy { get; set; }
 
         public Shift? Shift { get; set; }
         public List<WorkSchedule>? WorkSchedules { get; set; }

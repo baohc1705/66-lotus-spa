@@ -1,5 +1,6 @@
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using _66SMS.Domain.Enums;
 using AutoMapper;
@@ -24,7 +25,7 @@ namespace _66SMS.Application.Features.Auth.Commands.CreatePermission
                 return Result<object>.BadRequest("Permission name exsited");
 
             Permission? permission = mapper.Map<Permission>(request);
-            permission.Status = PermissionStatus.ACTIVE;
+            permission.Status = PermissionConst.STATUS_ACTIVED;
             permissionSqlRepository.Add(permission);
             await permissionSqlRepository.SaveChangeAsync(cancellationToken);
             return Result<object>.Created(permission);

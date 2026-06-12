@@ -16,8 +16,11 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.Note).HasColumnName(BookingRoomConst.FIELD_NOTE).HasMaxLength(BookingRoomConst.NOTE_MAX_LENGTH);
             builder.Property(x => x.Status).HasColumnName(BookingRoomConst.FIELD_STATUS);
             builder.Property(x => x.CreatedAt).HasColumnName(BookingRoomConst.FIELD_CREATED_AT);
+            builder.Property(x => x.CreatedBy).HasColumnName(BookingRoomConst.FIELD_CREATED_BY);
             builder.Property(x => x.UpdatedAt).HasColumnName(BookingRoomConst.FIELD_UPDATED_AT);
+            builder.Property(x => x.UpdatedBy).HasColumnName(BookingRoomConst.FIELD_UPDATED_BY);
             builder.ToTable(BookingRoomConst.TABLE_NAME);
+            builder.HasQueryFilter(x => x.Status != BookingRoomConst.STATUS_DELETED);
         }
     }
 }

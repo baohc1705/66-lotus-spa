@@ -1,4 +1,4 @@
-﻿using _66SMS.Contracts.Shared;
+using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Entities;
@@ -23,7 +23,10 @@ namespace _66SMS.Application.Features.WorkSchedules.Commands.DeleteWorkSchedule
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                workScheduleSqlRepository.Remove(workSchedule);
+                workSchedule.Status = _66SMS.Domain.Constants.WorkScheduleConst.STATUS_DELETED;
+                workSchedule.UpdatedAt = DateTime.UtcNow;
+                workSchedule.UpdatedBy = request.UpdatedBy;
+                workScheduleSqlRepository.Update(workSchedule);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
                 return Result<object>.Ok();

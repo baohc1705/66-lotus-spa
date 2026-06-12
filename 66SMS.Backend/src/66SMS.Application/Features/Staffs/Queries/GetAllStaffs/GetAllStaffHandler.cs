@@ -1,4 +1,4 @@
-using _66SMS.Application.DTOs.Employees;
+using _66SMS.Application.DTOs.Staffs;
 using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -11,22 +11,22 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace _66SMS.Application.Features.Employees.Queries.GetAllEmployee
+namespace _66SMS.Application.Features.Staffs.Queries.GetAllStaffs
 {
-    public class GetAllEmployeeHandler : IRequestHandler<GetAllEmployeeQuery, Result<PagedResult<EmployeeDTO>>>
+    public class GetAllStaffHandler : IRequestHandler<GetAllStaffQuery, Result<PagedResult<StaffDto>>>
     {
-        private readonly IEmployeeSqlRepository employeeSqlRepository;
+        private readonly IStaffSqlRepository staffSqlRepository;
         private readonly IMapper mapper;
 
-        public GetAllEmployeeHandler(IEmployeeSqlRepository employeeSqlRepository, IMapper mapper)
+        public GetAllStaffHandler(IStaffSqlRepository staffSqlRepository, IMapper mapper)
         {
-            this.employeeSqlRepository = employeeSqlRepository;
+            this.staffSqlRepository = staffSqlRepository;
             this.mapper = mapper;
         }
 
-        public async Task<Result<PagedResult<EmployeeDTO>>> Handle(GetAllEmployeeQuery request, CancellationToken cancellationToken)
+        public async Task<Result<PagedResult<StaffDto>>> Handle(GetAllStaffQuery request, CancellationToken cancellationToken)
         {
-            var query = employeeSqlRepository.AsQueryable();
+            var query = staffSqlRepository.AsQueryable();
 
             if (!string.IsNullOrEmpty(request.Filter))
             {
@@ -46,17 +46,17 @@ namespace _66SMS.Application.Features.Employees.Queries.GetAllEmployee
 
             query = query.Include(x => x.User);
 
-            PagedResult<Employee> paged = await query.ToPagedAsync(request, cancellationToken);
+            PagedResult<Staff> paged = await query.ToPagedAsync(request, cancellationToken);
 
-            PagedResult<EmployeeDTO> pagedDto = new()
+            PagedResult<StaffDto> pagedDto = new()
             {
-                Items = mapper.Map<List<EmployeeDTO>>(paged.Items),
+                Items = mapper.Map<List<StaffDto>>(paged.Items),
                 PageIndex = paged.PageIndex,
                 PageSize = paged.PageSize,
                 TotalCount = paged.TotalCount,
             };
 
-            return Result<PagedResult<EmployeeDTO>>.Success(pagedDto);
+            return Result<PagedResult<StaffDto>>.Success(pagedDto);
         }
     }
 }

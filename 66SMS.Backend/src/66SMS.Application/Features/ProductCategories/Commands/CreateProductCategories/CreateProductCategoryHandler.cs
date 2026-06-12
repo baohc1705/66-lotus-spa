@@ -27,6 +27,8 @@ namespace _66SMS.Application.Features.ProductCategories.Commands.CreateProductCa
         {
             ProductCategory productCategory = mapper.Map<ProductCategory>(request);
             productCategory.CreatedAt = DateTime.UtcNow;
+            productCategory.CreatedBy = request.CreatedBy ?? 1;
+            productCategory.Status = request.Status ?? _66SMS.Domain.Constants.ProductCategoryConst.STATUS_ACTIVED;
 
             productCategorySqlRepository.Add(productCategory);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

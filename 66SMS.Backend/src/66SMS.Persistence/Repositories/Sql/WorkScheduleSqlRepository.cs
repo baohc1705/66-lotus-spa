@@ -26,7 +26,7 @@ namespace _66SMS.Persistence.Repositories.Sql
         }
         public void Update(WorkSchedule entity)
         {
-            entity.ModifiedAt = DateTimeHelper.UtcNow();
+            entity.UpdatedAt = DateTimeHelper.UtcNow();
             base.Update(entity);
         }
 

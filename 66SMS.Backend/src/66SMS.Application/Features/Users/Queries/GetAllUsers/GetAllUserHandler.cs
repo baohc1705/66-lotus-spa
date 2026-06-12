@@ -53,7 +53,7 @@ namespace _66SMS.Application.Features.Users.Queries.GetAllUsers
                     Email = x.Email,
                     IsEmailConfirmed = x.IsEmailConfirmed,
                     Status = x.Status.ToString(),
-                    LogoutEnd = x.LogoutEnd.ToVietnamTimeString(),
+                    LockoutEnd = x.LockoutEnd.ToVietnamTimeString(),
                     LastLoginAt = x.LastLoginAt.ToVietnamTimeString(),
                     Roles = x.UserRoles.Select(x => x.Role.Name).ToList(),
                     Permissions = x.UserRoles.SelectMany(x => x.Role.RolePermissions.Select(x => x.Permission.PermissionKey)).ToList(),

@@ -4,6 +4,7 @@ using _66SMS.Application.Features.ServiceCategories.Commands.DeleteServiceCatego
 using _66SMS.Application.Features.ServiceCategories.Commands.UpdateServiceCategories;
 using _66SMS.Application.Features.ServiceCategories.Queries.GetAllServiceCategories;
 using _66SMS.Application.Features.ServiceCategories.Queries.GetServiceCategories;
+using _66SMS.Contracts.Abstractions;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -15,10 +16,12 @@ namespace _66SMS.API.Controllers
     public class ServiceCategoryController : ApiController<ServiceCategoryController>
     {
         private readonly IMediator mediator;
+        private readonly IJwtService jwtService;
 
-        public ServiceCategoryController(IMediator mediator)
+        public ServiceCategoryController(IMediator mediator, IJwtService jwtService)
         {
             this.mediator = mediator;
+            this.jwtService = jwtService;
         }
 
         [HttpGet]
@@ -41,6 +44,7 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Create([FromBody] CreateServiceCategoriesCommand command)
         {
+            command.CreatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -50,6 +54,7 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] UpdateServiceCategoriesCommand command)
         {
             command.Id = id;
+            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -58,7 +63,9 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await mediator.Send(new DeleteServiceCategoriesCommand { Id = id });
+            var command = new DeleteServiceCategoriesCommand { Id = id };
+            command.UpdatedBy = jwtService.GetUserId();
+            var result = await mediator.Send(command);
             return HandleResult(result);
         }
     }

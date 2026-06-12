@@ -40,7 +40,7 @@ namespace _66SMS.Application.Features.Users.Queries.GetDetailUser
                 Email = user.Email,
                 IsEmailConfirmed = user.IsEmailConfirmed,
                 Status = user.Status.ToString(),
-                LogoutEnd = user.LogoutEnd.ToVietnamTimeString(),
+                LockoutEnd = user.LockoutEnd.ToVietnamTimeString(),
                 LastLoginAt = user.LastLoginAt.ToVietnamTimeString(),
                 Roles = role == null ? [] : [role.Name],
                 Permissions = permissions ?? [],

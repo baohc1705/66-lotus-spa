@@ -40,6 +40,7 @@ namespace _66SMS.Application.Features.Products.Commands.DeleteProducts
                 // Xóa mềm Product
                 product.Status = ProductConst.STATUS_DELETED;
                 product.UpdatedAt = DateTime.UtcNow;
+                product.UpdatedBy = request.UpdatedBy;
                 productSqlRepository.Update(product);
 
                 // Xóa các entity con (ProductImages)

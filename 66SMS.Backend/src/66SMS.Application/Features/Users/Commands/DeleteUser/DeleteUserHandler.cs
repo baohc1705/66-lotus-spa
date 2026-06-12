@@ -29,7 +29,10 @@ namespace _66SMS.Application.Features.Users.Commands.DeleteUser
                 if (request.Id != null)
                 {
                     User? user = await userSqlRepository.FindByIdAsync(request.Id.Value);
-                    userSqlRepository.Remove(user);
+                    user.Status = _66SMS.Domain.Constants.UserConst.STATUS_DELETED;
+                    user.UpdatedAt = DateTime.UtcNow;
+                    user.UpdatedBy = request.UpdatedBy;
+                    userSqlRepository.Update(user);
                     await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 }
 
@@ -39,7 +42,14 @@ namespace _66SMS.Application.Features.Users.Commands.DeleteUser
                     List<User> users = await userSqlRepository.AsQueryable().Where(x => distinctIds.Contains(x.Id)).ToListAsync(cancellationToken);
                     if (users.Count == 0)
                         throw GlobalException.NotFound("User was not found with id");
-                    userSqlRepository.RemoveRange(users);
+                    foreach (var user in users)
+                    {
+                        user.Status = _66SMS.Domain.Constants.UserConst.STATUS_DELETED;
+                        user.UpdatedAt = DateTime.UtcNow;
+                        user.UpdatedBy = request.UpdatedBy;
+                        userSqlRepository.Update(user);
+                    }
+                    
                     await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 }
 

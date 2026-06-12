@@ -34,6 +34,7 @@ namespace _66SMS.Application.Features.Services.Commands.DeleteServices
 
                 entity.Status = ServiceConst.STATUS_DELETED;
                 entity.UpdatedAt = DateTimeHelper.UtcNow();
+                entity.UpdatedBy = request.UpdatedBy;
 
                 serviceSqlRepository.Update(entity);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

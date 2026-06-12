@@ -33,11 +33,11 @@ namespace _66SMS.Application.Features.WorkSchedules.Commands.BulkCreateWorkSched
             }
 
             var workDates = request.Schedules.Select(x => x.WorkDate).Distinct().ToList();
-            var employeeIds = request.Schedules.Select(x => x.EmployeeId).Distinct().ToList();
+            var staffIds = request.Schedules.Select(x => x.StaffId).Distinct().ToList();
             var shiftPeriodIds = request.Schedules.Select(x => x.ShiftPeriodId).Distinct().ToList();
 
             var existingSchedules = workScheduleSqlRepository.AsQueryable()
-                .Where(x => employeeIds.Contains(x.EmployeeId) 
+                .Where(x => staffIds.Contains(x.StaffId) 
                          && shiftPeriodIds.Contains(x.ShiftPeriodId) 
                          && workDates.Contains(x.WorkDate))
                 .ToList();
@@ -45,10 +45,14 @@ namespace _66SMS.Application.Features.WorkSchedules.Commands.BulkCreateWorkSched
             var validSchedules = new List<WorkSchedule>();
             foreach (var schedule in request.Schedules)
             {
-                bool isDuplicate = existingSchedules.Any(x => x.EmployeeId == schedule.EmployeeId && x.ShiftPeriodId == schedule.ShiftPeriodId && x.WorkDate == schedule.WorkDate);
+                bool isDuplicate = existingSchedules.Any(x => x.StaffId == schedule.StaffId && x.ShiftPeriodId == schedule.ShiftPeriodId && x.WorkDate == schedule.WorkDate);
                 if (!isDuplicate)
                 {
-                    validSchedules.Add(mapper.Map<WorkSchedule>(schedule));
+                    var entity = mapper.Map<WorkSchedule>(schedule);
+                    entity.CreatedAt = DateTime.UtcNow;
+                    entity.CreatedBy = request.CreatedBy ?? 1;
+                    entity.Status = _66SMS.Domain.Constants.WorkScheduleConst.STATUS_ACTIVED;
+                    validSchedules.Add(entity);
                 }
             }
 

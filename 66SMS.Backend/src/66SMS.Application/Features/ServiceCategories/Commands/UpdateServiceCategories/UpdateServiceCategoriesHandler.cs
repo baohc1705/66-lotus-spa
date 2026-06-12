@@ -35,6 +35,7 @@ namespace _66SMS.Application.Features.ServiceCategories.Commands.UpdateServiceCa
 
                 mapper.Map(request, entity);
                 entity.UpdatedAt = DateTime.UtcNow;
+                entity.UpdatedBy = request.UpdatedBy;
 
                 serviceCategorySqlRepository.Update(entity);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

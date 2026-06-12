@@ -9,5 +9,7 @@ namespace _66SMS.Application.Features.BookingRooms.Commands.CreateBookingRooms
         public string? ImageUrl { get; set; }
         public string? Note { get; set; }
         public int? Status { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        public int? CreatedBy { get; set; }
     }
 }

@@ -30,6 +30,8 @@ namespace _66SMS.Application.Features.Users.Commands.UpdateUser
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
+                user.UpdatedAt = DateTime.UtcNow;
+                user.UpdatedBy = request.UpdatedBy;
                 userSqlRepository.Update(user);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();

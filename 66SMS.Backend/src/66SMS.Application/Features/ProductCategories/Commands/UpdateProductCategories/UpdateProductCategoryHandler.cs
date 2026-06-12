@@ -34,6 +34,7 @@ namespace _66SMS.Application.Features.ProductCategories.Commands.UpdateProductCa
 
             mapper.Map(request, productCategory);
             productCategory.UpdatedAt = DateTime.UtcNow;
+            productCategory.UpdatedBy = request.UpdatedBy;
 
             productCategorySqlRepository.Update(productCategory);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
