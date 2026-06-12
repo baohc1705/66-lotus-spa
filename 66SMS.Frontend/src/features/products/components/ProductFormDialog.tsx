@@ -88,7 +88,7 @@ export function ProductFormDialog({
     formState: { errors },
     reset,
     setValue,
-    watch,
+    getValues,
   } = form;
 
   const {
@@ -179,7 +179,7 @@ export function ProductFormDialog({
               </FormField>
               <FormField label="Danh mục *" error={errors.categoryId?.message}>
                 <Select
-                  value={watch("categoryId")?.toString() ?? ""}
+                  value={getValues("categoryId")?.toString() ?? ""}
                   onValueChange={(v) => setValue("categoryId", Number(v))}
                 >
                   <SelectTrigger className="h-9 text-[13px]">
@@ -253,7 +253,7 @@ export function ProductFormDialog({
           <FormSection icon={ImageIcon} title="Hình ảnh sản phẩm">
             <div className="space-y-4">
               {imageFields.map((field, index) => {
-                const isPrimary = watch(`images.${index}.isPrimary`);
+                const isPrimary = getValues(`images.${index}.isPrimary`);
                 const errorObj = errors.images?.[index];
                 return (
                   <div
@@ -284,7 +284,7 @@ export function ProductFormDialog({
                             onCheckedChange={(checked) => {
                               if (checked) {
                                 // If turning this on, turn off others
-                                const currentImages = watch("images") || [];
+                                const currentImages = getValues("images") || [];
                                 currentImages.forEach((_, idx) => {
                                   if (idx !== index) {
                                     setValue(`images.${idx}.isPrimary`, false);
@@ -337,7 +337,7 @@ export function ProductFormDialog({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
               <FormField label="Trạng thái">
                 <Select
-                  value={watch("status")?.toString() ?? "1"}
+                  value={getValues("status")?.toString() ?? "1"}
                   onValueChange={(v) => setValue("status", Number(v))}
                 >
                   <SelectTrigger className="h-9 text-[13px]">

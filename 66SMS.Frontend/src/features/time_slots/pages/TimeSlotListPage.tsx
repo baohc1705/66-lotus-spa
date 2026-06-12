@@ -3,7 +3,6 @@ import { motion, type Variants } from "motion/react";
 import {
   useReactTable,
   getCoreRowModel,
-  getExpandedRowModel,
   type ColumnDef,
   type VisibilityState,
 } from "@tanstack/react-table";
@@ -13,12 +12,12 @@ import {
   Pencil,
   Trash2,
   ArrowUpDown,
-  Package,
   ArrowUp,
   ArrowDown,
   X,
-  Eye,
+  Clock,
 } from "lucide-react";
+
 import { DataTable } from "@/shared/components/DataTable/DataTable";
 import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
 import { Button } from "@/shared/components/ui/button";
@@ -29,23 +28,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
-// import { PermissionGate } from '@/shared/components/security/PermissionGate'
-import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
 import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
 import { Checkbox } from "@/shared/components/ui/checkbox";
-import { ProductFormDialog } from "../components/ProductFormDialog";
-import { ProductDetailExpanded } from "../components/ProductDetailExpanded";
-import { useProducts, useDeleteProduct } from "../hooks/useProducts";
-import type { ProductDto } from "../types/product.types";
 
-// ---- Constants ----
-
-const PRODUCT_STATUS_MAP: StatusMap = {
-  "0": { label: "Ngừng bán", variant: "error" },
-  "1": { label: "Đang bán", variant: "success", dot: true },
-};
+import { TimeSlotFormDialog } from "../components/TimeSlotFormDialog";
+import {
+  useTimeSlots,
+  useDeleteTimeSlot,
+} from "../hooks/useTimeSlots";
+import type { TimeSlotDTO } from "../types/time_slot.types";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -61,7 +55,7 @@ const itemVariants: Variants = {
   },
 };
 
-export function ProductListPage() {
+export function TimeSlotListPage() {
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [filter, setFilter] = useState("");
@@ -70,33 +64,34 @@ export function ProductListPage() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   const [createOpen, setCreateOpen] = useState(false);
-  const [editProduct, setEditProduct] = useState<ProductDto | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<ProductDto | null>(null);
+  const [editTimeSlot, setEditTimeSlot] = useState<TimeSlotDTO | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<TimeSlotDTO | null>(null);
 
   const [selectedRowIds, setSelectedRowIds] = useState<Set<number>>(new Set());
 
   const {
-    data: productsResult,
+    data: timeSlotResult,
     isLoading,
     isFetching,
-  } = useProducts({
+  } = useTimeSlots({
     pageIndex,
     pageSize,
     filter: filter || undefined,
     orderBy,
     isDescending,
   });
-  const deleteMutation = useDeleteProduct();
+  
+  const deleteMutation = useDeleteTimeSlot();
 
-  const paged = productsResult?.data;
-  const products = useMemo(() => paged?.items ?? [], [paged?.items]);
+  const paged = timeSlotResult?.data;
+  const timeSlots = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
 
   const currentPageIds = useMemo(
-    () =>
-      products.map((p) => p.id).filter((id): id is number => id !== undefined),
-    [products],
+    () => timeSlots.map((c) => c.id).filter((id): id is number => id !== undefined),
+    [timeSlots],
   );
+  
   const isAllSelected =
     currentPageIds.length > 0 &&
     currentPageIds.every((id) => selectedRowIds.has(id));
@@ -141,8 +136,7 @@ export function ProductListPage() {
 
   const SortIcon = useCallback(
     ({ column }: { column: string }) => {
-      if (orderBy !== column)
-        return <ArrowUpDown className="w-3 h-3 opacity-40" />;
+      if (orderBy !== column) return <ArrowUpDown className="w-3 h-3 opacity-40" />;
       return isDescending ? (
         <ArrowDown className="w-3 h-3 text-lotus-leaf" />
       ) : (
@@ -152,7 +146,16 @@ export function ProductListPage() {
     [orderBy, isDescending],
   );
 
-  const columns = useMemo<ColumnDef<ProductDto>[]>(
+  const formatDisplayTime = (t?: string) => {
+    if (!t) return "—";
+    const parts = t.split(":");
+    if (parts.length >= 2) {
+      return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+    }
+    return t;
+  };
+
+  const columns = useMemo<ColumnDef<TimeSlotDTO>[]>(
     () => [
       {
         id: "select",
@@ -172,15 +175,15 @@ export function ProductListPage() {
           />
         ),
         cell: ({ row }) => {
-          const prod = row.original;
+          const item = row.original;
           return (
             <Checkbox
-              checked={prod.id !== undefined && selectedRowIds.has(prod.id)}
+              checked={item.id !== undefined && selectedRowIds.has(item.id)}
               onCheckedChange={(checked) => {
-                if (prod.id === undefined) return;
+                if (item.id === undefined) return;
                 const newSet = new Set(selectedRowIds);
-                if (checked) newSet.add(prod.id);
-                else newSet.delete(prod.id);
+                if (checked) newSet.add(item.id);
+                else newSet.delete(item.id);
                 setSelectedRowIds(newSet);
               }}
               aria-label={`Select row`}
@@ -203,122 +206,44 @@ export function ProductListPage() {
         enableResizing: false,
       },
       {
-        accessorKey: "code",
-        header: "Mã SP",
-        cell: ({ row }) => (
-          <span className="text-lotus-deep/80 font-medium">
-            {row.original.code ?? "—"}
-          </span>
-        ),
-        size: 100,
-      },
-      {
-        accessorKey: "name",
+        accessorKey: "startTime",
         header: () => (
           <button
-            onClick={() => handleSort("name")}
+            onClick={() => handleSort("startTime")}
             className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors"
           >
-            Tên sản phẩm <SortIcon column="name" />
+            Giờ bắt đầu <SortIcon column="startTime" />
           </button>
         ),
-        cell: ({ row }) => {
-          const prod = row.original;
-          const primaryImage = prod.images?.find((img) => img.isPrimary)?.url;
-          return (
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center shrink-0 overflow-hidden">
-                {primaryImage ? (
-                  <img
-                    src={primaryImage}
-                    alt=""
-                    className="w-8 h-8 object-cover"
-                  />
-                ) : (
-                  <Package className="w-4 h-4 text-stone-400" />
-                )}
-              </div>
-              <span className="text-[13px] font-semibold text-lotus-deep truncate max-w-[180px]">
-                {prod.name ?? "—"}
-              </span>
-            </div>
-          );
-        },
-        size: 250,
-      },
-      {
-        accessorKey: "categoryName",
-        header: "Danh mục",
-        cell: ({ row }) => (
-          <span className="text-lotus-deep/70">
-            {row.original.categoryName ?? "—"}
-          </span>
-        ),
-        size: 120,
-      },
-      {
-        accessorKey: "stockQuantity",
-        header: () => (
-          <button
-            onClick={() => handleSort("stockquantity")}
-            className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors"
-          >
-            Tồn kho <SortIcon column="stockquantity" />
-          </button>
-        ),
-        cell: ({ row }) => {
-          const stock = row.original.stockQuantity ?? 0;
-          const minStock = row.original.minStock ?? 0;
-          const isLowStock = stock <= minStock;
-          return (
-            <span
-              className={`font-semibold ${isLowStock ? "text-red-500" : "text-lotus-deep"}`}
-            >
-              {stock}
-            </span>
-          );
-        },
-        size: 100,
-      },
-      {
-        accessorKey: "unit",
-        header: "Đơn vị",
-        cell: ({ row }) => (
-          <span className="text-lotus-deep/70">{row.original.unit ?? "—"}</span>
-        ),
-        size: 80,
-      },
-      {
-        accessorKey: "sellingPrice",
-        header: "Giá bán",
         cell: ({ row }) => (
           <span className="font-semibold text-lotus-deep">
-            {row.original.sellingPrice != null
-              ? new Intl.NumberFormat("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                }).format(row.original.sellingPrice)
-              : "—"}
+            {formatDisplayTime(row.original.startTime)}
           </span>
         ),
-        size: 120,
+        size: 200,
       },
       {
-        accessorKey: "status",
-        header: "Trạng thái",
-        cell: ({ row }) => (
-          <StatusBadge
-            status={row.original.status?.toString()}
-            statusMap={PRODUCT_STATUS_MAP}
-          />
+        accessorKey: "endTime",
+        header: () => (
+          <button
+            onClick={() => handleSort("endTime")}
+            className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors"
+          >
+            Giờ kết thúc <SortIcon column="endTime" />
+          </button>
         ),
-        size: 120,
+        cell: ({ row }) => (
+          <span className="font-semibold text-lotus-deep">
+            {formatDisplayTime(row.original.endTime)}
+          </span>
+        ),
+        size: 200,
       },
       {
         id: "actions",
         header: "",
         cell: ({ row }) => {
-          const prod = row.original;
+          const item = row.original;
           return (
             <div onClick={(e) => e.stopPropagation()}>
               <DropdownMenu>
@@ -331,27 +256,29 @@ export function ProductListPage() {
                     <MoreHorizontal className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => row.toggleExpanded()}>
-                    <Eye className="w-4 h-4" />
-                    {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
-                  </DropdownMenuItem>
-                  {/* <PermissionGate resource="products" action="update"> */}
-                  <DropdownMenuItem onClick={() => setEditProduct(prod)}>
-                    <Pencil className="w-4 h-4" />
-                    Chỉnh sửa
-                  </DropdownMenuItem>
-                  {/* </PermissionGate> */}
-                  {/* <PermissionGate resource="products" action="delete" role="admin"> */}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={() => setDeleteTarget(prod)}
+                <DropdownMenuContent align="end">
+                  <PermissionGate resource="time_slots" action="update">
+                    <DropdownMenuItem
+                      onClick={() => setEditTimeSlot(item)}
+                    >
+                      <Pencil className="w-4 h-4" />
+                      Chỉnh sửa
+                    </DropdownMenuItem>
+                  </PermissionGate>
+                  <PermissionGate
+                    resource="time_slots"
+                    action="delete"
+                    role="admin"
                   >
-                    <Trash2 className="w-4 h-4" />
-                    Xóa sản phẩm
-                  </DropdownMenuItem>
-                  {/* </PermissionGate> */}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={() => setDeleteTarget(item)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Xóa khung giờ
+                    </DropdownMenuItem>
+                  </PermissionGate>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -367,17 +294,15 @@ export function ProductListPage() {
       currentPageIds,
       pageIndex,
       pageSize,
-      handleSort,
       SortIcon,
+      handleSort,
     ],
   );
 
   const table = useReactTable({
-    data: products,
+    data: timeSlots,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
-    getRowCanExpand: () => true,
     enableMultiRowSelection: false,
     columnResizeMode: "onChange",
     state: {
@@ -401,7 +326,7 @@ export function ProductListPage() {
           <DataTableToolbar
             searchValue={filter}
             onSearchChange={handleSearchChange}
-            searchPlaceholder="Tìm theo tên, mã sản phẩm..."
+            searchPlaceholder="Tìm kiếm khung giờ..."
           >
             {selectedRowIds.size > 0 && (
               <div className="flex items-center gap-2 mr-auto text-[13px] text-lotus-deep font-medium bg-lotus-cream/50 px-3 py-1.5 rounded-lg border border-stone-200/50">
@@ -419,27 +344,26 @@ export function ProductListPage() {
             <DataTableViewOptions
               table={table}
               columnLabels={{
-                code: "Mã SP",
-                name: "Tên sản phẩm",
-                categoryName: "Danh mục",
-                stockQuantity: "Tồn kho",
-                unit: "Đơn vị",
-                sellingPrice: "Giá bán",
-                status: "Trạng thái",
+                startTime: "Giờ bắt đầu",
+                endTime: "Giờ kết thúc",
               }}
             />
 
-            {/* <PermissionGate resource="products" action="create"> */}
-            <Button
-              variant="admin"
-              size="sm"
-              onClick={() => setCreateOpen(true)}
-              className="text-[12px] gap-1.5"
+            <PermissionGate
+              resource="time_slots"
+              action="create"
+              role="admin"
             >
-              <Plus className="w-3.5 h-3.5" />
-              Thêm SP
-            </Button>
-            {/* </PermissionGate> */}
+              <Button
+                variant="admin"
+                size="sm"
+                onClick={() => setCreateOpen(true)}
+                className="text-[12px] gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Thêm khung giờ
+              </Button>
+            </PermissionGate>
           </DataTableToolbar>
         </div>
 
@@ -447,39 +371,34 @@ export function ProductListPage() {
           table={table}
           isLoading={isLoading}
           loadingRows={pageSize > 5 ? 5 : pageSize}
-          onRowClick={(row) => row.toggleExpanded()}
-          renderSubComponent={({ row }) =>
-            row.original.id ? (
-              <ProductDetailExpanded
-                productId={row.original.id}
-                onEdit={(product) => setEditProduct(product)}
-              />
-            ) : null
-          }
           emptyState={
             <div className="flex flex-col items-center gap-3">
               <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
-                <Package className="w-7 h-7 text-lotus-stone" />
+                <Clock className="w-7 h-7 text-lotus-stone" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-lotus-deep">
-                  Chưa có sản phẩm
+                  Chưa có khung giờ
                 </p>
                 <p className="text-[12px] text-lotus-stone mt-0.5">
-                  Thêm sản phẩm mới để bắt đầu quản lý kho.
+                  Thêm khung giờ mới để khách hàng chọn lịch.
                 </p>
               </div>
-              {/* <PermissionGate resource="products" action="create"> */}
-              <Button
-                variant="admin"
-                size="sm"
-                onClick={() => setCreateOpen(true)}
-                className="mt-1 text-[12px]"
+              <PermissionGate
+                resource="time_slots"
+                action="create"
+                role="admin"
               >
-                <Plus className="w-3.5 h-3.5" />
-                Thêm sản phẩm
-              </Button>
-              {/* </PermissionGate> */}
+                <Button
+                  variant="admin"
+                  size="sm"
+                  onClick={() => setCreateOpen(true)}
+                  className="mt-1 text-[12px]"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Thêm khung giờ
+                </Button>
+              </PermissionGate>
             </div>
           }
           pagination={
@@ -505,14 +424,17 @@ export function ProductListPage() {
         )}
       </motion.div>
 
-      <ProductFormDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <TimeSlotFormDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+      />
 
-      <ProductFormDialog
-        open={!!editProduct}
+      <TimeSlotFormDialog
+        open={!!editTimeSlot}
         onOpenChange={(open) => {
-          if (!open) setEditProduct(null);
+          if (!open) setEditTimeSlot(null);
         }}
-        product={editProduct}
+        timeSlot={editTimeSlot}
       />
 
       <ConfirmDialog
@@ -521,8 +443,8 @@ export function ProductListPage() {
           if (!open) setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
-        title="Xóa sản phẩm"
-        description={`Bạn có chắc muốn xóa sản phẩm "${deleteTarget?.name ?? ""}"? Hành động này không thể hoàn tác.`}
+        title="Xóa khung giờ"
+        description={`Bạn có chắc muốn xóa khung giờ "${formatDisplayTime(deleteTarget?.startTime)} - ${formatDisplayTime(deleteTarget?.endTime)}"? Hành động này không thể hoàn tác.`}
         confirmLabel="Xóa"
         loading={deleteMutation.isPending}
         variant="danger"

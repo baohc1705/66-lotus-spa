@@ -79,6 +79,7 @@ export const MENU_ITEMS: MenuItem[] = [
     children: [
       { label: "Phân ca", path: "/admin/staff/schedule", icon: Calendar },
       { label: "Quản lý ca", path: "/admin/shifts", icon: Clock },
+      { label: "Khung giờ", path: "/admin/timeslots", icon: Clock },
     ],
   },
   {

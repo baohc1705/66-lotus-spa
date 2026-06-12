@@ -14,6 +14,7 @@ import { ServiceCategoryListPage } from "@/features/service_categories/pages/Ser
 import { ServiceListPage } from "@/features/services/pages/ServiceListPage";
 import { BookingRoomListPage } from "@/features/booking_rooms/pages/BookingRoomListPage";
 import { BookingPositionListPage } from "@/features/booking_positions/pages/BookingPositionListPage";
+import { TimeSlotListPage } from "@/features/time_slots/pages/TimeSlotListPage";
 
 export const router = createBrowserRouter([
   {
@@ -70,6 +71,10 @@ export const router = createBrowserRouter([
           {
             path: "rooms/positions",
             element: <BookingPositionListPage />,
+          },
+          {
+            path: "timeslots",
+            element: <TimeSlotListPage />,
           },
           {
             path: "services/categories",
