@@ -20,9 +20,7 @@ export const serviceApi = {
       .then((r) => r.data),
   // Get Detail
   getDetail: (id: number) =>
-    axiosInstance
-      .get<Result<ServiceDTO>>(`${BASE}/${id}`)
-      .then((r) => r.data),
+    axiosInstance.get<Result<ServiceDTO>>(`${BASE}/${id}`).then((r) => r.data),
 
   // Create Service
   create: (payload: CreateServicePayload) =>
@@ -37,4 +35,10 @@ export const serviceApi = {
   // Delete Service
   delete: (id: number) =>
     axiosInstance.delete<Result<object>>(`${BASE}/${id}`).then((r) => r.data),
+
+  // User get all service
+  getAllServicesUsers: (params: PageRequest) =>
+    axiosInstance
+      .get<Result<PagedResult<ServiceDTO>>>(`${BASE}/users`, { params })
+      .then((r) => r.data),
 };

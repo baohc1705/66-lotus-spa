@@ -102,7 +102,7 @@ export function SpaNavbar({ light = false }: SpaNavbarProps) {
             )}
 
             <Button size="sm" asChild>
-              <Link to="/login">Đặt lịch ngay</Link>
+              <Link to="/dat-lich">Đặt lịch ngay</Link>
             </Button>
           </div>
 
@@ -175,7 +175,7 @@ export function SpaNavbar({ light = false }: SpaNavbarProps) {
               </Button>
             )}
             <Button className="w-full" asChild>
-              <Link to="/login" onClick={() => setMobileOpen(false)}>
+              <Link to="/dat-lich" onClick={() => setMobileOpen(false)}>
                 Đặt lịch ngay
               </Link>
             </Button>

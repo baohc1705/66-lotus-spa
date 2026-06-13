@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import { BookingPage } from "@/features/booking/pages/BookingPage";
 import { HomePage } from "@/features/landing/pages/HomePage";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { UsersPage } from "@/features/users/pages/UsersPage";
@@ -15,11 +16,17 @@ import { ServiceListPage } from "@/features/services/pages/ServiceListPage";
 import { BookingRoomListPage } from "@/features/booking_rooms/pages/BookingRoomListPage";
 import { BookingPositionListPage } from "@/features/booking_positions/pages/BookingPositionListPage";
 import { TimeSlotListPage } from "@/features/time_slots/pages/TimeSlotListPage";
+import { CashierPage } from "@/features/cashier/pages/CashierPage";
+import { VnPayReturnPage } from "@/features/cashier/pages/VnPayReturnPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <HomePage />,
+  },
+  {
+    path: "/dat-lich",
+    element: <BookingPage />,
   },
   {
     path: "/login",
@@ -35,6 +42,14 @@ export const router = createBrowserRouter([
       {
         path: "/users",
         element: <UsersPage />,
+      },
+      {
+        path: "/thu-ngan",
+        element: <CashierPage />,
+      },
+      {
+        path: "/thu-ngan/vnpay-return",
+        element: <VnPayReturnPage />,
       },
       {
         path: "/admin",

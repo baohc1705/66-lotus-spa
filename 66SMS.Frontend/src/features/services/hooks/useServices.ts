@@ -22,6 +22,13 @@ export function useServices(params: PageRequest) {
   });
 }
 
+export function useGetAllServicesUser(params: PageRequest) {
+  return useQuery({
+    queryKey: SERVICE_KEYS.list(params),
+    queryFn: () => serviceApi.getAllServicesUsers(params),
+  });
+}
+
 export function useServiceDetail(id: number | null) {
   return useQuery({
     queryKey: SERVICE_KEYS.detail(id!),
