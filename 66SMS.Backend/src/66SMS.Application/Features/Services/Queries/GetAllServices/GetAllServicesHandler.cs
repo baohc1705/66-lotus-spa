@@ -3,6 +3,7 @@ using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -26,6 +27,15 @@ namespace _66SMS.Application.Features.Services.Queries.GetAllServices
         {
             var query = serviceSqlRepository.AsQueryable();
             // Filter here
+            if (request.IsActived != null && (bool)request.IsActived)
+            {
+                query = query.Where(x => x.Status == ServiceConst.STATUS_ACTIVED);
+            }
+
+            if (!string.IsNullOrEmpty(request.keyword))
+            {
+                query = query.Where(x => x.Name.StartsWith(request.keyword));
+            }
 
             // Order by
             query = request.OrderBy?.ToLower() switch

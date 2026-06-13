@@ -7,5 +7,7 @@ namespace _66SMS.Application.Features.Services.Queries.GetAllServices
     public class GetAllServicesQuery : PageRequest, IRequest<Result<PagedResult<ServiceDto>>>
     {
         public string? Includes { get; set; }
+        public bool? IsActived { get; set; }
+        public string? keyword { get; set; }
     }
 }

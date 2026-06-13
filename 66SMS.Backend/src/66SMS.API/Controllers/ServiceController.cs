@@ -32,6 +32,17 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
+        [HttpGet("users")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllServiceActived(string? name)
+        {
+            GetAllServicesQuery query = new();
+            query.keyword = name != null ? name : null;
+            query.IsActived = true;
+            var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)

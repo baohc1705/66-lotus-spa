@@ -6,7 +6,7 @@ namespace _66SMS.Application.Features.TimeSlots.Commands.CreateTimeSlot
 {
     public class CreateTimeSlotCommand : IRequest<Result<int>>
     {
-        public TimeSpan? StartTime { get; set; }
-        public TimeSpan? EndTime { get; set; }
+        public TimeOnly? StartTime { get; set; }
+        public TimeOnly? EndTime { get; set; }
     }
 }

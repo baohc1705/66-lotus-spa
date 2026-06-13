@@ -4,8 +4,7 @@ namespace _66SMS.Domain.Entities
 {
     public class Appointment : EntityBase<int>
     {
-        public string AppointmentCode { get; set; } = string.Empty;
-        public int CustomerId { get; set; }
+        public string AppointmentCode { get; set; }
         public int CreatedByUserId { get; set; }
         public int StaffId { get; set; }
         public int SlotId { get; set; }
@@ -30,7 +29,6 @@ namespace _66SMS.Domain.Entities
         public int? UpdatedBy { get; set; }
 
         // Navigation properties
-        public Customer? Customer { get; set; }
         public User? CreatedByUser { get; set; }
         public Staff? Staff { get; set; }
         public TimeSlot? TimeSlot { get; set; }
@@ -38,9 +36,9 @@ namespace _66SMS.Domain.Entities
         public WorkSchedule? Schedule { get; set; }
         public AppointmentSlotLock? Lock { get; set; }
 
-        public ICollection<AppointmentSlotLock> SlotLocks { get; set; } = new List<AppointmentSlotLock>();
-        public ICollection<AppointmentService> Services { get; set; } = new List<AppointmentService>();
-        public ICollection<AppointmentPayment> Payments { get; set; } = new List<AppointmentPayment>();
-        public ICollection<AppointmentHistory> Histories { get; set; } = new List<AppointmentHistory>();
+        public ICollection<AppointmentSlotLock>? SlotLocks { get; set; }
+        public ICollection<AppointmentService>? Services { get; set; }
+        public ICollection<AppointmentPayment>? Payments { get; set; }
+        public ICollection<AppointmentHistory>? Histories { get; set; }
     }
 }

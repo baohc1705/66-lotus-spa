@@ -47,6 +47,7 @@ using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using System.Linq.Expressions;
+using _66SMS.Application.DTOs.Appointments;
 
 namespace _66SMS.Application.Commons.Mappers
 {
@@ -301,6 +302,10 @@ namespace _66SMS.Application.Commons.Mappers
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .IgnoreNullValueTypes();
             CreateMap<TimeSlot, TimeSlotDto>()
+                .IgnoreNullValueTypes();
+
+            // AppointmentDto
+            CreateMap<Appointment, AppointmentDto>()
                 .IgnoreNullValueTypes();
 
         }

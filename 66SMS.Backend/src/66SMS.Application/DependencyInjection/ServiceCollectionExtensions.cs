@@ -1,5 +1,7 @@
+using _66SMS.Application.Abstractions;
 using _66SMS.Application.Abstractions.Behaviors;
 using _66SMS.Application.Commons.Mappers;
+using _66SMS.Application.Services.Appointments;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,7 +25,7 @@ namespace _66SMS.Application.DependencyInjection
             {
                 cfg.AddProfile(typeof(ApplicationMappingProfiles));
             });
-
+            services.AddScoped<IBookingAvailabilityService, BookingAvailabilityService>();
             return services;
         }
     }

@@ -6,7 +6,7 @@ namespace _66SMS.Domain.Constants
         public const string TABLE_NAME = "appointments";
         public const string FIELD_ID = "id";
         public const string FIELD_APPOINTMENT_CODE = "appointment_code";
-        public const string FIELD_CUSTOMER_ID = "customer_id";
+        //public const string FIELD_CUSTOMER_ID = "customer_id";
         public const string FIELD_CREATED_BY_USER_ID = "created_by_user_id";
         public const string FIELD_STAFF_ID = "staff_id";
         public const string FIELD_SLOT_ID = "slot_id";
@@ -45,6 +45,7 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_APPOINTMENT_ID_NOT_FOUND = $"{nameof(Entities.Appointment)} with id not found";
+        
         #endregion
     }
 }

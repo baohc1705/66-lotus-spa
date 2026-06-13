@@ -12,7 +12,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).HasColumnName(AppointmentConst.FIELD_ID);
             builder.Property(x => x.AppointmentCode).HasColumnName(AppointmentConst.FIELD_APPOINTMENT_CODE).HasMaxLength(AppointmentConst.APPOINTMENT_CODE_MAX_LENGTH);
-            builder.Property(x => x.CustomerId).HasColumnName(AppointmentConst.FIELD_CUSTOMER_ID);
+            //builder.Property(x => x.CustomerId).HasColumnName(AppointmentConst.FIELD_CUSTOMER_ID);
             builder.Property(x => x.CreatedByUserId).HasColumnName(AppointmentConst.FIELD_CREATED_BY_USER_ID);
             builder.Property(x => x.StaffId).HasColumnName(AppointmentConst.FIELD_STAFF_ID);
             builder.Property(x => x.SlotId).HasColumnName(AppointmentConst.FIELD_SLOT_ID);
@@ -35,7 +35,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.UpdatedAt).HasColumnName(AppointmentConst.FIELD_UPDATED_AT);
             builder.Property(x => x.UpdatedBy).HasColumnName(AppointmentConst.FIELD_UPDATED_BY);
 
-            builder.HasOne(x => x.Customer).WithMany().HasForeignKey(x => x.CustomerId).IsRequired(false);
+            //builder.HasOne(x => x.Customer).WithMany().HasForeignKey(x => x.CustomerId).IsRequired(false);
             builder.HasOne(x => x.CreatedByUser).WithMany().HasForeignKey(x => x.CreatedByUserId).IsRequired(false);
             builder.HasOne(x => x.Staff).WithMany().HasForeignKey(x => x.StaffId).IsRequired(false);
             builder.HasOne(x => x.TimeSlot).WithMany(x => x.Appointments).HasForeignKey(x => x.SlotId).IsRequired(false);

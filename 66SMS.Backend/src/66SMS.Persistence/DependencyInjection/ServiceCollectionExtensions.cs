@@ -1,3 +1,4 @@
+using _66SMS.Application.Abstractions;
 using _66SMS.Contracts.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -62,7 +63,7 @@ namespace _66SMS.Persistence.DependencyInjection
             services.AddScoped<IMembershipCardHistorySqlRepository, MembershipCardHistorySqlRepository>();
 
             services.AddScoped<ITimeSlotSqlRepository, TimeSlotSqlRepository>();
-
+            services.AddScoped<IBookingContextProvider, BookingContextProvider>();
             return services;
         }
     }

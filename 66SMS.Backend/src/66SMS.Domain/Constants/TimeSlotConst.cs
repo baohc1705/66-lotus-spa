@@ -11,6 +11,7 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_TIME_SLOT_ID_NOT_FOUND = $"{nameof(Entities.TimeSlot)} with id not found";
+        public static int DEFAULT_SLOT_MINUTES = 15;
         #endregion
     }
 }
