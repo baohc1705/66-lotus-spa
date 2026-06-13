@@ -1,0 +1,104 @@
+using _66SMS.Application.DTOs.Cashier;
+using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace _66SMS.Application.Features.Cashier.Queries.GetCashierDaily
+{
+    public class GetCashierDailyHandler : IRequestHandler<GetCashierDailyQuery, Result<CashierDailyDto>>
+    {
+        private readonly IAppointmentSqlRepository appointmentRepository;
+        private readonly IStaffSqlRepository staffRepository;
+
+        public GetCashierDailyHandler(IAppointmentSqlRepository appointmentRepository, IStaffSqlRepository staffRepository)
+        {
+            this.appointmentRepository = appointmentRepository;
+            this.staffRepository = staffRepository;
+        }
+
+        public async Task<Result<CashierDailyDto>> Handle(GetCashierDailyQuery request, CancellationToken cancellationToken)
+        {
+            var dto = new CashierDailyDto();
+
+            // Lấy danh sách nhân viên để hiển thị lên cột
+            var staffs = await staffRepository.AsQueryable()
+                //.Where(s => s.Status == 1) // Assuming 1 is active
+                .ToListAsync(cancellationToken);
+
+            dto.Columns = staffs.Select(s => new StaffColumnDto
+            {
+                Id = s.Id.ToString(),
+                Name = s.FullName,
+                Avatar = s.AvatarUrl
+            }).ToList();
+
+            // Lấy danh sách lịch hẹn trong ngày
+            var appointments = await appointmentRepository.AsQueryable()
+                .Include(a => a.Staff)
+                .Include(a => a.CreatedByUser)
+                    .ThenInclude(u => u.Customer)
+                .Include(a => a.CreatedByUser)
+                    .ThenInclude(u => u.Staff)
+                .Include(a => a.TimeSlot)
+                .Include(a => a.Services)
+                    .ThenInclude(s => s.Service)
+                .Where(a => a.AppointmentDate == request.Date)
+                .ToListAsync(cancellationToken);
+
+            dto.Bookings = appointments.Select(a => {
+                string statusStr = "pending";
+                switch(a.Status)
+                {
+                    case AppointmentConst.STATUS_PENDING: statusStr = "pending"; break;
+                    case AppointmentConst.STATUS_CONFIRMED: statusStr = "waiting"; break;
+                    case AppointmentConst.STATUS_COMPLETED: 
+                        statusStr = a.PaidAmount >= a.TotalAmount ? "paid" : "unpaid";
+                        break;
+                    case AppointmentConst.STATUS_CANCELLED: statusStr = "cancelled"; break;
+                    case AppointmentConst.STATUS_NO_SHOW: statusStr = "not-arrived"; break;
+                }
+
+                string customerName = a.CreatedByUser?.Customer?.FullName 
+                                      ?? a.CreatedByUser?.Staff?.FullName 
+                                      ?? a.CreatedByUser?.Username 
+                                      ?? "Khách vãng lai";
+
+                string serviceName = "Dịch vụ";
+                if (a.Services != null && a.Services.Any())
+                {
+                    serviceName = string.Join(", ", a.Services.Where(s => s.Service != null).Select(s => s.Service?.Name));
+                }
+
+                return new CashierBookingDto
+                {
+                    Id = a.Id.ToString(),
+                    CustomerName = customerName,
+                    CustomerPhone = a.CreatedByUser?.Customer?.Phone,
+                    CustomerAvatar = a.CreatedByUser?.Customer?.AvatarUrl,
+                    BookingDate = a.AppointmentDate.ToString("yyyy-MM-dd"),
+                    ServiceName = serviceName,
+                    StaffId = a.StaffId.ToString(),
+                    StaffName = a.Staff?.FullName ?? "N/A",
+                    StartTime = a.TimeSlot?.StartTime.ToString("HH:mm") ?? "00:00",
+                    EndTime = a.TimeSlot?.EndTime.ToString("HH:mm") ?? "00:00",
+                    Status = statusStr,
+                    TotalAmount = a.TotalAmount,
+                    PaidAmount = a.PaidAmount,
+                    DepositAmount = 0,
+                    RemainingAmount = a.TotalAmount - a.PaidAmount,
+                    DepositPaid = false,
+                    DepositDeadlineAt = a.DepositDeadlineAt,
+                    Note = a.Note
+                };
+            }).ToList();
+
+            return Result<CashierDailyDto>.Success(dto);
+        }
+    }
+}

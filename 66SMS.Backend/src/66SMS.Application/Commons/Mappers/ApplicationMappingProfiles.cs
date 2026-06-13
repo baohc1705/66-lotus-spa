@@ -306,6 +306,7 @@ namespace _66SMS.Application.Commons.Mappers
 
             // AppointmentDto
             CreateMap<Appointment, AppointmentDto>()
+                .ForMember(dest => dest.ServiceNames, opt => opt.MapFrom(src => src.Services != null ? src.Services.Select(x => x.Service != null ? x.Service.Name : "").ToList() : new List<string>()))
                 .IgnoreNullValueTypes();
 
         }

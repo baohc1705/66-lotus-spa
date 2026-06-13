@@ -36,6 +36,16 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
+        [HttpPut("me")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserCommand command)
+        {
+            command.Id = jwtService.GetUserId();
+            command.UpdatedBy = jwtService.GetUserId();
+            Result<object> result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
         [HttpGet]
         [Authorize(Roles = "admin")]
         [PermissionAuthorize("users", "read")]

@@ -11,5 +11,32 @@ namespace _66SMS.Application.DTOs.Users
         public string? LastLoginAt { get; set; }
         public List<string>? Roles { get; set; }
         public List<string>? Permissions { get; set; }
+
+        public string? FullName { get; set; }
+        public string? AvatarUrl { get; set; }
+        public string? Phone { get; set; }
+        public int? Gender { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
+        
+        public string ProfileType { get; set; } = "None";
+
+        public StaffProfileDto? StaffInfo { get; set; }
+        public CustomerProfileDto? CustomerInfo { get; set; }
+    }
+
+    public class StaffProfileDto 
+    {
+        public string? Code { get; set; }
+        public string? NationalId { get; set; }
+        public DateOnly? HireDate { get; set; }
+        public string? ContractType { get; set; }
+    }
+
+    public class CustomerProfileDto
+    {
+        public string? Tier { get; set; }
+        public int? LoyaltyPoint { get; set; }
+        public DateTime? FirstPurchaseAt { get; set; }
+        public string? Source { get; set; }
     }
 }

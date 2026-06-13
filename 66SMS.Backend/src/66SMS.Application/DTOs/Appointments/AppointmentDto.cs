@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Application.DTOs.Appointments
+namespace _66SMS.Application.DTOs.Appointments
 {
     public class AppointmentDto
     {
@@ -14,5 +14,12 @@
         public decimal? TotalAmount { get; set; }
         public decimal? PaidAmount { get; set; }
         public DateTime? CreatedAt { get; set; }
+
+        public string? StaffFullName { get; set; }
+        public TimeOnly? TimeSlotStartTime { get; set; }
+        public TimeOnly? TimeSlotEndTime { get; set; }
+        public string? PositionName { get; set; }
+        public string? PositionRoomName { get; set; }
+        public List<string>? ServiceNames { get; set; }
     }
 }

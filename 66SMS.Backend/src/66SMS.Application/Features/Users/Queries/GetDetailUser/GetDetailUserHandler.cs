@@ -12,11 +12,19 @@ namespace _66SMS.Application.Features.Users.Queries.GetDetailUser
     {
         private readonly IUserSqlRepository userSqlRepository;
         private readonly IUserRoleSqlRepository userRoleSqlRepository;
+        private readonly IStaffSqlRepository staffSqlRepository;
+        private readonly ICustomerSqlRepository customerSqlRepository;
 
-        public GetDetailUserHandler(IUserSqlRepository userSqlRepository, IUserRoleSqlRepository userRoleSqlRepository)
+        public GetDetailUserHandler(
+            IUserSqlRepository userSqlRepository,
+            IUserRoleSqlRepository userRoleSqlRepository,
+            IStaffSqlRepository staffSqlRepository,
+            ICustomerSqlRepository customerSqlRepository)
         {
             this.userSqlRepository = userSqlRepository;
             this.userRoleSqlRepository = userRoleSqlRepository;
+            this.staffSqlRepository = staffSqlRepository;
+            this.customerSqlRepository = customerSqlRepository;
         }
 
         public async Task<Result<UserDto>> Handle(GetDetailUserQuery request, CancellationToken cancellationToken)
@@ -29,9 +37,7 @@ namespace _66SMS.Application.Features.Users.Queries.GetDetailUser
                 return Result<UserDto>.NotFound("User not found");
 
             Role? role = await userRoleSqlRepository.GetRoleByUserIdAsync(user.Id, cancellationToken);
-            List<string>? permissions = role == null
-                ? []
-                : await userRoleSqlRepository.GetPermissionKeysByUserIdAndRoleIdAsync(user.Id, role.Id, cancellationToken);
+            List<string>? permissions = role == null ? [] : await userRoleSqlRepository.GetPermissionKeysByUserIdAndRoleIdAsync(user.Id, role.Id, cancellationToken);
 
             UserDto userDto = new()
             {
@@ -45,6 +51,50 @@ namespace _66SMS.Application.Features.Users.Queries.GetDetailUser
                 Roles = role == null ? [] : [role.Name],
                 Permissions = permissions ?? [],
             };
+
+            Staff? staff = await staffSqlRepository.AsQueryable()
+                .FirstOrDefaultAsync(s => s.UserId == user.Id, cancellationToken);
+
+            if (staff != null)
+            {
+                userDto.ProfileType = "Staff";
+                userDto.FullName = staff.FullName;
+                userDto.AvatarUrl = staff.AvatarUrl;
+                userDto.Phone = staff.Phone;
+                userDto.Gender = staff.Gender;
+                userDto.DateOfBirth = staff.DateOfBirth;
+
+                userDto.StaffInfo = new StaffProfileDto
+                {
+                    Code = staff.Code,
+                    NationalId = staff.NationalId,
+                    HireDate = staff.HireDate,
+                    ContractType = staff.ContractType
+                };
+            }
+            else
+            {
+                Customer? customer = await customerSqlRepository.AsQueryable()
+                    .FirstOrDefaultAsync(c => c.UserId == user.Id, cancellationToken);
+
+                if (customer != null)
+                {
+                    userDto.ProfileType = "Customer";
+                    userDto.FullName = customer.FullName;
+                    userDto.AvatarUrl = customer.AvatarUrl;
+                    userDto.Phone = customer.Phone;
+                    userDto.Gender = customer.Gender;
+                    userDto.DateOfBirth = customer.DateOfBirth;
+
+                    userDto.CustomerInfo = new CustomerProfileDto
+                    {
+                        Tier = customer.Tier,
+                        LoyaltyPoint = customer.LoyaltyPoint,
+                        FirstPurchaseAt = customer.FirstPurchaseAt,
+                        Source = customer.Source
+                    };
+                }
+            }
 
             return Result<UserDto>.Success(userDto);
         }
