@@ -8,6 +8,31 @@ export interface UserDto {
   lastLoginAt?: string;
   roles?: string[];
   permissions?: string[];
+  
+  fullName?: string;
+  avatarUrl?: string;
+  phone?: string;
+  gender?: number;
+  dateOfBirth?: string;
+  
+  profileType?: string;
+  
+  staffInfo?: StaffProfileDto;
+  customerInfo?: CustomerProfileDto;
+}
+
+export interface StaffProfileDto {
+  code?: string;
+  nationalId?: string;
+  hireDate?: string;
+  contractType?: string;
+}
+
+export interface CustomerProfileDto {
+  tier?: string;
+  loyaltyPoint?: number;
+  firstPurchaseAt?: string;
+  source?: string;
 }
 
 // Request payloads

@@ -3,9 +3,15 @@ import { BookingPage } from "@/features/booking/pages/BookingPage";
 import { HomePage } from "@/features/landing/pages/HomePage";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { UsersPage } from "@/features/users/pages/UsersPage";
+import { ProfilePage } from "@/features/profile";
 import { ProtectedRoute } from "./ProtectedRoute";
-import { AdminLayout, AdminDashboard } from "@/features/admin";
+import {
+  AdminLayout,
+  AdminDashboard,
+  AdminProfilePage,
+} from "@/features/admin";
 import { StaffListPage } from "@/features/staffs/pages/StaffListPage";
+import { StaffAppointmentsPage } from "@/features/staff-appointments";
 import { CustomerListPage } from "@/features/customers/pages/CustomerListPage";
 import { ProductListPage } from "@/features/products/pages/ProductListPage";
 import { ProductCategoryListPage } from "@/features/product_categories/pages/ProductCategoryListPage";
@@ -44,6 +50,10 @@ export const router = createBrowserRouter([
         element: <UsersPage />,
       },
       {
+        path: "/profile",
+        element: <ProfilePage />,
+      },
+      {
         path: "/thu-ngan",
         element: <CashierPage />,
       },
@@ -60,8 +70,16 @@ export const router = createBrowserRouter([
             element: <AdminDashboard />,
           },
           {
+            path: "profile",
+            element: <AdminProfilePage />,
+          },
+          {
             path: "staff/list",
             element: <StaffListPage />,
+          },
+          {
+            path: "staff/appointments",
+            element: <StaffAppointmentsPage />,
           },
           {
             path: "customers/list",

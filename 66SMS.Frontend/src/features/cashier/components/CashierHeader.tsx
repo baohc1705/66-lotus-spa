@@ -26,7 +26,7 @@ export function CashierHeader({ activeTab = "calendar" }: CashierHeaderProps) {
   const [, setIsDrawerOpen] = useState(false);
   const { user, hasRole, clearAuth } = useAuthStore();
   const isAdmin = hasRole("Admin");
-  const isEmployee = hasRole("Employee");
+  const isEmployee = hasRole("Staff");
   const isReceptionist = hasRole("Receptionist");
   const navigate = useNavigate();
 

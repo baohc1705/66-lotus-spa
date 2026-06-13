@@ -14,7 +14,7 @@ export function AdminLayout() {
   const { hasRole } = usePermission()
 
   const isAdmin = hasRole('Admin')
-  const isEmployee = hasRole('Employee')
+  const isEmployee = hasRole('Staff')
   const isReceptionist = hasRole('Receptionist')
 
   useEffect(() => {

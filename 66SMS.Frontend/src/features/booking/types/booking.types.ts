@@ -67,4 +67,10 @@ export interface AppointmentDto {
   totalAmount?: number;
   paidAmount?: number;
   createdAt?: string;
+  staffFullName?: string;
+  timeSlotStartTime?: string;
+  timeSlotEndTime?: string;
+  positionName?: string;
+  positionRoomName?: string;
+  serviceNames?: string[];
 }
