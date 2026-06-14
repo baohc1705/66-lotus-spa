@@ -24,6 +24,7 @@ import { BookingPositionListPage } from "@/features/booking_positions/pages/Book
 import { TimeSlotListPage } from "@/features/time_slots/pages/TimeSlotListPage";
 import { CashierPage } from "@/features/cashier/pages/CashierPage";
 import { VnPayReturnPage } from "@/features/cashier/pages/VnPayReturnPage";
+import { WalletManagementPage } from "@/features/wallet/pages/WalletManagementPage";
 
 export const router = createBrowserRouter([
   {
@@ -120,6 +121,10 @@ export const router = createBrowserRouter([
           {
             path: "staff/schedule",
             element: <WorkSchedulePage />,
+          },
+          {
+            path: "customers/wallets",
+            element: <WalletManagementPage />,
           },
           // Placeholders for other admin routes
         ],

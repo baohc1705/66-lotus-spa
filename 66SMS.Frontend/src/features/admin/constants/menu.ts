@@ -14,6 +14,7 @@ import {
   Box,
   MapPin,
   CalendarHeart,
+  Wallet,
 } from "lucide-react";
 
 export interface SubMenuItem {
@@ -87,5 +88,12 @@ export const MENU_ITEMS: MenuItem[] = [
     path: "/admin/staff/appointments",
     icon: CalendarHeart,
   },
-  { label: "Khách hàng", path: "/admin/customers/list", icon: Users },
+  {
+    label: "Khách hàng",
+    icon: Users,
+    children: [
+      { label: "Khách hàng", path: "/admin/customers/list", icon: Users },
+      { label: "Ví khách hàng", path: "/admin/customers/wallets", icon: Wallet },
+    ],
+  },
 ];

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
   ChevronDown,
   ChevronUp,
@@ -12,17 +14,36 @@ import {
   Tag,
   DollarSign,
   StickyNote,
+  Wallet,
+  Loader2,
 } from "lucide-react";
 import { useMyBookings } from "../hooks/useMyBookings";
 import type { AppointmentDto } from "../types/booking.types";
-import { Loader2 } from "lucide-react";
 import { bookingApi } from "../api/booking.api";
 import { APPOINTMENT_STATUS } from "../constants/appointment.constants";
+import { getMyWallet } from "../../wallet/api/wallet.api";
+import { useQuery } from "@tanstack/react-query";
+import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 
 export function MyBookingsPanel() {
+  const queryClient = useQueryClient();
   const { data: bookings, isLoading, isError } = useMyBookings();
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [isPayingId, setIsPayingId] = useState<number | null>(null);
+  const [isPayingWalletId, setIsPayingWalletId] = useState<number | null>(null);
+  const [isPostponingId, setIsPostponingId] = useState<number | null>(null);
+
+  const [walletConfirm, setWalletConfirm] = useState<{
+    open: boolean;
+    appointmentId?: number;
+    depositAmount?: number;
+  }>({ open: false });
+
+  const { data: walletData } = useQuery({
+    queryKey: ["my-wallet"],
+    queryFn: getMyWallet,
+  });
+  const walletBalance = walletData?.data?.balance || 0;
 
   const canPayDeposit = (booking: AppointmentDto) => {
     if (booking.status !== APPOINTMENT_STATUS.CONFIRMED) return false;
@@ -34,6 +55,48 @@ export function MyBookingsPanel() {
     const deadline = new Date(booking.depositDeadlineAt).getTime();
     const now = new Date().getTime();
     return deadline > now;
+  };
+
+  const canPostpone = (booking: AppointmentDto) => {
+    return booking.status === APPOINTMENT_STATUS.WAITING;
+  };
+
+  const formatCurrency = (amount?: number) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount || 0);
+  };
+
+  const handlePostpone = async (
+    e: React.MouseEvent,
+    appointmentId: number,
+    paidAmount?: number,
+  ) => {
+    e.stopPropagation();
+
+    const confirmMsg = `Bạn có chắc chắn muốn hoãn lịch hẹn này không?\n\nSố tiền cọc đã thanh toán (${formatCurrency(paidAmount)}) sẽ được tự động hoàn lại vào Ví của bạn để sử dụng cho lần đặt lịch tiếp theo.`;
+
+    if (!window.confirm(confirmMsg)) {
+      return;
+    }
+
+    setIsPostponingId(appointmentId);
+    try {
+      const isSuccess = await bookingApi.postponeBooking(appointmentId);
+      if (isSuccess) {
+        toast.success("Hoãn lịch thành công! Tiền cọc đã được hoàn vào ví.");
+        queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
+        queryClient.invalidateQueries({ queryKey: ["my-wallet"] });
+        queryClient.invalidateQueries({ queryKey: ["my-wallet-transactions"] });
+      } else {
+        toast.error("Không thể hoãn lịch.");
+      }
+    } catch {
+      toast.error("Đã xảy ra lỗi khi hoãn lịch.");
+    } finally {
+      setIsPostponingId(null);
+    }
   };
 
   const handlePayDeposit = async (
@@ -52,6 +115,33 @@ export function MyBookingsPanel() {
       alert("Đã xảy ra lỗi khi tạo liên kết thanh toán. Vui lòng thử lại.");
     } finally {
       setIsPayingId(null);
+    }
+  };
+
+  const openWalletConfirm = (e: React.MouseEvent, appointmentId: number, depositAmount: number) => {
+    e.stopPropagation();
+    setWalletConfirm({ open: true, appointmentId, depositAmount });
+  };
+
+  const executePayWithWallet = async () => {
+    if (!walletConfirm.appointmentId) return;
+    setIsPayingWalletId(walletConfirm.appointmentId);
+    setWalletConfirm({ open: false });
+    
+    try {
+      const isSuccess = await bookingApi.payDepositWithWallet(walletConfirm.appointmentId);
+      if (isSuccess) {
+        toast.success("Thanh toán cọc bằng ví thành công!");
+        queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
+        queryClient.invalidateQueries({ queryKey: ["my-wallet"] });
+        queryClient.invalidateQueries({ queryKey: ["my-wallet-transactions"] });
+      } else {
+        toast.error("Không thể thanh toán bằng ví.");
+      }
+    } catch {
+      toast.error("Đã xảy ra lỗi khi thanh toán bằng ví.");
+    } finally {
+      setIsPayingWalletId(null);
     }
   };
 
@@ -94,55 +184,48 @@ export function MyBookingsPanel() {
       case 0: // Fallback
       case APPOINTMENT_STATUS.PENDING:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-status-pending/10 text-status-pending border border-status-pending/20">
-            <Clock3 className="w-4 h-4" /> Chờ xác nhận
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-status-pending/10 text-status-pending border border-status-pending/20 whitespace-nowrap">
+            <Clock3 className="w-3.5 h-3.5" /> Chờ xác nhận
           </span>
         );
       case APPOINTMENT_STATUS.CONFIRMED:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-status-confirmed/10 text-status-confirmed border border-status-confirmed/20">
-            <CheckCircle2 className="w-4 h-4" /> Đã xác nhận - Chờ đặt cọc
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-status-confirmed/10 text-status-confirmed border border-status-confirmed/20 whitespace-nowrap">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Đã xác nhận - Chờ đặt cọc
           </span>
         );
       case APPOINTMENT_STATUS.WAITING:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-status-waiting/10 text-status-waiting border border-status-waiting/20">
-            <Clock3 className="w-4 h-4" /> Chờ phục vụ
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-status-waiting/10 text-status-waiting border border-status-waiting/20 whitespace-nowrap">
+            <Clock3 className="w-3.5 h-3.5" /> Chờ phục vụ
           </span>
         );
       case APPOINTMENT_STATUS.IN_SERVICE:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-status-in-progress/10 text-status-in-progress border border-status-in-progress/20">
-            <Clock3 className="w-4 h-4" /> Đang phục vụ
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-status-in-progress/10 text-status-in-progress border border-status-in-progress/20 whitespace-nowrap">
+            <Clock3 className="w-3.5 h-3.5" /> Đang phục vụ
           </span>
         );
       case APPOINTMENT_STATUS.COMPLETED:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-status-completed/10 text-status-completed border border-status-completed/20">
-            <CheckCircle2 className="w-4 h-4" /> Đã hoàn thành
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-status-completed/10 text-status-completed border border-status-completed/20 whitespace-nowrap">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Đã hoàn thành
           </span>
         );
       case APPOINTMENT_STATUS.CANCELLED:
       case APPOINTMENT_STATUS.NO_SHOW:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-status-cancelled/10 text-status-cancelled border border-status-cancelled/20">
-            <XCircle className="w-4 h-4" /> Đã hủy
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-status-cancelled/10 text-status-cancelled border border-status-cancelled/20 whitespace-nowrap">
+            <XCircle className="w-3.5 h-3.5" /> Đã hủy
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-gray-50 text-gray-700 border border-gray-200">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200 whitespace-nowrap">
             Không xác định
           </span>
         );
     }
-  };
-
-  const formatCurrency = (amount?: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(amount || 0);
   };
 
   return (
@@ -163,47 +246,35 @@ export function MyBookingsPanel() {
         {bookings.map((booking: AppointmentDto) => (
           <div
             key={booking.id}
-            className={`border rounded-xl overflow-hidden transition-all duration-300 ${
+            className={`border rounded-lg overflow-hidden transition-all duration-300 ${
               expandedId === booking.id
                 ? "border-lotus-rose ring-1 ring-lotus-rose/20 bg-white"
-                : "border-gray-100 bg-gray-50/50 hover:border-lotus-gold/50 hover:bg-white"
+                : "border-gray-200 bg-gray-50/50 hover:border-lotus-gold/50 hover:bg-white shadow-sm"
             }`}
           >
             {/* Header (Always visible) */}
             <div
-              className="p-5 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 select-none"
+              className="p-4 cursor-pointer flex flex-col md:flex-row justify-between gap-4 select-none"
               onClick={() => toggleExpand(booking.id!)}
             >
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-gray-900">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="font-semibold text-gray-900 truncate">
                     Mã lịch hẹn:{" "}
                     <span className="text-lotus-rose">
                       {booking.appointmentCode || `#${booking.id}`}
                     </span>
                   </span>
-                  <div className="md:hidden flex items-center gap-2">
-                    {canPayDeposit(booking) && (
-                      <button
-                        onClick={(e) => handlePayDeposit(e, booking.id!)}
-                        disabled={isPayingId === booking.id}
-                        className="px-3 py-1 bg-lotus-leaf text-white text-xs font-medium rounded-full flex items-center gap-1 shadow-sm"
-                      >
-                        {isPayingId === booking.id ? (
-                          <Loader2 className="w-3 h-3 animate-spin" />
-                        ) : (
-                          <DollarSign className="w-3 h-3" />
-                        )}
-                        Cọc
-                      </button>
-                    )}
+                  <div className="hidden md:block">
                     {getStatusBadge(booking.status)}
                   </div>
                 </div>
-                <div className="text-xs text-gray-400 mb-2">
-                  Ngày đặt: {booking.createdAt}
-                </div>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-gray-400">Ngày đặt:</span> 
+                    <span>{booking.createdAt}</span>
+                  </div>
                   <div className="flex items-center gap-1.5">
                     <Calendar className="w-4 h-4 text-lotus-gold" />
                     <span>
@@ -222,26 +293,92 @@ export function MyBookingsPanel() {
                         : "Chưa xếp giờ"}
                     </span>
                   </div>
+                  {canPayDeposit(booking) && (
+                    <div className="flex items-center gap-1.5">
+                      <DollarSign className="w-4 h-4 text-lotus-gold" />
+                      <span className="text-gray-900 font-medium">
+                        Cần cọc: <span className="text-lotus-rose">{formatCurrency(((booking.totalAmount || 0) * (booking.depositPercent || 0)) / 100)}</span>
+                        <span className="text-gray-500 font-normal ml-1">({booking.depositPercent}%)</span>
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Mobile Badge */}
+                <div className="mt-3 md:hidden">
+                  {getStatusBadge(booking.status)}
                 </div>
               </div>
 
-              <div className="hidden md:flex items-center gap-4">
-                {canPayDeposit(booking) && (
-                  <button
-                    onClick={(e) => handlePayDeposit(e, booking.id!)}
-                    disabled={isPayingId === booking.id}
-                    className="px-4 py-1.5 bg-lotus-leaf text-white text-sm font-medium rounded-full hover:bg-lotus-leaf/90 transition flex items-center gap-2 shadow-sm"
-                  >
-                    {isPayingId === booking.id ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <DollarSign className="w-4 h-4" />
-                    )}
-                    Thanh toán cọc
-                  </button>
-                )}
-                {getStatusBadge(booking.status)}
-                <button className="p-1 hover:bg-lotus-cream rounded-full transition-colors text-gray-400">
+              {/* Actions Area */}
+              <div className="flex items-center gap-2 md:self-center shrink-0">
+                <div className="flex flex-wrap items-center gap-2 justify-end">
+                  {canPayDeposit(booking) && (
+                    <>
+                      {walletBalance >=
+                        ((booking.totalAmount || 0) *
+                          (booking.depositPercent || 0)) /
+                          100 && (
+                        <button
+                          onClick={(e) =>
+                            openWalletConfirm(
+                              e,
+                              booking.id!,
+                              ((booking.totalAmount || 0) *
+                                (booking.depositPercent || 0)) /
+                                100,
+                            )
+                          }
+                          disabled={
+                            isPayingWalletId === booking.id ||
+                            isPayingId === booking.id
+                          }
+                          className="px-3 py-1.5 bg-lotus-gold text-white text-xs font-medium rounded-md hover:bg-lotus-gold/90 transition flex items-center gap-1.5 shadow-sm whitespace-nowrap"
+                        >
+                          {isPayingWalletId === booking.id ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Wallet className="w-3.5 h-3.5" />
+                          )}
+                          Cọc bằng Ví
+                        </button>
+                      )}
+                      <button
+                        onClick={(e) => handlePayDeposit(e, booking.id!)}
+                        disabled={
+                          isPayingId === booking.id ||
+                          isPayingWalletId === booking.id
+                        }
+                        className="px-3 py-1.5 bg-lotus-leaf text-white text-xs font-medium rounded-md hover:bg-lotus-leaf/90 transition flex items-center gap-1.5 shadow-sm whitespace-nowrap"
+                      >
+                        {isPayingId === booking.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <DollarSign className="w-3.5 h-3.5" />
+                        )}
+                        Cọc VNPAY
+                      </button>
+                    </>
+                  )}
+                  {canPostpone(booking) && (
+                    <button
+                      onClick={(e) =>
+                        handlePostpone(e, booking.id!, booking.paidAmount)
+                      }
+                      disabled={isPostponingId === booking.id}
+                      className="px-3 py-1.5 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-medium rounded-md transition flex items-center gap-1.5 shadow-sm whitespace-nowrap"
+                    >
+                      {isPostponingId === booking.id ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <XCircle className="w-3.5 h-3.5" />
+                      )}
+                      Hoãn lịch
+                    </button>
+                  )}
+                </div>
+                
+                <button className="p-1.5 hover:bg-gray-100 rounded-md transition-colors text-gray-400 ml-1">
                   {expandedId === booking.id ? (
                     <ChevronUp className="w-5 h-5" />
                   ) : (
@@ -307,20 +444,18 @@ export function MyBookingsPanel() {
                           </div>
                         </div>
 
-                        {booking.depositPercent ? (
-                          <div className="flex items-center gap-3 text-sm pl-7">
-                            <span className="text-gray-500 mr-2">
-                              Cọc yêu cầu ({booking.depositPercent}%):
-                            </span>
-                            <span className="text-lotus-gold font-medium">
-                              {formatCurrency(
-                                ((booking.totalAmount || 0) *
-                                  booking.depositPercent) /
-                                  100,
-                              )}
-                            </span>
-                          </div>
-                        ) : null}
+                        <div className="flex items-center gap-3 text-sm pl-7">
+                          <span className="text-gray-500 mr-2">
+                            Cọc yêu cầu ({booking.depositPercent}%):
+                          </span>
+                          <span className="text-lotus-gold font-medium">
+                            {formatCurrency(
+                              ((booking.totalAmount || 0) *
+                                (booking.depositPercent || 0)) /
+                                100,
+                            )}
+                          </span>
+                        </div>
 
                         {booking.depositDeadlineAt &&
                           booking.status === APPOINTMENT_STATUS.CONFIRMED && (
@@ -393,6 +528,32 @@ export function MyBookingsPanel() {
           </div>
         ))}
       </div>
+
+      <ConfirmDialog
+        open={walletConfirm.open}
+        onOpenChange={(open) => setWalletConfirm({ ...walletConfirm, open })}
+        onConfirm={executePayWithWallet}
+        title="Xác nhận thanh toán cọc"
+        description={
+          <div className="space-y-3 mt-2">
+            <p>Bạn có muốn thanh toán cọc bằng Ví cho lịch hẹn này không?</p>
+            <div className="bg-gray-50 p-3 rounded-md space-y-2 text-sm border border-gray-100">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Số tiền cọc:</span>
+                <span className="font-medium text-lotus-rose">{formatCurrency(walletConfirm.depositAmount)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Số dư hiện tại:</span>
+                <span className="font-medium text-gray-900">{formatCurrency(walletBalance)}</span>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 italic">Số dư ví của bạn sẽ bị trừ tương ứng sau khi xác nhận.</p>
+          </div>
+        }
+        loading={isPayingWalletId !== null}
+        confirmLabel="Thanh toán"
+        cancelLabel="Hủy bỏ"
+      />
     </div>
   );
 }

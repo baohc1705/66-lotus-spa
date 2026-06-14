@@ -13,9 +13,3 @@ export interface ChangePasswordRequest {
   newPassword: string;
 }
 
-export interface WalletTransactionDto {
-  id: string | number;
-  amount: number;
-  note?: string;
-  createdAt: string;
-}

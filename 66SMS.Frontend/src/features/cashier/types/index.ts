@@ -28,6 +28,7 @@ export interface CashierBooking {
   depositPaid: boolean
   depositDeadlineAt?: string | null
   note?: string
+  customerWalletBalance?: number
 }
 
 export interface StaffColumn {

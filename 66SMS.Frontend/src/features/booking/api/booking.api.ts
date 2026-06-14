@@ -78,4 +78,18 @@ export const bookingApi = {
     );
     return res.data.data || "";
   },
+
+  postponeBooking: async (appointmentId: number): Promise<boolean> => {
+    const res = await axiosInstance.post<Result<object>>(
+      `${APPOINTMENT_BASE}/${appointmentId}/postpone`
+    );
+    return res.data.isSuccess;
+  },
+
+  payDepositWithWallet: async (appointmentId: number): Promise<boolean> => {
+    const res = await axiosInstance.post<Result<object>>(
+      `${APPOINTMENT_BASE}/${appointmentId}/pay-deposit-wallet`
+    );
+    return res.data.isSuccess;
+  },
 };

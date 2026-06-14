@@ -40,6 +40,7 @@ export function CashierInvoiceSidebar({
     { id: "cash", label: "Tiền mặt", icon: Banknote },
     { id: "transfer", label: "Chuyển khoản", icon: QrCode },
     { id: "card", label: "Thẻ / POS", icon: CreditCard },
+    { id: "wallet", label: "Ví khách hàng", icon: Wallet, isWallet: true },
     { id: "vnpay", label: "VNPAY", icon: Wallet, isVnpay: true },
   ];
 
@@ -126,23 +127,35 @@ export function CashierInvoiceSidebar({
                 <button
                   key={method.id}
                   onClick={() => setPaymentMethod(method.id)}
+                  disabled={method.isWallet && (booking.customerWalletBalance || 0) < amountDue}
                   className={cn(
-                    "flex flex-col items-center justify-center gap-2 p-3 rounded-xl transition-all",
+                    "flex flex-col items-center justify-center gap-2 p-3 rounded-xl transition-all relative overflow-hidden",
                     isSelected
                       ? "border-2 border-lotus-leaf bg-lotus-leaf/5 text-lotus-leaf"
-                      : "border border-lotus-gold/20 hover:border-lotus-gold/40 text-lotus-stone hover:bg-lotus-cream/20",
+                      : method.isWallet && (booking.customerWalletBalance || 0) < amountDue
+                        ? "border border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed opacity-60"
+                        : "border border-lotus-gold/20 hover:border-lotus-gold/40 text-lotus-stone hover:bg-lotus-cream/20",
                   )}
                 >
                   <Icon className="w-5 h-5" />
                   <span
                     className={cn(
-                      "text-xs font-medium",
-                      method.isVnpay &&
-                        "text-[#005BAA] font-bold tracking-wide",
+                      "text-xs font-medium text-center",
+                      method.isVnpay && !isSelected && "text-[#005BAA] font-bold tracking-wide",
                     )}
                   >
                     {method.label}
+                    {method.isWallet && (
+                      <span className="block text-[10px] opacity-80 mt-0.5">
+                        ({(booking.customerWalletBalance || 0).toLocaleString("vi-VN")}đ)
+                      </span>
+                    )}
                   </span>
+                  {method.isWallet && (booking.customerWalletBalance || 0) < amountDue && (
+                     <div className="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-[1px]">
+                       <span className="text-[10px] font-bold text-red-500 bg-white px-2 py-0.5 rounded border border-red-100 rotate-[-10deg]">KHÔNG ĐỦ SỐ DƯ</span>
+                     </div>
+                  )}
                 </button>
               );
             })}
@@ -246,7 +259,9 @@ export function CashierInvoiceSidebar({
                     ? "Chưa đặt cọc"
                     : paymentMethod === "vnpay"
                       ? `Thanh toán VNPAY (${amountDue.toLocaleString("vi-VN")}đ)`
-                      : `Thu phần còn lại (${amountDue.toLocaleString("vi-VN")}đ)`}
+                      : paymentMethod === "wallet"
+                        ? `Trừ Ví Khách (${amountDue.toLocaleString("vi-VN")}đ)`
+                        : `Thu phần còn lại (${amountDue.toLocaleString("vi-VN")}đ)`}
           </button>
         )}
       </div>
