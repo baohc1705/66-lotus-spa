@@ -38,9 +38,11 @@ namespace _66SMS.Domain.Constants
         #region Status
         public const int STATUS_PENDING = 1;
         public const int STATUS_CONFIRMED = 2;
-        public const int STATUS_COMPLETED = 3;
-        public const int STATUS_CANCELLED = 4;
-        public const int STATUS_NO_SHOW = 5;
+        public const int STATUS_WAITING = 3;
+        public const int STATUS_IN_SERVICE = 4;
+        public const int STATUS_COMPLETED = 5;
+        public const int STATUS_CANCELLED = 6;
+        public const int STATUS_NO_SHOW = 9;
         #endregion
 
         #region Message

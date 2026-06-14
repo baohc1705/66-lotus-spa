@@ -1,6 +1,6 @@
 using _66SMS.Contracts.Shared;
-using _66SMS.Domain.Enums;
 using MediatR;
+using System.Text.Json.Serialization;
 
 namespace _66SMS.Application.Features.Users.Commands.UpdateUser
 {
@@ -13,7 +13,7 @@ namespace _66SMS.Application.Features.Users.Commands.UpdateUser
         public int? AccessFailedCount { get; set; }
         public int? Status { get; set; }
         public DateTime? LockoutEnd { get; set; }
-        [System.Text.Json.Serialization.JsonIgnore]
+        [JsonIgnore]
         public int? UpdatedBy { get; set; }
     }
 }

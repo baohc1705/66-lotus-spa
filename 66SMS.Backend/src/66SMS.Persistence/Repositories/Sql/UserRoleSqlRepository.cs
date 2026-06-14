@@ -2,7 +2,6 @@ using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
-using _66SMS.Domain.Enums;
 using _66SMS.Persistence.Repositories.Sql.Base;
 using Microsoft.EntityFrameworkCore;
 

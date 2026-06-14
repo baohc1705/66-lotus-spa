@@ -1,0 +1,40 @@
+using _66SMS.Application.Services.Appointments;
+using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+
+namespace _66SMS.Application.Features.Appointments.Queries.GetDepositVnPayUrl
+{
+    public class GetDepositVnPayUrlHandler : IRequestHandler<GetDepositVnPayUrlQuery, Result<string>>
+    {
+        private readonly IAppointmentSqlRepository appointmentSqlRepository;
+        private readonly IVnPayService vnPayService;
+        public GetDepositVnPayUrlHandler(IAppointmentSqlRepository appointmentSqlRepository, IVnPayService vnPayService)
+        {
+            this.appointmentSqlRepository = appointmentSqlRepository;
+            this.vnPayService = vnPayService;
+        }
+
+        public async Task<Result<string>> Handle(GetDepositVnPayUrlQuery request, CancellationToken cancellationToken)
+        {
+            // Kiểm tra tồn tại lịch hẹn
+            var appointment = await appointmentSqlRepository.AsQueryable()
+                .Where(x => x.Id == request.AppointmentId.Value && x.Status != AppointmentConst.STATUS_CANCELLED)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (appointment == null)
+                return Result<string>.NotFound("Không tìm thấy lịch hẹn");
+
+            // Validate nghiệp vụ: có được phép đặt cọc hay không
+            if (!AppointmentStatusTransitions.CanPayDeposit(appointment)) 
+                return Result<string>.BadRequest("Lịch hẹn không ở trạng thái chờ đặt cọc.");
+
+            var depositAmount = AppointmentPaymentCalculator.GetDepositAmount(appointment.TotalAmount, appointment.DepositPercent ?? AppointmentPaymentCalculator.DefaultDepositPercent);
+
+            var url = vnPayService.CreatePaymentUrl(appointment.Id, depositAmount, $"Dat coc {appointment.Id}", request.IpAddress, AppointmentPaymentConst.PHASE_DEPOSIT);
+            return Result<string>.Success(url);
+        }
+    }
+}

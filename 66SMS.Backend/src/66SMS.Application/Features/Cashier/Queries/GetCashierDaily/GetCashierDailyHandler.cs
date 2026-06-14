@@ -2,6 +2,7 @@ using _66SMS.Application.DTOs.Cashier;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
+using _66SMS.Application.Services.Appointments;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -56,7 +57,9 @@ namespace _66SMS.Application.Features.Cashier.Queries.GetCashierDaily
                 switch(a.Status)
                 {
                     case AppointmentConst.STATUS_PENDING: statusStr = "pending"; break;
-                    case AppointmentConst.STATUS_CONFIRMED: statusStr = "waiting"; break;
+                    case AppointmentConst.STATUS_CONFIRMED: statusStr = "confirmed"; break;
+                    case AppointmentConst.STATUS_WAITING: statusStr = "waiting"; break;
+                    case AppointmentConst.STATUS_IN_SERVICE: statusStr = "in-progress"; break;
                     case AppointmentConst.STATUS_COMPLETED: 
                         statusStr = a.PaidAmount >= a.TotalAmount ? "paid" : "unpaid";
                         break;
@@ -90,9 +93,9 @@ namespace _66SMS.Application.Features.Cashier.Queries.GetCashierDaily
                     Status = statusStr,
                     TotalAmount = a.TotalAmount,
                     PaidAmount = a.PaidAmount,
-                    DepositAmount = 0,
+                    DepositAmount = AppointmentPaymentCalculator.GetDepositAmount(a.TotalAmount, a.DepositPercent ?? AppointmentPaymentCalculator.DefaultDepositPercent),
                     RemainingAmount = a.TotalAmount - a.PaidAmount,
-                    DepositPaid = false,
+                    DepositPaid = AppointmentPaymentCalculator.HasDepositPaid(a),
                     DepositDeadlineAt = a.DepositDeadlineAt,
                     Note = a.Note
                 };

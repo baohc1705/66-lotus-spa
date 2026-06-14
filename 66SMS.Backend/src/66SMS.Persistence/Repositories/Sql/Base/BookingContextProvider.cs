@@ -28,7 +28,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             this.appointmentSlotLockSqlRepository = appointmentSlotLockSqlRepository;
         }
 
-        public async Task<AvailabilityContext?> BuildContextAsync(DateOnly date, int serviceId, CancellationToken cancellationToken = default)
+        public async Task<AppointmentAvailabilityContext?> BuildContextAsync(DateOnly date, int serviceId, CancellationToken cancellationToken = default)
         {
             var service = await serviceSqlRepository
                 .AsQueryable()
@@ -107,7 +107,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
                 MarkConsecutiveSlots(heldSlots, slotLock.StaffId, slotLock.SlotId, lockSlotsNeeded, timeSlots);
             }
 
-            return new AvailabilityContext(
+            return new AppointmentAvailabilityContext(
                 date,
                 service.DurationMins,
                 slotsNeeded,

@@ -22,6 +22,9 @@ namespace _66SMS.Infrastructure.DependencyInjection.Extensions
             services.Configure<MailSettings>(configuration.GetSection(MailSettings.SectionName));
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IEmailTemplateFactory, EmailTemplateFactory>();
+
+            // VnPay
+            services.AddVnPayService(configuration);
             return services;
         }
     }

@@ -3,7 +3,7 @@
 namespace _66SMS.Application.Services.Appointments
 {
     public sealed record ShiftWindow(TimeOnly ShiftStart, TimeOnly ShiftEnd);
-    public sealed class AvailabilityContext
+    public sealed class AppointmentAvailabilityContext
     {
         public DateOnly Date { get; }
         public int DurationMins { get; }
@@ -14,7 +14,7 @@ namespace _66SMS.Application.Services.Appointments
         public Dictionary<int, int> StaffScheduleIds { get; }
         public Dictionary<(int StaffId, int SlotId), byte> BookedSlots { get; }
 
-        public AvailabilityContext(DateOnly date, int durationMins, int slotsNeeded, IReadOnlyList<TimeSlot> timeSlots, IReadOnlyList<Staff> activeStaff, Dictionary<int, List<ShiftWindow>> staffShiftWindows, Dictionary<int, int> staffScheduleIds, Dictionary<(int StaffId, int SlotId), byte> bookedSlots, Dictionary<(int StaffId, int SlotId), byte> heldSlots)
+        public AppointmentAvailabilityContext(DateOnly date, int durationMins, int slotsNeeded, IReadOnlyList<TimeSlot> timeSlots, IReadOnlyList<Staff> activeStaff, Dictionary<int, List<ShiftWindow>> staffShiftWindows, Dictionary<int, int> staffScheduleIds, Dictionary<(int StaffId, int SlotId), byte> bookedSlots, Dictionary<(int StaffId, int SlotId), byte> heldSlots)
         {
 
             Date = date;

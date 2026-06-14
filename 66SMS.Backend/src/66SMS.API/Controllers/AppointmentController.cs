@@ -124,5 +124,57 @@ namespace _66SMS.API.Controllers
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
+
+        /// <summary>
+        /// Tạo URL VNPAY đặt cọc sau khi đặt lịch online.
+        /// </summary>
+        /// <param name="id">ID của lịch hẹn</param>
+        /// <returns>URL VNPAY</returns>
+        [HttpGet("{id}/deposit-vnpay-url")]
+        [Authorize]
+        public async Task<IActionResult> GetDepositVnPayUrl(int id)
+        {
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4()?.ToString() ?? "127.0.0.1";
+            if (string.IsNullOrEmpty(ipAddress) || ipAddress == "0.0.0.0") ipAddress = "127.0.0.1";
+            var query = new _66SMS.Application.Features.Appointments.Queries.GetDepositVnPayUrl.GetDepositVnPayUrlQuery
+            {
+                AppointmentId = id,
+                IpAddress = ipAddress
+            };
+            var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        /// <summary>
+        /// Thanh toán tiền cọc bằng số dư Ví (Wallet).
+        /// </summary>
+        /// <param name="id">ID của lịch hẹn</param>
+        [HttpPost("{id}/pay-deposit-wallet")]
+        [Authorize]
+        public async Task<IActionResult> PayDepositWithWallet(int id)
+        {
+            var command = new _66SMS.Application.Features.Appointments.Commands.PayDepositWithWallet.PayDepositWithWalletCommand
+            {
+                AppointmentId = id
+            };
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        /// <summary>
+        /// Hoãn lịch hẹn và hoàn tiền cọc vào ví.
+        /// </summary>
+        /// <param name="id">ID của lịch hẹn</param>
+        [HttpPost("{id}/postpone")]
+        [Authorize]
+        public async Task<IActionResult> PostponeAppointment(int id)
+        {
+            var command = new _66SMS.Application.Features.Appointments.Commands.PostponeAppointment.PostponeAppointmentCommand
+            {
+                AppointmentId = id
+            };
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
     }
 }

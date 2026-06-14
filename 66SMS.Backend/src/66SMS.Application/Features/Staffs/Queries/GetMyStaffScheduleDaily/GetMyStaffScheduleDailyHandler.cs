@@ -3,6 +3,8 @@ using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Domain.Constants;
+using _66SMS.Domain.Entities;
 
 namespace _66SMS.Application.Features.Staffs.Queries.GetMyStaffScheduleDaily
 {
@@ -47,22 +49,25 @@ namespace _66SMS.Application.Features.Staffs.Queries.GetMyStaffScheduleDaily
             });
         }
 
-        private StaffScheduleBookingDto MapBooking(Domain.Entities.Appointment a)
+        private StaffScheduleBookingDto MapBooking(Appointment a)
         {
             // Map integer status to string equivalent based on BookingStatus
             string statusStr = a.Status switch
             {
-                0 => "pending",
-                1 => "not-arrived",
-                2 => "waiting",
-                3 => "in-service",
-                4 => "unpaid",
-                5 => "completed",
-                6 => "cancelled",
+                AppointmentConst.STATUS_PENDING => "pending",
+                AppointmentConst.STATUS_CONFIRMED => "confirmed",
+                AppointmentConst.STATUS_WAITING => "waiting",
+                AppointmentConst.STATUS_IN_SERVICE => "in-progress",
+                AppointmentConst.STATUS_COMPLETED => a.PaidAmount >= a.TotalAmount ? "paid" : "unpaid",
+                AppointmentConst.STATUS_CANCELLED => "cancelled",
+                AppointmentConst.STATUS_NO_SHOW => "not-arrived",
                 _ => "pending"
             };
 
-            var serviceNames = a.Services?.Select(s => s.Service?.Name ?? "").Where(n => n != "").ToList() ?? new List<string>();
+            var serviceNames = a.Services?
+                .Select(s => s.Service?.Name ?? "")
+                .Where(n => n != "")
+                .ToList() ?? new List<string>();
             var serviceName = string.Join(", ", serviceNames);
             if (string.IsNullOrEmpty(serviceName)) serviceName = "Dịch vụ";
 
@@ -72,8 +77,8 @@ namespace _66SMS.Application.Features.Staffs.Queries.GetMyStaffScheduleDaily
                 CustomerName = a.CreatedByUser?.Customer?.FullName ?? "Khách hàng",
                 CustomerPhone = a.CreatedByUser?.Customer?.Phone ?? "",
                 ServiceName = serviceName,
-                StartTime = a.TimeSlot?.StartTime.ToString(@"hh\:mm") ?? "00:00",
-                EndTime = a.TimeSlot?.EndTime.ToString(@"hh\:mm") ?? "00:00",
+                StartTime = a.TimeSlot?.StartTime.ToString(@"HH\:mm") ?? "00:00",
+                EndTime = a.TimeSlot?.EndTime.ToString(@"HH\:mm") ?? "00:00",
                 Status = statusStr,
                 TotalAmount = a.TotalAmount,
                 Note = a.Note

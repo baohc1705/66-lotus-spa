@@ -4,11 +4,11 @@ using _66SMS.Domain.Entities;
 
 namespace _66SMS.Application.Services.Appointments
 {
-    public class BookingAvailabilityService : IBookingAvailabilityService
+    public class AppointmentAvailabilityService : IBookingAvailabilityService
     {
         private readonly IBookingContextProvider contextProvider;
 
-        public BookingAvailabilityService(IBookingContextProvider contextProvider)
+        public AppointmentAvailabilityService(IBookingContextProvider contextProvider)
         {
             this.contextProvider = contextProvider;
         }
@@ -157,7 +157,7 @@ namespace _66SMS.Application.Services.Appointments
         /// <summary>
         /// Đếm số lượng khung giờ bắt đầu khả dụng cho một nhân viên.
         /// </summary>
-        private static int CountAvailableStartSlots(AvailabilityContext context, int staffId, IReadOnlyList<ShiftWindow> windows)
+        private static int CountAvailableStartSlots(AppointmentAvailabilityContext context, int staffId, IReadOnlyList<ShiftWindow> windows)
         {
             var count = 0;
             for (var i = 0; i < context.TimeSlots.Count; i++)
@@ -170,7 +170,7 @@ namespace _66SMS.Application.Services.Appointments
         /// <summary>
         /// Phân giải trạng thái của một slot cụ thể đối với một nhân viên (khả dụng, đã đặt, ngoài giờ làm).
         /// </summary>
-        private static string ResolveStaffSlotStatus(AvailabilityContext context, int staffId, int startIndex, IReadOnlyList<ShiftWindow> windows)
+        private static string ResolveStaffSlotStatus(AppointmentAvailabilityContext context, int staffId, int startIndex, IReadOnlyList<ShiftWindow> windows)
         {
             if (windows.Count == 0) return "outside";
             var statuses = windows.Select(w => ResolveStaffSlotStatusForWindow(context, staffId, startIndex, w)).Where(s => s != "outside").ToList();
@@ -183,7 +183,7 @@ namespace _66SMS.Application.Services.Appointments
         /// <summary>
         /// Phân giải trạng thái của một slot trong một ca làm việc cụ thể.
         /// </summary>
-        private static string ResolveStaffSlotStatusForWindow(AvailabilityContext context, int staffId, int startIndex, ShiftWindow window)
+        private static string ResolveStaffSlotStatusForWindow(AppointmentAvailabilityContext context, int staffId, int startIndex, ShiftWindow window)
         {
             if (startIndex + context.SlotsNeeded > context.TimeSlots.Count) return "outside";
             var start = context.TimeSlots[startIndex].StartTime;
@@ -203,7 +203,7 @@ namespace _66SMS.Application.Services.Appointments
         /// <summary>
         /// Phân giải trạng thái tổng hợp của một slot cho toàn bộ Spa (nếu có bất kỳ nhân viên nào rảnh thì slot đó rảnh).
         /// </summary>
-        private static string ResolveAggregatedStatus(AvailabilityContext context, int startIndex)
+        private static string ResolveAggregatedStatus(AppointmentAvailabilityContext context, int startIndex)
         {
             var statuses = context.ActiveStaff
                 .Where(s => context.StaffShiftWindows.TryGetValue(s.Id, out var w) && w.Count > 0)

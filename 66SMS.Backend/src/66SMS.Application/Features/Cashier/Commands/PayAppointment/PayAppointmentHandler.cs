@@ -1,0 +1,166 @@
+using _66SMS.Application.Services.Appointments;
+using _66SMS.Application.Services.Wallets;
+using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
+using _66SMS.Domain.Entities;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+
+namespace _66SMS.Application.Features.Cashier.Commands.PayAppointment
+{
+    public sealed class PayAppointmentHandler(
+        IAppointmentSqlRepository appointmentSqlRepository,
+        IUserSqlRepository userSqlRepository,
+        IWalletSqlRepository walletSqlRepository,
+        IWalletTransactionSqlRepository walletTransactionSqlRepository,
+        ISqlUnitOfWork sqlUnitOfWork)
+        : IRequestHandler<PayAppointmentCommand, Result<object>>
+    {
+        private static readonly HashSet<string> AllowedMethods =
+            new(StringComparer.OrdinalIgnoreCase) { "cash", "transfer", "card", "wallet" };
+
+        private static readonly Dictionary<string, string> MethodLabels = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["cash"] = "Tiền mặt",
+            ["transfer"] = "Chuyển khoản",
+            ["card"] = "Thẻ / POS",
+            ["wallet"] = "Ví khách hàng"
+        };
+
+        public async Task<Result<object>> Handle(
+            PayAppointmentCommand request,
+            CancellationToken cancellationToken)
+        {
+            if (!AllowedMethods.Contains(request.PaymentMethod))
+            {
+                return Result<object>.BadRequest("Phương thức thanh toán không hợp lệ.");
+            }
+
+            var appointment = await appointmentSqlRepository.AsQueryable(asNoTracking: false)
+                .Include(a => a.Histories)
+                .Include(a => a.Payments)
+                .FirstOrDefaultAsync(a => a.Id == request.Id, cancellationToken);
+
+            if (appointment == null)
+            {
+                return Result<object>.NotFound("Lịch hẹn không tồn tại.");
+            }
+
+            if (AppointmentPaymentCalculator.IsFullyPaid(appointment))
+            {
+                return Result<object>.BadRequest("Lịch hẹn đã được thanh toán.");
+            }
+
+            if (!AppointmentStatusTransitions.CanPayBalance(appointment.Status))
+            {
+                return Result<object>.BadRequest(
+                    "Chỉ thanh toán khi dịch vụ đã hoàn tất và lịch ở trạng thái chờ thanh toán.");
+            }
+
+            if (!AppointmentPaymentCalculator.HasDepositPaid(appointment))
+            {
+                return Result<object>.BadRequest("Khách chưa đặt cọc. Vui lòng thu cọc trước.");
+            }
+
+            var amount = AppointmentPaymentCalculator.GetRemainingAmount(appointment);
+            if (amount <= 0)
+            {
+                return Result<object>.BadRequest("Không còn số tiền cần thanh toán.");
+            }
+
+            using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
+
+            try
+            {
+                var methodLabel = MethodLabels[request.PaymentMethod];
+                var note = string.IsNullOrWhiteSpace(request.Note)
+                    ? $"Thanh toán phần còn lại — {methodLabel}"
+                    : $"Thanh toán phần còn lại — {methodLabel}: {request.Note.Trim()}";
+
+                int methodConst = request.PaymentMethod.ToLower() switch
+                {
+                    "cash" => AppointmentPaymentConst.METHOD_CASH,
+                    "transfer" => AppointmentPaymentConst.METHOD_BANK_TRANSFER,
+                    //"card" => AppointmentPaymentConst.METHOD_CREDIT_CARD,
+                    "wallet" => AppointmentPaymentConst.METHOD_WALLET,
+                    _ => AppointmentPaymentConst.METHOD_CASH
+                };
+
+                // Nếu thu ngân chọn phương thức Ví, thực hiện trừ tiền ví của khách
+                if (methodConst == AppointmentPaymentConst.METHOD_WALLET)
+                {
+                    Wallet wallet;
+                    try
+                    {
+                        wallet = await WalletManager.GetOrCreateWalletAsync(appointment.CreatedByUserId, userSqlRepository, walletSqlRepository, cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        return Result<object>.BadRequest(ex.Message);
+                    }
+
+                    if (wallet.Balance < amount)
+                    {
+                        transaction.Rollback();
+                        return Result<object>.BadRequest($"Ví của khách hàng không đủ số dư (Hiện có: {wallet.Balance:N0}đ).");
+                    }
+
+                    wallet.Balance -= amount;
+                    walletSqlRepository.Update(wallet);
+
+                    var walletTx = new WalletTransaction
+                    {
+                        WalletId = wallet.Id,
+                        Amount = -amount,
+                        BalanceAfter = wallet.Balance,
+                        Type = WalletTransactionConst.TYPE_PAYMENT_FOR_APPOINTMENT,
+                        Note = $"Thu ngân trừ tiền ví thanh toán cho lịch hẹn #{appointment.Id}",
+                        Status = WalletTransactionConst.STATUS_SUCCESS,
+                        CreatedAt = DateTime.UtcNow,
+                        CreatedBy = request.UserId.Value
+                    };
+                    walletTransactionSqlRepository.Add(walletTx);
+                }
+
+                if (!AppointmentPaymentRecorder.TryRecordPayment(
+                        appointment,
+                        AppointmentPaymentConst.PHASE_FINAL_PAYMENT,
+                        amount,
+                        methodConst,
+                        null,
+                        note,
+                        out var error))
+                {
+                    return Result<object>.BadRequest(error!);
+                }
+
+                var oldStatus = appointment.Status;
+
+                appointment.Histories ??= new List<AppointmentHistory>();
+                appointment.Histories.Add(new AppointmentHistory
+                {
+                    OldStatus = oldStatus,
+                    NewStatus = appointment.Status,
+                    Note = note,
+                    CreatedBy =request.UserId,
+                    CreatedAt = DateTime.UtcNow
+                });
+
+                appointmentSqlRepository.Update(appointment);
+                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+
+                transaction.Commit();
+
+                return Result<object>.Success("Thanh toán thành công.");
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+    }
+}

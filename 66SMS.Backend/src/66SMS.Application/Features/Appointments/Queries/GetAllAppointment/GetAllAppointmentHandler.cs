@@ -1,4 +1,4 @@
-﻿using _66SMS.Application.DTOs.Appointments;
+using _66SMS.Application.DTOs.Appointments;
 using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -26,6 +26,7 @@ namespace _66SMS.Application.Features.Appointments.Queries.GetAllAppointment
                 query = query.Where(x => x.CreatedByUserId == request.UserId);
             }
             var result = await query
+                .OrderByDescending(x => x.CreatedAt)
                 .ProjectTo<AppointmentDto>(mapper.ConfigurationProvider)
                 .ToPagedAsync(request, cancellationToken);
             return Result<PagedResult<AppointmentDto>>.Success(result);

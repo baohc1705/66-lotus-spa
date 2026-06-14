@@ -25,7 +25,7 @@ namespace _66SMS.Application.DependencyInjection
             {
                 cfg.AddProfile(typeof(ApplicationMappingProfiles));
             });
-            services.AddScoped<IBookingAvailabilityService, BookingAvailabilityService>();
+            services.AddScoped<IBookingAvailabilityService, AppointmentAvailabilityService>();
             return services;
         }
     }

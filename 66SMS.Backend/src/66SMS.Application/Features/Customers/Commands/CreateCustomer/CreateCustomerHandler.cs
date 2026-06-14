@@ -18,14 +18,16 @@ namespace _66SMS.Application.Features.Customers.Commands.CreateCustomer
         private readonly IRoleSqlRepository roleSqlRepository;
         private readonly IUserRoleSqlRepository userRoleSqlRepository;
         private readonly ICustomerSqlRepository customerSqlRepository;
+        private readonly IWalletSqlRepository walletSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
         private readonly IPasswordHash passwordHash;
 
-        public CreateCustomerHandler(IUserSqlRepository userSqlRepository, ICustomerSqlRepository customerSqlRepository, ISqlUnitOfWork sqlUnitOfWork, IMapper mapper, IPasswordHash passwordHash, IRoleSqlRepository roleSqlRepository, IUserRoleSqlRepository userRoleSqlRepository)
+        public CreateCustomerHandler(IUserSqlRepository userSqlRepository, ICustomerSqlRepository customerSqlRepository, IWalletSqlRepository walletSqlRepository, ISqlUnitOfWork sqlUnitOfWork, IMapper mapper, IPasswordHash passwordHash, IRoleSqlRepository roleSqlRepository, IUserRoleSqlRepository userRoleSqlRepository)
         {
             this.userSqlRepository = userSqlRepository;
             this.customerSqlRepository = customerSqlRepository;
+            this.walletSqlRepository = walletSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
             this.passwordHash = passwordHash;
@@ -62,6 +64,18 @@ namespace _66SMS.Application.Features.Customers.Commands.CreateCustomer
                 // save customer
                 customer.UserId = user.Id;
                 customerSqlRepository.Add(customer);
+                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+
+                // Auto-create wallet for customer
+                var wallet = new Wallet
+                {
+                    CustomerId = customer.Id,
+                    Balance = 0,
+                    Status = WalletConst.STATUS_ACTIVE,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = request.CreatedBy ?? 1
+                };
+                walletSqlRepository.Add(wallet);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 // Save role

@@ -28,44 +28,89 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-        [HttpGet("online-bookings")]
+        [HttpGet("online-appointments")]
         [Authorize]
-        public IActionResult GetOnlineBookings()
+        public async Task<IActionResult> GetOnlineAppointments()
         {
-            // Stub
-            return Ok(new { IsSuccess = true, Data = new object[] {} });
+            var query = new _66SMS.Application.Features.Cashier.Queries.GetOnlineAppointments.GetOnlineAppointmentsQuery();
+            var result = await mediator.Send(query);
+            return HandleResult(result);
         }
 
-        [HttpPut("bookings/{id}/status")]
+        [HttpPut("appointments/{id}/status")]
         [Authorize]
-        public IActionResult UpdateBookingStatus(int id, [FromBody] object request)
+        public async Task<IActionResult> UpdateAppointmentStatus(int id, [FromBody] _66SMS.Application.Features.Cashier.Commands.UpdateAppointmentStatus.UpdateAppointmentStatusCommand request)
         {
-            // Stub
-            return Ok(new { IsSuccess = true, Message = "Cập nhật trạng thái thành công" });
+            request.Id = id;
+            var result = await mediator.Send(request);
+            return HandleResult(result);
         }
 
-        [HttpPost("bookings/{id}/pay")]
+        [HttpPost("appointments/{id}/pay")]
         [Authorize]
-        public IActionResult PayBooking(int id, [FromBody] object request)
+        public async Task<IActionResult> PayAppointment(int id, [FromBody] _66SMS.Application.Features.Cashier.Commands.PayAppointment.PayAppointmentCommand request)
         {
-            // Stub
-            return Ok(new { IsSuccess = true, Message = "Thanh toán thành công" });
+            request.Id = id;
+            var result = await mediator.Send(request);
+            return HandleResult(result);
         }
 
-        [HttpGet("vnpay/create-url/{bookingId}")]
+        [HttpGet("vnpay/create-url/{appointmentId}")]
         [Authorize]
-        public IActionResult CreateVnPayUrl(int bookingId)
+        public async Task<IActionResult> CreateVnPayUrl(int appointmentId)
         {
-            // Stub
-            return Ok(new { IsSuccess = true, Data = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html" });
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4()?.ToString() ?? "127.0.0.1";
+            if (string.IsNullOrEmpty(ipAddress) || ipAddress == "0.0.0.0") ipAddress = "127.0.0.1";
+            var query = new _66SMS.Application.Features.Cashier.Queries.GetCashierVnPayUrl.GetCashierVnPayUrlQuery 
+            { 
+                AppointmentId = appointmentId, 
+                IpAddress = ipAddress 
+            };
+            var result = await mediator.Send(query);
+            return HandleResult(result);
         }
 
         [HttpGet("vnpay-return")]
         [AllowAnonymous]
-        public IActionResult VnPayReturn()
+        public async Task<IActionResult> VnPayReturn()
         {
-            // Stub
-            return Ok(new { IsSuccess = true, Message = "Giao dịch VNPay thành công" });
+            var collections = HttpContext.Request.Query.ToDictionary(k => k.Key, v => v.Value.ToString());
+            var command = new _66SMS.Application.Features.Cashier.Commands.VnPayReturn.VnPayReturnCommand 
+            { 
+                QueryData = collections 
+            };
+            var result = await mediator.Send(command);
+            
+            // Redirect or return JSON based on requirement. 
+            // Often VNPAY callback returns HTML or redirects. If JSON API:
+            return HandleResult(result);
+        }
+
+        /// <summary>
+        /// API Webhook nhận thông báo thanh toán (IPN) trực tiếp từ server VNPAY.
+        /// API này không cần đăng nhập (AllowAnonymous) vì được gọi ngầm từ hệ thống VNPAY.
+        /// </summary>
+        [HttpGet("vnpay-ipn")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VnPayIpn()
+        {
+            // Lấy toàn bộ các tham số (query string) mà VNPAY gắn lên URL và chuyển thành Dictionary
+            var collections = HttpContext.Request.Query.ToDictionary(k => k.Key, v => v.Value.ToString());
+            
+            // Đóng gói dữ liệu vào Command để đưa xuống Handler xử lý logic
+            var command = new _66SMS.Application.Features.Cashier.Commands.VnPayIpn.VnPayIpnCommand 
+            { 
+                QueryData = collections 
+            };
+            
+            // Gửi qua thư viện MediatR để chạy VnPayIpnHandler.cs
+            var result = await mediator.Send(command);
+            
+            // ĐIỂM ĐẶC BIỆT LƯU Ý KHI LÀM IPN:
+            // Hàm trả về (return) tuyệt đối không dùng HandleResult() vì HandleResult sẽ bọc data trong object { "success": true, "data": ... }
+            // VNPAY chỉ đọc được định dạng JSON thuần khiết của nó: { "RspCode": "00", "Message": "Confirm Success" }.
+            // Do đó phải dùng Ok(result) để serialize trực tiếp object VnPayIpnResponse ra JSON.
+            return Ok(result);
         }
     }
 }
