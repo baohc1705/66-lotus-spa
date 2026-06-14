@@ -11,6 +11,7 @@ import { CashierBookingModal } from "../components/CashierBookingModal";
 import { cashierApi } from "../api/cashier.api";
 import { Loader2 } from "lucide-react";
 import { useAuthStore } from "@/features/auth/stores/authStore";
+import { APPOINTMENT_STATUS } from "@/features/booking/constants/appointment.constants";
 
 export function CashierPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -26,6 +27,9 @@ export function CashierPage() {
   const isAdmin = hasRole("Admin");
   const isReceptionist = hasRole("Receptionist");
 
+  const { data, isLoading, isError, error, refetch, moveBooking } =
+    useCashierData(currentDate);
+
   useEffect(() => {
     // Only admin and receptionist can access cashier page
     if (!isAdmin && !isReceptionist) {
@@ -37,9 +41,6 @@ export function CashierPage() {
     return null;
   }
 
-  const { data, isLoading, isError, error, refetch, moveBooking } =
-    useCashierData(currentDate);
-
   const handleAddBooking = () => {
     setIsBookingModalOpen(true);
   };
@@ -49,7 +50,7 @@ export function CashierPage() {
     setIsSidebarOpen(true);
   };
 
-  const handleEmptySlotClick = (staffId: string, time: string) => {
+  const handleEmptySlotClick = () => {
     setIsBookingModalOpen(true);
   };
 
@@ -161,6 +162,28 @@ export function CashierPage() {
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
           onPay={handlePay}
+          onRequestDeposit={async (bookingId) => {
+            setIsPaying(true);
+            try {
+              const res = await cashierApi.updateBookingStatus(
+                bookingId,
+                APPOINTMENT_STATUS.CONFIRMED,
+                "Thu ngân xác nhận lịch — yêu cầu đặt cọc trong 24h",
+              );
+              if (res.isSuccess) {
+                toast.success("Đã xác nhận lịch và yêu cầu khách cọc.");
+                setIsSidebarOpen(false);
+                setSelectedBooking(null);
+                refetch();
+              } else {
+                toast.error(res.message || "Không thể yêu cầu cọc.");
+              }
+            } catch {
+              toast.error("Lỗi khi kết nối đến máy chủ.");
+            } finally {
+              setIsPaying(false);
+            }
+          }}
           isPaying={isPaying}
         />
       </div>

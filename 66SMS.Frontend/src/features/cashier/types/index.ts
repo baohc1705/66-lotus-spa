@@ -1,5 +1,6 @@
 export type BookingStatus =
   | 'pending'
+  | 'confirmed'
   | 'not-arrived'
   | 'waiting'
   | 'in-progress'

@@ -39,6 +39,10 @@ export const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
+    path: "/thanh-toan/vnpay-return",
+    element: <VnPayReturnPage />,
+  },
+  {
     element: <ProtectedRoute />,
     children: [
       {
@@ -56,10 +60,6 @@ export const router = createBrowserRouter([
       {
         path: "/thu-ngan",
         element: <CashierPage />,
-      },
-      {
-        path: "/thu-ngan/vnpay-return",
-        element: <VnPayReturnPage />,
       },
       {
         path: "/admin",

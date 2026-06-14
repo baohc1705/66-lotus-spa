@@ -1,5 +1,6 @@
 export type StaffBookingStatus =
   | 'pending'
+  | 'confirmed'
   | 'not-arrived'
   | 'waiting'
   | 'in-progress'
@@ -9,14 +10,13 @@ export type StaffBookingStatus =
   | 'cancelled'
 
 export const BookingStatus = {
-  Pending: 0,
-  NotArrived: 1,
-  Waiting: 2,
-  InService: 3,
-  Completed: 4,
-  Unpaid: 5,
-  Paid: 6,
-  Cancelled: 7,
+  Pending: 1,
+  Confirmed: 2,
+  Waiting: 3,
+  InService: 4,
+  Completed: 5,
+  Cancelled: 6,
+  NoShow: 9,
 } as const
 
 export interface StaffScheduleBooking {

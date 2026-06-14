@@ -71,4 +71,11 @@ export const bookingApi = {
     );
     return res.data.data?.items || [];
   },
+
+  getDepositVnPayUrl: async (appointmentId: number): Promise<string> => {
+    const res = await axiosInstance.get<Result<string>>(
+      `${APPOINTMENT_BASE}/${appointmentId}/deposit-vnpay-url`
+    );
+    return res.data.data || "";
+  },
 };

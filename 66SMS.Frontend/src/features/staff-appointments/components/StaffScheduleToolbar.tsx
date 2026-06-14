@@ -86,19 +86,23 @@ export function StaffScheduleToolbar({
 
         <div className="hidden sm:flex items-center gap-3 text-xs font-medium text-gray-600 ml-2">
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-gray-400" />
+            <span className="w-2 h-2 rounded-full bg-status-pending" />
             Chờ xác nhận
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-sky-500" />
+            <span className="w-2 h-2 rounded-full bg-status-confirmed" />
             Đã xác nhận
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-blue-500" />
+            <span className="w-2 h-2 rounded-full bg-status-waiting" />
+            Chờ phục vụ
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-status-in-progress" />
             Đang phục vụ
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="w-2 h-2 rounded-full bg-status-completed" />
             Hoàn thành
           </span>
         </div>

@@ -52,6 +52,14 @@ export default {
         input:        'rgb(var(--input) / <alpha-value>)',
         ring:         'rgb(var(--ring) / <alpha-value>)',
 
+        /* ── Status Tokens ── */
+        'status-pending':     'rgb(var(--status-pending) / <alpha-value>)',
+        'status-confirmed':   'rgb(var(--status-confirmed) / <alpha-value>)',
+        'status-waiting':     'rgb(var(--status-waiting) / <alpha-value>)',
+        'status-in-progress': 'rgb(var(--status-in-progress) / <alpha-value>)',
+        'status-completed':   'rgb(var(--status-completed) / <alpha-value>)',
+        'status-cancelled':   'rgb(var(--status-cancelled) / <alpha-value>)',
+
         /* ── Hoa Sen Spa Brand Tokens ── */
         'lotus-primary':    'var(--lotus-primary)',
         'lotus-secondary':  'var(--lotus-secondary)',

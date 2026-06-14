@@ -66,6 +66,8 @@ export interface AppointmentDto {
   note?: string;
   totalAmount?: number;
   paidAmount?: number;
+  depositPercent?: number;
+  depositDeadlineAt?: string;
   createdAt?: string;
   staffFullName?: string;
   timeSlotStartTime?: string;

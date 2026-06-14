@@ -19,43 +19,45 @@ function timeToMins(t: string) {
 function statusStyles(status: string) {
   switch (status) {
     case "in-progress":
-      return "bg-sky-50 border-sky-200 text-sky-700";
+      return "bg-status-in-progress/10 border-status-in-progress/30 text-status-in-progress";
     case "not-arrived":
-      return "bg-orange-50 border-orange-200 text-orange-700";
+      return "bg-status-cancelled/10 border-status-cancelled/30 text-status-cancelled";
     case "waiting":
-      return "bg-yellow-50 border-yellow-200 text-yellow-700";
+      return "bg-status-waiting/10 border-status-waiting/30 text-status-waiting";
     case "completed":
-      return "bg-slate-50 border-slate-200 text-slate-700";
-    case "unpaid":
-      return "bg-rose-50 border-rose-200 text-rose-700";
     case "paid":
-      return "bg-emerald-50 border-emerald-200 text-emerald-700";
+      return "bg-status-completed/10 border-status-completed/30 text-status-completed";
+    case "unpaid":
+      return "bg-lotus-rose/10 border-lotus-rose/30 text-lotus-rose";
     case "cancelled":
-      return "bg-red-50 border-red-200 text-red-700";
+      return "bg-status-cancelled/10 border-status-cancelled/30 text-status-cancelled";
+    case "confirmed":
+      return "bg-status-confirmed/10 border-status-confirmed/30 text-status-confirmed";
     case "pending":
     default:
-      return "bg-amber-50 border-amber-200 text-amber-800";
+      return "bg-status-pending/10 border-status-pending/30 text-status-pending";
   }
 }
 
 function statusDot(status: string) {
   switch (status) {
     case "in-progress":
-      return "bg-sky-500";
+      return "bg-status-in-progress";
     case "not-arrived":
-      return "bg-orange-500";
+      return "bg-status-cancelled";
     case "waiting":
-      return "bg-yellow-500";
+      return "bg-status-waiting";
     case "completed":
-      return "bg-slate-500";
-    case "unpaid":
-      return "bg-rose-500";
     case "paid":
-      return "bg-emerald-500";
+      return "bg-status-completed";
+    case "unpaid":
+      return "bg-lotus-rose";
     case "cancelled":
-      return "bg-red-500";
+      return "bg-status-cancelled";
+    case "confirmed":
+      return "bg-status-confirmed";
     default:
-      return "bg-amber-400";
+      return "bg-status-pending";
   }
 }
 

@@ -307,40 +307,37 @@ export function CashierGrid({
 
                           switch (booking.status) {
                             case "in-progress":
-                              statusColor =
-                                "bg-sky-50 border-sky-200 text-sky-700";
-                              statusBadge = "bg-sky-500";
+                              statusColor = "bg-status-in-progress/10 border-status-in-progress/30 text-status-in-progress";
+                              statusBadge = "bg-status-in-progress";
                               break;
                             case "not-arrived":
-                              statusColor =
-                                "bg-orange-50 border-orange-200 text-orange-700";
-                              statusBadge = "bg-orange-500";
+                              statusColor = "bg-status-cancelled/10 border-status-cancelled/30 text-status-cancelled";
+                              statusBadge = "bg-status-cancelled";
                               break;
                             case "waiting":
-                              statusColor =
-                                "bg-yellow-50 border-yellow-200 text-yellow-700";
-                              statusBadge = "bg-yellow-500";
+                              statusColor = "bg-status-waiting/10 border-status-waiting/30 text-status-waiting";
+                              statusBadge = "bg-status-waiting";
                               break;
                             case "pending":
-                              statusColor =
-                                "bg-amber-50 border-amber-200 text-amber-800";
-                              statusBadge = "bg-amber-400";
+                              statusColor = "bg-status-pending/10 border-status-pending/30 text-status-pending";
+                              statusBadge = "bg-status-pending";
+                              break;
+                            case "confirmed":
+                              statusColor = "bg-status-confirmed/10 border-status-confirmed/30 text-status-confirmed";
+                              statusBadge = "bg-status-confirmed";
                               break;
                             case "unpaid":
-                              statusColor =
-                                "bg-lotus-rose/10 border-lotus-rose/30 text-lotus-rose";
+                              statusColor = "bg-lotus-rose/10 border-lotus-rose/30 text-lotus-rose";
                               statusBadge = "bg-lotus-rose animate-pulse";
                               break;
                             case "paid":
                             case "completed":
-                              statusColor =
-                                "bg-lotus-leaf/10 border-lotus-leaf/30 text-lotus-leaf";
-                              statusBadge = "bg-lotus-leaf";
+                              statusColor = "bg-status-completed/10 border-status-completed/30 text-status-completed";
+                              statusBadge = "bg-status-completed";
                               break;
                             case "cancelled":
-                              statusColor =
-                                "bg-red-50 border-red-200 text-red-700";
-                              statusBadge = "bg-red-500";
+                              statusColor = "bg-status-cancelled/10 border-status-cancelled/30 text-status-cancelled";
+                              statusBadge = "bg-status-cancelled";
                               break;
                           }
 

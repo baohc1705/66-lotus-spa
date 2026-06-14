@@ -41,37 +41,29 @@ export function CashierToolbar({ currentDate, onDateChange, onAddBooking }: Cash
       </div>
 
       {/* Middle: Status Legend */}
-      <div className="hidden xl:flex flex-wrap items-center justify-center gap-3 text-xs font-medium max-w-[50%]">
+      <div className="hidden xl:flex flex-wrap items-center justify-center gap-3 text-xs font-medium max-w-[60%]">
         <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span className="w-2 h-2 rounded-full bg-status-pending"></span>
           <span className="text-lotus-deep/80">Chờ xác nhận</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-orange-500"></span>
-          <span className="text-lotus-deep/80">Chưa tới</span>
+          <span className="w-2 h-2 rounded-full bg-status-confirmed"></span>
+          <span className="text-lotus-deep/80">Đã xác nhận</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
-          <span className="text-lotus-deep/80">Đang chờ</span>
+          <span className="w-2 h-2 rounded-full bg-status-waiting"></span>
+          <span className="text-lotus-deep/80">Chờ phục vụ</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-sky-500"></span>
-          <span className="text-lotus-deep/80">Đang sử dụng</span>
+          <span className="w-2 h-2 rounded-full bg-status-in-progress"></span>
+          <span className="text-lotus-deep/80">Đang phục vụ</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-slate-500"></span>
-          <span className="text-lotus-deep/80">Đã xong</span>
+          <span className="w-2 h-2 rounded-full bg-status-completed"></span>
+          <span className="text-lotus-deep/80">Hoàn thành</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-lotus-rose"></span>
-          <span className="text-lotus-deep/80">Chưa thanh toán</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-lotus-leaf"></span>
-          <span className="text-lotus-deep/80">Đã thanh toán</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-red-500"></span>
+          <span className="w-2 h-2 rounded-full bg-status-cancelled"></span>
           <span className="text-lotus-deep/80">Đã hủy</span>
         </div>
       </div>

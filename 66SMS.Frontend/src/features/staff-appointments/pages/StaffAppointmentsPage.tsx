@@ -119,13 +119,13 @@ export function StaffAppointmentsPage() {
 
   const handleCompleteService = (bookingId: string) => {
     updateStatus.mutate(
-      { id: bookingId, status: BookingStatus.Unpaid },
+      { id: bookingId, status: BookingStatus.Completed },
       {
         onSuccess: () => {
           schedule.refetch();
           setSelectedBooking((prev) =>
             prev && prev.booking.id === bookingId
-              ? { ...prev, booking: { ...prev.booking, status: "unpaid" } }
+              ? { ...prev, booking: { ...prev.booking, status: "completed" } }
               : prev,
           );
         },

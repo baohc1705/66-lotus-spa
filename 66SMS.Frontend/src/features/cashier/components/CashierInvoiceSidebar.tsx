@@ -16,6 +16,7 @@ interface CashierInvoiceSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onPay: (bookingId: string, paymentMethod: string) => void;
+  onRequestDeposit?: (bookingId: string) => void;
   isPaying?: boolean;
 }
 
@@ -24,6 +25,7 @@ export function CashierInvoiceSidebar({
   isOpen,
   onClose,
   onPay,
+  onRequestDeposit,
   isPaying = false,
 }: CashierInvoiceSidebarProps) {
   const [paymentMethod, setPaymentMethod] = useState("cash");
@@ -206,31 +208,47 @@ export function CashierInvoiceSidebar({
           </p>
         )}
 
-        <button
-          onClick={() => onPay(booking.id, paymentMethod)}
-          className={cn(
-            "w-full py-3 rounded-xl flex items-center justify-center gap-2 text-white font-semibold text-sm transition-all shadow-md",
-            isPaid || isPaying || !canPay || !booking.depositPaid
-              ? "bg-lotus-stone/50 cursor-not-allowed text-white/80 shadow-none"
-              : paymentMethod === "vnpay"
-                ? "bg-gradient-to-r from-[#005BAA] to-[#ED1B24] hover:opacity-90 shadow-blue-500/20"
-                : "bg-lotus-leaf hover:bg-lotus-leaf/90 shadow-lotus-leaf/20 hover:shadow-lotus-leaf/40",
-          )}
-          disabled={isPaid || isPaying || !canPay || !booking.depositPaid}
-        >
-          <Check className="w-5 h-5" />
-          {isPaying
-            ? "Đang xử lý..."
-            : isPaid
-              ? "Đã thanh toán"
-              : !canPay
-                ? "Chưa thể thanh toán"
-                : !booking.depositPaid
-                  ? "Chưa đặt cọc"
-                  : paymentMethod === "vnpay"
-                    ? `Thanh toán VNPAY (${amountDue.toLocaleString("vi-VN")}đ)`
-                    : `Thu phần còn lại (${amountDue.toLocaleString("vi-VN")}đ)`}
-        </button>
+        {booking.status === "pending" && !booking.depositDeadlineAt && onRequestDeposit ? (
+          <button
+            onClick={() => onRequestDeposit(booking.id)}
+            disabled={isPaying}
+            className={cn(
+              "w-full py-3 rounded-xl flex items-center justify-center gap-2 text-white font-semibold text-sm transition-all shadow-md",
+              isPaying
+                ? "bg-lotus-stone/50 cursor-not-allowed text-white/80 shadow-none"
+                : "bg-[#005BAA] hover:bg-[#005BAA]/90 shadow-blue-500/20"
+            )}
+          >
+            <Wallet className="w-5 h-5" />
+            {isPaying ? "Đang xử lý..." : "Xác nhận & Yêu cầu khách cọc"}
+          </button>
+        ) : (
+          <button
+            onClick={() => onPay(booking.id, paymentMethod)}
+            className={cn(
+              "w-full py-3 rounded-xl flex items-center justify-center gap-2 text-white font-semibold text-sm transition-all shadow-md",
+              isPaid || isPaying || !canPay || (!booking.depositPaid && booking.status !== "confirmed")
+                ? "bg-lotus-stone/50 cursor-not-allowed text-white/80 shadow-none"
+                : paymentMethod === "vnpay"
+                  ? "bg-gradient-to-r from-[#005BAA] to-[#ED1B24] hover:opacity-90 shadow-blue-500/20"
+                  : "bg-lotus-leaf hover:bg-lotus-leaf/90 shadow-lotus-leaf/20 hover:shadow-lotus-leaf/40",
+            )}
+            disabled={isPaid || isPaying || !canPay || (!booking.depositPaid && booking.status !== "confirmed")}
+          >
+            <Check className="w-5 h-5" />
+            {isPaying
+              ? "Đang xử lý..."
+              : isPaid
+                ? "Đã thanh toán"
+                : !canPay
+                  ? "Chưa thể thanh toán"
+                  : (!booking.depositPaid && booking.status !== "confirmed")
+                    ? "Chưa đặt cọc"
+                    : paymentMethod === "vnpay"
+                      ? `Thanh toán VNPAY (${amountDue.toLocaleString("vi-VN")}đ)`
+                      : `Thu phần còn lại (${amountDue.toLocaleString("vi-VN")}đ)`}
+          </button>
+        )}
       </div>
     </div>
   );
