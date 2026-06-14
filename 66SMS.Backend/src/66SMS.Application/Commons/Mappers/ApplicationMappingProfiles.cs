@@ -1,53 +1,53 @@
+using _66SMS.Application.DTOs.Appointments;
+using _66SMS.Application.DTOs.BookingPositions;
+using _66SMS.Application.DTOs.BookingRooms;
 using _66SMS.Application.DTOs.Customers;
+using _66SMS.Application.DTOs.ProductCategories;
+using _66SMS.Application.DTOs.ProductImages;
+using _66SMS.Application.DTOs.Products;
+using _66SMS.Application.DTOs.ServiceCategories;
+using _66SMS.Application.DTOs.ServiceImages;
+using _66SMS.Application.DTOs.ServiceProducts;
+using _66SMS.Application.DTOs.Services;
 using _66SMS.Application.DTOs.Shifts;
+using _66SMS.Application.DTOs.Staffs;
+using _66SMS.Application.DTOs.TimeSlots;
 using _66SMS.Application.DTOs.Users;
 using _66SMS.Application.Features.Auth.Commands.CreatePermission;
 using _66SMS.Application.Features.Auth.Commands.CreateRole;
+using _66SMS.Application.Features.BookingPositions.Commands.CreateBookingPositions;
+using _66SMS.Application.Features.BookingPositions.Commands.UpdateBookingPositions;
+using _66SMS.Application.Features.BookingRooms.Commands.CreateBookingRooms;
+using _66SMS.Application.Features.BookingRooms.Commands.UpdateBookingRooms;
 using _66SMS.Application.Features.Customers.Commands.CreateCustomer;
 using _66SMS.Application.Features.Customers.Commands.UpdateCustomer;
-using _66SMS.Application.DTOs.Staffs;
-using _66SMS.Application.Features.Staffs.Commands.CreateStaff;
-using _66SMS.Application.Features.Staffs.Commands.UpdateStaff;
+using _66SMS.Application.Features.ProductCategories.Commands.CreateProductCategories;
+using _66SMS.Application.Features.ProductCategories.Commands.UpdateProductCategories;
+using _66SMS.Application.Features.ProductImages.Commands.CreateProductImages;
+using _66SMS.Application.Features.ProductImages.Commands.UpdateProductImages;
+using _66SMS.Application.Features.Products.Commands.CreateProducts;
+using _66SMS.Application.Features.Products.Commands.UpdateProducts;
+using _66SMS.Application.Features.ServiceCategories.Commands.CreateServiceCategories;
+using _66SMS.Application.Features.ServiceCategories.Commands.UpdateServiceCategories;
+using _66SMS.Application.Features.ServiceImages.Commands.CreateServiceImages;
+using _66SMS.Application.Features.ServiceImages.Commands.UpdateServiceImages;
+using _66SMS.Application.Features.Services.Commands.CreateServices;
+using _66SMS.Application.Features.Services.Commands.UpdateServices;
 using _66SMS.Application.Features.Shitfs.Commands.CreateShift;
 using _66SMS.Application.Features.Shitfs.Commands.CreateShiftPeriod;
 using _66SMS.Application.Features.Shitfs.Commands.UpdateShift;
+using _66SMS.Application.Features.Staffs.Commands.CreateStaff;
+using _66SMS.Application.Features.Staffs.Commands.UpdateStaff;
+using _66SMS.Application.Features.TimeSlots.Commands.CreateTimeSlot;
+using _66SMS.Application.Features.TimeSlots.Commands.UpdateTimeSlot;
 using _66SMS.Application.Features.Users.Commands.CreateUser;
 using _66SMS.Application.Features.Users.Commands.UpdateUser;
 using _66SMS.Application.Features.WorkSchedules.Commands.CreateWorkSchedule;
 using _66SMS.Application.Features.WorkSchedules.Commands.UpdateWorkSchedule;
-using _66SMS.Application.Features.ProductCategories.Commands.CreateProductCategories;
-using _66SMS.Application.Features.ProductCategories.Commands.UpdateProductCategories;
-using _66SMS.Application.DTOs.ProductCategories;
-using _66SMS.Application.Features.ProductImages.Commands.CreateProductImages;
-using _66SMS.Application.Features.ProductImages.Commands.UpdateProductImages;
-using _66SMS.Application.DTOs.ProductImages;
-using _66SMS.Application.Features.Products.Commands.CreateProducts;
-using _66SMS.Application.Features.Products.Commands.UpdateProducts;
-using _66SMS.Application.DTOs.Products;
-using _66SMS.Application.DTOs.ServiceCategories;
-using _66SMS.Application.DTOs.Services;
-using _66SMS.Application.DTOs.ServiceImages;
-using _66SMS.Application.DTOs.ServiceProducts;
-using _66SMS.Application.Features.ServiceCategories.Commands.CreateServiceCategories;
-using _66SMS.Application.Features.ServiceCategories.Commands.UpdateServiceCategories;
-using _66SMS.Application.Features.Services.Commands.CreateServices;
-using _66SMS.Application.Features.Services.Commands.UpdateServices;
-using _66SMS.Application.Features.ServiceImages.Commands.CreateServiceImages;
-using _66SMS.Application.Features.ServiceImages.Commands.UpdateServiceImages;
-using _66SMS.Application.DTOs.BookingRooms;
-using _66SMS.Application.DTOs.BookingPositions;
-using _66SMS.Application.Features.BookingRooms.Commands.CreateBookingRooms;
-using _66SMS.Application.Features.BookingRooms.Commands.UpdateBookingRooms;
-using _66SMS.Application.Features.BookingPositions.Commands.CreateBookingPositions;
-using _66SMS.Application.Features.BookingPositions.Commands.UpdateBookingPositions;
-using _66SMS.Application.DTOs.TimeSlots;
-using _66SMS.Application.Features.TimeSlots.Commands.CreateTimeSlot;
-using _66SMS.Application.Features.TimeSlots.Commands.UpdateTimeSlot;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using System.Linq.Expressions;
-using _66SMS.Application.DTOs.Appointments;
 
 namespace _66SMS.Application.Commons.Mappers
 {
@@ -308,6 +308,7 @@ namespace _66SMS.Application.Commons.Mappers
             CreateMap<Appointment, AppointmentDto>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
                 .ForMember(dest => dest.ServiceNames, opt => opt.MapFrom(src => src.Services != null ? src.Services.Select(x => x.Service != null ? x.Service.Name : "").ToList() : new List<string>()))
+                .ForMember(dest => dest.DepositPercent, opt => opt.MapFrom(src => src.DepositPercent ?? _66SMS.Application.Services.Appointments.AppointmentPaymentCalculator.DefaultDepositPercent))
                 .IgnoreNullValueTypes();
 
         }

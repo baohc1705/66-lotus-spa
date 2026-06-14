@@ -77,12 +77,15 @@ namespace _66SMS.Application.Features.Appointments.Commands.PayDepositWithWallet
 
                 // Trừ tiền ví
                 wallet.Balance -= depositAmount;
-                walletSqlRepository.Update(wallet);
+                if (wallet.Id > 0)
+                {
+                    walletSqlRepository.Update(wallet);
+                }
 
                 // Thêm transaction ví
                 var walletTx = new WalletTransaction
                 {
-                    WalletId = wallet.Id,
+                    Wallet = wallet,
                     Amount = -depositAmount,
                     BalanceAfter = wallet.Balance,
                     Type = WalletTransactionConst.TYPE_PAYMENT_FOR_APPOINTMENT,
@@ -117,6 +120,7 @@ namespace _66SMS.Application.Features.Appointments.Commands.PayDepositWithWallet
                     NewStatus = AppointmentConst.STATUS_CONFIRMED,
                     Note = "Thanh toán cọc bằng Ví thành công",
                     CreatedBy = request.UserId,
+                    ChangedBy = request.UserId,
                     CreatedAt = DateTime.UtcNow
                 });
 

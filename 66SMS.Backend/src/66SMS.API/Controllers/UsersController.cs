@@ -72,5 +72,27 @@ namespace _66SMS.API.Controllers
             Result<object> result = await mediator.Send(command);
             return HandleResult(result);
         }
+
+        [HttpGet("me/wallet")]
+        [Authorize]
+        public async Task<IActionResult> GetMyWallet()
+        {
+            var result = await mediator.Send(new Application.Features.Users.Queries.GetMyWallet.GetMyWalletQuery 
+            { 
+                UserId = jwtService.GetUserId() 
+            });
+            return HandleResult(result);
+        }
+
+        [HttpGet("me/wallet/transactions")]
+        [Authorize]
+        public async Task<IActionResult> GetMyWalletTransactions()
+        {
+            var result = await mediator.Send(new Application.Features.Users.Queries.GetMyWalletTransactions.GetMyWalletTransactionsQuery 
+            { 
+                UserId = jwtService.GetUserId() 
+            });
+            return HandleResult(result);
+        }
     }
 }

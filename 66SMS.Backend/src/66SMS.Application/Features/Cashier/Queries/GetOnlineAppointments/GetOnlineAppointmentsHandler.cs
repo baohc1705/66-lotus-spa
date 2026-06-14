@@ -1,14 +1,10 @@
 using _66SMS.Application.DTOs.Cashier;
+using _66SMS.Application.Services.Appointments;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using _66SMS.Application.Services.Appointments;
 
 namespace _66SMS.Application.Features.Cashier.Queries.GetOnlineAppointments
 {
@@ -20,9 +16,7 @@ namespace _66SMS.Application.Features.Cashier.Queries.GetOnlineAppointments
             GetOnlineAppointmentsQuery request,
             CancellationToken cancellationToken)
         {
-            // Get online appointments: ví dụ Appointment chưa có Staff (StaffId == null) hoặc Source là Online, v.v.
-            // Phỏng theo srcbev3: GetPendingOnlineBookingsAsync (chưa có nhân viên, hoặc từ kênh online)
-            // Giả sử lấy các Appointment có StaffId = null và Status không phải là Cancelled/Completed
+            
             var appointments = await appointmentRepository.AsQueryable()
                 .Include(a => a.CreatedByUser)
                     .ThenInclude(u => u.Customer)

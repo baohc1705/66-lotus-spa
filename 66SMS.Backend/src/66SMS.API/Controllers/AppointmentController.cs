@@ -1,7 +1,10 @@
 using _66SMS.API.Abstractions;
 using _66SMS.Application.Features.Appointments.Commands.CreateAppointment;
 using _66SMS.Application.Features.Appointments.Commands.CreateSlotLock;
+using _66SMS.Application.Features.Appointments.Commands.PayDepositWithWallet;
+using _66SMS.Application.Features.Appointments.Commands.PostponeAppointment;
 using _66SMS.Application.Features.Appointments.Queries.GetAllAppointment;
+using _66SMS.Application.Features.Appointments.Queries.GetDepositVnPayUrl;
 using _66SMS.Application.Features.Appointments.Queries.GetTechnicians;
 using _66SMS.Application.Features.Appointments.Queries.GetTimeSlots;
 using _66SMS.Contracts.Abstractions;
@@ -136,7 +139,7 @@ namespace _66SMS.API.Controllers
         {
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4()?.ToString() ?? "127.0.0.1";
             if (string.IsNullOrEmpty(ipAddress) || ipAddress == "0.0.0.0") ipAddress = "127.0.0.1";
-            var query = new _66SMS.Application.Features.Appointments.Queries.GetDepositVnPayUrl.GetDepositVnPayUrlQuery
+            var query = new GetDepositVnPayUrlQuery
             {
                 AppointmentId = id,
                 IpAddress = ipAddress
@@ -153,9 +156,10 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> PayDepositWithWallet(int id)
         {
-            var command = new _66SMS.Application.Features.Appointments.Commands.PayDepositWithWallet.PayDepositWithWalletCommand
+            var command = new PayDepositWithWalletCommand
             {
-                AppointmentId = id
+                AppointmentId = id,
+                UserId = jwtService.GetUserId()
             };
             var result = await mediator.Send(command);
             return HandleResult(result);
@@ -169,9 +173,10 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> PostponeAppointment(int id)
         {
-            var command = new _66SMS.Application.Features.Appointments.Commands.PostponeAppointment.PostponeAppointmentCommand
+            var command = new PostponeAppointmentCommand
             {
-                AppointmentId = id
+                AppointmentId = id,
+                UserId = jwtService.GetUserId()
             };
             var result = await mediator.Send(command);
             return HandleResult(result);

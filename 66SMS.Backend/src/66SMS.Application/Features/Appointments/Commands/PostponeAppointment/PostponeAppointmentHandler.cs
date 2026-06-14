@@ -96,11 +96,14 @@ namespace _66SMS.Application.Features.Appointments.Commands.PostponeAppointment
                     }
 
                     wallet.Balance += paidAmount;
-                    walletSqlRepository.Update(wallet);
+                    if (wallet.Id > 0)
+                    {
+                        walletSqlRepository.Update(wallet);
+                    }
 
                     var walletTx = new WalletTransaction
                     {
-                        WalletId = wallet.Id,
+                        Wallet = wallet,
                         Amount = paidAmount,
                         BalanceAfter = wallet.Balance,
                         Type = WalletTransactionConst.TYPE_REFUND_FROM_APPOINTMENT,
@@ -121,6 +124,7 @@ namespace _66SMS.Application.Features.Appointments.Commands.PostponeAppointment
                         ? $"Khách hàng hoãn lịch (tiền cọc {paidAmount:N0}đ đã được hoàn về ví)" 
                         : "Khách hàng hoãn lịch",
                     CreatedBy = request.UserId,
+                    ChangedBy = request.UserId,
                     CreatedAt = DateTime.UtcNow,
                 });
 

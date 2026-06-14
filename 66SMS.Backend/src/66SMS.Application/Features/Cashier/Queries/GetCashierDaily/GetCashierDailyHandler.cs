@@ -16,11 +16,13 @@ namespace _66SMS.Application.Features.Cashier.Queries.GetCashierDaily
     {
         private readonly IAppointmentSqlRepository appointmentRepository;
         private readonly IStaffSqlRepository staffRepository;
+        private readonly IWalletSqlRepository walletRepository;
 
-        public GetCashierDailyHandler(IAppointmentSqlRepository appointmentRepository, IStaffSqlRepository staffRepository)
+        public GetCashierDailyHandler(IAppointmentSqlRepository appointmentRepository, IStaffSqlRepository staffRepository, IWalletSqlRepository walletRepository)
         {
             this.appointmentRepository = appointmentRepository;
             this.staffRepository = staffRepository;
+            this.walletRepository = walletRepository;
         }
 
         public async Task<Result<CashierDailyDto>> Handle(GetCashierDailyQuery request, CancellationToken cancellationToken)
@@ -51,6 +53,16 @@ namespace _66SMS.Application.Features.Cashier.Queries.GetCashierDaily
                     .ThenInclude(s => s.Service)
                 .Where(a => a.AppointmentDate == request.Date)
                 .ToListAsync(cancellationToken);
+
+            var customerIds = appointments
+                .Where(a => a.CreatedByUser?.Customer != null)
+                .Select(a => a.CreatedByUser.Customer.Id)
+                .Distinct()
+                .ToList();
+
+            var walletBalances = await walletRepository.AsQueryable(asNoTracking: true)
+                .Where(w => customerIds.Contains(w.CustomerId))
+                .ToDictionaryAsync(w => w.CustomerId, w => w.Balance, cancellationToken);
 
             dto.Bookings = appointments.Select(a => {
                 string statusStr = "pending";
@@ -97,7 +109,8 @@ namespace _66SMS.Application.Features.Cashier.Queries.GetCashierDaily
                     RemainingAmount = a.TotalAmount - a.PaidAmount,
                     DepositPaid = AppointmentPaymentCalculator.HasDepositPaid(a),
                     DepositDeadlineAt = a.DepositDeadlineAt,
-                    Note = a.Note
+                    Note = a.Note,
+                    CustomerWalletBalance = a.CreatedByUser?.Customer != null && walletBalances.TryGetValue(a.CreatedByUser.Customer.Id, out var balance) ? balance : 0m
                 };
             }).ToList();
 

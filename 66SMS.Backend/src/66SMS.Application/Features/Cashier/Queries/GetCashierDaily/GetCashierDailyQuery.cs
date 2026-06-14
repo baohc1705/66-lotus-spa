@@ -1,7 +1,6 @@
 using _66SMS.Application.DTOs.Cashier;
 using _66SMS.Contracts.Shared;
 using MediatR;
-using System;
 
 namespace _66SMS.Application.Features.Cashier.Queries.GetCashierDaily
 {

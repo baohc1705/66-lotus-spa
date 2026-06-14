@@ -4,8 +4,6 @@ using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using MediatR;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.Features.Cashier.Queries.GetCashierVnPayUrl
