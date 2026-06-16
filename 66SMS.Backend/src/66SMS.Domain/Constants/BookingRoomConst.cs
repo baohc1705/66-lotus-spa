@@ -5,6 +5,7 @@ namespace _66SMS.Domain.Constants
         #region Database
         public const string TABLE_NAME = "booking_rooms";
         public const string FIELD_ID = "id";
+        public const string FIELD_SALON_ID = "salon_id";
         public const string FIELD_NAME = "name";
         public const string FIELD_IMAGE_URL = "image_url";
         public const string FIELD_NOTE = "note";

@@ -32,7 +32,9 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.UpdatedAt).HasColumnName(StaffConst.FIELD_UPDATED_AT);
             builder.Property(x => x.UpdatedBy).HasColumnName(StaffConst.FIELD_UPDATED_BY);
 
+            builder.Property(x => x.SalonId).HasColumnName(StaffConst.FIELD_SALON_ID);
             builder.HasOne(x => x.User).WithOne(x => x.Staff).HasForeignKey<Staff>(x => x.UserId).IsRequired(false);
+            builder.HasOne(x => x.Salon).WithMany(b => b.Staffs).HasForeignKey(x => x.SalonId).IsRequired(false);
             builder.ToTable(StaffConst.TABLE_NAME);
             builder.HasQueryFilter(x => x.Status != StaffConst.STATUS_DELETED);
         }

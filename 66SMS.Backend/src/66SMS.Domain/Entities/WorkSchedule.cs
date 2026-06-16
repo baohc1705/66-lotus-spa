@@ -5,6 +5,7 @@ namespace _66SMS.Domain.Entities
     public class WorkSchedule : EntityBase<int>
     {
         public int ShiftPeriodId { get; set; }
+        public int? SalonId { get; set; }
         public int StaffId { get; set; }
         public DateOnly WorkDate { get; set; }
         public int Status { get; set; }
@@ -16,5 +17,6 @@ namespace _66SMS.Domain.Entities
 
         public ShiftPeriod? ShiftPeriod { get; set; }
         public Staff? Staff { get; set; }
+        public Salon? Salon { get; set; }
     }
 }

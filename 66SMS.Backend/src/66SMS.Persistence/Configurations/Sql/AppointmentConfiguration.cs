@@ -42,6 +42,8 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.HasOne(x => x.Position).WithMany().HasForeignKey(x => x.PositionId).IsRequired(false);
             builder.HasOne(x => x.Schedule).WithMany().HasForeignKey(x => x.ScheduleId).IsRequired(false);
             builder.HasOne(x => x.Lock).WithMany().HasForeignKey(x => x.LockId).IsRequired(false);
+            builder.Property(x => x.SalonId).HasColumnName(AppointmentConst.FIELD_SALON_ID);
+            builder.HasOne(x => x.Salon).WithMany().HasForeignKey(x => x.SalonId).IsRequired(false);
 
             builder.ToTable(AppointmentConst.TABLE_NAME);
         }

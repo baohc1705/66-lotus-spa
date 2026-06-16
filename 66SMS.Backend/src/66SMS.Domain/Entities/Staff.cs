@@ -5,6 +5,7 @@ namespace _66SMS.Domain.Entities
     public class Staff : EntityBase<int>
     {
         public int UserId { get; set; }
+        public int? SalonId { get; set; }
         public string? Code { get; set; }
         public string FullName { get; set; }
         public string? AvatarUrl { get; set; }
@@ -27,5 +28,6 @@ namespace _66SMS.Domain.Entities
         public int? UpdatedBy { get; set; }
 
         public User? User { get; set; }
+        public Salon? Salon { get; set; }
     }
 }

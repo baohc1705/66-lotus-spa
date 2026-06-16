@@ -22,6 +22,8 @@ namespace _66SMS.Persistence.Configurations.Sql
 
             builder.HasOne(x => x.ShiftPeriod).WithMany(x => x.WorkSchedules).HasForeignKey(x => x.ShiftPeriodId).IsRequired();
             builder.HasOne(x => x.Staff).WithMany().HasForeignKey(x => x.StaffId).IsRequired();
+            builder.Property(x => x.SalonId).HasColumnName(WorkScheduleConst.FIELD_SALON_ID);
+            builder.HasOne(x => x.Salon).WithMany().HasForeignKey(x => x.SalonId).IsRequired(false);
 
             builder.ToTable(WorkScheduleConst.TABLE_NAME);
             builder.HasQueryFilter(x => x.Status != WorkScheduleConst.STATUS_DELETED);

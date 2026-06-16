@@ -50,6 +50,9 @@ using _66SMS.Application.Features.MembershipCards.Commands.CreateMembershipCards
 using _66SMS.Application.Features.MembershipCards.Commands.UpdateMembershipCards;
 using _66SMS.Application.Features.MembershipTiers.Commands.CreateMembershipTiers;
 using _66SMS.Application.Features.MembershipTiers.Commands.UpdateMembershipTiers;
+using _66SMS.Application.DTOs.Salons;
+using _66SMS.Application.Features.Salons.Commands.CreateSalon;
+using _66SMS.Application.Features.Salons.Commands.UpdateSalon;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Entities;
 using AutoMapper;
@@ -341,6 +344,16 @@ namespace _66SMS.Application.Commons.Mappers
                 .ForMember(dest => dest.ExpiresAt, opt => opt.MapFrom(src => src.ExpiresAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .IgnoreNullValueTypes();
+
+            // Salon
+            CreateMap<CreateSalonCommand, Salon>().IgnoreNullValueTypes();
+            CreateMap<UpdateSalonCommand, Salon>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<Salon, SalonDto>()
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt != null ? src.UpdatedAt.Value.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss") : null))
                 .IgnoreNullValueTypes();
         }
     }

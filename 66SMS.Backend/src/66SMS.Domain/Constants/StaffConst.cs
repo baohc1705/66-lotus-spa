@@ -6,6 +6,7 @@ namespace _66SMS.Domain.Constants
         public const string TABLE_NAME = "staffs";
         public const string FIELD_ID = "id";
         public const string FIELD_USER_ID = "user_id";
+        public const string FIELD_SALON_ID = "salon_id";
         public const string FIELD_CODE = "code";
         public const string FIELD_FULL_NAME = "full_name";
         public const string FIELD_AVATAR_URL = "avatar_url";

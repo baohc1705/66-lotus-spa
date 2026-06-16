@@ -115,5 +115,13 @@ namespace _66SMS.Contracts.Enumerations
         ERR_TIME_SLOT_NOT_FOUND,
         ERR_TIME_SLOT_INVALID,
         #endregion
+
+        #region Salon
+        ERR_SALON_NOT_FOUND,
+        ERR_SALON_INVALID,
+        ERR_SALON_CODE_EXISTED,
+        ERR_STAFF_SALON_NOT_FOUND,
+        ERR_STAFF_SALON_INVALID,
+        #endregion
     }
 }

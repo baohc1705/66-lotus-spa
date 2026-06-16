@@ -64,6 +64,9 @@ namespace _66SMS.Persistence.DependencyInjection
 
             services.AddScoped<ITimeSlotSqlRepository, TimeSlotSqlRepository>();
             services.AddScoped<IBookingContextProvider, BookingContextProvider>();
+
+            services.AddScoped<ISalonSqlRepository, SalonSqlRepository>();
+            services.AddScoped<IStaffSalonSqlRepository, StaffSalonSqlRepository>();
             return services;
         }
     }

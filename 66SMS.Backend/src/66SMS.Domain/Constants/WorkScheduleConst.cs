@@ -5,6 +5,7 @@ namespace _66SMS.Domain.Constants
         #region Database
         public const string TABLE_NAME = "work_schedules";
         public const string FIELD_ID = "id";
+        public const string FIELD_SALON_ID = "salon_id";
         public const string FIELD_SHIFT_PERIOD_ID = "shift_period_id";
         public const string FIELD_STAFF_ID = "staff_id";
         public const string FIELD_WORK_DATE = "work_date";
