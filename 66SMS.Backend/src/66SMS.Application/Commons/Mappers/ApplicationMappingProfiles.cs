@@ -44,6 +44,12 @@ using _66SMS.Application.Features.Users.Commands.CreateUser;
 using _66SMS.Application.Features.Users.Commands.UpdateUser;
 using _66SMS.Application.Features.WorkSchedules.Commands.CreateWorkSchedule;
 using _66SMS.Application.Features.WorkSchedules.Commands.UpdateWorkSchedule;
+using _66SMS.Application.DTOs.MembershipCards;
+using _66SMS.Application.DTOs.MembershipTiers;
+using _66SMS.Application.Features.MembershipCards.Commands.CreateMembershipCards;
+using _66SMS.Application.Features.MembershipCards.Commands.UpdateMembershipCards;
+using _66SMS.Application.Features.MembershipTiers.Commands.CreateMembershipTiers;
+using _66SMS.Application.Features.MembershipTiers.Commands.UpdateMembershipTiers;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Entities;
 using AutoMapper;
@@ -311,6 +317,31 @@ namespace _66SMS.Application.Commons.Mappers
                 .ForMember(dest => dest.DepositPercent, opt => opt.MapFrom(src => src.DepositPercent ?? _66SMS.Application.Services.Appointments.AppointmentPaymentCalculator.DefaultDepositPercent))
                 .IgnoreNullValueTypes();
 
+            // MembershipTier mappings
+            CreateMap<CreateMembershipTierCommand, MembershipTier>()
+                .IgnoreNullValueTypes();
+            CreateMap<UpdateMembershipTierCommand, MembershipTier>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<MembershipTier, MembershipTierDto>()
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .IgnoreNullValueTypes();
+
+            // MembershipCard mappings
+            CreateMap<CreateMembershipCardCommand, MembershipCard>()
+                .IgnoreNullValueTypes();
+            CreateMap<UpdateMembershipCardCommand, MembershipCard>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<MembershipCard, MembershipCardDto>()
+                .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer != null ? src.Customer.FullName : null))
+                .ForMember(dest => dest.TierName, opt => opt.MapFrom(src => src.Tier != null ? src.Tier.Name : null))
+                .ForMember(dest => dest.IssuedAt, opt => opt.MapFrom(src => src.IssuedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.ExpiresAt, opt => opt.MapFrom(src => src.ExpiresAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .IgnoreNullValueTypes();
         }
     }
 

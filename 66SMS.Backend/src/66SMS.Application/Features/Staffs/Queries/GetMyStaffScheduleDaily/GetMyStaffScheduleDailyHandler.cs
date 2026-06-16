@@ -71,14 +71,19 @@ namespace _66SMS.Application.Features.Staffs.Queries.GetMyStaffScheduleDaily
             var serviceName = string.Join(", ", serviceNames);
             if (string.IsNullOrEmpty(serviceName)) serviceName = "Dịch vụ";
 
+            var durationMins = a.Services?.Sum(s => s.Service?.DurationMins ?? 0) ?? 0;
+            if (durationMins == 0) durationMins = 15;
+            var startTs = a.TimeSlot?.StartTime ?? new TimeOnly(0, 0);
+            var endTs = startTs.AddMinutes(durationMins);
+
             return new StaffScheduleBookingDto
             {
                 Id = a.Id.ToString(),
                 CustomerName = a.CreatedByUser?.Customer?.FullName ?? "Khách hàng",
                 CustomerPhone = a.CreatedByUser?.Customer?.Phone ?? "",
                 ServiceName = serviceName,
-                StartTime = a.TimeSlot?.StartTime.ToString(@"HH\:mm") ?? "00:00",
-                EndTime = a.TimeSlot?.EndTime.ToString(@"HH\:mm") ?? "00:00",
+                StartTime = startTs.ToString(@"HH\:mm"),
+                EndTime = endTs.ToString(@"HH\:mm"),
                 Status = statusStr,
                 TotalAmount = a.TotalAmount,
                 Note = a.Note

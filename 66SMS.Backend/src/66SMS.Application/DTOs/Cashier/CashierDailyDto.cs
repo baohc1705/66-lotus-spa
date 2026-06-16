@@ -17,7 +17,7 @@ namespace _66SMS.Application.DTOs.Cashier
         public string? CustomerAvatar { get; set; }
         public string? BookingDate { get; set; }
         public string ServiceName { get; set; }
-        public string StaffId { get; set; }
+        public int StaffId { get; set; }
         public string StaffName { get; set; }
         public string StartTime { get; set; }
         public string EndTime { get; set; }

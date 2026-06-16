@@ -90,6 +90,11 @@ namespace _66SMS.Application.Features.Cashier.Queries.GetCashierDaily
                     serviceName = string.Join(", ", a.Services.Where(s => s.Service != null).Select(s => s.Service?.Name));
                 }
 
+                var durationMins = a.Services?.Sum(s => s.Service?.DurationMins ?? 0) ?? 0;
+                if (durationMins == 0) durationMins = 15;
+                var startTs = a.TimeSlot?.StartTime ?? new TimeOnly(0, 0);
+                var endTs = startTs.AddMinutes(durationMins);
+
                 return new CashierBookingDto
                 {
                     Id = a.Id.ToString(),
@@ -98,10 +103,10 @@ namespace _66SMS.Application.Features.Cashier.Queries.GetCashierDaily
                     CustomerAvatar = a.CreatedByUser?.Customer?.AvatarUrl,
                     BookingDate = a.AppointmentDate.ToString("yyyy-MM-dd"),
                     ServiceName = serviceName,
-                    StaffId = a.StaffId.ToString(),
+                    StaffId = a.StaffId,
                     StaffName = a.Staff?.FullName ?? "N/A",
-                    StartTime = a.TimeSlot?.StartTime.ToString("HH:mm") ?? "00:00",
-                    EndTime = a.TimeSlot?.EndTime.ToString("HH:mm") ?? "00:00",
+                    StartTime = startTs.ToString("HH:mm"),
+                    EndTime = endTs.ToString("HH:mm"),
                     Status = statusStr,
                     TotalAmount = a.TotalAmount,
                     PaidAmount = a.PaidAmount,

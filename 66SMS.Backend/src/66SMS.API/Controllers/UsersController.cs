@@ -94,5 +94,16 @@ namespace _66SMS.API.Controllers
             });
             return HandleResult(result);
         }
+
+        [HttpGet("me/membership-card")]
+        [Authorize]
+        public async Task<IActionResult> GetMyMembershipCard()
+        {
+            var result = await mediator.Send(new Application.Features.Users.Queries.GetMyMembershipCard.GetMyMembershipCardQuery 
+            { 
+                UserId = jwtService.GetUserId() 
+            });
+            return HandleResult(result);
+        }
     }
 }
