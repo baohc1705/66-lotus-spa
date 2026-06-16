@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ProfileSidebar } from "../components/ProfileSidebar";
 import { ProfileForm } from "../components/ProfileForm";
 import { SecurityForm } from "../components/SecurityForm";
+import { ProfileHeaderBanner } from "../components/ProfileHeaderBanner";
+import { HorizontalTabBar } from "../components/HorizontalTabBar";
+import { MembershipPanel } from "../components/MembershipPanel";
 import { useProfile } from "../hooks/useProfile";
 import { MyBookingsPanel } from '@/features/booking/components/MyBookingsPanel'
 import { useAuthStore } from "@/features/auth/stores/authStore";
@@ -12,6 +15,7 @@ import { MyWalletPanel } from "../components/MyWalletPanel";
 import { Loader2 } from "lucide-react";
 
 const VALID_TABS = [
+  "membership",
   "bookings",
   "profile",
   "security",
@@ -20,36 +24,30 @@ const VALID_TABS = [
 ] as const;
 
 export function ProfilePage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const tabFromUrl = searchParams.get("tab");
-  const initialTab =
-    tabFromUrl && VALID_TABS.includes(tabFromUrl as (typeof VALID_TABS)[number])
-      ? tabFromUrl
-      : "profile";
-  const [activeTab, setActiveTab] = useState(initialTab);
   const isAuthenticated = useAuthStore((s) => !!s.accessToken);
   const { data: profile, isLoading, isError } = useProfile();
+  const [activeTab, setActiveTab] = useState<string>("");
+
+  // Sync active tab state based on URL param or profile type
+  useEffect(() => {
+    if (tabFromUrl && VALID_TABS.includes(tabFromUrl as any)) {
+      setActiveTab(tabFromUrl);
+    } else if (profile) {
+      setActiveTab(profile.profileType === "Customer" ? "membership" : "profile");
+    }
+  }, [profile, tabFromUrl]);
+
+  // Update search param when active tab changes
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setSearchParams({ tab });
+  };
+
+  const isCustomer = profile?.profileType === "Customer";
 
   const renderContent = () => {
-    if (activeTab === "bookings") {
-      if (!isAuthenticated) {
-        return (
-          <div className="text-center py-16">
-            <p className="text-lotus-stone mb-4">
-              Đăng nhập để xem các lịch hẹn đã đặt trên tài khoản của bạn.
-            </p>
-            <Link
-              to="/dang-nhap"
-              className="text-lotus-rose font-semibold hover:underline"
-            >
-              Đăng nhập
-            </Link>
-          </div>
-        );
-      }
-      return <MyBookingsPanel />;
-    }
-
     if (isLoading) {
       return (
         <div className="h-full flex items-center justify-center py-20">
@@ -75,8 +73,28 @@ export function ProfilePage() {
       );
     }
 
+    if (activeTab === "bookings") {
+      if (!isAuthenticated) {
+        return (
+          <div className="text-center py-16">
+            <p className="text-lotus-stone mb-4">
+              Đăng nhập để xem các lịch hẹn đã đặt trên tài khoản của bạn.
+            </p>
+            <Link
+              to="/dang-nhap"
+              className="text-lotus-rose font-semibold hover:underline"
+            >
+              Đăng nhập
+            </Link>
+          </div>
+        );
+      }
+      return <MyBookingsPanel />;
+    }
+
     return (
       <>
+        {activeTab === "membership" && <MembershipPanel profile={profile} />}
         {activeTab === "profile" && <ProfileForm initialData={profile} />}
         {activeTab === "security" && <SecurityForm />}
         {activeTab === "wallet" && <MyWalletPanel />}
@@ -96,44 +114,44 @@ export function ProfilePage() {
       {/* Radiant Gradient (Cánh sen sang Nhị sen từ trên xuống) */}
       <div className="fixed inset-0 pointer-events-none bg-gradient-to-b from-lotus-rose/15 to-lotus-gold/15" />
       
-      <div className="relative z-10">
+      <div className="relative z-10 flex flex-col min-h-screen">
         <Navbar alwaysDark />
 
-        {/* Hero Header */}
-        <div className="pt-32 pb-20 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-lotus-rose/20 rounded-full blur-[80px] -mr-32 -mt-32" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-lotus-gold/20 rounded-full blur-[80px] -ml-48 -mb-48" />
+        <div className="flex-grow pt-28 pb-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            {/* Header Banner */}
+            <ProfileHeaderBanner profile={profile} />
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-            <h1
-              className="text-4xl md:text-5xl font-bold text-lotus-deep mb-4"
-              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
-            >
-              Tài khoản của tôi
-            </h1>
-          <p className="text-lotus-stone max-w-2xl">
-            Quản lý thông tin cá nhân, bảo mật và các tùy chọn trải nghiệm của
-            bạn tại Hoa Sen Spa.
-          </p>
-        </div>
-      </div>
+            {/* Horizontal Navigation Tab Bar */}
+            <HorizontalTabBar 
+              activeTab={activeTab} 
+              onTabChange={handleTabChange} 
+              isCustomer={isCustomer}
+            />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 pb-20 relative z-10">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar */}
-          <ProfileSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+            {/* Main content Area: Sidebar + Content Panel */}
+            <div className="flex flex-col lg:flex-row gap-8">
+              {/* Sidebar (Vertical Menu - stays visible on desktop, tab-sync is automatically handled) */}
+              <ProfileSidebar 
+                activeTab={activeTab} 
+                onTabChange={handleTabChange} 
+                isCustomer={isCustomer}
+              />
 
-          {/* Content Area */}
-          <div className="flex-1 bg-white rounded-b-2xl rounded-t-none border border-gray-100 shadow-sm min-h-[500px] relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-lotus-rose/80 via-lotus-rose/70 to-lotus-gold/80" />
-            <div className="p-6 md:p-10">
-              {renderContent()}
+              {/* Main Content Area */}
+              <div className="flex-1 bg-white rounded-2xl border border-gray-100 shadow-sm min-h-[500px] relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-lotus-rose/80 via-lotus-rose/70 to-lotus-gold/80" />
+                <div className="p-6 md:p-8">
+                  {renderContent()}
+                </div>
+              </div>
             </div>
+
           </div>
         </div>
-      </main>
 
-      <FooterSection />
+        <FooterSection />
       </div>
     </div>
   );

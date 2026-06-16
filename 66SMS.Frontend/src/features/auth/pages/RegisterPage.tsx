@@ -5,7 +5,7 @@ import {
   Users,
 } from "lucide-react";
 import { Logo } from "@/shared/components/Logo";
-import { LoginForm } from "@/features/auth/components/LoginForm";
+import { RegisterForm } from "@/features/auth/components/RegisterForm";
 import { Link } from "react-router-dom";
 
 const features = [
@@ -37,7 +37,7 @@ const stats = [
   { value: "98%", label: "Hài lòng" },
 ];
 
-export const LoginPage = () => (
+export const RegisterPage = () => (
   <div className="min-h-screen flex">
     <div
       className="hidden lg:flex lg:w-[52%] flex-col justify-between p-12 relative overflow-hidden"
@@ -147,32 +147,32 @@ export const LoginPage = () => (
       </div>
 
       <div className="w-full max-w-md">
-        <div className="mb-8">
+        <div className="mb-6">
           <h2
             className="text-3xl font-bold text-[var(--spa-ui-text)] mb-2 font-serif"
             style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
           >
-            Chào mừng trở lại
+            Tạo tài khoản mới
           </h2>
           <p className="text-[var(--spa-ui-text-muted)] text-sm">
-            Đăng nhập tài khoản hệ thống Lotus Spa
+            Đăng ký để trải nghiệm dịch vụ tại Lotus Spa
           </p>
         </div>
 
-        <LoginForm />
+        <RegisterForm />
 
         <div className="mt-6 text-center text-sm">
-          <span className="text-[var(--spa-ui-text-muted)]">Chưa có tài khoản? </span>
+          <span className="text-[var(--spa-ui-text-muted)]">Đã có tài khoản? </span>
           <Link
-            to="/register"
+            to="/login"
             className="font-semibold text-[var(--spa-rose)] hover:text-[var(--spa-rose-hover)] transition-colors"
           >
-            Đăng ký ngay
+            Đăng nhập ngay
           </Link>
         </div>
       </div>
 
-      <div className="mt-12 text-center text-xs text-[var(--spa-ui-text-muted)]">
+      <div className="mt-8 text-center text-xs text-[var(--spa-ui-text-muted)]">
         <p>© 2026 Lotus Spa. Bảo lưu mọi quyền.</p>
       </div>
     </div>

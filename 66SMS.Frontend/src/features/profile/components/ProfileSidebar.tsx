@@ -1,21 +1,14 @@
-import { User, Shield, Wallet, Bell, LogOut, Calendar } from 'lucide-react'
+import { User, Shield, Wallet, Bell, LogOut, Calendar, Award } from 'lucide-react'
 import { useAuthStore } from '@/features/auth/stores/authStore'
 import { useNavigate } from 'react-router-dom'
 
 interface ProfileSidebarProps {
   activeTab: string
   onTabChange: (tab: string) => void
+  isCustomer?: boolean
 }
 
-const menuItems = [
-  { id: 'bookings', label: 'Lịch hẹn', icon: Calendar },
-  { id: 'profile', label: 'Hồ sơ', icon: User },
-  { id: 'security', label: 'Bảo mật', icon: Shield },
-  { id: 'wallet', label: 'Ví của tôi', icon: Wallet },
-  { id: 'notifications', label: 'Thông báo', icon: Bell },
-]
-
-export function ProfileSidebar({ activeTab, onTabChange }: ProfileSidebarProps) {
+export function ProfileSidebar({ activeTab, onTabChange, isCustomer = false }: ProfileSidebarProps) {
   const clearAuth = useAuthStore((state) => state.clearAuth)
   const navigate = useNavigate()
 
@@ -23,6 +16,15 @@ export function ProfileSidebar({ activeTab, onTabChange }: ProfileSidebarProps) 
     clearAuth()
     navigate('/')
   }
+
+  const menuItems = [
+    ...(isCustomer ? [{ id: 'membership', label: 'Hạng thành viên', icon: Award }] : []),
+    { id: 'bookings', label: 'Lịch hẹn', icon: Calendar },
+    { id: 'profile', label: 'Hồ sơ', icon: User },
+    { id: 'security', label: 'Bảo mật', icon: Shield },
+    { id: 'wallet', label: 'Ví của tôi', icon: Wallet },
+    { id: 'notifications', label: 'Thông báo', icon: Bell },
+  ]
 
   return (
     <div className="w-full lg:w-64 space-y-2">

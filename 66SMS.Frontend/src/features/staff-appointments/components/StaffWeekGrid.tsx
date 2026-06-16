@@ -19,23 +19,23 @@ function timeToMins(t: string) {
 function statusStyles(status: string) {
   switch (status) {
     case "in-progress":
-      return "bg-status-in-progress/10 border-status-in-progress/30 text-status-in-progress";
+      return "bg-sky-50 border-sky-300 text-sky-600";
     case "not-arrived":
-      return "bg-status-cancelled/10 border-status-cancelled/30 text-status-cancelled";
+      return "bg-red-50 border-red-300 text-red-600";
     case "waiting":
-      return "bg-status-waiting/10 border-status-waiting/30 text-status-waiting";
+      return "bg-yellow-50 border-yellow-300 text-yellow-600";
     case "completed":
     case "paid":
-      return "bg-status-completed/10 border-status-completed/30 text-status-completed";
+      return "bg-emerald-50 border-emerald-300 text-emerald-600";
     case "unpaid":
-      return "bg-lotus-rose/10 border-lotus-rose/30 text-lotus-rose";
+      return "bg-rose-50 border-rose-300 text-rose-600";
     case "cancelled":
-      return "bg-status-cancelled/10 border-status-cancelled/30 text-status-cancelled";
+      return "bg-slate-50 border-slate-300 text-slate-600";
     case "confirmed":
-      return "bg-status-confirmed/10 border-status-confirmed/30 text-status-confirmed";
+      return "bg-blue-50 border-blue-300 text-blue-600";
     case "pending":
     default:
-      return "bg-status-pending/10 border-status-pending/30 text-status-pending";
+      return "bg-amber-50 border-amber-300 text-amber-600";
   }
 }
 

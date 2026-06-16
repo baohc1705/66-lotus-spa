@@ -26,7 +26,7 @@ export function useCashierData(date: Date) {
     staleTime: 30_000,
   })
 
-  const moveBooking = (bookingId: string, newStaffId: string, newStartTime: string) => {
+  const moveBooking = (bookingId: string, newStaffId: number, newStartTime: string) => {
     queryClient.setQueryData(['cashier-daily', date.toDateString()], (old: any) => {
       if (!old) return old
       const newBookings = old.bookings.map((b: CashierBooking) => {

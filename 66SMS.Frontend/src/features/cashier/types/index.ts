@@ -16,7 +16,7 @@ export interface CashierBooking {
   customerAvatar?: string
   bookingDate?: string
   serviceName: string
-  staffId: string
+  staffId: number
   staffName: string
   startTime: string // ISO string or HH:mm
   endTime: string

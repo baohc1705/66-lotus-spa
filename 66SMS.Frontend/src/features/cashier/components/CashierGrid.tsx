@@ -8,10 +8,10 @@ interface CashierGridProps {
   columns: StaffColumn[];
   bookings: CashierBooking[];
   onBookingClick: (booking: CashierBooking) => void;
-  onEmptySlotClick?: (staffId: string, time: string) => void;
+  onEmptySlotClick?: (staffId: number, time: string) => void;
   onBookingMove?: (
     bookingId: string,
-    newStaffId: string,
+    newStaffId: number,
     newStartTime: string,
   ) => void;
 }
@@ -156,22 +156,28 @@ export function CashierGrid({
     e.dataTransfer.dropEffect = "move";
   };
 
-  const handleDrop = (e: React.DragEvent, staffId: string) => {
+  const handleDrop = (e: React.DragEvent, staffId: number) => {
     e.preventDefault();
+
     const bookingId = e.dataTransfer.getData("bookingId");
     if (!bookingId || !onBookingMove) return;
 
-    const rect = e.currentTarget.getBoundingClientRect();
+    // Lấy vị trí thả
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const y = e.clientY - rect.top;
-    const HOUR_HEIGHT = 120;
 
-    const totalHours = y / HOUR_HEIGHT + 8;
-    const snappedHours = Math.round(totalHours * 4) / 4;
+    // Tính toán thời gian mới dựa trên vị trí Y
+    // Mỗi slot là 30px = 15 phút => 1px = 0.5 phút
+    const minutesFrom8 = Math.floor((y / SLOT_HEIGHT) * 15);
+    const newStartMins = 8 * 60 + minutesFrom8;
 
-    const hour = Math.floor(snappedHours);
-    const min = Math.round((snappedHours - hour) * 60);
+    // Làm tròn thời gian thả (nếu cần) - ví dụ làm tròn thành các mốc 15 phút
+    const roundedMins = Math.round(newStartMins / 15) * 15;
 
-    const newStartTime = `${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
+    const hours = Math.floor(roundedMins / 60);
+    const mins = roundedMins % 60;
+    const newStartTime = `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}`;
+
     onBookingMove(bookingId, staffId, newStartTime);
   };
 
@@ -216,7 +222,7 @@ export function CashierGrid({
           )}
 
           {columns.map((col) => {
-            const colBookings = bookings.filter((b) => b.staffId === col.id);
+            const colBookings = bookings.filter((b) => b.staffId.toString() === col.id.toString());
 
             return (
               <div
@@ -246,7 +252,7 @@ export function CashierGrid({
                   className="relative bg-white border-lotus-gold/20"
                   style={{ height: `${HOURS.length * 120}px` }}
                   onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, col.id)}
+                  onDrop={(e) => handleDrop(e, Number(col.id))}
                 >
                   <div className="absolute inset-0 flex flex-col pointer-events-none">
                     {HOURS.map((hour) => (
@@ -260,7 +266,7 @@ export function CashierGrid({
                             className="flex-1 border-b border-lotus-gold/10 border-dashed border-opacity-40 last:border-0 relative group pointer-events-auto cursor-crosshair hover:bg-lotus-leaf/5 transition-colors"
                             onClick={() =>
                               onEmptySlotClick?.(
-                                col.id,
+                                Number(col.id),
                                 `${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`,
                               )
                             }
@@ -307,36 +313,36 @@ export function CashierGrid({
 
                           switch (booking.status) {
                             case "in-progress":
-                              statusColor = "bg-status-in-progress/10 border-status-in-progress/30 text-status-in-progress";
+                              statusColor = "bg-sky-50 border-sky-300 text-sky-600";
                               statusBadge = "bg-status-in-progress";
                               break;
                             case "not-arrived":
-                              statusColor = "bg-status-cancelled/10 border-status-cancelled/30 text-status-cancelled";
+                              statusColor = "bg-red-50 border-red-300 text-red-600";
                               statusBadge = "bg-status-cancelled";
                               break;
                             case "waiting":
-                              statusColor = "bg-status-waiting/10 border-status-waiting/30 text-status-waiting";
+                              statusColor = "bg-yellow-50 border-yellow-300 text-yellow-600";
                               statusBadge = "bg-status-waiting";
                               break;
                             case "pending":
-                              statusColor = "bg-status-pending/10 border-status-pending/30 text-status-pending";
+                              statusColor = "bg-amber-50 border-amber-300 text-amber-600";
                               statusBadge = "bg-status-pending";
                               break;
                             case "confirmed":
-                              statusColor = "bg-status-confirmed/10 border-status-confirmed/30 text-status-confirmed";
+                              statusColor = "bg-blue-50 border-blue-300 text-blue-600";
                               statusBadge = "bg-status-confirmed";
                               break;
                             case "unpaid":
-                              statusColor = "bg-lotus-rose/10 border-lotus-rose/30 text-lotus-rose";
+                              statusColor = "bg-rose-50 border-rose-300 text-rose-600";
                               statusBadge = "bg-lotus-rose animate-pulse";
                               break;
                             case "paid":
                             case "completed":
-                              statusColor = "bg-status-completed/10 border-status-completed/30 text-status-completed";
+                              statusColor = "bg-emerald-50 border-emerald-300 text-emerald-600";
                               statusBadge = "bg-status-completed";
                               break;
                             case "cancelled":
-                              statusColor = "bg-status-cancelled/10 border-status-cancelled/30 text-status-cancelled";
+                              statusColor = "bg-slate-50 border-slate-300 text-slate-600";
                               statusBadge = "bg-status-cancelled";
                               break;
                           }

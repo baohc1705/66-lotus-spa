@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { BookingPage } from "@/features/booking/pages/BookingPage";
 import { HomePage } from "@/features/landing/pages/HomePage";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
+import { RegisterPage } from "@/features/auth/pages/RegisterPage";
 import { UsersPage } from "@/features/users/pages/UsersPage";
 import { ProfilePage } from "@/features/profile";
 import { ProtectedRoute } from "./ProtectedRoute";
@@ -13,6 +14,8 @@ import {
 import { StaffListPage } from "@/features/staffs/pages/StaffListPage";
 import { StaffAppointmentsPage } from "@/features/staff-appointments";
 import { CustomerListPage } from "@/features/customers/pages/CustomerListPage";
+import { MembershipCardListPage } from "@/features/customers/pages/MembershipCardListPage";
+import { MembershipTierListPage } from "@/features/customers/pages/MembershipTierListPage";
 import { ProductListPage } from "@/features/products/pages/ProductListPage";
 import { ProductCategoryListPage } from "@/features/product_categories/pages/ProductCategoryListPage";
 import { ShiftListPage } from "@/features/shifts/pages/ShiftListPage";
@@ -38,6 +41,10 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
   },
   {
     path: "/thanh-toan/vnpay-return",
@@ -85,6 +92,14 @@ export const router = createBrowserRouter([
           {
             path: "customers/list",
             element: <CustomerListPage />,
+          },
+          {
+            path: "customers/membership-cards",
+            element: <MembershipCardListPage />,
+          },
+          {
+            path: "customers/membership-tiers",
+            element: <MembershipTierListPage />,
           },
           {
             path: "products/list",

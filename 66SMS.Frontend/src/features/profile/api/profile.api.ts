@@ -1,5 +1,6 @@
 import axiosInstance from "@/shared/api/axiosInstance";
 import type { Result } from "@/shared/types/common.types";
+import type { MembershipCardDto } from "@/features/customers/types/membershipCard.types";
 import type {
   ProfileResponse,
   UpdateProfileRequest,
@@ -23,6 +24,11 @@ export const profileApi = {
       "/auth/change-password",
       body,
     );
+    return data;
+  },
+
+  getMyMembershipCard: async () => {
+    const { data } = await axiosInstance.get<Result<MembershipCardDto>>("/users/me/membership-card");
     return data;
   },
 };

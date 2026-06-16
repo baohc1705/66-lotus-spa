@@ -56,7 +56,7 @@ export function CashierPage() {
 
   const handleBookingMove = (
     bookingId: string,
-    newStaffId: string,
+    newStaffId: number,
     newStartTime: string,
   ) => {
     moveBooking(bookingId, newStaffId, newStartTime);

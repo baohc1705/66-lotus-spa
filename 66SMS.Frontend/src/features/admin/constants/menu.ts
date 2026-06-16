@@ -15,6 +15,8 @@ import {
   MapPin,
   CalendarHeart,
   Wallet,
+  CreditCard,
+  Crown,
 } from "lucide-react";
 
 export interface SubMenuItem {
@@ -94,6 +96,8 @@ export const MENU_ITEMS: MenuItem[] = [
     children: [
       { label: "Khách hàng", path: "/admin/customers/list", icon: Users },
       { label: "Ví khách hàng", path: "/admin/customers/wallets", icon: Wallet },
+      { label: "Thẻ thành viên", path: "/admin/customers/membership-cards", icon: CreditCard },
+      { label: "Loại thẻ", path: "/admin/customers/membership-tiers", icon: Crown },
     ],
   },
 ];
