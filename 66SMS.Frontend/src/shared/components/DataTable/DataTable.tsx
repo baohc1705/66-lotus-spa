@@ -105,7 +105,7 @@ export function DataTable<TData>({
                   ))}
                 </TableRow>
                 {row.getIsExpanded() && renderSubComponent && (
-                  <TableRow className="bg-stone-50/30 hover:bg-stone-50/30 border-x-2 border-b-2 border-t-0 border-lotus-leaf relative z-10 shadow-sm">
+                  <TableRow className="bg-stone-50/30 hover:bg-stone-50/30 !border-x-2 !border-b-2 border-t-0 border-lotus-leaf relative z-10 shadow-sm">
                     <TableCell colSpan={row.getVisibleCells().length} className="p-0 border-b-0">
                       {renderSubComponent({ row })}
                     </TableCell>

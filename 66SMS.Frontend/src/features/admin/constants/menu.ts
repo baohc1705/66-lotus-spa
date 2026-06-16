@@ -17,6 +17,7 @@ import {
   Wallet,
   CreditCard,
   Crown,
+  Building2,
 } from "lucide-react";
 
 export interface SubMenuItem {
@@ -34,6 +35,7 @@ export interface MenuItem {
 
 export const MENU_ITEMS: MenuItem[] = [
   { label: "Tổng quan", path: "/admin", icon: LayoutDashboard },
+  { label: "Chi nhánh", path: "/admin/salons", icon: Building2 },
   {
     label: "Phòng",
     icon: Armchair,

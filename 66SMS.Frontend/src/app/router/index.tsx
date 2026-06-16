@@ -28,6 +28,7 @@ import { TimeSlotListPage } from "@/features/time_slots/pages/TimeSlotListPage";
 import { CashierPage } from "@/features/cashier/pages/CashierPage";
 import { VnPayReturnPage } from "@/features/cashier/pages/VnPayReturnPage";
 import { WalletManagementPage } from "@/features/wallet/pages/WalletManagementPage";
+import { SalonListPage } from "@/features/salons/pages/SalonListPage";
 
 export const router = createBrowserRouter([
   {
@@ -140,6 +141,10 @@ export const router = createBrowserRouter([
           {
             path: "customers/wallets",
             element: <WalletManagementPage />,
+          },
+          {
+            path: "salons",
+            element: <SalonListPage />,
           },
           // Placeholders for other admin routes
         ],
