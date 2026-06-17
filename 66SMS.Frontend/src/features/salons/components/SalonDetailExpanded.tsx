@@ -1,10 +1,11 @@
-import { Building2, Pencil, Phone, Mail, MapPin, Calendar, Hash, FileText } from 'lucide-react'
+import { Building2, Pencil, Phone, Mail, MapPin, Calendar, Hash, FileText, Users } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { SalonStatusBadge } from './SalonStatusBadge'
 import { useSalonDetail } from '../hooks/useSalons'
 import type { SalonDTO } from '../types/salon.types'
+import { SalonStaffPage } from '@/features/staff_salons/pages/SalonStaffPage'
 
 interface SalonDetailExpandedProps {
   salonId: number
@@ -62,6 +63,10 @@ export function SalonDetailExpanded({ salonId, onEdit }: SalonDetailExpandedProp
             </TabsTrigger>
             <TabsTrigger value="address" className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors">
               Địa chỉ
+            </TabsTrigger>
+            <TabsTrigger value="staff" className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors">
+              <Users className="w-3.5 h-3.5 mr-1.5 inline" />
+              Nhân viên
             </TabsTrigger>
           </TabsList>
         </div>
@@ -166,6 +171,11 @@ export function SalonDetailExpanded({ salonId, onEdit }: SalonDetailExpandedProp
               </a>
             )}
           </div>
+        </TabsContent>
+
+        {/* Tab: Nhân viên */}
+        <TabsContent value="staff" className="p-4 m-0 border-none outline-none">
+          <SalonStaffPage salonId={salonId} />
         </TabsContent>
       </Tabs>
     </div>

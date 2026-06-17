@@ -1,20 +1,10 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Calendar as CalendarIcon, User, Repeat } from "lucide-react";
+import { useState, useMemo } from "react";
+import { User, Search, CheckSquare, Square } from "lucide-react";
 import { toast } from "sonner";
-import { formatDate, DateUtil } from "@/shared/utils/date.utils";
+import { formatDate } from "@/shared/utils/date.utils";
 import { useStaffs } from "@/features/staffs/hooks/useStaffs";
-import {
-  useCreateWorkSchedule,
-  useBulkCreateWorkSchedule,
-} from "../hooks/useSchedules";
-import type {
-  ShiftDTO,
-  ShiftPeriodDTO,
-} from "@/features/shifts/types/shift.types";
-import type { CreateWorkSchedulePayload } from "../types/schedule.types";
+import { useBulkCreateWorkSchedule } from "../hooks/useSchedules";
+import type { ShiftDTO, ShiftPeriodDTO } from "@/features/shifts/types/shift.types";
 
 import {
   Dialog,
@@ -26,33 +16,6 @@ import {
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
 import { FormSection } from "@/shared/components/forms/FormSection";
-import { FormField } from "@/shared/components/forms/FormField";
-import { Input } from "@/shared/components/ui/input";
-import { Switch } from "@/shared/components/ui/switch";
-
-const schema = z.object({
-  staffId: z
-    .number({ error: "Vui lòng chọn nhân viên" })
-    .min(1, "Vui lòng chọn nhân viên"),
-});
-
-type FormValues = z.infer<typeof schema>;
-
-interface AddStaffDialogProps {
-  shift?: ShiftDTO | null;
-  shiftPeriod?: ShiftPeriodDTO | null;
-  date: string | null;
-  defaultStaffId?: number | null;
-  existingStaffIds?: number[];
-  onClose: () => void;
-}
-
-const HARDCODED_HOLIDAYS = ["01/01", "30/04", "01/05", "02/09"];
-
-const isHoliday = (date: DateUtil) => {
-  const dateStr = date.format("DD/MM");
-  return HARDCODED_HOLIDAYS.includes(dateStr);
-};
 
 const WEEKDAYS = [
   { value: 1, label: "Thứ 2" },
@@ -64,6 +27,15 @@ const WEEKDAYS = [
   { value: 0, label: "Chủ nhật" },
 ];
 
+interface AddStaffDialogProps {
+  shift?: ShiftDTO | null;
+  shiftPeriod?: ShiftPeriodDTO | null;
+  date: string | null;
+  defaultStaffId?: number | null;
+  existingStaffIds?: number[];
+  onClose: () => void;
+}
+
 export function AddStaffDialog({
   shift,
   shiftPeriod,
@@ -72,122 +44,94 @@ export function AddStaffDialog({
   existingStaffIds = [],
   onClose,
 }: AddStaffDialogProps) {
-  const initialRecurringDays = date ? [formatDate(date).day()] : [];
-  const [isRecurring, setIsRecurring] = useState(false);
-  const [recurringDays, setRecurringDays] =
-    useState<number[]>(initialRecurringDays);
-  const [endDate, setEndDate] = useState<string>("");
-  const [workOnHolidays, setWorkOnHolidays] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<number[]>(
+    defaultStaffId ? [defaultStaffId] : [],
+  );
+  const [searchText, setSearchText] = useState("");
+  const [validationError, setValidationError] = useState("");
 
   const { data: staffsData, isLoading: isLoadingStaffs } = useStaffs({
     pageIndex: 1,
     pageSize: 1000,
   });
 
-  const { mutate: createWorkSchedule, isPending: isCreating } =
-    useCreateWorkSchedule();
-  const { mutate: bulkCreateWorkSchedule, isPending: isBulkCreating } =
-    useBulkCreateWorkSchedule();
-
-  const isPending = isCreating || isBulkCreating;
-
-  const form = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      staffId: defaultStaffId || 0,
-    },
-  });
+  const { mutate: bulkCreate, isPending } = useBulkCreateWorkSchedule();
 
   if (!date || !shift || !shiftPeriod) return null;
 
-  const toggleDay = (day: number) => {
-    setRecurringDays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
+  const availableStaffs = useMemo(
+    () =>
+      (staffsData?.data?.items || []).filter(
+        (s) => !existingStaffIds.includes(s.id!),
+      ),
+    [staffsData, existingStaffIds],
+  );
+
+  const filteredStaffs = useMemo(() => {
+    const q = searchText.toLowerCase().trim();
+    if (!q) return availableStaffs;
+    return availableStaffs.filter(
+      (s) =>
+        s.fullName?.toLowerCase().includes(q) ||
+        s.code?.toLowerCase().includes(q),
+    );
+  }, [availableStaffs, searchText]);
+
+  const toggleStaff = (id: number) => {
+    setValidationError("");
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
-  const toggleAllDays = () => {
-    if (recurringDays.length === 7) {
-      setRecurringDays([]);
+  const toggleAll = () => {
+    setValidationError("");
+    const allFilteredIds = filteredStaffs.map((s) => s.id!);
+    const allSelected = allFilteredIds.every((id) => selectedIds.includes(id));
+    if (allSelected) {
+      setSelectedIds((prev) => prev.filter((id) => !allFilteredIds.includes(id)));
     } else {
-      setRecurringDays([0, 1, 2, 3, 4, 5, 6]);
+      setSelectedIds((prev) => [
+        ...prev,
+        ...allFilteredIds.filter((id) => !prev.includes(id)),
+      ]);
     }
   };
 
-  const generateSchedules = (
-    staffId: number,
-  ): CreateWorkSchedulePayload[] => {
-    if (!isRecurring) {
-      return [
-        {
-          workDate: date,
-          staffId,
-          shiftPeriodId: shiftPeriod.id,
-        },
-      ];
-    }
+  const allFilteredSelected =
+    filteredStaffs.length > 0 &&
+    filteredStaffs.every((s) => selectedIds.includes(s.id!));
 
-    const schedules: CreateWorkSchedulePayload[] = [];
-    const start = formatDate(date).startOf("day");
-    const end = endDate
-      ? formatDate(endDate).startOf("day")
-      : start.add(180, "day");
-
-    for (
-      let d = start;
-      d.toDate().getTime() <= end.toDate().getTime();
-      d = d.add(1, "day")
-    ) {
-      if (recurringDays.includes(d.day())) {
-        if (!workOnHolidays && isHoliday(d)) {
-          continue; // Skip holiday
-        }
-        schedules.push({
-          workDate: d.format("YYYY-MM-DD"),
-          staffId,
-          shiftPeriodId: shiftPeriod.id,
-        });
-      }
-    }
-
-    return schedules;
-  };
-
-  const onSubmit = (values: FormValues) => {
-    const schedules = generateSchedules(values.staffId);
-
-    if (schedules.length === 0) {
-      toast.warning("Không có ngày nào hợp lệ để tạo lịch.");
+  const onSubmit = () => {
+    if (selectedIds.length === 0) {
+      setValidationError("Vui lòng chọn ít nhất 1 nhân viên");
       return;
     }
 
-    if (schedules.length === 1 && !isRecurring) {
-      // Create single
-      createWorkSchedule(schedules[0], {
+    const schedules = selectedIds.map((staffId) => ({
+      staffId,
+      shiftPeriodId: shiftPeriod.id,
+      workDate: date,
+    }));
+
+    bulkCreate(
+      { schedules },
+      {
         onSuccess: (res) => {
           if (res.isSuccess) {
-            toast.success("Phân lịch làm việc thành công!");
+            toast.success(
+              `Đã phân lịch cho ${selectedIds.length} nhân viên thành công!`,
+            );
             onClose();
           }
         },
-      });
-    } else {
-      // Bulk create
-      bulkCreateWorkSchedule(
-        { schedules },
-        {
-          onSuccess: (res) => {
-            if (res.isSuccess) {
-              onClose();
-            }
-          },
-        },
-      );
-    }
+      },
+    );
   };
 
   const utilDate = formatDate(date);
-  const dayName = WEEKDAYS.find((w) => w.value === utilDate.day())?.label || "";
+  const dayName =
+    WEEKDAYS.find((w) => w.value === utilDate.day())?.label || "";
   const subTitle = `Ca: ${shift.name} (${shiftPeriod.shiftStart?.substring(0, 5)} - ${shiftPeriod.shiftEnd?.substring(0, 5)}) | ${dayName}, ${utilDate.format("DD/MM/YYYY")}`;
 
   return (
@@ -197,149 +141,142 @@ export function AddStaffDialog({
         if (!open) onClose();
       }}
     >
-      <DialogContent className="sm:max-w-[700px]">
+      <DialogContent className="sm:max-w-[560px]">
         <DialogHeader>
           <DialogTitle>Thêm lịch làm việc</DialogTitle>
           <DialogDescription>{subTitle}</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-          <FormSection icon={User} title="Thông tin phân ca">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-              <div className="sm:col-span-2">
-                <FormField
-                  label="Nhân viên"
-                  tooltip="Vui lòng chọn nhân viên để xếp lịch"
-                  error={form.formState.errors.staffId?.message}
-                >
-                  <select
-                    {...form.register("staffId", { valueAsNumber: true })}
-                    className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lotus-leaf disabled:bg-stone-50 text-[13px] h-9 bg-white"
-                    disabled={isLoadingStaffs}
-                  >
-                    <option value={0} disabled>
-                      -- Tìm kiếm nhân viên --
-                    </option>
-                    {staffsData?.data?.items
-                      ?.filter((s) => !existingStaffIds.includes(s.id!))
-                      .map((s) => (
-                        <option key={s.id} value={s.id!}>
-                          {s.fullName} {s.code ? `(${s.code})` : ""}
-                        </option>
-                      ))}
-                  </select>
-                </FormField>
+        <div className="space-y-5">
+          <FormSection icon={User} title="Chọn nhân viên">
+            {/* Search + select all bar */}
+            <div className="flex items-center gap-2 mb-3">
+              <div className="relative flex-1">
+                <Search
+                  size={14}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-400"
+                />
+                <input
+                  type="text"
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  placeholder="Tìm theo tên hoặc mã nhân viên..."
+                  className="w-full pl-8 pr-3 py-1.5 border border-stone-200 rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-lotus-leaf bg-white"
+                />
               </div>
-            </div>
-          </FormSection>
-
-          <FormSection icon={Repeat} title="Tùy chọn lặp lại">
-            <div className="grid grid-cols-1 gap-y-5">
-              <FormField
-                label="Lặp lại hàng tuần"
-                tooltip="Bật để lịch tự động lặp lại theo tuần"
+              <button
+                type="button"
+                onClick={toggleAll}
+                disabled={filteredStaffs.length === 0}
+                className="flex items-center gap-1.5 text-[12px] font-semibold text-lotus-leaf hover:text-lotus-deep transition-colors whitespace-nowrap disabled:opacity-40"
               >
-                <div className="flex items-center h-9">
-                  <Switch
-                    checked={isRecurring}
-                    onCheckedChange={setIsRecurring}
-                  />
-                  <span className="ml-3 text-[13px] text-stone-500">
-                    Lịch làm việc sẽ tự động sao chép sang các tuần tiếp theo
-                  </span>
-                </div>
-              </FormField>
+                {allFilteredSelected ? (
+                  <CheckSquare size={14} />
+                ) : (
+                  <Square size={14} />
+                )}
+                {allFilteredSelected ? "Bỏ chọn tất cả" : "Chọn tất cả"}
+              </button>
+            </div>
 
-              {isRecurring && (
-                <>
-                  <FormField
-                    label="Các ngày trong tuần"
-                    tooltip="Chọn ngày để lặp lại"
-                  >
-                    <div className="flex flex-wrap gap-2 items-center">
-                      {WEEKDAYS.map((w) => (
+            {/* Staff list */}
+            <div className="border border-stone-200 rounded-lg overflow-hidden">
+              {isLoadingStaffs ? (
+                <div className="py-8 text-center text-[13px] text-stone-400">
+                  Đang tải danh sách nhân viên...
+                </div>
+              ) : filteredStaffs.length === 0 ? (
+                <div className="py-8 text-center text-[13px] text-stone-400">
+                  {searchText
+                    ? "Không tìm thấy nhân viên phù hợp"
+                    : "Tất cả nhân viên đã được xếp ca này"}
+                </div>
+              ) : (
+                <ul className="divide-y divide-stone-100 max-h-[260px] overflow-y-auto">
+                  {filteredStaffs.map((staff) => {
+                    const isSelected = selectedIds.includes(staff.id!);
+                    return (
+                      <li key={staff.id}>
                         <button
-                          key={w.value}
                           type="button"
-                          onClick={() => toggleDay(w.value)}
-                          className={`px-3 py-1.5 rounded-md border text-[13px] transition-colors ${
-                            recurringDays.includes(w.value)
-                              ? "bg-lotus-leaf text-white border-lotus-leaf font-medium"
-                              : "bg-white text-stone-600 border-stone-200 hover:border-stone-300"
+                          onClick={() => toggleStaff(staff.id!)}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-stone-50 ${
+                            isSelected ? "bg-lotus-cream/40" : ""
                           }`}
                         >
-                          {w.label}
-                        </button>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={toggleAllDays}
-                        className="text-[13px] text-lotus-leaf font-medium hover:underline ml-2"
-                      >
-                        {recurringDays.length === 7
-                          ? "Bỏ chọn tất cả"
-                          : "Chọn tất cả"}
-                      </button>
-                    </div>
-                  </FormField>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                    <FormField
-                      label="Ngày kết thúc"
-                      tooltip="Nếu bỏ trống, hệ thống sẽ tự sinh lịch trong 6 tháng"
-                    >
-                      <div className="relative">
-                        <Input
-                          type="date"
-                          value={endDate}
-                          min={date}
-                          onChange={(e) => setEndDate(e.target.value)}
-                          className="h-9 text-[13px]"
-                        />
-                        {!endDate && (
-                          <div className="absolute inset-0 pl-3 flex items-center pointer-events-none bg-white rounded-md border border-stone-200 text-stone-400 text-[13px]">
-                            Chưa xác định (Lặp lại 6 tháng)
+                          <div
+                            className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${
+                              isSelected
+                                ? "bg-lotus-leaf border-lotus-leaf"
+                                : "border-stone-300"
+                            }`}
+                          >
+                            {isSelected && (
+                              <svg
+                                viewBox="0 0 12 12"
+                                className="w-3 h-3 text-white"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                              >
+                                <polyline points="2,6 5,9 10,3" />
+                              </svg>
+                            )}
                           </div>
-                        )}
-                        <CalendarIcon
-                          size={14}
-                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none z-10"
-                        />
-                      </div>
-                    </FormField>
+                          <div className="flex-1 min-w-0">
+                            <span className="text-[13px] font-medium text-lotus-deep truncate block">
+                              {staff.fullName}
+                            </span>
+                            {staff.code && (
+                              <span className="text-[11px] text-stone-400">
+                                {staff.code}
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
 
-                    <FormField
-                      label="Làm việc cả ngày lễ tết"
-                      tooltip="Bật lên nếu bạn vẫn muốn tạo lịch vào các ngày nghỉ lễ"
-                    >
-                      <div className="flex items-center h-9">
-                        <Switch
-                          checked={workOnHolidays}
-                          onCheckedChange={setWorkOnHolidays}
-                        />
-                      </div>
-                    </FormField>
-                  </div>
-                </>
+            {/* Selected count + validation */}
+            <div className="mt-2 flex items-center justify-between min-h-[20px]">
+              {selectedIds.length > 0 ? (
+                <span className="text-[12px] text-lotus-leaf font-medium">
+                  Đã chọn {selectedIds.length} nhân viên
+                </span>
+              ) : (
+                <span />
+              )}
+              {validationError && (
+                <span className="text-[12px] text-red-500">{validationError}</span>
               )}
             </div>
           </FormSection>
+        </div>
 
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={onClose}
-              disabled={isPending}
-            >
-              Bỏ qua
-            </Button>
-            <Button type="submit" variant="admin" size="sm" loading={isPending}>
-              Lưu
-            </Button>
-          </DialogFooter>
-        </form>
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onClose}
+            disabled={isPending}
+          >
+            Bỏ qua
+          </Button>
+          <Button
+            type="button"
+            variant="admin"
+            size="sm"
+            loading={isPending}
+            onClick={onSubmit}
+          >
+            Lưu ({selectedIds.length})
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Search, Users, Briefcase, User } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, Users, Briefcase, User, Copy } from "lucide-react";
 import { formatDate } from "@/shared/utils/date.utils";
 
 import { useShifts } from "@/features/shifts/hooks/useShifts";
@@ -7,6 +7,7 @@ import { useWorkSchedules } from "../hooks/useSchedules";
 import { ScheduleTable } from "../components/ScheduleTable";
 import { Button } from "@/shared/components/ui/button";
 import { useStaffs } from "@/features/staffs/hooks/useStaffs";
+import { RepeatScheduleDialog } from "../components/RepeatScheduleDialog";
 
 export function WorkSchedulePage() {
   const [currentDate, setCurrentDate] = useState(
@@ -14,6 +15,7 @@ export function WorkSchedulePage() {
   );
   
   const [viewMode, setViewMode] = useState<"shift" | "staff" | "single">("shift");
+  const [isRepeatDialogOpen, setIsRepeatDialogOpen] = useState(false);
   const [selectedStaffId, setSelectedStaffId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
@@ -175,8 +177,31 @@ export function WorkSchedulePage() {
           >
             Tuần này
           </Button>
+
+          <Button
+            onClick={() => setIsRepeatDialogOpen(true)}
+            variant="outline"
+            className="text-[13px] h-9 gap-1.5"
+            disabled={!schedulesData?.data?.items?.length}
+            title={
+              !schedulesData?.data?.items?.length
+                ? "Chưa có lịch trong tuần này để lặp"
+                : "Lặp lại lịch tuần này sang các tuần sau"
+            }
+          >
+            <Copy size={14} />
+            Lặp lịch
+          </Button>
         </div>
       </div>
+
+      {isRepeatDialogOpen && (
+        <RepeatScheduleDialog
+          currentWeekStart={currentDate}
+          currentWeekSchedules={schedulesData?.data?.items || []}
+          onClose={() => setIsRepeatDialogOpen(false)}
+        />
+      )}
 
       {/* Content */}
       {isPageLoading ? (
