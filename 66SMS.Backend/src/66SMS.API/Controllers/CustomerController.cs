@@ -37,7 +37,8 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [PermissionAuthorize("customers", "delete", Roles = "admin")]
+        //[PermissionAuthorize("customers", "delete", Roles = "admin")]
+         [AllowAnonymous]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
             var command = new DeleteCustomerCommand { Id = id };
@@ -48,7 +49,8 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPatch("{id}")]
-        [PermissionAuthorize("customers", "update")]
+        //[PermissionAuthorize("customers", "update")]
+         [AllowAnonymous]
         public async Task<IActionResult> UpdateCustomer(int id, [FromBody] UpdateCustomerCommand command)
         {
             command.Id = id;
@@ -59,7 +61,8 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpGet]
-        [PermissionAuthorize("customers", "read", Roles = "admin")]
+        //[PermissionAuthorize("customers", "read", Roles = "admin")]
+         [AllowAnonymous]
         public async Task<IActionResult> GetAll([FromQuery] GetAllCustomerQuery query)
         {
             var result = await mediator.Send(query);
@@ -67,7 +70,8 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [PermissionAuthorize("customers", "read")]
+        //[PermissionAuthorize("customers", "read")]
+         [AllowAnonymous]
         public async Task<IActionResult> GetDetail(int id)
         {
             var result = await mediator.Send(new GetDetailCustomerQuery { Id = id});

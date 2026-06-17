@@ -51,8 +51,11 @@ using _66SMS.Application.Features.MembershipCards.Commands.UpdateMembershipCards
 using _66SMS.Application.Features.MembershipTiers.Commands.CreateMembershipTiers;
 using _66SMS.Application.Features.MembershipTiers.Commands.UpdateMembershipTiers;
 using _66SMS.Application.DTOs.Salons;
+using _66SMS.Application.DTOs.StaffSalons;
 using _66SMS.Application.Features.Salons.Commands.CreateSalon;
 using _66SMS.Application.Features.Salons.Commands.UpdateSalon;
+using _66SMS.Application.Features.StaffSalons.Commands.CreateStaffSalon;
+using _66SMS.Application.Features.StaffSalons.Commands.UpdateStaffSalon;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Entities;
 using AutoMapper;
@@ -344,6 +347,20 @@ namespace _66SMS.Application.Commons.Mappers
                 .ForMember(dest => dest.ExpiresAt, opt => opt.MapFrom(src => src.ExpiresAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .IgnoreNullValueTypes();
+
+            // StaffSalon
+            CreateMap<CreateStaffSalonCommand, StaffSalon>().IgnoreNullValueTypes();
+            CreateMap<UpdateStaffSalonCommand, StaffSalon>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.StaffId, opt => opt.Ignore())
+                .ForMember(dest => dest.SalonId, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<StaffSalon, StaffSalonDto>()
+                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate.ToDateOnlyString("dd/MM/yyyy")))
+                .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndDate.ToDateOnlyString("dd/MM/yyyy")))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt != null ? src.UpdatedAt.Value.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss") : null))
                 .IgnoreNullValueTypes();
 
             // Salon

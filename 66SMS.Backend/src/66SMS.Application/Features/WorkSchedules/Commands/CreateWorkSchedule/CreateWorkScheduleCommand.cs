@@ -7,6 +7,7 @@ namespace _66SMS.Application.Features.WorkSchedules.Commands.CreateWorkSchedule
     {
         public int? ShiftPeriodId { get; set; }
         public int? StaffId { get; set; }
+        public int? SalonId { get; set; }
         public DateOnly? WorkDate { get; set; }
         [System.Text.Json.Serialization.JsonIgnore]
         public int? CreatedBy { get; set; }
