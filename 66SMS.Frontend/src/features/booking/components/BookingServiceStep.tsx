@@ -46,7 +46,7 @@ export const BookingServiceStep: React.FC = () => {
     <div className="bg-lotus-surface rounded-3xl p-6 sm:p-8 border border-lotus-muted/20 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
       <h3 className="text-xl font-bold text-lotus-deep font-display mb-5 flex items-center gap-2 border-b border-lotus-muted/20 pb-3">
         <Heart className="w-5 h-5 text-lotus-rose" />
-        <span>Bước 1: Chọn dịch vụ làm đẹp & chăm sóc</span>
+        <span>Bước 2: Chọn dịch vụ làm đẹp & chăm sóc</span>
       </h3>
 
       {/* Filters Row */}

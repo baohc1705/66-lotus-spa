@@ -18,7 +18,7 @@ import {
 
 export const BookingTimeStep: React.FC = () => {
   const store = useBookingStore();
-  const { nextStep, prevStep } = store;
+  const { nextStep, prevStep, selectedSalon } = store;
   const activeGuest = store.guests[store.activeGuestIndex];
 
   const selectedDate = activeGuest?.selectedDate;
@@ -63,12 +63,14 @@ export const BookingTimeStep: React.FC = () => {
 
   const { data: technicians = [], isLoading: loadingTechs } = useTechnicians(
     dateInput,
-    serviceId
+    serviceId,
+    selectedSalon?.id
   );
   const { data: timeSlots = [], isLoading: loadingSlots } = useTimeSlots(
     dateInput,
     serviceId,
-    selectedTechnician?.id
+    selectedTechnician?.id,
+    selectedSalon?.id
   );
   const { data: positions = [], isLoading: loadingPositions } =
     useBookingPositions();
@@ -132,10 +134,17 @@ export const BookingTimeStep: React.FC = () => {
 
   return (
     <div className="bg-lotus-surface rounded-3xl p-6 sm:p-8 border border-lotus-muted/20 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h3 className="text-xl font-bold text-lotus-deep font-display mb-5 flex items-center gap-2 border-b border-lotus-muted/20 pb-3">
+      <h3 className="text-xl font-bold text-lotus-deep font-display mb-1 flex items-center gap-2">
         <CalendarIcon className="w-5 h-5 text-lotus-rose" />
-        <span>Bước 2: Chọn ngày lành, giờ đẹp & chuyên viên</span>
+        <span>Bước 3: Chọn ngày lành, giờ đẹp & chuyên viên</span>
       </h3>
+      {selectedSalon && (
+        <p className="text-xs text-lotus-stone mb-4 flex items-center gap-1.5 border-b border-lotus-muted/20 pb-3">
+          <MapPin className="w-3.5 h-3.5 text-lotus-rose-light" />
+          Kỹ thuật viên tại: <span className="font-semibold text-lotus-deep">{selectedSalon.name}</span>
+        </p>
+      )}
+      {!selectedSalon && <div className="border-b border-lotus-muted/20 mb-5" />}
 
       {/* 1. Chọn ngày */}
       <div className="mb-6">

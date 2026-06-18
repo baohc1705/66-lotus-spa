@@ -37,6 +37,7 @@ export interface GuestAppointmentDto {
   slotId: number;
   appointmentDate: string;
   positionId: number;
+  salonId?: number | null;
   note?: string;
   services: { serviceId: number; quantity: number }[];
 }

@@ -6,6 +6,7 @@ import { parseJwt } from '@/features/auth/utils/jwt';
 interface AuthState {
   accessToken: string | null;
   user: UserDto | null;
+  managedSalonId: number | null;
   // Actions
   setAccessToken: (token: string) => void;
   setUser: (user: UserDto) => void;
@@ -19,6 +20,7 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       accessToken: null,
       user: null,
+      managedSalonId: null,
 
       setAccessToken: (token) => {
         set({ accessToken: token });
@@ -26,18 +28,21 @@ export const useAuthStore = create<AuthState>()(
         if (decoded) {
           const roleClaim = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded.role;
           const roles = roleClaim ? (Array.isArray(roleClaim) ? roleClaim : [roleClaim]) : [];
-          
+
           const permClaim = decoded.permission;
           const permissions = permClaim ? (Array.isArray(permClaim) ? permClaim : [permClaim]) : [];
 
+          const salonIdClaim = decoded['salon_id'];
+          const managedSalonId = salonIdClaim ? parseInt(salonIdClaim, 10) : null;
+
           const currentUser = get().user || ({} as UserDto);
-          set({ user: { ...currentUser, roles, permissions } });
+          set({ user: { ...currentUser, roles, permissions }, managedSalonId });
         }
       },
 
       setUser: (user) => set({ user }),
 
-      clearAuth: () => set({ accessToken: null, user: null }),
+      clearAuth: () => set({ accessToken: null, user: null, managedSalonId: null }),
 
       // Kiểm tra permission theo format "resource:action" giống backend
       hasPermission: (resource, action) => {
@@ -68,7 +73,7 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       // Persist cả accessToken và user để giữ phiên đăng nhập (bao gồm permissions) sau khi F5
-      partialize: (state) => ({ accessToken: state.accessToken, user: state.user }),
+      partialize: (state) => ({ accessToken: state.accessToken, user: state.user, managedSalonId: state.managedSalonId }),
     },
   ),
 );

@@ -27,6 +27,7 @@ export interface StaffDto {
 
 // Payload tạo nhân viên (match CreateStaffCommand, bỏ [JsonIgnore] fields)
 export interface CreateStaffPayload {
+  salonId?: number
   fullName: string
   image?: string
   dob?: string

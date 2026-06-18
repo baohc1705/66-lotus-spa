@@ -7,9 +7,11 @@ import type {
   GuestBooking,
 } from "../types/booking.types";
 import type { ServiceDTO } from "@/features/services/types/service.types";
+import type { SalonDTO } from "@/features/salons/types/salon.types";
 
 interface BookingState {
   currentStep: number;
+  selectedSalon: SalonDTO | null;
   guests: GuestBooking[];
   activeGuestIndex: number;
   contactInfo: BookingContactFormValues | null;
@@ -18,6 +20,7 @@ interface BookingState {
   setStep: (step: number) => void;
   nextStep: () => void;
   prevStep: () => void;
+  selectSalon: (salon: SalonDTO) => void;
 
   addGuest: () => void;
   removeGuest: (index: number) => void;
@@ -46,7 +49,8 @@ const createNewGuest = (id: number): GuestBooking => ({
 });
 
 const initialState = {
-  currentStep: 1,
+  currentStep: 0,
+  selectedSalon: null as SalonDTO | null,
   guests: [createNewGuest(1)],
   activeGuestIndex: 0,
   contactInfo: null,
@@ -59,7 +63,9 @@ export const useBookingStore = create<BookingState>((set) => ({
   nextStep: () =>
     set((state) => ({ currentStep: Math.min(state.currentStep + 1, 4) })),
   prevStep: () =>
-    set((state) => ({ currentStep: Math.max(state.currentStep - 1, 1) })),
+    set((state) => ({ currentStep: Math.max(state.currentStep - 1, 0) })),
+
+  selectSalon: (salon) => set({ selectedSalon: salon }),
 
   addGuest: () =>
     set((state) => {

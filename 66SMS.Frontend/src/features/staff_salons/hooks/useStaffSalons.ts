@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { staffSalonApi } from '../api/staff-salon.api'
+import { staffSalonApi, meApi, type AssignManagerPayload } from '../api/staff-salon.api'
 import type {
   StaffSalonQueryParams,
   CreateStaffSalonPayload,
@@ -76,5 +76,45 @@ export function useDeleteStaffSalon() {
       }
     },
     onError: () => toast.error('Có lỗi xảy ra khi xóa nhân viên'),
+  })
+}
+
+export function useAssignManager() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: AssignManagerPayload) => staffSalonApi.assignManager(payload),
+    onSuccess: (result) => {
+      if (result.isSuccess) {
+        qc.invalidateQueries({ queryKey: STAFF_SALON_KEYS.all })
+        toast.success('Phân công quản lý thành công')
+      } else {
+        toast.error(result.message || 'Có lỗi xảy ra')
+      }
+    },
+    onError: () => toast.error('Có lỗi xảy ra khi phân công quản lý'),
+  })
+}
+
+export function useRemoveManager() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: AssignManagerPayload) => staffSalonApi.removeManager(payload),
+    onSuccess: (result) => {
+      if (result.isSuccess) {
+        qc.invalidateQueries({ queryKey: STAFF_SALON_KEYS.all })
+        toast.success('Gỡ quản lý thành công')
+      } else {
+        toast.error(result.message || 'Có lỗi xảy ra')
+      }
+    },
+    onError: () => toast.error('Có lỗi xảy ra khi gỡ quản lý'),
+  })
+}
+
+export function useMySalon() {
+  return useQuery({
+    queryKey: ['me', 'salon'],
+    queryFn: () => meApi.getMySalon(),
+    staleTime: 5 * 60 * 1000,
   })
 }

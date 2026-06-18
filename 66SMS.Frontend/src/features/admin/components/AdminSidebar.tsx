@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { ChevronDown, Menu } from "lucide-react";
+import { ChevronDown, Menu, MapPin } from "lucide-react";
 import { Logo } from "@/shared/components/Logo";
-//import { useAuthStore } from "@/features/auth/stores/authStore";
+import { useAuthStore } from "@/features/auth/stores/authStore";
+import { useMySalon } from "@/features/staff_salons/hooks/useStaffSalons";
 import { MENU_ITEMS, type SubMenuItem } from "../constants/menu";
 
 interface AdminSidebarProps {
@@ -22,10 +23,10 @@ export function AdminSidebar({
   const location = useLocation();
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
 
-  //const { hasRole } = useAuthStore();
+  const managedSalonId = useAuthStore((s) => s.managedSalonId);
+  const { data: mySalonResult } = useMySalon();
+  const mySalonName = managedSalonId ? mySalonResult?.data?.name : null;
 
-  // Bạn có thể sử dụng hasRole ở đây để lọc MENU_ITEMS nếu cần thiết.
-  // Ví dụ: const visibleMenuItems = MENU_ITEMS.filter(...)
   const visibleMenuItems = MENU_ITEMS;
 
   const toggleMenu = (label: string) => {
@@ -57,20 +58,29 @@ export function AdminSidebar({
         className={`fixed top-0 left-0 bottom-0 z-50 flex flex-col bg-lotus-cream/95 backdrop-blur-md shadow-xl transition-all duration-500 ease-out ${isOpen ? "w-64" : "w-20"} ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
         <div
-          className={`h-16 flex items-center shrink-0 px-4 overflow-hidden transition-all duration-500 ${isOpen ? "justify-between" : "justify-center"}`}
+          className={`shrink-0 px-4 overflow-hidden transition-all duration-500 ${isOpen ? "justify-between" : "justify-center"}`}
         >
-          <div
-            className={`transition-opacity duration-300 ${!isOpen ? "opacity-0 hidden" : "opacity-100 block"}`}
-          >
-            <Logo variant="dark" size="sm" showTagline={false} />
+          <div className={`h-16 flex items-center ${isOpen ? "justify-between" : "justify-center"}`}>
+            <div
+              className={`transition-opacity duration-300 ${!isOpen ? "opacity-0 hidden" : "opacity-100 block"}`}
+            >
+              <Logo variant="dark" size="sm" showTagline={false} />
+            </div>
+
+            <button
+              onClick={toggleSidebar}
+              className="hidden lg:flex w-10 h-10 rounded-admin text-lotus-leaf items-center justify-center hover:bg-lotus-leaf/10 transition-all duration-300 shrink-0"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
           </div>
 
-          <button
-            onClick={toggleSidebar}
-            className="hidden lg:flex w-10 h-10 rounded-admin text-lotus-leaf items-center justify-center hover:bg-lotus-leaf/10 transition-all duration-300 shrink-0"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
+          {isOpen && mySalonName && (
+            <div className="mb-3 flex items-center gap-1.5 px-2 py-1.5 bg-lotus-leaf/10 rounded-admin border border-lotus-leaf/20">
+              <MapPin className="w-3.5 h-3.5 text-lotus-leaf shrink-0" />
+              <span className="text-xs font-medium text-lotus-leaf truncate">{mySalonName}</span>
+            </div>
+          )}
         </div>
 
         <div className="flex-1 overflow-y-auto py-6 px-3 hide-scrollbar">

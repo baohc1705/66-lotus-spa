@@ -15,11 +15,12 @@ const POSITION_BASE = "/BookingPositions";
 export const bookingApi = {
   getTechnicians: async (
     date: string,
-    serviceId: number
+    serviceId: number,
+    salonId?: number
   ): Promise<TechnicianDTO[]> => {
     const res = await axiosInstance.get<Result<TechnicianDTO[]>>(
       `${APPOINTMENT_BASE}/technicians`,
-      { params: { date, serviceId } }
+      { params: { date, serviceId, salonId } }
     );
     return res.data.data || [];
   },
@@ -36,11 +37,12 @@ export const bookingApi = {
   getTimeSlots: async (
     date: string,
     serviceId: number,
-    technicianId?: number
+    technicianId?: number,
+    salonId?: number
   ): Promise<TimeSlotDTO[]> => {
     const res = await axiosInstance.get<Result<TimeSlotDTO[]>>(
       `${APPOINTMENT_BASE}/timeslots`,
-      { params: { date, serviceId, technicianId } }
+      { params: { date, serviceId, technicianId, salonId } }
     );
     return res.data.data || [];
   },

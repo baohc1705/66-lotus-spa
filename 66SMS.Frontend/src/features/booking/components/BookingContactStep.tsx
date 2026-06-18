@@ -18,6 +18,7 @@ export const BookingContactStep: React.FC = () => {
     setContactInfo,
     prevStep,
     nextStep,
+    selectedSalon,
   } = useBookingStore();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,6 +70,7 @@ export const BookingContactStep: React.FC = () => {
           slotId: guest.selectedTimeSlot!.slotId || 0,
           appointmentDate: guest.selectedDate!.toISOString().split("T")[0],
           positionId: guest.selectedPosition?.id || 0,
+          salonId: selectedSalon?.id ?? null,
           note: finalNote,
           services: [{ serviceId: guest.selectedService!.id, quantity: 1 }],
         };
@@ -97,7 +99,7 @@ export const BookingContactStep: React.FC = () => {
     <div className="bg-lotus-surface rounded-3xl p-6 sm:p-8 border border-lotus-muted/20 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
       <h3 className="text-xl font-bold text-lotus-deep font-display mb-5 flex items-center gap-2 border-b border-lotus-muted/20 pb-3">
         <Phone className="w-5 h-5 text-lotus-rose" />
-        <span>Bước 3: Nhập thông tin liên hệ & đặt cọc</span>
+        <span>Bước 4: Nhập thông tin liên hệ & đặt cọc</span>
       </h3>
 
       <div className="mb-5 p-4 rounded-2xl border border-blue-500/20 bg-blue-500/5 flex gap-3">

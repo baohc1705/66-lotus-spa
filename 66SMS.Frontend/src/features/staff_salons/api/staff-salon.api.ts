@@ -1,5 +1,6 @@
 import axiosInstance from '@/shared/api/axiosInstance'
 import type { Result, PagedResult } from '@/shared/types/common.types'
+import type { SalonDTO } from '@/features/salons/types/salon.types'
 import type {
   StaffSalonDTO,
   CreateStaffSalonPayload,
@@ -8,6 +9,11 @@ import type {
 } from '../types/staff-salon.types'
 
 const BASE = '/StaffSalons'
+
+export interface AssignManagerPayload {
+  staffId: number
+  salonId: number
+}
 
 export const staffSalonApi = {
   getAll: (params: StaffSalonQueryParams) =>
@@ -30,4 +36,19 @@ export const staffSalonApi = {
 
   delete: (id: number) =>
     axiosInstance.delete<Result<object>>(`${BASE}/${id}`).then((r) => r.data),
+
+  assignManager: (payload: AssignManagerPayload) =>
+    axiosInstance
+      .post<Result<object>>(`${BASE}/assign-manager`, payload)
+      .then((r) => r.data),
+
+  removeManager: (payload: AssignManagerPayload) =>
+    axiosInstance
+      .post<Result<object>>(`${BASE}/remove-manager`, payload)
+      .then((r) => r.data),
+}
+
+export const meApi = {
+  getMySalon: () =>
+    axiosInstance.get<Result<SalonDTO>>('/Me/salon').then((r) => r.data),
 }

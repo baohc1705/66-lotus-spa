@@ -1,4 +1,5 @@
-import { Building2, Pencil, Phone, Mail, MapPin, Calendar, Hash, FileText, Users } from 'lucide-react'
+import { useState } from 'react'
+import { Building2, Pencil, Phone, Mail, MapPin, Calendar, Hash, FileText, Users, UserCog } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs'
 import { Skeleton } from '@/shared/components/ui/skeleton'
@@ -6,6 +7,8 @@ import { SalonStatusBadge } from './SalonStatusBadge'
 import { useSalonDetail } from '../hooks/useSalons'
 import type { SalonDTO } from '../types/salon.types'
 import { SalonStaffPage } from '@/features/staff_salons/pages/SalonStaffPage'
+import { AssignManagerDialog } from './AssignManagerDialog'
+import { useStaffSalons, useRemoveManager } from '@/features/staff_salons/hooks/useStaffSalons'
 
 interface SalonDetailExpandedProps {
   salonId: number
@@ -28,6 +31,11 @@ function parseWorkingDays(workingDays?: string): string {
 export function SalonDetailExpanded({ salonId, onEdit }: SalonDetailExpandedProps) {
   const { data: result, isLoading } = useSalonDetail(salonId)
   const salon = result?.data
+
+  const [assignOpen, setAssignOpen] = useState(false)
+  const { data: staffSalonsData } = useStaffSalons({ salonId, status: 1, pageIndex: 1, pageSize: 100 })
+  const currentManager = staffSalonsData?.data?.items?.find((ss) => ss.isManager)
+  const { mutate: removeManager, isPending: removePending } = useRemoveManager()
 
   if (isLoading) {
     return (
@@ -67,6 +75,10 @@ export function SalonDetailExpanded({ salonId, onEdit }: SalonDetailExpandedProp
             <TabsTrigger value="staff" className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors">
               <Users className="w-3.5 h-3.5 mr-1.5 inline" />
               Nhân viên
+            </TabsTrigger>
+            <TabsTrigger value="manager" className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors">
+              <UserCog className="w-3.5 h-3.5 mr-1.5 inline" />
+              Quản lý
             </TabsTrigger>
           </TabsList>
         </div>
@@ -176,6 +188,56 @@ export function SalonDetailExpanded({ salonId, onEdit }: SalonDetailExpandedProp
         {/* Tab: Nhân viên */}
         <TabsContent value="staff" className="p-4 m-0 border-none outline-none">
           <SalonStaffPage salonId={salonId} />
+        </TabsContent>
+
+        {/* Tab: Quản lý */}
+        <TabsContent value="manager" className="p-4 m-0 border-none outline-none">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-[13px] font-semibold text-lotus-deep">Quản lý hiện tại</p>
+              <Button
+                variant="admin"
+                size="sm"
+                className="h-8 px-3 text-[12px] gap-1.5"
+                onClick={() => setAssignOpen(true)}
+              >
+                <UserCog className="w-3.5 h-3.5" />
+                Phân công Quản lý
+              </Button>
+            </div>
+
+            {currentManager ? (
+              <div className="rounded-lg border border-stone-100 bg-white p-3 flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-[13px] font-medium text-lotus-deep">
+                    Nhân viên #{currentManager.staffId}
+                  </p>
+                  <p className="text-[11px] text-lotus-stone mt-0.5">
+                    Từ: {currentManager.startDate ?? '—'}
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 px-2.5 text-[12px] text-red-500 border-red-200 hover:bg-red-50"
+                  disabled={removePending}
+                  onClick={() =>
+                    removeManager({ staffId: currentManager.staffId!, salonId })
+                  }
+                >
+                  Gỡ Quản lý
+                </Button>
+              </div>
+            ) : (
+              <p className="text-[13px] text-lotus-stone italic">Chưa có quản lý được phân công.</p>
+            )}
+          </div>
+
+          <AssignManagerDialog
+            open={assignOpen}
+            onOpenChange={setAssignOpen}
+            salonId={salonId}
+          />
         </TabsContent>
       </Tabs>
     </div>

@@ -35,6 +35,8 @@ import {
 
 import type { StaffDto } from "../types/staff.types";
 import { User, Briefcase, KeyRound } from "lucide-react";
+import { useAuthStore } from "@/features/auth/stores/authStore";
+import { useSalons } from "@/features/salons/hooks/useSalons";
 
 interface StaffFormDialogProps {
   open: boolean;
@@ -67,6 +69,11 @@ export function StaffFormDialog({
   staff,
 }: StaffFormDialogProps) {
   const isEdit = !!staff;
+  const managedSalonId = useAuthStore((s) => s.managedSalonId);
+  const isAdmin = managedSalonId === null;
+  const { data: salonsResult } = useSalons({ pageIndex: 1, pageSize: 100 });
+  const salons = salonsResult?.data?.items ?? [];
+
   const createMutation = useCreateStaff();
   const updateMutation = useUpdateStaff();
   const isPending = createMutation.isPending || updateMutation.isPending;
@@ -198,6 +205,29 @@ export function StaffFormDialog({
           {/* === Section: Thông tin công việc === */}
           <FormSection icon={Briefcase} title="Thông tin công việc">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+              {isAdmin && !isEdit && (
+                <FormField
+                  label="Chi nhánh *"
+                  tooltip="Chọn chi nhánh mà nhân viên này thuộc về"
+                  error={(errors as Record<string, { message?: string }>).salonId?.message}
+                >
+                  <Select
+                    value={watch("salonId")?.toString() ?? ""}
+                    onValueChange={(v) => setValue("salonId", Number(v))}
+                  >
+                    <SelectTrigger className="h-9 text-[13px]">
+                      <SelectValue placeholder="Chọn chi nhánh..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {salons.map((s) => (
+                        <SelectItem key={s.id} value={String(s.id)}>
+                          {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+              )}
               <FormField label="Ngày vào làm" error={errors.hireDate?.message}>
                 <Input
                   {...register("hireDate")}

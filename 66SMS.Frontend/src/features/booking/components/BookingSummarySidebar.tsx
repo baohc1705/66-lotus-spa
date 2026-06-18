@@ -9,6 +9,7 @@ export const BookingSummarySidebar: React.FC = () => {
     setActiveGuest,
     addGuest,
     removeGuest,
+    selectedSalon,
   } = useBookingStore();
 
   const total = guests.reduce((sum, g) => sum + (g.selectedService?.sellingPrice || 0), 0);
@@ -35,6 +36,18 @@ export const BookingSummarySidebar: React.FC = () => {
             <Plus className="w-3.5 h-3.5" /> Thêm khách
           </button>
         </div>
+
+        {selectedSalon && (
+          <div className="mb-3 pb-3 border-b border-lotus-muted/20 flex items-start gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-lotus-rose-light shrink-0 mt-0.5" />
+            <div>
+              <div className="text-xs font-bold text-lotus-deep">{selectedSalon.name}</div>
+              {selectedSalon.fullAddress && (
+                <div className="text-[10px] text-lotus-stone line-clamp-1">{selectedSalon.fullAddress}</div>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col gap-3">
           {guests.map((guest, index) => {

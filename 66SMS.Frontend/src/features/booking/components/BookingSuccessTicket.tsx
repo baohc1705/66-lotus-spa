@@ -3,7 +3,7 @@ import { CheckCircle2, Info } from "lucide-react";
 import { useBookingStore } from "../stores/bookingStore";
 
 export const BookingSuccessTicket: React.FC = () => {
-  const { guests, resetBooking } = useBookingStore();
+  const { guests, resetBooking, selectedSalon } = useBookingStore();
 
   const primaryGuest = guests[0];
   const {
@@ -52,6 +52,14 @@ export const BookingSuccessTicket: React.FC = () => {
           </div>
 
           <div className="flex flex-col gap-1.5 text-sm">
+            {selectedSalon && (
+              <div className="flex justify-between pb-2 mb-1 border-b border-lotus-muted/10">
+                <span className="text-lotus-stone">Chi nhánh:</span>
+                <span className="font-semibold text-lotus-deep text-right max-w-[200px]">
+                  {selectedSalon.name}
+                </span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-lotus-stone">Dịch vụ:</span>
               <span className="font-semibold text-lotus-deep text-right max-w-[200px] truncate">

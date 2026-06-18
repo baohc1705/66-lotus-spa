@@ -5,6 +5,7 @@ import { useBookingStore } from "../stores/bookingStore";
 import { Navbar } from "@/features/landing/components/Navbar";
 import { FooterSection } from "@/features/landing/components/FooterSection";
 
+import { BookingSalonStep } from "../components/BookingSalonStep";
 import { BookingServiceStep } from "../components/BookingServiceStep";
 import { BookingTimeStep } from "../components/BookingTimeStep";
 import { BookingContactStep } from "../components/BookingContactStep";
@@ -69,6 +70,7 @@ export const BookingPage: React.FC = () => {
             {/* Step Indicators */}
             <div className="flex items-center justify-center gap-1.5 sm:gap-2.5 bg-white border border-lotus-muted/20 rounded-full px-5 py-2.5 shadow-sm max-w-max mx-auto sm:mx-0">
               {[
+                { s: 0, label: "Chi nhánh" },
                 { s: 1, label: "Dịch vụ" },
                 { s: 2, label: "Thời gian" },
                 { s: 3, label: "Thông tin" },
@@ -89,7 +91,7 @@ export const BookingPage: React.FC = () => {
                     {currentStep > item.s ? (
                       <Check className="w-3.5 h-3.5" />
                     ) : (
-                      item.s
+                      item.s + 1
                     )}
                   </div>
                   <span
@@ -101,7 +103,7 @@ export const BookingPage: React.FC = () => {
                   >
                     {item.label}
                   </span>
-                  {idx < 2 && (
+                  {idx < 3 && (
                     <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
                   )}
                 </div>
@@ -114,6 +116,7 @@ export const BookingPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* LEFT PANEL: Interactive Form Content (60%) */}
           <div className="lg:col-span-8 flex flex-col gap-6">
+            {currentStep === 0 && <BookingSalonStep />}
             {currentStep === 1 && <BookingServiceStep />}
             {currentStep === 2 && <BookingTimeStep />}
             {currentStep === 3 && <BookingContactStep />}

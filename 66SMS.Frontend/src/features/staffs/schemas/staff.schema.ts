@@ -8,6 +8,9 @@ const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@
 
 /** Schema gốc chứa tất cả các trường chung */
 const staffBaseSchema = z.object({
+  // Chi nhánh (chỉ Admin cần chọn, Manager tự động gán từ token)
+  salonId: z.coerce.number().optional(),
+
   // Thông tin cá nhân
   fullName: z.string().min(1, 'Họ tên không được để trống').max(100, 'Tối đa 100 ký tự'),
   phone: z.string().min(1, 'SĐT không được để trống').regex(VIETNAM_PHONE_REGEX, 'SĐT không hợp lệ'),
