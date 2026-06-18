@@ -17,12 +17,14 @@ namespace _66SMS.Application.Features.Auth.Commands.Login
         private readonly IUserSqlRepository userSqlRepository;
         private readonly IUserRoleSqlRepository userRoleSqlRepository;
         private readonly IRefreshTokenSqlRepository refreshTokenSqlRepository;
+        private readonly IStaffSalonSqlRepository staffSalonSqlRepository;
+        private readonly IStaffSqlRepository staffSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IPasswordHash passwordHash;
         private readonly IOptions<JwtSettings> jwtOptions;
         private readonly IJwtService jwtService;
 
-        public LoginHandler(IUserSqlRepository userSqlRepository, IPasswordHash passwordHash, IOptions<JwtSettings> jwtOptions, IJwtService jwtService, IRefreshTokenSqlRepository refreshTokenSqlRepository, ISqlUnitOfWork sqlUnitOfWork, IUserRoleSqlRepository userRoleSqlRepository)
+        public LoginHandler(IUserSqlRepository userSqlRepository, IPasswordHash passwordHash, IOptions<JwtSettings> jwtOptions, IJwtService jwtService, IRefreshTokenSqlRepository refreshTokenSqlRepository, ISqlUnitOfWork sqlUnitOfWork, IUserRoleSqlRepository userRoleSqlRepository, IStaffSalonSqlRepository staffSalonSqlRepository, IStaffSqlRepository staffSqlRepository)
         {
             this.userSqlRepository = userSqlRepository;
             this.passwordHash = passwordHash;
@@ -31,6 +33,8 @@ namespace _66SMS.Application.Features.Auth.Commands.Login
             this.refreshTokenSqlRepository = refreshTokenSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.userRoleSqlRepository = userRoleSqlRepository;
+            this.staffSalonSqlRepository = staffSalonSqlRepository;
+            this.staffSqlRepository = staffSqlRepository;
         }
 
         public async Task<Result<TokenResponseDTO>> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -83,8 +87,22 @@ namespace _66SMS.Application.Features.Auth.Commands.Login
                 role.Id, 
                 cancellationToken) ?? new List<string>();
 
-            // Generate token 
-            var accessToken = jwtService.GenerateAccessToken(userExisted, role.Name, permissions);
+            // Check if user is a manager — get their salon_id from staff_salons
+            int? managedSalonId = null;
+            var staff = await staffSqlRepository.AsQueryable()
+                .Where(x => x.UserId == userExisted.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (staff != null)
+            {
+                var staffSalon = await staffSalonSqlRepository.AsQueryable()
+                    .Where(x => x.StaffId == staff.Id && x.IsManager == true && x.Status == StaffSalonConst.STATUS_ACTIVE)
+                    .FirstOrDefaultAsync(cancellationToken);
+                if (staffSalon != null)
+                    managedSalonId = staffSalon.SalonId;
+            }
+
+            // Generate token
+            var accessToken = jwtService.GenerateAccessToken(userExisted, role.Name, permissions, managedSalonId);
             var rawRefreshToken = jwtService.GenerateRefreshToken();
 
             // Add refresh token in db
@@ -98,7 +116,7 @@ namespace _66SMS.Application.Features.Auth.Commands.Login
 
             refreshTokenSqlRepository.Add(refreshToken);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-            return Result<TokenResponseDTO>.Success(new TokenResponseDTO { UserId = userExisted.Id, AccessToken = accessToken, RefreshToken = refreshToken.Token });
+            return Result<TokenResponseDTO>.Success(new TokenResponseDTO { UserId = userExisted.Id, AccessToken = accessToken, RefreshToken = refreshToken.Token, ManagedSalonId = managedSalonId });
         }
 
     }

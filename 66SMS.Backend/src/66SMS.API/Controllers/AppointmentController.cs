@@ -36,12 +36,13 @@ namespace _66SMS.API.Controllers
         /// <returns>Danh sách nhân viên khả dụng.</returns>
         [HttpGet("technicians")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetTechnicians([FromQuery] DateOnly date, [FromQuery] int serviceId)
+        public async Task<IActionResult> GetTechnicians([FromQuery] DateOnly date, [FromQuery] int serviceId, [FromQuery] int? salonId = null)
         {
             GetTechniciansQuery query = new()
             {
                 Date = date,
-                ServiceId = serviceId
+                ServiceId = serviceId,
+                SalonId = salonId
             };
             var result = await mediator.Send(query);
             return HandleResult(result);
@@ -56,13 +57,14 @@ namespace _66SMS.API.Controllers
         /// <returns>Danh sách khung giờ trống.</returns>
         [HttpGet("timeslots")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetTimeSlots([FromQuery] DateOnly date, [FromQuery] int serviceId, [FromQuery] int? technicianId)
+        public async Task<IActionResult> GetTimeSlots([FromQuery] DateOnly date, [FromQuery] int serviceId, [FromQuery] int? technicianId, [FromQuery] int? salonId = null)
         {
             GetTimeSlotsQuery query = new()
             {
                 Date = date,
                 ServiceId = serviceId,
-                StaffId = technicianId
+                StaffId = technicianId,
+                SalonId = salonId
             };
             var result = await mediator.Send(query);
             return HandleResult(result);
@@ -124,6 +126,9 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetAllAppointment([FromQuery] GetAllAppointmentQuery query)
         {
+            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            if (tokenSalonId.HasValue)
+                query.SalonId = tokenSalonId.Value;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

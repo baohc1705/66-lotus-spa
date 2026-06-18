@@ -23,7 +23,7 @@ namespace _66SMS.Application.Features.Appointments.Queries.GetTimeSlots
         /// <returns>Danh sách khung giờ kèm theo trạng thái (available, booked, outside).</returns>
         public async Task<Result<IReadOnlyList<BookingTimeSlotDto>>> Handle(GetTimeSlotsQuery request, CancellationToken cancellationToken)
         {
-            var result = await bookingAvailabilityService.GetTimeSlotsAsync((DateOnly)request.Date, (int)request.ServiceId, request.StaffId, cancellationToken);
+            var result = await bookingAvailabilityService.GetTimeSlotsAsync((DateOnly)request.Date, (int)request.ServiceId, request.StaffId, request.SalonId, cancellationToken);
             return Result<IReadOnlyList<BookingTimeSlotDto>>.Success(result);
         }
     }

@@ -1,10 +1,12 @@
 using _66SMS.API.Abstractions;
+using _66SMS.Application.DTOs.Salons;
 using _66SMS.Application.Features.Salons.Commands.CreateSalon;
 using _66SMS.Application.Features.Salons.Commands.DeleteSalon;
 using _66SMS.Application.Features.Salons.Commands.UpdateSalon;
 using _66SMS.Application.Features.Salons.Queries.GetAllSalons;
 using _66SMS.Application.Features.Salons.Queries.GetDetailSalon;
 using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Shared;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -51,6 +53,17 @@ namespace _66SMS.API.Controllers
             command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
+        }
+
+        [HttpGet("active")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetActive()
+        {
+            var query = new GetAllSalonsQuery { Status = 1, PageSize = 100, PageIndex = 1 };
+            var result = await mediator.Send(query);
+            if (!result.IsSuccess)
+                return HandleResult(result);
+            return HandleResult(Result<IReadOnlyList<SalonDto>>.Success(result.Data!.Items));
         }
 
         [HttpGet]

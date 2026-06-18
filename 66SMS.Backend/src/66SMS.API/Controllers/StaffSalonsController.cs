@@ -1,6 +1,8 @@
 using _66SMS.API.Abstractions;
+using _66SMS.Application.Features.StaffSalons.Commands.AssignManager;
 using _66SMS.Application.Features.StaffSalons.Commands.CreateStaffSalon;
 using _66SMS.Application.Features.StaffSalons.Commands.DeleteStaffSalon;
+using _66SMS.Application.Features.StaffSalons.Commands.RemoveManager;
 using _66SMS.Application.Features.StaffSalons.Commands.UpdateStaffSalon;
 using _66SMS.Application.Features.StaffSalons.Queries.GetAllStaffSalons;
 using _66SMS.Application.Features.StaffSalons.Queries.GetDetailStaffSalon;
@@ -66,6 +68,24 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> GetDetail(int id)
         {
             var result = await mediator.Send(new GetDetailStaffSalonQuery { Id = id });
+            return HandleResult(result);
+        }
+
+        [HttpPost("assign-manager")]
+        [AllowAnonymous]
+        public async Task<IActionResult> AssignManager([FromBody] AssignManagerCommand command)
+        {
+            command.CreatedBy = jwtService.GetUserId();
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpPost("remove-manager")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RemoveManager([FromBody] RemoveManagerCommand command)
+        {
+            command.UpdatedBy = jwtService.GetUserId();
+            var result = await mediator.Send(command);
             return HandleResult(result);
         }
     }

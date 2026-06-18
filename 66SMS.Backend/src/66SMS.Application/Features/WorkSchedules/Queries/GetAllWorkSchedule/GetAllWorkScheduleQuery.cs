@@ -9,5 +9,6 @@ namespace _66SMS.Application.Features.WorkSchedules.Queries.GetAllWorkSchedule
         public string? StartDate { get; set; }
         public string? EndDate { get; set; }
         public int? StaffId { get; set; }
+        public int? SalonId { get; set; }
     }
 }

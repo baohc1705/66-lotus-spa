@@ -12,7 +12,7 @@ namespace _66SMS.Infrastructure.Security
 {
     public class JwtService(IOptions<JwtSettings> options, IHttpContextAccessor httpContextAccessor) : IJwtService
     {
-        public string GenerateAccessToken<TEntity>(TEntity entity, string role, List<string> permissions)
+        public string GenerateAccessToken<TEntity>(TEntity entity, string role, List<string> permissions, int? salonId = null)
         {
             // Create claim
             var claims = new List<Claim>();
@@ -23,12 +23,16 @@ namespace _66SMS.Infrastructure.Security
                 claims.Add(new Claim(ClaimTypes.NameIdentifier, idProp.GetValue(entity)?.ToString() ?? ""));
             // Add role
             claims.Add(new Claim(ClaimTypes.Role, role));
-            
+
             // Add permissions
             foreach (var permission in permissions)
             {
                 claims.Add(new Claim("permission", permission));
             }
+
+            // Add salon_id for managers
+            if (salonId.HasValue)
+                claims.Add(new Claim("salon_id", salonId.Value.ToString()));
 
             // Create key and cred
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.Value.SecretKey));

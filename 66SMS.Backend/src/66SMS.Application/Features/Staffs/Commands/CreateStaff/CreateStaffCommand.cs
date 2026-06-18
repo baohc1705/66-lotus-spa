@@ -10,6 +10,7 @@ namespace _66SMS.Application.Features.Staffs.Commands.CreateStaff
         // Profile
         [JsonIgnore]
         public int? UserId { get; set; }
+        public int? SalonId { get; set; }
         public string? FullName { get; set; }
         public string? AvatarUrl { get; set; }
         public DateOnly? DateOfBirth { get; set; }

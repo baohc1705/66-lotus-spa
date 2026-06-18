@@ -23,6 +23,11 @@ namespace _66SMS.Application.Features.BookingRooms.Queries.GetAllBookingRooms
         {
             var query = bookingRoomSqlRepository.AsQueryable();
 
+            if (request.SalonId.HasValue)
+            {
+                query = query.Where(x => x.SalonId == request.SalonId.Value);
+            }
+
             if (!string.IsNullOrEmpty(request.Keyword))
             {
                 var keywordLower = request.Keyword.ToLower();

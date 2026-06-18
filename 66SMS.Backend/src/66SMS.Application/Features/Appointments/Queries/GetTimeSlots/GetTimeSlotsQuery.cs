@@ -9,5 +9,6 @@ namespace _66SMS.Application.Features.Appointments.Queries.GetTimeSlots
         public DateOnly? Date { get; set; }
         public int? ServiceId { get; set; }
         public int? StaffId { get; set; }
+        public int? SalonId { get; set; }
     }
 }

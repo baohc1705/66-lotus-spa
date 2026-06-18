@@ -16,7 +16,7 @@ namespace _66SMS.Application.Abstractions
         /// <param name="serviceId">ID của dịch vụ Spa muốn đặt (Dùng để tính thời lượng cần thiết).</param>
         /// <param name="ct">Hủy tác vụ bất đồng bộ.</param>
         /// <returns>Danh sách kỹ thuật viên kèm theo số slot trống thực tế của họ trong ngày.</returns>
-        Task<IReadOnlyList<BookingTechnicianDto>> GetTechniciansAsync(DateOnly date, int serviceId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<BookingTechnicianDto>> GetTechniciansAsync(DateOnly date, int serviceId, int? salonId = null, CancellationToken cancellationToken = default);
         /// <summary>
         /// Lấy danh sách trạng thái của tất cả các khung giờ trong ngày (Khả dụng / Kín lịch / Hết giờ làm).
         /// Trạng thái sẽ được tính toán dựa trên tổng thời lượng của Service.
@@ -26,7 +26,7 @@ namespace _66SMS.Application.Abstractions
         /// <param name="staffId">ID của nhân viên cụ thể (Nếu null, hệ thống sẽ gộp khung giờ khả dụng cho "Bất kỳ nhân viên nào").</param>
         /// <param name="ct">Hủy tác vụ bất đồng bộ.</param>
         /// <returns>Danh sách các khung giờ (Slot) kèm theo trạng thái tương ứng (available, booked, outside).</returns>
-        Task<IReadOnlyList<BookingTimeSlotDto>> GetTimeSlotsAsync(DateOnly date, int serviceId, int? staffId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<BookingTimeSlotDto>> GetTimeSlotsAsync(DateOnly date, int serviceId, int? staffId, int? salonId = null, CancellationToken cancellationToken = default);
         /// <summary>
         /// Xử lý logic chốt nhân viên khi khách hàng thực hiện Đặt lịch hoặc Khóa Slot (Lock).
         /// Ngăn chặn tình trạng Double-Booking bằng cách xác nhận lại tính khả dụng realtime ngay trước khi ghi vào Database.

@@ -57,6 +57,9 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAll([FromQuery] GetAllBookingRoomQuery query)
         {
+            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            if (tokenSalonId.HasValue)
+                query.SalonId = tokenSalonId.Value;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

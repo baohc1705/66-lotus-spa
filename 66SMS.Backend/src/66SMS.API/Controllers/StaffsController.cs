@@ -1,4 +1,5 @@
 using _66SMS.API.Abstractions;
+using _66SMS.Application.DTOs.Staffs;
 using _66SMS.Application.Features.Staffs.Commands.CreateStaff;
 using _66SMS.Application.Features.Staffs.Commands.DeleteStaff;
 using _66SMS.Application.Features.Staffs.Commands.UpdateStaff;
@@ -12,6 +13,7 @@ using _66SMS.Contracts.Shared;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace _66SMS.API.Controllers
@@ -29,10 +31,21 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPost]
-        [PermissionAuthorize("staffs", "create", Roles = "admin")]
+        [PermissionAuthorize("staffs", "create")]
         public async Task<IActionResult> CreateStaff([FromBody] CreateStaffCommand command)
         {
             command.CreatedBy = jwtService.GetUserId();
+            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            if (tokenSalonId.HasValue)
+            {
+                // Manager: ghi đè salon_id từ token
+                command.SalonId = tokenSalonId.Value;
+            }
+            else if (!command.SalonId.HasValue)
+            {
+                // Admin: bắt buộc phải truyền salon_id trong body
+                return HandleResult(Result<object>.BadRequest("salon_id là bắt buộc khi tạo nhân viên với tài khoản Admin"));
+            }
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -57,10 +70,24 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
+        [HttpGet("by-salon/{salonId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetBySalon(int salonId)
+        {
+            var query = new GetAllStaffQuery { SalonId = salonId, PageSize = 100, PageIndex = 1 };
+            var result = await mediator.Send(query);
+            if (!result.IsSuccess)
+                return HandleResult(result);
+            return HandleResult(Result<IReadOnlyList<StaffDto>>.Success(result.Data!.Items));
+        }
+
         [HttpGet]
-        [PermissionAuthorize("staffs", "read", Roles = "admin")]
+        [PermissionAuthorize("staffs", "read")]
         public async Task<IActionResult> GetAll([FromQuery] GetAllStaffQuery query)
         {
+            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            if (tokenSalonId.HasValue)
+                query.SalonId = tokenSalonId.Value;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

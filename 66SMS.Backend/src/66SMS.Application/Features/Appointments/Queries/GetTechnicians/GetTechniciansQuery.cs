@@ -8,5 +8,6 @@ namespace _66SMS.Application.Features.Appointments.Queries.GetTechnicians
     {
         public DateOnly? Date {  get; set; }
         public int ServiceId { get; set; }
+        public int? SalonId { get; set; }
     }
 }

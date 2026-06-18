@@ -14,14 +14,17 @@ namespace _66SMS.Application.Services.Appointments
         }
 
         /// <inheritdoc />
-        public async Task<IReadOnlyList<BookingTechnicianDto>> GetTechniciansAsync(DateOnly date, int serviceId, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<BookingTechnicianDto>> GetTechniciansAsync(DateOnly date, int serviceId, int? salonId = null, CancellationToken cancellationToken = default)
         {
             // Build context lấy danh sách lên ram xử lý
             var context = await contextProvider.BuildContextAsync(date, serviceId, cancellationToken);
             if (context == null) return [];
             var result = new List<BookingTechnicianDto>();
             var staffSlots = new List<(Staff Staff, int Available)>();
-            foreach (var staff in context.ActiveStaff)
+            var staffToProcess = salonId.HasValue
+                ? context.ActiveStaff.Where(s => s.SalonId == salonId.Value).ToList()
+                : context.ActiveStaff;
+            foreach (var staff in staffToProcess)
             {
                 if (!context.StaffShiftWindows.TryGetValue(staff.Id, out var windows) || windows.Count == 0)
                     continue;
@@ -62,7 +65,7 @@ namespace _66SMS.Application.Services.Appointments
             return result;
         }
         /// <inheritdoc />
-        public async Task<IReadOnlyList<BookingTimeSlotDto>> GetTimeSlotsAsync(DateOnly date, int serviceId, int? staffId, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<BookingTimeSlotDto>> GetTimeSlotsAsync(DateOnly date, int serviceId, int? staffId, int? salonId = null, CancellationToken cancellationToken = default)
         {
             var context = await contextProvider.BuildContextAsync(date, serviceId, cancellationToken);
             if (context == null) return [];
@@ -70,11 +73,16 @@ namespace _66SMS.Application.Services.Appointments
             // StaffId == null nghĩa là bất kỳ kỹ thuật viên
             if (!staffId.HasValue)
             {
+                // Nếu có salonId, chỉ aggregate từ staff thuộc salon đó
+                var staffForAggregate = salonId.HasValue
+                    ? context.ActiveStaff.Where(s => s.SalonId == salonId.Value).ToList()
+                    : (IEnumerable<Staff>)context.ActiveStaff;
+
                 return context.TimeSlots.Select((slot, index) => new BookingTimeSlotDto
                 {
                     SlotId = slot.Id,
                     Time = slot.StartTime.ToString("HH:mm"),
-                    Status = ResolveAggregatedStatus(context, index)
+                    Status = ResolveAggregatedStatusForStaff(context, index, staffForAggregate)
                 }).ToList();
             }
 
@@ -204,8 +212,11 @@ namespace _66SMS.Application.Services.Appointments
         /// Phân giải trạng thái tổng hợp của một slot cho toàn bộ Spa (nếu có bất kỳ nhân viên nào rảnh thì slot đó rảnh).
         /// </summary>
         private static string ResolveAggregatedStatus(AppointmentAvailabilityContext context, int startIndex)
+            => ResolveAggregatedStatusForStaff(context, startIndex, context.ActiveStaff);
+
+        private static string ResolveAggregatedStatusForStaff(AppointmentAvailabilityContext context, int startIndex, IEnumerable<Staff> staffSubset)
         {
-            var statuses = context.ActiveStaff
+            var statuses = staffSubset
                 .Where(s => context.StaffShiftWindows.TryGetValue(s.Id, out var w) && w.Count > 0)
                 .Select(s => ResolveStaffSlotStatus(context, s.Id, startIndex, context.StaffShiftWindows[s.Id]))
                 .ToList();

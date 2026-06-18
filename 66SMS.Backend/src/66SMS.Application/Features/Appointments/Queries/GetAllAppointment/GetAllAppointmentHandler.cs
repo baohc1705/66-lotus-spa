@@ -25,6 +25,10 @@ namespace _66SMS.Application.Features.Appointments.Queries.GetAllAppointment
             {
                 query = query.Where(x => x.CreatedByUserId == request.UserId);
             }
+            if (request.SalonId.HasValue)
+            {
+                query = query.Where(x => x.SalonId == request.SalonId.Value);
+            }
             var result = await query
                 .OrderByDescending(x => x.CreatedAt)
                 .ProjectTo<AppointmentDto>(mapper.ConfigurationProvider)

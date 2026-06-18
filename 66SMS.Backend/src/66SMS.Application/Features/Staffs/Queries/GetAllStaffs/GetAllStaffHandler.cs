@@ -28,6 +28,11 @@ namespace _66SMS.Application.Features.Staffs.Queries.GetAllStaffs
         {
             var query = staffSqlRepository.AsQueryable();
 
+            if (request.SalonId.HasValue)
+            {
+                query = query.Where(x => x.SalonId == request.SalonId.Value);
+            }
+
             if (!string.IsNullOrEmpty(request.Filter))
             {
                 query = query.Where(x => x.FullName.StartsWith(request.Filter) 

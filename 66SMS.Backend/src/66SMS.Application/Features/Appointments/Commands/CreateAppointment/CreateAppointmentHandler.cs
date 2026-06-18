@@ -16,14 +16,16 @@ namespace _66SMS.Application.Features.Appointments.Commands.CreateAppointment
         private readonly IServiceSqlRepository serviceSqlRepository;
         private readonly IBookingAvailabilityService bookingAvailabilityService;
         private readonly IAppointmentSlotLockSqlRepository appointmentSlotLockSqlRepository;
+        private readonly IStaffSqlRepository staffSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
 
-        public CreateAppointmentHandler(IAppointmentSqlRepository appointmentSqlRepository, IServiceSqlRepository serviceSqlRepository, IBookingAvailabilityService bookingAvailabilityService, IAppointmentSlotLockSqlRepository appointmentSlotLockSqlRepository, ISqlUnitOfWork sqlUnitOfWork)
+        public CreateAppointmentHandler(IAppointmentSqlRepository appointmentSqlRepository, IServiceSqlRepository serviceSqlRepository, IBookingAvailabilityService bookingAvailabilityService, IAppointmentSlotLockSqlRepository appointmentSlotLockSqlRepository, IStaffSqlRepository staffSqlRepository, ISqlUnitOfWork sqlUnitOfWork)
         {
             this.appointmentSqlRepository = appointmentSqlRepository;
             this.serviceSqlRepository = serviceSqlRepository;
             this.bookingAvailabilityService = bookingAvailabilityService;
             this.appointmentSlotLockSqlRepository = appointmentSlotLockSqlRepository;
+            this.staffSqlRepository = staffSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
         }
 
@@ -78,6 +80,16 @@ namespace _66SMS.Application.Features.Appointments.Commands.CreateAppointment
                         scheduleId = resolvedStaff.Value.ScheduleId;
                     }
 
+                    // Validate staff thuộc đúng salon (nếu salonId được truyền)
+                    if (guest.SalonId.HasValue)
+                    {
+                        var staff = await staffSqlRepository.AsQueryable()
+                            .Where(s => s.Id == staffId)
+                            .FirstOrDefaultAsync(cancellationToken);
+                        if (staff == null || staff.SalonId != guest.SalonId.Value)
+                            return Result<List<int>>.BadRequest("Staff không thuộc chi nhánh này.");
+                    }
+
                     // Tính toán giá và tạo danh sách Service đi kèm
                     var appointmentServices = new List<AppointmentService>();
                     decimal totalAmount = 0;
@@ -107,6 +119,7 @@ namespace _66SMS.Application.Features.Appointments.Commands.CreateAppointment
                         AppointmentCode = $"APT-{DateTime.UtcNow:yyyyMMddHHmmss}-{new Random().Next(100, 999)}",
                         CreatedByUserId = (int)request.CreatedByUserId,
                         StaffId = staffId,
+                        SalonId = guest.SalonId,
                         ScheduleId = scheduleId,
                         SlotId = (int)(validLock != null ? validLock.SlotId : guest.SlotId),
                         PositionId = (int)(validLock != null ? validLock.PositionId : guest.PositionId),

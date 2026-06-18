@@ -37,6 +37,11 @@ namespace _66SMS.Application.Features.WorkSchedules.Queries.GetAllWorkSchedule
                 query = query.Where(x => x.StaffId == request.StaffId.Value);
             }
 
+            if (request.SalonId.HasValue)
+            {
+                query = query.Where(x => x.SalonId == request.SalonId.Value);
+            }
+
             if (!string.IsNullOrEmpty(request.Filter))
             {
                 query = query.Where(x => x.Staff.FullName.StartsWith(request.Filter));

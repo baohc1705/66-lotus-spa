@@ -7,5 +7,6 @@ namespace _66SMS.Application.Features.Appointments.Queries.GetAllAppointment
     public class GetAllAppointmentQuery : PageRequest, IRequest<Result<PagedResult<AppointmentDto>>>
     {
         public int? UserId { get; set; }
+        public int? SalonId { get; set; }
     }
 }

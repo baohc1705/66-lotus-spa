@@ -6,5 +6,6 @@ namespace _66SMS.Application.Features.Staffs.Queries.GetAllStaffs
 {
     public class GetAllStaffQuery : PageRequest, IRequest<Result<PagedResult<StaffDto>>>
     {
+        public int? SalonId { get; set; }
     }
 }

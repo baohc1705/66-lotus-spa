@@ -16,6 +16,7 @@ namespace _66SMS.Application.Features.Appointments.Commands.CreateAppointment
         public int? SlotId { get; set; }
         public DateOnly? AppointmentDate { get; set; }
         public int? PositionId { get; set; }
+        public int? SalonId { get; set; }
         public string? Note { get; set; }
         public List<CreateAppointmentServiceDto>? Services { get; set; }
     }
