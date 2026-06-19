@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { useCreateStaff, useUpdateStaff } from "../hooks/useStaffs";
+import { useProvinces, useWardsByProvince } from "@/features/address/hooks/useAddress";
 import {
   createStaffSchema,
   updateStaffSchema,
@@ -95,6 +96,10 @@ export function StaffFormDialog({
     watch,
   } = form;
 
+  const selectedProvince = watch("provinceCode");
+  const provincesQuery = useProvinces();
+  const wardsQuery = useWardsByProvince(selectedProvince);
+
   // Reset form when dialog opens/closes or staff changes
   useEffect(() => {
     if (open) {
@@ -103,9 +108,14 @@ export function StaffFormDialog({
   }, [open, staff, reset]);
 
   const onSubmit = (data: StaffFormValues) => {
+    const provinceName = provincesQuery.data?.data?.find(p => p.code === data.provinceCode)?.name ?? "";
+    const wardName = wardsQuery.data?.data?.find(w => w.code === data.wardCode)?.name ?? "";
+    const parts = [data.streetAddress, wardName, provinceName].filter(Boolean);
+    const payload = { ...data, fullAddress: parts.join(", ") };
+
     if (isEdit && staff?.id) {
       updateMutation.mutate(
-        { id: staff.id, payload: data as UpdateStaffFormData },
+        { id: staff.id, payload: payload as UpdateStaffFormData },
         {
           onSuccess: (result) => {
             if (result.isSuccess) onOpenChange(false);
@@ -113,7 +123,7 @@ export function StaffFormDialog({
         },
       );
     } else {
-      createMutation.mutate(data as CreateStaffFormData, {
+      createMutation.mutate(payload as CreateStaffFormData, {
         onSuccess: (result) => {
           if (result.isSuccess) onOpenChange(false);
         },
@@ -192,10 +202,44 @@ export function StaffFormDialog({
                   className="h-9 text-[13px]"
                 />
               </FormField>
-              <FormField label="Địa chỉ" error={errors.fullAddress?.message}>
+              <FormField label="Tỉnh/Thành phố" error={errors.provinceCode?.message}>
+                <Select
+                  value={watch("provinceCode") ?? ""}
+                  onValueChange={v => {
+                    setValue("provinceCode", v);
+                    setValue("wardCode", "");
+                  }}
+                >
+                  <SelectTrigger className="h-9 text-[13px]">
+                    <SelectValue placeholder="Chọn tỉnh/thành phố" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {provincesQuery.data?.data?.map(p => (
+                      <SelectItem key={p.code ?? ""} value={p.code ?? ""}>{p.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormField>
+              <FormField label="Phường/Xã" error={errors.wardCode?.message}>
+                <Select
+                  value={watch("wardCode") ?? ""}
+                  onValueChange={v => setValue("wardCode", v)}
+                  disabled={!watch("provinceCode") || wardsQuery.isLoading}
+                >
+                  <SelectTrigger className="h-9 text-[13px]">
+                    <SelectValue placeholder="Chọn phường/xã" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {wardsQuery.data?.data?.map(w => (
+                      <SelectItem key={w.code ?? ""} value={w.code ?? ""}>{w.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormField>
+              <FormField label="Số nhà, tên đường" error={errors.streetAddress?.message} className="sm:col-span-2">
                 <Input
-                  {...register("fullAddress")}
-                  placeholder="123 Đường ABC, Quận 1, TP.HCM"
+                  {...register("streetAddress")}
+                  placeholder="123 Đường ABC"
                   className="h-9 text-[13px]"
                 />
               </FormField>

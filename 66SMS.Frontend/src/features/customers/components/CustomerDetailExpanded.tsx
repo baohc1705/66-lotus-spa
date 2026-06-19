@@ -90,7 +90,7 @@ export function CustomerDetailExpanded({ customerId, onEdit }: CustomerDetailExp
               <div className="flex flex-col">
                 <DetailField label="Nguồn khách" value={customer.source} />
                 <DetailField label="Trạng thái" value={STATUS_MAP[customer.status ?? ''] ?? customer.status} />
-                <DetailField label="Địa chỉ" value={customer.fullAddreess} />
+                <DetailField label="Địa chỉ" value={customer.fullAddress} />
               </div>
               <div className="flex flex-col">
                 <DetailField label="Tài khoản" value={customer.username} />

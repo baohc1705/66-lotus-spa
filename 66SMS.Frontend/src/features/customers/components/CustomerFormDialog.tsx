@@ -22,6 +22,7 @@ import {
 } from '@/shared/components/ui/select'
 import { Textarea } from '@/shared/components/ui/textarea'
 import { useCreateCustomer, useUpdateCustomer } from '../hooks/useCustomers'
+import { useProvinces, useWardsByProvince } from '@/features/address/hooks/useAddress'
 import {
   createCustomerSchema,
   updateCustomerSchema,
@@ -31,6 +32,7 @@ import {
 } from '../schemas/customer.schema'
 
 import type { CustomerDto } from '../types/customer.types'
+import type { ProvinceDto, WardDto } from '@/features/address/types/address.types'
 import { User, ShoppingBag, KeyRound } from 'lucide-react'
 
 interface CustomerFormDialogProps {
@@ -79,6 +81,10 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
 
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = form
 
+  const selectedProvince = watch('provinceCode')
+  const provincesQuery = useProvinces()
+  const wardsQuery = useWardsByProvince(selectedProvince)
+
   // Reset form when dialog opens/closes or customer changes
   useEffect(() => {
     if (open) {
@@ -87,14 +93,19 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
   }, [open, customer, reset])
 
   const onSubmit = (data: CustomerFormValues) => {
+    const provinceName = provincesQuery.data?.data?.find((p: ProvinceDto) => p.code === data.provinceCode)?.name ?? ''
+    const wardName = wardsQuery.data?.data?.find((w: WardDto) => w.code === data.wardCode)?.name ?? ''
+    const parts = [data.streetAddress, wardName, provinceName].filter(Boolean)
+    const payload = { ...data, fullAddress: parts.join(', ') }
+
     if (isEdit && customer?.id) {
       updateMutation.mutate(
-        { id: customer.id, payload: data as UpdateCustomerFormData },
+        { id: customer.id, payload: payload as UpdateCustomerFormData },
         { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) } }
       )
     } else {
       createMutation.mutate(
-        data as CreateCustomerFormData,
+        payload as CreateCustomerFormData,
         { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) } }
       )
     }
@@ -138,8 +149,42 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
                   </SelectContent>
                 </Select>
               </FormField>
-              <FormField label="Địa chỉ" error={errors.fullAddreess?.message} className="sm:col-span-2">
-                <Input {...register('fullAddreess')} placeholder="123 Đường ABC, Quận 1, TP.HCM" className="h-9 text-[13px]" />
+              <FormField label="Tỉnh/Thành phố" error={errors.provinceCode?.message}>
+                <Select
+                  value={watch('provinceCode') ?? ''}
+                  onValueChange={v => {
+                    setValue('provinceCode', v)
+                    setValue('wardCode', '')
+                  }}
+                >
+                  <SelectTrigger className="h-9 text-[13px]">
+                    <SelectValue placeholder="Chọn tỉnh/thành phố" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {provincesQuery.data?.data?.map((p: ProvinceDto) => (
+                      <SelectItem key={p.code ?? ''} value={p.code ?? ''}>{p.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormField>
+              <FormField label="Phường/Xã" error={errors.wardCode?.message}>
+                <Select
+                  value={watch('wardCode') ?? ''}
+                  onValueChange={v => setValue('wardCode', v)}
+                  disabled={!watch('provinceCode') || wardsQuery.isLoading}
+                >
+                  <SelectTrigger className="h-9 text-[13px]">
+                    <SelectValue placeholder="Chọn phường/xã" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {wardsQuery.data?.data?.map((w: WardDto) => (
+                      <SelectItem key={w.code ?? ''} value={w.code ?? ''}>{w.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormField>
+              <FormField label="Số nhà, tên đường" error={errors.streetAddress?.message} className="sm:col-span-2">
+                <Input {...register('streetAddress')} placeholder="123 Đường ABC" className="h-9 text-[13px]" />
               </FormField>
             </div>
           </FormSection>
@@ -325,10 +370,10 @@ function getDefaultValues(customer?: CustomerDto | null): CustomerFormValues {
       source: customer.source ?? '',
       status: customer.status ? Number(customer.status) : 1,
       note: customer.note ?? '',
-      streetAddress: '',
-      provinceCode: '',
-      wardCode: '',
-      fullAddreess: customer.fullAddreess ?? '',
+      streetAddress: customer.streetAddress ?? '',
+      provinceCode: customer.provinceCode ?? '',
+      wardCode: customer.wardCode ?? '',
+      fullAddress: customer.fullAddress ?? '',
       userName: customer.username ?? '',
       email: customer.email ?? '',
     }
@@ -347,7 +392,7 @@ function getDefaultValues(customer?: CustomerDto | null): CustomerFormValues {
     streetAddress: '',
     provinceCode: '',
     wardCode: '',
-    fullAddreess: '',
+    fullAddress: '',
     userName: '',
     email: '',
     password: '',

@@ -26,7 +26,7 @@ const customerBaseSchema = z.object({
   streetAddress: z.string().max(500).optional().or(z.literal('')),
   provinceCode: z.string().optional().or(z.literal('')),
   wardCode: z.string().optional().or(z.literal('')),
-  fullAddreess: z.string().optional().or(z.literal('')),
+  fullAddress: z.string().optional().or(z.literal('')),
 
   // Tài khoản
   userName: z.string().min(1, 'Tên tài khoản không được để trống').max(50, 'Tối đa 50 ký tự')

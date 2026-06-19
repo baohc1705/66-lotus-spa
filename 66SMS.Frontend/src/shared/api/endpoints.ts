@@ -52,4 +52,8 @@ export const API = {
   admin: {
     wallets:          '/admin/wallets',
   },
+  address: {
+    provinces:        '/address/provinces',
+    wards:            '/address/wards',
+  },
 } as const

@@ -14,7 +14,10 @@ export interface CustomerDto {
   source: string | null
   status: string | null
   note: string | null
-  fullAddreess: string | null
+  streetAddress: string | null
+  provinceCode: string | null
+  wardCode: string | null
+  fullAddress: string | null
   username: string | null
   email: string | null
   createdAt?: string | null
@@ -40,7 +43,7 @@ export interface CreateCustomerPayload {
   streetAddress?: string
   provinceCode?: string
   wardCode?: string
-  fullAddreess?: string
+  fullAddress?: string
   // Account fields
   userName: string
   email: string
@@ -65,7 +68,7 @@ export interface UpdateCustomerPayload {
   streetAddress?: string
   provinceCode?: string
   wardCode?: string
-  fullAddreess?: string
+  fullAddress?: string
   userName?: string
   email?: string
 }
