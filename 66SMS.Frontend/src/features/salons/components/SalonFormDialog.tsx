@@ -23,12 +23,15 @@ import {
 import { Textarea } from '@/shared/components/ui/textarea'
 import { Info } from 'lucide-react'
 import { useCreateSalon, useUpdateSalon } from '../hooks/useSalons'
+import { useProvinces, useWardsByProvince } from '@/features/address/hooks/useAddress'
+import { SearchableSelect } from '@/shared/components/ui/searchable-select'
 import {
   createSalonSchema,
   updateSalonSchema,
   type SalonFormValues,
 } from '../schemas/salon.schema'
 import type { SalonDTO } from '../types/salon.types'
+import type { ProvinceDto, WardDto } from '@/features/address/types/address.types'
 
 interface SalonFormDialogProps {
   open: boolean
@@ -57,20 +60,28 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
 
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = form
   const statusValue = watch('status')
+  const selectedProvince = watch('provinceCode')
+  const provincesQuery = useProvinces()
+  const wardsQuery = useWardsByProvince(selectedProvince)
 
   useEffect(() => {
     if (open) reset(getDefaultValues(salon))
   }, [open, salon, reset])
 
   const onSubmit = (data: SalonFormValues) => {
+    const provinceName = provincesQuery.data?.data?.find((p: ProvinceDto) => p.code === data.provinceCode)?.name ?? ''
+    const wardName = wardsQuery.data?.data?.find((w: WardDto) => w.code === data.wardCode)?.name ?? ''
+    const parts = [data.streetAddress, wardName, provinceName].filter(Boolean)
+    const payload = { ...data, fullAddress: parts.join(', ') }
+
     if (isEdit && salon?.id) {
       updateMutation.mutate(
-        { id: salon.id, payload: data },
+        { id: salon.id, payload },
         { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) } }
       )
     } else {
       createMutation.mutate(
-        data as Parameters<typeof createMutation.mutate>[0],
+        payload as Parameters<typeof createMutation.mutate>[0],
         { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) } }
       )
     }
@@ -119,17 +130,32 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
               Địa chỉ
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
-              <FormField label="Địa chỉ đường phố" error={errors.streetAddress?.message}>
+              <FormField label="Tỉnh/Thành phố" error={errors.provinceCode?.message}>
+                <SearchableSelect
+                  value={watch('provinceCode') ?? ''}
+                  onValueChange={v => {
+                    setValue('provinceCode', v)
+                    setValue('wardCode', '')
+                  }}
+                  options={(provincesQuery.data?.data ?? []).map((p: ProvinceDto) => ({ value: p.code ?? '', label: p.name ?? '' }))}
+                  placeholder="Chọn tỉnh/thành phố"
+                  searchPlaceholder="Tìm tỉnh/thành phố..."
+                  className="h-9"
+                />
+              </FormField>
+              <FormField label="Phường/Xã" error={errors.wardCode?.message}>
+                <SearchableSelect
+                  value={watch('wardCode') ?? ''}
+                  onValueChange={v => setValue('wardCode', v)}
+                  options={(wardsQuery.data?.data ?? []).map((w: WardDto) => ({ value: w.code ?? '', label: w.name ?? '' }))}
+                  placeholder="Chọn phường/xã"
+                  searchPlaceholder="Tìm phường/xã..."
+                  disabled={!watch('provinceCode') || wardsQuery.isLoading}
+                  className="h-9"
+                />
+              </FormField>
+              <FormField label="Số nhà, tên đường" error={errors.streetAddress?.message} className="sm:col-span-2">
                 <Input {...register('streetAddress')} placeholder="123 Nguyễn Trãi" className="h-9 text-[13px]" />
-              </FormField>
-              <FormField label="Địa chỉ đầy đủ" error={errors.fullAddress?.message}>
-                <Input {...register('fullAddress')} placeholder="123 Nguyễn Trãi, P.2, Q.5, TP.HCM" className="h-9 text-[13px]" />
-              </FormField>
-              <FormField label="Mã tỉnh/thành" error={errors.provinceCode?.message}>
-                <Input {...register('provinceCode')} placeholder="79" className="h-9 text-[13px]" />
-              </FormField>
-              <FormField label="Mã phường/xã" error={errors.wardCode?.message}>
-                <Input {...register('wardCode')} placeholder="26734" className="h-9 text-[13px]" />
               </FormField>
             </div>
           </div>

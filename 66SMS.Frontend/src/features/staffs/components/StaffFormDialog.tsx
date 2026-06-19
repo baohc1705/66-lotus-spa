@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
+import { SearchableSelect } from "@/shared/components/ui/searchable-select";
 import { useCreateStaff, useUpdateStaff } from "../hooks/useStaffs";
 import { useProvinces, useWardsByProvince } from "@/features/address/hooks/useAddress";
 import {
@@ -203,38 +204,28 @@ export function StaffFormDialog({
                 />
               </FormField>
               <FormField label="Tỉnh/Thành phố" error={errors.provinceCode?.message}>
-                <Select
+                <SearchableSelect
                   value={watch("provinceCode") ?? ""}
                   onValueChange={v => {
                     setValue("provinceCode", v);
                     setValue("wardCode", "");
                   }}
-                >
-                  <SelectTrigger className="h-9 text-[13px]">
-                    <SelectValue placeholder="Chọn tỉnh/thành phố" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {provincesQuery.data?.data?.map(p => (
-                      <SelectItem key={p.code ?? ""} value={p.code ?? ""}>{p.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  options={(provincesQuery.data?.data ?? []).map(p => ({ value: p.code ?? "", label: p.name ?? "" }))}
+                  placeholder="Chọn tỉnh/thành phố"
+                  searchPlaceholder="Tìm tỉnh/thành phố..."
+                  className="h-9"
+                />
               </FormField>
               <FormField label="Phường/Xã" error={errors.wardCode?.message}>
-                <Select
+                <SearchableSelect
                   value={watch("wardCode") ?? ""}
                   onValueChange={v => setValue("wardCode", v)}
+                  options={(wardsQuery.data?.data ?? []).map(w => ({ value: w.code ?? "", label: w.name ?? "" }))}
+                  placeholder="Chọn phường/xã"
+                  searchPlaceholder="Tìm phường/xã..."
                   disabled={!watch("provinceCode") || wardsQuery.isLoading}
-                >
-                  <SelectTrigger className="h-9 text-[13px]">
-                    <SelectValue placeholder="Chọn phường/xã" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {wardsQuery.data?.data?.map(w => (
-                      <SelectItem key={w.code ?? ""} value={w.code ?? ""}>{w.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  className="h-9"
+                />
               </FormField>
               <FormField label="Số nhà, tên đường" error={errors.streetAddress?.message} className="sm:col-span-2">
                 <Input
