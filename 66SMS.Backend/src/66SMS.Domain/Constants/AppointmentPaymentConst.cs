@@ -45,6 +45,8 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_APPOINTMENT_PAYMENT_ID_NOT_FOUND = $"{nameof(Entities.AppointmentPayment)} with id not found";
+        public const string MSG_PAYMENT_TRANSACTION_FAILED = "Giao dịch thất bại hoặc sai chữ ký.";
+        public const string MSG_PAYMENT_ORDER_NOT_FOUND = "Không tìm thấy đơn.";
         #endregion
     }
 }

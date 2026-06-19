@@ -27,6 +27,8 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_ROLE_ID_NOT_FOUND = $"{nameof(Entities.Role)} with id not found";
+        public const string MSG_ROLE_NOT_FOUND = "Role not found.";
+        public const string MSG_ROLE_NAME_EXISTED = "Role name already exists.";
         #endregion
     }
 }

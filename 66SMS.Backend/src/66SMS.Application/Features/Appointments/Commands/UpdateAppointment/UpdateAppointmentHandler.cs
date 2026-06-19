@@ -1,5 +1,7 @@
-﻿using _66SMS.Contracts.Shared;
+﻿using _66SMS.Contracts.Enumerations;
+using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using MediatR;
 using System.Data;
@@ -23,7 +25,7 @@ namespace _66SMS.Application.Features.Appointments.Commands.UpdateAppointment
             try
             {
                 var appointment = await appointmentSqlRepository.FindByIdAsync((int)request.Id, false, cancellationToken);
-                if (appointment == null) return Result<object>.NotFound("Lịch hẹn không tồn tại.");
+                if (appointment == null) return Result<object>.NotFound(AppointmentConst.MSG_APPOINTMENT_NOT_FOUND, ErrorCodes.ERR_APPOINTMENT_NOT_FOUND);
                 if (request.Note != null) appointment.Note = request.Note;
                 if (request.Status.HasValue) appointment.Status = request.Status.Value;
                 appointmentSqlRepository.Update(appointment);

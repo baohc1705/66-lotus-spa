@@ -49,6 +49,7 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_CUSTOMER_ID_NOT_FOUND = $"{nameof(Entities.Customer)} with id not found";
+        public const string MSG_CUSTOMER_NOT_FOUND = "Customer not found.";
         #endregion
     }
 }

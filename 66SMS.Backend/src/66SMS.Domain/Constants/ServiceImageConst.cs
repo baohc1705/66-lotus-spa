@@ -13,6 +13,7 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_SERVICE_IMAGE_ID_NOT_FOUND = $"{nameof(Entities.ServiceImage)} with id not found";
+        public const string MSG_SERVICE_IMAGE_NOT_FOUND = "Service image not found.";
         #endregion
     }
 }

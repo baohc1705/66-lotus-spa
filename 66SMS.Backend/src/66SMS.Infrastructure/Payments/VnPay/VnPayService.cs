@@ -1,10 +1,8 @@
 using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Constants;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Settings;
-using Microsoft.Extensions.Options;
-
 using _66SMS.Domain.Constants;
+using Microsoft.Extensions.Options;
 
 namespace _66SMS.Infrastructure.Payments.VnPay
 {

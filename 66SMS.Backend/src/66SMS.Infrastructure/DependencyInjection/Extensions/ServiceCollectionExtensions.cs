@@ -20,6 +20,7 @@ namespace _66SMS.Infrastructure.DependencyInjection.Extensions
 
             // Mail
             services.Configure<MailSettings>(configuration.GetSection(MailSettings.SectionName));
+            services.Configure<OtpSettings>(configuration.GetSection(OtpSettings.SectionName));
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IEmailTemplateFactory, EmailTemplateFactory>();
 

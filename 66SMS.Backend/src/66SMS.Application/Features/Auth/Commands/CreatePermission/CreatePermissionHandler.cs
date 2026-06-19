@@ -1,3 +1,4 @@
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
@@ -21,7 +22,7 @@ namespace _66SMS.Application.Features.Auth.Commands.CreatePermission
         {
             bool permissionNameExsited = await permissionSqlRepository.AsQueryable().Where(x => x.Name.Equals(request.Name)).AnyAsync(cancellationToken);
             if (permissionNameExsited)
-                return Result<object>.BadRequest("Permission name exsited");
+                return Result<object>.BadRequest(PermissionConst.MSG_PERMISSION_NAME_EXISTED, ErrorCodes.ERR_PERMISSION_NAME_EXISTED);
 
             Permission? permission = mapper.Map<Permission>(request);
             permission.Status = PermissionConst.STATUS_ACTIVED;

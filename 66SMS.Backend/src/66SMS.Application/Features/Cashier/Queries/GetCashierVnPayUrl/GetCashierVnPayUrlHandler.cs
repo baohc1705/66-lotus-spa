@@ -2,6 +2,7 @@ using _66SMS.Application.Services.Appointments;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -20,10 +21,10 @@ namespace _66SMS.Application.Features.Cashier.Queries.GetCashierVnPayUrl
                 .FirstOrDefaultAsync(a => a.Id == request.AppointmentId, cancellationToken);
 
             if (appointment == null)
-                return Result<string>.NotFound("Không tìm thấy lịch hẹn");
+                return Result<string>.NotFound(AppointmentConst.MSG_APPOINTMENT_NOT_FOUND, ErrorCodes.ERR_APPOINTMENT_NOT_FOUND);
 
             if (AppointmentPaymentCalculator.IsFullyPaid(appointment))
-                return Result<string>.BadRequest("Lịch hẹn đã được thanh toán");
+                return Result<string>.BadRequest(AppointmentConst.MSG_APPOINTMENT_ALREADY_PAID, ErrorCodes.ERR_APPOINTMENT_ALREADY_PAID);
 
             if (!AppointmentStatusTransitions.CanPayBalance(appointment.Status))
             {
@@ -32,11 +33,11 @@ namespace _66SMS.Application.Features.Cashier.Queries.GetCashierVnPayUrl
             }
 
             if (!AppointmentPaymentCalculator.HasDepositPaid(appointment))
-                return Result<string>.BadRequest("Khách chưa đặt cọc.");
+                return Result<string>.BadRequest(AppointmentConst.MSG_APPOINTMENT_NOT_DEPOSITED_YET, ErrorCodes.ERR_APPOINTMENT_NOT_DEPOSITED_YET);
 
             var amount = AppointmentPaymentCalculator.GetRemainingAmount(appointment);
             if (amount <= 0)
-                return Result<string>.BadRequest("Không còn số tiền cần thanh toán.");
+                return Result<string>.BadRequest(AppointmentConst.MSG_APPOINTMENT_NO_REMAINING_AMOUNT, ErrorCodes.ERR_APPOINTMENT_NO_REMAINING_AMOUNT);
 
             var description = $"Thanh toan phan con lai don {appointment.Id}";
             var url = vnPayService.CreatePaymentUrl(

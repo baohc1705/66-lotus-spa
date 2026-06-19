@@ -29,7 +29,7 @@ namespace _66SMS.Application.Features.Services.Commands.DeleteServices
                 Service? entity = await serviceSqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
                 if (entity == null)
                 {
-                    return Result<object>.NotFound("Service not found", ErrorCodes.ERR_SERVICE_NOT_FOUND);
+                    return Result<object>.NotFound(ServiceConst.MSG_SERVICE_NOT_FOUND, ErrorCodes.ERR_SERVICE_NOT_FOUND);
                 }
 
                 entity.Status = ServiceConst.STATUS_DELETED;

@@ -1,6 +1,7 @@
 using _66SMS.Application.DTOs.ProductCategories;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -29,7 +30,7 @@ namespace _66SMS.Application.Features.ProductCategories.Queries.GetDetailProduct
 
             if (productCategoryDto == null)
             {
-                return Result<ProductCategoryDto>.NotFound("Product category not found.", ErrorCodes.ERR_PRODUCT_CATEGORY_NOT_FOUND);
+                return Result<ProductCategoryDto>.NotFound(ProductCategoryConst.MSG_PRODUCT_CATEGORY_NOT_FOUND, ErrorCodes.ERR_PRODUCT_CATEGORY_NOT_FOUND);
             }
 
             return Result<ProductCategoryDto>.Success(productCategoryDto);

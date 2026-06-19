@@ -50,6 +50,7 @@ namespace _66SMS.Domain.Constants
         #region Message
         public const string MSG_NOT_FOUND = "Salon with id not found";
         public const string MSG_CODE_EXISTED = "Salon code already exists";
+        public const string MSG_SALON_NOT_FOUND = "Salon not found.";
         #endregion
     }
 }

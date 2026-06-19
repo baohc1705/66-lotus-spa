@@ -29,6 +29,7 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_MEMBERSHIP_TIER_ID_NOT_FOUND = $"{nameof(Entities.MembershipTier)} with id not found";
+        public const string MSG_MEMBERSHIP_TIER_NOT_FOUND = "Membership tier not found.";
         #endregion
     }
 }

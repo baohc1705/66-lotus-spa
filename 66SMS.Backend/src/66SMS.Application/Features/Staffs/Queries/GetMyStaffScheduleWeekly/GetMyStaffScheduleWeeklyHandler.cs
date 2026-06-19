@@ -1,9 +1,10 @@
 using _66SMS.Application.DTOs.Staffs;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Domain.Constants;
 
 namespace _66SMS.Application.Features.Staffs.Queries.GetMyStaffScheduleWeekly
 {
@@ -26,7 +27,7 @@ namespace _66SMS.Application.Features.Staffs.Queries.GetMyStaffScheduleWeekly
                 .FirstOrDefaultAsync(s => s.UserId == request.UserId, cancellationToken);
             
             if (staff == null)
-                return Result<StaffScheduleWeeklyDto>.NotFound("Lỗi: Không tìm thấy nhân viên.");
+                return Result<StaffScheduleWeeklyDto>.NotFound(StaffConst.MSG_STAFF_NOT_FOUND, ErrorCodes.ERR_STAFF_NOT_FOUND);
 
             var weekEnd = request.WeekStart.AddDays(6);
 

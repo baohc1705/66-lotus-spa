@@ -22,6 +22,10 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_WALLET_ID_NOT_FOUND = $"{nameof(Entities.Wallet)} with id not found";
+        public const string MSG_WALLET_NOT_FOUND = "Ví không tồn tại.";
+        public const string MSG_WALLET_INVALID_AMOUNT = "Số tiền phải khác 0.";
+        public const string MSG_WALLET_INSUFFICIENT_BALANCE = "Số dư ví không đủ để thanh toán tiền cọc.";
+        public const string MSG_WALLET_TRANSACTION_SUCCESS = "Giao dịch thành công.";
         #endregion
     }
 }

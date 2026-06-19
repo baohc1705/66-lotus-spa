@@ -34,7 +34,7 @@ namespace _66SMS.Application.Features.Products.Commands.DeleteProducts
                 Product product = await productSqlRepository.FindByIdAsync(request.Id);
                 if (product == null)
                 {
-                    return Result<object>.NotFound("Product not found.", ErrorCodes.ERR_PRODUCT_NOT_FOUND);
+                    return Result<object>.NotFound(ProductConst.MSG_PRODUCT_NOT_FOUND, ErrorCodes.ERR_PRODUCT_NOT_FOUND);
                 }
 
                 // Xóa mềm Product

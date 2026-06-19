@@ -1,4 +1,6 @@
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +24,7 @@ namespace _66SMS.Application.Features.Auth.Commands.Logout
                 .FirstOrDefaultAsync(cancellationToken);
             // kiem tra token
             if (stored == null || !stored.IsActive)
-                return Result<object>.BadRequest("Token khong hop le");
+                return Result<object>.BadRequest(UserConst.MSG_USER_INVALID_TOKEN, ErrorCodes.ERR_AUTH_TOKEN_INVALID);
             // Revoke token
             stored.IsRevoked = true;
             stored.RevokedAt = DateTime.UtcNow;

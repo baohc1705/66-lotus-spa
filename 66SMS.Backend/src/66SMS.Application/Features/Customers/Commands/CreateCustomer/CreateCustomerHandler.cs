@@ -42,7 +42,7 @@ namespace _66SMS.Application.Features.Customers.Commands.CreateCustomer
                 .Where(x => x.Email.Equals(request.Email) || x.Username.Equals(request.UserName))
                 .AnyAsync();
             if (emailOrUsernameExisted)
-                return Result<object>.Conflict("Email or username existed", ErrorCodes.ERR_USER_ALREADY_EXISTS);
+                return Result<object>.Conflict(UserConst.MSG_USER_ALREADY_EXISTS, ErrorCodes.ERR_USER_ALREADY_EXISTS);
 
             User? user = mapper.Map<User>(request);
             user.PasswordHash = passwordHash.Hash(request.Password!);
@@ -84,7 +84,7 @@ namespace _66SMS.Application.Features.Customers.Commands.CreateCustomer
                     .Where(x => x.Name.Equals(roleRequest))
                     .FirstOrDefaultAsync(cancellationToken);
                 if (role == null)
-                    return Result<object>.BadRequest("Invalid role", ErrorCodes.ERR_BAD_REQUEST);
+                    return Result<object>.BadRequest(UserConst.MSG_USER_INVALID_ROLE, ErrorCodes.ERR_ROLE_NOT_FOUND);
                 UserRole userRole = new ()
                 {
                     UserId = user.Id,

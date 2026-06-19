@@ -2,6 +2,7 @@ using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
@@ -29,7 +30,7 @@ namespace _66SMS.Application.Features.MembershipTiers.Commands.UpdateMembershipT
             MembershipTier membershipTier = await membershipTierSqlRepository.FindByIdAsync(request.Id);
             if (membershipTier == null)
             {
-                return Result<object>.NotFound("Membership tier not found.", ErrorCodes.ERR_MEMBERSHIP_TIER_NOT_FOUND);
+                return Result<object>.NotFound(MembershipTierConst.MSG_MEMBERSHIP_TIER_NOT_FOUND, ErrorCodes.ERR_MEMBERSHIP_TIER_NOT_FOUND);
             }
 
             mapper.Map(request, membershipTier);
@@ -38,7 +39,7 @@ namespace _66SMS.Application.Features.MembershipTiers.Commands.UpdateMembershipT
             membershipTierSqlRepository.Update(membershipTier);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-            return Result<object>.Success(null);
+            return Result<object>.Ok();
         }
     }
 }

@@ -31,7 +31,7 @@ namespace _66SMS.Application.Features.BookingPositions.Commands.DeleteBookingPos
                 BookingPosition bookingPosition = await bookingPositionSqlRepository.FindByIdAsync((int)request.Id);
                 if (bookingPosition == null)
                 {
-                    return Result<object>.NotFound("Booking position not found.", ErrorCodes.ERR_BOOKING_POSITION_NOT_FOUND);
+                    return Result<object>.NotFound(BookingPositionConst.MSG_BOOKING_POSITION_NOT_FOUND, ErrorCodes.ERR_BOOKING_POSITION_NOT_FOUND);
                 }
 
                 bookingPosition.Status = BookingPositionConst.STATUS_DELETED;

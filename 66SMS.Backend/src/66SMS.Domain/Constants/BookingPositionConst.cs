@@ -29,6 +29,7 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_BOOKING_POSITION_ID_NOT_FOUND = $"{nameof(Entities.BookingPosition)} with id not found";
+        public const string MSG_BOOKING_POSITION_NOT_FOUND = "Booking position not found.";
         #endregion
     }
 }

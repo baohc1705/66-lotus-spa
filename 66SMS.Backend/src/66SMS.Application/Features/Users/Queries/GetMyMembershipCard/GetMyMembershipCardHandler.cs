@@ -2,6 +2,7 @@ using _66SMS.Application.DTOs.MembershipCards;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
@@ -35,7 +36,7 @@ namespace _66SMS.Application.Features.Users.Queries.GetMyMembershipCard
 
             if (customer == null)
             {
-                return Result<MembershipCardDto>.NotFound("Customer profile not found.");
+                return Result<MembershipCardDto>.NotFound(UserConst.MSG_USER_CUSTOMER_PROFILE_NOT_FOUND, ErrorCodes.ERR_CUSTOMER_NOT_FOUND);
             }
 
             MembershipCardDto? membershipCardDto = await membershipCardSqlRepository.AsQueryable(asNoTracking: true)
@@ -45,7 +46,7 @@ namespace _66SMS.Application.Features.Users.Queries.GetMyMembershipCard
 
             if (membershipCardDto == null)
             {
-                return Result<MembershipCardDto>.NotFound("Membership card not found.");
+                return Result<MembershipCardDto>.NotFound(MembershipCardConst.MSG_MEMBERSHIP_CARD_NOT_FOUND, ErrorCodes.ERR_MEMBERSHIP_CARD_NOT_FOUND);
             }
 
             return Result<MembershipCardDto>.Success(membershipCardDto);

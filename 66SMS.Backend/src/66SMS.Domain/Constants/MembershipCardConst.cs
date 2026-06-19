@@ -29,6 +29,7 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_MEMBERSHIP_CARD_ID_NOT_FOUND = $"{nameof(Entities.MembershipCard)} with id not found";
+        public const string MSG_MEMBERSHIP_CARD_NOT_FOUND = "Membership card not found.";
         #endregion
     }
 }

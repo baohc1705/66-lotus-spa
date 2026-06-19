@@ -3,6 +3,7 @@ using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
@@ -33,7 +34,7 @@ namespace _66SMS.Application.Features.StaffSalons.Commands.UpdateStaffSalon
             {
                 StaffSalon? staffSalon = await staffSalonSqlRepository.FindByIdAsync((int)request.Id);
                 if (staffSalon == null)
-                    return Result<object>.NotFound("StaffSalon not found.", ErrorCodes.ERR_STAFF_SALON_NOT_FOUND);
+                    return Result<object>.NotFound(StaffSalonConst.MSG_STAFF_SALON_NOT_FOUND, ErrorCodes.ERR_STAFF_SALON_NOT_FOUND);
 
                 mapper.Map(request, staffSalon);
                 staffSalon.UpdatedAt = DateTimeHelper.UtcNow();

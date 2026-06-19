@@ -2,6 +2,7 @@ using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using System.Threading;
@@ -27,7 +28,7 @@ namespace _66SMS.Application.Features.TimeSlots.Commands.DeleteTimeSlot
             TimeSlot? timeSlot = await timeSlotSqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
             if (timeSlot == null)
             {
-                return Result<int>.NotFound("Time slot not found.", ErrorCodes.ERR_TIME_SLOT_NOT_FOUND);
+                return Result<int>.NotFound(TimeSlotConst.MSG_TIME_SLOT_NOT_FOUND, ErrorCodes.ERR_TIME_SLOT_NOT_FOUND);
             }
 
             timeSlotSqlRepository.Remove(timeSlot);

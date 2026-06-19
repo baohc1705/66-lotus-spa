@@ -1,6 +1,8 @@
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
@@ -23,7 +25,7 @@ namespace _66SMS.Application.Features.WorkSchedules.Commands.UpdateWorkSchedule
         public async Task<Result<object>> Handle(UpdateWorkScheduleCommand request, CancellationToken cancellationToken)
         {
             WorkSchedule workSchedule = await workScheduleSqlRepository.FindByIdAsync((int)request.Id, false, cancellationToken);
-            if (workSchedule == null) return Result<object>.Conflict("Không tìm thấy ca làm việc");
+            if (workSchedule == null) return Result<object>.NotFound(WorkScheduleConst.MSG_WORK_SCHEDULE_NOT_FOUND, ErrorCodes.ERR_WORK_SCHEDULE_NOT_FOUND);
 
             mapper.Map(request, workSchedule);
             workSchedule.UpdatedAt = DateTime.UtcNow;
@@ -32,7 +34,7 @@ namespace _66SMS.Application.Features.WorkSchedules.Commands.UpdateWorkSchedule
             bool isDuplicate = await workScheduleSqlRepository.AnyAsync(x => x.Id != request.Id && x.StaffId == workSchedule.StaffId && x.ShiftPeriodId == workSchedule.ShiftPeriodId && x.WorkDate == workSchedule.WorkDate, cancellationToken);
             if (isDuplicate)
             {
-                return Result<object>.Conflict("Nhân viên này đã được xếp vào ca này trong cùng ngày.");
+                return Result<object>.Conflict(WorkScheduleConst.MSG_WORK_SCHEDULE_DUPLICATE, ErrorCodes.ERR_WORK_SCHEDULE_DUPLICATE);
             }
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);

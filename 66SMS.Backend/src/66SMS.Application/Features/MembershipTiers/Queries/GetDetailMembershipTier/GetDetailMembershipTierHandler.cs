@@ -1,6 +1,7 @@
 using _66SMS.Application.DTOs.MembershipTiers;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -29,7 +30,7 @@ namespace _66SMS.Application.Features.MembershipTiers.Queries.GetDetailMembershi
 
             if (membershipTierDto == null)
             {
-                return Result<MembershipTierDto>.NotFound("Membership tier not found.", ErrorCodes.ERR_MEMBERSHIP_TIER_NOT_FOUND);
+                return Result<MembershipTierDto>.NotFound(MembershipTierConst.MSG_MEMBERSHIP_TIER_NOT_FOUND, ErrorCodes.ERR_MEMBERSHIP_TIER_NOT_FOUND);
             }
 
             return Result<MembershipTierDto>.Success(membershipTierDto);

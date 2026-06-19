@@ -3,6 +3,7 @@ using _66SMS.Application.Services.Wallets;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
@@ -29,12 +30,12 @@ namespace _66SMS.Application.Features.Cashier.Commands.UpdateAppointmentStatus
 
             if (appointment == null)
             {
-                return Result<object>.NotFound("Lịch hẹn không tồn tại.");
+                return Result<object>.NotFound(AppointmentConst.MSG_APPOINTMENT_NOT_FOUND, ErrorCodes.ERR_APPOINTMENT_NOT_FOUND);
             }
 
             if (appointment.Status == request.Status && request.Status != AppointmentConst.STATUS_WAITING)
             {
-                return Result<object>.BadRequest("Lịch hẹn đã ở trạng thái này.");
+                return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_ALREADY_THIS_STATUS, ErrorCodes.ERR_APPOINTMENT_ALREADY_THIS_STATUS);
             }
 
             // TODO: Bổ sung logic IsCashierTransition trong AppointmentStatusTransitions nếu cần
@@ -49,7 +50,7 @@ namespace _66SMS.Application.Features.Cashier.Commands.UpdateAppointmentStatus
                 && !AppointmentPaymentCalculator.HasDepositPaid(appointment)
                 && appointment.DepositDeadlineAt != null)
             {
-                return Result<object>.BadRequest("Lịch hẹn đã được xác nhận và đang chờ khách đặt cọc.");
+                return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_ALREADY_CONFIRMED_WAITING_DEPOSIT, ErrorCodes.ERR_APPOINTMENT_ALREADY_THIS_STATUS);
             }
 
             using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);

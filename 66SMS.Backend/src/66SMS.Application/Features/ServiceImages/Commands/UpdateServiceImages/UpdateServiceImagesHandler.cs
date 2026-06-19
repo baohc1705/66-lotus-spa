@@ -2,6 +2,7 @@ using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
@@ -30,7 +31,7 @@ namespace _66SMS.Application.Features.ServiceImages.Commands.UpdateServiceImages
                 ServiceImage? entity = await serviceImageSqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
                 if (entity == null)
                 {
-                    return Result<object>.NotFound("Service image not found", ErrorCodes.ERR_SERVICE_IMAGE_NOT_FOUND);
+                    return Result<object>.NotFound(ServiceImageConst.MSG_SERVICE_IMAGE_NOT_FOUND, ErrorCodes.ERR_SERVICE_IMAGE_NOT_FOUND);
                 }
 
                 mapper.Map(request, entity);

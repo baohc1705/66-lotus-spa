@@ -26,7 +26,7 @@ namespace _66SMS.Application.Features.ProductCategories.Commands.DeleteProductCa
             ProductCategory productCategory = await productCategorySqlRepository.FindByIdAsync(request.Id);
             if (productCategory == null)
             {
-                return Result<object>.NotFound("Product category not found.", ErrorCodes.ERR_PRODUCT_CATEGORY_NOT_FOUND);
+                return Result<object>.NotFound(ProductCategoryConst.MSG_PRODUCT_CATEGORY_NOT_FOUND, ErrorCodes.ERR_PRODUCT_CATEGORY_NOT_FOUND);
             }
 
             // Soft delete
@@ -37,7 +37,7 @@ namespace _66SMS.Application.Features.ProductCategories.Commands.DeleteProductCa
             productCategorySqlRepository.Update(productCategory);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-            return Result<object>.Success(null);
+            return Result<object>.Ok();
         }
     }
 }

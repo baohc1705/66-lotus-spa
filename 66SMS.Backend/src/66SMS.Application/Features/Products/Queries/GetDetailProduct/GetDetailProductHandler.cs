@@ -1,6 +1,7 @@
 using _66SMS.Application.DTOs.Products;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -29,7 +30,7 @@ namespace _66SMS.Application.Features.Products.Queries.GetDetailProduct
 
             if (productDto == null)
             {
-                return Result<ProductDto>.NotFound("Product not found.", ErrorCodes.ERR_PRODUCT_NOT_FOUND);
+                return Result<ProductDto>.NotFound(ProductConst.MSG_PRODUCT_NOT_FOUND, ErrorCodes.ERR_PRODUCT_NOT_FOUND);
             }
 
             return Result<ProductDto>.Success(productDto);

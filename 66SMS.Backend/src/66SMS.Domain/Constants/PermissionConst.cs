@@ -31,6 +31,7 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_PERMISSION_ID_NOT_FOUND = $"{nameof(Entities.Permission)} with id not found";
+        public const string MSG_PERMISSION_NAME_EXISTED = "Permission name already exists.";
         #endregion
     }
 }

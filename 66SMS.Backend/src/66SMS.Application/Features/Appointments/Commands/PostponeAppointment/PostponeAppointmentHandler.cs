@@ -3,6 +3,7 @@ using _66SMS.Application.Services.Wallets;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
@@ -35,7 +36,7 @@ namespace _66SMS.Application.Features.Appointments.Commands.PostponeAppointment
 
             if (appointment == null)
             {
-                return Result<object>.NotFound("Lịch hẹn không tồn tại.");
+                return Result<object>.NotFound(AppointmentConst.MSG_APPOINTMENT_NOT_FOUND, ErrorCodes.ERR_APPOINTMENT_NOT_FOUND);
             }
 
             if (appointment.CreatedByUserId != userId)
@@ -45,19 +46,19 @@ namespace _66SMS.Application.Features.Appointments.Commands.PostponeAppointment
 
             if (appointment.Status == AppointmentConst.STATUS_CANCELLED)
             {
-                return Result<object>.BadRequest("Lịch hẹn này đã bị hủy.");
+                return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_CANCELLED, ErrorCodes.ERR_APPOINTMENT_CANCELLED);
             }
 
             if (appointment.Status == AppointmentConst.STATUS_COMPLETED || 
                 appointment.Status == AppointmentConst.STATUS_NO_SHOW || 
                 AppointmentPaymentCalculator.IsFullyPaid(appointment))
             {
-                return Result<object>.BadRequest("Không thể hoãn/hủy lịch hẹn đã hoàn thành hoặc quá hạn.");
+                return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_CANNOT_POSTPONE_COMPLETED, ErrorCodes.ERR_APPOINTMENT_CANNOT_POSTPONE);
             }
 
             if (appointment.Status != AppointmentConst.STATUS_WAITING)
             {
-                return Result<object>.BadRequest("Chỉ cho phép hoãn/hủy nhận lại cọc với lịch hẹn đã thanh toán cọc và đang chờ phục vụ.");
+                return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_POSTPONE_ONLY_PAID_PENDING, ErrorCodes.ERR_APPOINTMENT_CANNOT_POSTPONE);
             }
 
             using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);

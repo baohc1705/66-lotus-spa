@@ -1,3 +1,4 @@
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -31,7 +32,7 @@ namespace _66SMS.Application.Features.Wallets.Commands.ManualWalletTransaction
         {
             if (request.Amount == 0)
             {
-                return Result<object>.BadRequest("Số tiền phải khác 0.");
+                return Result<object>.BadRequest(WalletConst.MSG_WALLET_INVALID_AMOUNT, ErrorCodes.ERR_WALLET_INVALID_AMOUNT);
             }
 
             using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
@@ -42,7 +43,7 @@ namespace _66SMS.Application.Features.Wallets.Commands.ManualWalletTransaction
 
                 if (wallet == null)
                 {
-                    return Result<object>.NotFound("Ví không tồn tại.");
+                    return Result<object>.NotFound(WalletConst.MSG_WALLET_NOT_FOUND, ErrorCodes.ERR_WALLET_NOT_FOUND);
                 }
 
                 if (wallet.Balance + request.Amount < 0)

@@ -36,6 +36,18 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_USER_ID_NOT_FOUND = $"{nameof(Entities.User)} with id not found";
+        public const string MSG_USER_NOT_FOUND = "User not found.";
+        public const string MSG_USER_ALREADY_EXISTS = "Email or username already exists.";
+        public const string MSG_USER_INVALID_ROLE = "Invalid role.";
+        public const string MSG_USER_CUSTOMER_PROFILE_NOT_FOUND = "Customer profile not found.";
+        public const string MSG_USER_NOT_ASSIGNED_TO_SALON = "You are not assigned to any salon.";
+        public const string MSG_USER_INVALID_CREDENTIALS = "Username or email wrong.";
+        public const string MSG_USER_ACCOUNT_LOCKED = "Account has been blocked due to too many login attempts.";
+        public const string MSG_USER_WRONG_PASSWORD = "Password is wrong.";
+        public const string MSG_USER_NO_ROLE = "Account has no role assigned.";
+        public const string MSG_USER_INVALID_TOKEN = "Token is invalid.";
+        public const string MSG_USER_TOKEN_REVOKED = "Token has been revoked.";
+        public const string MSG_USER_REFRESH_TOKEN_EXPIRED = "Refresh token has expired.";
         #endregion
     }
 }

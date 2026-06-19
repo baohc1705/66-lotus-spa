@@ -3,6 +3,7 @@ using _66SMS.Application.Services.Wallets;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
@@ -35,7 +36,7 @@ namespace _66SMS.Application.Features.Cashier.Commands.PayAppointment
         {
             if (!AllowedMethods.Contains(request.PaymentMethod))
             {
-                return Result<object>.BadRequest("Phương thức thanh toán không hợp lệ.");
+                return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_INVALID_PAYMENT_METHOD, ErrorCodes.ERR_APPOINTMENT_INVALID_PAYMENT_METHOD);
             }
 
             var appointment = await appointmentSqlRepository.AsQueryable(asNoTracking: false)
@@ -45,12 +46,12 @@ namespace _66SMS.Application.Features.Cashier.Commands.PayAppointment
 
             if (appointment == null)
             {
-                return Result<object>.NotFound("Lịch hẹn không tồn tại.");
+                return Result<object>.NotFound(AppointmentConst.MSG_APPOINTMENT_NOT_FOUND, ErrorCodes.ERR_APPOINTMENT_NOT_FOUND);
             }
 
             if (AppointmentPaymentCalculator.IsFullyPaid(appointment))
             {
-                return Result<object>.BadRequest("Lịch hẹn đã được thanh toán.");
+                return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_ALREADY_PAID, ErrorCodes.ERR_APPOINTMENT_ALREADY_PAID);
             }
 
             if (!AppointmentStatusTransitions.CanPayBalance(appointment.Status))
@@ -61,13 +62,13 @@ namespace _66SMS.Application.Features.Cashier.Commands.PayAppointment
 
             if (!AppointmentPaymentCalculator.HasDepositPaid(appointment))
             {
-                return Result<object>.BadRequest("Khách chưa đặt cọc. Vui lòng thu cọc trước.");
+                return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_NOT_DEPOSITED_YET, ErrorCodes.ERR_APPOINTMENT_NOT_DEPOSITED_YET);
             }
 
             var amount = AppointmentPaymentCalculator.GetRemainingAmount(appointment);
             if (amount <= 0)
             {
-                return Result<object>.BadRequest("Không còn số tiền cần thanh toán.");
+                return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_NO_REMAINING_AMOUNT, ErrorCodes.ERR_APPOINTMENT_NO_REMAINING_AMOUNT);
             }
 
             using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);

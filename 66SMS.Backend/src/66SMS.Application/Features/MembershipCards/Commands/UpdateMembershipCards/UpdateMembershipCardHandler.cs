@@ -2,6 +2,7 @@ using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
@@ -39,7 +40,7 @@ namespace _66SMS.Application.Features.MembershipCards.Commands.UpdateMembershipC
             MembershipCard membershipCard = await membershipCardSqlRepository.FindByIdAsync(request.Id);
             if (membershipCard == null)
             {
-                return Result<object>.NotFound("Membership card not found.", ErrorCodes.ERR_MEMBERSHIP_CARD_NOT_FOUND);
+                return Result<object>.NotFound(MembershipCardConst.MSG_MEMBERSHIP_CARD_NOT_FOUND, ErrorCodes.ERR_MEMBERSHIP_CARD_NOT_FOUND);
             }
 
             if (request.CustomerId.HasValue)
@@ -47,7 +48,7 @@ namespace _66SMS.Application.Features.MembershipCards.Commands.UpdateMembershipC
                 Customer customer = await customerSqlRepository.FindByIdAsync(request.CustomerId.Value);
                 if (customer == null)
                 {
-                    return Result<object>.NotFound("Customer not found.", ErrorCodes.ERR_CUSTOMER_NOT_FOUND);
+                    return Result<object>.NotFound(CustomerConst.MSG_CUSTOMER_NOT_FOUND, ErrorCodes.ERR_CUSTOMER_NOT_FOUND);
                 }
             }
 
@@ -57,7 +58,7 @@ namespace _66SMS.Application.Features.MembershipCards.Commands.UpdateMembershipC
                 MembershipTier tier = await membershipTierSqlRepository.FindByIdAsync(request.MembershipTierId.Value);
                 if (tier == null)
                 {
-                    return Result<object>.NotFound("Membership tier not found.", ErrorCodes.ERR_MEMBERSHIP_TIER_NOT_FOUND);
+                    return Result<object>.NotFound(MembershipTierConst.MSG_MEMBERSHIP_TIER_NOT_FOUND, ErrorCodes.ERR_MEMBERSHIP_TIER_NOT_FOUND);
                 }
                 oldTierId = membershipCard.MembershipTierId;
             }
@@ -90,7 +91,7 @@ namespace _66SMS.Application.Features.MembershipCards.Commands.UpdateMembershipC
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
 
-                return Result<object>.Success(null);
+                return Result<object>.Ok();
             }
             catch (Exception ex)
             {

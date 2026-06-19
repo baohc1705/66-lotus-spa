@@ -1,4 +1,5 @@
 using _66SMS.Application.DTOs.Staffs;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
@@ -27,7 +28,7 @@ namespace _66SMS.Application.Features.Staffs.Queries.GetMyStaffScheduleDaily
                 .FirstOrDefaultAsync(s => s.UserId == request.UserId, cancellationToken);
             
             if (staff == null)
-                return Result<StaffScheduleDailyDto>.NotFound("Lỗi: Không tìm thấy nhân viên.");
+                return Result<StaffScheduleDailyDto>.NotFound(StaffConst.MSG_STAFF_NOT_FOUND, ErrorCodes.ERR_STAFF_NOT_FOUND);
 
             var appointments = await appointmentSqlRepository.AsQueryable()
                 .Include(a => a.CreatedByUser).ThenInclude(u => u!.Customer)

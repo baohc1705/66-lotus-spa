@@ -1,51 +1,33 @@
+using _66SMS.Application.Features.WorkSchedules.Commands.BulkCreateWorkSchedule;
 using _66SMS.Contracts.Shared;
-using _66SMS.Domain.Abstractions.Repositories.Sql;
-using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
-using _66SMS.Domain.Entities;
-using AutoMapper;
 using MediatR;
-using System.Data;
 
 namespace _66SMS.Application.Features.WorkSchedules.Commands.CreateWorkSchedule
 {
     public class CreateWorkScheduleHandler : IRequestHandler<CreateWorkScheduleCommand, Result<object>>
     {
-        private readonly IWorkScheduleSqlRepository workScheduleSqlRepository;
-        private readonly ISqlUnitOfWork sqlUnitOfWork;
-        private readonly IMapper mapper;
-        public CreateWorkScheduleHandler(IWorkScheduleSqlRepository workScheduleSqlRepository, ISqlUnitOfWork sqlUnitOfWork, IMapper mapper)
+        private readonly IMediator mediator;
+
+        public CreateWorkScheduleHandler(IMediator mediator)
         {
-            this.workScheduleSqlRepository = workScheduleSqlRepository;
-            this.sqlUnitOfWork = sqlUnitOfWork;
-            this.mapper = mapper;
+            this.mediator = mediator;
         }
 
         public async Task<Result<object>> Handle(CreateWorkScheduleCommand request, CancellationToken cancellationToken)
         {
-            WorkSchedule? workSchedule = mapper.Map<WorkSchedule>(request);
-            workSchedule.CreatedAt = DateTime.UtcNow;
-            workSchedule.CreatedBy = request.CreatedBy ?? 1;
-            workSchedule.Status = _66SMS.Domain.Constants.WorkScheduleConst.STATUS_ACTIVED;
-
-            bool isDuplicate = await workScheduleSqlRepository.AnyAsync(x => x.StaffId == request.StaffId && x.ShiftPeriodId == request.ShiftPeriodId && x.WorkDate == request.WorkDate, cancellationToken);
-            if (isDuplicate)
+            var bulkCommand = new BulkCreateWorkScheduleCommand
             {
-                return Result<object>.Conflict("Nhân viên này đã được xếp vào ca này trong cùng ngày.");
-            }
-
-            using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
-            try
-            {
-                workScheduleSqlRepository.Add(workSchedule);
-                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-                transaction.Commit();
-                return Result<object>.Created(workSchedule.Id);
-            }
-            catch
-            {
-                transaction.Rollback();
-                throw;
-            }
+                Schedules = [new CreateWorkScheduleCommand
+                {
+                    ShiftPeriodId = request.ShiftPeriodId,
+                    StaffId = request.StaffId,
+                    SalonId = request.SalonId,
+                    WorkDate = request.WorkDate,
+                    CreatedBy = request.CreatedBy,
+                }],
+                CreatedBy = request.CreatedBy
+            };
+            return await mediator.Send(bulkCommand, cancellationToken);
         }
     }
 }

@@ -26,12 +26,12 @@ namespace _66SMS.Application.Features.Customers.Queries.GetAllCustomer
 
             if (!string.IsNullOrEmpty(request.Filter))
             {
-                query = query.Where(x => x.FullName.StartsWith(request.Filter) || x.Phone == request.Filter || x.User.Email == request.Filter);
+                query = query.Where(x => x.FullName.StartsWith(request.Filter) || x.Phone == request.Filter || x.User!.Email == request.Filter);
             }
 
             query = request.OrderBy?.ToLower() switch
             {
-                "email" => request.IsDescending ? query.OrderByDescending(x => x.User.Email) : query.OrderBy(x => x.User.Email),
+                "email" => request.IsDescending ? query.OrderByDescending(x => x.User!.Email) : query.OrderBy(x => x.User!.Email),
                 "fullname" => request.IsDescending ? query.OrderByDescending(x => x.FullName) : query.OrderBy(x => x.FullName),
                 _ => request.IsDescending ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt)
             };

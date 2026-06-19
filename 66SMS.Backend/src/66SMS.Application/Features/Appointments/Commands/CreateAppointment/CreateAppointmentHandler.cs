@@ -1,4 +1,5 @@
 using _66SMS.Application.Abstractions;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -42,7 +43,7 @@ namespace _66SMS.Application.Features.Appointments.Commands.CreateAppointment
                 foreach (var guest in request.Guests)
                 {
                     var mainServiceId = guest.Services?.FirstOrDefault()?.ServiceId ?? 0;
-                    if (mainServiceId == 0) return Result<List<int>>.BadRequest("Phải chọn ít nhất 1 dịch vụ cho mỗi khách.");
+                    if (mainServiceId == 0) return Result<List<int>>.BadRequest(AppointmentConst.MSG_APPOINTMENT_MIN_ONE_SERVICE, ErrorCodes.ERR_APPOINTMENT_MIN_ONE_SERVICE);
 
                     int staffId = 0;
                     int? scheduleId = null;
@@ -56,7 +57,7 @@ namespace _66SMS.Application.Features.Appointments.Commands.CreateAppointment
                             validLock.Status != AppointmentSlotLockConst.STATUS_ACTIVE ||
                             validLock.ExpiresAt <= DateTime.UtcNow)
                         {
-                            return Result<List<int>>.BadRequest("Khóa giữ chỗ không hợp lệ hoặc đã hết thời gian (10 phút). Vui lòng tải lại trang.");
+                            return Result<List<int>>.BadRequest(AppointmentConst.MSG_APPOINTMENT_SLOT_LOCK_INVALID, ErrorCodes.ERR_APPOINTMENT_SLOT_LOCK_INVALID);
                         }
 
                         // Nếu Lock hợp lệ -> Bỏ qua thuật toán tìm Staff, dùng luôn thông tin đã chốt trong Lock
@@ -74,7 +75,7 @@ namespace _66SMS.Application.Features.Appointments.Commands.CreateAppointment
 
                         if (resolvedStaff == null)
                         {
-                            return Result<List<int>>.Conflict("Khung giờ này đã kín lịch hoặc nhân viên bạn chọn không còn trống lịch.");
+                            return Result<List<int>>.Conflict(AppointmentConst.MSG_APPOINTMENT_SLOT_FULL, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
                         }
                         staffId = resolvedStaff.Value.StaffId;
                         scheduleId = resolvedStaff.Value.ScheduleId;
@@ -87,7 +88,7 @@ namespace _66SMS.Application.Features.Appointments.Commands.CreateAppointment
                             .Where(s => s.Id == staffId)
                             .FirstOrDefaultAsync(cancellationToken);
                         if (staff == null || staff.SalonId != guest.SalonId.Value)
-                            return Result<List<int>>.BadRequest("Staff không thuộc chi nhánh này.");
+                            return Result<List<int>>.BadRequest(AppointmentConst.MSG_APPOINTMENT_STAFF_NOT_IN_SALON, ErrorCodes.ERR_APPOINTMENT_STAFF_NOT_IN_SALON);
                     }
 
                     // Tính toán giá và tạo danh sách Service đi kèm

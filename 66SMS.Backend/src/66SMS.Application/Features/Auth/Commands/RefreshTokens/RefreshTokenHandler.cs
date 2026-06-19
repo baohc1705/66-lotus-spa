@@ -3,6 +3,7 @@ using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Settings;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
@@ -34,7 +35,7 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (stored == null)
-                return Result<TokenResponseDTO>.BadRequest("Token khong hop le");
+                return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_INVALID_TOKEN, ErrorCodes.ERR_AUTH_TOKEN_INVALID);
 
             // Phat hien reuse attack
             if (stored.IsRevoked)
@@ -49,12 +50,12 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
                 }
 
                 await refreshTokenSqlRepository.SaveChangeAsync(cancellationToken);
-                return Result<TokenResponseDTO>.BadRequest("Phai hien token bat thuong");
+                return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_TOKEN_REVOKED, ErrorCodes.ERR_AUTH_TOKEN_REVOKED);
             }
 
             // kiem tra neu token con han khong
             if (stored.IsExpired)
-                return Result<TokenResponseDTO>.BadRequest("Refresh token da het han");
+                return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_REFRESH_TOKEN_EXPIRED, ErrorCodes.ERR_AUTH_REFRESH_TOKEN_EXPIRED);
 
             // Kiem tra user co hop le
             User? user = await userSqlRepository.AsQueryable(asNoTracking: false)
@@ -67,7 +68,7 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
                .FirstOrDefaultAsync(cancellationToken);
 
             if (user == null || user.Status == UserConst.STATUS_LOCKED)
-                return Result<TokenResponseDTO>.BadRequest("Tai khoan khong hop le");
+                return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_NOT_FOUND, ErrorCodes.ERR_USER_NOT_FOUND);
 
             // Rotate token
             stored.IsRevoked = true;
@@ -87,7 +88,7 @@ namespace _66SMS.Application.Features.Auth.Commands.RefreshTokens
             refreshTokenSqlRepository.Add(newRefreshToken);
 
             if (user.UserRoles == null || !user.UserRoles.Any())
-                return Result<TokenResponseDTO>.NotFound("User has no role");
+                return Result<TokenResponseDTO>.NotFound(UserConst.MSG_USER_NO_ROLE, ErrorCodes.ERR_AUTH_NO_ROLE);
             
             var roleEntity = user.UserRoles.First().Role;
             string role = roleEntity.Name;

@@ -17,5 +17,8 @@ namespace _66SMS.Infrastructure.Mails
 
         public MailMessage CreateAppointmentReminder(string toEmail,string customerName, string serviceName,DateTime appointmentTime,string? cancelLink = null)
             => new AppointmentReminderTemplate(toEmail, customerName, serviceName, appointmentTime, cancelLink).Render();
+
+        public MailMessage CreateOtpEmail(string toEmail, string userName, string otpCode, int expiryMinutes)
+            => new OtpEmailTemplate(toEmail, userName, otpCode, expiryMinutes).Render();
     }
 }

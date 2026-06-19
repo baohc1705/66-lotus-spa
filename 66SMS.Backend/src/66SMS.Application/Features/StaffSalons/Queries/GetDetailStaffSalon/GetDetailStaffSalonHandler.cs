@@ -1,6 +1,7 @@
 using _66SMS.Application.DTOs.StaffSalons;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -28,7 +29,7 @@ namespace _66SMS.Application.Features.StaffSalons.Queries.GetDetailStaffSalon
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (staffSalon == null)
-                return Result<StaffSalonDto>.NotFound("StaffSalon not found.", ErrorCodes.ERR_STAFF_SALON_NOT_FOUND);
+                return Result<StaffSalonDto>.NotFound(StaffSalonConst.MSG_STAFF_SALON_NOT_FOUND, ErrorCodes.ERR_STAFF_SALON_NOT_FOUND);
 
             return Result<StaffSalonDto>.Success(staffSalon);
         }

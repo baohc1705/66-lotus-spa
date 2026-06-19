@@ -18,6 +18,17 @@ namespace _66SMS.Contracts.Enumerations
         ERR_AUTH_TOKEN_INVALID,
         ERR_AUTH_REFRESH_TOKEN_EXPIRED,
         ERR_AUTH_REFRESH_TOKEN_INVALID,
+        ERR_AUTH_ACCOUNT_LOCKED,
+        ERR_AUTH_NO_ROLE,
+        ERR_AUTH_TOKEN_REVOKED,
+        #endregion
+
+        #region OTP
+        ERR_OTP_EMAIL_NOT_FOUND,
+        ERR_OTP_EMAIL_ALREADY_VERIFIED,
+        ERR_OTP_NOT_SENT,
+        ERR_OTP_INVALID_OR_EXPIRED,
+        ERR_OTP_WRONG_CODE,
         #endregion
 
         #region User & Role & Permission
@@ -29,8 +40,10 @@ namespace _66SMS.Contracts.Enumerations
         ERR_USER_ACCOUNT_INACTIVE,
         ERR_ROLE_NOT_FOUND,
         ERR_ROLE_INVALID,
+        ERR_ROLE_NAME_EXISTED,
         ERR_PERMISSION_NOT_FOUND,
         ERR_PERMISSION_INVALID,
+        ERR_PERMISSION_NAME_EXISTED,
         ERR_USER_ROLE_NOT_FOUND,
         ERR_USER_ROLE_INVALID,
         ERR_ROLE_PERMISSION_NOT_FOUND,
@@ -44,6 +57,8 @@ namespace _66SMS.Contracts.Enumerations
         ERR_CUSTOMER_INVALID,
         ERR_STAFF_NOT_FOUND,
         ERR_STAFF_INVALID,
+        ERR_STAFF_BOOKING_NOT_FOUND,
+        ERR_STAFF_SALON_MANAGER_NOT_FOUND,
         #endregion
 
         #region Shift & WorkSchedule
@@ -53,6 +68,7 @@ namespace _66SMS.Contracts.Enumerations
         ERR_SHIFT_PERIOD_INVALID,
         ERR_WORK_SCHEDULE_NOT_FOUND,
         ERR_WORK_SCHEDULE_INVALID,
+        ERR_WORK_SCHEDULE_DUPLICATE,
         #endregion
 
         #region Product
@@ -93,6 +109,18 @@ namespace _66SMS.Contracts.Enumerations
         ERR_APPOINTMENT_PAYMENT_INVALID,
         ERR_APPOINTMENT_HISTORY_NOT_FOUND,
         ERR_APPOINTMENT_HISTORY_INVALID,
+        ERR_APPOINTMENT_SLOT_FULL,
+        ERR_APPOINTMENT_ALREADY_PAID,
+        ERR_APPOINTMENT_DEPOSIT_ALREADY_PAID,
+        ERR_APPOINTMENT_NOT_DEPOSITED_YET,
+        ERR_APPOINTMENT_NOT_WAITING_DEPOSIT,
+        ERR_APPOINTMENT_NO_REMAINING_AMOUNT,
+        ERR_APPOINTMENT_INVALID_PAYMENT_METHOD,
+        ERR_APPOINTMENT_ALREADY_THIS_STATUS,
+        ERR_APPOINTMENT_CANCELLED,
+        ERR_APPOINTMENT_CANNOT_POSTPONE,
+        ERR_APPOINTMENT_STAFF_NOT_IN_SALON,
+        ERR_APPOINTMENT_MIN_ONE_SERVICE,
         #endregion
 
         #region Wallet
@@ -100,6 +128,13 @@ namespace _66SMS.Contracts.Enumerations
         ERR_WALLET_INVALID,
         ERR_WALLET_TRANSACTION_NOT_FOUND,
         ERR_WALLET_TRANSACTION_INVALID,
+        ERR_WALLET_INVALID_AMOUNT,
+        ERR_WALLET_INSUFFICIENT_BALANCE,
+        #endregion
+
+        #region Payment
+        ERR_PAYMENT_TRANSACTION_FAILED,
+        ERR_PAYMENT_ORDER_NOT_FOUND,
         #endregion
 
         #region Membership

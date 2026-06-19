@@ -1,5 +1,7 @@
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,13 +26,13 @@ namespace _66SMS.Application.Features.Staffs.Commands.UpdateMyBookingStatus
                 .FirstOrDefaultAsync(s => s.UserId == request.UserId, cancellationToken);
             
             if (staff == null)
-                return Result<object>.NotFound("Không tìm thấy nhân viên.");
+                return Result<object>.NotFound(StaffConst.MSG_STAFF_NOT_FOUND, ErrorCodes.ERR_STAFF_NOT_FOUND);
 
             var appointment = await appointmentSqlRepository.AsQueryable(false)
                 .FirstOrDefaultAsync(a => a.Id == request.Id && a.StaffId == staff.Id, cancellationToken);
 
             if (appointment == null)
-                return Result<object>.NotFound("Lịch hẹn không tồn tại hoặc không thuộc về nhân viên này.");
+                return Result<object>.NotFound(StaffConst.MSG_STAFF_BOOKING_NOT_FOUND, ErrorCodes.ERR_STAFF_BOOKING_NOT_FOUND);
 
             appointment.Status = request.Status;
             if (request.Note != null)

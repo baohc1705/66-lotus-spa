@@ -36,6 +36,8 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_SERVICE_ID_NOT_FOUND = $"{nameof(Entities.Service)} with id not found";
+        public const string MSG_SERVICE_NOT_FOUND = "Service not found.";
+        public const string MSG_SERVICE_PRODUCT_NOT_FOUND = "Dịch vụ không tồn tại.";
         #endregion
     }
 }

@@ -28,7 +28,7 @@ namespace _66SMS.Application.Features.Salons.Commands.DeleteSalon
             {
                 Salon salon = await salonSqlRepository.FindByIdAsync((int)request.Id);
                 if (salon == null)
-                    return Result<object>.NotFound("Salon not found.", ErrorCodes.ERR_SALON_NOT_FOUND);
+                    return Result<object>.NotFound(SalonConst.MSG_SALON_NOT_FOUND, ErrorCodes.ERR_SALON_NOT_FOUND);
 
                 salon.Status = SalonConst.STATUS_DELETED;
                 salon.UpdatedAt = DateTimeHelper.UtcNow();

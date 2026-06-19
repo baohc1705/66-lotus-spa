@@ -3,7 +3,7 @@ using _66SMS.Application.Features.TimeSlots.Commands.CreateTimeSlot;
 using _66SMS.Application.Features.TimeSlots.Commands.DeleteTimeSlot;
 using _66SMS.Application.Features.TimeSlots.Commands.UpdateTimeSlot;
 using _66SMS.Application.Features.TimeSlots.Queries.GetAllTimeSlot;
-using _66SMS.Application.Features.TimeSlots.Queries.GetTimeSlotById;
+using _66SMS.Application.Features.TimeSlots.Queries.GetDetailTimeSlot;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -33,7 +33,7 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
-            var result = await mediator.Send(new GetTimeSlotByIdQuery(id));
+            var result = await mediator.Send(new GetDetailTimeSlotQuery(id));
             return HandleResult(result);
         }
 

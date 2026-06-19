@@ -1,6 +1,7 @@
 using _66SMS.Application.DTOs.BookingRooms;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -29,7 +30,7 @@ namespace _66SMS.Application.Features.BookingRooms.Queries.GetDetailBookingRooms
 
             if (bookingRoomDto == null)
             {
-                return Result<BookingRoomDto>.NotFound("Booking room not found.", ErrorCodes.ERR_BOOKING_ROOM_NOT_FOUND);
+                return Result<BookingRoomDto>.NotFound(BookingRoomConst.MSG_BOOKING_ROOM_NOT_FOUND, ErrorCodes.ERR_BOOKING_ROOM_NOT_FOUND);
             }
 
             return Result<BookingRoomDto>.Success(bookingRoomDto);

@@ -1,6 +1,7 @@
 using _66SMS.Application.DTOs.Salons;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -28,7 +29,7 @@ namespace _66SMS.Application.Features.Salons.Queries.GetDetailSalon
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (salon == null)
-                return Result<SalonDto>.NotFound("Salon not found.", ErrorCodes.ERR_SALON_NOT_FOUND);
+                return Result<SalonDto>.NotFound(SalonConst.MSG_SALON_NOT_FOUND, ErrorCodes.ERR_SALON_NOT_FOUND);
 
             return Result<SalonDto>.Success(salon);
         }

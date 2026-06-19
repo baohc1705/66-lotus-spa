@@ -31,7 +31,7 @@ namespace _66SMS.Application.Features.BookingRooms.Commands.DeleteBookingRooms
                 BookingRoom bookingRoom = await bookingRoomSqlRepository.FindByIdAsync((int)request.Id);
                 if (bookingRoom == null)
                 {
-                    return Result<object>.NotFound("Booking room not found.", ErrorCodes.ERR_BOOKING_ROOM_NOT_FOUND);
+                    return Result<object>.NotFound(BookingRoomConst.MSG_BOOKING_ROOM_NOT_FOUND, ErrorCodes.ERR_BOOKING_ROOM_NOT_FOUND);
                 }
 
                 bookingRoom.Status = BookingRoomConst.STATUS_DELETED;

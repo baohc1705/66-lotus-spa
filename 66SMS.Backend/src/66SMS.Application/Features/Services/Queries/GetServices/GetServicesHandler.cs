@@ -1,6 +1,7 @@
 using _66SMS.Application.DTOs.Services;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Entities;
 using AutoMapper;
@@ -31,7 +32,7 @@ namespace _66SMS.Application.Features.Services.Queries.GetServices
                 
             if (entity == null)
             {
-                return Result<ServiceDto>.NotFound("Service not found", ErrorCodes.ERR_SERVICE_NOT_FOUND);
+                return Result<ServiceDto>.NotFound(ServiceConst.MSG_SERVICE_NOT_FOUND, ErrorCodes.ERR_SERVICE_NOT_FOUND);
             }
 
             ServiceDto dto = mapper.Map<ServiceDto>(entity);

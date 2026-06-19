@@ -33,14 +33,13 @@ using _66SMS.Application.Features.ServiceImages.Commands.CreateServiceImages;
 using _66SMS.Application.Features.ServiceImages.Commands.UpdateServiceImages;
 using _66SMS.Application.Features.Services.Commands.CreateServices;
 using _66SMS.Application.Features.Services.Commands.UpdateServices;
-using _66SMS.Application.Features.Shitfs.Commands.CreateShift;
-using _66SMS.Application.Features.Shitfs.Commands.CreateShiftPeriod;
-using _66SMS.Application.Features.Shitfs.Commands.UpdateShift;
+using _66SMS.Application.Features.Shifts.Commands.CreateShift;
+using _66SMS.Application.Features.Shifts.Commands.CreateShiftPeriod;
+using _66SMS.Application.Features.Shifts.Commands.UpdateShift;
 using _66SMS.Application.Features.Staffs.Commands.CreateStaff;
 using _66SMS.Application.Features.Staffs.Commands.UpdateStaff;
 using _66SMS.Application.Features.TimeSlots.Commands.CreateTimeSlot;
 using _66SMS.Application.Features.TimeSlots.Commands.UpdateTimeSlot;
-using _66SMS.Application.Features.Users.Commands.CreateUser;
 using _66SMS.Application.Features.Users.Commands.UpdateUser;
 using _66SMS.Application.Features.WorkSchedules.Commands.CreateWorkSchedule;
 using _66SMS.Application.Features.WorkSchedules.Commands.UpdateWorkSchedule;
@@ -67,7 +66,6 @@ namespace _66SMS.Application.Commons.Mappers
     {
         public ApplicationMappingProfiles()
         {
-            CreateMap<CreateUserCommand, User>();
             // Update user
             CreateMap<UpdateUserCommand, User>()
                 .IgnoreNullValueTypes();

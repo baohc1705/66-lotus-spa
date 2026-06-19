@@ -1,5 +1,6 @@
 using _66SMS.Application.DTOs.Auth;
 using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Settings;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -45,7 +46,7 @@ namespace _66SMS.Application.Features.Auth.Commands.Login
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (userExisted == null)
-                return Result<TokenResponseDTO>.BadRequest("Username or email wrong");
+                return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_INVALID_CREDENTIALS);
 
             // Check lock account
             if (userExisted.Status == UserConst.STATUS_LOCKED)
@@ -67,8 +68,8 @@ namespace _66SMS.Application.Features.Auth.Commands.Login
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 return userExisted.Status == UserConst.STATUS_LOCKED
-                    ? Result<TokenResponseDTO>.BadRequest("Account has been block because login many time")
-                    : Result<TokenResponseDTO>.BadRequest("Password wrong");
+                    ? Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_ACCOUNT_LOCKED, ErrorCodes.ERR_AUTH_ACCOUNT_LOCKED)
+                    : Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_WRONG_PASSWORD);
             }
             // Reset failed access and unclock account if login success
             userExisted.AccessFailedCount = 0;
@@ -80,7 +81,7 @@ namespace _66SMS.Application.Features.Auth.Commands.Login
             // Get role and list permission then add to jwt
             Role? role = await userRoleSqlRepository.GetRoleByUserIdAsync(userExisted.Id, cancellationToken);
             if (role == null)
-                return Result<TokenResponseDTO>.NotFound("Account has no role");
+                return Result<TokenResponseDTO>.NotFound(UserConst.MSG_USER_NO_ROLE, ErrorCodes.ERR_AUTH_NO_ROLE);
 
             List<string> permissions = await userRoleSqlRepository.GetPermissionKeysByUserIdAndRoleIdAsync(
                 userExisted.Id, 

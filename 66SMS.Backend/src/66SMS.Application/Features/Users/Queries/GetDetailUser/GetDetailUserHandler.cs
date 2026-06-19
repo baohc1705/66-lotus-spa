@@ -1,7 +1,9 @@
 using _66SMS.Application.DTOs.Users;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +36,7 @@ namespace _66SMS.Application.Features.Users.Queries.GetDetailUser
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user == null)
-                return Result<UserDto>.NotFound("User not found");
+                return Result<UserDto>.NotFound(UserConst.MSG_USER_NOT_FOUND, ErrorCodes.ERR_USER_NOT_FOUND);
 
             Role? role = await userRoleSqlRepository.GetRoleByUserIdAsync(user.Id, cancellationToken);
             List<string>? permissions = role == null ? [] : await userRoleSqlRepository.GetPermissionKeysByUserIdAndRoleIdAsync(user.Id, role.Id, cancellationToken);

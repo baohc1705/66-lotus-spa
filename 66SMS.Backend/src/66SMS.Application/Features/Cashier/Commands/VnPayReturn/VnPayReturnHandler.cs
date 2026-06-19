@@ -4,6 +4,7 @@ using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Application.DTOs.Cashier;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -23,14 +24,14 @@ namespace _66SMS.Application.Features.Cashier.Commands.VnPayReturn
             var result = vnPayService.PaymentExecute(request.QueryData);
             var phaseKey = result.Phase == AppointmentPaymentConst.PHASE_DEPOSIT ? "deposit" : "balance";
 
-            if (!result.Success) return Result<VnPayReturnDto>.BadRequest("Giao dịch thất bại hoặc sai chữ ký.");
+            if (!result.Success) return Result<VnPayReturnDto>.BadRequest(AppointmentPaymentConst.MSG_PAYMENT_TRANSACTION_FAILED, ErrorCodes.ERR_PAYMENT_TRANSACTION_FAILED);
 
             var appointment = await appointmentRepository.AsQueryable()
                 .Include(a => a.Histories)
                 .Include(a => a.Payments)
                 .FirstOrDefaultAsync(a => a.Id == result.AppointmentId, cancellationToken);
 
-            if (appointment == null) return Result<VnPayReturnDto>.NotFound("Không tìm thấy đơn.");
+            if (appointment == null) return Result<VnPayReturnDto>.NotFound(AppointmentPaymentConst.MSG_PAYMENT_ORDER_NOT_FOUND, ErrorCodes.ERR_PAYMENT_ORDER_NOT_FOUND);
 
             var apply = AppointmentPaymentApplyService.ApplyVnPaySuccess(appointment, result.Phase, result.TransactionId);
             if (!apply.IsSuccess) return Result<VnPayReturnDto>.BadRequest(apply.Message);

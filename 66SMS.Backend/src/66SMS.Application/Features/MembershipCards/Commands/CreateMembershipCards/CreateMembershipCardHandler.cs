@@ -2,6 +2,7 @@ using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
@@ -36,13 +37,13 @@ namespace _66SMS.Application.Features.MembershipCards.Commands.CreateMembershipC
             Customer customer = await customerSqlRepository.FindByIdAsync(request.CustomerId);
             if (customer == null)
             {
-                return Result<int>.NotFound("Customer not found.", ErrorCodes.ERR_CUSTOMER_NOT_FOUND);
+                return Result<int>.NotFound(CustomerConst.MSG_CUSTOMER_NOT_FOUND, ErrorCodes.ERR_CUSTOMER_NOT_FOUND);
             }
 
             MembershipTier tier = await membershipTierSqlRepository.FindByIdAsync(request.MembershipTierId);
             if (tier == null)
             {
-                return Result<int>.NotFound("Membership tier not found.", ErrorCodes.ERR_MEMBERSHIP_TIER_NOT_FOUND);
+                return Result<int>.NotFound(MembershipTierConst.MSG_MEMBERSHIP_TIER_NOT_FOUND, ErrorCodes.ERR_MEMBERSHIP_TIER_NOT_FOUND);
             }
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);

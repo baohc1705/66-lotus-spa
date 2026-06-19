@@ -3,6 +3,7 @@ using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
@@ -34,7 +35,7 @@ namespace _66SMS.Application.Features.BookingPositions.Commands.UpdateBookingPos
                 BookingPosition bookingPosition = await bookingPositionSqlRepository.FindByIdAsync((int)request.Id);
                 if (bookingPosition == null)
                 {
-                    return Result<object>.NotFound("Booking position not found.", ErrorCodes.ERR_BOOKING_POSITION_NOT_FOUND);
+                    return Result<object>.NotFound(BookingPositionConst.MSG_BOOKING_POSITION_NOT_FOUND, ErrorCodes.ERR_BOOKING_POSITION_NOT_FOUND);
                 }
 
                 mapper.Map(request, bookingPosition);

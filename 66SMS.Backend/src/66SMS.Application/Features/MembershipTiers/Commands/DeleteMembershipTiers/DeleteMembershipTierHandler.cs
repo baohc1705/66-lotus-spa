@@ -26,7 +26,7 @@ namespace _66SMS.Application.Features.MembershipTiers.Commands.DeleteMembershipT
             MembershipTier membershipTier = await membershipTierSqlRepository.FindByIdAsync(request.Id);
             if (membershipTier == null)
             {
-                return Result<object>.NotFound("Membership tier not found.", ErrorCodes.ERR_MEMBERSHIP_TIER_NOT_FOUND);
+                return Result<object>.NotFound(MembershipTierConst.MSG_MEMBERSHIP_TIER_NOT_FOUND, ErrorCodes.ERR_MEMBERSHIP_TIER_NOT_FOUND);
             }
 
             membershipTier.Status = MembershipTierConst.STATUS_DELETED;

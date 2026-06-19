@@ -1,4 +1,5 @@
 using _66SMS.Contracts.Abstractions;
+using _66SMS.Domain.Constants;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -23,7 +24,7 @@ namespace _66SMS.Application.Features.Auth.Commands.ChangePassword
             User? user = await userSqlRepository.FindByIdAsync((int)request.Id, asNoTracking: false, cancellationToken: cancellationToken);
             bool verifyCurrentPass = passwordHash.Verify(user.PasswordHash, request.CurrentPassword);
             if (!verifyCurrentPass)
-                return Result<object>.BadRequest("Password Wrong", Contracts.Enumerations.ErrorCodes.ERR_VALIDATION_FAILED);
+                return Result<object>.BadRequest(UserConst.MSG_USER_WRONG_PASSWORD, Contracts.Enumerations.ErrorCodes.ERR_USER_INVALID_PASSWORD);
             user.PasswordHash = passwordHash.Hash(request.NewPassword);
             userSqlRepository.Update(user);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

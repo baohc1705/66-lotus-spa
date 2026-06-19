@@ -40,11 +40,11 @@ namespace _66SMS.Application.Features.StaffSalons.Commands.CreateStaffSalon
             {
                 Staff? staff = await staffSqlRepository.FindByIdAsync((int)request.StaffId);
                 if (staff == null)
-                    return Result<object>.NotFound("Staff not found.", ErrorCodes.ERR_STAFF_NOT_FOUND);
+                    return Result<object>.NotFound(StaffSalonConst.MSG_STAFF_SALON_STAFF_NOT_FOUND, ErrorCodes.ERR_STAFF_NOT_FOUND);
 
                 Salon? salon = await salonSqlRepository.FindByIdAsync((int)request.SalonId);
                 if (salon == null)
-                    return Result<object>.NotFound("Salon not found.", ErrorCodes.ERR_SALON_NOT_FOUND);
+                    return Result<object>.NotFound(StaffSalonConst.MSG_STAFF_SALON_SALON_NOT_FOUND, ErrorCodes.ERR_SALON_NOT_FOUND);
 
                 StaffSalon staffSalon = mapper.Map<StaffSalon>(request);
                 staffSalon.CreatedAt = DateTimeHelper.UtcNow();

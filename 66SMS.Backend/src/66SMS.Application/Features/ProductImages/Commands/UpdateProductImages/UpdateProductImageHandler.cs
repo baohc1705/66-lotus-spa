@@ -2,6 +2,7 @@ using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
@@ -29,7 +30,7 @@ namespace _66SMS.Application.Features.ProductImages.Commands.UpdateProductImages
             ProductImage productImage = await productImageSqlRepository.FindByIdAsync(request.Id);
             if (productImage == null)
             {
-                return Result<object>.NotFound("Product image not found.", ErrorCodes.ERR_PRODUCT_IMAGE_NOT_FOUND);
+                return Result<object>.NotFound(ProductImageConst.MSG_PRODUCT_IMAGE_NOT_FOUND, ErrorCodes.ERR_PRODUCT_IMAGE_NOT_FOUND);
             }
 
             mapper.Map(request, productImage);

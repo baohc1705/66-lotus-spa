@@ -28,6 +28,7 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_SERVICE_CATEGORY_ID_NOT_FOUND = $"{nameof(Entities.ServiceCategory)} with id not found";
+        public const string MSG_SERVICE_CATEGORY_NOT_FOUND = "Service category not found.";
         #endregion
     }
 }

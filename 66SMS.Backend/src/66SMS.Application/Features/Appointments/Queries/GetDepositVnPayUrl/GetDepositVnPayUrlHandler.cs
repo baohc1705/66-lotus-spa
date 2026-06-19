@@ -2,6 +2,7 @@ using _66SMS.Application.Services.Appointments;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -25,11 +26,11 @@ namespace _66SMS.Application.Features.Appointments.Queries.GetDepositVnPayUrl
                 .Where(x => x.Id == request.AppointmentId.Value && x.Status != AppointmentConst.STATUS_CANCELLED)
                 .FirstOrDefaultAsync(cancellationToken);
             if (appointment == null)
-                return Result<string>.NotFound("Không tìm thấy lịch hẹn");
+                return Result<string>.NotFound(AppointmentConst.MSG_APPOINTMENT_NOT_FOUND, ErrorCodes.ERR_APPOINTMENT_NOT_FOUND);
 
             // Validate nghiệp vụ: có được phép đặt cọc hay không
             if (!AppointmentStatusTransitions.CanPayDeposit(appointment)) 
-                return Result<string>.BadRequest("Lịch hẹn không ở trạng thái chờ đặt cọc.");
+                return Result<string>.BadRequest(AppointmentConst.MSG_APPOINTMENT_NOT_WAITING_DEPOSIT, ErrorCodes.ERR_APPOINTMENT_NOT_WAITING_DEPOSIT);
 
             var depositAmount = AppointmentPaymentCalculator.GetDepositAmount(appointment.TotalAmount, appointment.DepositPercent ?? AppointmentPaymentCalculator.DefaultDepositPercent);
 

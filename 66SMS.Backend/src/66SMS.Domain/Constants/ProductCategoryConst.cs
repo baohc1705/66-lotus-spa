@@ -28,6 +28,7 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_PRODUCT_CATEGORY_ID_NOT_FOUND = $"{nameof(Entities.ProductCategory)} with id not found";
+        public const string MSG_PRODUCT_CATEGORY_NOT_FOUND = "Product category not found.";
         #endregion
     }
 }

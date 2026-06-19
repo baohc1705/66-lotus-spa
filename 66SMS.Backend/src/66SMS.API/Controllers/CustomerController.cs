@@ -27,11 +27,10 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
+        [PermissionAuthorize("customers", "create", Roles = "admin,cashier")]
         public async Task<IActionResult> CreateCustomer([FromBody] CreateCustomerCommand command)
         {
-            var userId = jwtService.GetUserId();
-            if (userId > 0) command.CreatedBy = userId;
+            command.CreatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }

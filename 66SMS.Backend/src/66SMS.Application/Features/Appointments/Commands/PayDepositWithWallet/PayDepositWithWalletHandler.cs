@@ -3,6 +3,7 @@ using _66SMS.Application.Services.Wallets;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
@@ -35,7 +36,7 @@ namespace _66SMS.Application.Features.Appointments.Commands.PayDepositWithWallet
 
             if (appointment == null)
             {
-                return Result<object>.NotFound("Lịch hẹn không tồn tại.");
+                return Result<object>.NotFound(AppointmentConst.MSG_APPOINTMENT_NOT_FOUND, ErrorCodes.ERR_APPOINTMENT_NOT_FOUND);
             }
 
             if (appointment.CreatedByUserId != userId)
@@ -52,12 +53,12 @@ namespace _66SMS.Application.Features.Appointments.Commands.PayDepositWithWallet
 
                 if (depositAmount <= 0)
                 {
-                    return Result<object>.BadRequest("Số tiền cọc không hợp lệ.");
+                    return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_DEPOSIT_INVALID_AMOUNT, ErrorCodes.ERR_APPOINTMENT_SLOT_LOCK_INVALID);
                 }
 
                 if (AppointmentPaymentCalculator.HasDepositPaid(appointment))
                 {
-                    return Result<object>.BadRequest("Lịch hẹn đã được thanh toán cọc.");
+                    return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_DEPOSIT_ALREADY_PAID, ErrorCodes.ERR_APPOINTMENT_DEPOSIT_ALREADY_PAID);
                 }
 
                 Wallet wallet;
@@ -72,7 +73,7 @@ namespace _66SMS.Application.Features.Appointments.Commands.PayDepositWithWallet
 
                 if (wallet.Balance < depositAmount)
                 {
-                    return Result<object>.BadRequest("Số dư ví không đủ để thanh toán tiền cọc.");
+                    return Result<object>.BadRequest(WalletConst.MSG_WALLET_INSUFFICIENT_BALANCE, ErrorCodes.ERR_WALLET_INSUFFICIENT_BALANCE);
                 }
 
                 // Trừ tiền ví

@@ -3,6 +3,7 @@ using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
@@ -47,7 +48,7 @@ namespace _66SMS.Application.Features.Appointments.Commands.CreateSlotLock
 
                     var service = await serviceSqlRepository.FindByIdAsync((int)lockRequest.ServiceId);
                     if (service == null)
-                        return Result<List<int>>.BadRequest("Dịch vụ không tồn tại.");
+                        return Result<List<int>>.BadRequest(ServiceConst.MSG_SERVICE_PRODUCT_NOT_FOUND, ErrorCodes.ERR_SERVICE_NOT_FOUND);
 
                     var slotsNeeded = Math.Max(1, (int)Math.Ceiling(service.DurationMins / (double)TimeSlotConst.DEFAULT_SLOT_MINUTES));
                     var slotLock = new AppointmentSlotLock

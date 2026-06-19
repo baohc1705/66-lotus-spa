@@ -30,6 +30,7 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_BOOKING_ROOM_ID_NOT_FOUND = $"{nameof(Entities.BookingRoom)} with id not found";
+        public const string MSG_BOOKING_ROOM_NOT_FOUND = "Booking room not found.";
         #endregion
     }
 }

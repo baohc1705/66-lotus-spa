@@ -2,6 +2,7 @@ using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
@@ -29,7 +30,7 @@ namespace _66SMS.Application.Features.Products.Commands.UpdateProducts
             Product product = await productSqlRepository.FindByIdAsync(request.Id);
             if (product == null)
             {
-                return Result<object>.NotFound("Product not found.", ErrorCodes.ERR_PRODUCT_NOT_FOUND);
+                return Result<object>.NotFound(ProductConst.MSG_PRODUCT_NOT_FOUND, ErrorCodes.ERR_PRODUCT_NOT_FOUND);
             }
 
             mapper.Map(request, product);
@@ -38,7 +39,7 @@ namespace _66SMS.Application.Features.Products.Commands.UpdateProducts
             productSqlRepository.Update(product);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-            return Result<object>.Success(null);
+            return Result<object>.Ok();
         }
     }
 }

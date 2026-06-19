@@ -16,6 +16,8 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_SHIFT_ID_NOT_FOUND = $"{nameof(Entities.Shift)} with id not found";
+        public const string MSG_SHIFT_END_AFTER_START = "ShiftEnd phải sau ShiftStart.";
+        public const string MSG_SHIFT_EFFECTIVE_TO_AFTER_FROM = "EffectiveTo phải sau EffectiveFrom.";
         #endregion
     }
 }

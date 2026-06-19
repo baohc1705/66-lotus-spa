@@ -24,6 +24,8 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_WORK_SCHEDULE_ID_NOT_FOUND = $"{nameof(Entities.WorkSchedule)} with id not found";
+        public const string MSG_WORK_SCHEDULE_NOT_FOUND = "Không tìm thấy ca làm việc.";
+        public const string MSG_WORK_SCHEDULE_DUPLICATE = "Nhân viên này đã được xếp vào ca này trong cùng ngày.";
         #endregion
     }
 }

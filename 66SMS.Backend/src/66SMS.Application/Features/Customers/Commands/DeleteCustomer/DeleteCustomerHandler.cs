@@ -37,15 +37,15 @@ namespace _66SMS.Application.Features.Customers.Commands.DeleteCustomer
                 customerSqlRepository.Update(customer);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                User? user = await userSqlRepository.FindByIdAsync(customer.UserId, false);
-                if (user != null)
-                {
-                    user.Status = UserConst.STATUS_DELETED;
-                    user.UpdatedAt = DateTime.UtcNow;
-                    user.UpdatedBy = request.UpdatedBy;
-                    userSqlRepository.Update(user);
-                    await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-                }
+                //User? user = await userSqlRepository.FindByIdAsync(customer.UserId, false);
+                //if (user != null)
+                //{
+                //    user.Status = UserConst.STATUS_DELETED;
+                //    user.UpdatedAt = DateTime.UtcNow;
+                //    user.UpdatedBy = request.UpdatedBy;
+                //    userSqlRepository.Update(user);
+                //    await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                //}
 
                 transaction.Commit();
                 return Result<object>.Ok();

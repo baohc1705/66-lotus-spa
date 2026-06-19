@@ -9,7 +9,6 @@ namespace _66SMS.Application.Features.Customers.Commands.CreateCustomer
         public CreateCustomerValidator()
         {
 
-            RuleFor(x => x.UserId).GreaterThan(0);
             RuleFor(x => x.FullName).NotNull().NotEmpty().MaximumLength(CustomerConst.FULL_NAME_MAX_LENGTH);
             RuleFor(x => x.Phone).NotEmpty().Matches(RegexConst.VIETNAM_PHONE_REGEX).MaximumLength(CustomerConst.PHONE_MAX_LENGTH);
             RuleFor(x => x.UserName).NotEmpty().MaximumLength(UserConst.USERNAME_MAX_LENGTH).Matches(RegexConst.USERNAME_REGEX);

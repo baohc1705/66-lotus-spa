@@ -48,7 +48,7 @@ namespace _66SMS.Application.Features.Staffs.Commands.CreateStaff
                 .AnyAsync(cancellationToken);
 
             if (emailOrUsernameExisted)
-                return Result<object>.Conflict("Email or username existed", ErrorCodes.ERR_USER_ALREADY_EXISTS);
+                return Result<object>.Conflict(UserConst.MSG_USER_ALREADY_EXISTS, ErrorCodes.ERR_USER_ALREADY_EXISTS);
 
             User? user = mapper.Map<User>(request);
             user.PasswordHash = passwordHash.Hash(request.Password!);
@@ -79,7 +79,7 @@ namespace _66SMS.Application.Features.Staffs.Commands.CreateStaff
                     .FirstOrDefaultAsync(cancellationToken);
 
                 if (role == null)
-                    return Result<object>.BadRequest("Invalid role", ErrorCodes.ERR_ROLE_NOT_FOUND);
+                    return Result<object>.BadRequest(UserConst.MSG_USER_INVALID_ROLE, ErrorCodes.ERR_ROLE_NOT_FOUND);
 
                 UserRole userRole = new()
                 {

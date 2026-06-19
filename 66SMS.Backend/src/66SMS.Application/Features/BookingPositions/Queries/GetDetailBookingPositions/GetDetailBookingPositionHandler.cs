@@ -1,6 +1,7 @@
 using _66SMS.Application.DTOs.BookingPositions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -29,7 +30,7 @@ namespace _66SMS.Application.Features.BookingPositions.Queries.GetDetailBookingP
 
             if (bookingPositionDto == null)
             {
-                return Result<BookingPositionDto>.NotFound("Booking position not found.", ErrorCodes.ERR_BOOKING_POSITION_NOT_FOUND);
+                return Result<BookingPositionDto>.NotFound(BookingPositionConst.MSG_BOOKING_POSITION_NOT_FOUND, ErrorCodes.ERR_BOOKING_POSITION_NOT_FOUND);
             }
 
             return Result<BookingPositionDto>.Success(bookingPositionDto);

@@ -70,7 +70,27 @@ namespace _66SMS.Infrastructure.Security
 
         public ClaimsPrincipal? ValidateToken(string token)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.UTF8.GetBytes(options.Value.SecretKey);
+                var validationParams = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = true,
+                    ValidIssuer = options.Value.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = options.Value.Audience,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+                return tokenHandler.ValidateToken(token, validationParams, out _);
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

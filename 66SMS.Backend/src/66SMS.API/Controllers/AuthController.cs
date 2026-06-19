@@ -8,8 +8,10 @@ using _66SMS.Application.Features.Auth.Commands.Login;
 using _66SMS.Application.Features.Auth.Commands.Logout;
 using _66SMS.Application.Features.Auth.Commands.RefreshTokens;
 using _66SMS.Application.Features.Auth.Commands.ResetPassword;
+using _66SMS.Application.Features.Auth.Commands.SendEmailOtp;
+using _66SMS.Application.Features.Auth.Commands.VerifyEmailOtp;
 using _66SMS.Application.Features.Auth.Queries.GetAllRoles;
-using _66SMS.Application.Features.Users.Commands.CreateUser;
+using _66SMS.Application.Features.Customers.Commands.CreateCustomer;
 using _66SMS.Contracts.Abstractions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -33,10 +35,9 @@ namespace _66SMS.API.Controllers
 
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register(CreateUserCommand createUserCommand)
+        public async Task<IActionResult> Register([FromBody] CreateCustomerCommand command)
         {
-            //createUserCommand.CreatedBy = jwtService.GetUserId();
-            var result = await mediator.Send(createUserCommand);
+            var result = await mediator.Send(command);
             return HandleResult(result);
         }
 
@@ -127,6 +128,22 @@ namespace _66SMS.API.Controllers
         [HttpPost("reset-password")]
         [AllowAnonymous]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
+        {
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpPost("send-otp")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SendOtp([FromBody] SendEmailOtpCommand command)
+        {
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpPost("verify-otp")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyEmailOtpCommand command)
         {
             var result = await mediator.Send(command);
             return HandleResult(result);

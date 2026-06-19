@@ -30,7 +30,7 @@ namespace _66SMS.Application.Features.StaffSalons.Commands.DeleteStaffSalon
             {
                 StaffSalon? staffSalon = await staffSalonSqlRepository.FindByIdAsync((int)request.Id);
                 if (staffSalon == null)
-                    return Result<object>.NotFound("StaffSalon not found.", ErrorCodes.ERR_STAFF_SALON_NOT_FOUND);
+                    return Result<object>.NotFound(StaffSalonConst.MSG_STAFF_SALON_NOT_FOUND, ErrorCodes.ERR_STAFF_SALON_NOT_FOUND);
 
                 staffSalon.Status = StaffSalonConst.STATUS_DELETED;
                 staffSalon.UpdatedAt = DateTimeHelper.UtcNow();

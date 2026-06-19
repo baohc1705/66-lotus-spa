@@ -1,6 +1,7 @@
 using _66SMS.Application.DTOs.ServiceCategories;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Entities;
 using AutoMapper;
@@ -24,7 +25,7 @@ namespace _66SMS.Application.Features.ServiceCategories.Queries.GetServiceCatego
             ServiceCategory? entity = await serviceCategorySqlRepository.FindByIdAsync(request.Id);
             if (entity == null)
             {
-                return Result<ServiceCategoryDto>.NotFound("Service category not found", ErrorCodes.ERR_SERVICE_CATEGORY_NOT_FOUND);
+                return Result<ServiceCategoryDto>.NotFound(ServiceCategoryConst.MSG_SERVICE_CATEGORY_NOT_FOUND, ErrorCodes.ERR_SERVICE_CATEGORY_NOT_FOUND);
             }
 
             ServiceCategoryDto dto = mapper.Map<ServiceCategoryDto>(entity);

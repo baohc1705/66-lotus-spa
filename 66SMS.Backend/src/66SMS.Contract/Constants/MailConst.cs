@@ -8,6 +8,7 @@
             public const string EmailConfirmation = "Xác nhận địa chỉ email - 66SMS";
             public const string WelcomeEmail = "Chào mừng bạn đến với 66SMS";
             public const string AppointmentReminder = "Nhắc nhở lịch hẹn - 66SMS";
+            public const string OtpEmail = "Mã xác minh OTP - 66SMS";
         }
 
         public static class Template

@@ -48,7 +48,27 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_APPOINTMENT_ID_NOT_FOUND = $"{nameof(Entities.Appointment)} with id not found";
-        
+        public const string MSG_APPOINTMENT_NOT_FOUND = "Lịch hẹn không tồn tại.";
+        public const string MSG_APPOINTMENT_ALREADY_THIS_STATUS = "Lịch hẹn đã ở trạng thái này.";
+        public const string MSG_APPOINTMENT_ALREADY_CONFIRMED_WAITING_DEPOSIT = "Lịch hẹn đã được xác nhận và đang chờ khách đặt cọc.";
+        public const string MSG_APPOINTMENT_ALREADY_PAID = "Lịch hẹn đã được thanh toán.";
+        public const string MSG_APPOINTMENT_CANCELLED = "Lịch hẹn này đã bị hủy.";
+        public const string MSG_APPOINTMENT_CANNOT_POSTPONE_COMPLETED = "Không thể hoãn/hủy lịch hẹn đã hoàn thành hoặc quá hạn.";
+        public const string MSG_APPOINTMENT_POSTPONE_ONLY_PAID_PENDING = "Chỉ cho phép hoãn/hủy nhận lại cọc với lịch hẹn đã thanh toán cọc và đang chờ phục vụ.";
+        public const string MSG_APPOINTMENT_SLOT_LOCK_INVALID = "Khóa giữ chỗ không hợp lệ hoặc đã hết thời gian (10 phút). Vui lòng tải lại trang.";
+        public const string MSG_APPOINTMENT_SLOT_FULL = "Khung giờ này đã kín lịch hoặc nhân viên bạn chọn không còn trống lịch.";
+        public const string MSG_APPOINTMENT_STAFF_NOT_IN_SALON = "Staff không thuộc chi nhánh này.";
+        public const string MSG_APPOINTMENT_MIN_ONE_SERVICE = "Phải chọn ít nhất 1 dịch vụ cho mỗi khách.";
+        public const string MSG_APPOINTMENT_NOT_WAITING_DEPOSIT = "Lịch hẹn không ở trạng thái chờ đặt cọc.";
+        public const string MSG_APPOINTMENT_DEPOSIT_INVALID_AMOUNT = "Số tiền cọc không hợp lệ.";
+        public const string MSG_APPOINTMENT_DEPOSIT_ALREADY_PAID = "Lịch hẹn đã được thanh toán cọc.";
+        public const string MSG_APPOINTMENT_NOT_DEPOSITED_YET = "Khách chưa đặt cọc. Vui lòng thu cọc trước.";
+        public const string MSG_APPOINTMENT_NO_REMAINING_AMOUNT = "Không còn số tiền cần thanh toán.";
+        public const string MSG_APPOINTMENT_INVALID_PAYMENT_METHOD = "Phương thức thanh toán không hợp lệ.";
+        public const string MSG_APPOINTMENT_UPDATE_STATUS_SUCCESS = "Cập nhật trạng thái thành công.";
+        public const string MSG_APPOINTMENT_POSTPONE_REFUND_SUCCESS = "Hoãn lịch và hoàn tiền cọc vào ví thành công.";
+        public const string MSG_APPOINTMENT_PAY_DEPOSIT_SUCCESS = "Thanh toán tiền cọc thành công.";
+        public const string MSG_APPOINTMENT_PAY_SUCCESS = "Thanh toán thành công.";
         #endregion
     }
 }

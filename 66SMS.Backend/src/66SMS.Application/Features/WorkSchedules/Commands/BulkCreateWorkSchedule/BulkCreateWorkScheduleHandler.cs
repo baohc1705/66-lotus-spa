@@ -29,7 +29,7 @@ namespace _66SMS.Application.Features.WorkSchedules.Commands.BulkCreateWorkSched
         {
             if (request.Schedules == null || request.Schedules.Count == 0)
             {
-                return Result<object>.Success(null);
+                return Result<object>.Ok();
             }
 
             var workDates = request.Schedules.Select(x => x.WorkDate).Distinct().ToList();
