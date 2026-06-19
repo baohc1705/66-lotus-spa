@@ -62,3 +62,12 @@ export interface AssignPermissionsRequest {
   roleId: number;
   permissionIds: number[];
 }
+
+export interface SendOtpRequest {
+  email: string;
+}
+
+export interface VerifyOtpRequest {
+  email: string;
+  otpCode: string;
+}

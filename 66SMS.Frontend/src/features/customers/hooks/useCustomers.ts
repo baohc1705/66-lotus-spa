@@ -1,7 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import type { AxiosError } from 'axios'
 import { customerApi } from '../api/customer.api'
-import type { PageRequest } from '@/shared/types/common.types'
+import { getErrorMessage } from '@/shared/utils/errorUtils'
+import type { PageRequest, Result } from '@/shared/types/common.types'
 import type { CreateCustomerPayload, UpdateCustomerPayload } from '../types/customer.types'
 
 const CUSTOMER_KEYS = {
@@ -42,7 +44,7 @@ export function useCreateCustomer() {
         toast.error(result.message || 'Không thể tạo khách hàng')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi tạo khách hàng'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }
 
@@ -60,7 +62,7 @@ export function useUpdateCustomer() {
         toast.error(result.message || 'Không thể cập nhật khách hàng')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi cập nhật khách hàng'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }
 
@@ -77,6 +79,6 @@ export function useDeleteCustomer() {
         toast.error(result.message || 'Không thể xóa khách hàng')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi xóa khách hàng'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }

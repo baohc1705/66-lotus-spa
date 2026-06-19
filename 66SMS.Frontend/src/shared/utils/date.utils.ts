@@ -1,3 +1,9 @@
+// Tiện ích xử lý ngày giờ — dùng thay vì dayjs hay moment.
+//
+// Ví dụ:
+//   DateUtil.format(new Date(), 'DD/MM/YYYY')   → "18/06/2026"
+//   DateUtil.startOf(new Date(), 'week')         → thứ Hai đầu tuần
+//   DateUtil.add(new Date(), 1, 'day')           → ngày mai
 export class DateUtil {
   private date: Date;
 

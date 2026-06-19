@@ -41,8 +41,8 @@ export const useGetMe = () => {
   return useQuery({
     queryKey: userKeys.me(),
     queryFn: async () => {
-      const res = await usersApi.getMe();
-      return res.data.data;
+      const result = await usersApi.getMe();
+      return result.data;
     },
     enabled: !!accessToken,
     staleTime: 1000 * 60 * 5, // 5 phut

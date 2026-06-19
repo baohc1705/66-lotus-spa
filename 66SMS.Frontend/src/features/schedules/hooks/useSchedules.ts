@@ -1,6 +1,9 @@
 import { scheduleApi } from "@/features/schedules/api/schedule.api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import type { AxiosError } from "axios";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
+import type { Result } from "@/shared/types/common.types";
 import type {
   CreateWorkSchedulePayload,
   UpdateWorkSchedulePayload,
@@ -43,9 +46,7 @@ export function useCreateWorkSchedule() {
         toast.error(result.message || "Có lỗi xảy ra");
       }
     },
-    onError: () => {
-      toast.error("Có lỗi xảy ra khi tạo lịch làm việc");
-    },
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   });
 }
 
@@ -63,7 +64,7 @@ export function useBulkCreateWorkSchedule() {
         toast.error(result.message || "Không thể phân ca làm việc");
       }
     },
-    onError: () => toast.error("Có lỗi xảy ra khi phân ca làm việc"),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   });
 }
 
@@ -84,9 +85,7 @@ export function useUpdateWorkSchedule() {
         toast.error(result.message || "Có lỗi xảy ra");
       }
     },
-    onError: () => {
-      toast.error("Có lỗi xảy ra khi cập nhật lịch làm việc");
-    },
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   });
 }
 
@@ -102,8 +101,6 @@ export function useDeleteWorkSchedule() {
         toast.error(result.message || "Có lỗi xảy ra");
       }
     },
-    onError: () => {
-      toast.error("Có lỗi xảy ra khi xóa lịch làm việc");
-    },
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   });
 }

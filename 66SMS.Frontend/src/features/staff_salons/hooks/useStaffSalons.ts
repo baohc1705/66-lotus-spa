@@ -1,6 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import type { AxiosError } from 'axios'
 import { staffSalonApi, meApi, type AssignManagerPayload } from '../api/staff-salon.api'
+import { getErrorMessage } from '@/shared/utils/errorUtils'
+import type { Result } from '@/shared/types/common.types'
 import type {
   StaffSalonQueryParams,
   CreateStaffSalonPayload,
@@ -42,7 +45,7 @@ export function useCreateStaffSalon() {
         toast.error(result.message || 'Có lỗi xảy ra')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi gán nhân viên'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }
 
@@ -59,7 +62,7 @@ export function useUpdateStaffSalon() {
         toast.error(result.message || 'Có lỗi xảy ra')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi cập nhật'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }
 
@@ -75,7 +78,7 @@ export function useDeleteStaffSalon() {
         toast.error(result.message || 'Có lỗi xảy ra')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi xóa nhân viên'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }
 
@@ -91,7 +94,7 @@ export function useAssignManager() {
         toast.error(result.message || 'Có lỗi xảy ra')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi phân công quản lý'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }
 
@@ -107,7 +110,7 @@ export function useRemoveManager() {
         toast.error(result.message || 'Có lỗi xảy ra')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi gỡ quản lý'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }
 

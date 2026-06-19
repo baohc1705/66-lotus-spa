@@ -1,4 +1,5 @@
 import axiosInstance from "@/shared/api/axiosInstance";
+import { API } from "@/shared/api/endpoints";
 import type { Result, PagedResult } from "@/shared/types/common.types";
 import type {
   TechnicianDTO,
@@ -9,8 +10,8 @@ import type {
   AppointmentDto,
 } from "../types/booking.types";
 
-const APPOINTMENT_BASE = "/Appointment";
-const POSITION_BASE = "/BookingPositions";
+const APPOINTMENT_BASE = API.appointment;
+const POSITION_BASE = API.bookingPositions;
 
 export const bookingApi = {
   getTechnicians: async (

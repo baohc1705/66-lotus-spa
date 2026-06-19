@@ -1,4 +1,5 @@
 import axiosInstance from "@/shared/api/axiosInstance";
+import { API } from "@/shared/api/endpoints";
 import type {
   Result,
   PagedResult,
@@ -10,7 +11,7 @@ import type {
   UpdateTimeSlotPayload,
 } from "../types/time_slot.types";
 
-const BASE = "/TimeSlots";
+const BASE = API.timeSlots;
 
 export const timeSlotApi = {
   // Get All

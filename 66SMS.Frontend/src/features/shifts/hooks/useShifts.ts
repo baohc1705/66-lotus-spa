@@ -1,7 +1,9 @@
 import { shiftApi } from "@/features/shifts/api/shift.api";
-import type { PageRequest } from "@/shared/types/common.types";
+import type { PageRequest, Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import type { AxiosError } from "axios";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type {
   CreateShiftPayload,
   UpdateShiftPayload,
@@ -42,9 +44,7 @@ export function useCreateShift() {
         toast.error(result.message || "Có lỗi xảy ra");
       }
     },
-    onError: () => {
-      toast.error("Có lỗi xảy ra khi tạo ca làm việc");
-    },
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   });
 }
 
@@ -66,9 +66,7 @@ export function useUpdateShift() {
         toast.error(result.message || "Có lỗi xảy ra");
       }
     },
-    onError: () => {
-      toast.error("Có lỗi xảy ra khi cập nhật ca làm việc");
-    },
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   });
 }
 
@@ -84,8 +82,6 @@ export function useDeleteShift() {
         toast.error(result.message || "Có lỗi xảy ra");
       }
     },
-    onError: () => {
-      toast.error("Có lỗi xảy ra khi xóa ca làm việc");
-    },
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   });
 }

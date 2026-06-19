@@ -1,3 +1,7 @@
+// Bảng dữ liệu dùng chung cho các trang CRUD.
+// Hỗ trợ: phân trang, tìm kiếm, sort cột, ẩn/hiện cột, chọn nhiều dòng, mở rộng dòng.
+//
+// Dùng cùng với DataTableToolbar (thanh tìm kiếm) và DataTablePagination (phân trang).
 import { Fragment } from 'react'
 import { flexRender, type Table as ReactTable } from '@tanstack/react-table'
 import {

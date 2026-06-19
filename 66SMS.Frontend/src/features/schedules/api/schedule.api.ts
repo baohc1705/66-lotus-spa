@@ -1,4 +1,5 @@
 import axiosInstance from "@/shared/api/axiosInstance";
+import { API } from "@/shared/api/endpoints";
 import type {
   Result,
   PagedResult,
@@ -11,7 +12,7 @@ import type {
   GetWorkSchedulesParams,
 } from "../types/schedule.types";
 
-const BASE = "/WorkerSchedule"; // Path in backend
+const BASE = API.workSchedule;
 
 export const scheduleApi = {
   // Get All

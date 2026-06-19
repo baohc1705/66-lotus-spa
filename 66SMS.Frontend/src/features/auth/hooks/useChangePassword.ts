@@ -1,11 +1,13 @@
-import {useMutation} from '@tanstack/react-query';
-import {authApi} from '@/features/auth/api/authApi';
-import {toast} from 'sonner';
+import { useMutation } from '@tanstack/react-query';
+import type { AxiosError } from 'axios';
+import { authApi } from '@/features/auth/api/authApi';
+import { getErrorMessage } from '@/shared/utils/errorUtils';
+import { toast } from 'sonner';
+import type { Result } from '@/shared/types/common.types';
 
-export const useChangePassword = () => {
-    useMutation({
-        mutationFn: authApi.changePassword,
-        onSuccess:({data}) => data.isSuccess ? toast.success('Đổi mật khẩu thành công') : toast.error(data.message),
-        onError: () => toast.error('Có lỗi xảy ra'),
-    });
-}
+export const useChangePassword = () =>
+  useMutation({
+    mutationFn: authApi.changePassword,
+    onSuccess: (result) => result.isSuccess ? toast.success('Đổi mật khẩu thành công') : toast.error(result.message),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
+  })

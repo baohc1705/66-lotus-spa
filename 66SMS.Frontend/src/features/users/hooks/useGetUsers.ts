@@ -7,8 +7,8 @@ export const useGetUsers = (params?: PageRequest) => {
   return useQuery({
     queryKey: userKeys.list(params ?? {}),
     queryFn: async () => {
-      const res = await usersApi.getAll(params);
-      return res.data.data;
+      const result = await usersApi.getAll(params);
+      return result.data;
     },
     staleTime: 1000 * 30,
   });

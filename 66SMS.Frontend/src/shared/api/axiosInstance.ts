@@ -1,3 +1,6 @@
+// Axios instance dùng chung cho toàn bộ app.
+// Tự động gắn Bearer token vào header mỗi request.
+// Tự động refresh token khi nhận lỗi 401 và retry lại request gốc.
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 
@@ -9,7 +12,7 @@ const axiosInstance = axios.create({
   },
 });
 
-// Request interceptor: đính kèm access token
+// Gắn token vào mỗi request trước khi gửi đi
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = useAuthStore.getState().accessToken;
@@ -21,7 +24,9 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// Response interceptor: tự động refresh khi 401
+// Token hết hạn — thử refresh.
+// Nếu refresh thành công: retry tất cả request đang chờ.
+// Nếu refresh thất bại: xoá auth và chuyển về trang đăng nhập.
 let isRefreshing = false;
 let failedQueue: Array<{
   resolve: (token: string) => void;

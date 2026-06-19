@@ -1,4 +1,5 @@
-// File chứa các result chung của hệ thống
+// Re-export các kiểu từ apiTypes.ts để import gọn hơn từ các nơi khác.
+// Dùng: import type { Result } from '@/shared/types/common.types'
 
 export interface Result<T> {
   code: number;

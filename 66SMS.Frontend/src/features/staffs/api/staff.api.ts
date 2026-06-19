@@ -1,8 +1,9 @@
 import axiosInstance from '@/shared/api/axiosInstance'
+import { API } from '@/shared/api/endpoints'
 import type { Result, PagedResult, PageRequest } from '@/shared/types/common.types'
 import type { StaffDto, CreateStaffPayload, UpdateStaffPayload } from '../types/staff.types'
 
-const BASE = '/staffs'
+const BASE = API.staffs.base
 
 export const staffApi = {
   /** GET /staffs — Danh sách nhân viên (phân trang) — quyền: staffs.read, role: admin */

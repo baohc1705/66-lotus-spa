@@ -1,8 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import type { AxiosError } from 'axios'
 import { salonApi } from '../api/salon.api'
-import type { SalonQueryParams } from '../types/salon.types'
-import type { CreateSalonPayload, UpdateSalonPayload } from '../types/salon.types'
+import { getErrorMessage } from '@/shared/utils/errorUtils'
+import type { SalonQueryParams, CreateSalonPayload, UpdateSalonPayload } from '../types/salon.types'
+import type { Result } from '@/shared/types/common.types'
 
 const SALON_KEYS = {
   all: ['salons'] as const,
@@ -39,7 +41,7 @@ export function useCreateSalon() {
         toast.error(result.message || 'Có lỗi xảy ra')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi tạo chi nhánh'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }
 
@@ -56,7 +58,7 @@ export function useUpdateSalon() {
         toast.error(result.message || 'Có lỗi xảy ra')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi cập nhật chi nhánh'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }
 
@@ -72,6 +74,6 @@ export function useDeleteSalon() {
         toast.error(result.message || 'Có lỗi xảy ra')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi xóa chi nhánh'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }

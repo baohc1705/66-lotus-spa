@@ -1,4 +1,5 @@
 import axiosInstance from "@/shared/api/axiosInstance";
+import { API } from "@/shared/api/endpoints";
 import type {
   Result,
   PagedResult,
@@ -10,7 +11,7 @@ import type {
   UpdateServicePayload,
 } from "../types/service.types";
 
-const BASE = "/Service";
+const BASE = API.services;
 
 export const serviceApi = {
   // Get All

@@ -1,7 +1,9 @@
 import { serviceApi } from "@/features/services/api/service.api";
-import type { PageRequest } from "@/shared/types/common.types";
+import type { PageRequest, Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import type { AxiosError } from "axios";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type {
   CreateServicePayload,
   UpdateServicePayload,
@@ -49,9 +51,7 @@ export function useCreateService() {
         toast.error(result.message || "Có lỗi xảy ra");
       }
     },
-    onError: () => {
-      toast.error("Có lỗi xảy ra khi tạo dịch vụ");
-    },
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   });
 }
 
@@ -73,9 +73,7 @@ export function useUpdateService() {
         toast.error(result.message || "Có lỗi xảy ra");
       }
     },
-    onError: () => {
-      toast.error("Có lỗi xảy ra khi cập nhật dịch vụ");
-    },
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   });
 }
 
@@ -91,8 +89,6 @@ export function useDeleteService() {
         toast.error(result.message || "Có lỗi xảy ra");
       }
     },
-    onError: () => {
-      toast.error("Có lỗi xảy ra khi xóa dịch vụ");
-    },
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   });
 }

@@ -1,4 +1,5 @@
 import axiosInstance from "@/shared/api/axiosInstance";
+import { API } from "@/shared/api/endpoints";
 import type {
   Result,
   PagedResult,
@@ -10,7 +11,7 @@ import type {
   UpdateShiftPayload,
 } from "../types/shift.types";
 
-const BASE = "/Shift";
+const BASE = API.shifts;
 
 export const shiftApi = {
   // Get All

@@ -1,7 +1,9 @@
 import { timeSlotApi } from "@/features/time_slots/api/timeSlot.api";
-import type { PageRequest } from "@/shared/types/common.types";
+import type { PageRequest, Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import type { AxiosError } from "axios";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type {
   CreateTimeSlotPayload,
   UpdateTimeSlotPayload,
@@ -43,9 +45,7 @@ export function useCreateTimeSlot() {
         toast.error(result.message || "Có lỗi xảy ra");
       }
     },
-    onError: () => {
-      toast.error("Có lỗi xảy ra khi tạo khung giờ");
-    },
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   });
 }
 
@@ -67,9 +67,7 @@ export function useUpdateTimeSlot() {
         toast.error(result.message || "Có lỗi xảy ra");
       }
     },
-    onError: () => {
-      toast.error("Có lỗi xảy ra khi cập nhật khung giờ");
-    },
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   });
 }
 
@@ -85,8 +83,6 @@ export function useDeleteTimeSlot() {
         toast.error(result.message || "Có lỗi xảy ra");
       }
     },
-    onError: () => {
-      toast.error("Có lỗi xảy ra khi xóa khung giờ");
-    },
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   });
 }

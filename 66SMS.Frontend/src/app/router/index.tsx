@@ -1,34 +1,26 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { BookingPage } from "@/features/booking/pages/BookingPage";
 import { HomePage } from "@/features/landing/pages/HomePage";
-import { LoginPage } from "@/features/auth/pages/LoginPage";
-import { RegisterPage } from "@/features/auth/pages/RegisterPage";
-import { UsersPage } from "@/features/users/pages/UsersPage";
 import { ProfilePage } from "@/features/profile";
 import { ProtectedRoute } from "./ProtectedRoute";
-import {
-  AdminLayout,
-  AdminDashboard,
-  AdminProfilePage,
-} from "@/features/admin";
-import { StaffListPage } from "@/features/staffs/pages/StaffListPage";
-import { StaffAppointmentsPage } from "@/features/staff-appointments";
-import { CustomerListPage } from "@/features/customers/pages/CustomerListPage";
-import { MembershipCardListPage } from "@/features/customers/pages/MembershipCardListPage";
-import { MembershipTierListPage } from "@/features/customers/pages/MembershipTierListPage";
-import { ProductListPage } from "@/features/products/pages/ProductListPage";
-import { ProductCategoryListPage } from "@/features/product_categories/pages/ProductCategoryListPage";
-import { ShiftListPage } from "@/features/shifts/pages/ShiftListPage";
-import { WorkSchedulePage } from "@/features/schedules/pages/WorkSchedulePage";
-import { ServiceCategoryListPage } from "@/features/service_categories/pages/ServiceCategoryListPage";
-import { ServiceListPage } from "@/features/services/pages/ServiceListPage";
-import { BookingRoomListPage } from "@/features/booking_rooms/pages/BookingRoomListPage";
-import { BookingPositionListPage } from "@/features/booking_positions/pages/BookingPositionListPage";
-import { TimeSlotListPage } from "@/features/time_slots/pages/TimeSlotListPage";
-import { CashierPage } from "@/features/cashier/pages/CashierPage";
-import { VnPayReturnPage } from "@/features/cashier/pages/VnPayReturnPage";
-import { WalletManagementPage } from "@/features/wallet/pages/WalletManagementPage";
-import { SalonListPage } from "@/features/salons/pages/SalonListPage";
+import { AdminLayout, AdminDashboard, AdminProfilePage } from "@/features/admin";
+import { LoginPage, RegisterPage } from "@/features/auth";
+import { BookingPage } from "@/features/booking";
+import { CashierPage, VnPayReturnPage } from "@/features/cashier";
+import { UsersPage } from "@/features/users";
+import { StaffListPage } from "@/features/staffs";
+import { StaffAppointmentsPage } from "@/features/staff_appointments";
+import { CustomerListPage, MembershipCardListPage, MembershipTierListPage } from "@/features/customers";
+import { ProductListPage } from "@/features/products";
+import { ProductCategoryListPage } from "@/features/product_categories";
+import { ServiceListPage } from "@/features/services";
+import { ServiceCategoryListPage } from "@/features/service_categories";
+import { ShiftListPage } from "@/features/shifts";
+import { WorkSchedulePage } from "@/features/schedules";
+import { BookingRoomListPage } from "@/features/booking_rooms";
+import { BookingPositionListPage } from "@/features/booking_positions";
+import { TimeSlotListPage } from "@/features/time_slots";
+import { WalletManagementPage } from "@/features/wallet";
+import { SalonListPage } from "@/features/salons";
 
 export const router = createBrowserRouter([
   {

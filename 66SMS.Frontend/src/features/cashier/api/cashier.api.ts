@@ -1,4 +1,5 @@
 import axiosInstance from "@/shared/api/axiosInstance";
+import { API } from "@/shared/api/endpoints";
 import type { Result } from "@/shared/types/common.types";
 import type { CashierBooking, CashierDailyDto } from "../types";
 
@@ -12,40 +13,36 @@ function formatDate(date: Date): string {
 export const cashierApi = {
   getDaily: (date: Date) =>
     axiosInstance
-      .get<Result<CashierDailyDto>>("/cashier/daily", {
+      .get<Result<CashierDailyDto>>(API.cashier.daily, {
         params: { date: formatDate(date) },
       })
       .then((r) => r.data),
 
   getOnlineBookings: () =>
     axiosInstance
-      .get<Result<CashierBooking[]>>("/cashier/online-appointments")
+      .get<Result<CashierBooking[]>>(API.cashier.onlineAppointments)
       .then((r) => r.data),
 
   updateBookingStatus: (id: string | number, status: number, note?: string) =>
     axiosInstance
-      .put<
-        Result<void>
-      >(`/cashier/appointments/${id}/status`, { id, status, note })
+      .put<Result<void>>(`${API.cashier.appointment}/${id}/status`, { id, status, note })
       .then((r) => r.data),
 
   payBooking: (id: string | number, paymentMethod: string, note?: string) =>
     axiosInstance
-      .post<
-        Result<void>
-      >(`/cashier/appointments/${id}/pay`, { id: Number(id), paymentMethod, note })
+      .post<Result<void>>(`${API.cashier.appointment}/${id}/pay`, { id: Number(id), paymentMethod, note })
       .then((r) => r.data),
 
   createVnPayUrl: (bookingId: string | number) =>
     axiosInstance
-      .get<Result<string>>(`/cashier/vnpay/create-url/${bookingId}`)
+      .get<Result<string>>(`${API.cashier.vnpayCreate}/${bookingId}`)
       .then((r) => r.data),
 
   vnPayReturn: (queryString: string) =>
     axiosInstance
-      .get<
-        Result<{ appointmentId: number; paymentPhase: string; message: string }>
-      >(`/cashier/vnpay-return?${queryString}`)
+      .get<Result<{ appointmentId: number; paymentPhase: string; message: string }>>(
+        `${API.cashier.vnpayReturn}?${queryString}`
+      )
       .then((r) => r.data),
 
   formatDate,

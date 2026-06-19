@@ -1,8 +1,9 @@
 import axiosInstance from '@/shared/api/axiosInstance'
+import { API } from '@/shared/api/endpoints'
 import type { Result, PagedResult } from '@/shared/types/common.types'
 import type { SalonDTO, CreateSalonPayload, UpdateSalonPayload, SalonQueryParams } from '../types/salon.types'
 
-const BASE = '/Salons'
+const BASE = API.salons
 
 export const salonApi = {
   getAll: (params: SalonQueryParams) =>

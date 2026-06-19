@@ -1,4 +1,5 @@
 import axiosInstance from "@/shared/api/axiosInstance";
+import { API } from "@/shared/api/endpoints";
 import type { Result } from "@/shared/types/common.types";
 
 export interface AdminWalletDto {
@@ -28,14 +29,13 @@ export interface AdminWalletTransactionDto {
 }
 
 export const getAdminWallets = async () => {
-  const response =
-    await axiosInstance.get<Result<AdminWalletDto[]>>("/admin/wallets");
+  const response = await axiosInstance.get<Result<AdminWalletDto[]>>(API.admin.wallets);
   return response.data;
 };
 
 export const getAdminWalletTransactions = async (walletId: number) => {
   const response = await axiosInstance.get<Result<AdminWalletTransactionDto[]>>(
-    `/admin/wallets/${walletId}/transactions`,
+    `${API.admin.wallets}/${walletId}/transactions`,
   );
   return response.data;
 };
@@ -45,7 +45,7 @@ export const addManualTransaction = async (
   data: { amount: number; note: string },
 ) => {
   const response = await axiosInstance.post<Result<object>>(
-    `/admin/wallets/${walletId}/transaction`,
+    `${API.admin.wallets}/${walletId}/transaction`,
     data,
   );
   return response.data;

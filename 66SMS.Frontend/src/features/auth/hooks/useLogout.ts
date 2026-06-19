@@ -1,8 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
 import { authApi } from "@/features/auth/api/authApi";
 import { useAuthStore } from "@/features/auth/stores/authStore";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import type { Result } from "@/shared/types/common.types";
 
 export const useLogout = () => {
   const { clearAuth } = useAuthStore();
@@ -16,6 +19,6 @@ export const useLogout = () => {
       queryClient.clear();
       navigate("/login");
     },
-    onError: () => toast.error("Đăng xuất thất bại"),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error, 'Đăng xuất thất bại')),
   });
 };

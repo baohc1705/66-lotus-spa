@@ -1,4 +1,5 @@
 import axiosInstance from '@/shared/api/axiosInstance'
+import { API } from '@/shared/api/endpoints'
 import type { Result, PagedResult } from '@/shared/types/common.types'
 import type { SalonDTO } from '@/features/salons/types/salon.types'
 import type {
@@ -8,7 +9,7 @@ import type {
   StaffSalonQueryParams,
 } from '../types/staff-salon.types'
 
-const BASE = '/StaffSalons'
+const BASE = API.staffSalons
 
 export interface AssignManagerPayload {
   staffId: number
@@ -50,5 +51,5 @@ export const staffSalonApi = {
 
 export const meApi = {
   getMySalon: () =>
-    axiosInstance.get<Result<SalonDTO>>('/Me/salon').then((r) => r.data),
+    axiosInstance.get<Result<SalonDTO>>(API.meSalon).then((r) => r.data),
 }

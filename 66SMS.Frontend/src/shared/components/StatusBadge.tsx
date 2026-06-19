@@ -1,3 +1,5 @@
+// Badge hiển thị trạng thái với màu sắc tương ứng.
+// Nhận vào một map từ giá trị → { label, color } để tự cấu hình màu.
 import { Badge, type BadgeProps } from '@/shared/components/ui/badge'
 
 export interface StatusConfig {

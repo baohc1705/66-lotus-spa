@@ -1,7 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import type { AxiosError } from 'axios'
 import { staffApi } from '../api/staff.api'
-import type { PageRequest } from '@/shared/types/common.types'
+import { getErrorMessage } from '@/shared/utils/errorUtils'
+import type { PageRequest, Result } from '@/shared/types/common.types'
 import type { CreateStaffPayload, UpdateStaffPayload } from '../types/staff.types'
 
 const STAFF_KEYS = {
@@ -42,7 +44,7 @@ export function useCreateStaff() {
         toast.error(result.message || 'Không thể tạo nhân viên')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi tạo nhân viên'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }
 
@@ -60,7 +62,7 @@ export function useUpdateStaff() {
         toast.error(result.message || 'Không thể cập nhật nhân viên')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi cập nhật nhân viên'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }
 
@@ -77,6 +79,6 @@ export function useDeleteStaff() {
         toast.error(result.message || 'Không thể xóa nhân viên')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi xóa nhân viên'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }

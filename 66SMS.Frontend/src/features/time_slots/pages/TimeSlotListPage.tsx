@@ -56,6 +56,7 @@ const itemVariants: Variants = {
 };
 
 export function TimeSlotListPage() {
+
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [filter, setFilter] = useState("");
@@ -299,6 +300,7 @@ export function TimeSlotListPage() {
     ],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: timeSlots,
     columns,

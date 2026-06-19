@@ -1,3 +1,10 @@
+// Bọc component con — chỉ render nếu user có đủ quyền.
+// Admin role tự động có quyền mọi thứ, không cần kiểm tra.
+//
+// Cách dùng:
+//   <PermissionGate resource="staffs" action="update">
+//     <EditButton />
+//   </PermissionGate>
 import { usePermission } from "@/shared/hooks/usePermission";
 
 interface Props {

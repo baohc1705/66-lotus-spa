@@ -1,4 +1,5 @@
 import axiosInstance from '@/shared/api/axiosInstance'
+import { API } from '@/shared/api/endpoints'
 import type { Result, PagedResult } from '@/shared/types/common.types'
 import type {
   MembershipCardDto,
@@ -6,7 +7,7 @@ import type {
   MembershipCardQueryParams,
 } from '../types/membershipCard.types'
 
-const BASE = '/membershipcards'
+const BASE = API.membershipCards
 
 export const membershipCardApi = {
   getAll: (params: MembershipCardQueryParams) =>

@@ -1,4 +1,5 @@
 import axiosInstance from "@/shared/api/axiosInstance";
+import { API } from "@/shared/api/endpoints";
 import type {
   Result,
   PagedResult,
@@ -11,8 +12,8 @@ import type {
   ProductCategoryDto,
 } from "../types/product.types";
 
-const BASE_PRODUCT = "/Product";
-const BASE_CATEGORY = "/ProductCategory";
+const BASE_PRODUCT = API.products;
+const BASE_CATEGORY = API.productCategories;
 
 export const productApi = {
   getAll: (params: PageRequest) =>

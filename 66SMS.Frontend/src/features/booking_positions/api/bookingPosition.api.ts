@@ -1,4 +1,5 @@
 import axiosInstance from "@/shared/api/axiosInstance";
+import { API } from "@/shared/api/endpoints";
 import type {
   Result,
   PagedResult,
@@ -10,7 +11,7 @@ import type {
   UpdateBookingPositionPayload,
 } from "../types/booking_position.types";
 
-const BASE = "/BookingPositions";
+const BASE = API.bookingPositions;
 
 export const bookingPositionApi = {
   // Get All

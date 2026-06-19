@@ -1,7 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import type { AxiosError } from 'axios'
 import { productApi, productCategoryApi } from '../api/product.api'
-import type { PageRequest } from '@/shared/types/common.types'
+import { getErrorMessage } from '@/shared/utils/errorUtils'
+import type { PageRequest, Result } from '@/shared/types/common.types'
 import type { CreateProductPayload, UpdateProductPayload } from '../types/product.types'
 
 const PRODUCT_KEYS = {
@@ -44,7 +46,7 @@ export function useCreateProduct() {
         toast.error(result.message || 'Không thể tạo sản phẩm')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi tạo sản phẩm'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }
 
@@ -61,7 +63,7 @@ export function useUpdateProduct() {
         toast.error(result.message || 'Không thể cập nhật sản phẩm')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi cập nhật sản phẩm'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }
 
@@ -77,7 +79,7 @@ export function useDeleteProduct() {
         toast.error(result.message || 'Không thể xóa sản phẩm')
       }
     },
-    onError: () => toast.error('Có lỗi xảy ra khi xóa sản phẩm'),
+    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   })
 }
 
