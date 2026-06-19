@@ -54,6 +54,7 @@ namespace _66SMS.Application.Features.Customers.Commands.CreateCustomer
             customer.CreatedAt = DateTime.UtcNow;
             customer.CreatedBy = request.CreatedBy ?? 1;
             customer.Status = CustomerConst.STATUS_ACTIVED;
+
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {

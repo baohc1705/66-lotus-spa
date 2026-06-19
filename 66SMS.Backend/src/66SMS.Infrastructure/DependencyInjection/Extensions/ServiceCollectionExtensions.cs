@@ -26,6 +26,9 @@ namespace _66SMS.Infrastructure.DependencyInjection.Extensions
 
             // VnPay
             services.AddVnPayService(configuration);
+
+            // Cloudinary (lưu trữ file/ảnh)
+            services.AddCloudinaryStorage(configuration);
             return services;
         }
     }
