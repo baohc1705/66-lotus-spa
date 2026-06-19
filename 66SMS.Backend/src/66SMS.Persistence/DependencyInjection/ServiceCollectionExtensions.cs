@@ -68,6 +68,9 @@ namespace _66SMS.Persistence.DependencyInjection
             services.AddScoped<ISalonSqlRepository, SalonSqlRepository>();
             services.AddScoped<IStaffSalonSqlRepository, StaffSalonSqlRepository>();
             services.AddScoped<IOtpVerificationSqlRepository, OtpVerificationSqlRepository>();
+
+            services.AddScoped<IProvinceSqlRepository, ProvinceSqlRepository>();
+            services.AddScoped<IWardSqlRepository, WardSqlRepository>();
             return services;
         }
     }

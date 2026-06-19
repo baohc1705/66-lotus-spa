@@ -27,7 +27,8 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPost]
-        [PermissionAuthorize("customers", "create", Roles = "admin,cashier")]
+        //[PermissionAuthorize("customers", "create", Roles = "admin,cashier")]
+        [AllowAnonymous]
         public async Task<IActionResult> CreateCustomer([FromBody] CreateCustomerCommand command)
         {
             command.CreatedBy = jwtService.GetUserId();

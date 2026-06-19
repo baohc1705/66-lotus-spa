@@ -55,6 +55,8 @@ using _66SMS.Application.Features.Salons.Commands.CreateSalon;
 using _66SMS.Application.Features.Salons.Commands.UpdateSalon;
 using _66SMS.Application.Features.StaffSalons.Commands.CreateStaffSalon;
 using _66SMS.Application.Features.StaffSalons.Commands.UpdateStaffSalon;
+using _66SMS.Application.DTOs.Provinces;
+using _66SMS.Application.DTOs.Wards;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Entities;
 using AutoMapper;
@@ -370,6 +372,12 @@ namespace _66SMS.Application.Commons.Mappers
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt != null ? src.UpdatedAt.Value.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss") : null))
                 .IgnoreNullValueTypes();
+
+            CreateMap<Province, ProvinceDto>()
+                .ForMember(dest => dest.Code, opt => opt.MapFrom(src => src.Id));
+
+            CreateMap<Ward, WardDto>()
+                .ForMember(dest => dest.Code, opt => opt.MapFrom(src => src.Id));
         }
     }
 
