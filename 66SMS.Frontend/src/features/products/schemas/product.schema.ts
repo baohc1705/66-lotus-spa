@@ -29,7 +29,7 @@ const productBaseSchema = z.object({
     .array(
       z.object({
         id: z.number().optional(),
-        url: z.string().min(1, "Vui lòng nhập URL"),
+        url: z.string().min(1, "Vui lòng nhập URL").or(z.literal("")),
         isPrimary: z.boolean().default(false),
       }),
     )

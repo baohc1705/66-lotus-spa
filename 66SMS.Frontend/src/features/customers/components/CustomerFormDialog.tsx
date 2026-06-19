@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -35,6 +35,8 @@ import {
 import type { CustomerDto } from '../types/customer.types'
 import type { ProvinceDto, WardDto } from '@/features/address/types/address.types'
 import { User, ShoppingBag, KeyRound } from 'lucide-react'
+import { ImageUpload } from '@/shared/components/ImageUpload'
+import { uploadApi } from '@/shared/api/upload.api'
 
 interface CustomerFormDialogProps {
   open: boolean
@@ -73,6 +75,8 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
   const createMutation = useCreateCustomer()
   const updateMutation = useUpdateCustomer()
   const isPending = createMutation.isPending || updateMutation.isPending
+  const [pendingFile, setPendingFile] = useState<File | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
 
   // Dynamic schema & form based on create vs edit
   const form = useForm<CustomerFormValues>({
@@ -82,6 +86,7 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
 
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = form
 
+  const imageValue = watch('image')
   const selectedProvince = watch('provinceCode')
   const provincesQuery = useProvinces()
   const wardsQuery = useWardsByProvince(selectedProvince)
@@ -89,26 +94,37 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
   // Reset form when dialog opens/closes or customer changes
   useEffect(() => {
     if (open) {
+      setPendingFile(null)
       reset(getDefaultValues(customer))
     }
   }, [open, customer, reset])
 
-  const onSubmit = (data: CustomerFormValues) => {
-    const provinceName = provincesQuery.data?.data?.find((p: ProvinceDto) => p.code === data.provinceCode)?.name ?? ''
-    const wardName = wardsQuery.data?.data?.find((w: WardDto) => w.code === data.wardCode)?.name ?? ''
-    const parts = [data.streetAddress, wardName, provinceName].filter(Boolean)
-    const payload = { ...data, fullAddress: parts.join(', ') }
+  const onSubmit = async (data: CustomerFormValues) => {
+    setIsUploading(true)
+    try {
+      let image = data.image ?? ''
+      if (pendingFile) {
+        const result = await uploadApi.uploadImage(pendingFile, 'customer')
+        image = (result.isSuccess && result.data) ? result.data : ''
+      }
+      const provinceName = provincesQuery.data?.data?.find((p: ProvinceDto) => p.code === data.provinceCode)?.name ?? ''
+      const wardName = wardsQuery.data?.data?.find((w: WardDto) => w.code === data.wardCode)?.name ?? ''
+      const parts = [data.streetAddress, wardName, provinceName].filter(Boolean)
+      const payload = { ...data, image, fullAddress: parts.join(', ') }
 
-    if (isEdit && customer?.id) {
-      updateMutation.mutate(
-        { id: customer.id, payload: payload as UpdateCustomerFormData },
-        { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) } }
-      )
-    } else {
-      createMutation.mutate(
-        payload as CreateCustomerFormData,
-        { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) } }
-      )
+      if (isEdit && customer?.id) {
+        updateMutation.mutate(
+          { id: customer.id, payload: payload as UpdateCustomerFormData },
+          { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) } }
+        )
+      } else {
+        createMutation.mutate(
+          payload as CreateCustomerFormData,
+          { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) } }
+        )
+      }
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -125,6 +141,13 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* === Section: Thông tin cá nhân === */}
           <FormSection icon={User} title="Thông tin cá nhân">
+            <div className="mb-5">
+              <ImageUpload
+                value={imageValue || customer?.image}
+                onFileChange={setPendingFile}
+                label="Đổi ảnh đại diện"
+              />
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
               <FormField label="Họ tên *" tooltip="Vui lòng nhập họ và tên đầy đủ của khách hàng" error={errors.fullName?.message}>
                 <Input {...register('fullName')} placeholder="Nguyễn Văn A" className="h-9 text-[13px]" />
@@ -290,7 +313,7 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
               type="submit"
               variant="admin"
               size="sm"
-              loading={isPending}
+              loading={isPending || isUploading}
             >
               {isEdit ? 'Cập nhật' : 'Tạo khách hàng'}
             </Button>

@@ -56,4 +56,8 @@ export const API = {
     provinces:        '/address/provinces',
     wards:            '/address/wards',
   },
+  media: {
+    image:            '/media/image',
+    images:           '/media/images',
+  },
 } as const

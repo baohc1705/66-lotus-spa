@@ -17,7 +17,7 @@ const staffBaseSchema = z.object({
   dob: z.string().optional(),
   gender: z.coerce.number().min(0).optional(),
   nationalId: z.string().max(20, 'Tối đa 20 ký tự').optional().or(z.literal('')),
-  image: z.string().max(500).optional().or(z.literal('')),
+  avatarUrl: z.string().max(500).optional().or(z.literal('')),
 
   // Thông tin công việc
   hireDate: z.string().optional(),

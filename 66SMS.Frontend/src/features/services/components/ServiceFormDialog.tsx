@@ -28,10 +28,13 @@ import {
   Activity,
   Plus,
   Trash2,
-  Link as LinkIcon,
   Image as ImageIcon,
   Box,
+  Camera,
+  Star,
+  X,
 } from "lucide-react";
+import { uploadApi } from "@/shared/api/upload.api";
 import { FormField } from "@/shared/components/forms/FormField";
 import { Input } from "@/shared/components/ui/input";
 import { Textarea } from "@/shared/components/ui/textarea";
@@ -62,7 +65,9 @@ export function ServiceFormDialog({
   const createMutation = useCreateService();
   const updateMutation = useUpdateService();
   const isPending = createMutation.isPending || updateMutation.isPending;
-
+  const [pendingFiles, setPendingFiles] = useState<Record<number, File>>({});
+  const [imagePreviews, setImagePreviews] = useState<Record<number, string>>({});
+  const [isUploading, setIsUploading] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
 
   // Fetch lookups
@@ -118,6 +123,8 @@ export function ServiceFormDialog({
 
   useEffect(() => {
     if (open) {
+      setPendingFiles({});
+      setImagePreviews({});
       reset(getDefaultValues(service));
     }
   }, [open, service, reset]);
@@ -142,40 +149,41 @@ export function ServiceFormDialog({
     setValue("sellingPrice", base + productsCost);
   }, [watchProducts, watchCostPrice, products, setValue]);
 
-  const onSubmit = (data: ServiceFormValues) => {
-    // Map to payload
-    const payload = {
-      ...data,
-      images: data.images?.map((img) => ({
-        url: img.url,
-        sortOrder: img.sortOrder,
-        isPrimary: img.isPrimary,
-      })),
-      serviceProducts: data.serviceProducts?.map((sp) => ({
-        productId: sp.productId,
-        quantityUsed: sp.quantityUsed,
-        note: sp.note,
-      })),
-    };
-
-    if (isEdit && service?.id) {
-      updateMutation.mutate(
-        {
-          id: service.id,
-          payload: payload as UpdateServicePayload,
-        },
-        {
-          onSuccess: (result) => {
-            if (result.isSuccess) onOpenChange(false);
-          },
-        },
+  const onSubmit = async (data: ServiceFormValues) => {
+    setIsUploading(true);
+    try {
+      const images = await Promise.all(
+        (data.images || []).map(async (img, index) => {
+          const file = pendingFiles[index];
+          if (file) {
+            const result = await uploadApi.uploadImage(file, 'service');
+            return { url: (result.isSuccess && result.data) ? result.data : '', sortOrder: img.sortOrder, isPrimary: img.isPrimary };
+          }
+          return { url: img.url, sortOrder: img.sortOrder, isPrimary: img.isPrimary };
+        })
       );
-    } else {
-      createMutation.mutate(payload as CreateServicePayload, {
-        onSuccess: (result) => {
-          if (result.isSuccess) onOpenChange(false);
-        },
-      });
+      const payload = {
+        ...data,
+        images,
+        serviceProducts: data.serviceProducts?.map((sp) => ({
+          productId: sp.productId,
+          quantityUsed: sp.quantityUsed,
+          note: sp.note,
+        })),
+      };
+
+      if (isEdit && service?.id) {
+        updateMutation.mutate(
+          { id: service.id, payload: payload as UpdateServicePayload },
+          { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false); } },
+        );
+      } else {
+        createMutation.mutate(payload as CreateServicePayload, {
+          onSuccess: (result) => { if (result.isSuccess) onOpenChange(false); },
+        });
+      }
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -384,7 +392,7 @@ export function ServiceFormDialog({
                             if (prod)
                               setValue(
                                 `serviceProducts.${index}.costPrice`,
-                                prod.costPrice,
+                                prod.costPrice ?? undefined,
                               );
                           }}
                         >
@@ -464,93 +472,113 @@ export function ServiceFormDialog({
             </FormSection>
 
             <FormSection icon={ImageIcon} title="Hình ảnh dịch vụ">
-              <div className="space-y-4">
+              <div className="flex flex-wrap gap-3">
                 {imageFields.map((field, index) => {
                   const isPrimary = watch(`images.${index}.isPrimary`);
+                  const preview = imagePreviews[index] || watch(`images.${index}.url`);
                   const errorObj = errors.images?.[index];
                   return (
-                    <div
-                      key={field.id}
-                      className="flex gap-3 items-start border p-3 rounded-lg bg-stone-50/50"
-                    >
-                      <div className="flex-1 space-y-3">
-                        <div className="flex items-center gap-3">
-                          <LinkIcon className="w-4 h-4 text-stone-400 shrink-0" />
-                          <div className="flex-1">
-                            <Input
-                              {...register(`images.${index}.url`)}
-                              placeholder="https://example.com/image.jpg"
-                              className="h-9 w-full"
-                            />
-                            {errorObj?.url && (
-                              <span className="text-red-500 text-xs mt-1 block">
-                                {errorObj.url.message}
-                              </span>
-                            )}
+                    <div key={field.id} className="flex flex-col gap-1.5 w-[110px]">
+                      {/* Image zone */}
+                      <div className="relative group/card">
+                        <button
+                          type="button"
+                          onClick={() => document.getElementById(`service-img-${index}`)?.click()}
+                          className={[
+                            'h-[88px] w-full rounded-lg overflow-hidden transition-all',
+                            preview
+                              ? 'border border-stone-200 hover:border-lotus-leaf/60'
+                              : 'border-2 border-dashed border-stone-300 bg-stone-50 hover:border-lotus-leaf hover:bg-lotus-leaf/5',
+                          ].join(' ')}
+                        >
+                          {preview ? (
+                            <>
+                              <img src={preview} alt="" className="h-full w-full object-cover" />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/card:opacity-100 transition-opacity rounded-lg">
+                                <Camera className="h-5 w-5 text-white" />
+                              </div>
+                            </>
+                          ) : (
+                            <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-stone-400 group-hover/card:text-lotus-leaf transition-colors">
+                              <ImageIcon className="h-6 w-6" />
+                              <span className="text-[10px] font-medium">Chọn ảnh</span>
+                            </div>
+                          )}
+                        </button>
+                        {/* Remove */}
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute -top-1.5 -right-1.5 z-10 h-5 w-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity hover:bg-red-600 shadow-sm"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                        {/* Primary badge */}
+                        {isPrimary && (
+                          <div className="absolute bottom-1.5 left-1.5 bg-lotus-leaf text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none pointer-events-none">
+                            Chính
                           </div>
-                        </div>
-                        <div className="flex items-center gap-6 pl-7">
-                          <label className="flex items-center gap-2 text-sm text-stone-600 cursor-pointer">
-                            <input
-                              type="radio"
-                              name="primaryImage"
-                              checked={isPrimary}
-                              onChange={() => {
-                                // Reset all others
-                                const currentImages =
-                                  form.getValues("images") || [];
-                                currentImages.forEach((_, i) =>
-                                  setValue(`images.${i}.isPrimary`, false),
-                                );
-                                setValue(`images.${index}.isPrimary`, true);
-                              }}
-                              className="accent-lotus-leaf"
-                            />
-                            Ảnh chính
-                          </label>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm text-stone-600">
-                              Thứ tự:
-                            </span>
-                            <Input
-                              {...register(`images.${index}.sortOrder`, {
-                                valueAsNumber: true,
-                              })}
-                              type="number"
-                              className="h-7 w-20 px-2"
-                              placeholder="0"
-                            />
-                          </div>
-                        </div>
+                        )}
                       </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        className="text-red-500 hover:text-red-600 hover:bg-red-50 mt-1"
-                        onClick={() => removeImage(index)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        className="hidden"
+                        id={`service-img-${index}`}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (!file) return
+                          setPendingFiles((prev: Record<number, File>) => ({ ...prev, [index]: file }))
+                          setImagePreviews((prev: Record<number, string>) => ({ ...prev, [index]: URL.createObjectURL(file) }))
+                        }}
+                      />
+                      {/* URL input */}
+                      <Input
+                        {...register(`images.${index}.url`)}
+                        placeholder="URL ảnh..."
+                        className="h-7 text-[11px] px-2"
+                      />
+                      {errorObj?.url && (
+                        <p className="text-[10px] text-red-500 leading-tight">{errorObj.url.message}</p>
+                      )}
+                      {/* Sort order + isPrimary row */}
+                      <div className="flex items-center justify-between gap-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const imgs = form.getValues('images') || []
+                            imgs.forEach((_, i) => setValue(`images.${i}.isPrimary`, false))
+                            setValue(`images.${index}.isPrimary`, true)
+                          }}
+                          className={[
+                            'flex items-center gap-0.5 text-[11px] font-medium transition-colors',
+                            isPrimary ? 'text-lotus-leaf' : 'text-stone-400 hover:text-stone-600',
+                          ].join(' ')}
+                        >
+                          <Star className={`h-3 w-3 ${isPrimary ? 'fill-lotus-leaf' : ''}`} />
+                          <span>{isPrimary ? 'Chính' : 'Chính'}</span>
+                        </button>
+                        <Input
+                          {...register(`images.${index}.sortOrder`, { valueAsNumber: true })}
+                          type="number"
+                          className="h-6 w-12 px-1.5 text-[11px]"
+                          placeholder="0"
+                          title="Thứ tự"
+                        />
+                      </div>
                     </div>
                   );
                 })}
-                <Button
+
+                {/* Add card */}
+                <button
                   type="button"
-                  variant="outline"
-                  size="sm"
-                  className="w-full border-dashed"
-                  onClick={() =>
-                    appendImage({
-                      url: "",
-                      isPrimary: imageFields.length === 0,
-                      sortOrder: 0,
-                    })
-                  }
+                  onClick={() => appendImage({ url: '', isPrimary: imageFields.length === 0, sortOrder: 0 })}
+                  className="flex h-[88px] w-[110px] flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-stone-300 text-stone-400 transition-all hover:border-lotus-leaf hover:bg-lotus-leaf/5 hover:text-lotus-leaf self-start"
                 >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Thêm link ảnh
-                </Button>
+                  <Plus className="h-5 w-5" />
+                  <span className="text-[10px] font-medium">Thêm ảnh</span>
+                </button>
               </div>
             </FormSection>
 
@@ -568,7 +596,7 @@ export function ServiceFormDialog({
                 type="submit"
                 variant="admin"
                 size="sm"
-                loading={isPending}
+                loading={isPending || isUploading}
               >
                 {isEdit ? "Cập nhật" : "Tạo dịch vụ"}
               </Button>

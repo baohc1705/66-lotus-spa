@@ -12,7 +12,7 @@ import {
   type UpdateBookingRoomPayload,
 } from "../schemas/bookingRoom.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Dialog,
@@ -29,6 +29,8 @@ import { FormField } from "@/shared/components/forms/FormField";
 import { Input } from "@/shared/components/ui/input";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { Switch } from "@/shared/components/ui/switch";
+import { ImageUpload } from "@/shared/components/ImageUpload";
+import { uploadApi } from "@/shared/api/upload.api";
 
 interface BookingRoomFormDialogProps {
   open: boolean;
@@ -45,6 +47,8 @@ export function BookingRoomFormDialog({
   const createMutation = useCreateBookingRoom();
   const updateMutation = useUpdateBookingRoom();
   const isPending = createMutation.isPending || updateMutation.isPending;
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<BookingRoomFormValues>({
     resolver: zodResolver(
@@ -64,29 +68,33 @@ export function BookingRoomFormDialog({
 
   useEffect(() => {
     if (open) {
+      setPendingFile(null);
       reset(getDefaultValues(bookingRoom));
     }
   }, [open, bookingRoom, reset]);
 
-  const onSubmit = (data: BookingRoomFormValues) => {
-    if (isEdit && bookingRoom?.id) {
-      updateMutation.mutate(
-        {
-          id: bookingRoom.id,
-          payload: data as UpdateBookingRoomPayload,
-        },
-        {
-          onSuccess: (result) => {
-            if (result.isSuccess) onOpenChange(false);
-          },
-        },
-      );
-    } else {
-      createMutation.mutate(data as CreateBookingRoomPayload, {
-        onSuccess: (result) => {
-          if (result.isSuccess) onOpenChange(false);
-        },
-      });
+  const onSubmit = async (data: BookingRoomFormValues) => {
+    setIsUploading(true);
+    try {
+      let imageUrl = data.imageUrl ?? '';
+      if (pendingFile) {
+        const result = await uploadApi.uploadImage(pendingFile, 'booking-room');
+        imageUrl = (result.isSuccess && result.data) ? result.data : '';
+      }
+      const payload = { ...data, imageUrl };
+
+      if (isEdit && bookingRoom?.id) {
+        updateMutation.mutate(
+          { id: bookingRoom.id, payload: payload as UpdateBookingRoomPayload },
+          { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false); } },
+        );
+      } else {
+        createMutation.mutate(payload as CreateBookingRoomPayload, {
+          onSuccess: (result) => { if (result.isSuccess) onOpenChange(false); },
+        });
+      }
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -133,17 +141,12 @@ export function BookingRoomFormDialog({
               </FormField>
               
               <div className="sm:col-span-2">
-                <FormField
-                  label="URL Hình ảnh"
-                  tooltip="Đường dẫn đến hình ảnh của phòng (nếu có)"
-                  error={errors.imageUrl?.message}
-                >
-                  <Input
-                    {...register("imageUrl")}
-                    placeholder="https://example.com/image.jpg"
-                    className="h-9 text-[13px]"
-                  />
-                </FormField>
+                <ImageUpload
+                  value={watch("imageUrl")}
+                  onFileChange={setPendingFile}
+                  shape="square"
+                  label="Chọn ảnh phòng"
+                />
               </div>
 
               <div className="sm:col-span-2">
@@ -172,7 +175,7 @@ export function BookingRoomFormDialog({
             >
               Hủy
             </Button>
-            <Button type="submit" variant="admin" size="sm" loading={isPending}>
+            <Button type="submit" variant="admin" size="sm" loading={isPending || isUploading}>
               {isEdit ? "Cập nhật" : "Tạo phòng"}
             </Button>
           </DialogFooter>

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -22,6 +22,8 @@ import {
 } from '@/shared/components/ui/select'
 import { Textarea } from '@/shared/components/ui/textarea'
 import { Info } from 'lucide-react'
+import { ImageUpload } from '@/shared/components/ImageUpload'
+import { uploadApi } from '@/shared/api/upload.api'
 import { useCreateSalon, useUpdateSalon } from '../hooks/useSalons'
 import { useProvinces, useWardsByProvince } from '@/features/address/hooks/useAddress'
 import { SearchableSelect } from '@/shared/components/ui/searchable-select'
@@ -50,6 +52,8 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
   const createMutation = useCreateSalon()
   const updateMutation = useUpdateSalon()
   const isPending = createMutation.isPending || updateMutation.isPending
+  const [pendingFile, setPendingFile] = useState<File | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
 
   const form = useForm<SalonFormValues>({
     resolver: zodResolver(
@@ -60,30 +64,44 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
 
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = form
   const statusValue = watch('status')
+  const imageUrlValue = watch('imageUrl')
   const selectedProvince = watch('provinceCode')
   const provincesQuery = useProvinces()
   const wardsQuery = useWardsByProvince(selectedProvince)
 
   useEffect(() => {
-    if (open) reset(getDefaultValues(salon))
+    if (open) {
+      setPendingFile(null)
+      reset(getDefaultValues(salon))
+    }
   }, [open, salon, reset])
 
-  const onSubmit = (data: SalonFormValues) => {
-    const provinceName = provincesQuery.data?.data?.find((p: ProvinceDto) => p.code === data.provinceCode)?.name ?? ''
-    const wardName = wardsQuery.data?.data?.find((w: WardDto) => w.code === data.wardCode)?.name ?? ''
-    const parts = [data.streetAddress, wardName, provinceName].filter(Boolean)
-    const payload = { ...data, fullAddress: parts.join(', ') }
+  const onSubmit = async (data: SalonFormValues) => {
+    setIsUploading(true)
+    try {
+      let imageUrl = data.imageUrl ?? ''
+      if (pendingFile) {
+        const result = await uploadApi.uploadImage(pendingFile, 'salon')
+        imageUrl = (result.isSuccess && result.data) ? result.data : ''
+      }
+      const provinceName = provincesQuery.data?.data?.find((p: ProvinceDto) => p.code === data.provinceCode)?.name ?? ''
+      const wardName = wardsQuery.data?.data?.find((w: WardDto) => w.code === data.wardCode)?.name ?? ''
+      const parts = [data.streetAddress, wardName, provinceName].filter(Boolean)
+      const payload = { ...data, imageUrl, fullAddress: parts.join(', ') }
 
-    if (isEdit && salon?.id) {
-      updateMutation.mutate(
-        { id: salon.id, payload },
-        { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) } }
-      )
-    } else {
-      createMutation.mutate(
-        payload as Parameters<typeof createMutation.mutate>[0],
-        { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) } }
-      )
+      if (isEdit && salon?.id) {
+        updateMutation.mutate(
+          { id: salon.id, payload },
+          { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) } }
+        )
+      } else {
+        createMutation.mutate(
+          payload as Parameters<typeof createMutation.mutate>[0],
+          { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) } }
+        )
+      }
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -100,6 +118,15 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="mb-5">
+            <ImageUpload
+              value={imageUrlValue || salon?.imageUrl}
+              onFileChange={setPendingFile}
+              shape="square"
+              label="Đổi ảnh chi nhánh"
+            />
+          </div>
+
           {/* Thông tin cơ bản */}
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-wider text-lotus-stone mb-3">
@@ -213,7 +240,7 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
             >
               Hủy
             </Button>
-            <Button type="submit" variant="admin" size="sm" loading={isPending}>
+            <Button type="submit" variant="admin" size="sm" loading={isPending || isUploading}>
               {isEdit ? 'Cập nhật' : 'Tạo chi nhánh'}
             </Button>
           </DialogFooter>

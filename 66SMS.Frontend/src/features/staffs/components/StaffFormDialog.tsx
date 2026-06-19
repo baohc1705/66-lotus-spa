@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -26,6 +26,8 @@ import {
 } from "@/shared/components/ui/select";
 import { SearchableSelect } from "@/shared/components/ui/searchable-select";
 import { useCreateStaff, useUpdateStaff } from "../hooks/useStaffs";
+import { uploadApi } from "@/shared/api/upload.api";
+import { ImageUpload } from "@/shared/components/ImageUpload";
 import { useProvinces, useWardsByProvince } from "@/features/address/hooks/useAddress";
 import {
   createStaffSchema,
@@ -36,7 +38,7 @@ import {
 } from "../schemas/staff.schema";
 
 import type { StaffDto } from "../types/staff.types";
-import { User, Briefcase, KeyRound } from "lucide-react";
+import { Briefcase, KeyRound, User } from "lucide-react";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useSalons } from "@/features/salons/hooks/useSalons";
 
@@ -79,6 +81,8 @@ export function StaffFormDialog({
   const createMutation = useCreateStaff();
   const updateMutation = useUpdateStaff();
   const isPending = createMutation.isPending || updateMutation.isPending;
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Dynamic schema & form based on create vs edit
   const form = useForm<StaffFormValues>({
@@ -98,37 +102,43 @@ export function StaffFormDialog({
   } = form;
 
   const selectedProvince = watch("provinceCode");
+  const avatarUrl = watch("avatarUrl");
   const provincesQuery = useProvinces();
   const wardsQuery = useWardsByProvince(selectedProvince);
 
   // Reset form when dialog opens/closes or staff changes
   useEffect(() => {
     if (open) {
+      setPendingFile(null);
       reset(getDefaultValues(staff));
     }
   }, [open, staff, reset]);
 
-  const onSubmit = (data: StaffFormValues) => {
-    const provinceName = provincesQuery.data?.data?.find(p => p.code === data.provinceCode)?.name ?? "";
-    const wardName = wardsQuery.data?.data?.find(w => w.code === data.wardCode)?.name ?? "";
-    const parts = [data.streetAddress, wardName, provinceName].filter(Boolean);
-    const payload = { ...data, fullAddress: parts.join(", ") };
+  const onSubmit = async (data: StaffFormValues) => {
+    setIsUploading(true);
+    try {
+      let avatarUrl = data.avatarUrl ?? '';
+      if (pendingFile) {
+        const result = await uploadApi.uploadImage(pendingFile, 'staff');
+        avatarUrl = (result.isSuccess && result.data) ? result.data : '';
+      }
+      const provinceName = provincesQuery.data?.data?.find(p => p.code === data.provinceCode)?.name ?? "";
+      const wardName = wardsQuery.data?.data?.find(w => w.code === data.wardCode)?.name ?? "";
+      const parts = [data.streetAddress, wardName, provinceName].filter(Boolean);
+      const payload = { ...data, avatarUrl, fullAddress: parts.join(", ") };
 
-    if (isEdit && staff?.id) {
-      updateMutation.mutate(
-        { id: staff.id, payload: payload as UpdateStaffFormData },
-        {
-          onSuccess: (result) => {
-            if (result.isSuccess) onOpenChange(false);
-          },
-        },
-      );
-    } else {
-      createMutation.mutate(payload as CreateStaffFormData, {
-        onSuccess: (result) => {
-          if (result.isSuccess) onOpenChange(false);
-        },
-      });
+      if (isEdit && staff?.id) {
+        updateMutation.mutate(
+          { id: staff.id, payload: payload as UpdateStaffFormData },
+          { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false); } },
+        );
+      } else {
+        createMutation.mutate(payload as CreateStaffFormData, {
+          onSuccess: (result) => { if (result.isSuccess) onOpenChange(false); },
+        });
+      }
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -149,6 +159,13 @@ export function StaffFormDialog({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* === Section: Thông tin cá nhân === */}
           <FormSection icon={User} title="Thông tin cá nhân">
+            <div className="mb-5">
+              <ImageUpload
+                value={avatarUrl || staff?.avatarUrl}
+                onFileChange={setPendingFile}
+                label="Đổi ảnh đại diện"
+              />
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
               <FormField
                 label="Họ tên *"
@@ -423,7 +440,7 @@ export function StaffFormDialog({
             >
               Hủy
             </Button>
-            <Button type="submit" variant="admin" size="sm" loading={isPending}>
+            <Button type="submit" variant="admin" size="sm" loading={isPending || isUploading}>
               {isEdit ? "Cập nhật" : "Tạo nhân viên"}
             </Button>
           </DialogFooter>
@@ -459,18 +476,20 @@ function FormField({
   label,
   error,
   tooltip,
+  className,
   children,
 }: {
   label: string;
   error?: string;
   tooltip?: string;
+  className?: string;
   children: React.ReactNode;
 }) {
   const isRequired = label.includes("*");
   const cleanLabel = label.replace("*", "").trim();
 
   return (
-    <div className="space-y-1">
+    <div className={`space-y-1 ${className ?? ''}`}>
       <Label className="flex items-center gap-1 text-[12px] font-semibold text-lotus-deep/80">
         {cleanLabel}
         {isRequired &&
@@ -505,7 +524,7 @@ function getDefaultValues(staff?: StaffDto | null): StaffFormValues {
       dob: staff.dob ?? "",
       gender: staff.gender ? Number(staff.gender) : undefined,
       nationalId: staff.nationalId ?? "",
-      image: staff.image ?? "",
+      avatarUrl: staff.avatarUrl ?? "",
       hireDate: staff.hireDate ?? "",
       contractType: staff.contractType ?? "",
       basicSalary: staff.basicSalary ?? undefined,
@@ -524,7 +543,7 @@ function getDefaultValues(staff?: StaffDto | null): StaffFormValues {
     dob: "",
     gender: undefined,
     nationalId: "",
-    image: "",
+    avatarUrl: "",
     hireDate: "",
     contractType: "",
     basicSalary: undefined,

@@ -5,6 +5,7 @@ export interface StaffDto {
   code: string | null
   fullName: string | null
   image: string | null
+  avatarUrl: string | null
   dob: string | null
   gender: string | null
   nationalId: string | null
@@ -29,7 +30,7 @@ export interface StaffDto {
 export interface CreateStaffPayload {
   salonId?: number
   fullName: string
-  image?: string
+  avatarUrl?: string
   dob?: string
   gender?: number
   nationalId?: string
@@ -52,7 +53,7 @@ export interface CreateStaffPayload {
 // Payload cập nhật nhân viên (match UpdateStaffCommand, bỏ [JsonIgnore] fields, không có password)
 export interface UpdateStaffPayload {
   fullName?: string
-  image?: string
+  avatarUrl?: string
   dob?: string
   gender?: number
   nationalId?: string
