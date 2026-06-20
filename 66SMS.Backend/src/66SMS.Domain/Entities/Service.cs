@@ -5,8 +5,8 @@ namespace _66SMS.Domain.Entities
     public class Service : EntityBase<int>
     {
         public int CategoryId { get; set; }
-        public string Code { get; set; }
-        public string Name { get; set; }
+        public string Code { get; set; } = null!;
+        public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public string? Content { get; set; }
         public int DurationMins { get; set; }

@@ -1,5 +1,5 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.Cashier.Queries.GetCashierDaily;
+using _66SMS.Application.PaymentService.Cashier.Queries.GetCashierDaily;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -32,14 +32,14 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetOnlineAppointments()
         {
-            var query = new _66SMS.Application.Features.Cashier.Queries.GetOnlineAppointments.GetOnlineAppointmentsQuery();
+            var query = new _66SMS.Application.PaymentService.Cashier.Queries.GetOnlineAppointments.GetOnlineAppointmentsQuery();
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
 
         [HttpPut("appointments/{id}/status")]
         [Authorize]
-        public async Task<IActionResult> UpdateAppointmentStatus(int id, [FromBody] _66SMS.Application.Features.Cashier.Commands.UpdateAppointmentStatus.UpdateAppointmentStatusCommand request)
+        public async Task<IActionResult> UpdateAppointmentStatus(int id, [FromBody] _66SMS.Application.PaymentService.Cashier.Commands.UpdateAppointmentStatus.UpdateAppointmentStatusCommand request)
         {
             request.Id = id;
             var result = await mediator.Send(request);
@@ -48,7 +48,7 @@ namespace _66SMS.API.Controllers
 
         [HttpPost("appointments/{id}/pay")]
         [Authorize]
-        public async Task<IActionResult> PayAppointment(int id, [FromBody] _66SMS.Application.Features.Cashier.Commands.PayAppointment.PayAppointmentCommand request)
+        public async Task<IActionResult> PayAppointment(int id, [FromBody] _66SMS.Application.PaymentService.Cashier.Commands.PayAppointment.PayAppointmentCommand request)
         {
             request.Id = id;
             var result = await mediator.Send(request);
@@ -61,7 +61,7 @@ namespace _66SMS.API.Controllers
         {
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4()?.ToString() ?? "127.0.0.1";
             if (string.IsNullOrEmpty(ipAddress) || ipAddress == "0.0.0.0") ipAddress = "127.0.0.1";
-            var query = new _66SMS.Application.Features.Cashier.Queries.GetCashierVnPayUrl.GetCashierVnPayUrlQuery 
+            var query = new _66SMS.Application.PaymentService.Cashier.Queries.GetCashierVnPayUrl.GetCashierVnPayUrlQuery 
             { 
                 AppointmentId = appointmentId, 
                 IpAddress = ipAddress 
@@ -75,7 +75,7 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> VnPayReturn()
         {
             var collections = HttpContext.Request.Query.ToDictionary(k => k.Key, v => v.Value.ToString());
-            var command = new _66SMS.Application.Features.Cashier.Commands.VnPayReturn.VnPayReturnCommand 
+            var command = new _66SMS.Application.PaymentService.Cashier.Commands.VnPayReturn.VnPayReturnCommand 
             { 
                 QueryData = collections 
             };
@@ -98,7 +98,7 @@ namespace _66SMS.API.Controllers
             var collections = HttpContext.Request.Query.ToDictionary(k => k.Key, v => v.Value.ToString());
             
             // Đóng gói dữ liệu vào Command để đưa xuống Handler xử lý logic
-            var command = new _66SMS.Application.Features.Cashier.Commands.VnPayIpn.VnPayIpnCommand 
+            var command = new _66SMS.Application.PaymentService.Cashier.Commands.VnPayIpn.VnPayIpnCommand 
             { 
                 QueryData = collections 
             };

@@ -4,24 +4,24 @@ namespace _66SMS.Application.DTOs.Cashier
 {
     public class StaffColumnDto
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
+        public string Id { get; set; } = null!;
+        public string Name { get; set; } = null!;
         public string? Avatar { get; set; }
     }
 
     public class CashierBookingDto
     {
-        public string Id { get; set; }
-        public string CustomerName { get; set; }
+        public string Id { get; set; } = null!;
+        public string CustomerName { get; set; } = null!;
         public string? CustomerPhone { get; set; }
         public string? CustomerAvatar { get; set; }
         public string? BookingDate { get; set; }
-        public string ServiceName { get; set; }
+        public string ServiceName { get; set; } = null!;
         public int StaffId { get; set; }
-        public string StaffName { get; set; }
-        public string StartTime { get; set; }
-        public string EndTime { get; set; }
-        public string Status { get; set; }
+        public string StaffName { get; set; } = null!;
+        public string StartTime { get; set; } = null!;
+        public string EndTime { get; set; } = null!;
+        public string Status { get; set; } = null!;
         public decimal TotalAmount { get; set; }
         public decimal PaidAmount { get; set; }
         public decimal DepositAmount { get; set; }

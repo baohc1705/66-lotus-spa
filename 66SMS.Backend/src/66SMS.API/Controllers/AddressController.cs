@@ -1,6 +1,6 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.Provinces.Queries.GetAllProvinces;
-using _66SMS.Application.Features.Wards.Queries.GetAllWardsByProvince;
+using _66SMS.Application.CommonService.Provinces.Queries.GetAllProvinces;
+using _66SMS.Application.CommonService.Wards.Queries.GetAllWardsByProvince;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

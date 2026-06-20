@@ -1,9 +1,9 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.BookingPositions.Commands.CreateBookingPositions;
-using _66SMS.Application.Features.BookingPositions.Commands.DeleteBookingPositions;
-using _66SMS.Application.Features.BookingPositions.Commands.UpdateBookingPositions;
-using _66SMS.Application.Features.BookingPositions.Queries.GetAllBookingPositions;
-using _66SMS.Application.Features.BookingPositions.Queries.GetDetailBookingPositions;
+using _66SMS.Application.BookingService.BookingPositions.Commands.CreateBookingPositions;
+using _66SMS.Application.BookingService.BookingPositions.Commands.DeleteBookingPositions;
+using _66SMS.Application.BookingService.BookingPositions.Commands.UpdateBookingPositions;
+using _66SMS.Application.BookingService.BookingPositions.Queries.GetAllBookingPositions;
+using _66SMS.Application.BookingService.BookingPositions.Queries.GetDetailBookingPositions;
 using _66SMS.Contracts.Abstractions;
 using Asp.Versioning;
 using MediatR;

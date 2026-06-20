@@ -1,7 +1,7 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.ServiceImages.Commands.CreateServiceImages;
-using _66SMS.Application.Features.ServiceImages.Commands.DeleteServiceImages;
-using _66SMS.Application.Features.ServiceImages.Commands.UpdateServiceImages;
+using _66SMS.Application.CatalogService.ServiceImages.Commands.CreateServiceImages;
+using _66SMS.Application.CatalogService.ServiceImages.Commands.DeleteServiceImages;
+using _66SMS.Application.CatalogService.ServiceImages.Commands.UpdateServiceImages;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

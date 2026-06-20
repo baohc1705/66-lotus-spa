@@ -1,0 +1,13 @@
+using _66SMS.Contracts.Constants;
+using FluentValidation;
+
+namespace _66SMS.Application.IdentityService.Auth.Commands.SendEmailOtp
+{
+    public class SendEmailOtpValidator : AbstractValidator<SendEmailOtpCommand>
+    {
+        public SendEmailOtpValidator()
+        {
+            RuleFor(x => x.Email).NotNull().NotEmpty().Matches(RegexConst.EMAIL_REGEX);
+        }
+    }
+}

@@ -37,7 +37,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
         public async Task<TEntity?> FindByIdAsync(TKey id, bool asNoTracking = true, CancellationToken cancellationToken = default)
         {
             var query = AsQueryable(asNoTracking);
-            query = query.Where(x => x.Id.Equals(id));
+            query = query.Where(x => x.Id!.Equals(id));
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
 

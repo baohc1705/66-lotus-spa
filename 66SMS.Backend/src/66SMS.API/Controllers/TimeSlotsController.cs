@@ -1,9 +1,9 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.TimeSlots.Commands.CreateTimeSlot;
-using _66SMS.Application.Features.TimeSlots.Commands.DeleteTimeSlot;
-using _66SMS.Application.Features.TimeSlots.Commands.UpdateTimeSlot;
-using _66SMS.Application.Features.TimeSlots.Queries.GetAllTimeSlot;
-using _66SMS.Application.Features.TimeSlots.Queries.GetDetailTimeSlot;
+using _66SMS.Application.BookingService.TimeSlots.Commands.CreateTimeSlot;
+using _66SMS.Application.BookingService.TimeSlots.Commands.DeleteTimeSlot;
+using _66SMS.Application.BookingService.TimeSlots.Commands.UpdateTimeSlot;
+using _66SMS.Application.BookingService.TimeSlots.Queries.GetAllTimeSlot;
+using _66SMS.Application.BookingService.TimeSlots.Queries.GetDetailTimeSlot;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

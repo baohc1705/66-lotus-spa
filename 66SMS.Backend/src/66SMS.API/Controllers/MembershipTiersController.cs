@@ -1,9 +1,9 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.MembershipTiers.Commands.CreateMembershipTiers;
-using _66SMS.Application.Features.MembershipTiers.Commands.DeleteMembershipTiers;
-using _66SMS.Application.Features.MembershipTiers.Commands.UpdateMembershipTiers;
-using _66SMS.Application.Features.MembershipTiers.Queries.GetAllMembershipTiers;
-using _66SMS.Application.Features.MembershipTiers.Queries.GetDetailMembershipTier;
+using _66SMS.Application.CustomerService.MembershipTiers.Commands.CreateMembershipTiers;
+using _66SMS.Application.CustomerService.MembershipTiers.Commands.DeleteMembershipTiers;
+using _66SMS.Application.CustomerService.MembershipTiers.Commands.UpdateMembershipTiers;
+using _66SMS.Application.CustomerService.MembershipTiers.Queries.GetAllMembershipTiers;
+using _66SMS.Application.CustomerService.MembershipTiers.Queries.GetDetailMembershipTier;
 using _66SMS.Contracts.Abstractions;
 using Asp.Versioning;
 using MediatR;

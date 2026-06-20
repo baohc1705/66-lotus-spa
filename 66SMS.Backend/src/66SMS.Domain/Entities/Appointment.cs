@@ -4,7 +4,7 @@ namespace _66SMS.Domain.Entities
 {
     public class Appointment : EntityBase<int>
     {
-        public string AppointmentCode { get; set; }
+        public string AppointmentCode { get; set; } = null!;
         public int CreatedByUserId { get; set; }
         public int StaffId { get; set; }
         public int SlotId { get; set; }

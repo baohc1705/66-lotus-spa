@@ -1,8 +1,8 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.Users.Commands.DeleteUser;
-using _66SMS.Application.Features.Users.Commands.UpdateUser;
-using _66SMS.Application.Features.Users.Queries.GetAllUsers;
-using _66SMS.Application.Features.Users.Queries.GetDetailUser;
+using _66SMS.Application.IdentityService.Users.Commands.DeleteUser;
+using _66SMS.Application.IdentityService.Users.Commands.UpdateUser;
+using _66SMS.Application.IdentityService.Users.Queries.GetAllUsers;
+using _66SMS.Application.IdentityService.Users.Queries.GetDetailUser;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Infrastructure.Security;
@@ -77,7 +77,7 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetMyWallet()
         {
-            var result = await mediator.Send(new Application.Features.Users.Queries.GetMyWallet.GetMyWalletQuery 
+            var result = await mediator.Send(new Application.IdentityService.Users.Queries.GetMyWallet.GetMyWalletQuery 
             { 
                 UserId = jwtService.GetUserId() 
             });
@@ -88,7 +88,7 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetMyWalletTransactions()
         {
-            var result = await mediator.Send(new Application.Features.Users.Queries.GetMyWalletTransactions.GetMyWalletTransactionsQuery 
+            var result = await mediator.Send(new Application.IdentityService.Users.Queries.GetMyWalletTransactions.GetMyWalletTransactionsQuery 
             { 
                 UserId = jwtService.GetUserId() 
             });
@@ -99,7 +99,7 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetMyMembershipCard()
         {
-            var result = await mediator.Send(new Application.Features.Users.Queries.GetMyMembershipCard.GetMyMembershipCardQuery 
+            var result = await mediator.Send(new Application.IdentityService.Users.Queries.GetMyMembershipCard.GetMyMembershipCardQuery 
             { 
                 UserId = jwtService.GetUserId() 
             });

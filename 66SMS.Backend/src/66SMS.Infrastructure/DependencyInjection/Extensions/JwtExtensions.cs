@@ -19,7 +19,7 @@ namespace _66SMS.Infrastructure.DependencyInjection.Extensions
             // cấu hình authentication
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
-                var jwtSettings = configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>();
+                var jwtSettings = configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>()!;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,

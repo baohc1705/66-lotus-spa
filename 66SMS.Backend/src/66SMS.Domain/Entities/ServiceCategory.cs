@@ -4,7 +4,7 @@ namespace _66SMS.Domain.Entities
 {
     public class ServiceCategory : EntityBase<int>
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public int SortOrder { get; set; }
         public int Status { get; set; }

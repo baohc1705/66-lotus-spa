@@ -7,7 +7,7 @@ namespace _66SMS.Domain.Entities
         public int UserId { get; set; }
         public int? SalonId { get; set; }
         public string? Code { get; set; }
-        public string FullName { get; set; }
+        public string FullName { get; set; } = null!;
         public string? AvatarUrl { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public int? Gender { get; set; }

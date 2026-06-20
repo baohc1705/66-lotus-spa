@@ -16,9 +16,9 @@ namespace _66SMS.Persistence.Repositories.Sql
         {
             return await Entities
                 .AsNoTracking()
-                .Where(ur => ur.UserId == userId && ur.Role.Status == RoleConst.STATUS_ACTIVED)
-                .SelectMany(ur => ur.Role.RolePermissions)
-                .Select(rp => rp.Permission.PermissionKey)
+                .Where(ur => ur.UserId == userId && ur.Role!.Status == RoleConst.STATUS_ACTIVED)
+                .SelectMany(ur => ur.Role!.RolePermissions)
+                .Select(rp => rp.Permission!.PermissionKey)
                 .Distinct()
                 .ToListAsync(cancellationToken);
         }
@@ -30,9 +30,9 @@ namespace _66SMS.Persistence.Repositories.Sql
                 .Where(ur =>
                     ur.UserId == userId &&
                     ur.RoleId == roleId &&
-                    ur.Role.Status == RoleConst.STATUS_ACTIVED)
-                .SelectMany(ur => ur.Role.RolePermissions)
-                .Select(rp => rp.Permission.PermissionKey)
+                    ur.Role!.Status == RoleConst.STATUS_ACTIVED)
+                .SelectMany(ur => ur.Role!.RolePermissions)
+                .Select(rp => rp.Permission!.PermissionKey)
                 .Distinct()
                 .ToListAsync(cancellationToken);
         }
@@ -59,7 +59,7 @@ namespace _66SMS.Persistence.Repositories.Sql
         {
             return await Entities
                   .AsNoTracking()
-                  .Where(x => x.UserId == id &&  x.Role.Status == RoleConst.STATUS_ACTIVED)
+                  .Where(x => x.UserId == id &&  x.Role!.Status == RoleConst.STATUS_ACTIVED)
                   .Select(x => x.Role)
                   .FirstOrDefaultAsync(cancellationToken);
         }

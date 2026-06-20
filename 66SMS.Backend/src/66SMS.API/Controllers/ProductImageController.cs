@@ -1,9 +1,9 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.ProductImages.Commands.CreateProductImages;
-using _66SMS.Application.Features.ProductImages.Commands.DeleteProductImages;
-using _66SMS.Application.Features.ProductImages.Commands.UpdateProductImages;
-using _66SMS.Application.Features.ProductImages.Queries.GetAllProductImages;
-using _66SMS.Application.Features.ProductImages.Queries.GetDetailProductImage;
+using _66SMS.Application.CatalogService.ProductImages.Commands.CreateProductImages;
+using _66SMS.Application.CatalogService.ProductImages.Commands.DeleteProductImages;
+using _66SMS.Application.CatalogService.ProductImages.Commands.UpdateProductImages;
+using _66SMS.Application.CatalogService.ProductImages.Queries.GetAllProductImages;
+using _66SMS.Application.CatalogService.ProductImages.Queries.GetDetailProductImage;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

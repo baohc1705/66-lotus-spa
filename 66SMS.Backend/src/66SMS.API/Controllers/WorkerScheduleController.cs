@@ -1,10 +1,10 @@
 
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.WorkSchedules.Commands.CreateWorkSchedule;
-using _66SMS.Application.Features.WorkSchedules.Commands.DeleteWorkSchedule;
-using _66SMS.Application.Features.WorkSchedules.Commands.UpdateWorkSchedule;
-using _66SMS.Application.Features.WorkSchedules.Queries.GetAllWorkSchedule;
-using _66SMS.Application.Features.WorkSchedules.Queries.GetDetailWorkSchedule;
+using _66SMS.Application.BookingService.WorkSchedules.Commands.CreateWorkSchedule;
+using _66SMS.Application.BookingService.WorkSchedules.Commands.DeleteWorkSchedule;
+using _66SMS.Application.BookingService.WorkSchedules.Commands.UpdateWorkSchedule;
+using _66SMS.Application.BookingService.WorkSchedules.Queries.GetAllWorkSchedule;
+using _66SMS.Application.BookingService.WorkSchedules.Queries.GetDetailWorkSchedule;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
 using Asp.Versioning;
@@ -38,7 +38,7 @@ namespace _66SMS.API.Controllers
 
         [HttpPost("bulk")]
         [AllowAnonymous]
-        public async Task<IActionResult> BulkCreate([FromBody] _66SMS.Application.Features.WorkSchedules.Commands.BulkCreateWorkSchedule.BulkCreateWorkScheduleCommand command)
+        public async Task<IActionResult> BulkCreate([FromBody] _66SMS.Application.BookingService.WorkSchedules.Commands.BulkCreateWorkSchedule.BulkCreateWorkScheduleCommand command)
         {
             command.CreatedBy = jwtService.GetUserId();
             Result<object> result = await mediator.Send(command);

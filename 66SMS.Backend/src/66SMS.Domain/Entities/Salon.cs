@@ -4,9 +4,9 @@ namespace _66SMS.Domain.Entities
 {
     public class Salon : EntityBase<int>
     {
-        public string Code { get; set; }
-        public string Name { get; set; }
-        public string Phone { get; set; }
+        public string Code { get; set; } = null!;
+        public string Name { get; set; } = null!;
+        public string Phone { get; set; } = null!;
         public string? Email { get; set; }
         public string? StreetAddress { get; set; }
         public string? ProvinceCode { get; set; }

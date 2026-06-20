@@ -1,22 +1,22 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.Auth.Commands.AssignPermissions;
-using _66SMS.Application.Features.Auth.Commands.DeletePermission;
-using _66SMS.Application.Features.Auth.Commands.DeleteRole;
-using _66SMS.Application.Features.Auth.Commands.UpdatePermission;
-using _66SMS.Application.Features.Auth.Commands.UpdateRole;
-using _66SMS.Application.Features.Auth.Commands.ChangePassword;
-using _66SMS.Application.Features.Auth.Commands.CreatePermission;
-using _66SMS.Application.Features.Auth.Commands.CreateRole;
-using _66SMS.Application.Features.Auth.Commands.ForgotPassword;
-using _66SMS.Application.Features.Auth.Commands.Login;
-using _66SMS.Application.Features.Auth.Commands.Logout;
-using _66SMS.Application.Features.Auth.Commands.RefreshTokens;
-using _66SMS.Application.Features.Auth.Commands.Registers;
-using _66SMS.Application.Features.Auth.Commands.ResetPassword;
-using _66SMS.Application.Features.Auth.Commands.SendEmailOtp;
-using _66SMS.Application.Features.Auth.Commands.VerifyEmailOtp;
-using _66SMS.Application.Features.Auth.Queries.GetAllPermissions;
-using _66SMS.Application.Features.Auth.Queries.GetAllRoles;
+using _66SMS.Application.IdentityService.Roles.Commands.AssignPermissions;
+using _66SMS.Application.IdentityService.Permissions.Commands.DeletePermission;
+using _66SMS.Application.IdentityService.Roles.Commands.DeleteRole;
+using _66SMS.Application.IdentityService.Permissions.Commands.UpdatePermission;
+using _66SMS.Application.IdentityService.Roles.Commands.UpdateRole;
+using _66SMS.Application.IdentityService.Auth.Commands.ChangePassword;
+using _66SMS.Application.IdentityService.Permissions.Commands.CreatePermission;
+using _66SMS.Application.IdentityService.Roles.Commands.CreateRole;
+using _66SMS.Application.IdentityService.Auth.Commands.ForgotPassword;
+using _66SMS.Application.IdentityService.Auth.Commands.Login;
+using _66SMS.Application.IdentityService.Auth.Commands.Logout;
+using _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens;
+using _66SMS.Application.IdentityService.Auth.Commands.Registers;
+using _66SMS.Application.IdentityService.Auth.Commands.ResetPassword;
+using _66SMS.Application.IdentityService.Auth.Commands.SendEmailOtp;
+using _66SMS.Application.IdentityService.Auth.Commands.VerifyEmailOtp;
+using _66SMS.Application.IdentityService.Permissions.Queries.GetAllPermissions;
+using _66SMS.Application.IdentityService.Roles.Queries.GetAllRoles;
 using _66SMS.Contracts.Abstractions;
 using Asp.Versioning;
 using MediatR;
@@ -86,7 +86,7 @@ namespace _66SMS.API.Controllers
             var result = await mediator.Send(command);
             if (result != null)
                 Response.Cookies.Delete("refreshToken");
-            return HandleResult(result);
+            return HandleResult(result!);
         }
 
        

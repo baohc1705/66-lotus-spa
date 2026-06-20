@@ -1,10 +1,10 @@
 using _66SMS.API.Abstractions;
 using _66SMS.Application.DTOs.Shifts;
-using _66SMS.Application.Features.Shifts.Commands.CreateShift;
-using _66SMS.Application.Features.Shifts.Commands.CreateShiftPeriod;
-using _66SMS.Application.Features.Shifts.Commands.DeleteShift;
-using _66SMS.Application.Features.Shifts.Commands.UpdateShift;
-using _66SMS.Application.Features.Shifts.Queries.GetAllShift;
+using _66SMS.Application.BookingService.Shifts.Commands.CreateShift;
+using _66SMS.Application.BookingService.Shifts.Commands.CreateShiftPeriod;
+using _66SMS.Application.BookingService.Shifts.Commands.DeleteShift;
+using _66SMS.Application.BookingService.Shifts.Commands.UpdateShift;
+using _66SMS.Application.BookingService.Shifts.Queries.GetAllShift;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
 using Asp.Versioning;

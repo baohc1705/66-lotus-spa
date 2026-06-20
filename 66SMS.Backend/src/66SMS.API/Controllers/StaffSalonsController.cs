@@ -1,10 +1,10 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.StaffSalons.Commands.CreateStaffSalon;
-using _66SMS.Application.Features.StaffSalons.Commands.DeleteStaffSalon;
-using _66SMS.Application.Features.StaffSalons.Commands.UpdateManagerStatus;
-using _66SMS.Application.Features.StaffSalons.Commands.UpdateStaffSalon;
-using _66SMS.Application.Features.StaffSalons.Queries.GetAllStaffSalons;
-using _66SMS.Application.Features.StaffSalons.Queries.GetDetailStaffSalon;
+using _66SMS.Application.SalonService.StaffSalons.Commands.CreateStaffSalon;
+using _66SMS.Application.SalonService.StaffSalons.Commands.DeleteStaffSalon;
+using _66SMS.Application.SalonService.StaffSalons.Commands.UpdateManagerStatus;
+using _66SMS.Application.SalonService.StaffSalons.Commands.UpdateStaffSalon;
+using _66SMS.Application.SalonService.StaffSalons.Queries.GetAllStaffSalons;
+using _66SMS.Application.SalonService.StaffSalons.Queries.GetDetailStaffSalon;
 using _66SMS.Contracts.Abstractions;
 using Asp.Versioning;
 using MediatR;

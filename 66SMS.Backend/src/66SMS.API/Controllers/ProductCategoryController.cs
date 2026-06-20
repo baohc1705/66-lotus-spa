@@ -1,9 +1,9 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.ProductCategories.Commands.CreateProductCategories;
-using _66SMS.Application.Features.ProductCategories.Commands.DeleteProductCategories;
-using _66SMS.Application.Features.ProductCategories.Commands.UpdateProductCategories;
-using _66SMS.Application.Features.ProductCategories.Queries.GetAllProductCategories;
-using _66SMS.Application.Features.ProductCategories.Queries.GetDetailProductCategory;
+using _66SMS.Application.CatalogService.ProductCategories.Commands.CreateProductCategories;
+using _66SMS.Application.CatalogService.ProductCategories.Commands.DeleteProductCategories;
+using _66SMS.Application.CatalogService.ProductCategories.Commands.UpdateProductCategories;
+using _66SMS.Application.CatalogService.ProductCategories.Queries.GetAllProductCategories;
+using _66SMS.Application.CatalogService.ProductCategories.Queries.GetDetailProductCategory;
 using _66SMS.Contracts.Abstractions;
 using Asp.Versioning;
 using MediatR;

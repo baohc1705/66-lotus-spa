@@ -1,7 +1,7 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.Wallets.Commands.ManualWalletTransaction;
-using _66SMS.Application.Features.Wallets.Queries.GetWallets;
-using _66SMS.Application.Features.Wallets.Queries.GetWalletTransactions;
+using _66SMS.Application.CustomerService.Wallets.Commands.ManualWalletTransaction;
+using _66SMS.Application.CustomerService.Wallets.Queries.GetWallets;
+using _66SMS.Application.CustomerService.Wallets.Queries.GetWalletTransactions;
 using _66SMS.Contracts.Abstractions;
 using Asp.Versioning;
 using MediatR;
@@ -59,6 +59,6 @@ namespace _66SMS.API.Controllers
     public class ManualTransactionRequest
     {
         public decimal Amount { get; set; }
-        public string Note { get; set; }
+        public string Note { get; set; } = null!;
     }
 }

@@ -15,6 +15,6 @@ namespace _66SMS.Domain.Entities
 
        
         public Customer? Customer { get; set; }
-        public ICollection<WalletTransaction> Transactions { get; set; }
+        public ICollection<WalletTransaction> Transactions { get; set; } = null!;
     }
 }

@@ -1,9 +1,9 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.MembershipCards.Commands.CreateMembershipCards;
-using _66SMS.Application.Features.MembershipCards.Commands.DeleteMembershipCards;
-using _66SMS.Application.Features.MembershipCards.Commands.UpdateMembershipCards;
-using _66SMS.Application.Features.MembershipCards.Queries.GetAllMembershipCards;
-using _66SMS.Application.Features.MembershipCards.Queries.GetDetailMembershipCard;
+using _66SMS.Application.CustomerService.MembershipCards.Commands.CreateMembershipCards;
+using _66SMS.Application.CustomerService.MembershipCards.Commands.DeleteMembershipCards;
+using _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMembershipCards;
+using _66SMS.Application.CustomerService.MembershipCards.Queries.GetAllMembershipCards;
+using _66SMS.Application.CustomerService.MembershipCards.Queries.GetDetailMembershipCard;
 using _66SMS.Contracts.Abstractions;
 using Asp.Versioning;
 using MediatR;

@@ -1,9 +1,9 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.ServiceCategories.Commands.CreateServiceCategories;
-using _66SMS.Application.Features.ServiceCategories.Commands.DeleteServiceCategories;
-using _66SMS.Application.Features.ServiceCategories.Commands.UpdateServiceCategories;
-using _66SMS.Application.Features.ServiceCategories.Queries.GetAllServiceCategories;
-using _66SMS.Application.Features.ServiceCategories.Queries.GetServiceCategories;
+using _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateServiceCategories;
+using _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteServiceCategories;
+using _66SMS.Application.CatalogService.ServiceCategories.Commands.UpdateServiceCategories;
+using _66SMS.Application.CatalogService.ServiceCategories.Queries.GetAllServiceCategories;
+using _66SMS.Application.CatalogService.ServiceCategories.Queries.GetServiceCategories;
 using _66SMS.Contracts.Abstractions;
 using Asp.Versioning;
 using MediatR;

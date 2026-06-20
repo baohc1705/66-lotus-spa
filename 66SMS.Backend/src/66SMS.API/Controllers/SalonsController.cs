@@ -1,10 +1,10 @@
 using _66SMS.API.Abstractions;
 using _66SMS.Application.DTOs.Salons;
-using _66SMS.Application.Features.Salons.Commands.CreateSalon;
-using _66SMS.Application.Features.Salons.Commands.DeleteSalon;
-using _66SMS.Application.Features.Salons.Commands.UpdateSalon;
-using _66SMS.Application.Features.Salons.Queries.GetAllSalons;
-using _66SMS.Application.Features.Salons.Queries.GetDetailSalon;
+using _66SMS.Application.SalonService.Salons.Commands.CreateSalon;
+using _66SMS.Application.SalonService.Salons.Commands.DeleteSalon;
+using _66SMS.Application.SalonService.Salons.Commands.UpdateSalon;
+using _66SMS.Application.SalonService.Salons.Queries.GetAllSalons;
+using _66SMS.Application.SalonService.Salons.Queries.GetDetailSalon;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
 using Asp.Versioning;

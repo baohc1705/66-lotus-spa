@@ -4,7 +4,7 @@ namespace _66SMS.Domain.Entities
 {
     public class Shift : EntityBase<int>
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
         public string? Description { get; set; }
 
         public List<ShiftPeriod>? ShiftPeriods { get; set; }

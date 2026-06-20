@@ -4,9 +4,9 @@ namespace _66SMS.Domain.Entities
 {
     public class Permission : EntityBase<int>
     {
-        public string Name { get; set; }
-        public string Resource { get; set; }
-        public string Action { get; set; }
+        public string Name { get; set; } = null!;
+        public string Resource { get; set; } = null!;
+        public string Action { get; set; } = null!;
         public string? Description { get; set; }
         public int Status {  get; set; }
         

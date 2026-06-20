@@ -1,6 +1,6 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.Media.Commands.UploadImage;
-using _66SMS.Application.Features.Media.Commands.UploadImages;
+using _66SMS.Application.CommonService.Media.Commands.UploadImage;
+using _66SMS.Application.CommonService.Media.Commands.UploadImages;
 using _66SMS.Contracts.Shared;
 using Asp.Versioning;
 using MediatR;

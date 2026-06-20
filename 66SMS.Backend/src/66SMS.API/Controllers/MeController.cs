@@ -1,5 +1,5 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.Me.Queries.GetMySalon;
+using _66SMS.Application.IdentityService.Users.Queries.GetMySalon;
 using _66SMS.Contracts.Abstractions;
 using Asp.Versioning;
 using MediatR;

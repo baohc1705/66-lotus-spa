@@ -1,9 +1,9 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.Features.Customers.Commands.CreateCustomer;
-using _66SMS.Application.Features.Customers.Commands.DeleteCustomer;
-using _66SMS.Application.Features.Customers.Commands.UpdateCustomer;
-using _66SMS.Application.Features.Customers.Queries.GetAllCustomer;
-using _66SMS.Application.Features.Customers.Queries.GetDetailCustomer;
+using _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer;
+using _66SMS.Application.CustomerService.Customers.Commands.DeleteCustomer;
+using _66SMS.Application.CustomerService.Customers.Commands.UpdateCustomer;
+using _66SMS.Application.CustomerService.Customers.Queries.GetAllCustomer;
+using _66SMS.Application.CustomerService.Customers.Queries.GetDetailCustomer;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Infrastructure.Security;

@@ -1,0 +1,25 @@
+using _66SMS.Application.DTOs.ProductImages;
+using _66SMS.Contracts.Shared;
+using MediatR;
+
+namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
+{
+    public class CreateProductCommand : IRequest<Result<int>>
+    {
+        public int CategoryId { get; set; }
+        public string Code { get; set; } = null!;
+        public string Name { get; set; } = null!;
+        public string? Description { get; set; }
+        public string? Content { get; set; }
+        public string Unit { get; set; } = null!;
+        public decimal CostPrice { get; set; }
+        public decimal? SellingPrice { get; set; }
+        public int StockQuantity { get; set; }
+        public int MinStock { get; set; }
+        public int Status { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        public int? CreatedBy { get; set; }
+        
+        public List<ProductImageDto>? Images { get; set; }
+    }
+}
