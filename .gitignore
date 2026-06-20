@@ -26,3 +26,10 @@
 .env
 fe
 sourcev1
+sourcev2
+srcbev3
+.agent
+claude.md
+.claude
+
+implement-vnpay.md
