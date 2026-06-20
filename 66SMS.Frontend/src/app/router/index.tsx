@@ -4,6 +4,7 @@ import { ProfilePage } from "@/features/profile";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AdminLayout, AdminDashboard, AdminProfilePage } from "@/features/admin";
 import { LoginPage, RegisterPage } from "@/features/auth";
+import RolePermissionPage from "@/features/auth/pages/RolePermissionPage";
 import { BookingPage } from "@/features/booking";
 import { CashierPage, VnPayReturnPage } from "@/features/cashier";
 import { UsersPage } from "@/features/users";
@@ -137,6 +138,10 @@ export const router = createBrowserRouter([
           {
             path: "salons",
             element: <SalonListPage />,
+          },
+          {
+            path: "roles",
+            element: <RolePermissionPage />,
           },
           // Placeholders for other admin routes
         ],

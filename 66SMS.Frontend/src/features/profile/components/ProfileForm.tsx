@@ -126,7 +126,7 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
                     <Star className="w-4 h-4 text-lotus-gold" />
                     Hạng thành viên:
                   </span>
-                  <span className="text-sm font-semibold text-lotus-deep">{initialData.customerInfo.tier || "Thường"}</span>
+                  <span className="text-sm font-semibold text-lotus-deep">Thường</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-lotus-stone flex items-center gap-1">

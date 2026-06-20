@@ -75,7 +75,7 @@ export function CustomerDetailExpanded({ customerId, onEdit }: CustomerDetailExp
               <div className="flex-1 min-w-0">
                 <h3 className="text-base font-bold text-lotus-deep truncate">{customer.fullName ?? '—'}</h3>
                 <p className="text-[12px] text-lotus-stone mt-0.5">
-                  Hạng: {customer.tier ?? 'Thường'} · Điểm: {customer.loyaltyPoint ?? 0}
+                  Điểm: {customer.loyaltyPoint ?? 0}
                 </p>
               </div>
             </div>

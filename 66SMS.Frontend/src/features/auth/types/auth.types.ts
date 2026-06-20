@@ -1,3 +1,12 @@
+export interface PermissionDTO {
+  id: number;
+  name: string;
+  resource: string;
+  action: string;
+  description?: string;
+  permissionKey: string;
+}
+
 export interface TokenResponseDTO {
   userId: number;
   accessToken: string;
@@ -20,6 +29,7 @@ export interface RoleUserDTO {
 
 export interface RolePermissionDTO {
   id: number;
+  permissionId: number;
   name: string;
 }
 
@@ -61,6 +71,32 @@ export interface CreatePermissionRequest {
 export interface AssignPermissionsRequest {
   roleId: number;
   permissionIds: number[];
+}
+
+export interface UpdateRoleRequest {
+  name: string;
+  description?: string;
+}
+
+export interface UpdatePermissionRequest {
+  name: string;
+  resource: string;
+  action: string;
+  description?: string;
+}
+
+export interface RegisterPayload {
+  fullName: string
+  phone: string
+  userName: string
+  email: string
+  password: string
+  confirmPassword: string
+}
+
+export interface RegisterResponseDto {
+  userId: number
+  customerId: number
 }
 
 export interface SendOtpRequest {

@@ -1,9 +1,12 @@
 import axiosInstance from '@/shared/api/axiosInstance';
 import { API } from '@/shared/api/endpoints';
-import type { Result, PagedResult } from '@/shared/types/common.types';
+import type { Result } from '@/shared/types/common.types';
 import type {
   TokenResponseDTO,
   RoleDTO,
+  PermissionDTO,
+  UpdateRoleRequest,
+  UpdatePermissionRequest,
   LoginRequest,
   ForgotPasswordRequest,
   ResetPasswordRequest,
@@ -13,8 +16,9 @@ import type {
   AssignPermissionsRequest,
   SendOtpRequest,
   VerifyOtpRequest,
+  RegisterPayload,
+  RegisterResponseDto,
 } from '@/features/auth/types/auth.types';
-import type { CreateCustomerPayload } from '@/features/customers/types/customer.types';
 
 export const authApi = {
   login: (body: LoginRequest) =>
@@ -27,8 +31,8 @@ export const authApi = {
     axiosInstance.post<Result<TokenResponseDTO>>(API.auth.refreshToken, { token }).then(r => r.data),
 
   // Public registration — AllowAnonymous on POST /auth/register, NOT POST /customer
-  register: (body: CreateCustomerPayload) =>
-    axiosInstance.post<Result<object>>(API.auth.register, body).then(r => r.data),
+  register: (body: RegisterPayload) =>
+    axiosInstance.post<Result<RegisterResponseDto>>(API.auth.register, body).then(r => r.data),
 
   forgotPassword: (body: ForgotPasswordRequest) =>
     axiosInstance.post<Result<object>>(API.auth.forgotPassword, body).then(r => r.data),
@@ -54,6 +58,21 @@ export const authApi = {
   assignPermissions: (body: AssignPermissionsRequest) =>
     axiosInstance.post<Result<object>>(API.auth.roleAssign, body).then(r => r.data),
 
-  getAllRoles: (params?: { pageIndex?: number; pageSize?: number }) =>
-    axiosInstance.get<Result<PagedResult<RoleDTO>>>(API.auth.role, { params }).then(r => r.data),
+  getAllRoles: () =>
+    axiosInstance.get<Result<RoleDTO[]>>(API.auth.role).then(r => r.data),
+
+  getAllPermissions: () =>
+    axiosInstance.get<Result<PermissionDTO[]>>(API.auth.permission).then(r => r.data),
+
+  updateRole: (id: number, body: UpdateRoleRequest) =>
+    axiosInstance.put<Result<object>>(`${API.auth.role}/${id}`, body).then(r => r.data),
+
+  deleteRole: (id: number) =>
+    axiosInstance.delete<Result<object>>(`${API.auth.role}/${id}`).then(r => r.data),
+
+  updatePermission: (id: number, body: UpdatePermissionRequest) =>
+    axiosInstance.put<Result<object>>(`${API.auth.permission}/${id}`, body).then(r => r.data),
+
+  deletePermission: (id: number) =>
+    axiosInstance.delete<Result<object>>(`${API.auth.permission}/${id}`).then(r => r.data),
 };

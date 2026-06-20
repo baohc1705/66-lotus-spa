@@ -56,13 +56,6 @@ const STATUS_OPTIONS = [
   { value: '2', label: 'Tạm khóa' },
 ]
 
-const TIER_OPTIONS = [
-  { value: 'Thường', label: 'Thường' },
-  { value: 'Bạc', label: 'Bạc' },
-  { value: 'Vàng', label: 'Vàng' },
-  { value: 'Kim cương', label: 'Kim cương' },
-]
-
 const SOURCE_OPTIONS = [
   { value: 'Walk-in', label: 'Đến trực tiếp' },
   { value: 'Online', label: 'Online' },
@@ -206,21 +199,6 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
           {/* === Section: Thông tin khách hàng === */}
           <FormSection icon={ShoppingBag} title="Thông tin khách hàng">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-              <FormField label="Hạng thành viên">
-                <Select
-                  value={watch('tier') ?? ''}
-                  onValueChange={(v) => setValue('tier', v)}
-                >
-                  <SelectTrigger className="h-9 text-[13px]">
-                    <SelectValue placeholder="Chọn hạng" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TIER_OPTIONS.map(opt => (
-                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
               <FormField label="Điểm tích lũy" error={errors.loyaltyPoint?.message}>
                 <Input
                   {...register('loyaltyPoint')}
@@ -379,7 +357,6 @@ function getDefaultValues(customer?: CustomerDto | null): CustomerFormValues {
       dob: customer.dob ?? '',
       gender: customer.gender ? Number(customer.gender) : undefined,
       image: customer.image ?? '',
-      tier: customer.tier ?? '',
       loyaltyPoint: customer.loyaltyPoint ?? undefined,
       source: customer.source ?? '',
       status: customer.status ? Number(customer.status) : 1,
@@ -398,7 +375,6 @@ function getDefaultValues(customer?: CustomerDto | null): CustomerFormValues {
     dob: '',
     gender: undefined,
     image: '',
-    tier: '',
     loyaltyPoint: undefined,
     source: '',
     status: 1,

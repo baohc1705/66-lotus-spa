@@ -5,15 +5,17 @@ import { z } from "zod";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Eye, EyeOff, Loader2, Mail, RotateCcw } from "lucide-react";
 import {
-  createCustomerSchema,
-  type CreateCustomerFormData,
-} from "@/features/customers/schemas/customer.schema";
+  registerSchema,
+  type RegisterFormData,
+} from "@/features/auth/schemas/registerSchema";
 import { Label } from "@/shared/components/ui/label";
 import { Input } from "@/shared/components/ui/input";
 import { toast } from "sonner";
 import { useRegister } from "@/features/auth/hooks/useRegister";
 import { useSendOtp } from "@/features/auth/hooks/useSendOtp";
 import { useVerifyOtp } from "@/features/auth/hooks/useVerifyOtp";
+import axiosInstance from "@/shared/api/axiosInstance";
+import { API } from "@/shared/api/endpoints";
 
 const RESEND_COOLDOWN = 60;
 const OTP_LENGTH = 6;
@@ -56,8 +58,8 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<z.input<typeof createCustomerSchema>, unknown, CreateCustomerFormData>({
-    resolver: zodResolver(createCustomerSchema),
+  } = useForm<z.input<typeof registerSchema>, unknown, RegisterFormData>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       fullName: "",
       phone: "",
@@ -68,22 +70,32 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
     },
   });
 
-  const onSubmit = (data: CreateCustomerFormData) => {
+  const onSubmit = (data: RegisterFormData) => {
     registerMutation.mutate(data, {
-      onSuccess: () => {
-        sendOtpMutation.mutate(
-          { email: data.email },
-          {
-            onSuccess: () => {
-              toast.success("Đăng ký thành công! Mã OTP đã được gửi đến email của bạn.");
-              onSuccess(data.email);
-            },
-            onError: () => {
-              toast.warning("Đăng ký thành công nhưng không gửi được OTP. Vui lòng thử gửi lại.");
-              onSuccess(data.email);
-            },
-          },
-        );
+      onSuccess: (response) => {
+        const customerId = response.data?.customerId ?? 0;
+
+        // Gọi song song sendOtp và tạo membership card để tránh gọi tuần tự không cần thiết.
+        // Hai thao tác độc lập nhau — OTP dùng email, membership card dùng customerId từ register response.
+        // Nếu tạo membership card thất bại thì vẫn chuyển bước OTP bình thường (best-effort).
+        Promise.allSettled([
+          sendOtpMutation.mutateAsync({ email: data.email }),
+          customerId > 0
+            ? axiosInstance.post(API.membershipCards, {
+                customerId,
+                membershipTierName: "common",
+                issuedAt: new Date().toISOString(),
+                status: 1,
+              })
+            : Promise.resolve(),
+        ]).then(([otpResult]) => {
+          if (otpResult.status === "fulfilled") {
+            toast.success("Đăng ký thành công! Mã OTP đã được gửi đến email của bạn.");
+          } else {
+            toast.warning("Đăng ký thành công nhưng không gửi được OTP. Vui lòng thử gửi lại.");
+          }
+          onSuccess(data.email);
+        });
       },
     });
   };

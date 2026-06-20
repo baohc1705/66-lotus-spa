@@ -21,7 +21,7 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
   }
 
   // Calculate tier details
-  const currentTierName = profile?.customerInfo?.tier || 'Thường'
+  const currentTierName = 'Thường'
   const loyaltyPoints = profile?.customerInfo?.loyaltyPoint || 0
 
   // Mock total spending (using 10,000đ per loyalty point, or a baseline of 1,250,000đ)

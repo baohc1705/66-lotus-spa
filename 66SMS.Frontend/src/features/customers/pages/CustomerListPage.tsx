@@ -230,26 +230,6 @@ export function CustomerListPage() {
       size: 90,
     },
     {
-      accessorKey: 'tier',
-      header: 'Hạng',
-      cell: ({ row }) => {
-        const tier = row.original.tier
-        if (!tier) return <span className="text-lotus-deep/50">—</span>
-        const colorMap: Record<string, string> = {
-          'Thường': 'bg-stone-100 text-stone-600',
-          'Bạc': 'bg-slate-100 text-slate-600',
-          'Vàng': 'bg-amber-50 text-amber-700',
-          'Kim cương': 'bg-violet-50 text-violet-700',
-        }
-        return (
-          <Badge variant="outline" size="sm" className={`text-[10px] font-medium ${colorMap[tier] ?? ''}`}>
-            {tier}
-          </Badge>
-        )
-      },
-      size: 100,
-    },
-    {
       accessorKey: 'loyaltyPoint',
       header: 'Điểm',
       cell: ({ row }) => {
@@ -353,7 +333,6 @@ export function CustomerListPage() {
                 phone: 'SĐT',
                 email: 'Email',
                 gender: 'Giới tính',
-                tier: 'Hạng',
                 loyaltyPoint: 'Điểm',
                 source: 'Nguồn',
                 status: 'Trạng thái',

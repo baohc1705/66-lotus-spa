@@ -16,7 +16,6 @@ const customerBaseSchema = z.object({
   image: z.string().max(500).optional().or(z.literal('')),
 
   // Thông tin khách hàng
-  tier: z.string().max(20, 'Tối đa 20 ký tự').optional().or(z.literal('')),
   loyaltyPoint: z.coerce.number().min(0, 'Điểm tích lũy phải >= 0').optional(),
   source: z.string().max(100, 'Tối đa 100 ký tự').optional().or(z.literal('')),
   status: z.coerce.number().min(0).optional(),

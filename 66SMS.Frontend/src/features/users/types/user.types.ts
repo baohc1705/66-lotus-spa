@@ -29,7 +29,6 @@ export interface StaffProfileDto {
 }
 
 export interface CustomerProfileDto {
-  tier?: string;
   loyaltyPoint?: number;
   firstPurchaseAt?: string;
   source?: string;

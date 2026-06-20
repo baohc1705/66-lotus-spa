@@ -7,7 +7,6 @@ export interface CustomerDto {
   dob: string | null
   gender: string | null
   phone: string | null
-  tier: string | null
   loyaltyPoint: number | null
   firstPurchaseAt: string | null
   lastPurchaseAt: string | null
@@ -33,7 +32,6 @@ export interface CreateCustomerPayload {
   dob?: string
   gender?: number
   phone: string
-  tier?: string
   loyaltyPoint?: number
   firstPurchaseAt?: string
   lastPurchaseAt?: string
@@ -58,7 +56,6 @@ export interface UpdateCustomerPayload {
   dob?: string
   gender?: number
   phone?: string
-  tier?: string
   loyaltyPoint?: number
   firstPurchaseAt?: string
   lastPurchaseAt?: string

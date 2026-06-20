@@ -101,6 +101,7 @@ export function StaffFormDialog({
     watch,
   } = form;
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const selectedProvince = watch("provinceCode");
   const avatarUrl = watch("avatarUrl");
   const provincesQuery = useProvinces();
