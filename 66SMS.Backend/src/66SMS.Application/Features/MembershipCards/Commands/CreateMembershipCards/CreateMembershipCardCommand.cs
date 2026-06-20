@@ -7,7 +7,8 @@ namespace _66SMS.Application.Features.MembershipCards.Commands.CreateMembershipC
     public class CreateMembershipCardCommand : IRequest<Result<int>>
     {
         public int CustomerId { get; set; }
-        public int MembershipTierId { get; set; }
+        public int? MembershipTierId { get; set; }
+        public string? MembershipTierName { get; set; }
         public string CardCode { get; set; } = string.Empty;
         public DateTime IssuedAt { get; set; }
         public DateTime? ExpiresAt { get; set; }
@@ -15,5 +16,7 @@ namespace _66SMS.Application.Features.MembershipCards.Commands.CreateMembershipC
 
         [JsonIgnore]
         public int? CreatedBy { get; set; }
+
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

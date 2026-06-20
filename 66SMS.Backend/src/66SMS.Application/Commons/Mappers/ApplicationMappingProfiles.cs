@@ -61,6 +61,7 @@ using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using System.Linq.Expressions;
+using _66SMS.Application.Features.Auth.Commands.Registers;
 
 namespace _66SMS.Application.Commons.Mappers
 {
@@ -378,6 +379,12 @@ namespace _66SMS.Application.Commons.Mappers
 
             CreateMap<Ward, WardDto>()
                 .ForMember(dest => dest.Code, opt => opt.MapFrom(src => src.Id));
+
+            // Register 
+            CreateMap<RegisterCommand, User>()
+                .IgnoreNullValueTypes();
+            CreateMap<RegisterCommand, Customer>()
+               .IgnoreNullValueTypes();
         }
     }
 

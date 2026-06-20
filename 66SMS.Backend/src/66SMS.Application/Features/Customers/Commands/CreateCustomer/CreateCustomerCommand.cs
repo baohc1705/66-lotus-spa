@@ -14,7 +14,6 @@ namespace _66SMS.Application.Features.Customers.Commands.CreateCustomer
         public DateOnly? DateOfBirth { get; set; }
         public int? Gender { get; set; }
         public string? Phone { get; set; }
-        public string? Tier { get; set; }
         public int? LoyaltyPoint { get; set; }
         public DateTime? FirstPurchaseAt { get; set; }
         public DateTime? LastPurchaseAt { get; set; }

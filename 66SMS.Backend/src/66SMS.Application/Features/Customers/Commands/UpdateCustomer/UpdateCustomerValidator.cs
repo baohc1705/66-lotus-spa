@@ -14,7 +14,6 @@ namespace _66SMS.Application.Features.Customers.Commands.UpdateCustomer
             RuleFor(x => x.DateOfBirth).LessThan(DateOnly.FromDateTime(DateTime.Now)).When(x => x.DateOfBirth.HasValue);
             RuleFor(x => x.Gender).GreaterThanOrEqualTo(0).When(x => x.Gender.HasValue);
             RuleFor(x => x.Phone).NotEmpty().Matches(RegexConst.VIETNAM_PHONE_REGEX).MaximumLength(CustomerConst.PHONE_MAX_LENGTH).When(x => x.Phone != null);
-            RuleFor(x => x.Tier).NotEmpty().MaximumLength(CustomerConst.TIER_MAX_LENGTH).When(x => x.Tier != null);
             RuleFor(x => x.LoyaltyPoint).GreaterThanOrEqualTo(0).When(x => x.LoyaltyPoint.HasValue);
             RuleFor(x => x.FirstPurchaseAt).LessThanOrEqualTo(DateTime.Now).When(x => x.FirstPurchaseAt.HasValue);
             RuleFor(x => x.LastPurchaseAt).GreaterThanOrEqualTo(x => x.FirstPurchaseAt).When(x => x.LastPurchaseAt.HasValue && x.FirstPurchaseAt.HasValue);

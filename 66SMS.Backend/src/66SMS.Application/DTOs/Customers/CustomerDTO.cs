@@ -9,7 +9,6 @@ namespace _66SMS.Application.DTOs.Customers
         public string? DateOfBirth { get; set; }
         public string? Gender { get; set; }
         public string? Phone { get; set; }
-        public string? Tier { get; set; }
         public int? LoyaltyPoint { get; set; }
         public string? FirstPurchaseAt { get; set; }
         public string? LastPurchaseAt { get; set; }

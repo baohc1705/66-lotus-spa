@@ -19,7 +19,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.UpdatedAt).HasColumnName(WalletConst.FIELD_UPDATED_AT);
             builder.Property(x => x.UpdatedBy).HasColumnName(WalletConst.FIELD_UPDATED_BY);
 
-            builder.HasOne(x => x.Customer).WithOne().HasForeignKey<Wallet>(x => x.CustomerId).IsRequired(false);
+            builder.HasOne(x => x.Customer).WithOne(c => c.Wallet).HasForeignKey<Wallet>(x => x.CustomerId).IsRequired(false);
 
             builder.ToTable(WalletConst.TABLE_NAME);
         }

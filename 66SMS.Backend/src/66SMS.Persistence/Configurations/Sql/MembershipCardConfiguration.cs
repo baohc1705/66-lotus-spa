@@ -22,7 +22,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.UpdatedAt).HasColumnName(MembershipCardConst.FIELD_UPDATED_AT);
             builder.Property(x => x.UpdatedBy).HasColumnName(MembershipCardConst.FIELD_UPDATED_BY);
 
-            builder.HasOne(x => x.Customer).WithMany().HasForeignKey(x => x.CustomerId).IsRequired(false);
+            builder.HasOne(x => x.Customer).WithOne(c => c.MembershipCard).HasForeignKey<MembershipCard>(x => x.CustomerId).IsRequired(false);
             builder.HasOne(x => x.Tier).WithMany(x => x.Cards).HasForeignKey(x => x.MembershipTierId).IsRequired(false);
 
             builder.ToTable(MembershipCardConst.TABLE_NAME);

@@ -34,7 +34,6 @@ namespace _66SMS.Application.DTOs.Users
 
     public class CustomerProfileDto
     {
-        public string? Tier { get; set; }
         public int? LoyaltyPoint { get; set; }
         public DateTime? FirstPurchaseAt { get; set; }
         public string? Source { get; set; }

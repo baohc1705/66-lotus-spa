@@ -90,7 +90,6 @@ namespace _66SMS.Application.Features.Users.Queries.GetDetailUser
 
                     userDto.CustomerInfo = new CustomerProfileDto
                     {
-                        Tier = customer.Tier,
                         LoyaltyPoint = customer.LoyaltyPoint,
                         FirstPurchaseAt = customer.FirstPurchaseAt,
                         Source = customer.Source

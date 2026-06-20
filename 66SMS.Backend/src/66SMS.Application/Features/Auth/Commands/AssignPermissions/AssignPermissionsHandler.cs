@@ -22,27 +22,38 @@ namespace _66SMS.Application.Features.Auth.Commands.AssignPermissions
         }
         public async Task<Result<object>> Handle(AssignPermissionsCommand request, CancellationToken cancellationToken)
         {
-            // Check role id 
             bool hasRole = await roleSqlRepository.AsQueryable().Where(x => x.Id == request.RoleId).AnyAsync(cancellationToken);
             if (!hasRole) return Result<object>.NotFound(RoleConst.MSG_ROLE_NOT_FOUND, ErrorCodes.ERR_ROLE_NOT_FOUND);
-            // Check permission id
-            // Ki?m tra s? lu?ng permission trong request c� t?n t?i ? du?i db kh�ng
-            bool hasPermission = await permissionSqlRepository.AsQueryable()
-                .Where(x => request.PermissionIds.Contains(x.Id))
-                .CountAsync(cancellationToken) == request.PermissionIds.Count;
-            // Th�m v�o danh s�ch permission ?ng v?i role
+
+            if (request.PermissionIds.Count > 0)
+            {
+                bool allExist = await permissionSqlRepository.AsQueryable()
+                    .Where(x => request.PermissionIds.Contains(x.Id))
+                    .CountAsync(cancellationToken) == request.PermissionIds.Count;
+                if (!allExist) return Result<object>.NotFound("Một hoặc nhiều quyền không tồn tại.", ErrorCodes.ERR_PERMISSION_NOT_FOUND);
+            }
+
+            // Xóa toàn bộ permissions cũ của role này trước khi gán mới
+            var existing = await rolePermissionSqlRepository.AsQueryable()
+                .Where(x => x.RoleId == request.RoleId)
+                .ToListAsync(cancellationToken);
+            if (existing.Count > 0)
+                rolePermissionSqlRepository.RemoveRange(existing);
+
             List<RolePermission> rolePermissions = [];
-            foreach(var permission in request.PermissionIds)
+            foreach (var permissionId in request.PermissionIds)
             {
                 rolePermissions.Add(new RolePermission
                 {
                     RoleId = request.RoleId,
-                    PermissionId = permission,
+                    PermissionId = permissionId,
                     AssignedAt = DateTimeHelper.UtcNow(),
                 });
             }
 
-            rolePermissionSqlRepository.AddRange(rolePermissions);
+            if (rolePermissions.Count > 0)
+                rolePermissionSqlRepository.AddRange(rolePermissions);
+
             await rolePermissionSqlRepository.SaveChangeAsync(cancellationToken);
             return Result<object>.Ok();
         }

@@ -18,6 +18,7 @@ namespace _66SMS.Application.DTOs.Auth
     public class RolePermissionDTO
     {
         public int Id { get; set; }
+        public int PermissionId { get; set; }
         public string Name { get; set; }
     }
 }

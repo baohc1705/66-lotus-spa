@@ -1,16 +1,16 @@
 using _66SMS.Domain.Abstractions.Entities;
+using System.Text.Json.Serialization;
 
 namespace _66SMS.Domain.Entities
 {
     public class Customer : EntityBase<int>
     {
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
         public string FullName { get; set; } = string.Empty;
         public string? AvatarUrl {  get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public int? Gender { get; set; }
         public string? Phone { get; set; }
-        public string? Tier { get; set; }
         public int? LoyaltyPoint { get; set; }
         public DateTime? FirstPurchaseAt { get; set; }
         public DateTime? LastPurchaseAt { get; set; }
@@ -27,6 +27,11 @@ namespace _66SMS.Domain.Entities
         public DateTime? UpdatedAt { get; set; }
         public int? UpdatedBy { get; set; }
 
-        public User? User { get; set; }
+        [JsonIgnore]
+        public User User { get; set; } = null!;
+        [JsonIgnore]
+        public Wallet? Wallet  { get; set; }
+        [JsonIgnore]
+        public MembershipCard? MembershipCard { get; set; }
     }
 }

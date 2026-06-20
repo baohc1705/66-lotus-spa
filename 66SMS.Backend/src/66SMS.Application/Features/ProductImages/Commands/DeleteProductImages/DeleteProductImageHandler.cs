@@ -23,7 +23,7 @@ namespace _66SMS.Application.Features.ProductImages.Commands.DeleteProductImages
 
         public async Task<Result<object>> Handle(DeleteProductImageCommand request, CancellationToken cancellationToken)
         {
-            ProductImage productImage = await productImageSqlRepository.FindByIdAsync(request.Id);
+            ProductImage? productImage = await productImageSqlRepository.FindByIdAsync(request.Id);
             if (productImage == null)
             {
                 return Result<object>.NotFound(ProductImageConst.MSG_PRODUCT_IMAGE_NOT_FOUND, ErrorCodes.ERR_PRODUCT_IMAGE_NOT_FOUND);

@@ -2,12 +2,13 @@ namespace _66SMS.Domain.Constants
 {
     public static class OtpVerificationConst
     {
-        public const string TABLE_NAME = "OtpVerifications";
-        public const string FIELD_USER_ID = "UserId";
-        public const string FIELD_OTP_CODE = "OtpCode";
-        public const string FIELD_EXPIRES_AT = "ExpiresAt";
-        public const string FIELD_IS_USED = "IsUsed";
-        public const string FIELD_CREATED_AT = "CreatedAt";
+        public const string TABLE_NAME = "otp_verifications";
+        public const string FIELD_ID = "id";
+        public const string FIELD_USER_ID = "user_id";
+        public const string FIELD_OTP_CODE = "otp_code";
+        public const string FIELD_EXPIRES_AT = "expires_at";
+        public const string FIELD_IS_USED = "is_used";
+        public const string FIELD_CREATED_AT = "created_at";
         public const int OTP_CODE_MAX_LENGTH = 6;
 
         #region Message

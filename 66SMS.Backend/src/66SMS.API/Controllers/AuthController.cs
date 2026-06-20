@@ -1,5 +1,9 @@
 using _66SMS.API.Abstractions;
 using _66SMS.Application.Features.Auth.Commands.AssignPermissions;
+using _66SMS.Application.Features.Auth.Commands.DeletePermission;
+using _66SMS.Application.Features.Auth.Commands.DeleteRole;
+using _66SMS.Application.Features.Auth.Commands.UpdatePermission;
+using _66SMS.Application.Features.Auth.Commands.UpdateRole;
 using _66SMS.Application.Features.Auth.Commands.ChangePassword;
 using _66SMS.Application.Features.Auth.Commands.CreatePermission;
 using _66SMS.Application.Features.Auth.Commands.CreateRole;
@@ -7,17 +11,17 @@ using _66SMS.Application.Features.Auth.Commands.ForgotPassword;
 using _66SMS.Application.Features.Auth.Commands.Login;
 using _66SMS.Application.Features.Auth.Commands.Logout;
 using _66SMS.Application.Features.Auth.Commands.RefreshTokens;
+using _66SMS.Application.Features.Auth.Commands.Registers;
 using _66SMS.Application.Features.Auth.Commands.ResetPassword;
 using _66SMS.Application.Features.Auth.Commands.SendEmailOtp;
 using _66SMS.Application.Features.Auth.Commands.VerifyEmailOtp;
+using _66SMS.Application.Features.Auth.Queries.GetAllPermissions;
 using _66SMS.Application.Features.Auth.Queries.GetAllRoles;
-using _66SMS.Application.Features.Customers.Commands.CreateCustomer;
 using _66SMS.Contracts.Abstractions;
+using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-using Asp.Versioning;
 
 namespace _66SMS.API.Controllers
 {
@@ -35,7 +39,7 @@ namespace _66SMS.API.Controllers
 
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromBody] CreateCustomerCommand command)
+        public async Task<IActionResult> Register([FromBody] RegisterCommand command)
         {
             var result = await mediator.Send(command);
             return HandleResult(result);
@@ -86,6 +90,14 @@ namespace _66SMS.API.Controllers
         }
 
        
+        [HttpGet("permission")]
+        [Authorize]
+        public async Task<IActionResult> GetAllPermissions()
+        {
+            var result = await mediator.Send(new GetAllPermissionsQuery());
+            return HandleResult(result);
+        }
+
         [HttpPost("permission")]
         [Authorize]
         public async Task<IActionResult> CreatePermission([FromBody] CreatePermissionCommand command)
@@ -114,6 +126,40 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> GetAllRole([FromQuery]GetAllRoleQuery query)
         {
             var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        [Authorize]
+        [HttpPut("role/{id}")]
+        public async Task<IActionResult> UpdateRole(int id, [FromBody] UpdateRoleCommand command)
+        {
+            command.Id = id;
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [Authorize]
+        [HttpDelete("role/{id}")]
+        public async Task<IActionResult> DeleteRole(int id)
+        {
+            var result = await mediator.Send(new DeleteRoleCommand { Id = id });
+            return HandleResult(result);
+        }
+
+        [Authorize]
+        [HttpPut("permission/{id}")]
+        public async Task<IActionResult> UpdatePermission(int id, [FromBody] UpdatePermissionCommand command)
+        {
+            command.Id = id;
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [Authorize]
+        [HttpDelete("permission/{id}")]
+        public async Task<IActionResult> DeletePermission(int id)
+        {
+            var result = await mediator.Send(new DeletePermissionCommand { Id = id });
             return HandleResult(result);
         }
 

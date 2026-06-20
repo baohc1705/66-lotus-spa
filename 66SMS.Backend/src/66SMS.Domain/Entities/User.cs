@@ -1,12 +1,13 @@
 using _66SMS.Domain.Abstractions.Entities;
+using System.Text.Json.Serialization;
 
 namespace _66SMS.Domain.Entities
 {
     public class User : EntityBase<int>
     {
-        public string Username { get; set; }
-        public string Email { get; set; }
-        public string PasswordHash { get; set; }
+        public string Username { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string PasswordHash { get; set; } = null!;
         public bool IsEmailConfirmed { get; set; }
         public int AccessFailedCount { get; set; }
         public int Status { get; set; }
@@ -22,7 +23,7 @@ namespace _66SMS.Domain.Entities
 
         public List<UserRole>? UserRoles { get; set; }
         public List<RefreshToken>? RefreshTokens { get; set; }
-
+      
         public Customer? Customer { get; set; }
         public Staff? Staff { get; set; }
     }

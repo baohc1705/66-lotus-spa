@@ -21,11 +21,11 @@ namespace _66SMS.Application.Features.Auth.Commands.ChangePassword
         }
         public async Task<Result<object>> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
         {
-            User? user = await userSqlRepository.FindByIdAsync((int)request.Id, asNoTracking: false, cancellationToken: cancellationToken);
-            bool verifyCurrentPass = passwordHash.Verify(user.PasswordHash, request.CurrentPassword);
+            User? user = await userSqlRepository.FindByIdAsync((int)request.Id!, asNoTracking: false, cancellationToken: cancellationToken);
+            bool verifyCurrentPass = passwordHash.Verify(user!.PasswordHash, request.CurrentPassword!);
             if (!verifyCurrentPass)
                 return Result<object>.BadRequest(UserConst.MSG_USER_WRONG_PASSWORD, Contracts.Enumerations.ErrorCodes.ERR_USER_INVALID_PASSWORD);
-            user.PasswordHash = passwordHash.Hash(request.NewPassword);
+            user.PasswordHash = passwordHash.Hash(request.NewPassword!);
             userSqlRepository.Update(user);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
             return Result<object>.Ok();

@@ -15,7 +15,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.PasswordHash).HasColumnName(UserConst.FIELD_PASSWORD_HASH);
             builder.Property(x => x.IsEmailConfirmed).HasColumnName(UserConst.FIELD_IS_EMAIL_CONFIRMED);
             builder.Property(x => x.AccessFailedCount).HasColumnName(UserConst.FIELD_ACCESS_FAILED_COUNT);
-            builder.Property(x => x.Status).HasColumnName(UserConst.FIELD_STATUS).HasConversion<int>();
+            builder.Property(x => x.Status).HasColumnName(UserConst.FIELD_STATUS);
             builder.Property(x => x.LockoutEnd).HasColumnName(UserConst.FIELD_LOCKOUT_END);
             builder.Property(x => x.LastLoginAt).HasColumnName(UserConst.FIELD_LAST_LOGIN_AT);
             builder.Property(x => x.CreatedAt).HasColumnName(UserConst.FIELD_CREATED_AT);
@@ -24,9 +24,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.UpdatedBy).HasColumnName(UserConst.FIELD_UPDATED_BY);
             builder.Property(x => x.PasswordResetToken).HasColumnName(UserConst.FIELD_PASSWORD_RESET_TOKEN);
             builder.Property(x => x.PasswordResetTokenExpiry).HasColumnName(UserConst.FIELD_PASSWORD_RESET_TOKEN_EXPIRY);
-
             builder.ToTable(UserConst.TABLE_NAME);
-            builder.HasQueryFilter(x => x.Status != UserConst.STATUS_DELETED);
         }
     }
 }

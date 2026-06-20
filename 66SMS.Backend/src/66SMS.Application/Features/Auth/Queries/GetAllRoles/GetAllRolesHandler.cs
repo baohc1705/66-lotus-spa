@@ -52,6 +52,7 @@ namespace _66SMS.Application.Features.Auth.Queries.GetAllRoles
                 RolePermissions = x.RolePermissions?.Select(x => new RolePermissionDTO
                 {
                     Id = x.Id,
+                    PermissionId = x.PermissionId,
                     Name = x.Permission.Name,
                 }).ToList() ?? null,
             }).ToList();

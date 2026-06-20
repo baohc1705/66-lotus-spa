@@ -20,6 +20,7 @@ namespace _66SMS.Domain.Constants
         #region Constraint
         public const int NAME_MAX_LENGTH = 100;
         public const int BENEFITS_MAX_LENGTH = 1000;
+        public const string MEMBERSHIP_CARD_TIER_COMMON = "common";
         #endregion
 
         #region Status

@@ -1,4 +1,5 @@
 using _66SMS.Contracts.Enumerations;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -6,6 +7,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace _66SMS.Application.Features.MembershipCards.Commands.CreateMembershipCards
@@ -34,13 +36,17 @@ namespace _66SMS.Application.Features.MembershipCards.Commands.CreateMembershipC
 
         public async Task<Result<int>> Handle(CreateMembershipCardCommand request, CancellationToken cancellationToken)
         {
-            Customer customer = await customerSqlRepository.FindByIdAsync(request.CustomerId);
+            Customer? customer = await customerSqlRepository.FindByIdAsync(request.CustomerId);
             if (customer == null)
             {
                 return Result<int>.NotFound(CustomerConst.MSG_CUSTOMER_NOT_FOUND, ErrorCodes.ERR_CUSTOMER_NOT_FOUND);
             }
 
-            MembershipTier tier = await membershipTierSqlRepository.FindByIdAsync(request.MembershipTierId);
+            MembershipTier? tier = await membershipTierSqlRepository
+               .AsQueryable()
+               .Where(x => x.Id == request.MembershipTierId! || x.Name.Equals(request.MembershipTierName))
+               .FirstOrDefaultAsync(cancellationToken);
+
             if (tier == null)
             {
                 return Result<int>.NotFound(MembershipTierConst.MSG_MEMBERSHIP_TIER_NOT_FOUND, ErrorCodes.ERR_MEMBERSHIP_TIER_NOT_FOUND);
@@ -50,20 +56,29 @@ namespace _66SMS.Application.Features.MembershipCards.Commands.CreateMembershipC
             try
             {
                 MembershipCard membershipCard = mapper.Map<MembershipCard>(request);
-                membershipCard.CreatedAt = DateTime.UtcNow;
+                membershipCard.MembershipTierId = tier.Id;
+                membershipCard.CardCode = GenerateCardCode();
                 membershipCard.CreatedBy = request.CreatedBy ?? 1;
 
                 membershipCardSqlRepository.Add(membershipCard);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 transaction.Commit();
-                return Result<int>.Success(membershipCard.Id);
+
+                return Result<int>.Created(membershipCard.Id);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 transaction.Rollback();
-                return Result<int>.Failure(500, $"An error occurred while creating membership card: {ex.Message}");
+                throw;
             }
+        }
+
+        private string GenerateCardCode()
+        {
+            string random = Random.Shared.Next(100000,999999).ToString();
+            string dateNowStr = DateTimeHelper.VietnamNowString("HHmmss");
+            return $"LOTUS{dateNowStr}{random}";
         }
     }
 }

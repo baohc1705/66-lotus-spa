@@ -11,7 +11,6 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_DATE_OF_BIRTH = "date_of_birth";
         public const string FIELD_GENDER = "gender";
         public const string FIELD_PHONE = "phone";
-        public const string FIELD_TIER = "tier";
         public const string FIELD_LOYALTY_POINT = "loyalty_point";
         public const string FIELD_FIRST_PURCHASE_AT = "first_purchase_at";
         public const string FIELD_LAST_PURCHASE_AT = "last_purchase_at";
@@ -32,7 +31,6 @@ namespace _66SMS.Domain.Constants
         public const int FULL_NAME_MAX_LENGTH = 100;
         public const int AVATAR_URL_MAX_LENGTH = 500;
         public const int PHONE_MAX_LENGTH = 20;
-        public const int TIER_MAX_LENGTH = 20;
         public const int SOURCE_MAX_LENGTH = 100;
         public const int NOTE_MAX_LENGTH = 500;
         public const int STREET_ADDRESS_MAX_LENGTH = 200;

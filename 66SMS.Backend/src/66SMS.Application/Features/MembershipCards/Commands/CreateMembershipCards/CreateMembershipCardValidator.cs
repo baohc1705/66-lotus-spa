@@ -8,8 +8,7 @@ namespace _66SMS.Application.Features.MembershipCards.Commands.CreateMembershipC
         public CreateMembershipCardValidator()
         {
             RuleFor(x => x.CustomerId).NotEmpty();
-            RuleFor(x => x.MembershipTierId).NotEmpty();
-            RuleFor(x => x.CardCode).NotEmpty().MaximumLength(MembershipCardConst.CARD_CODE_MAX_LENGTH);
+            RuleFor(x => x.CardCode).MaximumLength(MembershipCardConst.CARD_CODE_MAX_LENGTH);
         }
     }
 }

@@ -28,7 +28,7 @@ namespace _66SMS.Application.Features.Customers.Commands.UpdateCustomer
             try
             {
                 // Update customer
-                Customer? customer = await customerSqlRepository.FindByIdAsync((int)request.Id, false);
+                Customer? customer = await customerSqlRepository.FindByIdAsync((int)request.Id!, false);
                 if (customer == null) return Result<object>.NotFound();
                 mapper.Map(request, customer);
                 customer.UpdatedAt = DateTime.UtcNow;
@@ -39,9 +39,9 @@ namespace _66SMS.Application.Features.Customers.Commands.UpdateCustomer
                 // Update user if request not null
                 if (request.UserName != null || request.Email != null)
                 {
-                    User? user = await userSqlRepository.FindByIdAsync(customer.UserId, false);
+                    User? user = await userSqlRepository.FindByIdAsync((int)customer.UserId!, false);
                     mapper.Map(request, user);
-                    user.UpdatedAt = DateTime.UtcNow;
+                    user!.UpdatedAt = DateTime.UtcNow;
                     user.UpdatedBy = request.UpdatedBy;
                     userSqlRepository.Update(user);
                     await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

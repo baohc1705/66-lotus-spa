@@ -6,10 +6,10 @@ namespace _66SMS.Domain.Entities
     {
         public int UserId { get; set; }
         public int RoleId { get; set; }
-        public DateTime AssignedAt { get; set; }
+        public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
         public int? AssignedBy { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public int? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public int? UpdatedBy { get; set; }

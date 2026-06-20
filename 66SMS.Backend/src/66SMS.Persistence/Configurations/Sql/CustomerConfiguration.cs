@@ -18,7 +18,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.DateOfBirth).HasColumnName(CustomerConst.FIELD_DATE_OF_BIRTH);
             builder.Property(x => x.Gender).HasColumnName(CustomerConst.FIELD_GENDER).HasConversion<int>();
             builder.Property(x => x.Phone).HasColumnName(CustomerConst.FIELD_PHONE).HasMaxLength(CustomerConst.PHONE_MAX_LENGTH);
-            builder.Property(x => x.Tier).HasColumnName(CustomerConst.FIELD_TIER).HasMaxLength(CustomerConst.TIER_MAX_LENGTH);
             builder.Property(x => x.LoyaltyPoint).HasColumnName(CustomerConst.FIELD_LOYALTY_POINT);
             builder.Property(x => x.FirstPurchaseAt).HasColumnName(CustomerConst.FIELD_FIRST_PURCHASE_AT);
             builder.Property(x => x.LastPurchaseAt).HasColumnName(CustomerConst.FIELD_LAST_PURCHASE_AT);
@@ -35,7 +34,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.UpdatedBy).HasColumnName(CustomerConst.FIELD_UPDATED_BY);
             builder.HasOne(x => x.User).WithOne(x => x.Customer).HasForeignKey<Customer>(x => x.UserId).IsRequired(false);
             builder.ToTable(CustomerConst.TABLE_NAME);
-            builder.HasQueryFilter(x => x.Status != CustomerConst.STATUS_DELETED);
         }
     }
 }

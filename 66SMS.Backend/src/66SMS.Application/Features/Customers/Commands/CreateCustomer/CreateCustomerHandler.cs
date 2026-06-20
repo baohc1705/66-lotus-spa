@@ -3,12 +3,12 @@ using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using _66SMS.Domain.Constants;
 
 namespace _66SMS.Application.Features.Customers.Commands.CreateCustomer
 {
