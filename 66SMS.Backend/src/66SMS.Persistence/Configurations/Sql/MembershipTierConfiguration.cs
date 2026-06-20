@@ -12,9 +12,9 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).HasColumnName(MembershipTierConst.FIELD_ID);
             builder.Property(x => x.Name).HasColumnName(MembershipTierConst.FIELD_NAME).HasMaxLength(MembershipTierConst.NAME_MAX_LENGTH);
-            builder.Property(x => x.MinSpending).HasColumnName(MembershipTierConst.FIELD_MIN_SPENDING);
+            builder.Property(x => x.MinSpending).HasColumnName(MembershipTierConst.FIELD_MIN_SPENDING).HasColumnType("decimal(18, 0)");
             builder.Property(x => x.DiscountPercent).HasColumnName(MembershipTierConst.FIELD_DISCOUNT_PERCENT);
-            builder.Property(x => x.PointMultiplier).HasColumnName(MembershipTierConst.FIELD_POINT_MULTIPLIER);
+            builder.Property(x => x.PointMultiplier).HasColumnName(MembershipTierConst.FIELD_POINT_MULTIPLIER).HasColumnType("decimal(5, 2)");
             builder.Property(x => x.Benefits).HasColumnName(MembershipTierConst.FIELD_BENEFITS).HasMaxLength(MembershipTierConst.BENEFITS_MAX_LENGTH);
             builder.Property(x => x.Status).HasColumnName(MembershipTierConst.FIELD_STATUS);
             builder.Property(x => x.CreatedAt).HasColumnName(MembershipTierConst.FIELD_CREATED_AT);

@@ -13,7 +13,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.Id).HasColumnName(AppointmentServiceConst.FIELD_ID);
             builder.Property(x => x.AppointmentId).HasColumnName(AppointmentServiceConst.FIELD_APPOINTMENT_ID);
             builder.Property(x => x.ServiceId).HasColumnName(AppointmentServiceConst.FIELD_SERVICE_ID);
-            builder.Property(x => x.PriceSnapshot).HasColumnName(AppointmentServiceConst.FIELD_PRICE_SNAPSHOT);
+            builder.Property(x => x.PriceSnapshot).HasColumnName(AppointmentServiceConst.FIELD_PRICE_SNAPSHOT).HasColumnType("decimal(18, 0)");
             builder.Property(x => x.DurationSnapshot).HasColumnName(AppointmentServiceConst.FIELD_DURATION_SNAPSHOT);
             builder.Property(x => x.Quantity).HasColumnName(AppointmentServiceConst.FIELD_QUANTITY);
             builder.Property(x => x.Status).HasColumnName(AppointmentServiceConst.FIELD_STATUS);

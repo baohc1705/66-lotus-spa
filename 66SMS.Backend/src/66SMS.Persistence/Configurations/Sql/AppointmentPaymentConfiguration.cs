@@ -13,8 +13,8 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.Id).HasColumnName(AppointmentPaymentConst.FIELD_ID);
             builder.Property(x => x.AppointmentId).HasColumnName(AppointmentPaymentConst.FIELD_APPOINTMENT_ID);
             builder.Property(x => x.Phase).HasColumnName(AppointmentPaymentConst.FIELD_PHASE);
-            builder.Property(x => x.Amount).HasColumnName(AppointmentPaymentConst.FIELD_AMOUNT);
-            builder.Property(x => x.RefundedAmount).HasColumnName(AppointmentPaymentConst.FIELD_REFUNDED_AMOUNT);
+            builder.Property(x => x.Amount).HasColumnName(AppointmentPaymentConst.FIELD_AMOUNT).HasColumnType("decimal(18, 0)");
+            builder.Property(x => x.RefundedAmount).HasColumnName(AppointmentPaymentConst.FIELD_REFUNDED_AMOUNT).HasColumnType("decimal(18, 0)");
             builder.Property(x => x.Method).HasColumnName(AppointmentPaymentConst.FIELD_METHOD);
             builder.Property(x => x.TransactionId).HasColumnName(AppointmentPaymentConst.FIELD_TRANSACTION_ID).HasMaxLength(AppointmentPaymentConst.TRANSACTION_ID_MAX_LENGTH);
             builder.Property(x => x.DueDate).HasColumnName(AppointmentPaymentConst.FIELD_DUE_DATE);

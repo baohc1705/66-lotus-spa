@@ -23,8 +23,8 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.Source).HasColumnName(AppointmentConst.FIELD_SOURCE);
             builder.Property(x => x.Status).HasColumnName(AppointmentConst.FIELD_STATUS);
             builder.Property(x => x.Note).HasColumnName(AppointmentConst.FIELD_NOTE).HasMaxLength(AppointmentConst.NOTE_MAX_LENGTH);
-            builder.Property(x => x.TotalAmount).HasColumnName(AppointmentConst.FIELD_TOTAL_AMOUNT);
-            builder.Property(x => x.PaidAmount).HasColumnName(AppointmentConst.FIELD_PAID_AMOUNT);
+            builder.Property(x => x.TotalAmount).HasColumnName(AppointmentConst.FIELD_TOTAL_AMOUNT).HasColumnType("decimal(18, 0)");
+            builder.Property(x => x.PaidAmount).HasColumnName(AppointmentConst.FIELD_PAID_AMOUNT).HasColumnType("decimal(18, 0)");
             builder.Property(x => x.DepositPercent).HasColumnName(AppointmentConst.FIELD_DEPOSIT_PERCENT);
             builder.Property(x => x.DepositDeadlineAt).HasColumnName(AppointmentConst.FIELD_DEPOSIT_DEADLINE_AT);
             builder.Property(x => x.DepositRequestedAt).HasColumnName(AppointmentConst.FIELD_DEPOSIT_REQUESTED_AT);
