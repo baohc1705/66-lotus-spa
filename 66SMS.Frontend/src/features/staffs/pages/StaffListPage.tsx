@@ -261,9 +261,9 @@ export function StaffListPage() {
           return (
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-lotus-leaf/10 flex items-center justify-center shrink-0 overflow-hidden">
-                {staff.image ? (
+                {staff.avatarUrl ? (
                   <img
-                    src={staff.image}
+                    src={staff.avatarUrl}
                     alt=""
                     className="w-8 h-8 object-cover"
                   />
@@ -343,7 +343,9 @@ export function StaffListPage() {
         header: "Ngày tạo",
         cell: ({ row }) => (
           <span className="text-lotus-deep/70">
-            {row.original.createdAt ? formatDate(row.original.createdAt).format("DD/MM/YYYY") : "—"}
+            {row.original.createdAt
+              ? formatDate(row.original.createdAt).format("DD/MM/YYYY")
+              : "—"}
           </span>
         ),
         size: 120,

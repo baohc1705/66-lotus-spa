@@ -87,3 +87,24 @@ export class DateUtil {
 export function formatDate(date?: Date | string | number | DateUtil) {
   return new DateUtil(date);
 }
+
+export function formatDisplayDate(val?: string | null): string {
+  if (!val) return "";
+  if (val.includes("/") && val.length === 10) {
+    return val;
+  }
+  if (val.length >= 10 && val.indexOf("-") === 4) {
+    const [year, month, day] = val.substring(0, 10).split("-");
+    return `${day}/${month}/${year}`;
+  }
+  return val;
+}
+
+export function parseToDateInput(val?: string | null): string {
+  if (!val) return "";
+  if (val.includes("/") && val.length === 10) {
+    const [day, month, year] = val.split("/");
+    return `${year}-${month}-${day}`;
+  }
+  return val.substring(0, 10);
+}

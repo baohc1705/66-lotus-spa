@@ -28,7 +28,10 @@ import { SearchableSelect } from "@/shared/components/ui/searchable-select";
 import { useCreateStaff, useUpdateStaff } from "../hooks/useStaffs";
 import { uploadApi } from "@/shared/api/upload.api";
 import { ImageUpload } from "@/shared/components/ImageUpload";
-import { useProvinces, useWardsByProvince } from "@/features/address/hooks/useAddress";
+import {
+  useProvinces,
+  useWardsByProvince,
+} from "@/features/address/hooks/useAddress";
 import {
   createStaffSchema,
   updateStaffSchema,
@@ -38,6 +41,8 @@ import {
 } from "../schemas/staff.schema";
 
 import type { StaffDto } from "../types/staff.types";
+import { parseToDateInput } from "@/shared/utils/date.utils";
+import { useGetAllRoles } from "@/features/auth/hooks/useGetAllRoles";
 import { Briefcase, KeyRound, User } from "lucide-react";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useSalons } from "@/features/salons/hooks/useSalons";
@@ -55,10 +60,9 @@ const GENDER_OPTIONS = [
 ];
 
 const CONTRACT_TYPE_OPTIONS = [
-  { value: "Toàn thời gian", label: "Toàn thời gian" },
-  { value: "Bán thời gian", label: "Bán thời gian" },
-  { value: "Thời vụ", label: "Thời vụ" },
-  { value: "Thử việc", label: "Thử việc" },
+  { value: "fulltime", label: "Toàn thời gian" },
+  { value: "parttime", label: "Bán thời gian" },
+  { value: "probation", label: "Thử việc" },
 ];
 
 const STATUS_OPTIONS = [
@@ -74,9 +78,11 @@ export function StaffFormDialog({
 }: StaffFormDialogProps) {
   const isEdit = !!staff;
   const managedSalonId = useAuthStore((s) => s.managedSalonId);
-  const isAdmin = managedSalonId === null;
+  //const isAdmin = managedSalonId === null;
   const { data: salonsResult } = useSalons({ pageIndex: 1, pageSize: 100 });
   const salons = salonsResult?.data?.items ?? [];
+  const { data: rolesResult } = useGetAllRoles();
+  const roles = rolesResult?.data ?? [];
 
   const createMutation = useCreateStaff();
   const updateMutation = useUpdateStaff();
@@ -89,7 +95,7 @@ export function StaffFormDialog({
     resolver: zodResolver(
       isEdit ? updateStaffSchema : createStaffSchema,
     ) as Resolver<StaffFormValues>,
-    defaultValues: getDefaultValues(staff),
+    defaultValues: getDefaultValues(staff, managedSalonId),
   });
 
   const {
@@ -111,31 +117,50 @@ export function StaffFormDialog({
   useEffect(() => {
     if (open) {
       setPendingFile(null);
-      reset(getDefaultValues(staff));
+      reset(getDefaultValues(staff, managedSalonId));
     }
-  }, [open, staff, reset]);
+  }, [open, staff, reset, managedSalonId]);
 
   const onSubmit = async (data: StaffFormValues) => {
     setIsUploading(true);
     try {
-      let avatarUrl = data.avatarUrl ?? '';
+      let avatarUrl = data.avatarUrl ?? "";
       if (pendingFile) {
-        const result = await uploadApi.uploadImage(pendingFile, 'staff');
-        avatarUrl = (result.isSuccess && result.data) ? result.data : '';
+        const result = await uploadApi.uploadImage(pendingFile, "staff");
+        avatarUrl = result.isSuccess && result.data ? result.data : "";
       }
-      const provinceName = provincesQuery.data?.data?.find(p => p.code === data.provinceCode)?.name ?? "";
-      const wardName = wardsQuery.data?.data?.find(w => w.code === data.wardCode)?.name ?? "";
-      const parts = [data.streetAddress, wardName, provinceName].filter(Boolean);
-      const payload = { ...data, avatarUrl, fullAddress: parts.join(", ") };
+      const provinceName =
+        provincesQuery.data?.data?.find((p) => p.code === data.provinceCode)
+          ?.name ?? "";
+      const wardName =
+        wardsQuery.data?.data?.find((w) => w.code === data.wardCode)?.name ??
+        "";
+      const parts = [data.streetAddress, wardName, provinceName].filter(
+        Boolean,
+      );
+
+      const payload: StaffFormValues = {
+        ...data,
+        avatarUrl,
+        fullAddress: parts.join(", "),
+        dateOfBirth: data.dateOfBirth || undefined,
+        hireDate: data.hireDate || undefined,
+      };
 
       if (isEdit && staff?.id) {
         updateMutation.mutate(
           { id: staff.id, payload: payload as UpdateStaffFormData },
-          { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false); } },
+          {
+            onSuccess: (result) => {
+              if (result.isSuccess) onOpenChange(false);
+            },
+          },
         );
       } else {
         createMutation.mutate(payload as CreateStaffFormData, {
-          onSuccess: (result) => { if (result.isSuccess) onOpenChange(false); },
+          onSuccess: (result) => {
+            if (result.isSuccess) onOpenChange(false);
+          },
         });
       }
     } finally {
@@ -190,9 +215,9 @@ export function StaffFormDialog({
                   className="h-9 text-[13px]"
                 />
               </FormField>
-              <FormField label="Ngày sinh" error={errors.dob?.message}>
+              <FormField label="Ngày sinh" error={errors.dateOfBirth?.message}>
                 <Input
-                  {...register("dob")}
+                  {...register("dateOfBirth")}
                   type="date"
                   className="h-9 text-[13px]"
                 />
@@ -221,14 +246,20 @@ export function StaffFormDialog({
                   className="h-9 text-[13px]"
                 />
               </FormField>
-              <FormField label="Tỉnh/Thành phố" error={errors.provinceCode?.message}>
+              <FormField
+                label="Tỉnh/Thành phố"
+                error={errors.provinceCode?.message}
+              >
                 <SearchableSelect
                   value={watch("provinceCode") ?? ""}
-                  onValueChange={v => {
+                  onValueChange={(v) => {
                     setValue("provinceCode", v);
                     setValue("wardCode", "");
                   }}
-                  options={(provincesQuery.data?.data ?? []).map(p => ({ value: p.code ?? "", label: p.name ?? "" }))}
+                  options={(provincesQuery.data?.data ?? []).map((p) => ({
+                    value: p.code ?? "",
+                    label: p.name ?? "",
+                  }))}
                   placeholder="Chọn tỉnh/thành phố"
                   searchPlaceholder="Tìm tỉnh/thành phố..."
                   className="h-9"
@@ -237,15 +268,22 @@ export function StaffFormDialog({
               <FormField label="Phường/Xã" error={errors.wardCode?.message}>
                 <SearchableSelect
                   value={watch("wardCode") ?? ""}
-                  onValueChange={v => setValue("wardCode", v)}
-                  options={(wardsQuery.data?.data ?? []).map(w => ({ value: w.code ?? "", label: w.name ?? "" }))}
+                  onValueChange={(v) => setValue("wardCode", v)}
+                  options={(wardsQuery.data?.data ?? []).map((w) => ({
+                    value: w.code ?? "",
+                    label: w.name ?? "",
+                  }))}
                   placeholder="Chọn phường/xã"
                   searchPlaceholder="Tìm phường/xã..."
                   disabled={!watch("provinceCode") || wardsQuery.isLoading}
                   className="h-9"
                 />
               </FormField>
-              <FormField label="Số nhà, tên đường" error={errors.streetAddress?.message} className="sm:col-span-2">
+              <FormField
+                label="Số nhà, tên đường"
+                error={errors.streetAddress?.message}
+                className="sm:col-span-2"
+              >
                 <Input
                   {...register("streetAddress")}
                   placeholder="123 Đường ABC"
@@ -258,29 +296,39 @@ export function StaffFormDialog({
           {/* === Section: Thông tin công việc === */}
           <FormSection icon={Briefcase} title="Thông tin công việc">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-              {isAdmin && !isEdit && (
-                <FormField
-                  label="Chi nhánh *"
-                  tooltip="Chọn chi nhánh mà nhân viên này thuộc về"
-                  error={(errors as Record<string, { message?: string }>).salonId?.message}
+              <FormField
+                label="Chi nhánh *"
+                tooltip="Chọn chi nhánh mà nhân viên này thuộc về"
+                error={
+                  (errors as Record<string, { message?: string }>).salonId
+                    ?.message
+                }
+              >
+                <Select
+                  value={watch("salonId")?.toString() ?? ""}
+                  onValueChange={(v) => setValue("salonId", Number(v))}
+                  disabled={salonsResult === undefined}
                 >
-                  <Select
-                    value={watch("salonId")?.toString() ?? ""}
-                    onValueChange={(v) => setValue("salonId", Number(v))}
-                  >
-                    <SelectTrigger className="h-9 text-[13px]">
-                      <SelectValue placeholder="Chọn chi nhánh..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {salons.map((s) => (
-                        <SelectItem key={s.id} value={String(s.id)}>
-                          {s.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
-              )}
+                  <SelectTrigger className="h-9 text-[13px]">
+                    <SelectValue
+                      placeholder={
+                        salonsResult === undefined
+                          ? "Đang tải chi nhánh..."
+                          : salons.length === 0
+                            ? "Không có chi nhánh"
+                            : "Chọn chi nhánh..."
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {salons.map((s) => (
+                      <SelectItem key={s.id} value={String(s.id)}>
+                        {s.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormField>
               <FormField label="Ngày vào làm" error={errors.hireDate?.message}>
                 <Input
                   {...register("hireDate")}
@@ -333,102 +381,49 @@ export function StaffFormDialog({
                   </SelectContent>
                 </Select>
               </FormField>
+              <FormField label="Vai trò *" error={errors.role?.message}>
+                <Select
+                  value={watch("role") ?? ""}
+                  onValueChange={(v) => setValue("role", v)}
+                  disabled={rolesResult === undefined}
+                >
+                  <SelectTrigger className="h-9 text-[13px]">
+                    <SelectValue
+                      placeholder={
+                        rolesResult === undefined
+                          ? "Đang tải vai trò..."
+                          : roles.length === 0
+                            ? "Không có vai trò"
+                            : "Chọn vai trò..."
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roles.map((r) => (
+                      <SelectItem key={r.id} value={r.name}>
+                        {r.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormField>
             </div>
           </FormSection>
 
-          {/* === Section: Tài khoản (chỉ khi tạo mới) === */}
           {!isEdit && (
-            <FormSection icon={KeyRound} title="Tài khoản đăng nhập">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                <FormField
-                  label="Tên tài khoản *"
-                  tooltip="Tên đăng nhập viết liền, không dấu, không chứa ký tự đặc biệt"
-                  error={
-                    (errors as Record<string, { message?: string }>).userName
-                      ?.message
-                  }
-                >
-                  <Input
-                    {...register("userName")}
-                    placeholder="nguyenvana"
-                    className="h-9 text-[13px]"
-                  />
-                </FormField>
-                <FormField
-                  label="Email *"
-                  tooltip="Địa chỉ email hợp lệ (ví dụ: user@example.com)"
-                  error={errors.email?.message}
-                >
-                  <Input
-                    {...register("email")}
-                    type="email"
-                    placeholder="nv@hoasenspa.com"
-                    className="h-9 text-[13px]"
-                  />
-                </FormField>
-                <FormField
-                  label="Mật khẩu *"
-                  tooltip="Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường và số"
-                  error={
-                    (errors as Record<string, { message?: string }>).password
-                      ?.message
-                  }
-                >
-                  <Input
-                    {...register("password")}
-                    type="password"
-                    placeholder="••••••••"
-                    className="h-9 text-[13px]"
-                  />
-                </FormField>
-                <FormField
-                  label="Xác nhận mật khẩu *"
-                  tooltip="Nhập lại mật khẩu khớp với mật khẩu ở trên"
-                  error={
-                    (errors as Record<string, { message?: string }>)
-                      .confirmPassword?.message
-                  }
-                >
-                  <Input
-                    {...register("confirmPassword")}
-                    type="password"
-                    placeholder="••••••••"
-                    className="h-9 text-[13px]"
-                  />
-                </FormField>
+            <div className="p-3.5 bg-lotus-leaf/5 border border-lotus-leaf/10 rounded-lg text-lotus-deep/80 text-[12px] flex items-start gap-2.5">
+              <KeyRound className="w-4 h-4 text-lotus-leaf mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold text-lotus-deep">
+                  Tài khoản đăng nhập tự động
+                </p>
+                <p className="text-stone-500 mt-0.5">
+                  Tài khoản (Tên đăng nhập & Mật khẩu mặc định) sẽ được hệ thống
+                  tạo tự động dựa trên mã nhân viên sau khi bạn nhấn nút tạo
+                  mới.
+                </p>
               </div>
-            </FormSection>
-          )}
-
-          {/* === Account fields khi edit === */}
-          {isEdit && (
-            <FormSection icon={KeyRound} title="Tài khoản">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                <FormField
-                  label="Tên tài khoản *"
-                  tooltip="Tên đăng nhập viết liền, không dấu"
-                  error={errors.userName?.message}
-                >
-                  <Input
-                    {...register("userName")}
-                    placeholder="nguyenvana"
-                    className="h-9 text-[13px]"
-                  />
-                </FormField>
-                <FormField
-                  label="Email *"
-                  tooltip="Địa chỉ email hợp lệ"
-                  error={errors.email?.message}
-                >
-                  <Input
-                    {...register("email")}
-                    type="email"
-                    placeholder="nv@hoasenspa.com"
-                    className="h-9 text-[13px]"
-                  />
-                </FormField>
-              </div>
-            </FormSection>
+            </div>
           )}
 
           <DialogFooter>
@@ -441,7 +436,12 @@ export function StaffFormDialog({
             >
               Hủy
             </Button>
-            <Button type="submit" variant="admin" size="sm" loading={isPending || isUploading}>
+            <Button
+              type="submit"
+              variant="admin"
+              size="sm"
+              loading={isPending || isUploading}
+            >
               {isEdit ? "Cập nhật" : "Tạo nhân viên"}
             </Button>
           </DialogFooter>
@@ -490,7 +490,7 @@ function FormField({
   const cleanLabel = label.replace("*", "").trim();
 
   return (
-    <div className={`space-y-1 ${className ?? ''}`}>
+    <div className={`space-y-1 ${className ?? ""}`}>
       <Label className="flex items-center gap-1 text-[12px] font-semibold text-lotus-deep/80">
         {cleanLabel}
         {isRequired &&
@@ -517,31 +517,35 @@ function FormField({
 
 // ---- Default Values ----
 
-function getDefaultValues(staff?: StaffDto | null): StaffFormValues {
+function getDefaultValues(
+  staff?: StaffDto | null,
+  managedSalonId?: number | null,
+): StaffFormValues {
   if (staff) {
     return {
+      salonId: staff.salonId ?? managedSalonId ?? undefined,
       fullName: staff.fullName ?? "",
       phone: staff.phone ?? "",
-      dob: staff.dob ?? "",
+      dateOfBirth: parseToDateInput(staff.dateOfBirth),
       gender: staff.gender ? Number(staff.gender) : undefined,
       nationalId: staff.nationalId ?? "",
       avatarUrl: staff.avatarUrl ?? "",
-      hireDate: staff.hireDate ?? "",
+      hireDate: parseToDateInput(staff.hireDate),
       contractType: staff.contractType ?? "",
       basicSalary: staff.basicSalary ?? undefined,
       status: staff.status ? Number(staff.status) : 1,
+      role: staff.role ?? "staff",
       streetAddress: staff.streetAddress ?? "",
       provinceCode: staff.provinceCode ?? "",
       wardCode: staff.wardCode ?? "",
       fullAddress: staff.fullAddress ?? "",
-      userName: staff.username ?? "",
-      email: staff.email ?? "",
     };
   }
   return {
+    salonId: managedSalonId ?? undefined,
     fullName: "",
     phone: "",
-    dob: "",
+    dateOfBirth: "",
     gender: undefined,
     nationalId: "",
     avatarUrl: "",
@@ -549,13 +553,10 @@ function getDefaultValues(staff?: StaffDto | null): StaffFormValues {
     contractType: "",
     basicSalary: undefined,
     status: 1,
+    role: "staff",
     streetAddress: "",
     provinceCode: "",
     wardCode: "",
     fullAddress: "",
-    userName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
   };
 }
