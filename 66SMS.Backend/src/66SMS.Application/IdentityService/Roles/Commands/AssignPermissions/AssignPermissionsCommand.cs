@@ -3,9 +3,12 @@ using MediatR;
 
 namespace _66SMS.Application.IdentityService.Roles.Commands.AssignPermissions
 {
+    /// <summary>
+    /// Assign permission to role request
+    /// </summary>
     public class AssignPermissionsCommand : IRequest<Result<object>>
     {
-        public int RoleId { get; set; }
-        public List<int> PermissionIds { get; set; } = null!;
+        public int? RoleId { get; set; }
+        public List<int>? PermissionIds { get; set; } = null!;
     }
 }

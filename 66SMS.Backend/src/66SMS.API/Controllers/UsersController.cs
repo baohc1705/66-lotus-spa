@@ -3,14 +3,16 @@ using _66SMS.Application.IdentityService.Users.Commands.DeleteUser;
 using _66SMS.Application.IdentityService.Users.Commands.UpdateUser;
 using _66SMS.Application.IdentityService.Users.Queries.GetAllUsers;
 using _66SMS.Application.IdentityService.Users.Queries.GetDetailUser;
+using _66SMS.Application.IdentityService.Users.Queries.GetMyMembershipCard;
+using _66SMS.Application.IdentityService.Users.Queries.GetMyWallet;
+using _66SMS.Application.IdentityService.Users.Queries.GetMyWalletTransactions;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Infrastructure.Security;
+using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-using Asp.Versioning;
 
 namespace _66SMS.API.Controllers
 {
@@ -48,7 +50,6 @@ namespace _66SMS.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = "admin")]
-        [PermissionAuthorize("users", "read")]
         public async Task<IActionResult> GetAll([FromQuery] GetAllUserQuery query)
         {
             var result = await mediator.Send(query);
@@ -56,7 +57,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpDelete]
-        [PermissionAuthorize("users", "delete")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteUser([FromBody] DeleteUserCommand command)
         {
             command.UpdatedBy = jwtService.GetUserId();
@@ -77,7 +78,7 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetMyWallet()
         {
-            var result = await mediator.Send(new Application.IdentityService.Users.Queries.GetMyWallet.GetMyWalletQuery 
+            var result = await mediator.Send(new GetMyWalletQuery 
             { 
                 UserId = jwtService.GetUserId() 
             });
@@ -88,7 +89,7 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetMyWalletTransactions()
         {
-            var result = await mediator.Send(new Application.IdentityService.Users.Queries.GetMyWalletTransactions.GetMyWalletTransactionsQuery 
+            var result = await mediator.Send(new GetMyWalletTransactionsQuery 
             { 
                 UserId = jwtService.GetUserId() 
             });
@@ -99,7 +100,7 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetMyMembershipCard()
         {
-            var result = await mediator.Send(new Application.IdentityService.Users.Queries.GetMyMembershipCard.GetMyMembershipCardQuery 
+            var result = await mediator.Send(new GetMyMembershipCardQuery
             { 
                 UserId = jwtService.GetUserId() 
             });

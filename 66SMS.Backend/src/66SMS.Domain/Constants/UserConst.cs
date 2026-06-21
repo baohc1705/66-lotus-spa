@@ -48,6 +48,7 @@ namespace _66SMS.Domain.Constants
         public const string MSG_USER_INVALID_TOKEN = "Token is invalid.";
         public const string MSG_USER_TOKEN_REVOKED = "Token has been revoked.";
         public const string MSG_USER_REFRESH_TOKEN_EXPIRED = "Refresh token has expired.";
+        public const string MSG_USER_LOCKOUT_TIMEOUT = "Account is locked. Try again after {0}";
         #endregion
     }
 }

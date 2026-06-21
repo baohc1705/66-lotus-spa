@@ -4,7 +4,7 @@ using MediatR;
 
 namespace _66SMS.Application.IdentityService.Users.Queries.GetDetailUser
 {
-    public class GetDetailUserQuery : IRequest<Result<UserDto>>
+    public class GetDetailUserQuery : IRequest<Result<UserFullDto>>
     {
         public int Id { get; set; }
     }

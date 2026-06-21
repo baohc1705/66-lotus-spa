@@ -3,6 +3,9 @@ using MediatR;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.ForgotPassword
 {
+    /// <summary>
+    /// Request to forgot password
+    /// </summary>
     public record ForgotPasswordCommand : IRequest<Result<object>>
     {
         public string? Email {get; set;}

@@ -3,6 +3,9 @@ using MediatR;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.ChangePassword
 {
+    /// <summary>
+    /// Request to change password
+    /// </summary>
     public record ChangePasswordCommand : IRequest<Result<object>>
     {
         public int? Id { get; set; }

@@ -5,10 +5,13 @@ using System.Text.Json.Serialization;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.Login
 {
+    /// <summary>
+    /// Request for login
+    /// </summary>
     public class LoginCommand : IRequest<Result<TokenResponseDTO>>
     {
-        public string UsernameOrEmail { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+        public string UsernameOrEmail { get; set; } = null!;
+        public string Password { get; set; } = null!;
         [JsonIgnore]
         public string? IpAddress { get; set; }
     }

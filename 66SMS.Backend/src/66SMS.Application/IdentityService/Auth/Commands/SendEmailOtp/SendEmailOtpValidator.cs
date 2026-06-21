@@ -3,6 +3,9 @@ using FluentValidation;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.SendEmailOtp
 {
+    /// <summary>
+    /// Validator for <see cref="SendEmailOtpCommand"/>
+    /// </summary>
     public class SendEmailOtpValidator : AbstractValidator<SendEmailOtpCommand>
     {
         public SendEmailOtpValidator()

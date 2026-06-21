@@ -4,7 +4,10 @@ using MediatR;
 
 namespace _66SMS.Application.IdentityService.Users.Queries.GetAllUsers
 {
-    public class GetAllUserQuery : PageRequest, IRequest<Result<PagedResult<UserDto>>>
+    /// <summary>
+    /// Get all user request
+    /// </summary>
+    public class GetAllUserQuery : PageRequest, IRequest<Result<PagedResult<UserFullDto>>>
     {
     }
 }

@@ -2,8 +2,6 @@ using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace _66SMS.Application.IdentityService.Users.Queries.GetMyWallet
 {

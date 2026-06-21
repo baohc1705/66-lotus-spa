@@ -3,6 +3,9 @@ using FluentValidation;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.ForgotPassword
 {
+    /// <summary>
+    /// Validator for <see cref="ForgotPasswordCommand"/>
+    /// </summary>
     public class ForgotPasswordValidator : AbstractValidator<ForgotPasswordCommand>
     {
         public ForgotPasswordValidator()

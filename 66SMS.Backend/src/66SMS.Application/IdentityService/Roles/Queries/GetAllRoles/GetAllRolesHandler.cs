@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.IdentityService.Roles.Queries.GetAllRoles
 {
+    /// <summary>
+    /// Handler for <see cref="GetAllRoleQuery"/>
+    /// </summary>
     public class GetAllRolesHandler : IRequestHandler<GetAllRoleQuery, Result<List<RoleDTO>>>
     {
         private readonly IRoleSqlRepository roleSqlRepository;

@@ -1,6 +1,6 @@
 namespace _66SMS.Application.DTOs.Users
 {
-    public class UserDto
+    public class UserFullDto
     {
         public int Id { get; set; }
         public string Username { get; set; } = string.Empty;

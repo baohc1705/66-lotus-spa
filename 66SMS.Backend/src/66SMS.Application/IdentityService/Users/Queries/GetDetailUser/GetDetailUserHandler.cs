@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.IdentityService.Users.Queries.GetDetailUser
 {
-    public class GetDetailUserHandler : IRequestHandler<GetDetailUserQuery, Result<UserDto>>
+    public class GetDetailUserHandler : IRequestHandler<GetDetailUserQuery, Result<UserFullDto>>
     {
         private readonly IUserSqlRepository userSqlRepository;
         private readonly IUserRoleSqlRepository userRoleSqlRepository;
@@ -29,19 +29,19 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetDetailUser
             this.customerSqlRepository = customerSqlRepository;
         }
 
-        public async Task<Result<UserDto>> Handle(GetDetailUserQuery request, CancellationToken cancellationToken)
+        public async Task<Result<UserFullDto>> Handle(GetDetailUserQuery request, CancellationToken cancellationToken)
         {
             User? user = await userSqlRepository.AsQueryable()
                 .Where(x => x.Id == request.Id)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user == null)
-                return Result<UserDto>.NotFound(UserConst.MSG_USER_NOT_FOUND, ErrorCodes.ERR_USER_NOT_FOUND);
+                return Result<UserFullDto>.NotFound(UserConst.MSG_USER_NOT_FOUND, ErrorCodes.ERR_USER_NOT_FOUND);
 
             Role? role = await userRoleSqlRepository.GetRoleByUserIdAsync(user.Id, cancellationToken);
             List<string>? permissions = role == null ? [] : await userRoleSqlRepository.GetPermissionKeysByUserIdAndRoleIdAsync(user.Id, role.Id, cancellationToken);
 
-            UserDto userDto = new()
+            UserFullDto userDto = new()
             {
                 Id = user.Id,
                 Username = user.Username,
@@ -97,7 +97,7 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetDetailUser
                 }
             }
 
-            return Result<UserDto>.Success(userDto);
+            return Result<UserFullDto>.Success(userDto);
         }
     }
 }

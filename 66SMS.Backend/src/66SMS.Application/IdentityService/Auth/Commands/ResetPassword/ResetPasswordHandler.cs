@@ -24,10 +24,14 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.ResetPassword
 
         public async Task<Result<object>> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
         {
-            User? user = await userSqlRepository.AsQueryable(asNoTracking: false).Where(x => x.Email.Equals(request.Email)).FirstOrDefaultAsync(cancellationToken) ?? throw GlobalException.NotFound("User not found");
+            string email = request.Email!.Trim().ToLowerInvariant();
 
-            // Kiem tra token
-            if (user.PasswordResetToken != request.Token || user.PasswordResetTokenExpiry == null || user.PasswordResetTokenExpiry.IsExpired())
+            User? user = await userSqlRepository.AsQueryable(asNoTracking: false).Where(x => x.Email.ToLower() == email).FirstOrDefaultAsync(cancellationToken) ?? throw GlobalException.NotFound("User not found");
+
+            // Token gửi lên là token THẬT, trong DB chỉ lưu hash → hash rồi so sánh timing-safe
+            if (!GenerateTokenHelper.Verify(request.Token!, user.PasswordResetToken)
+                || user.PasswordResetTokenExpiry == null
+                || user.PasswordResetTokenExpiry.IsExpired())
                 throw GlobalException.BadRequest("Token invalid");
 
             // hash pass and delete token

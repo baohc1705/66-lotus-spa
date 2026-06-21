@@ -25,7 +25,14 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Login
         private readonly IOptions<JwtSettings> jwtOptions;
         private readonly IJwtService jwtService;
 
-        public LoginHandler(IUserSqlRepository userSqlRepository, IPasswordHash passwordHash, IOptions<JwtSettings> jwtOptions, IJwtService jwtService, IRefreshTokenSqlRepository refreshTokenSqlRepository, ISqlUnitOfWork sqlUnitOfWork, IUserRoleSqlRepository userRoleSqlRepository, IStaffSalonSqlRepository staffSalonSqlRepository, IStaffSqlRepository staffSqlRepository)
+        public LoginHandler(IUserSqlRepository userSqlRepository, 
+                            IPasswordHash passwordHash, 
+                            IOptions<JwtSettings> jwtOptions, 
+                            IJwtService jwtService, 
+                            IRefreshTokenSqlRepository refreshTokenSqlRepository, 
+                            ISqlUnitOfWork sqlUnitOfWork, 
+                            IUserRoleSqlRepository userRoleSqlRepository, 
+                            IStaffSalonSqlRepository staffSalonSqlRepository, IStaffSqlRepository staffSqlRepository)
         {
             this.userSqlRepository = userSqlRepository;
             this.passwordHash = passwordHash;
@@ -50,7 +57,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Login
 
             // Check lock account
             if (userExisted.Status == UserConst.STATUS_LOCKED)
-                return Result<TokenResponseDTO>.BadRequest($"Account is locked. Try again after {userExisted.LockoutEnd:HH:mm dd/MM/yyyy}");
+                return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_LOCKOUT_TIMEOUT);
 
             // Check password
             if (!passwordHash.Verify(userExisted.PasswordHash, request.Password))
@@ -117,7 +124,13 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Login
 
             refreshTokenSqlRepository.Add(refreshToken);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-            return Result<TokenResponseDTO>.Success(new TokenResponseDTO { UserId = userExisted.Id, AccessToken = accessToken, RefreshToken = refreshToken.Token, ManagedSalonId = managedSalonId });
+            return Result<TokenResponseDTO>.Success(new TokenResponseDTO 
+            { 
+                UserId = userExisted.Id, 
+                AccessToken = accessToken, 
+                RefreshToken = refreshToken.Token, 
+                ManagedSalonId = managedSalonId 
+            });
         }
 
     }

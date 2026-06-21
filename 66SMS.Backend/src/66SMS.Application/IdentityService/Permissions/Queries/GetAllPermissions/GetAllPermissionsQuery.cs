@@ -4,6 +4,9 @@ using MediatR;
 
 namespace _66SMS.Application.IdentityService.Permissions.Queries.GetAllPermissions
 {
+    /// <summary>
+    /// Get all permission request
+    /// </summary>
     public class GetAllPermissionsQuery : IRequest<Result<List<PermissionDTO>>>
     {
     }

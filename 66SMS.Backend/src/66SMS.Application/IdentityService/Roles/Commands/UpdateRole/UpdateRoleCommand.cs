@@ -1,12 +1,22 @@
 using _66SMS.Contracts.Shared;
 using MediatR;
+using System.Text.Json.Serialization;
 
 namespace _66SMS.Application.IdentityService.Roles.Commands.UpdateRole
 {
+    /// <summary>
+    /// Update role request
+    /// </summary>
     public class UpdateRoleCommand : IRequest<Result<object>>
     {
+        [JsonIgnore]
         public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
+        public string? Name { get; set; }
         public string? Description { get; set; }
+        [JsonIgnore]
+        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
+        [JsonIgnore]
+        public int? UpdatedBy { get; set; }
+
     }
 }

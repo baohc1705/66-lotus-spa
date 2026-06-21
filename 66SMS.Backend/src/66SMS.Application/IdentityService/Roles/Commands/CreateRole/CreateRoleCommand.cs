@@ -1,11 +1,20 @@
 using _66SMS.Contracts.Shared;
 using MediatR;
+using System.Text.Json.Serialization;
 
 namespace _66SMS.Application.IdentityService.Roles.Commands.CreateRole
 {
-    public class CreateRoleCommand : IRequest<Result<object>>
+    /// <summary>
+    /// Create role request
+    /// </summary>
+    public class CreateRoleCommand : IRequest<Result<int>>
     {
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
+
+        [JsonIgnore]
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        [JsonIgnore]
+        public int? CreatedBy { get; set; }
     }
 }

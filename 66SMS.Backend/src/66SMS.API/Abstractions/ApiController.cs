@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
 using _66SMS.Contracts.Shared;
+using Microsoft.AspNetCore.Mvc;
 
 namespace _66SMS.API.Abstractions
 {

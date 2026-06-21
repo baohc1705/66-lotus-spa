@@ -1,38 +1,32 @@
 using _66SMS.Application.DTOs.Users;
 using _66SMS.Contracts.Extensions;
-using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
-using _66SMS.Domain.Entities;
-using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.IdentityService.Users.Queries.GetAllUsers
 {
-    public class GetAllUserHandler : IRequestHandler<GetAllUserQuery, Result<PagedResult<UserDto>>>
+    /// <summary>
+    /// Handler for <see cref="GetAllUserQuery"/>
+    /// </summary>
+    public class GetAllUserHandler : IRequestHandler<GetAllUserQuery, Result<PagedResult<UserFullDto>>>
     {
         private readonly IUserSqlRepository userSqlRepository;
-        private readonly IMapper mapper;
 
-        public GetAllUserHandler(IUserSqlRepository userSqlRepository, IMapper mapper)
+        public GetAllUserHandler(IUserSqlRepository userSqlRepository)
         {
             this.userSqlRepository = userSqlRepository;
-            this.mapper = mapper;
         }
 
-        public async Task<Result<PagedResult<UserDto>>> Handle(GetAllUserQuery request, CancellationToken cancellationToken)
+        public async Task<Result<PagedResult<UserFullDto>>> Handle(GetAllUserQuery request, CancellationToken cancellationToken)
         {
             var query = userSqlRepository.AsQueryable();
-            //Include
-            query = query.Include(ur => ur.UserRoles)
-                            .ThenInclude(ur => ur.Role!.RolePermissions)
-                                .ThenInclude(rp => rp.Permission);
 
             // Search keyword
             if (!string.IsNullOrEmpty(request.Filter))
                 query = query.Where(x => x.Username.Contains(request.Filter) ||
                                     x.Email.Contains(request.Filter));
+
             // Order by
             query = request.OrderBy?.ToLower() switch
             {
@@ -41,29 +35,26 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetAllUsers
                 _ => request.IsDescending ? query.OrderByDescending(x => x.Username) : query.OrderBy(x => x.Username)
             };
 
-            
-
-            PagedResult<User>? paged = await query.ToPagedAsync(request, cancellationToken);
-            PagedResult<UserDto> pageDto = new PagedResult<UserDto>
+            // Projection trực tiếp xuống DTO, không cần Include
+            var dtoQuery = query.Select(x => new UserFullDto
             {
-                Items = paged.Items.Select(x => new UserDto
-                {
-                    Id = x.Id,
-                    Username = x.Username,
-                    Email = x.Email,
-                    IsEmailConfirmed = x.IsEmailConfirmed,
-                    Status = x.Status.ToString(),
-                    LockoutEnd = x.LockoutEnd.ToVietnamTimeString(),
-                    LastLoginAt = x.LastLoginAt.ToVietnamTimeString(),
-                    Roles = x.UserRoles.Select(x => x.Role!.Name).ToList(),
-                    Permissions = x.UserRoles.SelectMany(x => x.Role!.RolePermissions.Select(x => x.Permission!.PermissionKey)).ToList(),
-                }).ToList(),
-                PageIndex = paged.PageIndex,
-                PageSize = paged.PageSize,
-                TotalCount = paged.TotalCount,
-            };
-           
-            return Result<PagedResult<UserDto>>.Success(pageDto);
+                Id = x.Id,
+                Username = x.Username,
+                Email = x.Email,
+                IsEmailConfirmed = x.IsEmailConfirmed,
+                Status = x.Status.ToString(),
+                LockoutEnd = x.LockoutEnd.HasValue ? x.LockoutEnd.Value.ToString("HH:mm:ss dd/MM/yyyy") : null,
+                LastLoginAt = x.LastLoginAt.HasValue ? x.LastLoginAt.Value.ToString("HH:mm:ss dd/MM/yyyy") : null,
+                Roles = x.UserRoles!.Select(ur => ur.Role!.Name).ToList(),
+                Permissions = x.UserRoles!
+                    .SelectMany(ur => ur.Role!.RolePermissions!.Select(rp => rp.Permission!.PermissionKey))
+                    .Distinct()
+                    .ToList(),
+            });
+
+            PagedResult<UserFullDto> pageDto = await dtoQuery.ToPagedAsync(request, cancellationToken);
+
+            return Result<PagedResult<UserFullDto>>.Success(pageDto);
         }
     }
 }

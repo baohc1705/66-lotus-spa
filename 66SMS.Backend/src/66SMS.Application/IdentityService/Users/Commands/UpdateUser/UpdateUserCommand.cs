@@ -4,8 +4,12 @@ using System.Text.Json.Serialization;
 
 namespace _66SMS.Application.IdentityService.Users.Commands.UpdateUser
 {
+    /// <summary>
+    /// Update user account request
+    /// </summary>
     public class UpdateUserCommand : IRequest<Result<object>>
     {
+        [JsonIgnore]
         public int? Id { get; set; }
         public string? Username { get; set; }
         public string? Email { get; set; }
@@ -15,5 +19,7 @@ namespace _66SMS.Application.IdentityService.Users.Commands.UpdateUser
         public DateTime? LockoutEnd { get; set; }
         [JsonIgnore]
         public int? UpdatedBy { get; set; }
+        [JsonIgnore]
+        public DateTime? UpdateAt { get; set; } = DateTime.UtcNow;
     }
 }

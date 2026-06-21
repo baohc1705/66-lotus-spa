@@ -4,6 +4,9 @@ using MediatR;
 
 namespace _66SMS.Application.IdentityService.Roles.Queries.GetAllRoles
 {
+    /// <summary>
+    /// Get all role request with params key include
+    /// </summary>
     public class GetAllRoleQuery : IRequest<Result<List<RoleDTO>>>
     {
         public List<string>? Include { get; set; }

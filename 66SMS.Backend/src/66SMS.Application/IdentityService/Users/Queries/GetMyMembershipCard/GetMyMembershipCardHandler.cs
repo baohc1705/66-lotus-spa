@@ -7,9 +7,6 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace _66SMS.Application.IdentityService.Users.Queries.GetMyMembershipCard
 {

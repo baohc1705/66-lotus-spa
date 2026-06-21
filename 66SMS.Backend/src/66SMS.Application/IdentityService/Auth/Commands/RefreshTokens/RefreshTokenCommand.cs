@@ -5,6 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
 {
+    /// <summary>
+    /// Refresh token request
+    /// </summary>
     public class RefreshTokenCommand : IRequest<Result<TokenResponseDTO>>
     {
         public string Token { get; set; } = null!;

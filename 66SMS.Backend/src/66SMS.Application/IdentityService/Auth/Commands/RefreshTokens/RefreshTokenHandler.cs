@@ -1,9 +1,9 @@
 using _66SMS.Application.DTOs.Auth;
 using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Settings;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
-using _66SMS.Contracts.Enumerations;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
@@ -12,6 +12,9 @@ using Microsoft.Extensions.Options;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
 {
+    /// <summary>
+    /// Handler for <see cref="RefreshTokenCommand"/>
+    /// </summary>
     public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, Result<TokenResponseDTO>>
     {
         private readonly IRefreshTokenSqlRepository refreshTokenSqlRepository;
@@ -60,11 +63,11 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
             // Kiem tra user co hop le
             User? user = await userSqlRepository.AsQueryable(asNoTracking: false)
                .AsQueryable()
-               .Where(x => x.Id == stored.UserId)
+               .Where(x => x.Id == stored.UserId!)
                .Include(x => x.UserRoles!)
-                   .ThenInclude(ur => ur.Role)
-                       .ThenInclude(r => r!.RolePermissions)
-                           .ThenInclude(rp => rp.Permission)
+                   .ThenInclude(ur => ur.Role!)
+                       .ThenInclude(r => r.RolePermissions!)
+                           .ThenInclude(rp => rp.Permission!)
                .FirstOrDefaultAsync(cancellationToken);
 
             if (user == null || user.Status == UserConst.STATUS_LOCKED)
@@ -85,11 +88,15 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
                 ExpiresAt = DateTime.UtcNow.AddDays(jwtOptions.Value.RefreshTokenExpiryDays),
                 CreatedByIp = request.IpAddress ?? "",
             };
+
+            // Tracking insert state
             refreshTokenSqlRepository.Add(newRefreshToken);
 
+            // Check user role 
             if (user.UserRoles == null || !user.UserRoles.Any())
                 return Result<TokenResponseDTO>.NotFound(UserConst.MSG_USER_NO_ROLE, ErrorCodes.ERR_AUTH_NO_ROLE);
             
+            // Set role and permission to jwt
             var roleEntity = user.UserRoles.First().Role!;
             string role = roleEntity.Name;
             List<string> permissions = roleEntity.RolePermissions?
@@ -97,10 +104,20 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
                 .Select(rp => rp.Permission!.PermissionKey)
                 .Distinct()
                 .ToList() ?? new List<string>();
-
+            
+            // Generate jwt with role and permission
             string accessToken = jwtService.GenerateAccessToken(user, role, permissions);
+
+            // Persist to database
             await refreshTokenSqlRepository.SaveChangeAsync(cancellationToken);
-            return Result<TokenResponseDTO>.Success(new TokenResponseDTO { AccessToken = accessToken , RefreshToken = newRawToken, UserId = user.Id });
+
+            // Return to token response dto
+            return Result<TokenResponseDTO>.Success(new TokenResponseDTO 
+            { 
+                AccessToken = accessToken , 
+                RefreshToken = newRawToken, 
+                UserId = user.Id 
+            });
         }
     }
 }
