@@ -1,12 +1,12 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.DTOs.Salons;
 using _66SMS.Application.SalonService.Salons.Commands.CreateSalon;
 using _66SMS.Application.SalonService.Salons.Commands.DeleteSalon;
 using _66SMS.Application.SalonService.Salons.Commands.UpdateSalon;
 using _66SMS.Application.SalonService.Salons.Queries.GetAllSalons;
 using _66SMS.Application.SalonService.Salons.Queries.GetDetailSalon;
 using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Constants;
+using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -27,7 +27,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
+        [PermissionAuthorize("salons", "create")]
         public async Task<IActionResult> Create([FromBody] CreateSalonCommand command)
         {
             command.CreatedBy = jwtService.GetUserId();
@@ -36,7 +36,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPatch("{id}")]
-        [AllowAnonymous]
+        [PermissionAuthorize("salons", "update")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateSalonCommand command)
         {
             command.Id = id;
@@ -46,7 +46,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [AllowAnonymous]
+        [PermissionAuthorize("salons", "delete")]
         public async Task<IActionResult> Delete(int id)
         {
             DeleteSalonCommand command = new DeleteSalonCommand { Id = id };
@@ -55,20 +55,26 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-        [HttpGet("active")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetActive()
-        {
-            var query = new GetAllSalonsQuery { Status = 1, PageSize = 100, PageIndex = 1 };
-            var result = await mediator.Send(query);
-            if (!result.IsSuccess)
-                return HandleResult(result);
-            return HandleResult(Result<IReadOnlyList<SalonDto>>.Success(result.Data!.Items));
-        }
-
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAll([FromQuery] GetAllSalonsQuery query)
+        public async Task<IActionResult> GetAll(string? filter, string? orderBy, bool? isDescending, int? pageIndex, int? pageSize)
+        {
+            var query = new GetAllSalonsQuery 
+            {
+                Filter = filter,
+                Status = SalonConst.STATUS_ACTIVE,
+                OrderBy = orderBy,
+                IsDescending = isDescending ?? false,
+                PageIndex = pageIndex ?? 1,
+                PageSize = pageSize ?? 10,
+            };
+            var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        [HttpGet("admin")]
+        [PermissionAuthorize("salons", "read")]
+        public async Task<IActionResult> AdminGetAll([FromQuery] GetAllSalonsQuery query)
         {
             var result = await mediator.Send(query);
             return HandleResult(result);

@@ -35,17 +35,17 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> CreateStaff([FromBody] CreateStaffCommand command)
         {
             command.CreatedBy = jwtService.GetUserId();
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
-            if (tokenSalonId.HasValue)
-            {
-                // Manager: ghi đè salon_id từ token
-                command.SalonId = tokenSalonId.Value;
-            }
-            else if (!command.SalonId.HasValue)
-            {
-                // Admin: bắt buộc phải truyền salon_id trong body
-                return HandleResult(Result<object>.BadRequest("salon_id là bắt buộc khi tạo nhân viên với tài khoản Admin"));
-            }
+            //var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            //if (tokenSalonId.HasValue)
+            //{
+            //    // Manager: ghi đè salon_id từ token
+            //    command.SalonId = tokenSalonId.Value;
+            //}
+            //else if (!command.SalonId.HasValue)
+            //{
+            //    // Admin: bắt buộc phải truyền salon_id trong body
+            //    return HandleResult(Result<object>.BadRequest("salon_id là bắt buộc khi tạo nhân viên với tài khoản Admin"));
+            //}
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
