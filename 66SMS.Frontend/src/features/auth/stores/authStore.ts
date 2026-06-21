@@ -7,12 +7,15 @@ interface AuthState {
   accessToken: string | null;
   user: UserDto | null;
   managedSalonId: number | null;
+  selectedSalonId: number | null;
   // Actions
   setAccessToken: (token: string) => void;
   setUser: (user: UserDto) => void;
   clearAuth: () => void;
   hasPermission: (resource: string, action: string) => boolean;
   hasRole: (role: string) => boolean;
+  setSelectedSalonId: (id: number | null) => void;
+  getEffectiveSalonId: () => number | null;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -21,6 +24,7 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       user: null,
       managedSalonId: null,
+      selectedSalonId: null,
 
       setAccessToken: (token) => {
         set({ accessToken: token });
@@ -42,7 +46,15 @@ export const useAuthStore = create<AuthState>()(
 
       setUser: (user) => set({ user }),
 
-      clearAuth: () => set({ accessToken: null, user: null, managedSalonId: null }),
+      clearAuth: () => set({ accessToken: null, user: null, managedSalonId: null, selectedSalonId: null }),
+
+      setSelectedSalonId: (id) => set({ selectedSalonId: id }),
+
+      getEffectiveSalonId: () => {
+        const state = get();
+        if (state.managedSalonId) return state.managedSalonId;
+        return state.selectedSalonId;
+      },
 
       // Kiểm tra permission theo format "resource:action" giống backend
       hasPermission: (resource, action) => {
@@ -73,7 +85,12 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       // Persist cả accessToken và user để giữ phiên đăng nhập (bao gồm permissions) sau khi F5
-      partialize: (state) => ({ accessToken: state.accessToken, user: state.user, managedSalonId: state.managedSalonId }),
+      partialize: (state) => ({ 
+        accessToken: state.accessToken, 
+        user: state.user, 
+        managedSalonId: state.managedSalonId,
+        selectedSalonId: state.selectedSalonId
+      }),
     },
   ),
 );

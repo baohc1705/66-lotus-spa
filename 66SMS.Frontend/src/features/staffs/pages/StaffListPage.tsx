@@ -39,6 +39,7 @@ import { Checkbox } from "@/shared/components/ui/checkbox";
 import { StaffFormDialog } from "../components/StaffFormDialog";
 import { StaffDetailExpanded } from "../components/StaffDetailExpanded";
 import { useStaffs, useDeleteStaff } from "../hooks/useStaffs";
+import { useAuthStore } from "@/features/auth/stores/authStore";
 import type { StaffDto } from "../types/staff.types";
 import { formatDate } from "@/shared/utils/date.utils";
 
@@ -90,6 +91,13 @@ export function StaffListPage() {
   const [selectedRowIds, setSelectedRowIds] = useState<Set<number>>(new Set());
 
   // Data fetching
+  const salonId = useAuthStore((s) => s.getEffectiveSalonId());
+  const [prevSalonId, setPrevSalonId] = useState(salonId);
+  if (salonId !== prevSalonId) {
+    setPageIndex(1);
+    setPrevSalonId(salonId);
+  }
+
   const {
     data: staffsResult,
     isLoading,
@@ -100,6 +108,7 @@ export function StaffListPage() {
     filter: filter || undefined,
     orderBy,
     isDescending,
+    salonId,
   });
   const deleteMutation = useDeleteStaff();
 

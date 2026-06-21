@@ -7,7 +7,7 @@ const BASE = API.staffs.base
 
 export const staffApi = {
   /** GET /staffs — Danh sách nhân viên (phân trang) — quyền: staffs.read, role: admin */
-  getAll: (params: PageRequest) =>
+  getAll: (params: PageRequest & { salonId?: number | null }) =>
     axiosInstance.get<Result<PagedResult<StaffDto>>>(BASE, { params }).then(r => r.data),
 
   /** GET /staffs/:id — Chi tiết nhân viên — quyền: staffs.read */

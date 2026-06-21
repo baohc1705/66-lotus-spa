@@ -5,6 +5,7 @@ import { ChevronDown, Menu, MapPin } from "lucide-react";
 import { Logo } from "@/shared/components/Logo";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useMySalon } from "@/features/staff_salons/hooks/useStaffSalons";
+import { BranchSelector } from "@/shared/components/BranchSelector";
 import { MENU_ITEMS, type SubMenuItem } from "../constants/menu";
 
 interface AdminSidebarProps {
@@ -75,11 +76,19 @@ export function AdminSidebar({
             </button>
           </div>
 
-          {isOpen && mySalonName && (
-            <div className="mb-3 flex items-center gap-1.5 px-2 py-1.5 bg-lotus-leaf/10 rounded-admin border border-lotus-leaf/20">
-              <MapPin className="w-3.5 h-3.5 text-lotus-leaf shrink-0" />
-              <span className="text-xs font-medium text-lotus-leaf truncate">{mySalonName}</span>
-            </div>
+          {isOpen && (
+            managedSalonId ? (
+              mySalonName && (
+                <div className="mb-3 flex items-center gap-1.5 px-2 py-1.5 bg-lotus-leaf/10 rounded-admin border border-lotus-leaf/20">
+                  <MapPin className="w-3.5 h-3.5 text-lotus-leaf shrink-0" />
+                  <span className="text-xs font-medium text-lotus-leaf truncate">{mySalonName}</span>
+                </div>
+              )
+            ) : (
+              <div className="mb-3">
+                <BranchSelector />
+              </div>
+            )
           )}
         </div>
 

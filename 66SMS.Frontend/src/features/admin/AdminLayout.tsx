@@ -5,6 +5,7 @@ import { AdminHeader } from './components/AdminHeader'
 import { motion } from 'motion/react'
 
 import { usePermission } from '@/shared/hooks/usePermission'
+import { useAuthStore } from '@/features/auth/stores/authStore'
 
 export function AdminLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
@@ -12,18 +13,17 @@ export function AdminLayout() {
   const navigate = useNavigate()
 
   const { hasRole } = usePermission()
-
-  const isAdmin = hasRole('Admin')
-  const isEmployee = hasRole('Staff')
-  const isReceptionist = hasRole('Receptionist')
+  const user = useAuthStore((s) => s.user)
+  const isCustomer = hasRole('Customer')
+  const hasAccess = !!user && !isCustomer
 
   useEffect(() => {
-    if (!isAdmin && !isEmployee && !isReceptionist) {
+    if (!hasAccess) {
       navigate('/')
     }
-  }, [isAdmin, isEmployee, isReceptionist, navigate])
+  }, [hasAccess, navigate])
 
-  if (!isAdmin && !isEmployee && !isReceptionist) {
+  if (!hasAccess) {
     return null
   }
 
