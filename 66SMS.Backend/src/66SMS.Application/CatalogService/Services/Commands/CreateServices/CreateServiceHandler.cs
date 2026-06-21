@@ -9,82 +9,75 @@ using System.Data;
 
 namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
 {
+    /// <summary>
+    /// Handler for <see cref="CreateServiceCommand"/>
+    /// </summary>
     public class CreateServiceHandler : IRequestHandler<CreateServiceCommand, Result<object>>
     {
         private readonly IServiceSqlRepository serviceSqlRepository;
-        private readonly IServiceProductSqlRepository serviceProductSqlRepository;
-        private readonly IServiceImageSqlRepository serviceImageSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
 
-        public CreateServiceHandler(IServiceSqlRepository serviceSqlRepository,
-                                    IServiceProductSqlRepository serviceProductSqlRepository,
-                                    ISqlUnitOfWork sqlUnitOfWork,
-                                    IMapper mapper,
-                                    IServiceImageSqlRepository serviceImageSqlRepository)
+        public CreateServiceHandler(IServiceSqlRepository serviceSqlRepository, ISqlUnitOfWork sqlUnitOfWork, IMapper mapper)
         {
             this.serviceSqlRepository = serviceSqlRepository;
-            this.serviceProductSqlRepository = serviceProductSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
-            this.serviceImageSqlRepository = serviceImageSqlRepository;
         }
 
         public async Task<Result<object>> Handle(CreateServiceCommand request, CancellationToken cancellationToken)
         {
+            // Begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
+                // Map request to domain entity
                 Service? service = mapper.Map<Service>(request);
-                service.CreatedAt = DateTimeHelper.UtcNow();
-                service.CreatedBy = request.CreatedBy ?? 1;
-                service.Status = request.Status ?? _66SMS.Domain.Constants.ServiceConst.STATUS_ACTIVED;
-                serviceSqlRepository.Add(service);
-                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                service.Code = request.Code ?? GenerateServiceCode();
+
+                // Set image for service if request provived
                 if (request.ServiceImages != null && request.ServiceImages.Any())
                 {
-                    AddServiceImages(service.Id, request.ServiceImages);
-                    await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                    service.Images = request.ServiceImages.Select(x =>
+                    {
+                        var image = mapper.Map<ServiceImage>(x);
+                        return image;
+                    }).ToList();
                 }
 
+                // Set product for service if request provived
                 if (request.ServiceProducts != null && request.ServiceProducts.Any())
                 {
-                    AddServiceProducts(service.Id, request.ServiceProducts, request.CreatedBy);
-                    await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                    service.ServiceProducts = request.ServiceProducts.Select(x =>
+                    {
+                        var serviceProduct = mapper.Map<ServiceProduct>(x);
+                        return serviceProduct;
+                    }).ToList();
                 }
+
+                // Create and persist to database
+                serviceSqlRepository.Add(service);
+                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+
+                // commit transaction
                 transaction.Commit();
+
+                // result success result
                 return Result<object>.Created(service.Id);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                // rollback transaction on failure
                 transaction.Rollback();
                 throw;
             }
         }
 
-        private void AddServiceProducts(int id, List<ServiceProductItems> serviceProductsRequest, int? createdBy)
+        private string GenerateServiceCode()
         {
-            List<ServiceProduct> serviceProducts = serviceProductsRequest.Select(x =>
-            {
-                ServiceProduct serviceProduct = mapper.Map<ServiceProduct>(x);
-                serviceProduct.ServiceId = id;
-                serviceProduct.CreatedAt = DateTimeHelper.UtcNow();
-                serviceProduct.CreatedBy = createdBy ?? 1;
-                serviceProduct.Status = x.Status ?? _66SMS.Domain.Constants.ServiceProductConst.STATUS_ACTIVED;
-                return serviceProduct;
-            }).ToList();
-            serviceProductSqlRepository.AddRange(serviceProducts);
-        }
-
-        private void AddServiceImages(int id, List<ServiceImageItems> serviceImagesRequest)
-        {
-            List<ServiceImage> serviceImages = serviceImagesRequest.Select(x =>
-            {
-                ServiceImage serviceImage = mapper.Map<ServiceImage>(x);
-                serviceImage.ServiceId = id;
-                return serviceImage;
-            }).ToList();
-            serviceImageSqlRepository.AddRange(serviceImages);
+            string random = Random.Shared.Next(100000, 999999).ToString();
+            string dateNowStr = DateTimeHelper.VietnamNowString("HHmmss");
+            return $"SER{random}{dateNowStr}";
         }
     }
 }

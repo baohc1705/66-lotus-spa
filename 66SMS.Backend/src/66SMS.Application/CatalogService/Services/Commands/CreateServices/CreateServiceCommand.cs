@@ -1,8 +1,13 @@
 using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Constants;
 using MediatR;
+using System.Text.Json.Serialization;
 
 namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
 {
+    /// <summary>
+    /// Create new service request
+    /// </summary>
     public class CreateServiceCommand : IRequest<Result<object>>
     {
         public int? CategoryId { get; set; }
@@ -14,10 +19,12 @@ namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
         public decimal? CostPrice { get; set; }
         public decimal? SellingPrice { get; set; }
         public decimal? CommissionRate { get; set; }
-        public int? SortOrder { get; set; }
-        public int? Status { get; set; }
-        [System.Text.Json.Serialization.JsonIgnore]
+        public int? SortOrder { get; set; } = 0;
+        public int? Status { get; set; } = ServiceConst.STATUS_ACTIVED;
+        [JsonIgnore]
         public int? CreatedBy { get; set; }
+        [JsonIgnore]
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 
         public List<ServiceProductItems>? ServiceProducts { get; set; }
         public List<ServiceImageItems>? ServiceImages { get; set; }
@@ -29,10 +36,10 @@ namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
         public int? ProductId { get; set; }
         public int? QuantityUsed { get; set; }
         public string? Note { get; set; }
-        public int? Status { get; set; }
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-        [System.Text.Json.Serialization.JsonIgnore]
+        public int? Status { get; set; } = ServiceProductConst.STATUS_ACTIVED;
+        [JsonIgnore]
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        [JsonIgnore]
         public int? CreatedBy { get; set; }
     }
 

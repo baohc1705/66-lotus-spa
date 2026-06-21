@@ -19,7 +19,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.UpdatedBy).HasColumnName(RoleConst.FIELD_UPDATED_BY);
 
             builder.ToTable(RoleConst.TABLE_NAME);
-            builder.HasQueryFilter(x => x.Status != RoleConst.STATUS_DELETED);
         }
     }
 }

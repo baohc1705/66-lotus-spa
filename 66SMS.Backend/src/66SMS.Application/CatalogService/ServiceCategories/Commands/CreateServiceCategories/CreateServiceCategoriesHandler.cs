@@ -8,6 +8,9 @@ using System.Data;
 
 namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateServiceCategories
 {
+    /// <summary>
+    /// Handler for <see cref="CreateServiceCategoriesCommand"/>
+    /// </summary>
     public class CreateServiceCategoriesHandler : IRequestHandler<CreateServiceCategoriesCommand, Result<object>>
     {
         private readonly IServiceCategorySqlRepository serviceCategorySqlRepository;
@@ -23,24 +26,26 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateSer
 
         public async Task<Result<object>> Handle(CreateServiceCategoriesCommand request, CancellationToken cancellationToken)
         {
+            // Begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                ServiceCategory entity = mapper.Map<ServiceCategory>(request);
-                entity.CreatedAt = DateTime.UtcNow;
-                entity.CreatedBy = request.CreatedBy ?? 1;
-                entity.Status = request.Status;
+                // Map request to domain entity
+                ServiceCategory? service = mapper.Map<ServiceCategory>(request);
 
-                serviceCategorySqlRepository.Add(entity);
+                // Create and persist to database
+                serviceCategorySqlRepository.Add(service);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
+                // Commit transaction
                 transaction.Commit();
-                return Result<object>.Success(new { entity.Id });
+
+                // return to created result
+                return Result<object>.Created(service.Id);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                transaction.Rollback();
-                return Result<object>.Failure(500, $"An error occurred: {ex.Message}");
+                transaction.Rollback(); throw;
             }
         }
     }

@@ -4,6 +4,9 @@ using MediatR;
 
 namespace _66SMS.Application.CatalogService.ProductCategories.Queries.GetAllProductCategories
 {
+    /// <summary>
+    /// Get all category request
+    /// </summary>
     public class GetAllProductCategoryQuery : PageRequest, IRequest<Result<PagedResult<ProductCategoryDto>>>
     {
     }

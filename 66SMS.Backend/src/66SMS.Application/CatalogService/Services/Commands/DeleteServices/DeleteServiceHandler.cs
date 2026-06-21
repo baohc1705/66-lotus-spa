@@ -10,6 +10,9 @@ using System.Data;
 
 namespace _66SMS.Application.CatalogService.Services.Commands.DeleteServices
 {
+    /// <summary>
+    /// Handler for <see cref="DeleteServiceCommand"/>
+    /// </summary>
     public class DeleteServiceHandler : IRequestHandler<DeleteServiceCommand, Result<object>>
     {
         private readonly IServiceSqlRepository serviceSqlRepository;
@@ -23,27 +26,37 @@ namespace _66SMS.Application.CatalogService.Services.Commands.DeleteServices
 
         public async Task<Result<object>> Handle(DeleteServiceCommand request, CancellationToken cancellationToken)
         {
+            // Begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                Service? entity = await serviceSqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
-                if (entity == null)
+                // Find service by id and tracking
+                Service? service = await serviceSqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
+
+                // Return not found if service is null
+                if (service == null)
                 {
                     return Result<object>.NotFound(ServiceConst.MSG_SERVICE_NOT_FOUND, ErrorCodes.ERR_SERVICE_NOT_FOUND);
                 }
 
-                entity.Status = ServiceConst.STATUS_DELETED;
-                entity.UpdatedAt = DateTimeHelper.UtcNow();
-                entity.UpdatedBy = request.UpdatedBy;
+                // Update status is deleted
+                service.Status = ServiceConst.STATUS_DELETED;
+                service.UpdatedAt = DateTimeHelper.UtcNow();
+                service.UpdatedBy = request.UpdatedBy;
 
-                serviceSqlRepository.Update(entity);
+                // Update and persist to database
+                serviceSqlRepository.Update(service);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-
+                
+                // commit transaction
                 transaction.Commit();
+
+                // Return success result
                 return Result<object>.Ok();
             }
             catch
             {
+                // rollback transaction on failure
                 transaction.Rollback();
                 throw;
             }

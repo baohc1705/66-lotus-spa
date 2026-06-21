@@ -1,3 +1,4 @@
+using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -8,6 +9,9 @@ using System.Data;
 
 namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
 {
+    /// <summary>
+    /// Handler for <see cref="CreateProductCommand"/>
+    /// </summary>
     public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result<int>>
     {
         private readonly IProductSqlRepository productSqlRepository;
@@ -32,35 +36,38 @@ namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
+                // Map request to database
                 Product product = mapper.Map<Product>(request);
-                product.CreatedAt = DateTime.UtcNow;
-                product.CreatedBy = request.CreatedBy ?? 1;
-                product.Status = request.Status;
+                product.Code = request.Code ?? GenerateProductCode();
+
+                if (request.Images != null && request.Images.Any())
+                {
+                    product.Images = request.Images.Select(x => new ProductImage
+                    {
+                        Url = x.Url!,
+                        IsPrimary = (bool)x.IsPrimary!,
+                        SortOrder = (int)x.SortOrder!,
+                    }).ToList();
+                }
 
                 productSqlRepository.Add(product);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                if (request.Images != null && request.Images.Any())
-                {
-                    List<ProductImage> productImages = new List<ProductImage>();
-                    foreach (var imgDto in request.Images)
-                    {
-                        ProductImage img = mapper.Map<ProductImage>(imgDto);
-                        img.ProductId = product.Id;
-                        productImages.Add(img);
-                    }
-                    productImageSqlRepository.AddRange(productImages);
-                    await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-                }
-
                 transaction.Commit();
                 return Result<int>.Success(product.Id);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 transaction.Rollback();
-                return Result<int>.Failure(500, $"An error occurred while creating product: {ex.Message}");
+                throw;
             }
+        }
+
+        private string GenerateProductCode()
+        {
+            string random = Random.Shared.Next(100000, 999999).ToString();
+            string dateNowStr = DateTimeHelper.VietnamNowString("HHmmss");
+            return $"PRO{random}{dateNowStr}";
         }
     }
 }

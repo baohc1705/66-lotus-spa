@@ -55,5 +55,6 @@
             if (string.IsNullOrEmpty(value)) return null; 
             return DateOnly.TryParseExact(value, format, out var result) ? result : null; 
         }
+
     }
 }

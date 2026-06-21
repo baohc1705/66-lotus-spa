@@ -10,6 +10,9 @@ using System.Data;
 
 namespace _66SMS.Application.CatalogService.Products.Commands.DeleteProducts
 {
+    /// <summary>
+    /// Handler for <see cref="DeleteProductCommand"/>
+    /// </summary>
     public class DeleteProductHandler : IRequestHandler<DeleteProductCommand, Result<object>>
     {
         private readonly IProductSqlRepository productSqlRepository;
@@ -31,34 +34,43 @@ namespace _66SMS.Application.CatalogService.Products.Commands.DeleteProducts
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                Product product = await productSqlRepository.FindByIdAsync(request.Id);
+                // Find by id and tracking
+                Product? product = await productSqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
+
+                // return not found if product is null
                 if (product == null)
                 {
                     return Result<object>.NotFound(ProductConst.MSG_PRODUCT_NOT_FOUND, ErrorCodes.ERR_PRODUCT_NOT_FOUND);
                 }
 
-                // Xóa mềm Product
+                // update status is deleted soft deleted
                 product.Status = ProductConst.STATUS_DELETED;
                 product.UpdatedAt = DateTime.UtcNow;
                 product.UpdatedBy = request.UpdatedBy;
+
+                // Update and persist to database
                 productSqlRepository.Update(product);
+                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 // Xóa các entity con (ProductImages)
-                List<ProductImage> productImages = await productImageSqlRepository.AsQueryable(false).Where(x => x.ProductId == product.Id).ToListAsync();
+                List<ProductImage> productImages = await productImageSqlRepository
+                    .AsQueryable(false)
+                    .Where(x => x.ProductId == product.Id)
+                    .ToListAsync(cancellationToken);
+
                 if (productImages.Any())
                 {
                     productImageSqlRepository.RemoveRange(productImages);
                 }
-
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+
                 transaction.Commit();
 
                 return Result<object>.Ok();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                transaction.Rollback();
-                return Result<object>.Failure(500, $"An error occurred while deleting product: {ex.Message}");
+                transaction.Rollback(); throw;
             }
         }
     }

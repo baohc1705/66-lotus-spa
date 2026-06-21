@@ -15,7 +15,14 @@ namespace _66SMS.Persistence.DependencyInjection
         public static IServiceCollection AddPersistence(this IServiceCollection services,IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString(DatabaseConst.CONN_SQL_SERVER);
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddDbContext<ApplicationDbContext>(options =>
+            {
+               options.UseSqlServer(connectionString)
+               //.EnableSensitiveDataLogging()
+               //.EnableDetailedErrors()
+               //.LogTo(Console.WriteLine)
+               ;
+            });
             services.RegisterRepositories();
             return services;
         }

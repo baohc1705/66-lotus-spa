@@ -26,10 +26,8 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.CreatedBy).HasColumnName(ProductConst.FIELD_CREATED_BY);
             builder.Property(x => x.UpdatedAt).HasColumnName(ProductConst.FIELD_UPDATED_AT);
             builder.Property(x => x.UpdatedBy).HasColumnName(ProductConst.FIELD_UPDATED_BY);
-
             builder.HasOne(x => x.Category).WithMany(c => c.Products).HasForeignKey(x => x.CategoryId).IsRequired(false);
             builder.ToTable(ProductConst.TABLE_NAME);
-            builder.HasQueryFilter(x => x.Status != ProductConst.STATUS_DELETED);
         }
     }
 }

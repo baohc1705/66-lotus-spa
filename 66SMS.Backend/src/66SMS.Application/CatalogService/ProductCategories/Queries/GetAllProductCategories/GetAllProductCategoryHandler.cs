@@ -2,21 +2,20 @@ using _66SMS.Application.DTOs.ProductCategories;
 using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using MediatR;
 
 namespace _66SMS.Application.CatalogService.ProductCategories.Queries.GetAllProductCategories
 {
+    /// <summary>
+    /// Handler for <see cref="GetAllProductCategoryQuery"/>
+    /// </summary>
     public class GetAllProductCategoryHandler : IRequestHandler<GetAllProductCategoryQuery, Result<PagedResult<ProductCategoryDto>>>
     {
         private readonly IProductCategorySqlRepository productCategorySqlRepository;
-        private readonly IMapper mapper;
 
-        public GetAllProductCategoryHandler(IProductCategorySqlRepository productCategorySqlRepository, IMapper mapper)
+        public GetAllProductCategoryHandler(IProductCategorySqlRepository productCategorySqlRepository)
         {
             this.productCategorySqlRepository = productCategorySqlRepository;
-            this.mapper = mapper;
         }
 
         public async Task<Result<PagedResult<ProductCategoryDto>>> Handle(GetAllProductCategoryQuery request, CancellationToken cancellationToken)
@@ -33,7 +32,17 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Queries.GetAllProd
             }
             
             PagedResult<ProductCategoryDto> result = await query
-                .ProjectTo<ProductCategoryDto>(mapper.ConfigurationProvider)
+                .Select(x => new ProductCategoryDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Description = x.Description,
+                    SortOrder = x.SortOrder,
+                    Status = x.Status,
+                    CreatedAt = x.CreatedAt.ToString(),
+                    UpdatedAt = x.UpdatedAt.HasValue ? x.UpdatedAt.Value.ToString("HH:mm dd/MM/yyyy") : null,
+                })
+                .OrderByDescending(x => x.CreatedAt)
                 .ToPagedAsync(request, cancellationToken);
 
             return Result<PagedResult<ProductCategoryDto>>.Success(result);

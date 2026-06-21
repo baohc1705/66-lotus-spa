@@ -4,6 +4,9 @@ using System.Text.Json.Serialization;
 
 namespace _66SMS.Application.CatalogService.ProductCategories.Commands.UpdateProductCategories
 {
+    /// <summary>
+    /// Update product category request
+    /// </summary>
     public class UpdateProductCategoryCommand : IRequest<Result<object>>
     {
         [JsonIgnore]
@@ -13,7 +16,9 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Commands.UpdatePro
         public string? Description { get; set; }
         public int? SortOrder { get; set; }
         public int? Status { get; set; }
-        [System.Text.Json.Serialization.JsonIgnore]
+        [JsonIgnore]
         public int? UpdatedBy { get; set; }
+        [JsonIgnore]
+        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

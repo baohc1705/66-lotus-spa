@@ -6,8 +6,10 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
 {
     public class GetAllServicesQuery : PageRequest, IRequest<Result<PagedResult<ServiceDto>>>
     {
-        public string? Includes { get; set; }
-        public bool? IsActived { get; set; }
-        public string? keyword { get; set; }
+        public int? CategoryId {  get; set; }
+        public int? Status { get; set; }
+        public string? Keyword { get; set; }
+        public decimal? MinPrice { get; set; }
+        public decimal? MaxPrice { get; set; }
     }
 }

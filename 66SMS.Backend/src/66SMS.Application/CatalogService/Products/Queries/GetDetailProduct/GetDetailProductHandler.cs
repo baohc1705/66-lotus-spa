@@ -1,31 +1,56 @@
+using _66SMS.Application.DTOs.ProductImages;
 using _66SMS.Application.DTOs.Products;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
-using _66SMS.Domain.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
+using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.CatalogService.Products.Queries.GetDetailProduct
 {
+    /// <summary>
+    /// Handler for <see cref="GetDetailProductQuery"/>
+    /// </summary>
     public class GetDetailProductHandler : IRequestHandler<GetDetailProductQuery, Result<ProductDto>>
     {
         private readonly IProductSqlRepository productSqlRepository;
-        private readonly IMapper mapper;
 
-        public GetDetailProductHandler(IProductSqlRepository productSqlRepository, IMapper mapper)
+        public GetDetailProductHandler(IProductSqlRepository productSqlRepository)
         {
             this.productSqlRepository = productSqlRepository;
-            this.mapper = mapper;
         }
 
         public async Task<Result<ProductDto>> Handle(GetDetailProductQuery request, CancellationToken cancellationToken)
         {
-            ProductDto? productDto = await productSqlRepository.AsQueryable()
+            ProductDto? productDto = await productSqlRepository
+                .AsQueryable()
                 .Where(x => x.Id == request.Id)
-                .ProjectTo<ProductDto>(mapper.ConfigurationProvider)
+                .Select(x => new ProductDto
+                {
+                    Id = x.Id,
+                    CategoryId = x.CategoryId,
+                    CategoryName = x.Category!.Name,
+                    Code = x.Code,
+                    Name = x.Name,
+                    Description = x.Description,
+                    Content = x.Content,
+                    Unit = x.Unit,
+                    CostPrice = x.CostPrice,
+                    SellingPrice = x.SellingPrice,
+                    StockQuantity = x.StockQuantity,
+                    MinStock = x.MinStock,
+                    Status = x.Status,
+                    CreatedAt = x.CreatedAt.ToString(),
+                    UpdatedAt = x.UpdatedAt.ToString(),
+                    Images = x.Images!.Select(x => new ProductImageDto
+                    {
+                        Id = x.Id,
+                        Url = x.Url,
+                        SortOrder = x.SortOrder,
+                        IsPrimary = x.IsPrimary
+                    }).ToList(),
+                })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (productDto == null)

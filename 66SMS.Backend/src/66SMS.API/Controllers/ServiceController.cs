@@ -3,8 +3,10 @@ using _66SMS.Application.CatalogService.Services.Commands.CreateServices;
 using _66SMS.Application.CatalogService.Services.Commands.DeleteServices;
 using _66SMS.Application.CatalogService.Services.Commands.UpdateServices;
 using _66SMS.Application.CatalogService.Services.Queries.GetAllServices;
-using _66SMS.Application.CatalogService.Services.Queries.GetServices;
+using _66SMS.Application.CatalogService.Services.Queries.GetDetailService;
 using _66SMS.Contracts.Abstractions;
+using _66SMS.Domain.Constants;
+using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -24,22 +26,33 @@ namespace _66SMS.API.Controllers
             this.jwtService = jwtService;
         }
 
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetAll([FromQuery] GetAllServicesQuery query)
+        [HttpGet("admin")]
+        [PermissionAuthorize("services", "read")]
+        public async Task<IActionResult> AdminGetAll([FromQuery] GetAllServicesQuery query)
         {
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
 
-        [HttpGet("users")]
+        [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAllServiceActived(string? name)
+        public async Task<IActionResult> GetAll(int? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice, string? orderBy, bool? isDescending, int? pageIndex, int? pageSize)
         {
-            GetAllServicesQuery query = new();
-            query.keyword = name != null ? name : null;
-            query.IsActived = true;
+            GetAllServicesQuery query = new()
+            {
+                CategoryId = categoryId,
+                Keyword = keyword,
+                MinPrice = minPrice,
+                MaxPrice = maxPrice,
+                Status = ServiceConst.STATUS_ACTIVED,
+                OrderBy = orderBy,
+                IsDescending = isDescending ?? false,
+                PageIndex = pageIndex ?? 1,
+                PageSize = pageSize ?? 10,
+            };
+
             var result = await mediator.Send(query);
+
             return HandleResult(result);
         }
 
@@ -47,12 +60,12 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
-            var result = await mediator.Send(new GetServicesQuery { Id = id });
+            var result = await mediator.Send(new GetDetailServicesQuery { Id = id });
             return HandleResult(result);
         }
 
         [HttpPost]
-        [AllowAnonymous]
+        [PermissionAuthorize("services", "create")]
         public async Task<IActionResult> Create([FromBody] CreateServiceCommand command)
         {
             command.CreatedBy = jwtService.GetUserId();
@@ -61,7 +74,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPatch("{id}")]
-        [AllowAnonymous]
+        [PermissionAuthorize("services", "update")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateServiceCommand command)
         {
             command.Id = id;
@@ -71,7 +84,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [AllowAnonymous]
+        [PermissionAuthorize("services", "delete")]
         public async Task<IActionResult> Delete(int id)
         {
             var command = new DeleteServiceCommand { Id = id };

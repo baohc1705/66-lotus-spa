@@ -1,10 +1,3 @@
-using _66SMS.Application.DTOs.ProductCategories;
-using _66SMS.Application.DTOs.ProductImages;
-using _66SMS.Application.DTOs.Products;
-using _66SMS.Application.DTOs.ServiceCategories;
-using _66SMS.Application.DTOs.ServiceImages;
-using _66SMS.Application.DTOs.ServiceProducts;
-using _66SMS.Application.DTOs.Services;
 using _66SMS.Application.CatalogService.ProductCategories.Commands.CreateProductCategories;
 using _66SMS.Application.CatalogService.ProductCategories.Commands.UpdateProductCategories;
 using _66SMS.Application.CatalogService.ProductImages.Commands.CreateProductImages;
@@ -17,6 +10,12 @@ using _66SMS.Application.CatalogService.ServiceImages.Commands.CreateServiceImag
 using _66SMS.Application.CatalogService.ServiceImages.Commands.UpdateServiceImages;
 using _66SMS.Application.CatalogService.Services.Commands.CreateServices;
 using _66SMS.Application.CatalogService.Services.Commands.UpdateServices;
+using _66SMS.Application.DTOs.ProductCategories;
+using _66SMS.Application.DTOs.ProductImages;
+using _66SMS.Application.DTOs.ServiceCategories;
+using _66SMS.Application.DTOs.ServiceImages;
+using _66SMS.Application.DTOs.ServiceProducts;
+using _66SMS.Application.DTOs.Services;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Entities;
 using AutoMapper;
@@ -27,57 +26,24 @@ namespace _66SMS.Application.Commons.Mappers
     {
         public CatalogMappingProfile()
         {
-            // ProductCategory
-            CreateMap<CreateProductCategoryCommand, ProductCategory>()
-                .IgnoreNullValueTypes();
-            CreateMap<UpdateProductCategoryCommand, ProductCategory>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .IgnoreNullValueTypes();
-            CreateMap<ProductCategory, ProductCategoryDto>()
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyy hh:mm:ss")))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt.ToVietnamTimeString("dd/MM/yyy hh:mm:ss")))
-                .IgnoreNullValueTypes();
+            #region Products
+            CreateMap<CreateProductCategoryCommand, ProductCategory>().IgnoreNullValueTypes();
+            CreateMap<UpdateProductCategoryCommand, ProductCategory>().IgnoreNullValueTypes();
+            CreateMap<ProductCategory, ProductCategoryDto>().IgnoreNullValueTypes();
 
-            // ProductImage
-            CreateMap<CreateProductImageCommand, ProductImage>()
-                .IgnoreNullValueTypes();
-            CreateMap<UpdateProductImageCommand, ProductImage>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .IgnoreNullValueTypes();
-            CreateMap<ProductImage, ProductImageDto>()
-                .IgnoreNullValueTypes();
-            CreateMap<ProductImageDto, ProductImage>()
-                .IgnoreNullValueTypes();
+            CreateMap<CreateProductCommand, Product>().IgnoreNullValueTypes();
+            CreateMap<UpdateProductCommand, Product>().IgnoreNullValueTypes();
 
-            // Product
-            CreateMap<CreateProductCommand, Product>()
-                .ForMember(dest => dest.Category, opt => opt.Ignore())
-                .ForMember(dest => dest.Images, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
-                .IgnoreNullValueTypes();
-            CreateMap<UpdateProductCommand, Product>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.Category, opt => opt.Ignore())
-                .ForMember(dest => dest.Images, opt => opt.Ignore())
-                .IgnoreNullValueTypes();
-            CreateMap<Product, ProductDto>()
-                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : string.Empty))
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyy hh:mm:ss")))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt.ToVietnamTimeString("dd/MM/yyy hh:mm:ss")))
-                .IgnoreNullValueTypes(); ;
+            CreateMap<CreateProductImageCommand, ProductImage>().IgnoreNullValueTypes();
+            CreateMap<UpdateProductImageCommand, ProductImage>().IgnoreNullValueTypes();
+            CreateMap<ProductImage, ProductImageDto>().IgnoreNullValueTypes();
+            CreateMap<ProductImageDto, ProductImage>().IgnoreNullValueTypes();
+            #endregion
 
+            #region Services
             // ServiceCategory
-            CreateMap<CreateServiceCategoriesCommand, ServiceCategory>()
-                .IgnoreNullValueTypes();
-            CreateMap<UpdateServiceCategoriesCommand, ServiceCategory>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .IgnoreNullValueTypes();
-            CreateMap<ServiceCategory, ServiceCategoryDto>()
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt != null
-                    ? src.UpdatedAt.Value.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")
-                    : null))
-                .IgnoreNullValueTypes();
+            CreateMap<CreateServiceCategoriesCommand, ServiceCategory>().IgnoreNullValueTypes();
+            CreateMap<UpdateServiceCategoriesCommand, ServiceCategory>().IgnoreNullValueTypes();
 
             // ServiceImage
             CreateMap<CreateServiceImagesCommand, ServiceImage>()
@@ -133,6 +99,8 @@ namespace _66SMS.Application.Commons.Mappers
                 .ForMember(dest => dest.Images, opt => opt.Ignore())
                 .ForMember(dest => dest.ServiceProducts, opt => opt.Ignore())
                 .IgnoreNullValueTypes();
+            #endregion
+
         }
     }
 }

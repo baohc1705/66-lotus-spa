@@ -22,7 +22,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.UpdatedBy).HasColumnName(PermissionConst.FIELD_UPDATED_BY);
 
             builder.ToTable(PermissionConst.TABLE_NAME);
-            builder.HasQueryFilter(x => x.Status != PermissionConst.STATUS_DELETED);
         }
     }
 }

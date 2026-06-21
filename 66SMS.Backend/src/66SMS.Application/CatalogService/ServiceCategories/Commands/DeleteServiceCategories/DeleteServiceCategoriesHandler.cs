@@ -9,6 +9,9 @@ using System.Data;
 
 namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteServiceCategories
 {
+    /// <summary>
+    /// Handler for <see cref="DeleteServiceCategoriesCommand"/>
+    /// </summary>
     public class DeleteServiceCategoriesHandler : IRequestHandler<DeleteServiceCategoriesCommand, Result<object>>
     {
         private readonly IServiceCategorySqlRepository serviceCategorySqlRepository;
@@ -22,29 +25,39 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteSer
 
         public async Task<Result<object>> Handle(DeleteServiceCategoriesCommand request, CancellationToken cancellationToken)
         {
+            // Begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
+                // Find service by id
                 ServiceCategory? entity = await serviceCategorySqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
+
+                // Return not found if service is null
                 if (entity == null)
                 {
                     return Result<object>.NotFound(ServiceCategoryConst.MSG_SERVICE_CATEGORY_NOT_FOUND, ErrorCodes.ERR_SERVICE_CATEGORY_NOT_FOUND);
                 }
 
+                // Update status is deleted
                 entity.Status = ServiceCategoryConst.STATUS_DELETED;
                 entity.UpdatedAt = DateTime.UtcNow;
                 entity.UpdatedBy = request.UpdatedBy;
 
+                // Update and persist to database
                 serviceCategorySqlRepository.Update(entity);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
+                // Commit transaction
                 transaction.Commit();
-                return Result<object>.Success(new { entity.Id });
+
+                // return success result
+                return Result<object>.Ok();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                // Rollback on failure
                 transaction.Rollback();
-                return Result<object>.Failure(500, $"An error occurred: {ex.Message}");
+                throw;
             }
         }
     }

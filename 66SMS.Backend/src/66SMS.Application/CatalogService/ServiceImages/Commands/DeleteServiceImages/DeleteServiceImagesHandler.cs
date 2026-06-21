@@ -37,10 +37,9 @@ namespace _66SMS.Application.CatalogService.ServiceImages.Commands.DeleteService
                 transaction.Commit();
                 return Result<object>.Success(new { entity.Id });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                transaction.Rollback();
-                return Result<object>.Failure(500, $"An error occurred: {ex.Message}");
+                transaction.Rollback();throw;
             }
         }
     }

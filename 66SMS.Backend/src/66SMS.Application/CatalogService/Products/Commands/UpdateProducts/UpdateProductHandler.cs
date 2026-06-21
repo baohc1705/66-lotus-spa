@@ -9,6 +9,9 @@ using MediatR;
 
 namespace _66SMS.Application.CatalogService.Products.Commands.UpdateProducts
 {
+    /// <summary>
+    /// Handler for <see cref="UpdateProductCommand"/>
+    /// </summary>
     public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result<object>>
     {
         private readonly IProductSqlRepository productSqlRepository;
@@ -27,14 +30,13 @@ namespace _66SMS.Application.CatalogService.Products.Commands.UpdateProducts
 
         public async Task<Result<object>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
         {
-            Product product = await productSqlRepository.FindByIdAsync(request.Id);
+            Product? product = await productSqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
             if (product == null)
             {
                 return Result<object>.NotFound(ProductConst.MSG_PRODUCT_NOT_FOUND, ErrorCodes.ERR_PRODUCT_NOT_FOUND);
             }
 
             mapper.Map(request, product);
-            product.UpdatedAt = DateTime.UtcNow;
 
             productSqlRepository.Update(product);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

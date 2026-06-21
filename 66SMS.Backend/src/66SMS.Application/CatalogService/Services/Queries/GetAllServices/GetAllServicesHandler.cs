@@ -1,14 +1,11 @@
+using _66SMS.Application.DTOs.ServiceImages;
 using _66SMS.Application.DTOs.Services;
 using _66SMS.Contracts.Extensions;
-using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
-using _66SMS.Domain.Entities;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
 {
@@ -27,14 +24,29 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
         {
             var query = serviceSqlRepository.AsQueryable();
             // Filter here
-            if (request.IsActived != null && (bool)request.IsActived)
+            if (request.CategoryId.HasValue)
             {
-                query = query.Where(x => x.Status == ServiceConst.STATUS_ACTIVED);
+                query = query.Where(x => x.CategoryId == request.CategoryId);
             }
 
-            if (!string.IsNullOrEmpty(request.keyword))
+            if (!string.IsNullOrEmpty(request.Keyword))
             {
-                query = query.Where(x => x.Name.StartsWith(request.keyword));
+                query = query.Where(x => x.Name.StartsWith(request.Keyword) || x.Code == request.Keyword);
+            }
+
+            if (request.Status != null)
+            {
+                query = query.Where(x => x.Status == request.Status);
+            }
+
+            if (request.MinPrice.HasValue)
+            {
+                query = query.Where(x => x.SellingPrice >= request.MinPrice);
+            }
+
+            if (request.MaxPrice.HasValue)
+            {
+                query = query.Where(x => x.SellingPrice <= request.MinPrice);
             }
 
             // Order by
@@ -43,11 +55,47 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
                 "code" => request.IsDescending ? query.OrderByDescending(x => x.Code) : query.OrderBy(x => x.Code),
                 "name" => request.IsDescending ? query.OrderByDescending(x => x.Name) : query.OrderBy(x => x.Name),
                 "category" => request.IsDescending ? query.OrderByDescending(x => x.CategoryId) : query.OrderBy(x => x.CategoryId),
-                _ => query.OrderByDescending(x => x.CreatedAt)
+                _ => request.IsDescending ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt),
             };
 
             PagedResult<ServiceDto> pagedResult = await query
-                .SelectServiceDto(request.Includes?.ToLower())
+                .Select(x => new ServiceDto
+                {
+                    Id = x.Id,
+                    CategoryId = x.CategoryId,
+                    CategoryName = x.Category!.Name,
+                    Code = x.Code,
+                    Name = x.Name,
+                    Description = x.Description,
+                    Content = x.Content,
+                    DurationMins = x.DurationMins,
+                    CostPrice = x.CostPrice,
+                    SellingPrice = x.SellingPrice,
+                    CommissionRate = x.CommissionRate,
+                    SortOrder = x.SortOrder,
+                    Status = x.Status,
+                    CreatedAt = x.CreatedAt.ToString(),
+                    UpdatedAt = x.UpdatedAt.ToString(),
+                    Images = x.Images!.Select(x => new ServiceImageResponse
+                    {
+                        Id = x.Id,
+                        Url = x.Url,
+                        SortOrder = x.SortOrder,
+                        IsPrimary = x.IsPrimary,
+                    }).ToList(),
+                    ServiceProducts = x.ServiceProducts!.Select(x => new ServiceProductResponse
+                    {
+                        Id = x.Id,
+                        ProductId = x.ProductId,
+                        ProductName = x.Product!.Name,
+                        QuantityUsed = x.QuantityUsed,
+                        Note = x.Note,
+                        Status =  x.Status,
+                        CreatedAt = x.CreatedAt.ToString(),
+                        UpdatedAt = x.UpdatedAt.ToString()
+                    }).ToList()
+
+                })
                 .ToPagedAsync(request, cancellationToken);
             return Result<PagedResult<ServiceDto>>.Success(pagedResult);
         }

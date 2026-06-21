@@ -1,11 +1,15 @@
-using _66SMS.Application.DTOs.ServiceProducts;
 using _66SMS.Contracts.Shared;
 using MediatR;
+using System.Text.Json.Serialization;
 
 namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
 {
+    /// <summary>
+    /// Update service request
+    /// </summary>
     public class UpdateServiceCommand : IRequest<Result<object>>
     {
+        [JsonIgnore]
         public int? Id { get; set; }
         public int? CategoryId { get; set; }
         public string? Code { get; set; }
@@ -18,7 +22,9 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
         public decimal? CommissionRate { get; set; }
         public int? SortOrder { get; set; }
         public int? Status { get; set; }
-        [System.Text.Json.Serialization.JsonIgnore]
+        [JsonIgnore]
         public int? UpdatedBy { get; set; }
+        [JsonIgnore]
+        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

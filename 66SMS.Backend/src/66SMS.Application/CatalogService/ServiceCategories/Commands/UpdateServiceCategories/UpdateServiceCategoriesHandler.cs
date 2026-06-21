@@ -10,6 +10,9 @@ using System.Data;
 
 namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.UpdateServiceCategories
 {
+    /// <summary>
+    /// Handler for <see cref="UpdateServiceCategoriesCommand"/>
+    /// </summary>
     public class UpdateServiceCategoriesHandler : IRequestHandler<UpdateServiceCategoriesCommand, Result<object>>
     {
         private readonly IServiceCategorySqlRepository serviceCategorySqlRepository;
@@ -25,29 +28,36 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.UpdateSer
 
         public async Task<Result<object>> Handle(UpdateServiceCategoriesCommand request, CancellationToken cancellationToken)
         {
+            // Begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                ServiceCategory? entity = await serviceCategorySqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
-                if (entity == null)
+                // find by id and tracking
+                ServiceCategory? service = await serviceCategorySqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
+
+                // return not found if service is not null
+                if (service == null)
                 {
                     return Result<object>.NotFound(ServiceCategoryConst.MSG_SERVICE_CATEGORY_NOT_FOUND, ErrorCodes.ERR_SERVICE_CATEGORY_NOT_FOUND);
                 }
 
-                mapper.Map(request, entity);
-                entity.UpdatedAt = DateTime.UtcNow;
-                entity.UpdatedBy = request.UpdatedBy;
+                // map request to domain entity, ignore null
+                mapper.Map(request, service);
 
-                serviceCategorySqlRepository.Update(entity);
+                // update and persist to database
+                serviceCategorySqlRepository.Update(service);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
+                // commit transaction
                 transaction.Commit();
-                return Result<object>.Success(new { entity.Id });
+
+                // return success result
+                return Result<object>.Ok();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                transaction.Rollback();
-                return Result<object>.Failure(500, $"An error occurred: {ex.Message}");
+                // rollback on failure
+                transaction.Rollback(); throw;
             }
         }
     }

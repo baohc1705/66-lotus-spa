@@ -4,9 +4,13 @@ using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
+using System.Data;
 
 namespace _66SMS.Application.CatalogService.ProductCategories.Commands.CreateProductCategories
 {
+    /// <summary>
+    /// Handler for <see cref="CreateProductCategoryCommand"/>
+    /// </summary>
     public class CreateProductCategoryHandler : IRequestHandler<CreateProductCategoryCommand, Result<int>>
     {
         private readonly IProductCategorySqlRepository productCategorySqlRepository;
@@ -25,15 +29,27 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Commands.CreatePro
 
         public async Task<Result<int>> Handle(CreateProductCategoryCommand request, CancellationToken cancellationToken)
         {
+            // Map request to domain entity
             ProductCategory productCategory = mapper.Map<ProductCategory>(request);
-            productCategory.CreatedAt = DateTime.UtcNow;
-            productCategory.CreatedBy = request.CreatedBy ?? 1;
-            productCategory.Status = request.Status ?? _66SMS.Domain.Constants.ProductCategoryConst.STATUS_ACTIVED;
 
-            productCategorySqlRepository.Add(productCategory);
-            await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+            // Beigin transaction
+            using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                // Insert and persist to database
+                productCategorySqlRepository.Add(productCategory);
+                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-            return Result<int>.Success(productCategory.Id);
+                // Commit transaction
+                transaction.Commit();
+                return Result<int>.Success(productCategory.Id);
+            }
+            catch
+            {
+                // Rollback on failure
+                transaction.Rollback();
+                throw;
+            }
         }
     }
 }

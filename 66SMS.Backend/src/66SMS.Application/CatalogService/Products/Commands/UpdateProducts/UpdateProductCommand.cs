@@ -8,9 +8,7 @@ namespace _66SMS.Application.CatalogService.Products.Commands.UpdateProducts
     {
         [JsonIgnore]
         public int Id { get; set; }
-        
         public int? CategoryId { get; set; }
-        public string? Code { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
         public string? Content { get; set; }
@@ -20,7 +18,9 @@ namespace _66SMS.Application.CatalogService.Products.Commands.UpdateProducts
         public int? StockQuantity { get; set; }
         public int? MinStock { get; set; }
         public int? Status { get; set; }
-        [System.Text.Json.Serialization.JsonIgnore]
+        [JsonIgnore]
         public int? UpdatedBy { get; set; }
+        [JsonIgnore]
+        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

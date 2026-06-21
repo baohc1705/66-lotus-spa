@@ -5,6 +5,7 @@ using _66SMS.Application.CatalogService.ProductCategories.Commands.UpdateProduct
 using _66SMS.Application.CatalogService.ProductCategories.Queries.GetAllProductCategories;
 using _66SMS.Application.CatalogService.ProductCategories.Queries.GetDetailProductCategory;
 using _66SMS.Contracts.Abstractions;
+using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -25,7 +26,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
+        [PermissionAuthorize("products", "create")]
         public async Task<IActionResult> Create([FromBody] CreateProductCategoryCommand command)
         {
             command.CreatedBy = jwtService.GetUserId();
@@ -34,7 +35,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPatch("{id}")]
-        [AllowAnonymous]
+        [PermissionAuthorize("products", "update")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateProductCategoryCommand command)
         {
             command.Id = id;
@@ -44,7 +45,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [AllowAnonymous]
+        [PermissionAuthorize("products", "delete")]
         public async Task<IActionResult> Delete(int id)
         {
             var command = new DeleteProductCategoryCommand { Id = id };
