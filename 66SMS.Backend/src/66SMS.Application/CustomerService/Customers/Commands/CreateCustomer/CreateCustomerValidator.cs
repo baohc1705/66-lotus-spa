@@ -4,6 +4,9 @@ using FluentValidation;
 
 namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
 {
+    /// <summary>
+    /// Validator for <see cref="CreateCustomerCommand"/>
+    /// </summary>
     public class CreateCustomerValidator : AbstractValidator<CreateCustomerCommand>
     {
         public CreateCustomerValidator()
@@ -11,10 +14,6 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
 
             RuleFor(x => x.FullName).NotNull().NotEmpty().MaximumLength(CustomerConst.FULL_NAME_MAX_LENGTH);
             RuleFor(x => x.Phone).NotNull().Matches(RegexConst.VIETNAM_PHONE_REGEX).MaximumLength(CustomerConst.PHONE_MAX_LENGTH);
-            RuleFor(x => x.UserName).NotNull().MaximumLength(UserConst.USERNAME_MAX_LENGTH).Matches(RegexConst.USERNAME_REGEX);
-            RuleFor(x => x.Email).NotNull().MaximumLength(UserConst.EMAIL_MAX_LENGTH).Matches(RegexConst.EMAIL_REGEX);
-            RuleFor(x => x.Password).NotNull().Matches(RegexConst.PASSWORD_REGEX);
-            RuleFor(x => x.ConfirmPassword).NotEmpty().Equal(x => x.Password);
 
             RuleFor(x => x.AvatarUrl).MaximumLength(CustomerConst.AVATAR_URL_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.AvatarUrl));
             RuleFor(x => x.DateOfBirth).LessThan(DateOnly.FromDateTime(DateTime.Now)).When(x => x.DateOfBirth.HasValue);

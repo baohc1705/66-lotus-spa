@@ -1,6 +1,7 @@
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
@@ -11,46 +12,43 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.UpdateCustomer
     public class UpdateCustomerHandler : IRequestHandler<UpdateCustomerCommand, Result<object>>
     {
         private readonly ICustomerSqlRepository customerSqlRepository;
-        private readonly IUserSqlRepository userSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
-        public UpdateCustomerHandler(ICustomerSqlRepository customerSqlRepository, IUserSqlRepository userSqlRepository, ISqlUnitOfWork sqlUnitOfWork, IMapper mapper)
+        public UpdateCustomerHandler(ICustomerSqlRepository customerSqlRepository,ISqlUnitOfWork sqlUnitOfWork, IMapper mapper)
         {
             this.customerSqlRepository = customerSqlRepository;
-            this.userSqlRepository = userSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
         }
 
         public async Task<Result<object>> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
         {
+            // begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Update customer
+                // Find customer by id and tracking
                 Customer? customer = await customerSqlRepository.FindByIdAsync((int)request.Id!, false);
-                if (customer == null) return Result<object>.NotFound();
+                
+                if (customer == null) 
+                    return Result<object>.NotFound(CustomerConst.MSG_CUSTOMER_NOT_FOUND, Contracts.Enumerations.ErrorCodes.ERR_CUSTOMER_NOT_FOUND);
+
+                // Map request to domain entity
                 mapper.Map(request, customer);
-                customer.UpdatedAt = DateTime.UtcNow;
-                customer.UpdatedBy = request.UpdatedBy;
+
+                // update and persist to database
                 customerSqlRepository.Update(customer);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-
-                // Update user if request not null
-                if (request.UserName != null || request.Email != null)
-                {
-                    User? user = await userSqlRepository.FindByIdAsync((int)customer.UserId!, false);
-                    mapper.Map(request, user);
-                    user!.UpdatedAt = DateTime.UtcNow;
-                    user.UpdatedBy = request.UpdatedBy;
-                    userSqlRepository.Update(user);
-                    await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-                }
+                
+                // commit transaction
                 transaction.Commit();
-                return Result<object>.Created(customer.Id);
+
+                // return success result
+                return Result<object>.Ok();
             }
             catch
             {
+                // rollback transaction
                 transaction.Rollback();
                 throw;
             }

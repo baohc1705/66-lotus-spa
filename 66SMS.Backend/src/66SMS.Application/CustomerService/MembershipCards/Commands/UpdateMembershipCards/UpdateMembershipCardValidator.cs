@@ -7,6 +7,7 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMemb
     {
         public UpdateMembershipCardValidator()
         {
+            RuleFor(x => x.Id).NotNull().GreaterThan(0);
             RuleFor(x => x.CardCode).MaximumLength(MembershipCardConst.CARD_CODE_MAX_LENGTH);
         }
     }

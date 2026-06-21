@@ -3,11 +3,15 @@ using FluentValidation;
 
 namespace _66SMS.Application.CustomerService.MembershipCards.Commands.CreateMembershipCards
 {
+    /// <summary>
+    /// Validator for <see cref="CreateMembershipCardCommand"/>
+    /// </summary>
     public class CreateMembershipCardValidator : AbstractValidator<CreateMembershipCardCommand>
     {
         public CreateMembershipCardValidator()
         {
-            RuleFor(x => x.CustomerId).NotEmpty();
+            RuleFor(x => x.CustomerId).NotNull().GreaterThan(0);
+            RuleFor(x => x.MembershipTierId).NotNull().GreaterThan(0);
             RuleFor(x => x.CardCode).MaximumLength(MembershipCardConst.CARD_CODE_MAX_LENGTH);
         }
     }

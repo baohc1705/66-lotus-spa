@@ -40,9 +40,9 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Queries.GetAllMembe
                 query = query.Where(x => x.Status == request.Status.Value);
             }
 
-            if (!string.IsNullOrEmpty(request.Keyword))
+            if (!string.IsNullOrEmpty(request.Filter))
             {
-                string keywordLower = request.Keyword.ToLower();
+                string keywordLower = request.Filter.ToLower();
                 query = query.Where(x => x.CardCode.ToLower().Contains(keywordLower) 
                     || (x.Customer != null && x.Customer.FullName.ToLower().Contains(keywordLower)));
             }

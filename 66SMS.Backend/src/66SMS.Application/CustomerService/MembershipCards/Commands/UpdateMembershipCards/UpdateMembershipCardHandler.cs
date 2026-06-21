@@ -10,6 +10,9 @@ using System.Data;
 
 namespace _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMembershipCards
 {
+    /// <summary>
+    /// handler for <see cref="UpdateMembershipCardCommand"/>
+    /// </summary>
     public class UpdateMembershipCardHandler : IRequestHandler<UpdateMembershipCardCommand, Result<object>>
     {
         private readonly IMembershipCardSqlRepository membershipCardSqlRepository;
@@ -37,12 +40,16 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMemb
 
         public async Task<Result<object>> Handle(UpdateMembershipCardCommand request, CancellationToken cancellationToken)
         {
-            MembershipCard? membershipCard = await membershipCardSqlRepository.FindByIdAsync(request.Id);
+            // find membership card by id and tracking to update
+            MembershipCard? membershipCard = await membershipCardSqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
+
+            // return not found if membership card is null
             if (membershipCard == null)
             {
                 return Result<object>.NotFound(MembershipCardConst.MSG_MEMBERSHIP_CARD_NOT_FOUND, ErrorCodes.ERR_MEMBERSHIP_CARD_NOT_FOUND);
             }
 
+            // find customer if request provived
             if (request.CustomerId.HasValue)
             {
                 Customer? customer = await customerSqlRepository.FindByIdAsync(request.CustomerId.Value);
@@ -52,6 +59,7 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMemb
                 }
             }
 
+            // set oldtier id 
             int? oldTierId = null;
             if (request.MembershipTierId.HasValue && request.MembershipTierId.Value != membershipCard.MembershipTierId)
             {
@@ -63,16 +71,17 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMemb
                 oldTierId = membershipCard.MembershipTierId;
             }
 
+            // map request to domain entity
+            mapper.Map(request, membershipCard);
+
+            // begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                mapper.Map(request, membershipCard);
-                membershipCard.UpdatedAt = DateTime.UtcNow;
-                membershipCard.UpdatedBy = request.UpdatedBy;
-
+                // tracking update
                 membershipCardSqlRepository.Update(membershipCard);
 
-                // Ghi log vào MembershipCardHistory nếu có thay đổi Tier
+                // save log if change membership card tier
                 if (oldTierId.HasValue && request.MembershipTierId.HasValue)
                 {
                     MembershipCardHistory history = new MembershipCardHistory
@@ -88,15 +97,19 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMemb
                     membershipCardHistorySqlRepository.Add(history);
                 }
 
+                // persist to database
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+
+                // commit transaction
                 transaction.Commit();
 
+                // return success result
                 return Result<object>.Ok();
             }
             catch (Exception ex)
             {
-                transaction.Rollback();
-                return Result<object>.Failure(500, $"An error occurred while updating membership card: {ex.Message}");
+                // rollback transaction on failure
+                transaction.Rollback(); throw;
             }
         }
     }

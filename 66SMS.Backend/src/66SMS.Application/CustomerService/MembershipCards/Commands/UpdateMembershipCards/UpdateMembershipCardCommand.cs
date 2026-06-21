@@ -8,7 +8,6 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMemb
     {
         [JsonIgnore]
         public int Id { get; set; }
-
         public int? CustomerId { get; set; }
         public int? MembershipTierId { get; set; }
         public string? CardCode { get; set; }
@@ -18,5 +17,7 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMemb
 
         [JsonIgnore]
         public int? UpdatedBy { get; set; }
+        [JsonIgnore]
+        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

@@ -8,14 +8,15 @@ using MediatR;
 
 namespace _66SMS.Application.CustomerService.MembershipCards.Commands.DeleteMembershipCards
 {
+    /// <summary>
+    /// handler for <see cref="DeleteMembershipCardCommand"/>
+    /// </summary>
     public class DeleteMembershipCardHandler : IRequestHandler<DeleteMembershipCardCommand, Result<object>>
     {
         private readonly IMembershipCardSqlRepository membershipCardSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
 
-        public DeleteMembershipCardHandler(
-            IMembershipCardSqlRepository membershipCardSqlRepository,
-            ISqlUnitOfWork sqlUnitOfWork)
+        public DeleteMembershipCardHandler(IMembershipCardSqlRepository membershipCardSqlRepository,ISqlUnitOfWork sqlUnitOfWork)
         {
             this.membershipCardSqlRepository = membershipCardSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
@@ -23,19 +24,25 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.DeleteMemb
 
         public async Task<Result<object>> Handle(DeleteMembershipCardCommand request, CancellationToken cancellationToken)
         {
-            MembershipCard? membershipCard = await membershipCardSqlRepository.FindByIdAsync(request.Id);
+            // find membership card with id and tracking to delete
+            MembershipCard? membershipCard = await membershipCardSqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
+
+            // return not found if membership is null
             if (membershipCard == null)
             {
                 return Result<object>.NotFound(MembershipCardConst.MSG_MEMBERSHIP_CARD_NOT_FOUND, ErrorCodes.ERR_MEMBERSHIP_CARD_NOT_FOUND);
             }
 
+            // update status is  deleted
             membershipCard.Status = MembershipCardConst.STATUS_REVOKED;
             membershipCard.UpdatedAt = DateTime.UtcNow;
             membershipCard.UpdatedBy = request.UpdatedBy;
 
+            // update and persist to database
             membershipCardSqlRepository.Update(membershipCard);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
+            // return success result
             return Result<object>.Ok();
         }
     }

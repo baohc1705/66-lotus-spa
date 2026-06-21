@@ -8,7 +8,7 @@ using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
-using MediatR;  
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,8 +27,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPost]
-        //[PermissionAuthorize("customers", "create", Roles = "admin,cashier")]
-        [AllowAnonymous]
+        [PermissionAuthorize("customers", "create")]
         public async Task<IActionResult> CreateCustomer([FromBody] CreateCustomerCommand command)
         {
             command.CreatedBy = jwtService.GetUserId();
@@ -37,8 +36,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        //[PermissionAuthorize("customers", "delete", Roles = "admin")]
-         [AllowAnonymous]
+        [PermissionAuthorize("customers", "delete")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
             var command = new DeleteCustomerCommand { Id = id };
@@ -49,32 +47,45 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPatch("{id}")]
-        //[PermissionAuthorize("customers", "update")]
-         [AllowAnonymous]
+        [PermissionAuthorize("customers", "update")]
         public async Task<IActionResult> UpdateCustomer(int id, [FromBody] UpdateCustomerCommand command)
         {
             command.Id = id;
-            var userId = jwtService.GetUserId();
-            if (userId > 0) command.UpdatedBy = userId;
+            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
 
         [HttpGet]
-        //[PermissionAuthorize("customers", "read", Roles = "admin")]
-         [AllowAnonymous]
-        public async Task<IActionResult> GetAll([FromQuery] GetAllCustomerQuery query)
+        [PermissionAuthorize("customers", "read")]
+        public async Task<IActionResult> AdminGetAll([FromQuery] GetAllCustomerQuery query)
         {
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
 
+        //[HttpGet]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> GetAll(string? filter, string? orderBy, bool? isDescending, int? pageIndex, int? pageSize)
+        //{
+        //    var query = new GetAllCustomerQuery
+        //    {
+        //        Filter = filter,
+        //        Status = CustomerConst.STATUS_ACTIVED,
+        //        OrderBy = orderBy,
+        //        IsDescending = isDescending ?? false,
+        //        PageIndex = pageIndex ?? 1,
+        //        PageSize = pageSize ?? 10
+        //    };
+        //    var result = await mediator.Send(query);
+        //    return HandleResult(result);
+        //}
+
         [HttpGet("{id}")]
-        //[PermissionAuthorize("customers", "read")]
-         [AllowAnonymous]
+        [Authorize]
         public async Task<IActionResult> GetDetail(int id)
         {
-            var result = await mediator.Send(new GetDetailCustomerQuery { Id = id});
+            var result = await mediator.Send(new GetDetailCustomerQuery { Id = id });
             return HandleResult(result);
         }
     }

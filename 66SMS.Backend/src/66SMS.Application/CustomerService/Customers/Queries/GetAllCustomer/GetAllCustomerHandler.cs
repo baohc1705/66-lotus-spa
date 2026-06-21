@@ -2,13 +2,14 @@ using _66SMS.Application.DTOs.Customers;
 using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
-using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.CustomerService.Customers.Queries.GetAllCustomer
 {
+    /// <summary>
+    /// Handler for <see cref="GetAllCustomerQuery"/>
+    /// </summary>
     public class GetAllCustomerHandler : IRequestHandler<GetAllCustomerQuery, Result<PagedResult<CustomerDTO>>>
     {
         private readonly ICustomerSqlRepository customerSqlRepository;
@@ -23,12 +24,18 @@ namespace _66SMS.Application.CustomerService.Customers.Queries.GetAllCustomer
         public async Task<Result<PagedResult<CustomerDTO>>> Handle(GetAllCustomerQuery request, CancellationToken cancellationToken)
         {
             var query = customerSqlRepository.AsQueryable();
-
+            // filter
             if (!string.IsNullOrEmpty(request.Filter))
             {
                 query = query.Where(x => x.FullName.StartsWith(request.Filter) || x.Phone == request.Filter || x.User!.Email == request.Filter);
             }
 
+            if (request.Status != null)
+            {
+                query = query.Where(x => x.Status == request.Status);
+            }
+
+            // order
             query = request.OrderBy?.ToLower() switch
             {
                 "email" => request.IsDescending ? query.OrderByDescending(x => x.User!.Email) : query.OrderBy(x => x.User!.Email),
@@ -36,18 +43,28 @@ namespace _66SMS.Application.CustomerService.Customers.Queries.GetAllCustomer
                 _ => request.IsDescending ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt)
             };
 
-            query = query.Include(x => x.User);
+            var customers = await query
+                .Select(x => new CustomerDTO
+                {
+                    Id = x.Id,
+                    UserId = x.UserId,
+                    FullName = x.FullName,
+                    AvatarUrl = x.AvatarUrl,
+                    DateOfBirth = x.DateOfBirth.ToString(),
+                    Gender = x.Gender,
+                    Phone = x.Phone,
+                    LoyaltyPoint = x.LoyaltyPoint,
+                    FirstPurchaseAt = x.FirstPurchaseAt.ToString(),
+                    LastPurchaseAt = x.LastPurchaseAt.ToString(),
+                    Source = x.Source,
+                    Status = x.Status,
+                    Note = x.Note,
+                    FullAddress = x.FullAddress,
+                    Email = x.User.Email
+                })
+                .ToPagedAsync(request, cancellationToken);
 
-            PagedResult<Customer> paged = await query.ToPagedAsync(request, cancellationToken);
-
-            PagedResult<CustomerDTO> pagedDto = new()
-            {
-                Items = mapper.Map<List<CustomerDTO>>(paged.Items),
-                PageIndex = paged.PageIndex,
-                PageSize = paged.PageSize,
-                TotalCount = paged.TotalCount,
-            };
-            return Result<PagedResult<CustomerDTO>>.Success(pagedDto); 
+            return Result<PagedResult<CustomerDTO>>.Success(customers);
         }
     }
 }
