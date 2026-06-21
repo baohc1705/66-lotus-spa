@@ -17,12 +17,14 @@ namespace _66SMS.Application.PaymentService.Cashier.Queries.GetCashierDaily
         private readonly IAppointmentSqlRepository appointmentRepository;
         private readonly IStaffSqlRepository staffRepository;
         private readonly IWalletSqlRepository walletRepository;
+        private readonly IStaffSalonSqlRepository staffSalonSqlRepository;
 
-        public GetCashierDailyHandler(IAppointmentSqlRepository appointmentRepository, IStaffSqlRepository staffRepository, IWalletSqlRepository walletRepository)
+        public GetCashierDailyHandler(IAppointmentSqlRepository appointmentRepository, IStaffSqlRepository staffRepository, IWalletSqlRepository walletRepository, IStaffSalonSqlRepository staffSalonSqlRepository)
         {
             this.appointmentRepository = appointmentRepository;
             this.staffRepository = staffRepository;
             this.walletRepository = walletRepository;
+            this.staffSalonSqlRepository = staffSalonSqlRepository;
         }
 
         public async Task<Result<CashierDailyDto>> Handle(GetCashierDailyQuery request, CancellationToken cancellationToken)
@@ -30,9 +32,15 @@ namespace _66SMS.Application.PaymentService.Cashier.Queries.GetCashierDaily
             var dto = new CashierDailyDto();
 
             // Lấy danh sách nhân viên để hiển thị lên cột
-            var staffs = await staffRepository.AsQueryable()
-                //.Where(s => s.Status == 1) // Assuming 1 is active
-                .ToListAsync(cancellationToken);
+            var staffsQuery = staffRepository.AsQueryable();
+            if (request.SalonId.HasValue)
+            {
+                staffsQuery = staffsQuery.Where(x => staffSalonSqlRepository.AsQueryable(true)
+                    .Any(ss => ss.StaffId == x.Id 
+                         && ss.SalonId == request.SalonId.Value 
+                         && ss.Status == StaffSalonConst.STATUS_ACTIVE));
+            }
+            var staffs = await staffsQuery.ToListAsync(cancellationToken);
 
             dto.Columns = staffs.Select(s => new StaffColumnDto
             {
@@ -42,7 +50,7 @@ namespace _66SMS.Application.PaymentService.Cashier.Queries.GetCashierDaily
             }).ToList();
 
             // Lấy danh sách lịch hẹn trong ngày
-            var appointments = await appointmentRepository.AsQueryable()
+            var appointmentsQuery = appointmentRepository.AsQueryable()
                 .Include(a => a.Staff)
                 .Include(a => a.CreatedByUser)
                     .ThenInclude(u => u!.Customer)
@@ -51,8 +59,14 @@ namespace _66SMS.Application.PaymentService.Cashier.Queries.GetCashierDaily
                 .Include(a => a.TimeSlot)
                 .Include(a => a.Services)
                     .ThenInclude(s => s.Service)
-                .Where(a => a.AppointmentDate == request.Date)
-                .ToListAsync(cancellationToken);
+                .Where(a => a.AppointmentDate == request.Date);
+
+            if (request.SalonId.HasValue)
+            {
+                appointmentsQuery = appointmentsQuery.Where(a => a.SalonId == request.SalonId.Value);
+            }
+
+            var appointments = await appointmentsQuery.ToListAsync(cancellationToken);
 
             var customerIds = appointments
                 .Where(a => a.CreatedByUser?.Customer != null)

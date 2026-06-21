@@ -8,6 +8,8 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using System;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
 {
@@ -17,17 +19,23 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
         private readonly IUserSqlRepository userSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
+        private readonly IRoleSqlRepository roleSqlRepository;
+        private readonly IUserRoleSqlRepository userRoleSqlRepository;
 
         public UpdateStaffHandler(
             IStaffSqlRepository staffSqlRepository,
             IUserSqlRepository userSqlRepository,
             ISqlUnitOfWork sqlUnitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            IRoleSqlRepository roleSqlRepository,
+            IUserRoleSqlRepository userRoleSqlRepository)
         {
             this.staffSqlRepository = staffSqlRepository;
             this.userSqlRepository = userSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
+            this.roleSqlRepository = roleSqlRepository;
+            this.userRoleSqlRepository = userRoleSqlRepository;
         }
 
         public async Task<Result<object>> Handle(UpdateStaffCommand request, CancellationToken cancellationToken)
@@ -54,6 +62,47 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
                         user.UpdatedAt = DateTime.UtcNow;
                         user.UpdatedBy = request.UpdatedBy;
                         userSqlRepository.Update(user);
+                        await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                    }
+                }
+
+                // Update UserRole
+                if (!string.IsNullOrEmpty(request.Role))
+                {
+                    var role = await roleSqlRepository.AsQueryable()
+                        .Where(x => x.Name.ToLower() == request.Role.ToLower())
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    if (role == null)
+                    {
+                        return Result<object>.BadRequest("Vai trò không hợp lệ.");
+                    }
+
+                    var currentRole = await userRoleSqlRepository.AsQueryable()
+                        .Where(x => x.UserId == staff.UserId)
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    if (currentRole != null)
+                    {
+                        if (currentRole.RoleId != role.Id)
+                        {
+                            currentRole.RoleId = role.Id;
+                            userRoleSqlRepository.Update(currentRole);
+                            await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                        }
+                    }
+                    else
+                    {
+                        UserRole userRole = new()
+                        {
+                            UserId = staff.UserId,
+                            RoleId = role.Id,
+                            AssignedAt = DateTime.UtcNow,
+                            AssignedBy = request.UpdatedBy ?? 1,
+                            CreatedAt = DateTime.UtcNow,
+                            CreatedBy = request.UpdatedBy ?? 1
+                        };
+                        userRoleSqlRepository.Add(userRole);
                         await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                     }
                 }

@@ -10,6 +10,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
         // Profile
         [JsonIgnore]
         public int? Id { get; set; }
+        public int? SalonId { get; set; }
         public string? FullName { get; set; }
         public string? AvatarUrl { get; set; }
         public DateOnly? DateOfBirth { get; set; }
@@ -29,7 +30,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
         public string? UserName { get; set; }
         public string? Email { get; set; }
 
-        [JsonIgnore]
         public string? Role { get; set; }
         [JsonIgnore]
         public int? UpdatedBy { get; set; }

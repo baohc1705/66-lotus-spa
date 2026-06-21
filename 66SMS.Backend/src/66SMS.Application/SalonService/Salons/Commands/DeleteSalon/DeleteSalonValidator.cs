@@ -6,7 +6,7 @@ namespace _66SMS.Application.SalonService.Salons.Commands.DeleteSalon
     {
         public DeleteSalonValidator()
         {
-            RuleFor(x => x.Id).NotEmpty();
+            RuleFor(x => x.Id).NotNull().GreaterThan(0);
         }
     }
 }

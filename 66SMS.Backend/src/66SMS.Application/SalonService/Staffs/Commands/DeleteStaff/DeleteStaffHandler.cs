@@ -1,17 +1,16 @@
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System;
-
 namespace _66SMS.Application.SalonService.Staffs.Commands.DeleteStaff
 {
+    /// <summary>
+    /// Handler for <see cref="DeleteStaffCommand"/>
+    /// </summary>
     public class DeleteStaffHandler : IRequestHandler<DeleteStaffCommand, Result<object>>
     {
         private readonly IUserSqlRepository userSqlRepository;
@@ -35,12 +34,12 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.DeleteStaff
         {
             Staff? staff = await staffSqlRepository.FindByIdAsync((int)request.Id!, false);
             if (staff == null)
-                return Result<object>.NotFound();
+                return Result<object>.NotFound(StaffConst.MSG_STAFF_NOT_FOUND, ErrorCodes.ERR_STAFF_NOT_FOUND);
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                staff.Status = _66SMS.Domain.Constants.StaffConst.STATUS_DELETED;
+                staff.Status = StaffConst.STATUS_DELETED;
                 staff.UpdatedAt = DateTime.UtcNow;
                 staff.UpdatedBy = request.UpdatedBy;
                 staffSqlRepository.Update(staff);

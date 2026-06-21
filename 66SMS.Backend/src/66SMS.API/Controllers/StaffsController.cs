@@ -35,17 +35,17 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> CreateStaff([FromBody] CreateStaffCommand command)
         {
             command.CreatedBy = jwtService.GetUserId();
-            //var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
-            //if (tokenSalonId.HasValue)
-            //{
-            //    // Manager: ghi đè salon_id từ token
-            //    command.SalonId = tokenSalonId.Value;
-            //}
-            //else if (!command.SalonId.HasValue)
-            //{
-            //    // Admin: bắt buộc phải truyền salon_id trong body
-            //    return HandleResult(Result<object>.BadRequest("salon_id là bắt buộc khi tạo nhân viên với tài khoản Admin"));
-            //}
+            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            if (tokenSalonId.HasValue)
+            {
+                // Manager: ghi đè salon_id từ token
+                command.SalonId = tokenSalonId.Value;
+            }
+            else if (!command.SalonId.HasValue)
+            {
+                // Admin: bắt buộc phải truyền salon_id trong body
+                return HandleResult(Result<object>.BadRequest("salon_id là bắt buộc khi tạo nhân viên với tài khoản Admin"));
+            }
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -54,6 +54,14 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("staffs", "delete", Roles = "admin")]
         public async Task<IActionResult> DeleteStaff(int id)
         {
+            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            if (tokenSalonId.HasValue)
+            {
+                var check = await mediator.Send(new GetDetailStaffQuery { Id = id, SalonId = tokenSalonId });
+                if (!check.IsSuccess) 
+                    return HandleResult(Result<object>.NotFound("Nhân viên không thuộc chi nhánh của bạn."));
+            }
+
             var command = new DeleteStaffCommand { Id = id };
             command.UpdatedBy = jwtService.GetUserId();
             Result<object> result = await mediator.Send(command);
@@ -64,6 +72,14 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("staffs", "update")]
         public async Task<IActionResult> UpdateStaff(int id, [FromBody] UpdateStaffCommand command)
         {
+            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            if (tokenSalonId.HasValue)
+            {
+                var check = await mediator.Send(new GetDetailStaffQuery { Id = id, SalonId = tokenSalonId });
+                if (!check.IsSuccess) 
+                    return HandleResult(Result<object>.NotFound("Nhân viên không thuộc chi nhánh của bạn."));
+            }
+
             command.Id = id;
             command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
@@ -96,7 +112,8 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("staffs", "read")]
         public async Task<IActionResult> GetDetail(int id)
         {
-            var result = await mediator.Send(new GetDetailStaffQuery { Id = id });
+            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var result = await mediator.Send(new GetDetailStaffQuery { Id = id, SalonId = tokenSalonId });
             return HandleResult(result);
         }
 

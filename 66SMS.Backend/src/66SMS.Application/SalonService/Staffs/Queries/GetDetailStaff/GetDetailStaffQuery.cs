@@ -7,5 +7,6 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetDetailStaff
     public record GetDetailStaffQuery : IRequest<Result<StaffDto>>
     {
         public int? Id { get; set; }
+        public int? SalonId { get; set; }
     }
 }

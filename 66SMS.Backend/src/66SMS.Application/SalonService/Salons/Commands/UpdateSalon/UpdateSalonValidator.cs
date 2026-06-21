@@ -7,8 +7,7 @@ namespace _66SMS.Application.SalonService.Salons.Commands.UpdateSalon
     {
         public UpdateSalonValidator()
         {
-            RuleFor(x => x.Id).NotEmpty();
-            RuleFor(x => x.Code).MaximumLength(SalonConst.CODE_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.Code));
+            RuleFor(x => x.Id).NotNull().GreaterThan(0);
             RuleFor(x => x.Name).MaximumLength(SalonConst.NAME_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.Name));
             RuleFor(x => x.Phone).MaximumLength(SalonConst.PHONE_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.Phone));
             RuleFor(x => x.Email).MaximumLength(SalonConst.EMAIL_MAX_LENGTH).EmailAddress().When(x => !string.IsNullOrEmpty(x.Email));

@@ -17,7 +17,7 @@ namespace _66SMS.Application.PaymentService.Cashier.Queries.GetOnlineAppointment
             CancellationToken cancellationToken)
         {
             
-            var appointments = await appointmentRepository.AsQueryable()
+            var query = appointmentRepository.AsQueryable()
                 .Include(a => a.CreatedByUser)
                     .ThenInclude(u => u!.Customer)
                 .Include(a => a.CreatedByUser)
@@ -25,7 +25,14 @@ namespace _66SMS.Application.PaymentService.Cashier.Queries.GetOnlineAppointment
                 .Include(a => a.TimeSlot)
                 .Include(a => a.Services)
                     .ThenInclude(s => s.Service)
-                .Where(a => a.StaffId == null && a.Status != AppointmentConst.STATUS_CANCELLED && a.Status != AppointmentConst.STATUS_COMPLETED)
+                .Where(a => a.StaffId == null && a.Status != AppointmentConst.STATUS_CANCELLED && a.Status != AppointmentConst.STATUS_COMPLETED);
+
+            if (request.SalonId.HasValue)
+            {
+                query = query.Where(a => a.SalonId == request.SalonId.Value);
+            }
+
+            var appointments = await query
                 .OrderBy(a => a.AppointmentDate)
                 .ThenBy(a => a.TimeSlot != null ? a.TimeSlot.StartTime : default)
                 .ToListAsync(cancellationToken);

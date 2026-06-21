@@ -4,8 +4,11 @@ using MediatR;
 
 namespace _66SMS.Application.SalonService.Salons.Queries.GetDetailSalon
 {
+    /// <summary>
+    /// Get detail salon
+    /// </summary>
     public class GetDetailSalonQuery : IRequest<Result<SalonDto>>
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
     }
 }

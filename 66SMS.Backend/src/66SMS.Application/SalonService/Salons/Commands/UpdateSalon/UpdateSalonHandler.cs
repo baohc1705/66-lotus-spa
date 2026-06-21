@@ -29,7 +29,7 @@ namespace _66SMS.Application.SalonService.Salons.Commands.UpdateSalon
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                Salon salon = await salonSqlRepository.FindByIdAsync((int)request.Id);
+                Salon? salon = await salonSqlRepository.FindByIdAsync((int)request.Id!, false, cancellationToken);
                 if (salon == null)
                     return Result<object>.NotFound(SalonConst.MSG_SALON_NOT_FOUND, ErrorCodes.ERR_SALON_NOT_FOUND);
 

@@ -1,11 +1,12 @@
 using _66SMS.Contracts.Shared;
 using MediatR;
+using System.Text.Json.Serialization;
 
 namespace _66SMS.Application.SalonService.Salons.Commands.UpdateSalon
 {
     public class UpdateSalonCommand : IRequest<Result<object>>
     {
-        [System.Text.Json.Serialization.JsonIgnore]
+        [JsonIgnore]
         public int? Id { get; set; }
         public string? Code { get; set; }
         public string? Name { get; set; }
@@ -23,7 +24,9 @@ namespace _66SMS.Application.SalonService.Salons.Commands.UpdateSalon
         public string? Description { get; set; }
         public int? SortOrder { get; set; }
         public int? Status { get; set; }
-        [System.Text.Json.Serialization.JsonIgnore]
+        [JsonIgnore]
         public int? UpdatedBy { get; set; }
+        [JsonIgnore]
+        public DateTime? UpdatedAt {  get; set; } = DateTime.UtcNow;
     }
 }

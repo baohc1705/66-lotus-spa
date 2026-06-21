@@ -2,6 +2,7 @@ using _66SMS.Application.DTOs.Staffs;
 using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
@@ -16,11 +17,13 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetAllStaffs
     public class GetAllStaffHandler : IRequestHandler<GetAllStaffQuery, Result<PagedResult<StaffDto>>>
     {
         private readonly IStaffSqlRepository staffSqlRepository;
+        private readonly IStaffSalonSqlRepository staffSalonSqlRepository;
         private readonly IMapper mapper;
 
-        public GetAllStaffHandler(IStaffSqlRepository staffSqlRepository, IMapper mapper)
+        public GetAllStaffHandler(IStaffSqlRepository staffSqlRepository, IStaffSalonSqlRepository staffSalonSqlRepository, IMapper mapper)
         {
             this.staffSqlRepository = staffSqlRepository;
+            this.staffSalonSqlRepository = staffSalonSqlRepository;
             this.mapper = mapper;
         }
 
@@ -30,7 +33,10 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetAllStaffs
 
             if (request.SalonId.HasValue)
             {
-                query = query.Where(x => x.SalonId == request.SalonId.Value);
+                query = query.Where(x => staffSalonSqlRepository.AsQueryable(true)
+                    .Any(ss => ss.StaffId == x.Id 
+                         && ss.SalonId == request.SalonId.Value 
+                         && ss.Status == StaffSalonConst.STATUS_ACTIVE));
             }
 
             if (!string.IsNullOrEmpty(request.Filter))
@@ -49,17 +55,33 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetAllStaffs
                 _ => request.IsDescending ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt)
             };
 
-            query = query.Include(x => x.User);
-
-            PagedResult<Staff> paged = await query.ToPagedAsync(request, cancellationToken);
-
-            PagedResult<StaffDto> pagedDto = new()
-            {
-                Items = mapper.Map<List<StaffDto>>(paged.Items),
-                PageIndex = paged.PageIndex,
-                PageSize = paged.PageSize,
-                TotalCount = paged.TotalCount,
-            };
+            PagedResult<StaffDto> pagedDto = await query
+                .Select(x => new StaffDto
+                {
+                    Id = x.Id,
+                    UserId = x.UserId,
+                    SalonId = x.SalonId,
+                    SalonName = x.Salon!.Name,
+                    Code = x.Code,
+                    FullName = x.FullName,
+                    AvatarUrl = x.AvatarUrl,
+                    DateOfBirth = x.DateOfBirth.ToString(),
+                    Gender = x.Gender.ToString(),
+                    NationalId = x.NationalId,
+                    Phone = x.Phone,
+                    HireDate = x.HireDate.ToString(),
+                    ContractType = x.ContractType,
+                    BasicSalary = x.BasicSalary,
+                    Status = x.Status.ToString(),
+                    StreetAddress = x.StreetAddress,
+                    ProvinceCode = x.ProvinceCode,
+                    WardCode = x.WardCode,
+                    FullAddress = x.FullAddress,
+                    Username = x.User != null ? x.User.Username : null,
+                    Email = x.User != null ? x.User.Email : null,
+                    Role = x.User != null ? x.User.UserRoles!.Select(ur => ur.Role!.Name).FirstOrDefault() : null
+                })
+                .ToPagedAsync(request, cancellationToken);
 
             return Result<PagedResult<StaffDto>>.Success(pagedDto);
         }

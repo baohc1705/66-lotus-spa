@@ -3,7 +3,6 @@ using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using MediatR;
 
 namespace _66SMS.Application.SalonService.Salons.Queries.GetAllSalons
@@ -23,19 +22,42 @@ namespace _66SMS.Application.SalonService.Salons.Queries.GetAllSalons
         {
             var query = salonSqlRepository.AsQueryable();
 
-            if (!string.IsNullOrEmpty(request.Keyword))
+            if (!string.IsNullOrEmpty(request.Filter))
             {
-                string keywordLower = request.Keyword.ToLower();
+                string keywordLower = request.Filter.ToLower();
                 query = query.Where(x => x.Name.ToLower().Contains(keywordLower)
                     || x.Code.ToLower().Contains(keywordLower)
-                    || x.Phone.Contains(request.Keyword));
+                    || x.Phone.Contains(request.Filter));
             }
 
             if (request.Status.HasValue)
                 query = query.Where(x => x.Status == request.Status.Value);
 
+            query = query.OrderByDescending(x => x.CreatedAt);
+
             PagedResult<SalonDto> result = await query
-                .ProjectTo<SalonDto>(mapper.ConfigurationProvider)
+                .Select(x => new SalonDto
+                {
+                    Id = x.Id,
+                    Code = x.Code,
+                    Name = x.Name,
+                    Phone = x.Phone,
+                    Email = x.Email,
+                    StreetAddress = x.StreetAddress,
+                    ProvinceCode = x.ProvinceCode,
+                    WardCode = x.WardCode,
+                    FullAddress = x.FullAddress,
+                    Latitude = x.Latitude,
+                    Longitude = x.Longitude,
+                    WorkingDays = x.WorkingDays,
+                    TaxCode = x.TaxCode,
+                    ImageUrl = x.ImageUrl,
+                    Description = x.Description,
+                    SortOrder = x.SortOrder,
+                    Status = x.Status,
+                    CreatedAt = x.CreatedAt.ToString(),
+                    UpdatedAt = x.UpdatedAt.ToString()
+                })
                 .ToPagedAsync(request, cancellationToken);
 
             return Result<PagedResult<SalonDto>>.Success(result);

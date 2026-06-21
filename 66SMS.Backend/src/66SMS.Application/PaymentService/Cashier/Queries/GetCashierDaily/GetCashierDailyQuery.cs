@@ -7,5 +7,6 @@ namespace _66SMS.Application.PaymentService.Cashier.Queries.GetCashierDaily
     public class GetCashierDailyQuery : IRequest<Result<CashierDailyDto>>
     {
         public DateOnly Date { get; set; }
+        public int? SalonId { get; set; }
     }
 }

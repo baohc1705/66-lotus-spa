@@ -4,6 +4,8 @@ namespace _66SMS.Application.DTOs.Staffs
     {
         public int? Id { get; set; }
         public int? UserId { get; set; }
+        public int? SalonId { get; set; }
+        public string? SalonName { get; set; }
         public string? Code { get; set; }
         public string? FullName { get; set; }
         public string? AvatarUrl { get; set; }
@@ -21,5 +23,6 @@ namespace _66SMS.Application.DTOs.Staffs
         public string? FullAddress { get; set; }
         public string? Username { get; set; }
         public string? Email { get; set; }
+        public string? Role { get; set; }
     }
 }

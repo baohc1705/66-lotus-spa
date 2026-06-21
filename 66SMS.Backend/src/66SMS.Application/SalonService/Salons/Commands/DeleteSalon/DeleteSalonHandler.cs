@@ -23,16 +23,17 @@ namespace _66SMS.Application.SalonService.Salons.Commands.DeleteSalon
 
         public async Task<Result<object>> Handle(DeleteSalonCommand request, CancellationToken cancellationToken)
         {
+            Salon? salon = await salonSqlRepository.FindByIdAsync((int)request.Id!, false, cancellationToken);
+            if (salon == null)
+                return Result<object>.NotFound(SalonConst.MSG_SALON_NOT_FOUND, ErrorCodes.ERR_SALON_NOT_FOUND);
+
+            salon.Status = SalonConst.STATUS_DELETED;
+            salon.UpdatedAt = DateTimeHelper.UtcNow();
+            salon.UpdatedBy = request.UpdatedBy;
+
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                Salon salon = await salonSqlRepository.FindByIdAsync((int)request.Id);
-                if (salon == null)
-                    return Result<object>.NotFound(SalonConst.MSG_SALON_NOT_FOUND, ErrorCodes.ERR_SALON_NOT_FOUND);
-
-                salon.Status = SalonConst.STATUS_DELETED;
-                salon.UpdatedAt = DateTimeHelper.UtcNow();
-                salon.UpdatedBy = request.UpdatedBy;
                 salonSqlRepository.Update(salon);
 
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

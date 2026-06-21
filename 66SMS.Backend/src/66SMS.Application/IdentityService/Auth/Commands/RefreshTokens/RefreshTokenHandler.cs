@@ -21,13 +21,23 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
         private readonly IUserSqlRepository userSqlRepository;
         private readonly IJwtService jwtService;
         private readonly IOptions<JwtSettings> jwtOptions;
+        private readonly IStaffSqlRepository staffSqlRepository;
+        private readonly IStaffSalonSqlRepository staffSalonSqlRepository;
 
-        public RefreshTokenHandler(IRefreshTokenSqlRepository refreshTokenSqlRepository, IUserSqlRepository userSqlRepository, IJwtService jwtService, IOptions<JwtSettings> jwtOptions)
+        public RefreshTokenHandler(
+            IRefreshTokenSqlRepository refreshTokenSqlRepository,
+            IUserSqlRepository userSqlRepository,
+            IJwtService jwtService,
+            IOptions<JwtSettings> jwtOptions,
+            IStaffSqlRepository staffSqlRepository,
+            IStaffSalonSqlRepository staffSalonSqlRepository)
         {
             this.refreshTokenSqlRepository = refreshTokenSqlRepository;
             this.userSqlRepository = userSqlRepository;
             this.jwtService = jwtService;
             this.jwtOptions = jwtOptions;
+            this.staffSqlRepository = staffSqlRepository;
+            this.staffSalonSqlRepository = staffSalonSqlRepository;
         }
 
         public async Task<Result<TokenResponseDTO>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
@@ -105,8 +115,22 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
                 .Distinct()
                 .ToList() ?? new List<string>();
             
+            // Check if user is a manager — get their salon_id from staff_salons
+            int? managedSalonId = null;
+            var staff = await staffSqlRepository.AsQueryable()
+                .Where(x => x.UserId == user.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (staff != null)
+            {
+                var staffSalon = await staffSalonSqlRepository.AsQueryable()
+                    .Where(x => x.StaffId == staff.Id && x.IsManager == true && x.Status == StaffSalonConst.STATUS_ACTIVE)
+                    .FirstOrDefaultAsync(cancellationToken);
+                if (staffSalon != null)
+                    managedSalonId = staffSalon.SalonId;
+            }
+
             // Generate jwt with role and permission
-            string accessToken = jwtService.GenerateAccessToken(user, role, permissions);
+            string accessToken = jwtService.GenerateAccessToken(user, role, permissions, managedSalonId);
 
             // Persist to database
             await refreshTokenSqlRepository.SaveChangeAsync(cancellationToken);
@@ -116,7 +140,8 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
             { 
                 AccessToken = accessToken , 
                 RefreshToken = newRawToken, 
-                UserId = user.Id 
+                UserId = user.Id,
+                ManagedSalonId = managedSalonId
             });
         }
     }

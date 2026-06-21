@@ -43,36 +43,39 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
 
         public async Task<Result<object>> Handle(CreateStaffCommand request, CancellationToken cancellationToken)
         {
-            bool emailOrUsernameExisted = await userSqlRepository.AsQueryable()
-                .Where(x => x.Email.Equals(request.Email) || x.Username.Equals(request.UserName))
-                .AnyAsync(cancellationToken);
+            // generate code and email for staff
+            string staffCode = await GenerateUniqueStaffCodeAsync(cancellationToken);
+            string staffEmail = $"{staffCode}@lotusspa.com.vn";
 
-            if (emailOrUsernameExisted)
-                return Result<object>.Conflict(UserConst.MSG_USER_ALREADY_EXISTS, ErrorCodes.ERR_USER_ALREADY_EXISTS);
+            // Create user account for staff
+            User? user = new User
+            {
+                Username = staffCode,
+                Email = staffEmail,
+                PasswordHash = passwordHash.Hash(staffCode),
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = request.CreatedBy,
+                Status =  (int)request.Status!,
+            };
 
-            User? user = mapper.Map<User>(request);
-            user.PasswordHash = passwordHash.Hash(request.Password!);
-            user.CreatedAt = DateTimeHelper.UtcNow();
-            user.CreatedBy = request.CreatedBy;
-            user.Status = UserConst.STATUS_ACTIVED;
-
+            // map request to domain entity
             Staff? staff = mapper.Map<Staff>(request);
-            staff.CreatedAt = DateTimeHelper.UtcNow();
-            staff.CreatedBy = request.CreatedBy;
-            staff.Status = StaffConst.STATUS_ACTIVED;
+            staff.Code = staffCode;
 
-            staff.Code = await GenerateUniqueStaffCodeAsync(cancellationToken);
-
+            // begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
+                // save and persist user to database
                 userSqlRepository.Add(user);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
+                // save and persist staff to database
                 staff.UserId = user.Id;
                 staffSqlRepository.Add(staff);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
+                // create role for staff
                 string roleRequest = request.Role ?? "staff";
                 Role? role = await roleSqlRepository.AsQueryable()
                     .Where(x => x.Name.Equals(roleRequest))
@@ -91,6 +94,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
                     CreatedBy = request.CreatedBy ?? 1
                 };
 
+                // save and persist userrole to database
                 userRoleSqlRepository.Add(userRole);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
@@ -106,6 +110,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
 
         private async Task<string> GenerateUniqueStaffCodeAsync(CancellationToken cancellationToken)
         {
+            // find first staff with code order by descending => last code
             Staff? staff = await staffSqlRepository.AsQueryable()
                 .Where(x => x.Code!.StartsWith("SEN"))
                 .OrderByDescending(x => x.Code)
@@ -114,6 +119,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
             int nextNumber = 1;
             if (staff != null && !string.IsNullOrEmpty(staff.Code) && staff.Code.Length > 7)
             {
+                // get number last code then add one number
                 string numberPart = staff.Code.Substring(7);
                 if (int.TryParse(numberPart, out int parsedNumber))
                 {
@@ -125,16 +131,21 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
             bool isUnique = false;
             do
             {
+                // create new code with next number
                 newCode = $"SEN{nextNumber:D4}";
+
+                // check if new code exisited
                 bool exists = await staffSqlRepository.AsQueryable()
                     .Where(x => x.Code == newCode)
                     .AnyAsync(cancellationToken);
+
+                // if not existed then newCode is unique else increment 1
                 if (!exists) 
                     isUnique = true;
                 else
                     nextNumber++;
 
-            } while (!isUnique);
+            } while (!isUnique); // loop util find new code is unique
 
             return newCode;
         }

@@ -1,5 +1,6 @@
 using _66SMS.API.Abstractions;
 using _66SMS.Application.PaymentService.Cashier.Queries.GetCashierDaily;
+using _66SMS.Contracts.Abstractions;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -13,17 +14,20 @@ namespace _66SMS.API.Controllers
     public class CashierController : ApiController<CashierController>
     {
         private readonly IMediator mediator;
+        private readonly IJwtService jwtService;
 
-        public CashierController(IMediator mediator)
+        public CashierController(IMediator mediator, IJwtService jwtService)
         {
             this.mediator = mediator;
+            this.jwtService = jwtService;
         }
 
         [HttpGet("daily")]
         [Authorize]
         public async Task<IActionResult> GetDaily([FromQuery] DateOnly date)
         {
-            var query = new GetCashierDailyQuery { Date = date };
+            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var query = new GetCashierDailyQuery { Date = date, SalonId = tokenSalonId };
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
@@ -32,7 +36,8 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetOnlineAppointments()
         {
-            var query = new _66SMS.Application.PaymentService.Cashier.Queries.GetOnlineAppointments.GetOnlineAppointmentsQuery();
+            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var query = new _66SMS.Application.PaymentService.Cashier.Queries.GetOnlineAppointments.GetOnlineAppointmentsQuery { SalonId = tokenSalonId };
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

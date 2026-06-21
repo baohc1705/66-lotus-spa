@@ -7,5 +7,6 @@ namespace _66SMS.Application.PaymentService.Cashier.Queries.GetOnlineAppointment
 {
     public sealed class GetOnlineAppointmentsQuery : IRequest<Result<IReadOnlyList<CashierBookingDto>>>
     {
+        public int? SalonId { get; set; }
     }
 }
