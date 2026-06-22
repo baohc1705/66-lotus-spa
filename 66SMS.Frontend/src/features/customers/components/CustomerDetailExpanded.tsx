@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { PermissionGate } from '@/shared/components/security/PermissionGate'
 import { useCustomerDetail } from '../hooks/useCustomers'
+import { formatDisplayDate } from '@/shared/utils/date.utils'
 import type { CustomerDto } from '../types/customer.types'
 
 const GENDER_MAP: Record<string, string> = {
@@ -66,8 +67,8 @@ export function CustomerDetailExpanded({ customerId, onEdit }: CustomerDetailExp
             {/* Header profile info */}
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
-                {customer.image ? (
-                  <img src={customer.image} alt={customer.fullName ?? ''} className="w-14 h-14 object-cover" />
+                {customer.avatarUrl ? (
+                  <img src={customer.avatarUrl} alt={customer.fullName ?? ''} className="w-14 h-14 object-cover" />
                 ) : (
                   <User className="w-7 h-7 text-amber-400" />
                 )}
@@ -84,19 +85,18 @@ export function CustomerDetailExpanded({ customerId, onEdit }: CustomerDetailExp
             <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-0">
               <div className="flex flex-col">
                 <DetailField label="Số điện thoại" value={customer.phone} />
-                <DetailField label="Giới tính" value={GENDER_MAP[customer.gender ?? ''] ?? customer.gender} />
-                <DetailField label="Ngày sinh" value={customer.dob} />
+                <DetailField label="Giới tính" value={GENDER_MAP[customer.gender ?? ''] ?? customer.gender?.toString()} />
+                <DetailField label="Ngày sinh" value={formatDisplayDate(customer.dateOfBirth)} />
               </div>
               <div className="flex flex-col">
                 <DetailField label="Nguồn khách" value={customer.source} />
-                <DetailField label="Trạng thái" value={STATUS_MAP[customer.status ?? ''] ?? customer.status} />
+                <DetailField label="Trạng thái" value={STATUS_MAP[customer.status ?? ''] ?? customer.status?.toString()} />
                 <DetailField label="Địa chỉ" value={customer.fullAddress} />
               </div>
               <div className="flex flex-col">
-                <DetailField label="Tài khoản" value={customer.username} />
                 <DetailField label="Email" value={customer.email} />
-                <DetailField label="Lần mua đầu" value={customer.firstPurchaseAt} />
-                <DetailField label="Lần mua gần nhất" value={customer.lastPurchaseAt} />
+                <DetailField label="Lần mua đầu" value={formatDisplayDate(customer.firstPurchaseAt)} />
+                <DetailField label="Lần mua gần nhất" value={formatDisplayDate(customer.lastPurchaseAt)} />
               </div>
             </div>
 

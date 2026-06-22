@@ -55,7 +55,9 @@ export function AdminSidebar({
         <div
           className={`shrink-0 px-4 overflow-hidden transition-all duration-500 ${isOpen ? "justify-between" : "justify-center"}`}
         >
-          <div className={`h-16 flex items-center ${isOpen ? "justify-between" : "justify-center"}`}>
+          <div
+            className={`h-16 flex items-center ${isOpen ? "justify-between" : "justify-center"}`}
+          >
             <div
               className={`transition-opacity duration-300 ${!isOpen ? "opacity-0 hidden" : "opacity-100 block"}`}
             >

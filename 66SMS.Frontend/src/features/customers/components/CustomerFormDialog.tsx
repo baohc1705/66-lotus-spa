@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
-import { useForm, type Resolver } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useState } from "react";
+import { useForm, type Resolver } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
   DialogContent,
@@ -8,126 +8,187 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '@/shared/components/ui/dialog'
-import { Button } from '@/shared/components/ui/button'
-import { Input } from '@/shared/components/ui/input'
-import { Label } from '@/shared/components/ui/label'
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/shared/components/ui/tooltip'
+} from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/shared/components/ui/tooltip";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/shared/components/ui/select'
-import { SearchableSelect } from '@/shared/components/ui/searchable-select'
-import { Textarea } from '@/shared/components/ui/textarea'
-import { useCreateCustomer, useUpdateCustomer } from '../hooks/useCustomers'
-import { useProvinces, useWardsByProvince } from '@/features/address/hooks/useAddress'
+} from "@/shared/components/ui/select";
+import { SearchableSelect } from "@/shared/components/ui/searchable-select";
+import { Textarea } from "@/shared/components/ui/textarea";
+import { useCreateCustomer, useUpdateCustomer } from "../hooks/useCustomers";
+import {
+  useProvinces,
+  useWardsByProvince,
+} from "@/features/address/hooks/useAddress";
+import { parseToDateInput } from "@/shared/utils/date.utils";
 import {
   createCustomerSchema,
   updateCustomerSchema,
-  type CreateCustomerFormData,
-  type UpdateCustomerFormData,
   type CustomerFormValues,
-} from '../schemas/customer.schema'
+} from "../schemas/customer.schema";
 
-import type { CustomerDto } from '../types/customer.types'
-import type { ProvinceDto, WardDto } from '@/features/address/types/address.types'
-import { User, ShoppingBag, KeyRound } from 'lucide-react'
-import { ImageUpload } from '@/shared/components/ImageUpload'
-import { uploadApi } from '@/shared/api/upload.api'
+import type {
+  CreateCustomerPayload,
+  CustomerDto,
+  UpdateCustomerPayload,
+} from "../types/customer.types";
+import type {
+  ProvinceDto,
+  WardDto,
+} from "@/features/address/types/address.types";
+import { User, ShoppingBag } from "lucide-react";
+import { ImageUpload } from "@/shared/components/ImageUpload";
+import { uploadApi } from "@/shared/api/upload.api";
+import axiosInstance from "@/shared/api/axiosInstance";
+import { API } from "@/shared/api/endpoints";
 
 interface CustomerFormDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  customer?: CustomerDto | null
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  customer?: CustomerDto | null;
 }
 
 const GENDER_OPTIONS = [
-  { value: '0', label: 'Nam' },
-  { value: '1', label: 'Nữ' },
-  { value: '2', label: 'Khác' },
-]
+  { value: "0", label: "Nam" },
+  { value: "1", label: "Nữ" },
+  { value: "2", label: "Khác" },
+];
 
 const STATUS_OPTIONS = [
-  { value: '1', label: 'Hoạt động' },
-  { value: '0', label: 'Ngưng hoạt động' },
-  { value: '2', label: 'Tạm khóa' },
-]
+  { value: "1", label: "Hoạt động" },
+  { value: "0", label: "Ngưng hoạt động" },
+];
 
 const SOURCE_OPTIONS = [
-  { value: 'Walk-in', label: 'Đến trực tiếp' },
-  { value: 'Online', label: 'Online' },
-  { value: 'Referral', label: 'Giới thiệu' },
-  { value: 'Social Media', label: 'Mạng xã hội' },
-]
+  { value: "Walk-in", label: "Đến trực tiếp" },
+  { value: "Online", label: "Online" },
+  { value: "Referral", label: "Giới thiệu" },
+  { value: "Social Media", label: "Mạng xã hội" },
+];
 
-export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFormDialogProps) {
-  const isEdit = !!customer
-  const createMutation = useCreateCustomer()
-  const updateMutation = useUpdateCustomer()
-  const isPending = createMutation.isPending || updateMutation.isPending
-  const [pendingFile, setPendingFile] = useState<File | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
+export function CustomerFormDialog({
+  open,
+  onOpenChange,
+  customer,
+}: CustomerFormDialogProps) {
+  const isEdit = !!customer;
+  const createMutation = useCreateCustomer();
+  const updateMutation = useUpdateCustomer();
+  const isPending = createMutation.isPending || updateMutation.isPending;
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Dynamic schema & form based on create vs edit
   const form = useForm<CustomerFormValues>({
-    resolver: zodResolver(isEdit ? updateCustomerSchema : createCustomerSchema) as Resolver<CustomerFormValues>,
+    resolver: zodResolver(
+      isEdit ? updateCustomerSchema : createCustomerSchema,
+    ) as Resolver<CustomerFormValues>,
     defaultValues: getDefaultValues(customer),
-  })
+  });
 
-  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = form
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+    watch,
+  } = form;
 
-  const imageValue = watch('image')
-  const selectedProvince = watch('provinceCode')
-  const provincesQuery = useProvinces()
-  const wardsQuery = useWardsByProvince(selectedProvince)
+  const avatarUrlValue = watch("avatarUrl");
+  const selectedProvince = watch("provinceCode");
+  const provincesQuery = useProvinces();
+  const wardsQuery = useWardsByProvince(selectedProvince);
 
   // Reset form when dialog opens/closes or customer changes
   useEffect(() => {
     if (open) {
-      setPendingFile(null)
-      reset(getDefaultValues(customer))
+      setPendingFile(null);
+      reset(getDefaultValues(customer));
     }
-  }, [open, customer, reset])
+  }, [open, customer, reset]);
 
   const onSubmit = async (data: CustomerFormValues) => {
-    setIsUploading(true)
+    setIsUploading(true);
     try {
-      let image = data.image ?? ''
+      let avatarUrl = data.avatarUrl ?? "";
       if (pendingFile) {
-        const result = await uploadApi.uploadImage(pendingFile, 'customer')
-        image = (result.isSuccess && result.data) ? result.data : ''
+        const result = await uploadApi.uploadImage(pendingFile, "customer");
+        avatarUrl = result.isSuccess && result.data ? result.data : "";
       }
-      const provinceName = provincesQuery.data?.data?.find((p: ProvinceDto) => p.code === data.provinceCode)?.name ?? ''
-      const wardName = wardsQuery.data?.data?.find((w: WardDto) => w.code === data.wardCode)?.name ?? ''
-      const parts = [data.streetAddress, wardName, provinceName].filter(Boolean)
-      const payload = { ...data, image, fullAddress: parts.join(', ') }
+      const provinceName =
+        provincesQuery.data?.data?.find(
+          (p: ProvinceDto) => p.code === data.provinceCode,
+        )?.name ?? "";
+      const wardName =
+        wardsQuery.data?.data?.find((w: WardDto) => w.code === data.wardCode)
+          ?.name ?? "";
+      const parts = [data.streetAddress, wardName, provinceName].filter(
+        Boolean,
+      );
+      const payload = { ...data, avatarUrl, fullAddress: parts.join(", ") };
 
       if (isEdit && customer?.id) {
         updateMutation.mutate(
-          { id: customer.id, payload: payload as UpdateCustomerFormData },
-          { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) } }
-        )
+          { id: customer.id, payload: payload as UpdateCustomerPayload },
+          {
+            onSuccess: (result) => {
+              if (result.isSuccess) onOpenChange(false);
+            },
+          },
+        );
       } else {
-        createMutation.mutate(
-          payload as CreateCustomerFormData,
-          { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) } }
-        )
+        createMutation.mutate(payload as CreateCustomerPayload, {
+          onSuccess: async (result) => {
+            if (result.isSuccess) {
+              const customerId = result.data as unknown as number;
+              if (customerId > 0) {
+                try {
+                  await axiosInstance.post(API.membershipCards, {
+                    customerId,
+                    membershipTierName: "common",
+                    issuedAt: new Date().toISOString(),
+                    status: 1,
+                  });
+                } catch (err) {
+                  console.error(
+                    "Failed to automatically create membership card:",
+                    err,
+                  );
+                }
+              }
+              onOpenChange(false);
+            }
+          },
+        });
       }
     } finally {
-      setIsUploading(false)
+      setIsUploading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[850px]">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Chỉnh sửa khách hàng' : 'Thêm khách hàng mới'}</DialogTitle>
+          <DialogTitle>
+            {isEdit ? "Chỉnh sửa khách hàng" : "Thêm khách hàng mới"}
+          </DialogTitle>
           <DialogDescription>
-            {isEdit ? `Cập nhật thông tin khách hàng ${customer?.fullName ?? ''}` : 'Điền thông tin để tạo khách hàng mới'}
+            {isEdit
+              ? `Cập nhật thông tin khách hàng ${customer?.fullName ?? ""}`
+              : "Điền thông tin để tạo khách hàng mới"}
           </DialogDescription>
         </DialogHeader>
 
@@ -136,44 +197,74 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
           <FormSection icon={User} title="Thông tin cá nhân">
             <div className="mb-5">
               <ImageUpload
-                value={imageValue || customer?.image}
+                value={avatarUrlValue || customer?.avatarUrl}
                 onFileChange={setPendingFile}
                 label="Đổi ảnh đại diện"
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-              <FormField label="Họ tên *" tooltip="Vui lòng nhập họ và tên đầy đủ của khách hàng" error={errors.fullName?.message}>
-                <Input {...register('fullName')} placeholder="Nguyễn Văn A" className="h-9 text-[13px]" />
+              <FormField
+                label="Họ tên *"
+                tooltip="Vui lòng nhập họ và tên đầy đủ của khách hàng"
+                error={errors.fullName?.message}
+              >
+                <Input
+                  {...register("fullName")}
+                  placeholder="Nguyễn Văn A"
+                  className="h-9 text-[13px]"
+                />
               </FormField>
-              <FormField label="Số điện thoại *" tooltip="Số điện thoại phải có 10 chữ số" error={errors.phone?.message}>
-                <Input {...register('phone')} placeholder="0901234567" className="h-9 text-[13px]" />
+              <FormField
+                label="Số điện thoại *"
+                tooltip="Số điện thoại phải có 10 chữ số"
+                error={errors.phone?.message}
+              >
+                <Input
+                  {...register("phone")}
+                  placeholder="0901234567"
+                  className="h-9 text-[13px]"
+                />
               </FormField>
-              <FormField label="Ngày sinh" error={errors.dob?.message}>
-                <Input {...register('dob')} type="date" className="h-9 text-[13px]" />
+              <FormField label="Ngày sinh" error={errors.dateOfBirth?.message}>
+                <Input
+                  {...register("dateOfBirth")}
+                  type="date"
+                  className="h-9 text-[13px]"
+                />
               </FormField>
               <FormField label="Giới tính">
                 <Select
-                  value={watch('gender')?.toString() ?? ''}
-                  onValueChange={(v) => setValue('gender', Number(v))}
+                  value={watch("gender")?.toString() ?? ""}
+                  onValueChange={(v) => setValue("gender", Number(v))}
                 >
                   <SelectTrigger className="h-9 text-[13px]">
                     <SelectValue placeholder="Chọn giới tính" />
                   </SelectTrigger>
                   <SelectContent>
-                    {GENDER_OPTIONS.map(opt => (
-                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                    {GENDER_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </FormField>
-              <FormField label="Tỉnh/Thành phố" error={errors.provinceCode?.message}>
+              <FormField
+                label="Tỉnh/Thành phố"
+                error={errors.provinceCode?.message}
+              >
                 <SearchableSelect
-                  value={watch('provinceCode') ?? ''}
-                  onValueChange={v => {
-                    setValue('provinceCode', v)
-                    setValue('wardCode', '')
+                  value={watch("provinceCode") ?? ""}
+                  onValueChange={(v) => {
+                    setValue("provinceCode", v);
+                    setValue("wardCode", "");
                   }}
-                  options={(provincesQuery.data?.data ?? []).map((p: ProvinceDto) => ({ value: p.code ?? '', label: p.name ?? '' }))}
+                  options={(provincesQuery.data?.data ?? []).map(
+                    (p: ProvinceDto) => ({
+                      value: p.code ?? "",
+                      label: p.name ?? "",
+                    }),
+                  )}
                   placeholder="Chọn tỉnh/thành phố"
                   searchPlaceholder="Tìm tỉnh/thành phố..."
                   className="h-9"
@@ -181,17 +272,28 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
               </FormField>
               <FormField label="Phường/Xã" error={errors.wardCode?.message}>
                 <SearchableSelect
-                  value={watch('wardCode') ?? ''}
-                  onValueChange={v => setValue('wardCode', v)}
-                  options={(wardsQuery.data?.data ?? []).map((w: WardDto) => ({ value: w.code ?? '', label: w.name ?? '' }))}
+                  value={watch("wardCode") ?? ""}
+                  onValueChange={(v) => setValue("wardCode", v)}
+                  options={(wardsQuery.data?.data ?? []).map((w: WardDto) => ({
+                    value: w.code ?? "",
+                    label: w.name ?? "",
+                  }))}
                   placeholder="Chọn phường/xã"
                   searchPlaceholder="Tìm phường/xã..."
-                  disabled={!watch('provinceCode') || wardsQuery.isLoading}
+                  disabled={!watch("provinceCode") || wardsQuery.isLoading}
                   className="h-9"
                 />
               </FormField>
-              <FormField label="Số nhà, tên đường" error={errors.streetAddress?.message} className="sm:col-span-2">
-                <Input {...register('streetAddress')} placeholder="123 Đường ABC" className="h-9 text-[13px]" />
+              <FormField
+                label="Số nhà, tên đường"
+                error={errors.streetAddress?.message}
+                className="sm:col-span-2"
+              >
+                <Input
+                  {...register("streetAddress")}
+                  placeholder="123 Đường ABC"
+                  className="h-9 text-[13px]"
+                />
               </FormField>
             </div>
           </FormSection>
@@ -199,83 +301,56 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
           {/* === Section: Thông tin khách hàng === */}
           <FormSection icon={ShoppingBag} title="Thông tin khách hàng">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-              <FormField label="Điểm tích lũy" error={errors.loyaltyPoint?.message}>
-                <Input
-                  {...register('loyaltyPoint')}
-                  type="number"
-                  placeholder="0"
-                  className="h-9 text-[13px]"
-                />
-              </FormField>
+              {/* Điểm tích lũy được quản lý tự động bởi hệ thống */}
               <FormField label="Nguồn khách">
                 <Select
-                  value={watch('source') ?? ''}
-                  onValueChange={(v) => setValue('source', v)}
+                  value={watch("source") ?? ""}
+                  onValueChange={(v) => setValue("source", v)}
                 >
                   <SelectTrigger className="h-9 text-[13px]">
                     <SelectValue placeholder="Chọn nguồn" />
                   </SelectTrigger>
                   <SelectContent>
-                    {SOURCE_OPTIONS.map(opt => (
-                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                    {SOURCE_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </FormField>
               <FormField label="Trạng thái">
                 <Select
-                  value={watch('status')?.toString() ?? '1'}
-                  onValueChange={(v) => setValue('status', Number(v))}
+                  value={watch("status")?.toString() ?? "1"}
+                  onValueChange={(v) => setValue("status", Number(v))}
                 >
                   <SelectTrigger className="h-9 text-[13px]">
                     <SelectValue placeholder="Chọn trạng thái" />
                   </SelectTrigger>
                   <SelectContent>
-                    {STATUS_OPTIONS.map(opt => (
-                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                    {STATUS_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </FormField>
-              <FormField label="Ghi chú" error={errors.note?.message} className="sm:col-span-2">
-                <Textarea {...register('note')} placeholder="Ghi chú thêm về khách hàng..." className="text-[13px] min-h-[60px] resize-none" />
+              <FormField
+                label="Ghi chú"
+                error={errors.note?.message}
+                className="sm:col-span-2"
+              >
+                <Textarea
+                  {...register("note")}
+                  placeholder="Ghi chú thêm về khách hàng..."
+                  className="text-[13px] min-h-[60px] resize-none"
+                />
               </FormField>
             </div>
           </FormSection>
 
-          {/* === Section: Tài khoản (chỉ khi tạo mới) === */}
-          {!isEdit && (
-            <FormSection icon={KeyRound} title="Tài khoản đăng nhập">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                <FormField label="Tên tài khoản *" tooltip="Tên đăng nhập viết liền, không dấu, không chứa ký tự đặc biệt" error={(errors as Record<string, { message?: string }>).userName?.message}>
-                  <Input {...register('userName')} placeholder="nguyenvana" className="h-9 text-[13px]" />
-                </FormField>
-                <FormField label="Email *" tooltip="Địa chỉ email hợp lệ (ví dụ: user@example.com)" error={errors.email?.message}>
-                  <Input {...register('email')} type="email" placeholder="kh@hoasenspa.com" className="h-9 text-[13px]" />
-                </FormField>
-                <FormField label="Mật khẩu *" tooltip="Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt" error={(errors as Record<string, { message?: string }>).password?.message}>
-                  <Input {...register('password')} type="password" placeholder="••••••••" className="h-9 text-[13px]" />
-                </FormField>
-                <FormField label="Xác nhận mật khẩu *" tooltip="Nhập lại mật khẩu khớp với mật khẩu ở trên" error={(errors as Record<string, { message?: string }>).confirmPassword?.message}>
-                  <Input {...register('confirmPassword')} type="password" placeholder="••••••••" className="h-9 text-[13px]" />
-                </FormField>
-              </div>
-            </FormSection>
-          )}
-
-          {/* === Account fields khi edit === */}
-          {isEdit && (
-            <FormSection icon={KeyRound} title="Tài khoản">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                <FormField label="Tên tài khoản *" tooltip="Tên đăng nhập viết liền, không dấu" error={errors.userName?.message}>
-                  <Input {...register('userName')} placeholder="nguyenvana" className="h-9 text-[13px]" />
-                </FormField>
-                <FormField label="Email *" tooltip="Địa chỉ email hợp lệ" error={errors.email?.message}>
-                  <Input {...register('email')} type="email" placeholder="kh@hoasenspa.com" className="h-9 text-[13px]" />
-                </FormField>
-              </div>
-            </FormSection>
-          )}
+          {/* Note: Account creation is handled via public registration only */}
 
           <DialogFooter>
             <Button
@@ -293,18 +368,26 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
               size="sm"
               loading={isPending || isUploading}
             >
-              {isEdit ? 'Cập nhật' : 'Tạo khách hàng'}
+              {isEdit ? "Cập nhật" : "Tạo khách hàng"}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
 // ---- Helper Components ----
 
-function FormSection({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) {
+function FormSection({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon: React.ElementType;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <div className="flex items-center gap-2 mb-3 pb-2 border-b border-stone-100">
@@ -313,19 +396,31 @@ function FormSection({ icon: Icon, title, children }: { icon: React.ElementType;
       </div>
       {children}
     </div>
-  )
+  );
 }
 
-function FormField({ label, error, tooltip, className, children }: { label: string; error?: string; tooltip?: string; className?: string; children: React.ReactNode }) {
-  const isRequired = label.includes('*');
-  const cleanLabel = label.replace('*', '').trim();
+function FormField({
+  label,
+  error,
+  tooltip,
+  className,
+  children,
+}: {
+  label: string;
+  error?: string;
+  tooltip?: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const isRequired = label.includes("*");
+  const cleanLabel = label.replace("*", "").trim();
 
   return (
-    <div className={`space-y-1 ${className ?? ''}`}>
+    <div className={`space-y-1 ${className ?? ""}`}>
       <Label className="flex items-center gap-1 text-[12px] font-semibold text-lotus-deep/80">
         {cleanLabel}
-        {isRequired && (
-          tooltip ? (
+        {isRequired &&
+          (tooltip ? (
             <Tooltip>
               <TooltipTrigger asChild>
                 <span className="text-red-500 cursor-help hover:text-red-600 focus:outline-none select-none">
@@ -338,13 +433,12 @@ function FormField({ label, error, tooltip, className, children }: { label: stri
             </Tooltip>
           ) : (
             <span className="text-red-500">*</span>
-          )
-        )}
+          ))}
       </Label>
       {children}
       {error && <p className="text-[11px] text-red-500 font-medium">{error}</p>}
     </div>
-  )
+  );
 }
 
 // ---- Default Values ----
@@ -352,40 +446,34 @@ function FormField({ label, error, tooltip, className, children }: { label: stri
 function getDefaultValues(customer?: CustomerDto | null): CustomerFormValues {
   if (customer) {
     return {
-      fullName: customer.fullName ?? '',
-      phone: customer.phone ?? '',
-      dob: customer.dob ?? '',
+      fullName: customer.fullName ?? "",
+      phone: customer.phone ?? "",
+      dateOfBirth: parseToDateInput(customer.dateOfBirth),
       gender: customer.gender ? Number(customer.gender) : undefined,
-      image: customer.image ?? '',
+      avatarUrl: customer.avatarUrl ?? "",
       loyaltyPoint: customer.loyaltyPoint ?? undefined,
-      source: customer.source ?? '',
+      source: customer.source ?? "",
       status: customer.status ? Number(customer.status) : 1,
-      note: customer.note ?? '',
-      streetAddress: customer.streetAddress ?? '',
-      provinceCode: customer.provinceCode ?? '',
-      wardCode: customer.wardCode ?? '',
-      fullAddress: customer.fullAddress ?? '',
-      userName: customer.username ?? '',
-      email: customer.email ?? '',
-    }
+      note: customer.note ?? "",
+      streetAddress: customer.streetAddress ?? "",
+      provinceCode: customer.provinceCode ?? "",
+      wardCode: customer.wardCode ?? "",
+      fullAddress: customer.fullAddress ?? "",
+    };
   }
   return {
-    fullName: '',
-    phone: '',
-    dob: '',
+    fullName: "",
+    phone: "",
+    dateOfBirth: "",
     gender: undefined,
-    image: '',
+    avatarUrl: "",
     loyaltyPoint: undefined,
-    source: '',
+    source: "",
     status: 1,
-    note: '',
-    streetAddress: '',
-    provinceCode: '',
-    wardCode: '',
-    fullAddress: '',
-    userName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  }
+    note: "",
+    streetAddress: "",
+    provinceCode: "",
+    wardCode: "",
+    fullAddress: "",
+  };
 }

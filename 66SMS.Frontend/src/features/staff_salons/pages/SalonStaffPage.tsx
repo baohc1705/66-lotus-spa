@@ -1,83 +1,109 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo } from "react";
 import {
   useReactTable,
   getCoreRowModel,
   type ColumnDef,
   type VisibilityState,
-} from '@tanstack/react-table'
-import { Plus, MoreHorizontal, Pencil, Trash2, Users } from 'lucide-react'
-import { DataTable } from '@/shared/components/DataTable/DataTable'
-import { DataTableViewOptions } from '@/shared/components/DataTable/DataTableViewOptions'
-import { Button } from '@/shared/components/ui/button'
+} from "@tanstack/react-table";
+import { Plus, MoreHorizontal, Pencil, Trash2, Users } from "lucide-react";
+import { DataTable } from "@/shared/components/DataTable/DataTable";
+import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
+import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu'
-import { ConfirmDialog } from '@/shared/components/ConfirmDialog'
-import { DataTablePagination } from '@/shared/components/DataTable/DataTablePagination'
-import { StaffSalonFormDialog } from '../components/StaffSalonFormDialog'
-import { StaffSalonStatusBadge } from '../components/StaffSalonStatusBadge'
-import { useStaffSalons, useDeleteStaffSalon } from '../hooks/useStaffSalons'
-import type { StaffSalonDTO } from '../types/staff-salon.types'
+} from "@/shared/components/ui/dropdown-menu";
+import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
+import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
+import { StaffSalonFormDialog } from "../components/StaffSalonFormDialog";
+import { StaffSalonStatusBadge } from "../components/StaffSalonStatusBadge";
+import { useStaffSalons, useDeleteStaffSalon } from "../hooks/useStaffSalons";
+import type { StaffSalonDTO } from "../types/staff-salon.types";
 
 interface SalonStaffPageProps {
-  salonId: number
+  salonId: number;
 }
 
 export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
-  const [pageIndex, setPageIndex] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [pageIndex, setPageIndex] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
-  const [createOpen, setCreateOpen] = useState(false)
-  const [editTarget, setEditTarget] = useState<StaffSalonDTO | null>(null)
-  const [deleteTarget, setDeleteTarget] = useState<StaffSalonDTO | null>(null)
+  const [createOpen, setCreateOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<StaffSalonDTO | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<StaffSalonDTO | null>(null);
 
-  const { data: result, isLoading } = useStaffSalons({ salonId, pageIndex, pageSize })
-  const deleteMutation = useDeleteStaffSalon()
+  const { data: result, isLoading } = useStaffSalons({
+    salonId,
+    pageIndex,
+    pageSize,
+  });
+  const deleteMutation = useDeleteStaffSalon();
 
-  const paged = result?.data
-  const items = useMemo(() => paged?.items ?? [], [paged?.items])
-  const totalCount = paged?.totalCount ?? 0
+  const paged = result?.data;
+  const items = useMemo(() => paged?.items ?? [], [paged?.items]);
+  const totalCount = paged?.totalCount ?? 0;
 
   const columns: ColumnDef<StaffSalonDTO>[] = [
     {
-      id: 'index',
-      header: '#',
+      id: "index",
+      header: "#",
       cell: ({ row }) => (
-        <span className="text-stone-400 text-sm">{(pageIndex - 1) * pageSize + row.index + 1}</span>
+        <span className="text-stone-400 text-sm">
+          {(pageIndex - 1) * pageSize + row.index + 1}
+        </span>
       ),
       size: 50,
     },
     {
-      accessorKey: 'staffId',
-      header: 'Mã NV',
+      accessorKey: "staffId",
+      header: "Mã NV",
       cell: ({ getValue }) => (
-        <span className="font-mono text-xs bg-stone-100 px-1.5 py-0.5 rounded">{String(getValue())}</span>
+        <span className="font-mono text-xs bg-stone-100 px-1.5 py-0.5 rounded">
+          {String(getValue())}
+        </span>
       ),
     },
     {
-      accessorKey: 'startDate',
-      header: 'Ngày bắt đầu',
-      cell: ({ getValue }) => <span className="text-sm">{String(getValue() ?? '—')}</span>,
-    },
-    {
-      accessorKey: 'endDate',
-      header: 'Ngày kết thúc',
-      cell: ({ getValue }) => <span className="text-sm text-stone-500">{String(getValue() ?? '—')}</span>,
-    },
-    {
-      id: 'statusBadge',
-      header: 'Trạng thái',
+      accessorKey: "staffName",
+      header: "Họ tên",
       cell: ({ row }) => (
-        <StaffSalonStatusBadge status={row.original.status} isManager={row.original.isManager} />
+        <span className="font-mono text-xs bg-stone-100 px-1.5 py-0.5 rounded">
+          {row.original.staffName}
+        </span>
       ),
     },
     {
-      id: 'actions',
-      header: '',
+      accessorKey: "startDate",
+      header: "Ngày bắt đầu",
+      cell: ({ getValue }) => (
+        <span className="text-sm">{String(getValue() ?? "—")}</span>
+      ),
+    },
+    {
+      accessorKey: "endDate",
+      header: "Ngày kết thúc",
+      cell: ({ getValue }) => (
+        <span className="text-sm text-stone-500">
+          {String(getValue() ?? "—")}
+        </span>
+      ),
+    },
+    {
+      id: "statusBadge",
+      header: "Trạng thái",
+      cell: ({ row }) => (
+        <StaffSalonStatusBadge
+          status={row.original.status}
+          isManager={row.original.isManager}
+        />
+      ),
+    },
+    {
+      id: "actions",
+      header: "",
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -100,7 +126,7 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
       ),
       size: 50,
     },
-  ]
+  ];
 
   const table = useReactTable({
     data: items,
@@ -110,7 +136,7 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
     pageCount: Math.ceil(totalCount / pageSize),
-  })
+  });
 
   return (
     <div className="space-y-4">
@@ -132,12 +158,17 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
 
       {totalCount > pageSize && (
         <DataTablePagination
-          table={table}
           pageIndex={pageIndex}
           pageSize={pageSize}
           totalCount={totalCount}
+          totalPages={paged?.totalPages ?? 0}
+          hasPreviousPage={paged?.hasPreviousPage ?? false}
+          hasNextPage={paged?.hasNextPage ?? false}
           onPageChange={setPageIndex}
-          onPageSizeChange={(s) => { setPageSize(s); setPageIndex(1) }}
+          onPageSizeChange={(s) => {
+            setPageSize(s);
+            setPageIndex(1);
+          }}
         />
       )}
 
@@ -149,25 +180,29 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
 
       <StaffSalonFormDialog
         open={!!editTarget}
-        onOpenChange={(o) => { if (!o) setEditTarget(null) }}
+        onOpenChange={(o) => {
+          if (!o) setEditTarget(null);
+        }}
         salonId={salonId}
         staffSalon={editTarget}
       />
 
       <ConfirmDialog
         open={!!deleteTarget}
-        onOpenChange={(o) => { if (!o) setDeleteTarget(null) }}
+        onOpenChange={(o) => {
+          if (!o) setDeleteTarget(null);
+        }}
         title="Xóa nhân viên khỏi chi nhánh?"
         description="Hành động này sẽ xóa nhân viên khỏi chi nhánh này."
         onConfirm={() => {
           if (deleteTarget?.id) {
             deleteMutation.mutate(deleteTarget.id, {
               onSuccess: () => setDeleteTarget(null),
-            })
+            });
           }
         }}
-        isLoading={deleteMutation.isPending}
+        loading={deleteMutation.isPending}
       />
     </div>
-  )
+  );
 }

@@ -1,10 +1,10 @@
 import {
   LayoutDashboard,
-  MessageSquare,
+  //MessageSquare,
   Users,
-  Send,
-  History,
-  FileText,
+  //Send,
+  //History,
+  //FileText,
   Calendar,
   SoapDispenserDroplet,
   Stethoscope,
@@ -94,16 +94,16 @@ export const MENU_ITEMS: MenuItem[] = [
       },
     ],
   },
-  {
-    label: "Quản lý Spa",
-    icon: MessageSquare,
-    allowedRoles: ["Admin"],
-    children: [
-      { label: "Đặt lịch hẹn", path: "/admin/appointments", icon: Send },
-      { label: "Liệu trình", path: "/admin/treatments", icon: History },
-      { label: "Gói dịch vụ", path: "/admin/packages", icon: FileText },
-    ],
-  },
+  // {
+  //   label: "Quản lý Spa",
+  //   icon: MessageSquare,
+  //   allowedRoles: ["Admin"],
+  //   children: [
+  //     { label: "Đặt lịch hẹn", path: "/admin/appointments", icon: Send },
+  //     { label: "Liệu trình", path: "/admin/treatments", icon: History },
+  //     { label: "Gói dịch vụ", path: "/admin/packages", icon: FileText },
+  //   ],
+  // },
   {
     label: "Nhân viên",
     path: "/admin/staff/list",
@@ -139,7 +139,7 @@ export const MENU_ITEMS: MenuItem[] = [
     label: "Lịch hẹn của tôi",
     path: "/admin/staff/appointments",
     icon: CalendarHeart,
-    allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
+    allowedRoles: ["Staff"],
   },
   {
     label: "Khách hàng",
@@ -147,9 +147,21 @@ export const MENU_ITEMS: MenuItem[] = [
     allowedRoles: ["Admin", "Manager"],
     children: [
       { label: "Khách hàng", path: "/admin/customers/list", icon: Users },
-      { label: "Ví khách hàng", path: "/admin/customers/wallets", icon: Wallet },
-      { label: "Thẻ thành viên", path: "/admin/customers/membership-cards", icon: CreditCard },
-      { label: "Loại thẻ", path: "/admin/customers/membership-tiers", icon: Crown },
+      {
+        label: "Ví khách hàng",
+        path: "/admin/customers/wallets",
+        icon: Wallet,
+      },
+      {
+        label: "Thẻ thành viên",
+        path: "/admin/customers/membership-cards",
+        icon: CreditCard,
+      },
+      {
+        label: "Loại thẻ",
+        path: "/admin/customers/membership-tiers",
+        icon: Crown,
+      },
     ],
   },
 ];

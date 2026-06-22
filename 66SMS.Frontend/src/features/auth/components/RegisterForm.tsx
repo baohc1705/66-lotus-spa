@@ -3,7 +3,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Eye, EyeOff, Loader2, Mail, RotateCcw } from "lucide-react";
+import {
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Loader2,
+  Mail,
+  RotateCcw,
+} from "lucide-react";
 import {
   registerSchema,
   type RegisterFormData,
@@ -90,9 +97,13 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
             : Promise.resolve(),
         ]).then(([otpResult]) => {
           if (otpResult.status === "fulfilled") {
-            toast.success("Đăng ký thành công! Mã OTP đã được gửi đến email của bạn.");
+            toast.success(
+              "Đăng ký thành công! Mã OTP đã được gửi đến email của bạn.",
+            );
           } else {
-            toast.warning("Đăng ký thành công nhưng không gửi được OTP. Vui lòng thử gửi lại.");
+            toast.warning(
+              "Đăng ký thành công nhưng không gửi được OTP. Vui lòng thử gửi lại.",
+            );
           }
           onSuccess(data.email);
         });
@@ -183,10 +194,16 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
           aria-invalid={!!errors.confirmPassword}
           {...register("confirmPassword")}
         />
-        {errors.confirmPassword && <FieldError message={errors.confirmPassword.message} />}
+        {errors.confirmPassword && (
+          <FieldError message={errors.confirmPassword.message} />
+        )}
       </div>
 
-      <SubmitButton pending={isPending} label="Đăng ký" pendingLabel="Đang xử lý..." />
+      <SubmitButton
+        pending={isPending}
+        label="Đăng ký"
+        pendingLabel="Đang xử lý..."
+      />
     </form>
   );
 };
@@ -222,7 +239,10 @@ const OtpStep = ({ email }: OtpStepProps) => {
     if (char && index < OTP_LENGTH - 1) focusAt(index + 1);
   };
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
     if (e.key === "Backspace") {
       if (otp[index]) {
         const next = [...otp];
@@ -240,10 +260,15 @@ const OtpStep = ({ email }: OtpStepProps) => {
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, OTP_LENGTH);
+    const pasted = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, OTP_LENGTH);
     if (!pasted) return;
     const next = Array(OTP_LENGTH).fill("") as string[];
-    pasted.split("").forEach((ch, i) => { next[i] = ch; });
+    pasted.split("").forEach((ch, i) => {
+      next[i] = ch;
+    });
     setOtp(next);
     focusAt(Math.min(pasted.length, OTP_LENGTH - 1));
   };
@@ -280,8 +305,9 @@ const OtpStep = ({ email }: OtpStepProps) => {
     );
   };
 
-  const maskedEmail = email.replace(/^(.{2})(.+?)(@.+)$/, (_, a, b, c) =>
-    a + "*".repeat(Math.min(b.length, 4)) + c,
+  const maskedEmail = email.replace(
+    /^(.{2})(.+?)(@.+)$/,
+    (_, a, b, c) => a + "*".repeat(Math.min(b.length, 4)) + c,
   );
 
   const otpComplete = otp.every((d) => d !== "");
@@ -303,7 +329,9 @@ const OtpStep = ({ email }: OtpStepProps) => {
           <p className="text-sm text-[var(--spa-ui-text-muted)] mt-1">
             Chúng tôi đã gửi mã OTP 6 chữ số đến
           </p>
-          <p className="text-sm font-semibold text-[var(--spa-rose)]">{maskedEmail}</p>
+          <p className="text-sm font-semibold text-[var(--spa-rose)]">
+            {maskedEmail}
+          </p>
         </div>
       </div>
 
@@ -312,7 +340,9 @@ const OtpStep = ({ email }: OtpStepProps) => {
         {otp.map((digit, i) => (
           <input
             key={i}
-            ref={(el) => { inputRefs.current[i] = el; }}
+            ref={(el) => {
+              inputRefs.current[i] = el;
+            }}
             type="text"
             inputMode="numeric"
             maxLength={1}
@@ -320,7 +350,10 @@ const OtpStep = ({ email }: OtpStepProps) => {
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
             className="w-12 h-14 text-center text-xl font-bold rounded-xl border-2 transition-all duration-150 outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 bg-white"
-            style={{ borderColor: digit ? "#E91E8C" : "#e5e7eb", color: "#1f2937" }}
+            style={{
+              borderColor: digit ? "#E91E8C" : "#e5e7eb",
+              color: "#1f2937",
+            }}
             aria-label={`Ký tự OTP thứ ${i + 1}`}
           />
         ))}
@@ -338,7 +371,9 @@ const OtpStep = ({ email }: OtpStepProps) => {
         {countdown > 0 ? (
           <span>
             Gửi lại sau{" "}
-            <span className="font-semibold text-[var(--spa-rose)]">{countdown}s</span>
+            <span className="font-semibold text-[var(--spa-rose)]">
+              {countdown}s
+            </span>
           </span>
         ) : (
           <button
@@ -377,7 +412,11 @@ interface PasswordFieldProps extends React.InputHTMLAttributes<HTMLInputElement>
   onToggle: () => void;
 }
 
-const PasswordField = ({ show, onToggle, ...inputProps }: PasswordFieldProps) => (
+const PasswordField = ({
+  show,
+  onToggle,
+  ...inputProps
+}: PasswordFieldProps) => (
   <div className="relative">
     <Input
       {...inputProps}
@@ -402,16 +441,27 @@ interface SubmitButtonProps {
   pendingLabel: string;
 }
 
-const SubmitButton = ({ pending, disabled = false, label, pendingLabel }: SubmitButtonProps) => {
+const SubmitButton = ({
+  pending,
+  disabled = false,
+  label,
+  pendingLabel,
+}: SubmitButtonProps) => {
   const isDisabled = pending || disabled;
   return (
     <button
       type="submit"
       disabled={isDisabled}
       className={`w-full flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-white font-semibold text-sm transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-pink-200 mt-2 ${
-        isDisabled ? "opacity-60 cursor-not-allowed" : "hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+        isDisabled
+          ? "opacity-60 cursor-not-allowed"
+          : "hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
       }`}
-      style={{ background: isDisabled ? "#9ca3af" : "linear-gradient(135deg, #E91E8C, #C4177A)" }}
+      style={{
+        background: isDisabled
+          ? "#9ca3af"
+          : "linear-gradient(135deg, #E91E8C, #C4177A)",
+      }}
     >
       {pending ? (
         <>

@@ -3,21 +3,20 @@ export interface CustomerDto {
   id: number | null
   userId: number | null
   fullName: string | null
-  image: string | null
-  dob: string | null
-  gender: string | null
+  avatarUrl: string | null
+  dateOfBirth: string | null
+  gender: number | null
   phone: string | null
   loyaltyPoint: number | null
   firstPurchaseAt: string | null
   lastPurchaseAt: string | null
   source: string | null
-  status: string | null
+  status: number | null
   note: string | null
   streetAddress: string | null
   provinceCode: string | null
   wardCode: string | null
   fullAddress: string | null
-  username: string | null
   email: string | null
   createdAt?: string | null
   createdBy?: number | null
@@ -28,8 +27,8 @@ export interface CustomerDto {
 // Payload tạo khách hàng (match CreateCustomerCommand, bỏ [JsonIgnore] fields: UserId, Role, CreatedBy)
 export interface CreateCustomerPayload {
   fullName: string
-  image?: string
-  dob?: string
+  avatarUrl?: string
+  dateOfBirth?: string
   gender?: number
   phone: string
   loyaltyPoint?: number
@@ -42,18 +41,13 @@ export interface CreateCustomerPayload {
   provinceCode?: string
   wardCode?: string
   fullAddress?: string
-  // Account fields
-  userName: string
-  email: string
-  password: string
-  confirmPassword: string
 }
 
-// Payload cập nhật khách hàng (match UpdateCustomerCommand, bỏ [JsonIgnore] fields: Id, Role, CreatedBy, không có password)
+// Payload cập nhật khách hàng (match UpdateCustomerCommand, bỏ [JsonIgnore] fields: Id, Role, CreatedBy)
 export interface UpdateCustomerPayload {
   fullName?: string
-  image?: string
-  dob?: string
+  avatarUrl?: string
+  dateOfBirth?: string
   gender?: number
   phone?: string
   loyaltyPoint?: number
@@ -66,6 +60,4 @@ export interface UpdateCustomerPayload {
   provinceCode?: string
   wardCode?: string
   fullAddress?: string
-  userName?: string
-  email?: string
 }
