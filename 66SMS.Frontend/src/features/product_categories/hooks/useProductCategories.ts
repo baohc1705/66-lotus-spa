@@ -1,4 +1,4 @@
-import { productCategoryApi } from "@/features/product_categories/api/productCategory.api.";
+import { productCategoryApi } from "@/features/product_categories/api/productCategory.api";
 import type { PageRequest } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";

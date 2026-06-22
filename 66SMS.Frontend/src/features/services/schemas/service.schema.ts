@@ -1,12 +1,14 @@
 import { z } from "zod";
 
 export const serviceImageSchema = z.object({
+  id: z.number().optional(),
   url: z.string().url("URL không hợp lệ").or(z.literal("")),
   sortOrder: z.coerce.number().optional(),
   isPrimary: z.boolean().optional(),
 });
 
 export const serviceProductSchema = z.object({
+  id: z.number().optional(),
   productId: z.coerce.number().min(1, "Vui lòng chọn sản phẩm"),
   quantityUsed: z.coerce.number().min(1, "Số lượng phải lớn hơn 0"),
   note: z.string().optional(),

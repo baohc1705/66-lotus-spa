@@ -1,4 +1,5 @@
 import axiosInstance from "@/shared/api/axiosInstance";
+import { API } from "@/shared/api/endpoints";
 import type {
   Result,
   PagedResult,
@@ -10,7 +11,7 @@ import type {
   UpdateProductCategoryPayload,
 } from "../types/product_category.types";
 
-const BASE = "/ProductCategory";
+const BASE = API.productCategories;
 
 export const productCategoryApi = {
   // Get All
@@ -18,6 +19,7 @@ export const productCategoryApi = {
     axiosInstance
       .get<Result<PagedResult<ProductCategoryDTO>>>(BASE, { params })
       .then((r) => r.data),
+
   // Get Detail
   getDetail: (id: number) =>
     axiosInstance

@@ -8,7 +8,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useBookingStore } from "../stores/bookingStore";
-import { useGetAllServicesUser } from "../../services/hooks/useServices";
+import { useServices } from "../../services/hooks/useServices";
 
 export const BookingServiceStep: React.FC = () => {
   const store = useBookingStore();
@@ -16,7 +16,7 @@ export const BookingServiceStep: React.FC = () => {
   const selectedService = activeGuest?.selectedService;
   const selectService = store.selectService;
   const nextStep = store.nextStep;
-  const { data, isLoading, isError } = useGetAllServicesUser({
+  const { data, isLoading, isError } = useServices({
     pageIndex: 1,
     pageSize: 100,
   });

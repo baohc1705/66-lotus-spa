@@ -1,9 +1,13 @@
+import type { PageRequest } from "@/shared/types/common.types";
+
 export interface ProductImageDto {
   id: number
   productId: number
   url: string
   isPrimary: boolean
+  sortOrder?: number
 }
+
 
 export interface ProductDto {
   id: number | null
@@ -62,3 +66,26 @@ export interface ProductCategoryDto {
   code?: string
   description?: string
 }
+
+export interface GetAllProductQuery extends PageRequest {
+  categoryId?: number;
+  keyword?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  status?: number;
+}
+
+export interface CreateProductImagePayload {
+  productId: number;
+  url: string;
+  sortOrder: number;
+  isPrimary: boolean;
+}
+
+export interface UpdateProductImagePayload {
+  productId?: number;
+  url?: string;
+  sortOrder?: number;
+  isPrimary?: boolean;
+}
+

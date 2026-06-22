@@ -120,11 +120,16 @@ export function ProductFormDialog({
       const images = (await Promise.all(
         (data.images || []).map(async (img, index) => {
           const file = pendingFiles[index];
+          let url = img.url || '';
           if (file) {
             const result = await uploadApi.uploadImage(file, 'product');
-            return { ...img, url: (result.isSuccess && result.data) ? result.data : '' };
+            url = (result.isSuccess && result.data) ? result.data : '';
           }
-          return img;
+          return {
+            id: img.id,
+            url,
+            isPrimary: !!img.isPrimary,
+          };
         })
       )).filter(img => img.url !== '');
       const payload = { ...data, images };
@@ -182,7 +187,7 @@ export function ProductFormDialog({
               </FormField>
               <FormField label="Danh mục *" error={errors.categoryId?.message}>
                 <Select
-                  value={getValues("categoryId")?.toString() ?? ""}
+                  value={watch("categoryId")?.toString() ?? ""}
                   onValueChange={(v) => setValue("categoryId", Number(v))}
                 >
                   <SelectTrigger className="h-9 text-[13px]">
@@ -350,7 +355,7 @@ export function ProductFormDialog({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
               <FormField label="Trạng thái">
                 <Select
-                  value={getValues("status")?.toString() ?? "1"}
+                  value={watch("status")?.toString() ?? "1"}
                   onValueChange={(v) => setValue("status", Number(v))}
                 >
                   <SelectTrigger className="h-9 text-[13px]">

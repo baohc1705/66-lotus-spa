@@ -40,7 +40,7 @@ import { Switch } from "@/shared/components/ui/switch";
 import { ServiceFormDialog } from "../components/ServiceFormDialog";
 import { ServiceDetailExpanded } from "../components/ServiceDetailExpanded";
 import {
-  useServices,
+  useServicesAdmin,
   useDeleteService,
   useUpdateService,
 } from "../hooks/useServices";
@@ -78,10 +78,10 @@ export function ServiceListPage() {
     data: serviceResult,
     isLoading,
     isFetching,
-  } = useServices({
+  } = useServicesAdmin({
     pageIndex,
     pageSize,
-    filter: filter || undefined,
+    keyword: filter || undefined,
     orderBy,
     isDescending,
   });
@@ -94,9 +94,7 @@ export function ServiceListPage() {
 
   const currentPageIds = useMemo(
     () =>
-      services
-        .map((s) => s.id)
-        .filter((id): id is number => id !== undefined),
+      services.map((s) => s.id).filter((id): id is number => id !== undefined),
     [services],
   );
   const isAllSelected =
@@ -287,7 +285,9 @@ export function ServiceListPage() {
         header: "Thời gian",
         cell: ({ row }) => (
           <span className="text-stone-600">
-            {row.original.durationMins ? `${row.original.durationMins} phút` : "—"}
+            {row.original.durationMins
+              ? `${row.original.durationMins} phút`
+              : "—"}
           </span>
         ),
         size: 100,
@@ -344,9 +344,7 @@ export function ServiceListPage() {
                     {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
                   </DropdownMenuItem>
                   <PermissionGate resource="services" action="update">
-                    <DropdownMenuItem
-                      onClick={() => setEditService(item)}
-                    >
+                    <DropdownMenuItem onClick={() => setEditService(item)}>
                       <Pencil className="w-4 h-4" />
                       Chỉnh sửa
                     </DropdownMenuItem>
@@ -443,11 +441,7 @@ export function ServiceListPage() {
               }}
             />
 
-            <PermissionGate
-              resource="services"
-              action="create"
-              role="admin"
-            >
+            <PermissionGate resource="services" action="create" role="admin">
               <Button
                 variant="admin"
                 size="sm"
@@ -466,9 +460,14 @@ export function ServiceListPage() {
           isLoading={isLoading}
           loadingRows={pageSize > 5 ? 5 : pageSize}
           onRowClick={(row) => row.toggleExpanded()}
-          renderSubComponent={({ row }) => (
-            row.original.id ? <ServiceDetailExpanded serviceId={row.original.id} onEdit={(service) => setEditService(service)} /> : null
-          )}
+          renderSubComponent={({ row }) =>
+            row.original.id ? (
+              <ServiceDetailExpanded
+                serviceId={row.original.id}
+                onEdit={(service) => setEditService(service)}
+              />
+            ) : null
+          }
           emptyState={
             <div className="flex flex-col items-center gap-3">
               <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
@@ -482,11 +481,7 @@ export function ServiceListPage() {
                   Thêm dịch vụ mới để cung cấp cho khách hàng.
                 </p>
               </div>
-              <PermissionGate
-                resource="services"
-                action="create"
-                role="admin"
-              >
+              <PermissionGate resource="services" action="create" role="admin">
                 <Button
                   variant="admin"
                   size="sm"
@@ -522,10 +517,7 @@ export function ServiceListPage() {
         )}
       </motion.div>
 
-      <ServiceFormDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-      />
+      <ServiceFormDialog open={createOpen} onOpenChange={setCreateOpen} />
 
       <ServiceFormDialog
         open={!!editService}

@@ -23,6 +23,13 @@ export function useServiceCategories(params: PageRequest) {
   });
 }
 
+export function useServiceCategoriesAdmin(params: PageRequest) {
+  return useQuery({
+    queryKey: SERVICE_CATEGORY_KEYS.list(params),
+    queryFn: () => serviceCategoryApi.adminGetAll(params),
+  });
+}
+
 export function useServiceCategoryDetail(id: number | null) {
   return useQuery({
     queryKey: SERVICE_CATEGORY_KEYS.detail(id!),

@@ -37,7 +37,7 @@ import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { ProductFormDialog } from "../components/ProductFormDialog";
 import { ProductDetailExpanded } from "../components/ProductDetailExpanded";
-import { useProducts, useDeleteProduct } from "../hooks/useProducts";
+import { useAdminProducts, useDeleteProduct } from "../hooks/useProducts";
 import type { ProductDto } from "../types/product.types";
 
 // ---- Constants ----
@@ -79,10 +79,10 @@ export function ProductListPage() {
     data: productsResult,
     isLoading,
     isFetching,
-  } = useProducts({
+  } = useAdminProducts({
     pageIndex,
     pageSize,
-    filter: filter || undefined,
+    keyword: filter || undefined,
     orderBy,
     isDescending,
   });

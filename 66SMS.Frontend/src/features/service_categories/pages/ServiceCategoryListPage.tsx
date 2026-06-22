@@ -37,7 +37,7 @@ import { Switch } from "@/shared/components/ui/switch";
 
 import { ServiceCategoryFormDialog } from "../components/ServiceCategoryFormDialog";
 import {
-  useServiceCategories,
+  useServiceCategoriesAdmin,
   useDeleteServiceCategory,
   useUpdateServiceCategory,
 } from "../hooks/useServiceCategories";
@@ -78,7 +78,7 @@ export function ServiceCategoryListPage() {
     data: categoryResult,
     isLoading,
     isFetching,
-  } = useServiceCategories({
+  } = useServiceCategoriesAdmin({
     pageIndex,
     pageSize,
     filter: filter || undefined,

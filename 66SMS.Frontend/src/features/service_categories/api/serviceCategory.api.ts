@@ -19,6 +19,11 @@ export const serviceCategoryApi = {
     axiosInstance
       .get<Result<PagedResult<ServiceCategoryDTO>>>(BASE, { params })
       .then((r) => r.data),
+  // Admin Get All
+  adminGetAll: (params: PageRequest) =>
+    axiosInstance
+      .get<Result<PagedResult<ServiceCategoryDTO>>>(`${BASE}/admin`, { params })
+      .then((r) => r.data),
   // Get Detail
   getDetail: (id: number) =>
     axiosInstance

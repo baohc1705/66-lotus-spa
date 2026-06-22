@@ -3,6 +3,7 @@ import {
   useCreateService,
   useUpdateService,
 } from "@/features/services/hooks/useServices";
+import { serviceProductApi, serviceImageApi } from "@/features/services/api/service.api";
 import type { ServiceDTO } from "../types/service.types";
 import {
   createServiceSchema,
@@ -132,6 +133,7 @@ export function ServiceFormDialog({
   // Handle dynamic pricing calculation
   const watchProducts = watch("serviceProducts");
   const watchCostPrice = watch("costPrice");
+  const serializedProducts = JSON.stringify(watchProducts);
 
   useEffect(() => {
     let productsCost = 0;
@@ -146,8 +148,9 @@ export function ServiceFormDialog({
       });
     }
     const base = watchCostPrice || 0;
-    setValue("sellingPrice", base + productsCost);
-  }, [watchProducts, watchCostPrice, products, setValue]);
+    setValue("sellingPrice", base + productsCost, { shouldValidate: true, shouldDirty: true });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serializedProducts, watchCostPrice, products, setValue]);
 
   const onSubmit = async (data: ServiceFormValues) => {
     setIsUploading(true);
@@ -157,27 +160,96 @@ export function ServiceFormDialog({
           const file = pendingFiles[index];
           if (file) {
             const result = await uploadApi.uploadImage(file, 'service');
-            return { url: (result.isSuccess && result.data) ? result.data : '', sortOrder: img.sortOrder, isPrimary: img.isPrimary };
+            return { id: img.id, url: (result.isSuccess && result.data) ? result.data : '', sortOrder: img.sortOrder, isPrimary: img.isPrimary };
           }
-          return { url: img.url, sortOrder: img.sortOrder, isPrimary: img.isPrimary };
+          return { id: img.id, url: img.url, sortOrder: img.sortOrder, isPrimary: img.isPrimary };
         })
       );
-      const payload = {
-        ...data,
-        images,
-        serviceProducts: data.serviceProducts?.map((sp) => ({
-          productId: sp.productId,
-          quantityUsed: sp.quantityUsed,
-          note: sp.note,
-        })),
-      };
-
+      
       if (isEdit && service?.id) {
+        // Sync Service Products
+        const existingProducts = service.serviceProducts || [];
+        const formProducts = data.serviceProducts || [];
+        
+        // Delete
+        const toDeleteProducts = existingProducts.filter(ep => !formProducts.some(fp => fp.id === ep.id));
+        for (const p of toDeleteProducts) {
+          if (p.id) await serviceProductApi.delete(p.id);
+        }
+        
+        // Create / Update
+        for (const fp of formProducts) {
+          if (fp.id) {
+            await serviceProductApi.update(fp.id, {
+              serviceId: service.id,
+              productId: fp.productId,
+              quantityUsed: fp.quantityUsed,
+              note: fp.note,
+            });
+          } else {
+            await serviceProductApi.create({
+              serviceId: service.id,
+              productId: fp.productId,
+              quantityUsed: fp.quantityUsed,
+              note: fp.note,
+            });
+          }
+        }
+
+        // Sync Service Images
+        const existingImages = service.images || [];
+        const formImages = images;
+
+        // Delete
+        const toDeleteImages = existingImages.filter(ei => !formImages.some(fi => fi.id === ei.id));
+        for (const img of toDeleteImages) {
+          if (img.id) await serviceImageApi.delete(img.id);
+        }
+
+        // Create / Update
+        for (const fi of formImages) {
+          if (fi.id) {
+            await serviceImageApi.update(fi.id, {
+              serviceId: service.id,
+              url: fi.url,
+              sortOrder: fi.sortOrder,
+              isPrimary: fi.isPrimary,
+            });
+          } else {
+            if (fi.url) {
+              await serviceImageApi.create({
+                serviceId: service.id,
+                url: fi.url,
+                sortOrder: fi.sortOrder || 0,
+                isPrimary: fi.isPrimary || false,
+              });
+            }
+          }
+        }
+
+        const payload = {
+          ...data,
+          // Remove images and serviceProducts from payload because UpdateServiceCommand doesn't take them
+        };
+
         updateMutation.mutate(
           { id: service.id, payload: payload as UpdateServicePayload },
           { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false); } },
         );
       } else {
+        const payload = {
+          ...data,
+          serviceImages: images.map(img => ({
+            url: img.url,
+            sortOrder: img.sortOrder,
+            isPrimary: img.isPrimary
+          })),
+          serviceProducts: data.serviceProducts?.map((sp) => ({
+            productId: sp.productId,
+            quantityUsed: sp.quantityUsed,
+            note: sp.note,
+          })),
+        };
         createMutation.mutate(payload as CreateServicePayload, {
           onSuccess: (result) => { if (result.isSuccess) onOpenChange(false); },
         });
@@ -278,8 +350,8 @@ export function ServiceFormDialog({
                 </FormField>
 
                 <FormField
-                  label="Giá cơ bản *"
-                  tooltip="Giá cơ bản của dịch vụ (Chưa bao gồm sản phẩm đi kèm)"
+                  label="Giá vốn *"
+                  tooltip="Giá vốn của dịch vụ (Chưa bao gồm sản phẩm đi kèm)"
                   error={errors.costPrice?.message}
                 >
                   <Input
@@ -292,7 +364,7 @@ export function ServiceFormDialog({
 
                 <FormField
                   label="Giá bán"
-                  tooltip="Giá bán = Giá cơ bản + Chi phí sản phẩm"
+                  tooltip="Giá bán = Giá vốn + Chi phí sản phẩm tiêu hao"
                   error={errors.sellingPrice?.message}
                 >
                   <Input
@@ -369,18 +441,20 @@ export function ServiceFormDialog({
               <div className="space-y-4">
                 {productFields.map((field, index) => {
                   const errorObj = errors.serviceProducts?.[index];
+                  const productId = watch(`serviceProducts.${index}.productId`);
+                  const quantity = watch(`serviceProducts.${index}.quantityUsed`) || 0;
+                  const selectedProduct = products.find((p) => p.id === productId);
+                  const costPrice = selectedProduct?.costPrice || 0;
+                  const total = costPrice * quantity;
+
                   return (
                     <div
                       key={field.id}
                       className="grid grid-cols-12 gap-3 items-start border p-3 rounded-lg bg-stone-50/50"
                     >
-                      <div className="col-span-5">
+                      <div className="col-span-4">
                         <Select
-                          value={
-                            watch(
-                              `serviceProducts.${index}.productId`,
-                            )?.toString() || ""
-                          }
+                          value={productId?.toString() || ""}
                           onValueChange={(val) => {
                             setValue(
                               `serviceProducts.${index}.productId`,
@@ -417,7 +491,7 @@ export function ServiceFormDialog({
                         )}
                       </div>
 
-                      <div className="col-span-3">
+                      <div className="col-span-2">
                         <Input
                           {...register(
                             `serviceProducts.${index}.quantityUsed`,
@@ -435,6 +509,12 @@ export function ServiceFormDialog({
                       </div>
 
                       <div className="col-span-3">
+                         <div className="h-9 flex items-center justify-end px-3 bg-stone-100 rounded-md border border-transparent text-[13px] text-stone-700 font-medium">
+                           {total > 0 ? `${total.toLocaleString()} đ` : '0 đ'}
+                         </div>
+                      </div>
+
+                      <div className="col-span-2">
                         <Input
                           {...register(`serviceProducts.${index}.note`)}
                           placeholder="Ghi chú"
@@ -476,7 +556,7 @@ export function ServiceFormDialog({
                 {imageFields.map((field, index) => {
                   const isPrimary = watch(`images.${index}.isPrimary`);
                   const preview = imagePreviews[index] || watch(`images.${index}.url`);
-                  const errorObj = errors.images?.[index];
+                  //const errorObj = errors.images?.[index];
                   return (
                     <div key={field.id} className="flex flex-col gap-1.5 w-[110px]">
                       {/* Image zone */}
@@ -532,40 +612,22 @@ export function ServiceFormDialog({
                           setImagePreviews((prev: Record<number, string>) => ({ ...prev, [index]: URL.createObjectURL(file) }))
                         }}
                       />
-                      {/* URL input */}
-                      <Input
-                        {...register(`images.${index}.url`)}
-                        placeholder="URL ảnh..."
-                        className="h-7 text-[11px] px-2"
-                      />
-                      {errorObj?.url && (
-                        <p className="text-[10px] text-red-500 leading-tight">{errorObj.url.message}</p>
-                      )}
-                      {/* Sort order + isPrimary row */}
-                      <div className="flex items-center justify-between gap-1">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const imgs = form.getValues('images') || []
-                            imgs.forEach((_, i) => setValue(`images.${i}.isPrimary`, false))
-                            setValue(`images.${index}.isPrimary`, true)
-                          }}
-                          className={[
-                            'flex items-center gap-0.5 text-[11px] font-medium transition-colors',
-                            isPrimary ? 'text-lotus-leaf' : 'text-stone-400 hover:text-stone-600',
-                          ].join(' ')}
-                        >
-                          <Star className={`h-3 w-3 ${isPrimary ? 'fill-lotus-leaf' : ''}`} />
-                          <span>{isPrimary ? 'Chính' : 'Chính'}</span>
-                        </button>
-                        <Input
-                          {...register(`images.${index}.sortOrder`, { valueAsNumber: true })}
-                          type="number"
-                          className="h-6 w-12 px-1.5 text-[11px]"
-                          placeholder="0"
-                          title="Thứ tự"
-                        />
-                      </div>
+                      {/* isPrimary star */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const imgs = form.getValues('images') || [];
+                          imgs.forEach((_, i) => { if (i !== index) setValue(`images.${i}.isPrimary`, false); });
+                          setValue(`images.${index}.isPrimary`, !isPrimary);
+                        }}
+                        className={[
+                          'flex items-center gap-1 text-[11px] font-medium transition-colors self-start',
+                          isPrimary ? 'text-lotus-leaf' : 'text-stone-400 hover:text-stone-600',
+                        ].join(' ')}
+                      >
+                        <Star className={`h-3 w-3 ${isPrimary ? 'fill-lotus-leaf' : ''}`} />
+                        {isPrimary ? 'Ảnh chính' : 'Đặt chính'}
+                      </button>
                     </div>
                   );
                 })}
@@ -635,12 +697,14 @@ function getDefaultValues(service?: ServiceDTO | null): ServiceFormValues {
       status: service.status ?? 0,
       images:
         service.images?.map((i) => ({
+          id: i.id,
           url: i.url || "",
           sortOrder: i.sortOrder || 0,
           isPrimary: i.isPrimary || false,
         })) ?? [],
       serviceProducts:
         service.serviceProducts?.map((sp) => ({
+          id: sp.id,
           productId: sp.productId ?? 0,
           quantityUsed: sp.quantityUsed ?? 1,
           note: sp.note ?? "",

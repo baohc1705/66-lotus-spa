@@ -1,3 +1,5 @@
+import type { PageRequest } from "@/shared/types/common.types";
+
 export interface ServiceImageResponse {
   id?: number;
   url?: string;
@@ -9,11 +11,10 @@ export interface ServiceProductResponse {
   id?: number;
   productId?: number;
   productName?: string;
+  sellingPrice?: number;
   quantityUsed?: number;
   note?: string;
   status?: number;
-  createdAt?: string;
-  updatedAt?: string;
 }
 
 export interface ServiceDTO {
@@ -34,6 +35,7 @@ export interface ServiceDTO {
   createdBy?: number;
   updatedAt?: string;
   updatedBy?: number;
+  imageUrl?: string;
   images?: ServiceImageResponse[];
   serviceProducts?: ServiceProductResponse[];
 }
@@ -62,7 +64,7 @@ export interface CreateServicePayload {
   commissionRate?: number;
   sortOrder?: number;
   status?: number;
-  images?: ServiceImagePayload[];
+  serviceImages?: ServiceImagePayload[];
   serviceProducts?: ServiceProductPayload[];
 }
 
@@ -79,6 +81,41 @@ export interface UpdateServicePayload {
   commissionRate?: number;
   sortOrder?: number;
   status?: number;
-  images?: ServiceImagePayload[];
-  serviceProducts?: ServiceProductPayload[];
+}
+
+export interface GetAllServiceQuery extends PageRequest {
+  categoryId?: number;
+  keyword?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  status?: number;
+}
+
+export interface CreateServiceImagePayload {
+  serviceId: number;
+  url: string;
+  sortOrder: number;
+  isPrimary: boolean;
+}
+
+export interface UpdateServiceImagePayload {
+  serviceId?: number;
+  url?: string;
+  sortOrder?: number;
+  isPrimary?: boolean;
+}
+
+export interface CreateServiceProductPayload {
+  serviceId: number;
+  productId: number;
+  quantityUsed: number;
+  note?: string;
+}
+
+export interface UpdateServiceProductPayload {
+  serviceId?: number;
+  productId?: number;
+  quantityUsed?: number;
+  note?: string;
+  status?: number;
 }
