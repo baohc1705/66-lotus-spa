@@ -1,5 +1,5 @@
-using FluentValidation;
 using _66SMS.Domain.Constants;
+using FluentValidation;
 
 namespace _66SMS.Application.BookingService.Shifts.Commands.CreateShift
 {

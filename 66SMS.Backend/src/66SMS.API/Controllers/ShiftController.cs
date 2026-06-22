@@ -1,15 +1,15 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.DTOs.Shifts;
 using _66SMS.Application.BookingService.Shifts.Commands.CreateShift;
 using _66SMS.Application.BookingService.Shifts.Commands.CreateShiftPeriod;
 using _66SMS.Application.BookingService.Shifts.Commands.DeleteShift;
 using _66SMS.Application.BookingService.Shifts.Commands.UpdateShift;
 using _66SMS.Application.BookingService.Shifts.Queries.GetAllShift;
+using _66SMS.Application.DTOs.Shifts;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
+using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace _66SMS.API.Controllers
@@ -27,7 +27,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
+        [PermissionAuthorize("shifts", "create")]
         public async Task<IActionResult> CreateShift([FromBody]CreateShiftCommand command)
         {
             Result<object> result = await mediator.Send(command);
@@ -35,7 +35,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPost("{shiftId:int}/periods")]
-        [AllowAnonymous]
+        [PermissionAuthorize("shifts", "create")]
         public async Task<IActionResult> CreateShiftPeriod([FromRoute] int shiftId, [FromBody] CreateShiftPeriodCommand command)
         {
             command.ShiftId = shiftId;
@@ -45,7 +45,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        [AllowAnonymous]
+        [PermissionAuthorize("shifts", "delete")]
         public async Task<IActionResult> DeleteShift([FromRoute] int id)
         {
             Result<object> result = await mediator.Send(new DeleteShiftCommand { Id = id });
@@ -53,7 +53,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPatch("{id:int}")]
-        [AllowAnonymous]
+        [PermissionAuthorize("shifts", "update")]
         public async Task<IActionResult> UpdateShift([FromRoute] int id, [FromBody] UpdateShiftCommand command)
         {
             command.Id = id;
@@ -62,7 +62,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
+        [PermissionAuthorize("shifts", "read")]
         public async Task<IActionResult> GetAllShift([FromQuery] GetAllShiftQuery query)
         {
             Result<PagedResult<ShiftDTO>> result = await mediator.Send(query);

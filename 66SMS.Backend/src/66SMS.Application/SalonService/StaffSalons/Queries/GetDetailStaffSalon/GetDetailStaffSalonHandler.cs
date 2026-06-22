@@ -1,8 +1,8 @@
 using _66SMS.Application.DTOs.StaffSalons;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
-using _66SMS.Domain.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
@@ -24,7 +24,7 @@ namespace _66SMS.Application.SalonService.StaffSalons.Queries.GetDetailStaffSalo
         public async Task<Result<StaffSalonDto>> Handle(GetDetailStaffSalonQuery request, CancellationToken cancellationToken)
         {
             StaffSalonDto? staffSalon = await staffSalonSqlRepository.AsQueryable()
-                .Where(x => x.Id == request.Id)
+                .Where(x => x.Id == request.Id || x.StaffId == request.StaffId || x.SalonId == request.SalonId)
                 .ProjectTo<StaffSalonDto>(mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(cancellationToken);
 

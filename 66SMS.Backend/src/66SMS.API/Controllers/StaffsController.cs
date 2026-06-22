@@ -15,6 +15,7 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using _66SMS.Domain.Constants;
 
 namespace _66SMS.API.Controllers
 {
@@ -100,6 +101,17 @@ namespace _66SMS.API.Controllers
         [HttpGet]
         [PermissionAuthorize("staffs", "read")]
         public async Task<IActionResult> GetAll([FromQuery] GetAllStaffQuery query)
+        {
+            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            if (tokenSalonId.HasValue)
+                query.SalonId = tokenSalonId.Value;
+            var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        [HttpGet("admin")]
+        [PermissionAuthorize("staffs", "read")]
+        public async Task<IActionResult> AdminGetAll([FromQuery] GetAllStaffQuery query)
         {
             var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
             if (tokenSalonId.HasValue)

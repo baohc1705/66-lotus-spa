@@ -84,10 +84,9 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                     // Validate staff thuộc đúng salon (nếu salonId được truyền)
                     if (guest.SalonId.HasValue)
                     {
-                        var staff = await staffSqlRepository.AsQueryable()
-                            .Where(s => s.Id == staffId)
-                            .FirstOrDefaultAsync(cancellationToken);
-                        if (staff == null || staff.SalonId != guest.SalonId.Value)
+                        var belongsToSalon = await staffSqlRepository.AsQueryable()
+                            .AnyAsync(s => s.Id == staffId && s.StaffSalons != null && s.StaffSalons.Any(ss => ss.SalonId == guest.SalonId.Value && ss.Status == StaffSalonConst.STATUS_ACTIVE), cancellationToken);
+                        if (!belongsToSalon)
                             return Result<List<int>>.BadRequest(AppointmentConst.MSG_APPOINTMENT_STAFF_NOT_IN_SALON, ErrorCodes.ERR_APPOINTMENT_STAFF_NOT_IN_SALON);
                     }
 

@@ -22,7 +22,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.UpdatedAt).HasColumnName(StaffSalonConst.FIELD_UPDATED_AT);
             builder.Property(x => x.UpdatedBy).HasColumnName(StaffSalonConst.FIELD_UPDATED_BY);
             builder.HasOne(x => x.Salon).WithMany(b => b.StaffSalons).HasForeignKey(x => x.SalonId).IsRequired(false);
-            builder.HasOne(x => x.Staff).WithMany().HasForeignKey(x => x.StaffId).IsRequired(false);
+            builder.HasOne(x => x.Staff).WithMany(s => s.StaffSalons).HasForeignKey(x => x.StaffId).IsRequired(false);
             builder.ToTable(StaffSalonConst.TABLE_NAME);
         }
     }

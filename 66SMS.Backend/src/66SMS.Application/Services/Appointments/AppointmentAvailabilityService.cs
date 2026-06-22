@@ -1,5 +1,6 @@
 using _66SMS.Application.Abstractions;
 using _66SMS.Application.DTOs.Appointments;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 
 namespace _66SMS.Application.Services.Appointments
@@ -22,8 +23,8 @@ namespace _66SMS.Application.Services.Appointments
             var result = new List<BookingTechnicianDto>();
             var staffSlots = new List<(Staff Staff, int Available)>();
             var staffToProcess = salonId.HasValue
-                ? context.ActiveStaff.Where(s => s.SalonId == salonId.Value).ToList()
-                : context.ActiveStaff;
+                ? context.ActiveStaff.Where(s => s.StaffSalons != null && s.StaffSalons.Any(ss => ss.SalonId == salonId.Value && ss.Status == StaffSalonConst.STATUS_ACTIVE)).ToList()
+                : context.ActiveStaff.ToList();
             foreach (var staff in staffToProcess)
             {
                 if (!context.StaffShiftWindows.TryGetValue(staff.Id, out var windows) || windows.Count == 0)
@@ -75,8 +76,8 @@ namespace _66SMS.Application.Services.Appointments
             {
                 // Nếu có salonId, chỉ aggregate từ staff thuộc salon đó
                 var staffForAggregate = salonId.HasValue
-                    ? context.ActiveStaff.Where(s => s.SalonId == salonId.Value).ToList()
-                    : (IEnumerable<Staff>)context.ActiveStaff;
+                    ? context.ActiveStaff.Where(s => s.StaffSalons != null && s.StaffSalons.Any(ss => ss.SalonId == salonId.Value && ss.Status == StaffSalonConst.STATUS_ACTIVE)).ToList()
+                    : context.ActiveStaff.ToList();
 
                 return context.TimeSlots.Select((slot, index) => new BookingTimeSlotDto
                 {

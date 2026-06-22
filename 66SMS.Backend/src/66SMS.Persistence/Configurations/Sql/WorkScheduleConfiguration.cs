@@ -26,7 +26,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.HasOne(x => x.Salon).WithMany().HasForeignKey(x => x.SalonId).IsRequired(false);
 
             builder.ToTable(WorkScheduleConst.TABLE_NAME);
-            builder.HasQueryFilter(x => x.Status != WorkScheduleConst.STATUS_DELETED);
         }
     }
 }

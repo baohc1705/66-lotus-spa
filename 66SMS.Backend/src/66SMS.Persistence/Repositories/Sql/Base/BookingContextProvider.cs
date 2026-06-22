@@ -58,10 +58,22 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
                 .ToList();
             if (staffIdsOnDuty.Count == 0) return null;
 
-            var activeStaff = await staffSqlRepository
+            var staffWithSalons = await staffSqlRepository
                 .AsQueryable()
                 .Where(x => staffIdsOnDuty.Contains(x.Id) && x.Status == StaffConst.STATUS_ACTIVED)
+                .Select(x => new
+                {
+                    Staff = x,
+                    StaffSalons = x.StaffSalons.Where(ss => ss.Status == StaffSalonConst.STATUS_ACTIVE).ToList()
+                })
                 .ToListAsync(cancellationToken);
+
+            var activeStaff = staffWithSalons.Select(x =>
+            {
+                x.Staff.StaffSalons = x.StaffSalons;
+                return x.Staff;
+            }).ToList();
+
             activeStaff = await FilterEmployeeStaffAsync(activeStaff, cancellationToken);
             if (activeStaff.Count == 0) return null;
 

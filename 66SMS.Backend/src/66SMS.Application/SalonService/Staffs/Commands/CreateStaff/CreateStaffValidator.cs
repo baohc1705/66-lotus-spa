@@ -24,6 +24,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
             RuleFor(x => x.ProvinceCode).MaximumLength(StaffConst.PROVINCE_CODE_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.ProvinceCode));
             RuleFor(x => x.WardCode).MaximumLength(StaffConst.WARD_CODE_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.WardCode));
             RuleFor(x => x.FullAddress).MaximumLength(StaffConst.FULL_ADDRESS_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.FullAddress));
+            RuleFor(x => x.Email).Matches(RegexConst.EMAIL_REGEX).When(x => x.Email != null);
         }
     }
 }

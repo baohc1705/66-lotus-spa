@@ -23,7 +23,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.HasOne(x => x.Service).WithMany(s => s.ServiceProducts).HasForeignKey(x => x.ServiceId).IsRequired(false);
             builder.HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).IsRequired(false);
             builder.ToTable(ServiceProductConst.TABLE_NAME);
-            builder.HasQueryFilter(x => x.Status != ServiceProductConst.STATUS_DELETED);
         }
     }
 }

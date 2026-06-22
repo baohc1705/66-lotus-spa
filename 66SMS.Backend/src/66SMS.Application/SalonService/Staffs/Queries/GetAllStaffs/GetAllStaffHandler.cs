@@ -3,14 +3,8 @@ using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
-using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace _66SMS.Application.SalonService.Staffs.Queries.GetAllStaffs
 {
@@ -47,6 +41,12 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetAllStaffs
                                       || x.Code == request.Filter);
             }
 
+            if (!request.IsDeleted)
+            {
+                query = query.Where(x => x.Status != StaffConst.STATUS_DELETED);
+            }
+            
+
             query = request.OrderBy?.ToLower() switch
             {
                 "email" => request.IsDescending ? query.OrderByDescending(x => x.User!.Email) : query.OrderBy(x => x.User!.Email),
@@ -60,8 +60,8 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetAllStaffs
                 {
                     Id = x.Id,
                     UserId = x.UserId,
-                    SalonId = x.SalonId,
-                    SalonName = x.Salon!.Name,
+                    SalonId = x.StaffSalons != null ? x.StaffSalons.Where(ss => ss.Status == StaffSalonConst.STATUS_ACTIVE).Select(ss => (int?)ss.SalonId).FirstOrDefault() : null,
+                    SalonName = x.StaffSalons != null ? x.StaffSalons.Where(ss => ss.Status == StaffSalonConst.STATUS_ACTIVE && ss.Salon != null).Select(ss => ss.Salon!.Name).FirstOrDefault() : null,
                     Code = x.Code,
                     FullName = x.FullName,
                     AvatarUrl = x.AvatarUrl,
@@ -72,14 +72,15 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetAllStaffs
                     HireDate = x.HireDate.ToString(),
                     ContractType = x.ContractType,
                     BasicSalary = x.BasicSalary,
-                    Status = x.Status.ToString(),
+                    Status = x.Status,
                     StreetAddress = x.StreetAddress,
                     ProvinceCode = x.ProvinceCode,
                     WardCode = x.WardCode,
                     FullAddress = x.FullAddress,
                     Username = x.User != null ? x.User.Username : null,
                     Email = x.User != null ? x.User.Email : null,
-                    Role = x.User != null ? x.User.UserRoles!.Select(ur => ur.Role!.Name).FirstOrDefault() : null
+                    Role = x.User != null ? x.User.UserRoles!.Select(ur => ur.Role!.Name).FirstOrDefault() : null,
+                    CreatedAt  = x.CreatedAt.ToString(),
                 })
                 .ToPagedAsync(request, cancellationToken);
 

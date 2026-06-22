@@ -26,6 +26,7 @@ namespace _66SMS.Application.DTOs.Users
 
     public class StaffProfileDto 
     {
+        public int Id { get; set; }
         public string? Code { get; set; }
         public string? NationalId { get; set; }
         public DateOnly? HireDate { get; set; }

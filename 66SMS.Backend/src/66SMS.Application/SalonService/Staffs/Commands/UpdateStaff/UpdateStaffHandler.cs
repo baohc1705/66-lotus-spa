@@ -1,6 +1,7 @@
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
@@ -21,6 +22,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
         private readonly IMapper mapper;
         private readonly IRoleSqlRepository roleSqlRepository;
         private readonly IUserRoleSqlRepository userRoleSqlRepository;
+        private readonly IStaffSalonSqlRepository staffSalonSqlRepository;
 
         public UpdateStaffHandler(
             IStaffSqlRepository staffSqlRepository,
@@ -28,7 +30,8 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
             ISqlUnitOfWork sqlUnitOfWork,
             IMapper mapper,
             IRoleSqlRepository roleSqlRepository,
-            IUserRoleSqlRepository userRoleSqlRepository)
+            IUserRoleSqlRepository userRoleSqlRepository,
+            IStaffSalonSqlRepository staffSalonSqlRepository)
         {
             this.staffSqlRepository = staffSqlRepository;
             this.userSqlRepository = userSqlRepository;
@@ -36,6 +39,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
             this.mapper = mapper;
             this.roleSqlRepository = roleSqlRepository;
             this.userRoleSqlRepository = userRoleSqlRepository;
+            this.staffSalonSqlRepository = staffSalonSqlRepository;
         }
 
         public async Task<Result<object>> Handle(UpdateStaffCommand request, CancellationToken cancellationToken)
@@ -52,6 +56,40 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
                 staff.UpdatedBy = request.UpdatedBy;
                 staffSqlRepository.Update(staff);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+
+                // Update StaffSalon relationship if SalonId has changed
+                if (request.SalonId.HasValue)
+                {
+                    var activeAssignments = await staffSalonSqlRepository.AsQueryable()
+                        .Where(x => x.StaffId == staff.Id && x.Status == StaffSalonConst.STATUS_ACTIVE)
+                        .ToListAsync(cancellationToken);
+
+                    // If request.SalonId is not in the active assignments, deactivate existing ones and add a new one
+                    if (!activeAssignments.Any(x => x.SalonId == request.SalonId.Value))
+                    {
+                        foreach (var assignment in activeAssignments)
+                        {
+                            assignment.Status = StaffSalonConst.STATUS_INACTIVE;
+                            assignment.EndDate = DateOnly.FromDateTime(DateTime.UtcNow);
+                            assignment.UpdatedAt = DateTime.UtcNow;
+                            assignment.UpdatedBy = request.UpdatedBy;
+                            staffSalonSqlRepository.Update(assignment);
+                        }
+
+                        var newAssignment = new StaffSalon
+                        {
+                            StaffId = staff.Id,
+                            SalonId = request.SalonId.Value,
+                            IsManager = false,
+                            StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                            Status = StaffSalonConst.STATUS_ACTIVE,
+                            CreatedAt = DateTime.UtcNow,
+                            CreatedBy = request.UpdatedBy ?? 1
+                        };
+                        staffSalonSqlRepository.Add(newAssignment);
+                        await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                    }
+                }
 
                 if (request.UserName != null || request.Email != null)
                 {

@@ -29,5 +29,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
         [JsonIgnore]
         public int? CreatedBy { get; set; }
         public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public string? Email { get; set; }
     }
 }

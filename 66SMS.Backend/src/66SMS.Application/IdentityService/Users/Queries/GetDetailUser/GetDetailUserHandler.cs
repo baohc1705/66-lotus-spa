@@ -68,6 +68,7 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetDetailUser
 
                 userDto.StaffInfo = new StaffProfileDto
                 {
+                    Id = staff.Id,
                     Code = staff.Code,
                     NationalId = staff.NationalId,
                     HireDate = staff.HireDate,

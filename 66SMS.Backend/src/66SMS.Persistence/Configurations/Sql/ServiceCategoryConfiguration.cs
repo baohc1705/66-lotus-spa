@@ -20,7 +20,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.UpdatedAt).HasColumnName(ServiceCategoryConst.FIELD_UPDATED_AT);
             builder.Property(x => x.UpdatedBy).HasColumnName(ServiceCategoryConst.FIELD_UPDATED_BY);
             builder.ToTable(ServiceCategoryConst.TABLE_NAME);
-            builder.HasQueryFilter(x => x.Status != ServiceCategoryConst.STATUS_DELETED);
         }
     }
 }

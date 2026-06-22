@@ -28,7 +28,6 @@ namespace _66SMS.Domain.Entities
 
         // Navigation
         public List<StaffSalon>? StaffSalons { get; set; }
-        public List<Staff>? Staffs { get; set; }
         public List<BookingRoom>? BookingRooms { get; set; }
     }
 }

@@ -2,12 +2,9 @@ using _66SMS.Application.DTOs.Staffs;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
-using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace _66SMS.Application.SalonService.Staffs.Queries.GetDetailStaff
 {
@@ -32,8 +29,8 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetDetailStaff
                 {
                     Id = x.Id,
                     UserId = x.UserId,
-                    SalonId = x.SalonId,
-                    SalonName = x.Salon != null ? x.Salon.Name : null,
+                    SalonId = x.StaffSalons != null ? x.StaffSalons.Where(ss => ss.Status == StaffSalonConst.STATUS_ACTIVE).Select(ss => (int?)ss.SalonId).FirstOrDefault() : null,
+                    SalonName = x.StaffSalons != null ? x.StaffSalons.Where(ss => ss.Status == StaffSalonConst.STATUS_ACTIVE && ss.Salon != null).Select(ss => ss.Salon.Name).FirstOrDefault() : null,
                     Code = x.Code,
                     FullName = x.FullName,
                     AvatarUrl = x.AvatarUrl,
@@ -44,14 +41,15 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetDetailStaff
                     HireDate = x.HireDate.ToString(),
                     ContractType = x.ContractType,
                     BasicSalary = x.BasicSalary,
-                    Status = x.Status.ToString(),
+                    Status = x.Status,
                     StreetAddress = x.StreetAddress,
                     ProvinceCode = x.ProvinceCode,
                     WardCode = x.WardCode,
                     FullAddress = x.FullAddress,
                     Username = x.User != null ? x.User.Username : null,
                     Email = x.User != null ? x.User.Email : null,
-                    Role = x.User != null ? x.User.UserRoles.Select(ur => ur.Role!.Name).FirstOrDefault() : null
+                    Role = x.User != null ? x.User.UserRoles!.Select(ur => ur.Role!.Name).FirstOrDefault() : null,
+                    CreatedAt = x.CreatedAt.ToString(),
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

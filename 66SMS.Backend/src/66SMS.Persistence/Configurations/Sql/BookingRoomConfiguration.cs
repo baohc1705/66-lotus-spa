@@ -22,7 +22,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.SalonId).HasColumnName(BookingRoomConst.FIELD_SALON_ID);
             builder.HasOne(x => x.Salon).WithMany(b => b.BookingRooms).HasForeignKey(x => x.SalonId).IsRequired(false);
             builder.ToTable(BookingRoomConst.TABLE_NAME);
-            builder.HasQueryFilter(x => x.Status != BookingRoomConst.STATUS_DELETED);
         }
     }
 }

@@ -115,16 +115,18 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
                 .Distinct()
                 .ToList() ?? new List<string>();
             
-            // Check if user is a manager — get their salon_id from staff_salons
+            // Get their salon_id from staff_salons
             int? managedSalonId = null;
             var staff = await staffSqlRepository.AsQueryable()
                 .Where(x => x.UserId == user.Id)
                 .FirstOrDefaultAsync(cancellationToken);
+            Console.WriteLine($"[RefreshTokenHandler] UserId: {user.Id}, Staff found: {staff != null}");
             if (staff != null)
             {
                 var staffSalon = await staffSalonSqlRepository.AsQueryable()
-                    .Where(x => x.StaffId == staff.Id && x.IsManager == true && x.Status == StaffSalonConst.STATUS_ACTIVE)
+                    .Where(x => x.StaffId == staff.Id && x.Status == StaffSalonConst.STATUS_ACTIVE)
                     .FirstOrDefaultAsync(cancellationToken);
+                Console.WriteLine($"[RefreshTokenHandler] StaffId: {staff.Id}, StaffSalon found: {staffSalon != null}, SalonId: {staffSalon?.SalonId}, Status: {staffSalon?.Status}");
                 if (staffSalon != null)
                     managedSalonId = staffSalon.SalonId;
             }

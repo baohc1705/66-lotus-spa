@@ -24,20 +24,22 @@ namespace _66SMS.API.Controllers
 
         [HttpGet("daily")]
         [Authorize]
-        public async Task<IActionResult> GetDaily([FromQuery] DateOnly date)
+        public async Task<IActionResult> GetDaily([FromQuery] DateOnly date, [FromQuery] int? salonId)
         {
             var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
-            var query = new GetCashierDailyQuery { Date = date, SalonId = tokenSalonId };
+            var finalSalonId = tokenSalonId ?? salonId;
+            var query = new GetCashierDailyQuery { Date = date, SalonId = finalSalonId };
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
 
         [HttpGet("online-appointments")]
         [Authorize]
-        public async Task<IActionResult> GetOnlineAppointments()
+        public async Task<IActionResult> GetOnlineAppointments([FromQuery] int? salonId)
         {
             var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
-            var query = new _66SMS.Application.PaymentService.Cashier.Queries.GetOnlineAppointments.GetOnlineAppointmentsQuery { SalonId = tokenSalonId };
+            var finalSalonId = tokenSalonId ?? salonId;
+            var query = new _66SMS.Application.PaymentService.Cashier.Queries.GetOnlineAppointments.GetOnlineAppointmentsQuery { SalonId = finalSalonId };
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

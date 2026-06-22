@@ -17,7 +17,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
     {
         private readonly IUserSqlRepository userSqlRepository;
         private readonly IRoleSqlRepository roleSqlRepository;
-        private readonly IUserRoleSqlRepository userRoleSqlRepository;
         private readonly IStaffSqlRepository staffSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
@@ -29,8 +28,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
             ISqlUnitOfWork sqlUnitOfWork,
             IMapper mapper,
             IPasswordHash passwordHash,
-            IRoleSqlRepository roleSqlRepository,
-            IUserRoleSqlRepository userRoleSqlRepository)
+            IRoleSqlRepository roleSqlRepository)
         {
             this.userSqlRepository = userSqlRepository;
             this.staffSqlRepository = staffSqlRepository;
@@ -38,7 +36,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
             this.mapper = mapper;
             this.passwordHash = passwordHash;
             this.roleSqlRepository = roleSqlRepository;
-            this.userRoleSqlRepository = userRoleSqlRepository;
         }
 
         public async Task<Result<object>> Handle(CreateStaffCommand request, CancellationToken cancellationToken)
@@ -55,12 +52,48 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
                 PasswordHash = passwordHash.Hash(staffCode),
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = request.CreatedBy,
-                Status =  (int)request.Status!,
+                Status = (int)request.Status!,
             };
+
+            // create role for staff
+            string roleRequest = request.Role ?? "staff";
+            Role? role = await roleSqlRepository.AsQueryable()
+                .Where(x => x.Name.Equals(roleRequest))
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (role == null)
+                return Result<object>.BadRequest(UserConst.MSG_USER_INVALID_ROLE, ErrorCodes.ERR_ROLE_NOT_FOUND);
+
+            UserRole userRole = new()
+            {
+                UserId = user.Id,
+                RoleId = role.Id,
+                AssignedAt = DateTimeHelper.UtcNow(),
+                AssignedBy = request.CreatedBy ?? 1,
+                CreatedAt = DateTimeHelper.UtcNow(),
+                CreatedBy = request.CreatedBy ?? 1
+            };
+            user.UserRoles = new List<UserRole> { userRole };
 
             // map request to domain entity
             Staff? staff = mapper.Map<Staff>(request);
             staff.Code = staffCode;
+
+            // Assign staff to salon if request has provived salon id
+            if (request.SalonId.HasValue)
+            {
+                staff.StaffSalons = new List<StaffSalon>
+                {
+                    new StaffSalon
+                    {
+                        SalonId = request.SalonId.Value,
+                        StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                        CreatedAt = DateTime.UtcNow,
+                        CreatedBy = request.CreatedBy,
+                        Status = StaffSalonConst.STATUS_ACTIVE,
+                    }
+                };
+            }
 
             // begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
@@ -75,34 +108,15 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
                 staffSqlRepository.Add(staff);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // create role for staff
-                string roleRequest = request.Role ?? "staff";
-                Role? role = await roleSqlRepository.AsQueryable()
-                    .Where(x => x.Name.Equals(roleRequest))
-                    .FirstOrDefaultAsync(cancellationToken);
-
-                if (role == null)
-                    return Result<object>.BadRequest(UserConst.MSG_USER_INVALID_ROLE, ErrorCodes.ERR_ROLE_NOT_FOUND);
-
-                UserRole userRole = new()
-                {
-                    UserId = user.Id,
-                    RoleId = role.Id,
-                    AssignedAt = DateTimeHelper.UtcNow(),
-                    AssignedBy = request.CreatedBy ?? 1,
-                    CreatedAt = DateTimeHelper.UtcNow(),
-                    CreatedBy = request.CreatedBy ?? 1
-                };
-
-                // save and persist userrole to database
-                userRoleSqlRepository.Add(userRole);
-                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-
+                // commit transaction
                 transaction.Commit();
+
+                // return staff id was created
                 return Result<object>.Created(staff.Id);
             }
             catch
             {
+                // Rollback on failure
                 transaction.Rollback();
                 throw;
             }
@@ -140,7 +154,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
                     .AnyAsync(cancellationToken);
 
                 // if not existed then newCode is unique else increment 1
-                if (!exists) 
+                if (!exists)
                     isUnique = true;
                 else
                     nextNumber++;

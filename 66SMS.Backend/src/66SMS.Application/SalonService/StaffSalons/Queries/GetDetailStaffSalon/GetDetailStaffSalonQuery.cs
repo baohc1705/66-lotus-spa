@@ -6,6 +6,8 @@ namespace _66SMS.Application.SalonService.StaffSalons.Queries.GetDetailStaffSalo
 {
     public class GetDetailStaffSalonQuery : IRequest<Result<StaffSalonDto>>
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
+        public int? StaffId { get; set; }
+        public int? SalonId { get; set; }
     }
 }

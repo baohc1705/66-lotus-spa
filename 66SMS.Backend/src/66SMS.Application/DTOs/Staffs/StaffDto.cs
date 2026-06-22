@@ -16,7 +16,7 @@ namespace _66SMS.Application.DTOs.Staffs
         public string? HireDate { get; set; }
         public string? ContractType { get; set; }
         public decimal? BasicSalary { get; set; }
-        public string? Status { get; set; }
+        public int? Status { get; set; }
         public string? StreetAddress { get; set; }
         public string? ProvinceCode { get; set; }
         public string? WardCode { get; set; }
@@ -24,5 +24,6 @@ namespace _66SMS.Application.DTOs.Staffs
         public string? Username { get; set; }
         public string? Email { get; set; }
         public string? Role { get; set; }
+        public string? CreatedAt {  get; set; }
     }
 }

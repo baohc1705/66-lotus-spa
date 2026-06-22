@@ -22,7 +22,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.UpdatedBy).HasColumnName(BookingPositionConst.FIELD_UPDATED_BY);
             builder.HasOne(x => x.Room).WithMany(p => p.Positions).HasForeignKey(x => x.RoomId).IsRequired(false);
             builder.ToTable(BookingPositionConst.TABLE_NAME);
-            builder.HasQueryFilter(x => x.Status != BookingPositionConst.STATUS_DELETED);
 
         }
     }
