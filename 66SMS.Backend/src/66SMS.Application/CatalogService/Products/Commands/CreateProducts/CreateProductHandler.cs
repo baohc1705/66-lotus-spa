@@ -44,9 +44,9 @@ namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
                 {
                     product.Images = request.Images.Select(x => new ProductImage
                     {
-                        Url = x.Url!,
-                        IsPrimary = (bool)x.IsPrimary!,
-                        SortOrder = (int)x.SortOrder!,
+                        Url = x.Url ?? string.Empty,
+                        IsPrimary = x.IsPrimary ?? false,
+                        SortOrder = x.SortOrder ?? 0,
                     }).ToList();
                 }
 

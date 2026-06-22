@@ -45,6 +45,7 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetDetailService
                     Status = x.Status,
                     CreatedAt = x.CreatedAt.ToString(),
                     UpdatedAt = x.UpdatedAt.ToString(),
+                    ImageUrl = x.Images!.Where(x => x.IsPrimary).Select(x => x.Url).FirstOrDefault(),
                     Images = x.Images!.Select(x => new ServiceImageResponse
                     {
                         Id = x.Id,
@@ -57,11 +58,10 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetDetailService
                         Id = x.Id,
                         ProductId = x.ProductId,
                         ProductName = x.Product!.Name,
+                        SellingPrice = x.Product.SellingPrice,
                         QuantityUsed = x.QuantityUsed,
                         Note = x.Note,
                         Status = x.Status,
-                        CreatedAt = x.CreatedAt.ToString(),
-                        UpdatedAt = x.UpdatedAt.ToString()
                     }).ToList()
 
                 })

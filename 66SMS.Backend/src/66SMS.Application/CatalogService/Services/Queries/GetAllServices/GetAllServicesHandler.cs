@@ -1,4 +1,3 @@
-using _66SMS.Application.DTOs.ServiceImages;
 using _66SMS.Application.DTOs.Services;
 using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
@@ -32,6 +31,11 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
             if (!string.IsNullOrEmpty(request.Keyword))
             {
                 query = query.Where(x => x.Name.StartsWith(request.Keyword) || x.Code == request.Keyword);
+            }
+
+            if (!request.IsDeleted)
+            {
+                query = query.Where(x => x.Status != ServiceConst.STATUS_DELETED);
             }
 
             if (request.Status != null)
@@ -76,6 +80,7 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
                     Status = x.Status,
                     CreatedAt = x.CreatedAt.ToString(),
                     UpdatedAt = x.UpdatedAt.ToString(),
+                    ImageUrl = x.Images!.Where(x => x.IsPrimary).Select(x => x.Url).FirstOrDefault(),
                     Images = x.Images!.Select(x => new ServiceImageResponse
                     {
                         Id = x.Id,
@@ -88,11 +93,10 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
                         Id = x.Id,
                         ProductId = x.ProductId,
                         ProductName = x.Product!.Name,
+                        SellingPrice = x.Product.SellingPrice,
                         QuantityUsed = x.QuantityUsed,
                         Note = x.Note,
-                        Status =  x.Status,
-                        CreatedAt = x.CreatedAt.ToString(),
-                        UpdatedAt = x.UpdatedAt.ToString()
+                        Status = x.Status,
                     }).ToList()
 
                 })

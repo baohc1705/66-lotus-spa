@@ -4,8 +4,6 @@ using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using MediatR;
 
 namespace _66SMS.Application.CatalogService.Products.Queries.GetAllProducts
@@ -37,11 +35,16 @@ namespace _66SMS.Application.CatalogService.Products.Queries.GetAllProducts
                 query = query.Where(x => x.Name.ToLower().Contains(keywordLower) || x.Code.ToLower().Contains(keywordLower));
             }
 
+            if (request.IsDeleted)
+            {
+                query = query.Where(x => x.Status != ProductConst.STATUS_DELETED);
+            }
+
             if (request.Status.HasValue)
             {
                 query = query.Where(x => x.Status == request.Status);
             }
-
+            
             if (request.MinPrice.HasValue)
             {
                 query = query.Where(x => x.SellingPrice >= request.MinPrice.Value);

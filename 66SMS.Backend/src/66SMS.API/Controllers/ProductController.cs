@@ -59,6 +59,7 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("products", "read")]
         public async Task<IActionResult> AdminGetAll([FromQuery] GetAllProductQuery query)
         {
+            
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
