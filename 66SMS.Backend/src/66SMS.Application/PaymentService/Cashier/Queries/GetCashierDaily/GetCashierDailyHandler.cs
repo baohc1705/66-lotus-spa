@@ -32,7 +32,8 @@ namespace _66SMS.Application.PaymentService.Cashier.Queries.GetCashierDaily
             var dto = new CashierDailyDto();
 
             // Lấy danh sách nhân viên để hiển thị lên cột
-            var staffsQuery = staffRepository.AsQueryable();
+            var staffsQuery = staffRepository.AsQueryable()
+                .Where(x => x.User != null && x.User.UserRoles!.Any(ur => ur.Role != null && ur.Role.Name.ToLower() == "staff"));
             if (request.SalonId.HasValue)
             {
                 staffsQuery = staffsQuery.Where(x => staffSalonSqlRepository.AsQueryable(true)

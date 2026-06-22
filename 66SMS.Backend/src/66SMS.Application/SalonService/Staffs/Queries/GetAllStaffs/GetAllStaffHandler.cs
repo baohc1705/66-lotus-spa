@@ -33,6 +33,11 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetAllStaffs
                          && ss.Status == StaffSalonConst.STATUS_ACTIVE));
             }
 
+            if (!string.IsNullOrEmpty(request.Role))
+            {
+                query = query.Where(x => x.User != null && x.User.UserRoles!.Any(ur => ur.Role != null && ur.Role.Name.ToLower() == request.Role.ToLower()));
+            }
+
             if (!string.IsNullOrEmpty(request.Filter))
             {
                 query = query.Where(x => x.FullName.StartsWith(request.Filter) 

@@ -9,6 +9,7 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Commands.UpdateWorkSch
         public int? Id { get; set; }
         public int? ShiftPeriodId { get; set; }
         public int? StaffId { get; set; }
+        public int? SalonId { get; set; }
         public DateOnly? WorkDate { get; set; }
         [System.Text.Json.Serialization.JsonIgnore]
         public int? UpdatedBy { get; set; }

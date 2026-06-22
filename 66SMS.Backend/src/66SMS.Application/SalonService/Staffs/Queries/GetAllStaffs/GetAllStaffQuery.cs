@@ -8,5 +8,6 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetAllStaffs
     {
         public int? SalonId { get; set; }
         public bool IsDeleted { get; set; } = false;
+        public string? Role { get; set; }
     }
 }
