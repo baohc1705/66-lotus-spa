@@ -10,7 +10,6 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
     /// </summary>
     public record CreateCustomerCommand : IRequest<Result<object>>
     {
-        [JsonIgnore]
         public string? FullName { get; set; }
         public string? AvatarUrl { get; set; }
         public DateOnly? DateOfBirth { get; set; }

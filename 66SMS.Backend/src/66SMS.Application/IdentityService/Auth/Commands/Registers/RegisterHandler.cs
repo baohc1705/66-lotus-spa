@@ -69,7 +69,8 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
                 var customer = new Customer
                 {
                     FullName = request.FullName!,
-                    Phone = request.Phone!
+                    Phone = request.Phone!,
+                    Source =  "Online"
                 };
                 user.Customer = customer;
 

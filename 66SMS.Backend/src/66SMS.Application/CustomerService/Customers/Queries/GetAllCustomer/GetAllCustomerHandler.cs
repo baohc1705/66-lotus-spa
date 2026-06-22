@@ -60,6 +60,9 @@ namespace _66SMS.Application.CustomerService.Customers.Queries.GetAllCustomer
                     Status = x.Status,
                     Note = x.Note,
                     FullAddress = x.FullAddress,
+                    StreetAddress = x.StreetAddress,
+                    ProvinceCode = x.ProvinceCode,
+                    WardCode = x.WardCode,
                     Email = x.User.Email
                 })
                 .ToPagedAsync(request, cancellationToken);

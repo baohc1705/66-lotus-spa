@@ -28,11 +28,12 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.DeleteStaffSalon
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                StaffSalon? staffSalon = await staffSalonSqlRepository.FindByIdAsync((int)request.Id);
+                StaffSalon? staffSalon = await staffSalonSqlRepository.FindByIdAsync((int)request.Id!);
                 if (staffSalon == null)
                     return Result<object>.NotFound(StaffSalonConst.MSG_STAFF_SALON_NOT_FOUND, ErrorCodes.ERR_STAFF_SALON_NOT_FOUND);
 
                 staffSalon.Status = StaffSalonConst.STATUS_DELETED;
+                staffSalon.EndDate = DateOnly.FromDateTime(DateTime.UtcNow);
                 staffSalon.UpdatedAt = DateTimeHelper.UtcNow();
                 staffSalon.UpdatedBy = request.UpdatedBy;
                 staffSalonSqlRepository.Update(staffSalon);

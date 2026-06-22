@@ -21,7 +21,7 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.UpdateCustomer
             RuleFor(x => x.FirstPurchaseAt).LessThanOrEqualTo(DateTime.Now).When(x => x.FirstPurchaseAt.HasValue);
             RuleFor(x => x.LastPurchaseAt).GreaterThanOrEqualTo(x => x.FirstPurchaseAt).When(x => x.LastPurchaseAt.HasValue && x.FirstPurchaseAt.HasValue);
             RuleFor(x => x.Source).MaximumLength(CustomerConst.SOURCE_MAX_LENGTH).When(x => x.Source != null);
-            RuleFor(x => x.Status).GreaterThan(0).When(x => x.Status.HasValue);
+            RuleFor(x => x.Status).GreaterThanOrEqualTo(0).When(x => x.Status.HasValue);
             RuleFor(x => x.Note).MaximumLength(CustomerConst.NOTE_MAX_LENGTH).When(x => x.Note != null);
             RuleFor(x => x.StreetAddress).MaximumLength(CustomerConst.STREET_ADDRESS_MAX_LENGTH).When(x => x.StreetAddress != null);
             RuleFor(x => x.ProvinceCode).MaximumLength(CustomerConst.PROVINCE_CODE_MAX_LENGTH).When(x => x.ProvinceCode != null);

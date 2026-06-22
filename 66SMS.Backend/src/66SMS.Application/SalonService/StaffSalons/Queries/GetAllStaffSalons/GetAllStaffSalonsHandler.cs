@@ -33,7 +33,20 @@ namespace _66SMS.Application.SalonService.StaffSalons.Queries.GetAllStaffSalons
                 query = query.Where(x => x.Status == request.Status.Value);
 
             PagedResult<StaffSalonDto> result = await query
-                .ProjectTo<StaffSalonDto>(mapper.ConfigurationProvider)
+                .Select(x => new StaffSalonDto
+                {
+                    Id = x.Id,
+                    SalonId = x.SalonId,
+                    SalonName = x.Salon!.Name,
+                    StaffId = x.StaffId,
+                    StaffName = x.Staff!.FullName,
+                    IsManager = x.IsManager,
+                    Status = x.Status,
+                    StartDate = x.StartDate.ToString(),
+                    EndDate = x.EndDate.ToString(),
+                    CreatedAt = x.CreatedAt.ToString(),
+                    UpdatedAt = x.UpdatedAt.ToString(),
+                })
                 .ToPagedAsync(request, cancellationToken);
 
             return Result<PagedResult<StaffSalonDto>>.Success(result);

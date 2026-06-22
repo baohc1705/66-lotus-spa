@@ -16,6 +16,9 @@ namespace _66SMS.Application.DTOs.Customers
         public int? Status { get; set; }
         public string? Note { get; set; }
         public string? FullAddress { get; set; }
+        public string? StreetAddress { get; set; }
+        public string? ProvinceCode { get; set; }
+        public string? WardCode { get; set; }
         public string? Email { get; set; }
     }
 }

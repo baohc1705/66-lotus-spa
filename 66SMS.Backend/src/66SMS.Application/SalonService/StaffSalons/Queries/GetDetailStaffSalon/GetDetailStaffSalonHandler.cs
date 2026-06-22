@@ -3,8 +3,6 @@ using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,19 +11,30 @@ namespace _66SMS.Application.SalonService.StaffSalons.Queries.GetDetailStaffSalo
     public class GetDetailStaffSalonHandler : IRequestHandler<GetDetailStaffSalonQuery, Result<StaffSalonDto>>
     {
         private readonly IStaffSalonSqlRepository staffSalonSqlRepository;
-        private readonly IMapper mapper;
 
-        public GetDetailStaffSalonHandler(IStaffSalonSqlRepository staffSalonSqlRepository, IMapper mapper)
+        public GetDetailStaffSalonHandler(IStaffSalonSqlRepository staffSalonSqlRepository)
         {
             this.staffSalonSqlRepository = staffSalonSqlRepository;
-            this.mapper = mapper;
         }
 
         public async Task<Result<StaffSalonDto>> Handle(GetDetailStaffSalonQuery request, CancellationToken cancellationToken)
         {
             StaffSalonDto? staffSalon = await staffSalonSqlRepository.AsQueryable()
                 .Where(x => x.Id == request.Id || x.StaffId == request.StaffId || x.SalonId == request.SalonId)
-                .ProjectTo<StaffSalonDto>(mapper.ConfigurationProvider)
+                .Select(x => new StaffSalonDto
+                {
+                    Id = x.Id,
+                    SalonId = x.SalonId,
+                    SalonName = x.Salon!.Name,
+                    StaffId = x.StaffId,
+                    StaffName = x.Staff!.FullName,
+                    IsManager = x.IsManager,
+                    Status = x.Status,
+                    StartDate = x.StartDate.ToString(),
+                    EndDate = x.EndDate.ToString(),
+                    CreatedAt = x.CreatedAt.ToString(),
+                    UpdatedAt = x.UpdatedAt.ToString(),
+                })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (staffSalon == null)

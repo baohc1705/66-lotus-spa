@@ -4,6 +4,7 @@ namespace _66SMS.Application.DTOs.StaffSalons
     {
         public int? Id { get; set; }
         public int? StaffId { get; set; }
+        public string? StaffName { get; set; }
         public int? SalonId { get; set; }
         public string? SalonName { get; set; }
         public bool? IsManager { get; set; }
