@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { ChevronDown, Menu, MapPin } from "lucide-react";
+import { ChevronDown, Menu } from "lucide-react";
 import { Logo } from "@/shared/components/Logo";
-import { useAuthStore } from "@/features/auth/stores/authStore";
-import { useMySalon } from "@/features/staff_salons/hooks/useStaffSalons";
-import { BranchSelector } from "@/shared/components/BranchSelector";
-import { MENU_ITEMS, type SubMenuItem } from "../constants/menu";
+import { type SubMenuItem } from "../constants/menu";
+import { useMenuByRole } from "../hooks/useMenuByRole";
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -24,11 +22,7 @@ export function AdminSidebar({
   const location = useLocation();
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
 
-  const managedSalonId = useAuthStore((s) => s.managedSalonId);
-  const { data: mySalonResult } = useMySalon();
-  const mySalonName = managedSalonId ? mySalonResult?.data?.name : null;
-
-  const visibleMenuItems = MENU_ITEMS;
+  const visibleMenuItems = useMenuByRole();
 
   const toggleMenu = (label: string) => {
     if (!isOpen) return;
@@ -75,21 +69,6 @@ export function AdminSidebar({
               <Menu className="w-5 h-5" />
             </button>
           </div>
-
-          {isOpen && (
-            managedSalonId ? (
-              mySalonName && (
-                <div className="mb-3 flex items-center gap-1.5 px-2 py-1.5 bg-lotus-leaf/10 rounded-admin border border-lotus-leaf/20">
-                  <MapPin className="w-3.5 h-3.5 text-lotus-leaf shrink-0" />
-                  <span className="text-xs font-medium text-lotus-leaf truncate">{mySalonName}</span>
-                </div>
-              )
-            ) : (
-              <div className="mb-3">
-                <BranchSelector />
-              </div>
-            )
-          )}
         </div>
 
         <div className="flex-1 overflow-y-auto py-6 px-3 hide-scrollbar">

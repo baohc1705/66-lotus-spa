@@ -29,6 +29,7 @@ import { ShiftFormDialog } from "../components/ShiftFormDialog";
 import { ShiftDetailExpanded } from "../components/ShiftDetailExpanded";
 import { useShifts, useDeleteShift } from "../hooks/useShifts";
 import type { ShiftDTO } from "../types/shift.types";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -248,16 +249,17 @@ export function ShiftListPage() {
                 description: "Mô tả",
               }}
             />
-
-            <Button
-              variant="admin"
-              size="sm"
-              onClick={() => setCreateOpen(true)}
-              className="text-[12px] gap-1.5"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Thêm ca
-            </Button>
+            <PermissionGate action="create" resource="shifts">
+              <Button
+                variant="admin"
+                size="sm"
+                onClick={() => setCreateOpen(true)}
+                className="text-[12px] gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Thêm ca
+              </Button>
+            </PermissionGate>
           </DataTableToolbar>
         </div>
 

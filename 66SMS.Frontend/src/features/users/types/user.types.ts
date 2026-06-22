@@ -22,6 +22,7 @@ export interface UserDto {
 }
 
 export interface StaffProfileDto {
+  id?: number;
   code?: string;
   nationalId?: string;
   hireDate?: string;

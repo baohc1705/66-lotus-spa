@@ -2,15 +2,18 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { type UserDto } from '@/features/users/types/user.types';
 import { parseJwt } from '@/features/auth/utils/jwt';
+import type { StaffSalonDTO } from '@/features/staff_salons/types/staff-salon.types';
 
 interface AuthState {
   accessToken: string | null;
   user: UserDto | null;
   managedSalonId: number | null;
   selectedSalonId: number | null;
+  mySalon: StaffSalonDTO | null;
   // Actions
   setAccessToken: (token: string) => void;
   setUser: (user: UserDto) => void;
+  setMySalon: (salon: StaffSalonDTO | null) => void;
   clearAuth: () => void;
   hasPermission: (resource: string, action: string) => boolean;
   hasRole: (role: string) => boolean;
@@ -25,6 +28,8 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       managedSalonId: null,
       selectedSalonId: null,
+
+      mySalon: null,
 
       setAccessToken: (token) => {
         set({ accessToken: token });
@@ -46,13 +51,16 @@ export const useAuthStore = create<AuthState>()(
 
       setUser: (user) => set({ user }),
 
-      clearAuth: () => set({ accessToken: null, user: null, managedSalonId: null, selectedSalonId: null }),
+      setMySalon: (salon) => set({ mySalon: salon }),
+
+      clearAuth: () => set({ accessToken: null, user: null, managedSalonId: null, selectedSalonId: null, mySalon: null }),
 
       setSelectedSalonId: (id) => set({ selectedSalonId: id }),
 
       getEffectiveSalonId: () => {
         const state = get();
         if (state.managedSalonId) return state.managedSalonId;
+        if (state.mySalon?.salonId) return state.mySalon.salonId;
         return state.selectedSalonId;
       },
 
@@ -89,7 +97,8 @@ export const useAuthStore = create<AuthState>()(
         accessToken: state.accessToken, 
         user: state.user, 
         managedSalonId: state.managedSalonId,
-        selectedSalonId: state.selectedSalonId
+        selectedSalonId: state.selectedSalonId,
+        mySalon: state.mySalon
       }),
     },
   ),

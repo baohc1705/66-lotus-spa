@@ -11,16 +11,23 @@ function formatDate(date: Date): string {
 }
 
 export const cashierApi = {
-  getDaily: (date: Date) =>
+  getDaily: (date: Date, salonId?: number | null) =>
     axiosInstance
       .get<Result<CashierDailyDto>>(API.cashier.daily, {
-        params: { date: formatDate(date) },
+        params: { 
+          date: formatDate(date),
+          ...(salonId !== undefined && salonId !== null ? { salonId } : {})
+        },
       })
       .then((r) => r.data),
 
-  getOnlineBookings: () =>
+  getOnlineBookings: (salonId?: number | null) =>
     axiosInstance
-      .get<Result<CashierBooking[]>>(API.cashier.onlineAppointments)
+      .get<Result<CashierBooking[]>>(API.cashier.onlineAppointments, {
+        params: {
+          ...(salonId !== undefined && salonId !== null ? { salonId } : {})
+        }
+      })
       .then((r) => r.data),
 
   updateBookingStatus: (id: string | number, status: number, note?: string) =>

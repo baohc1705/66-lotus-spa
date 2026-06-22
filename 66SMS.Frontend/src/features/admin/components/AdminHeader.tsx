@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { MENU_ITEMS } from "../constants/menu";
 import { useAuthStore } from "@/features/auth/stores/authStore";
+import { BranchSelector } from "@/shared/components/BranchSelector";
 
 interface AdminHeaderProps {
   toggleSidebar: () => void;
@@ -63,7 +64,7 @@ export function AdminHeader({
 
   return (
     <header className="h-16 bg-lotus-cream/80 backdrop-blur-xl flex items-center justify-between px-2 sm:px-4 sticky top-0 z-30 transition-all duration-300 border-b border-lotus-gold/10 shadow-sm shadow-lotus-gold/5">
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-4">
         <button
           onClick={toggleMobileSidebar}
           className="lg:hidden w-10 h-10 rounded-admin bg-lotus-leaf/5 text-lotus-leaf flex items-center justify-center hover:bg-lotus-leaf hover:text-white transition-all duration-300"
@@ -74,6 +75,10 @@ export function AdminHeader({
         <h1 className="text-lg sm:text-xl font-bold text-lotus-deep ml-1 sm:ml-2 tracking-tight">
           {currentTitle}
         </h1>
+
+        <div className="w-40 sm:w-48 md:w-56 shrink-0">
+          <BranchSelector />
+        </div>
       </div>
 
       <div className="flex items-center gap-2 sm:gap-2.5">

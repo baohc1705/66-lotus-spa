@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { AdminSidebar } from './components/AdminSidebar'
 import { AdminHeader } from './components/AdminHeader'
 import { motion } from 'motion/react'
@@ -11,17 +11,29 @@ export function AdminLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
 
   const { hasRole } = usePermission()
   const user = useAuthStore((s) => s.user)
   const isCustomer = hasRole('Customer')
   const hasAccess = !!user && !isCustomer
 
+  // Redirect user không có quyền vào admin
   useEffect(() => {
     if (!hasAccess) {
       navigate('/')
     }
   }, [hasAccess, navigate])
+
+  // Staff / Receptionist không có Dashboard → redirect về "Lịch hẹn của tôi"
+  const isStaffOrReceptionist =
+    (hasRole('Staff') || hasRole('Receptionist')) && !hasRole('Admin') && !hasRole('Manager')
+
+  useEffect(() => {
+    if (hasAccess && isStaffOrReceptionist && location.pathname === '/admin') {
+      navigate('/admin/staff/appointments', { replace: true })
+    }
+  }, [hasAccess, isStaffOrReceptionist, location.pathname, navigate])
 
   if (!hasAccess) {
     return null

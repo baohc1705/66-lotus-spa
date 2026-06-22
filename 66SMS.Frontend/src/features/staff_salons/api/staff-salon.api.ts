@@ -1,19 +1,18 @@
-import axiosInstance from '@/shared/api/axiosInstance'
-import { API } from '@/shared/api/endpoints'
-import type { Result, PagedResult } from '@/shared/types/common.types'
-import type { SalonDTO } from '@/features/salons/types/salon.types'
+import axiosInstance from "@/shared/api/axiosInstance";
+import { API } from "@/shared/api/endpoints";
+import type { Result, PagedResult } from "@/shared/types/common.types";
 import type {
   StaffSalonDTO,
   CreateStaffSalonPayload,
   UpdateStaffSalonPayload,
   StaffSalonQueryParams,
-} from '../types/staff-salon.types'
+} from "../types/staff-salon.types";
 
-const BASE = API.staffSalons
+const BASE = API.staffSalons;
 
 export interface AssignManagerPayload {
-  staffId: number
-  salonId: number
+  staffId: number;
+  salonId: number;
 }
 
 export const staffSalonApi = {
@@ -25,6 +24,11 @@ export const staffSalonApi = {
   getDetail: (id: number) =>
     axiosInstance
       .get<Result<StaffSalonDTO>>(`${BASE}/${id}`)
+      .then((r) => r.data),
+
+  getDetailByStaffId: (staffId: number) =>
+    axiosInstance
+      .get<Result<StaffSalonDTO>>(`${BASE}/staff/${staffId}`)
       .then((r) => r.data),
 
   create: (payload: CreateStaffSalonPayload) =>
@@ -47,9 +51,5 @@ export const staffSalonApi = {
     axiosInstance
       .post<Result<object>>(`${BASE}/remove-manager`, payload)
       .then((r) => r.data),
-}
+};
 
-export const meApi = {
-  getMySalon: () =>
-    axiosInstance.get<Result<SalonDTO>>(API.meSalon).then((r) => r.data),
-}

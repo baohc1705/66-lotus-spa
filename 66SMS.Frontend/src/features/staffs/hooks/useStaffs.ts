@@ -22,6 +22,14 @@ export function useStaffs(params: PageRequest & { salonId?: number | null }) {
   })
 }
 
+export function useAdminStaffs(params: PageRequest & { salonId?: number | null }) {
+  return useQuery({
+    queryKey: STAFF_KEYS.list(params),
+    queryFn: () => staffApi.adminGetAll(params),
+  })
+}
+
+
 /** Hook lấy chi tiết nhân viên */
 export function useStaffDetail(id: number | null) {
   return useQuery({

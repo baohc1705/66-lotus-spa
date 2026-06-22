@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { Logo } from "@/shared/components/Logo";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useOnlineBookings } from "../hooks/useOnlineBookings";
+import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
 // import { OnlineBookingsDrawer } from './OnlineBookingsDrawer'
 
 interface CashierHeaderProps {
@@ -24,13 +25,18 @@ interface CashierHeaderProps {
 export function CashierHeader({ activeTab = "calendar" }: CashierHeaderProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [, setIsDrawerOpen] = useState(false);
-  const { user, hasRole, clearAuth } = useAuthStore();
+  const { user, hasRole, clearAuth, getEffectiveSalonId } = useAuthStore();
   const isAdmin = hasRole("Admin");
   const isEmployee = hasRole("Staff");
   const isReceptionist = hasRole("Receptionist");
   const navigate = useNavigate();
 
-  const { data: onlineBookings = [] } = useOnlineBookings();
+  const salonId = getEffectiveSalonId();
+  const { data: salons = [] } = useActiveSalons();
+  const activeSalon = salons.find((s) => s.id === salonId);
+  const salonLabel = activeSalon ? activeSalon.name : (salonId ? `Chi nhánh #${salonId}` : "Tất cả chi nhánh");
+
+  const { data: onlineBookings = [] } = useOnlineBookings(salonId);
   const hasPendingBookings = onlineBookings.length > 0;
 
   const handleLogoutClick = () => {
@@ -106,7 +112,7 @@ export function CashierHeader({ activeTab = "calendar" }: CashierHeaderProps) {
 
         <button className="flex items-center gap-1.5 hover:text-lotus-leaf text-lotus-deep/80 transition-colors border-l border-lotus-gold/20 pl-4">
           <MapPin className="w-4 h-4" />
-          <span className="hidden lg:inline">Chi nhánh Sen Trắng</span>
+          <span className="hidden lg:inline">{salonLabel}</span>
         </button>
 
         <div className="border-l border-lotus-gold/20 pl-4 flex items-center gap-3 relative">

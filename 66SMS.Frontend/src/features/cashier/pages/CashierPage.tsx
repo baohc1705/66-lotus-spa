@@ -23,12 +23,13 @@ export function CashierPage() {
   const [isPaying, setIsPaying] = useState(false);
   const navigate = useNavigate();
 
-  const { hasRole } = useAuthStore();
+  const { hasRole, getEffectiveSalonId } = useAuthStore();
   const isAdmin = hasRole("Admin");
   const isReceptionist = hasRole("Receptionist");
 
+  const salonId = getEffectiveSalonId();
   const { data, isLoading, isError, error, refetch, moveBooking } =
-    useCashierData(currentDate);
+    useCashierData(currentDate, salonId);
 
   useEffect(() => {
     // Only admin and receptionist can access cashier page

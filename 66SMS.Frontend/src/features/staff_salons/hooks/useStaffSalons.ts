@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { AxiosError } from 'axios'
-import { staffSalonApi, meApi, type AssignManagerPayload } from '../api/staff-salon.api'
+import { staffSalonApi, type AssignManagerPayload } from '../api/staff-salon.api'
 import { getErrorMessage } from '@/shared/utils/errorUtils'
 import type { Result } from '@/shared/types/common.types'
 import type {
@@ -114,10 +114,3 @@ export function useRemoveManager() {
   })
 }
 
-export function useMySalon() {
-  return useQuery({
-    queryKey: ['me', 'salon'],
-    queryFn: () => meApi.getMySalon(),
-    staleTime: 5 * 60 * 1000,
-  })
-}

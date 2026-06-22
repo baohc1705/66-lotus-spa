@@ -22,7 +22,6 @@ import {
 import { DataTable } from "@/shared/components/DataTable/DataTable";
 import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
 import { Button } from "@/shared/components/ui/button";
-import { Badge } from "@/shared/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,7 +37,7 @@ import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { StaffFormDialog } from "../components/StaffFormDialog";
 import { StaffDetailExpanded } from "../components/StaffDetailExpanded";
-import { useStaffs, useDeleteStaff } from "../hooks/useStaffs";
+import { useDeleteStaff, useAdminStaffs } from "../hooks/useStaffs";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import type { StaffDto } from "../types/staff.types";
 import { formatDate } from "@/shared/utils/date.utils";
@@ -46,9 +45,9 @@ import { formatDate } from "@/shared/utils/date.utils";
 // ---- Constants ----
 
 const STAFF_STATUS_MAP: StatusMap = {
-  "0": { label: "Nghỉ việc", variant: "error" },
+  "0": { label: "Tạm nghỉ", variant: "warning" },
   "1": { label: "Đang làm", variant: "success", dot: true },
-  "2": { label: "Tạm nghỉ", variant: "warning" },
+  "2": { label: "Nghỉ việc", variant: "error" },
 };
 
 const GENDER_MAP: Record<string, string> = {
@@ -102,7 +101,7 @@ export function StaffListPage() {
     data: staffsResult,
     isLoading,
     isFetching,
-  } = useStaffs({
+  } = useAdminStaffs({
     pageIndex,
     pageSize,
     filter: filter || undefined,
@@ -164,14 +163,6 @@ export function StaffListPage() {
       });
     }
   }, [deleteTarget, deleteMutation]);
-
-  const formatCurrency = (value: number | null) => {
-    if (value === null || value === undefined) return "—";
-    return new Intl.NumberFormat("vi-VN", {
-      notation: "compact",
-      maximumFractionDigits: 1,
-    }).format(value);
-  };
 
   // Render sort icon
   const SortIcon = useCallback(
@@ -249,9 +240,7 @@ export function StaffListPage() {
           </button>
         ),
         cell: ({ row }) => (
-          <Badge variant="outline" size="sm" className="text-[10px] font-mono">
-            {row.original.code ?? "—"}
-          </Badge>
+          <span className="text-lotus-leaf/80">{row.original.code ?? "—"}</span>
         ),
         size: 100,
       },
@@ -342,7 +331,10 @@ export function StaffListPage() {
         header: "Lương",
         cell: ({ row }) => (
           <span className="font-semibold text-lotus-deep">
-            {formatCurrency(row.original.basicSalary)}
+            {row.original.basicSalary !== null &&
+            row.original.basicSalary !== undefined
+              ? new Intl.NumberFormat("vi-VN").format(row.original.basicSalary)
+              : "—"}
           </span>
         ),
         size: 100,
