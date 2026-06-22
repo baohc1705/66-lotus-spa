@@ -9,20 +9,20 @@ import type { CreateStaffPayload, UpdateStaffPayload } from '../types/staff.type
 const STAFF_KEYS = {
   all: ['staffs'] as const,
   lists: () => [...STAFF_KEYS.all, 'list'] as const,
-  list: (params: PageRequest & { salonId?: number | null }) => [...STAFF_KEYS.lists(), params] as const,
+  list: (params: PageRequest & { salonId?: number | null; role?: string | null }) => [...STAFF_KEYS.lists(), params] as const,
   details: () => [...STAFF_KEYS.all, 'detail'] as const,
   detail: (id: number) => [...STAFF_KEYS.details(), id] as const,
 }
 
 /** Hook lấy danh sách nhân viên (phân trang, search, sort) */
-export function useStaffs(params: PageRequest & { salonId?: number | null }) {
+export function useStaffs(params: PageRequest & { salonId?: number | null; role?: string | null }) {
   return useQuery({
     queryKey: STAFF_KEYS.list(params),
     queryFn: () => staffApi.getAll(params),
   })
 }
 
-export function useAdminStaffs(params: PageRequest & { salonId?: number | null }) {
+export function useAdminStaffs(params: PageRequest & { salonId?: number | null; role?: string | null }) {
   return useQuery({
     queryKey: STAFF_KEYS.list(params),
     queryFn: () => staffApi.adminGetAll(params),

@@ -10,6 +10,7 @@ import { AddStaffDialog } from "./AddStaffDialog";
 import { useUpdateWorkSchedule } from "../hooks/useSchedules";
 import { toast } from "sonner";
 import { formatDate, DateUtil } from "@/shared/utils/date.utils";
+import { useAuthStore } from "@/features/auth/stores/authStore";
 
 interface ScheduleTableProps {
   shifts: ShiftDTO[];
@@ -30,6 +31,8 @@ export function ScheduleTable({
   selectedStaffId,
   canEdit = true,
 }: ScheduleTableProps) {
+  const salonId = useAuthStore((s) => s.getEffectiveSalonId());
+
   const [addingShift, setAddingShift] = useState<{
     shift: ShiftDTO;
     shiftPeriod: ShiftPeriodDTO;
@@ -136,6 +139,7 @@ export function ScheduleTable({
           shiftPeriodId: targetPeriodId,
           staffId: staffId,
           workDate: targetDateStr,
+          salonId: salonId || undefined,
         },
       },
       {

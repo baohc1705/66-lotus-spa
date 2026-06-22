@@ -8,8 +8,11 @@ import { ScheduleTable } from "../components/ScheduleTable";
 import { Button } from "@/shared/components/ui/button";
 import { useStaffs } from "@/features/staffs/hooks/useStaffs";
 import { RepeatScheduleDialog } from "../components/RepeatScheduleDialog";
+import { useAuthStore } from "@/features/auth/stores/authStore";
 
 export function WorkSchedulePage() {
+  const salonId = useAuthStore((s) => s.getEffectiveSalonId());
+
   const [currentDate, setCurrentDate] = useState(
     formatDate().startOf("isoWeek"),
   );
@@ -38,6 +41,7 @@ export function WorkSchedulePage() {
         pageSize: 1000,
         filter: debouncedSearchQuery,
         staffId: selectedStaffId || undefined,
+        salonId: salonId || undefined,
       };
     }
     return {
@@ -46,8 +50,9 @@ export function WorkSchedulePage() {
       pageIndex: 1,
       pageSize: 1000,
       staffId: selectedStaffId || undefined,
+      salonId: salonId || undefined,
     };
-  }, [startDateStr, endDateStr, debouncedSearchQuery, selectedStaffId]);
+  }, [startDateStr, endDateStr, debouncedSearchQuery, selectedStaffId, salonId]);
 
   const { data: shiftsData, isLoading: isLoadingShifts } = useShifts({
     pageIndex: 1,
@@ -58,6 +63,7 @@ export function WorkSchedulePage() {
     pageIndex: 1,
     pageSize: 1000,
     filter: debouncedSearchQuery || undefined,
+    salonId: salonId || undefined,
   });
 
   const { data: schedulesData, isLoading: isLoadingSchedules } =

@@ -2,7 +2,6 @@ import React, { useMemo, useState } from "react";
 import {
   Search,
   Heart,
-  Clock,
   Check,
   HelpCircle,
   ChevronRight,
@@ -22,65 +21,61 @@ export const BookingServiceStep: React.FC = () => {
   });
   const services = useMemo(() => data?.data?.items || [], [data?.data?.items]);
 
-  const categories = useMemo(() => {
-    // Lấy danh sách category từ data thực tế
-    const names = Array.from(
-      new Set(services.map((s) => s.categoryName).filter(Boolean)),
-    );
-    return ["Tất cả", ...names];
-  }, [services]);
-
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState("Tất cả");
 
   const filteredServices = services.filter((s) => {
     const matchesSearch =
       (s.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
       (s.description || "").toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      activeCategory === "Tất cả" || s.categoryName === activeCategory;
-    return matchesSearch && matchesCategory;
+    return matchesSearch;
   });
+
+  const groupedServices = useMemo(() => {
+    const groups: { [key: string]: typeof services } = {};
+    filteredServices.forEach((s) => {
+      const cat = s.categoryName || "Dịch vụ khác";
+      if (!groups[cat]) {
+        groups[cat] = [];
+      }
+      groups[cat].push(s);
+    });
+    return groups;
+  }, [filteredServices]);
+
+  const formatDuration = (mins?: number) => {
+    if (!mins) return "0'";
+    const hours = Math.floor(mins / 60);
+    const remainingMins = mins % 60;
+    if (hours > 0 && remainingMins > 0) {
+      return `${hours}h${remainingMins}'`;
+    }
+    if (hours > 0) {
+      return `${hours}h`;
+    }
+    return `${mins}'`;
+  };
 
   return (
     <div className="bg-lotus-surface rounded-3xl p-6 sm:p-8 border border-lotus-muted/20 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
       <h3 className="text-xl font-bold text-lotus-deep font-display mb-5 flex items-center gap-2 border-b border-lotus-muted/20 pb-3">
         <Heart className="w-5 h-5 text-lotus-rose" />
-        <span>Bước 2: Chọn dịch vụ làm đẹp & chăm sóc</span>
+        <span>Bước 1: Chọn dịch vụ làm đẹp & chăm sóc</span>
       </h3>
 
-      {/* Filters Row */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Tìm tên dịch vụ, mô tả..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 border border-lotus-muted/20 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-lotus-rose-light bg-lotus-cream/50 text-lotus-deep"
-          />
-        </div>
-
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:max-w-[400px]">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-2xl text-xs font-semibold whitespace-nowrap transition-all border ${
-                activeCategory === cat
-                  ? "bg-lotus-rose text-white border-lotus-rose shadow-sm"
-                  : "bg-lotus-surface text-lotus-stone border-lotus-muted/20 hover:bg-lotus-rose/10"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+      {/* Search Row */}
+      <div className="relative mb-6">
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Tìm tên dịch vụ, mô tả..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-10 pr-4 py-2.5 border border-lotus-muted/20 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-lotus-rose-light bg-lotus-cream/50 text-lotus-deep"
+        />
       </div>
 
-      {/* Services cards grid */}
-      <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto pr-1 scrollbar-thin">
+      {/* Services list grouped by category */}
+      <div className="flex flex-col gap-6 max-h-[500px] overflow-y-auto pr-1 scrollbar-thin">
         {isLoading ? (
           <div className="text-center py-12 text-lotus-stone">
             Đang tải danh sách dịch vụ...
@@ -89,62 +84,61 @@ export const BookingServiceStep: React.FC = () => {
           <div className="text-center py-12 text-lotus-error text-sm">
             Không tải được dịch vụ. Vui lòng thử lại sau.
           </div>
-        ) : filteredServices.length > 0 ? (
-          filteredServices.map((s) => {
-            const isSelected = selectedService?.id === s.id;
-            return (
-              <div
-                key={s.id}
-                onClick={() => selectService(s)}
-                className={`group border rounded-2xl p-4 sm:p-5 cursor-pointer transition-all flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative overflow-hidden ${
-                  isSelected
-                    ? "border-lotus-rose bg-lotus-rose/5 shadow-sm"
-                    : "border-lotus-muted/20 hover:border-lotus-rose-light hover:bg-lotus-cream"
-                }`}
-              >
-                {isSelected && (
-                  <div className="absolute top-0 right-0 w-8 h-8 bg-lotus-rose rounded-bl-2xl flex items-center justify-center">
-                    <Check className="w-4 h-4 text-white" />
-                  </div>
-                )}
-
-                <div className="flex-1">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-lotus-gold bg-lotus-rose/5 px-2.5 py-1 rounded-full border border-lotus-muted/20">
-                    {s.categoryName || "Dịch Vụ Spa"}
-                  </span>
-                  <h4 className="font-bold text-lotus-deep text-base mt-2 group-hover:text-lotus-rose transition-colors">
-                    {s.name}
-                  </h4>
-                  <p className="text-xs text-lotus-stone mt-1.5 leading-relaxed max-w-xl">
-                    {s.description}
-                  </p>
-
-                  <div className="flex items-center gap-4 mt-3 text-xs text-lotus-stone font-medium">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-lotus-rose-light" />
-                      {s.durationMins} phút
-                    </span>
-                    <span>·</span>
-                    <span className="font-bold text-lotus-rose">
-                      {(s.sellingPrice || 0).toLocaleString("vi-VN")}đ
-                    </span>
-                  </div>
-                </div>
-
-                <div className="shrink-0 w-full sm:w-auto">
-                  <button
-                    className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 border ${
-                      isSelected
-                        ? "bg-lotus-rose text-white border-lotus-rose"
-                        : "bg-lotus-surface text-lotus-rose border-lotus-muted/20 group-hover:bg-lotus-rose group-hover:text-white group-hover:border-lotus-rose"
-                    }`}
-                  >
-                    {isSelected ? "Đã Chọn" : "Chọn dịch vụ"}
-                  </button>
-                </div>
+        ) : Object.keys(groupedServices).length > 0 ? (
+          Object.entries(groupedServices).map(([categoryName, items]) => (
+            <div key={categoryName} className="flex flex-col gap-2">
+              <h4 className="text-sm font-bold text-lotus-rose uppercase tracking-wider mb-2 border-b border-lotus-muted/10 pb-1">
+                {categoryName}
+              </h4>
+              <div className="flex flex-col gap-1.5">
+                {items.map((s) => {
+                  const isSelected = selectedService?.id === s.id;
+                  return (
+                    <div
+                      key={s.id}
+                      onClick={() => selectService(s)}
+                      className={`flex items-center justify-between p-3.5 rounded-2xl cursor-pointer transition-all ${
+                        isSelected
+                          ? "bg-lotus-rose/5 border border-lotus-rose shadow-sm"
+                          : "border border-transparent hover:bg-lotus-cream"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        {s.imageUrl ? (
+                          <img
+                            src={s.imageUrl}
+                            alt={s.name}
+                            className="w-12 h-12 rounded-full object-cover shrink-0"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-lotus-rose/10 to-lotus-gold/10 flex items-center justify-center shrink-0 text-lg">
+                            🌸
+                          </div>
+                        )}
+                        <div>
+                          <h5 className="font-bold text-lotus-deep text-sm">
+                            {s.name}
+                          </h5>
+                          <div className="flex items-center gap-2 mt-0.5 text-xs text-lotus-stone">
+                            <span>Thời lượng: {formatDuration(s.durationMins)}</span>
+                            <span>·</span>
+                            <span className="font-semibold text-lotus-rose">
+                              Giá: {(s.sellingPrice || 0).toLocaleString("vi-VN")}đ
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      {isSelected && (
+                        <div className="w-6 h-6 bg-lotus-rose rounded-full flex items-center justify-center text-white shrink-0 shadow-sm animate-in zoom-in-50 duration-200">
+                          <Check className="w-4 h-4" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })
+            </div>
+          ))
         ) : (
           <div className="text-center py-12 border border-dashed border-lotus-muted/20 rounded-2xl">
             <HelpCircle className="w-8 h-8 text-lotus-stone/50 mx-auto mb-2" />
@@ -165,7 +159,7 @@ export const BookingServiceStep: React.FC = () => {
               : "bg-gray-100 text-gray-400 cursor-not-allowed"
           }`}
         >
-          Tiếp tục: Chọn thời gian
+          Tiếp tục: Chọn chi nhánh
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>

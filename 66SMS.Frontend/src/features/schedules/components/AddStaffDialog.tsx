@@ -5,6 +5,7 @@ import { formatDate } from "@/shared/utils/date.utils";
 import { useStaffs } from "@/features/staffs/hooks/useStaffs";
 import { useBulkCreateWorkSchedule } from "../hooks/useSchedules";
 import type { ShiftDTO, ShiftPeriodDTO } from "@/features/shifts/types/shift.types";
+import { useAuthStore } from "@/features/auth/stores/authStore";
 
 import {
   Dialog,
@@ -44,6 +45,8 @@ export function AddStaffDialog({
   existingStaffIds = [],
   onClose,
 }: AddStaffDialogProps) {
+  const salonId = useAuthStore((s) => s.getEffectiveSalonId());
+
   const [selectedIds, setSelectedIds] = useState<number[]>(
     defaultStaffId ? [defaultStaffId] : [],
   );
@@ -53,11 +56,10 @@ export function AddStaffDialog({
   const { data: staffsData, isLoading: isLoadingStaffs } = useStaffs({
     pageIndex: 1,
     pageSize: 1000,
+    salonId: salonId || undefined,
   });
 
   const { mutate: bulkCreate, isPending } = useBulkCreateWorkSchedule();
-
-  if (!date || !shift || !shiftPeriod) return null;
 
   const availableStaffs = useMemo(
     () =>
@@ -76,6 +78,8 @@ export function AddStaffDialog({
         s.code?.toLowerCase().includes(q),
     );
   }, [availableStaffs, searchText]);
+
+  if (!date || !shift || !shiftPeriod) return null;
 
   const toggleStaff = (id: number) => {
     setValidationError("");
@@ -112,6 +116,7 @@ export function AddStaffDialog({
       staffId,
       shiftPeriodId: shiftPeriod.id,
       workDate: date,
+      salonId: salonId || undefined,
     }));
 
     bulkCreate(

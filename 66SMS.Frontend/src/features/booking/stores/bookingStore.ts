@@ -106,7 +106,7 @@ export const useBookingStore = create<BookingState>((set) => ({
       newGuests[state.activeGuestIndex].selectedPosition = null;
       newGuests[state.activeGuestIndex].selectedTimeSlot = null;
       newGuests[state.activeGuestIndex].lockId = undefined;
-      return { guests: newGuests };
+      return { guests: newGuests, selectedSalon: null };
     }),
 
   selectTechnician: (technician) =>

@@ -16,6 +16,7 @@ import { Logo } from "@/shared/components/Logo";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useOnlineBookings } from "../hooks/useOnlineBookings";
 import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
+import { BranchSelector } from "@/shared/components/BranchSelector";
 // import { OnlineBookingsDrawer } from './OnlineBookingsDrawer'
 
 interface CashierHeaderProps {
@@ -110,10 +111,16 @@ export function CashierHeader({ activeTab = "calendar" }: CashierHeaderProps) {
           )}
         </button>
 
-        <button className="flex items-center gap-1.5 hover:text-lotus-leaf text-lotus-deep/80 transition-colors border-l border-lotus-gold/20 pl-4">
-          <MapPin className="w-4 h-4" />
-          <span className="hidden lg:inline">{salonLabel}</span>
-        </button>
+        {isAdmin ? (
+          <div className="w-40 sm:w-48 md:w-56 shrink-0 border-l border-lotus-gold/20 pl-4">
+            <BranchSelector />
+          </div>
+        ) : (
+          <button className="flex items-center gap-1.5 hover:text-lotus-leaf text-lotus-deep/80 transition-colors border-l border-lotus-gold/20 pl-4">
+            <MapPin className="w-4 h-4" />
+            <span className="hidden lg:inline">{salonLabel}</span>
+          </button>
+        )}
 
         <div className="border-l border-lotus-gold/20 pl-4 flex items-center gap-3 relative">
           <button

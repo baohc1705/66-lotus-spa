@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { formatDate, DateUtil } from "@/shared/utils/date.utils";
 import { useBulkCreateWorkSchedule } from "../hooks/useSchedules";
 import type { WorkScheduleDTO } from "../types/schedule.types";
+import { useAuthStore } from "@/features/auth/stores/authStore";
 
 import {
   Dialog,
@@ -35,6 +36,7 @@ export function RepeatScheduleDialog({
   currentWeekSchedules,
   onClose,
 }: RepeatScheduleDialogProps) {
+  const salonId = useAuthStore((s) => s.getEffectiveSalonId());
   const currentWeekEnd = currentWeekStart.endOf("isoWeek");
 
   // endDate: ngày bất kỳ trong tuần kết thúc (người dùng chọn)
@@ -96,7 +98,7 @@ export function RepeatScheduleDialog({
       return;
     }
 
-    const schedules: { staffId: number; shiftPeriodId: number; workDate: string }[] = [];
+    const schedules: { staffId: number; shiftPeriodId: number; workDate: string; salonId?: number }[] = [];
 
     let w = currentWeekStart.add(1, "week");
     while (w.toDate() <= endWeekStart.toDate()) {
@@ -112,6 +114,7 @@ export function RepeatScheduleDialog({
           staffId: ws.staffId,
           shiftPeriodId: ws.shiftPeriodId,
           workDate: newDate.format("YYYY-MM-DD"),
+          salonId: salonId || undefined,
         });
       }
       w = w.add(1, "week");

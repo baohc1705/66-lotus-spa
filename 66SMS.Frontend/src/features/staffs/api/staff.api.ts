@@ -15,11 +15,11 @@ const BASE = API.staffs.base;
 
 export const staffApi = {
   /** GET /staffs — Danh sách nhân viên (phân trang) — quyền: staffs.read, role: admin */
-  getAll: (params: PageRequest & { salonId?: number | null }) =>
+  getAll: (params: PageRequest & { salonId?: number | null; role?: string | null }) =>
     axiosInstance
       .get<Result<PagedResult<StaffDto>>>(BASE, { params })
       .then((r) => r.data),
-  adminGetAll: (params: PageRequest & { salonId?: number | null }) =>
+  adminGetAll: (params: PageRequest & { salonId?: number | null; role?: string | null }) =>
     axiosInstance
       .get<Result<PagedResult<StaffDto>>>(`${BASE}/admin`, { params })
       .then((r) => r.data),

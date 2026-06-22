@@ -4,6 +4,7 @@ export interface WorkScheduleDTO {
   id?: number;
   shiftPeriodId?: number;
   staffId?: number;
+  salonId?: number;
   workDate?: string; // DateOnly from backend, format: YYYY-MM-DD
   shift?: ShiftDTO;
   staffName?: string;
@@ -12,6 +13,7 @@ export interface WorkScheduleDTO {
 export interface CreateWorkSchedulePayload {
   shiftPeriodId?: number;
   staffId?: number;
+  salonId?: number;
   workDate?: string;
 }
 
@@ -23,6 +25,7 @@ export interface UpdateWorkSchedulePayload {
   id?: number;
   shiftPeriodId?: number;
   staffId?: number;
+  salonId?: number;
   workDate?: string;
 }
 
@@ -32,4 +35,5 @@ export interface GetWorkSchedulesParams extends PageRequest {
   startDate?: string;
   endDate?: string;
   staffId?: number;
+  salonId?: number;
 }

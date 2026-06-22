@@ -1,17 +1,17 @@
 import React from "react";
-import { MapPin, Phone, Clock, ChevronRight, Check } from "lucide-react";
+import { MapPin, Phone, Clock, ChevronRight, Check, ArrowLeft } from "lucide-react";
 import { useBookingStore } from "../stores/bookingStore";
 import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
 
 export const BookingSalonStep: React.FC = () => {
-  const { selectedSalon, selectSalon, nextStep } = useBookingStore();
+  const { selectedSalon, selectSalon, nextStep, prevStep } = useBookingStore();
   const { data: salons = [], isLoading } = useActiveSalons();
 
   return (
     <div className="bg-lotus-surface rounded-3xl p-6 sm:p-8 border border-lotus-muted/20 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
       <h3 className="text-xl font-bold text-lotus-deep font-display mb-5 flex items-center gap-2 border-b border-lotus-muted/20 pb-3">
         <MapPin className="w-5 h-5 text-lotus-rose" />
-        <span>Bước 1: Chọn Chi Nhánh Của Bạn</span>
+        <span>Bước 2: Chọn Chi Nhánh Của Bạn</span>
       </h3>
 
       {isLoading ? (
@@ -86,17 +86,24 @@ export const BookingSalonStep: React.FC = () => {
         </div>
       )}
 
-      <div className="flex justify-end border-t border-lotus-muted/20 pt-5">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-lotus-muted/20 pt-5">
+        <button
+          onClick={prevStep}
+          className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl font-bold transition-all bg-lotus-surface text-lotus-deep border border-lotus-muted/20 hover:bg-lotus-cream"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          Quay lại
+        </button>
         <button
           onClick={nextStep}
           disabled={!selectedSalon}
-          className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${
+          className={`flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl font-bold transition-all ${
             selectedSalon
               ? "bg-lotus-rose text-white hover:bg-lotus-rose/90 shadow-md"
               : "bg-gray-100 text-gray-400 cursor-not-allowed"
           }`}
         >
-          Tiếp theo: Chọn dịch vụ
+          Tiếp theo: Chọn thời gian
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
