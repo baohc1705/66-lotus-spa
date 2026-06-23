@@ -86,17 +86,18 @@ export interface UpdatePermissionRequest {
 }
 
 export interface RegisterPayload {
-  fullName: string
-  phone: string
-  userName: string
-  email: string
-  password: string
-  confirmPassword: string
+  fullName: string;
+  phone: string;
+  userName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  status: number;
 }
 
 export interface RegisterResponseDto {
-  userId: number
-  customerId: number
+  userId: number;
+  customerId: number;
 }
 
 export interface SendOtpRequest {

@@ -51,7 +51,7 @@ export const MENU_ITEMS: MenuItem[] = [
     label: "Chi nhánh",
     path: "/admin/salons",
     icon: Building2,
-    allowedRoles: ["Admin", "Manager"],
+    allowedRoles: ["Admin"],
   },
   {
     label: "Phân quyền",

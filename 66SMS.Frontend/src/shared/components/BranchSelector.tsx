@@ -31,12 +31,20 @@ export function BranchSelector() {
   const assignedSalons = useMemo(() => {
     if (isAdmin) return [];
     
-    const list = (staffSalonsResult?.data?.items ?? [])
-      .filter((item) => item.salonId !== undefined && item.salonId !== null)
-      .map((item) => ({
-        id: item.salonId!,
-        name: item.salonName || `Chi nhánh #${item.salonId}`
-      }));
+    const list: Array<{ id: number; name: string }> = [];
+    const seenIds = new Set<number>();
+
+    (staffSalonsResult?.data?.items ?? []).forEach((item) => {
+      if (item.salonId !== undefined && item.salonId !== null) {
+        if (!seenIds.has(item.salonId)) {
+          seenIds.add(item.salonId);
+          list.push({
+            id: item.salonId,
+            name: item.salonName || `Chi nhánh #${item.salonId}`
+          });
+        }
+      }
+    });
     
     // Fallback if empty but managedSalonId is set
     if (list.length === 0 && managedSalonId) {

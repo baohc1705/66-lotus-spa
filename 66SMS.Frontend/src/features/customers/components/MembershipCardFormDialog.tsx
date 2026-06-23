@@ -31,6 +31,7 @@ import {
   type MembershipCardFormValues,
 } from "../schemas/membershipCard.schema";
 import type { MembershipCardDto } from "../types/membershipCard.types";
+import type { MembershipTierDto } from "../types/membershipTier.types";
 import { Info } from "lucide-react";
 
 interface MembershipCardFormDialogProps {
@@ -84,8 +85,13 @@ export function MembershipCardFormDialog({
 
   const onSubmit = (data: MembershipCardFormValues) => {
     if (card?.id) {
+      const payload = {
+        ...data,
+        issuedAt: data.issuedAt === "" ? undefined : data.issuedAt,
+        expiresAt: data.expiresAt === "" ? undefined : data.expiresAt,
+      };
       updateMutation.mutate(
-        { id: card.id, payload: data },
+        { id: card.id, payload },
         {
           onSuccess: (result) => {
             if (result.isSuccess) onOpenChange(false);
@@ -149,7 +155,7 @@ export function MembershipCardFormDialog({
                   <SelectValue placeholder="Chọn loại thẻ" />
                 </SelectTrigger>
                 <SelectContent>
-                  {tiers.map((tier) => (
+                  {tiers.map((tier: MembershipTierDto) => (
                     <SelectItem key={tier.id} value={tier.id!.toString()}>
                       {tier.name}
                     </SelectItem>

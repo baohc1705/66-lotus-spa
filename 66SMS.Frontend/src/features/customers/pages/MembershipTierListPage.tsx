@@ -157,7 +157,7 @@ export function MembershipTierListPage() {
     {
       accessorKey: 'status',
       header: 'Trạng thái',
-      cell: ({ row }) => <StatusBadge status={row.original.status} statusMap={TIER_STATUS_MAP} />,
+      cell: ({ row }) => <StatusBadge status={String(row.original.status)} statusMap={TIER_STATUS_MAP} />,
       size: 120,
     },
     {

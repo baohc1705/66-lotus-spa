@@ -9,6 +9,8 @@ import { Button } from "@/shared/components/ui/button";
 import { Camera, User, Phone, Mail, Fingerprint, ShieldCheck, Loader2, Calendar, Activity, Star } from "lucide-react";
 import type { ProfileResponse } from "../types/profile.types";
 import { useEffect } from "react";
+import { formatDisplayDate } from "@/shared/utils/date.utils";
+import { useMyMembershipCard } from "../hooks/useMembershipInfo";
 
 interface ProfileFormProps {
   initialData?: ProfileResponse;
@@ -16,6 +18,8 @@ interface ProfileFormProps {
 
 export function ProfileForm({ initialData }: ProfileFormProps) {
   const { mutate, isPending } = useUpdateProfile();
+  const isCustomer = initialData?.profileType === "Customer";
+  const { data: card } = useMyMembershipCard(isCustomer);
 
   const {
     register,
@@ -61,19 +65,6 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
     }
   };
 
-  const formatDOB = (dateString?: string) => {
-    if (!dateString) return "Chưa cập nhật";
-    try {
-      const date = new Date(dateString);
-      return new Intl.DateTimeFormat('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      }).format(date);
-    } catch {
-      return dateString;
-    }
-  };
 
   const getGenderText = (gender?: number) => {
     if (gender === 1) return "Nam";
@@ -126,7 +117,7 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
                     <Star className="w-4 h-4 text-lotus-gold" />
                     Hạng thành viên:
                   </span>
-                  <span className="text-sm font-semibold text-lotus-deep">Thường</span>
+                  <span className="text-sm font-semibold text-lotus-deep">{card?.tierName || "Thường"}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-lotus-stone flex items-center gap-1">
@@ -159,7 +150,7 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
                     <Calendar className="w-4 h-4 text-lotus-stone" />
                     Ngày vào làm:
                   </span>
-                  <span className="text-sm font-semibold text-lotus-deep">{formatDOB(initialData.staffInfo.hireDate)}</span>
+                  <span className="text-sm font-semibold text-lotus-deep">{formatDisplayDate(initialData.staffInfo.hireDate)}</span>
                 </div>
               </div>
             )}
@@ -232,7 +223,7 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
                     Ngày sinh
                   </label>
                   <input
-                    value={formatDOB(initialData?.dateOfBirth)}
+                    value={formatDisplayDate(initialData?.dateOfBirth)}
                     disabled
                     className="w-full px-4 py-3 rounded-md border border-gray-100 bg-lotus-cream text-lotus-stone cursor-not-allowed"
                   />

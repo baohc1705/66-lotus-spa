@@ -460,7 +460,7 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
   const { data: card } = useMyMembershipCard(isCustomer)
   const { data: tiers = [], isLoading: isLoadingTiers } = useMembershipTiers()
 
-  const currentTierName = 'Thường'
+  const currentTierName = card?.tierName || 'Thường'
   const sortedTiers = [...tiers].sort((a, b) => a.minSpending - b.minSpending)
   const currentTier = sortedTiers.find(
     t => t.name.toLowerCase() === currentTierName.toLowerCase()

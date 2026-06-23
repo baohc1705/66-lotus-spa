@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { profileApi } from "../api/profile.api";
 import { toast } from "sonner";
+import type { AxiosError } from "axios";
+import type { Result } from "@/shared/types/common.types";
 
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
@@ -15,8 +17,9 @@ export function useUpdateProfile() {
         toast.error(result.message ?? "Cập nhật thất bại");
       }
     },
-    onError: () => {
-      toast.error("Không thể kết nối đến máy chủ");
+    onError: (error: AxiosError<Result<unknown>>) => {
+      const msg = error.response?.data?.message ?? "Không thể kết nối đến máy chủ";
+      toast.error(msg);
     },
   });
 }

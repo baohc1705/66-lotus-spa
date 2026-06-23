@@ -73,12 +73,12 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
       userName: "",
       email: "",
       password: "",
-      confirmPassword: "",
+      confirmPassword: ""
     },
   });
 
   const onSubmit = (data: RegisterFormData) => {
-    registerMutation.mutate(data, {
+    registerMutation.mutate({ ...data, status: 1 }, {
       onSuccess: (response) => {
         const customerId = response.data?.customerId ?? 0;
 

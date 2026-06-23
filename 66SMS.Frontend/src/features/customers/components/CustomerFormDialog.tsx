@@ -66,8 +66,9 @@ const GENDER_OPTIONS = [
 ];
 
 const STATUS_OPTIONS = [
-  { value: "1", label: "Hoạt động" },
   { value: "0", label: "Ngưng hoạt động" },
+  { value: "1", label: "Hoạt động" },
+  { value: "2", label: "Tạm khóa" },
 ];
 
 const SOURCE_OPTIONS = [
@@ -137,7 +138,12 @@ export function CustomerFormDialog({
       const parts = [data.streetAddress, wardName, provinceName].filter(
         Boolean,
       );
-      const payload = { ...data, avatarUrl, fullAddress: parts.join(", ") };
+      const payload = { 
+        ...data, 
+        avatarUrl, 
+        fullAddress: parts.join(", "),
+        dateOfBirth: data.dateOfBirth ? data.dateOfBirth : undefined
+      };
 
       if (isEdit && customer?.id) {
         updateMutation.mutate(

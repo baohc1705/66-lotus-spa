@@ -1,6 +1,7 @@
 import { Calendar, Award, CreditCard, Sparkles, User as UserIcon } from 'lucide-react'
 import { formatCurrency } from '@/shared/utils/currency'
 import { useMyMembershipCard, useMembershipTiers } from '../hooks/useMembershipInfo'
+import { useMyBookings } from '@/features/booking/hooks/useMyBookings'
 import type { UserDto } from '@/features/users/types/user.types'
 
 interface ProfileHeaderBannerProps {
@@ -13,6 +14,7 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
   // Call hooks conditionally (React Query will handle query key caching, enabled parameter prevents errors)
   const { data: card } = useMyMembershipCard(isCustomer)
   const { data: tiers = [] } = useMembershipTiers()
+  const { data: bookings = [] } = useMyBookings()
 
   const maskPhone = (phone?: string) => {
     if (!phone) return '---'
@@ -21,11 +23,12 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
   }
 
   // Calculate tier details
-  const currentTierName = 'Thường'
+  const currentTierName = card?.tierName || 'Thường'
   const loyaltyPoints = profile?.customerInfo?.loyaltyPoint || 0
 
-  // Mock total spending (using 10,000đ per loyalty point, or a baseline of 1,250,000đ)
-  const calculatedSpending = loyaltyPoints * 10000 || 1250000
+  // Calculate total spending (using 10,000đ per loyalty point)
+  const calculatedSpending = loyaltyPoints * 10000
+
 
   // Find current tier index and next tier
   const sortedTiers = [...tiers].sort((a, b) => a.minSpending - b.minSpending)
@@ -121,8 +124,8 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
                     <Calendar className="w-4 h-4 text-lotus-rose" />
                     <span className="text-xs font-medium uppercase tracking-wider">Lịch hẹn</span>
                   </div>
-                  {/* Mock total appointments */}
-                  <p className="text-xl font-bold text-lotus-deep">12 <span className="text-xs text-lotus-stone font-normal">lượt</span></p>
+                  {/* Total appointments */}
+                  <p className="text-xl font-bold text-lotus-deep">{bookings.length} <span className="text-xs text-lotus-stone font-normal">lượt</span></p>
                 </div>
 
                 <div className="bg-lotus-cream/40 backdrop-blur-sm rounded-xl p-4 border border-lotus-rose/5 shadow-sm hover:shadow-md transition-all duration-200">
