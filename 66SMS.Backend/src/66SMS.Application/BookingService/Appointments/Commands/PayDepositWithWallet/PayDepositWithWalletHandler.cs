@@ -112,13 +112,13 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
 
                 // Cập nhật trạng thái appointment
                 var oldStatus = appointment.Status;
-                appointment.Status = AppointmentConst.STATUS_CONFIRMED;
+                appointment.Status = AppointmentConst.STATUS_WAITING;
 
                 appointment.Histories ??= new List<AppointmentHistory>();
                 appointment.Histories.Add(new AppointmentHistory
                 {
                     OldStatus = oldStatus,
-                    NewStatus = AppointmentConst.STATUS_CONFIRMED,
+                    NewStatus = AppointmentConst.STATUS_WAITING,
                     Note = "Thanh toán cọc bằng Ví thành công",
                     CreatedBy = request.UserId,
                     ChangedBy = request.UserId,
@@ -129,10 +129,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                 
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // Link AppointmentPaymentId to WalletTransaction after SaveChanges gets the IDs
-                // However, EF Core navigation properties might not easily link newly created in same context if not explicitly saved.
-                // We'll skip linking AppointmentPaymentId into WalletTransaction for now, or just let it be null.
-                
                 transaction.Commit();
 
                 return Result<object>.Success("Thanh toán tiền cọc thành công.");

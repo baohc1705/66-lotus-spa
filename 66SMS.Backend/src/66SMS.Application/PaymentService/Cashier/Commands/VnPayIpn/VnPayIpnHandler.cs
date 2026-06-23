@@ -1,3 +1,4 @@
+using _66SMS.Application.Abstractions;
 using _66SMS.Application.Services.Appointments;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -13,6 +14,7 @@ namespace _66SMS.Application.PaymentService.Cashier.Commands.VnPayIpn
     public sealed class VnPayIpnHandler(
         IVnPayService vnPayService,
         IAppointmentSqlRepository appointmentRepository,
+        ILoyaltyPointService loyaltyPointService,
         ISqlUnitOfWork unitOfWork)
         : IRequestHandler<VnPayIpnCommand, VnPayIpnResponse>
     {
@@ -75,6 +77,18 @@ namespace _66SMS.Application.PaymentService.Cashier.Commands.VnPayIpn
                 if (!apply.IsSuccess)
                 {
                     return VnPayIpnResponse.OrderAlreadyConfirmed();
+                }
+
+                // Add loyalty points if it's the final payment phase and was newly paid
+                if (result.Phase == AppointmentPaymentConst.PHASE_FINAL_PAYMENT 
+                    && apply.Data is bool isNewlyPaid && isNewlyPaid
+                    && appointment.TotalAmount > 0)
+                {
+                    await loyaltyPointService.AddPointsAndCheckUpgradeAsync(
+                        appointment.CreatedByUserId,
+                        appointment.TotalAmount,
+                        appointment.CreatedByUserId,
+                        cancellationToken);
                 }
 
                 // Cập nhật sự thay đổi (Trạng thái đơn hàng, History) vào CSDL

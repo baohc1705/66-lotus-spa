@@ -123,7 +123,7 @@ namespace _66SMS.Application.PaymentService.Cashier.Commands.PayAppointment
                         Note = $"Thu ngân trừ tiền ví thanh toán cho lịch hẹn #{appointment.Id}",
                         Status = WalletTransactionConst.STATUS_SUCCESS,
                         CreatedAt = DateTime.UtcNow,
-                        CreatedBy = request.UserId.Value
+                        CreatedBy = request.UserId!.Value
                     };
                     walletTransactionSqlRepository.Add(walletTx);
                 }
@@ -162,7 +162,7 @@ namespace _66SMS.Application.PaymentService.Cashier.Commands.PayAppointment
                     await loyaltyPointService.AddPointsAndCheckUpgradeAsync(
                         appointment.CreatedByUserId,
                         appointment.TotalAmount,
-                        request.UserId.Value,
+                        request.UserId!.Value,
                         cancellationToken);
                 }
 

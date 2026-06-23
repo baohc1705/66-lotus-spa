@@ -1,3 +1,4 @@
+using _66SMS.Application.Abstractions;
 using _66SMS.Application.Services.Appointments;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
@@ -16,6 +17,7 @@ namespace _66SMS.Application.PaymentService.Cashier.Commands.VnPayReturn
     public sealed class VnPayReturnHandler(
         IVnPayService vnPayService,
         IAppointmentSqlRepository appointmentRepository,
+        ILoyaltyPointService loyaltyPointService,
         ISqlUnitOfWork unitOfWork)
         : IRequestHandler<VnPayReturnCommand, Result<VnPayReturnDto>>
     {
@@ -37,6 +39,18 @@ namespace _66SMS.Application.PaymentService.Cashier.Commands.VnPayReturn
             if (!apply.IsSuccess) return Result<VnPayReturnDto>.BadRequest(apply.Message);
 
             appointmentRepository.Update(appointment);
+
+            if (result.Phase == AppointmentPaymentConst.PHASE_FINAL_PAYMENT 
+                && apply.Data is bool isNewlyPaid && isNewlyPaid
+                && appointment.TotalAmount > 0)
+            {
+                await loyaltyPointService.AddPointsAndCheckUpgradeAsync(
+                    appointment.CreatedByUserId,
+                    appointment.TotalAmount,
+                    appointment.CreatedByUserId,
+                    cancellationToken);
+            }
+
             await unitOfWork.SaveChangeAsync(cancellationToken);
 
             return Result<VnPayReturnDto>.Success(new VnPayReturnDto

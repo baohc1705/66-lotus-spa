@@ -13,7 +13,7 @@ namespace _66SMS.Application.Services.Appointments
             if (phase == AppointmentPaymentConst.PHASE_DEPOSIT)
             {
                 if (AppointmentPaymentCalculator.HasDepositPaid(appointment))
-                    return Result<object>.Ok(); // Đã thanh toán (do IPN xử lý trước)
+                    return Result<object>.Success(false, "Đã thanh toán cọc trước đó"); // Đã thanh toán (do IPN xử lý trước)
 
                 if (!AppointmentStatusTransitions.CanPayDeposit(appointment))
                     return Result<object>.BadRequest("Lỗi: Không ở trạng thái chờ cọc hoặc đã cọc.");
@@ -31,12 +31,12 @@ namespace _66SMS.Application.Services.Appointments
                     CreatedAt = DateTimeHelper.UtcNow(),
                 });
 
-                return Result<object>.Ok();
+                return Result<object>.Success(true, "Thanh toán cọc thành công");
             }
 
             // THANH TOÁN PHẦN CÒN LẠI (BALANCE)
             if (AppointmentPaymentCalculator.IsFullyPaid(appointment))
-                return Result<object>.Ok(); // Đã thanh toán (do IPN xử lý trước)
+                return Result<object>.Success(false, "Đã thanh toán phần còn lại trước đó"); // Đã thanh toán (do IPN xử lý trước)
 
             if (!AppointmentStatusTransitions.CanPayBalance(appointment.Status))
             {
@@ -57,7 +57,7 @@ namespace _66SMS.Application.Services.Appointments
                 CreatedAt = DateTimeHelper.UtcNow(),
             });
 
-            return Result<object>.Ok();
+            return Result<object>.Success(true, "Thanh toán phần còn lại thành công");
         }
     }
 }

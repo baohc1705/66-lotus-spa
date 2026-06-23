@@ -49,6 +49,7 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> UpdateAppointmentStatus(int id, [FromBody] _66SMS.Application.PaymentService.Cashier.Commands.UpdateAppointmentStatus.UpdateAppointmentStatusCommand request)
         {
             request.Id = id;
+            request.UserId = jwtService.GetUserId();
             var result = await mediator.Send(request);
             return HandleResult(result);
         }
@@ -58,6 +59,7 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> PayAppointment(int id, [FromBody] _66SMS.Application.PaymentService.Cashier.Commands.PayAppointment.PayAppointmentCommand request)
         {
             request.Id = id;
+            request.UserId = jwtService.GetUserId();
             var result = await mediator.Send(request);
             return HandleResult(result);
         }
