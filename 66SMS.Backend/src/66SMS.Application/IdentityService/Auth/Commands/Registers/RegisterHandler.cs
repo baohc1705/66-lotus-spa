@@ -1,4 +1,4 @@
-﻿using _66SMS.Application.DTOs.Auth;
+using _66SMS.Application.DTOs.Auth;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
@@ -61,42 +61,45 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Create user entity
+                // 1. Create user entity
                 User user = mapper.Map<User>(request);
                 user.PasswordHash = passwordHash.Hash(request.Password!);
 
-                // Create and link customer
+                // Thêm User vào CSDL trước để lấy Id (An toàn với Transaction)
+                userSqlRepository.Add(user);
+                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+
+                // 2. Create and link customer
                 var customer = new Customer
                 {
+                    UserId = user.Id, // Gán cứng UserId vừa sinh ra
                     FullName = request.FullName!,
                     Phone = request.Phone!,
-                    Source =  "Online"
+                    Source =  "Online",
+                    CreatedBy = user.Id,
+                    Status = request.Status ?? CustomerConst.STATUS_ACTIVED // Tự set active nếu không có status
                 };
                 user.Customer = customer;
 
-                // Create and link wallet to customer
+                // 3. Create and link wallet to customer
                 var wallet = new Wallet
                 {
                     Balance = 0,
                     Status = WalletConst.STATUS_ACTIVE,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = user.Id
                 };
                 customer.Wallet = wallet;
 
-                // Create and link user role
+                // 4. Create and link user role
                 var userRole = new UserRole
                 {
+                    UserId = user.Id,
                     RoleId = role.Id
                 };
                 user.UserRoles = new List<UserRole> { userRole };
 
-                // Persist all entities in single transaction
-                // EF Core will automatically:
-                // 1. Insert User -> populate user.Id
-                // 2. Insert Customer with user.Id -> populate customer.Id
-                // 3. Insert Wallet with customer.Id
-                // 4. Insert UserRole with user.Id
-                userSqlRepository.Add(user);
+                // 5. Persist relations
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 transaction.Commit();

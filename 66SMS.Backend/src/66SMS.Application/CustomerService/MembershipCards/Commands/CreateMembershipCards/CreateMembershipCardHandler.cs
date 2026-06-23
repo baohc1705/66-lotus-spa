@@ -49,11 +49,30 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.CreateMemb
             }
 
             // find membership tier by id or name
-            MembershipTier? tier = await membershipTierSqlRepository
-               .AsQueryable()
-               .Where(x => x.Id == request.MembershipTierId! || x.Name.Equals(request.MembershipTierName!.Trim().ToLower()))
-               .FirstOrDefaultAsync(cancellationToken);
-            
+            MembershipTier? tier = null;
+
+            if (request.MembershipTierId.HasValue && request.MembershipTierId.Value > 0)
+            {
+                tier = await membershipTierSqlRepository.FindByIdAsync(request.MembershipTierId.Value, false, cancellationToken);
+            }
+
+            if (tier == null && !string.IsNullOrEmpty(request.MembershipTierName))
+            {
+                string cleanName = request.MembershipTierName.Trim().ToLower();
+                tier = await membershipTierSqlRepository
+                    .AsQueryable()
+                    .FirstOrDefaultAsync(x => x.Name.ToLower() == cleanName, cancellationToken);
+            }
+
+            // Fallback to the default tier (lowest MinSpending) if not found
+            if (tier == null)
+            {
+                tier = await membershipTierSqlRepository
+                    .AsQueryable()
+                    .OrderBy(x => x.MinSpending)
+                    .FirstOrDefaultAsync(cancellationToken);
+            }
+
             // return not found if tier is null
             if (tier == null)
             {

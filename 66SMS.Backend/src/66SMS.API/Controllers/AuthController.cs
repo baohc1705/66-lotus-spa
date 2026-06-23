@@ -201,7 +201,7 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin,manager")]
         [HttpGet("role")]
         public async Task<IActionResult> GetAllRole([FromQuery]GetAllRoleQuery query)
         {

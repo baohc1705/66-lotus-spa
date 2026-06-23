@@ -11,7 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace _66SMS.API.Controllers
 {
     [ApiVersion("1.0")]
-    [Route("api/admin/wallets")]
+    [Route("api/v{version:apiVersion}/admin/wallets")]
+    [Route("admin/wallets")]
     [Authorize] // Requires auth, optionally restrict to Admin/Staff roles
     public class AdminWalletController : ApiController<AdminWalletController>
     {

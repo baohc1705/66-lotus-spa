@@ -91,9 +91,17 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetDetailUser
 
                     userDto.CustomerInfo = new CustomerProfileDto
                     {
+                        Id = customer.Id,
                         LoyaltyPoint = customer.LoyaltyPoint,
                         FirstPurchaseAt = customer.FirstPurchaseAt,
-                        Source = customer.Source
+                        LastPurchaseAt = customer.LastPurchaseAt,
+                        Source = customer.Source,
+                        Status = customer.Status,
+                        Note = customer.Note,
+                        StreetAddress = customer.StreetAddress,
+                        ProvinceCode = customer.ProvinceCode,
+                        WardCode = customer.WardCode,
+                        FullAddress = customer.FullAddress
                     };
                 }
             }

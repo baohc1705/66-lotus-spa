@@ -19,7 +19,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
         public string? ConfirmPassword { get; set; }
         [JsonIgnore]
         public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
-        [JsonIgnore]
+        
         public int? Status { get; set; } = UserConst.STATUS_ACTIVED;
     }
 }

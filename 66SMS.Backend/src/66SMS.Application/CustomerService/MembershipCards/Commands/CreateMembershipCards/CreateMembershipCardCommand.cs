@@ -14,7 +14,7 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.CreateMemb
         public int? MembershipTierId { get; set; }
         public string? MembershipTierName { get; set; } // client 
         public string CardCode { get; set; } = string.Empty;
-        public DateTime IssuedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? IssuedAt { get; set; } = DateTime.UtcNow;
         public DateTime? ExpiresAt { get; set; } 
         public int? Status { get; set; } = MembershipCardConst.STATUS_ACTIVE;
 

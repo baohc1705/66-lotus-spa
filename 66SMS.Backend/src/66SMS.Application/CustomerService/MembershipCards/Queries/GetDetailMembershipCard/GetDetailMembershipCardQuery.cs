@@ -6,6 +6,8 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Queries.GetDetailMe
 {
     public class GetDetailMembershipCardQuery : IRequest<Result<MembershipCardDto>>
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
+        public int? CustomerId { get; set; }
+        public int? UserId { get; set; }
     }
 }

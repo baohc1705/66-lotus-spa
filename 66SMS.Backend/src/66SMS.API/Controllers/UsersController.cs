@@ -1,9 +1,9 @@
 using _66SMS.API.Abstractions;
+using _66SMS.Application.CustomerService.MembershipCards.Queries.GetDetailMembershipCard;
 using _66SMS.Application.IdentityService.Users.Commands.DeleteUser;
 using _66SMS.Application.IdentityService.Users.Commands.UpdateUser;
 using _66SMS.Application.IdentityService.Users.Queries.GetAllUsers;
 using _66SMS.Application.IdentityService.Users.Queries.GetDetailUser;
-using _66SMS.Application.IdentityService.Users.Queries.GetMyMembershipCard;
 using _66SMS.Application.IdentityService.Users.Queries.GetMyWallet;
 using _66SMS.Application.IdentityService.Users.Queries.GetMyWalletTransactions;
 using _66SMS.Contracts.Abstractions;
@@ -100,9 +100,9 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetMyMembershipCard()
         {
-            var result = await mediator.Send(new GetMyMembershipCardQuery
+            var result = await mediator.Send(new GetDetailMembershipCardQuery
             { 
-                UserId = jwtService.GetUserId() 
+                UserId = jwtService.GetUserId()
             });
             return HandleResult(result);
         }

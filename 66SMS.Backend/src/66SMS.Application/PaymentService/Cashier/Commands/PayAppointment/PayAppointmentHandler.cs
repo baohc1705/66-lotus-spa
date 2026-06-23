@@ -1,3 +1,4 @@
+using _66SMS.Application.Abstractions;
 using _66SMS.Application.Services.Appointments;
 using _66SMS.Application.Services.Wallets;
 using _66SMS.Contracts.Enumerations;
@@ -16,6 +17,7 @@ namespace _66SMS.Application.PaymentService.Cashier.Commands.PayAppointment
         IUserSqlRepository userSqlRepository,
         IWalletSqlRepository walletSqlRepository,
         IWalletTransactionSqlRepository walletTransactionSqlRepository,
+        ILoyaltyPointService loyaltyPointService,
         ISqlUnitOfWork sqlUnitOfWork)
         : IRequestHandler<PayAppointmentCommand, Result<object>>
     {
@@ -151,6 +153,19 @@ namespace _66SMS.Application.PaymentService.Cashier.Commands.PayAppointment
                 });
 
                 appointmentSqlRepository.Update(appointment);
+                
+                // Gọi service để cộng điểm và kiểm tra tự động nâng hạng thẻ thành viên
+                // Tính điểm dựa trên TỔNG tiền dịch vụ (TotalAmount) — bao gồm cả phần cọc đã thanh toán trước
+                // Việc lưu các thay đổi của thẻ và lịch sử sẽ được thực thi chung trong SaveChangeAsync dưới đây
+                if (appointment.TotalAmount > 0)
+                {
+                    await loyaltyPointService.AddPointsAndCheckUpgradeAsync(
+                        appointment.CreatedByUserId,
+                        appointment.TotalAmount,
+                        request.UserId.Value,
+                        cancellationToken);
+                }
+
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 transaction.Commit();

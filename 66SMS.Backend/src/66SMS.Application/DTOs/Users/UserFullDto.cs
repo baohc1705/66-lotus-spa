@@ -35,8 +35,16 @@ namespace _66SMS.Application.DTOs.Users
 
     public class CustomerProfileDto
     {
+        public int Id { get; set; }
         public int? LoyaltyPoint { get; set; }
         public DateTime? FirstPurchaseAt { get; set; }
+        public DateTime? LastPurchaseAt { get; set; }
         public string? Source { get; set; }
+        public int Status { get; set; }
+        public string? Note { get; set; }
+        public string? StreetAddress { get; set; }
+        public string? ProvinceCode { get; set; }
+        public string? WardCode { get; set; }
+        public string? FullAddress { get; set; }
     }
 }

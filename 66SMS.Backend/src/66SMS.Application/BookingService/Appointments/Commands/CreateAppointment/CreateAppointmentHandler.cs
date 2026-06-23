@@ -1,4 +1,4 @@
-using _66SMS.Application.Abstractions;
+ using _66SMS.Application.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -18,15 +18,17 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
         private readonly IBookingAvailabilityService bookingAvailabilityService;
         private readonly IAppointmentSlotLockSqlRepository appointmentSlotLockSqlRepository;
         private readonly IStaffSqlRepository staffSqlRepository;
+        private readonly ICustomerSqlRepository customerSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
 
-        public CreateAppointmentHandler(IAppointmentSqlRepository appointmentSqlRepository, IServiceSqlRepository serviceSqlRepository, IBookingAvailabilityService bookingAvailabilityService, IAppointmentSlotLockSqlRepository appointmentSlotLockSqlRepository, IStaffSqlRepository staffSqlRepository, ISqlUnitOfWork sqlUnitOfWork)
+        public CreateAppointmentHandler(IAppointmentSqlRepository appointmentSqlRepository, IServiceSqlRepository serviceSqlRepository, IBookingAvailabilityService bookingAvailabilityService, IAppointmentSlotLockSqlRepository appointmentSlotLockSqlRepository, IStaffSqlRepository staffSqlRepository, ICustomerSqlRepository customerSqlRepository, ISqlUnitOfWork sqlUnitOfWork)
         {
             this.appointmentSqlRepository = appointmentSqlRepository;
             this.serviceSqlRepository = serviceSqlRepository;
             this.bookingAvailabilityService = bookingAvailabilityService;
             this.appointmentSlotLockSqlRepository = appointmentSlotLockSqlRepository;
             this.staffSqlRepository = staffSqlRepository;
+            this.customerSqlRepository = customerSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
         }
 
@@ -39,6 +41,14 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             try
             {
                 var appointmentIds = new List<int>();
+
+                // Lấy thông tin khách hàng và thẻ thành viên để tính giảm giá chung cho các lịch hẹn
+                var customer = await customerSqlRepository.AsQueryable(asNoTracking: true)
+                    .Include(c => c.MembershipCard)
+                    .ThenInclude(mc => mc!.Tier)
+                    .FirstOrDefaultAsync(c => c.UserId == request.CreatedByUserId, cancellationToken);
+                
+                int discountPercent = customer?.MembershipCard?.Tier?.DiscountPercent ?? 0;
 
                 foreach (var guest in request.Guests)
                 {
@@ -111,6 +121,13 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                             Status = AppointmentServiceConst.STATUS_ACTIVE // Active
                         });
                         totalAmount += serviceEntity.SellingPrice * (int)reqService.Quantity;
+                    }
+
+                    // Áp dụng giảm giá từ thẻ thành viên
+                    if (discountPercent > 0 && totalAmount > 0)
+                    {
+                        // Trừ trực tiếp phần trăm trên tổng bill dịch vụ
+                        totalAmount -= totalAmount * discountPercent / 100m;
                     }
 
                     // Tạo record Appointment
