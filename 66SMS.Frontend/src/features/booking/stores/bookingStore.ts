@@ -65,7 +65,21 @@ export const useBookingStore = create<BookingState>((set) => ({
   prevStep: () =>
     set((state) => ({ currentStep: Math.max(state.currentStep - 1, 0) })),
 
-  selectSalon: (salon) => set({ selectedSalon: salon }),
+  selectSalon: (salon) =>
+    set((state) => {
+      if (state.selectedSalon?.id !== salon.id) {
+        const newGuests = state.guests.map((guest) => ({
+          ...guest,
+          selectedTechnician: null,
+          selectedPosition: null,
+          selectedDate: null,
+          selectedTimeSlot: null,
+          lockId: undefined,
+        }));
+        return { selectedSalon: salon, guests: newGuests };
+      }
+      return { selectedSalon: salon };
+    }),
 
   addGuest: () =>
     set((state) => {
@@ -106,7 +120,7 @@ export const useBookingStore = create<BookingState>((set) => ({
       newGuests[state.activeGuestIndex].selectedPosition = null;
       newGuests[state.activeGuestIndex].selectedTimeSlot = null;
       newGuests[state.activeGuestIndex].lockId = undefined;
-      return { guests: newGuests, selectedSalon: null };
+      return { guests: newGuests };
     }),
 
   selectTechnician: (technician) =>

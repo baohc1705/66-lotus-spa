@@ -45,19 +45,26 @@ export function CashierInvoiceSidebar({
   ];
 
   return (
-    <div className="w-[400px] flex-shrink-0 bg-white border-l border-lotus-gold/20 shadow-[-4px_0_24px_rgba(42,31,26,0.04)] flex flex-col z-30 transition-all duration-300 transform translate-x-0">
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-md max-h-[90vh] bg-white rounded-[5px] border border-lotus-gold/30 shadow-[0_12px_40px_rgba(42,31,26,0.22)] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
       <div className="h-14 flex items-center justify-between px-5 border-b border-lotus-gold/20 bg-lotus-cream/30">
         <h2 className="font-semibold text-lotus-deep">Chi tiết hóa đơn</h2>
         <button
           onClick={onClose}
-          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-lotus-cream text-lotus-stone hover:text-lotus-deep transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-[5px] hover:bg-lotus-cream text-lotus-stone hover:text-lotus-deep transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-5 scrollbar-thin">
-        <div className="flex items-center gap-3 mb-6 p-4 rounded-xl border border-lotus-gold/20 bg-lotus-cream/20">
+        <div className="flex items-center gap-3 mb-6 p-4 rounded-[5px] border border-lotus-gold/20 bg-lotus-cream/20">
           <div className="w-12 h-12 rounded-full bg-lotus-gold/10 flex items-center justify-center text-lotus-gold font-bold text-lg">
             {booking.customerName.charAt(0)}
           </div>
@@ -98,7 +105,7 @@ export function CashierInvoiceSidebar({
           </div>
         </div>
 
-        <div className="mb-6 p-3 rounded-xl bg-lotus-leaf/5 border border-lotus-leaf/20 text-sm space-y-1.5">
+        <div className="mb-6 p-3 rounded-[5px] bg-lotus-leaf/5 border border-lotus-leaf/20 text-sm space-y-1.5">
           <div className="flex justify-between">
             <span className="text-lotus-deep/70">Đã cọc (20%):</span>
             <span className="font-medium text-lotus-leaf">
@@ -129,7 +136,7 @@ export function CashierInvoiceSidebar({
                   onClick={() => setPaymentMethod(method.id)}
                   disabled={method.isWallet && (booking.customerWalletBalance || 0) < amountDue}
                   className={cn(
-                    "flex flex-col items-center justify-center gap-2 p-3 rounded-xl transition-all relative overflow-hidden",
+                    "flex flex-col items-center justify-center gap-2 p-3 rounded-[5px] transition-all relative overflow-hidden",
                     isSelected
                       ? "border-2 border-lotus-leaf bg-lotus-leaf/5 text-lotus-leaf"
                       : method.isWallet && (booking.customerWalletBalance || 0) < amountDue
@@ -162,7 +169,7 @@ export function CashierInvoiceSidebar({
           </div>
 
           {paymentMethod === "vnpay" && (
-            <div className="mt-4 p-4 border border-[#005BAA]/20 bg-[#005BAA]/5 rounded-xl flex flex-col items-center justify-center relative overflow-hidden transition-all">
+            <div className="mt-4 p-4 border border-[#005BAA]/20 bg-[#005BAA]/5 rounded-[5px] flex flex-col items-center justify-center relative overflow-hidden transition-all">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#005BAA] to-[#ED1B24]"></div>
               <p className="text-sm text-center font-semibold text-gray-800">
                 Thanh toán phần còn lại qua VNPAY
@@ -181,7 +188,7 @@ export function CashierInvoiceSidebar({
           <textarea
             placeholder="Nhập ghi chú hóa đơn..."
             defaultValue={booking.note || ""}
-            className="w-full text-sm border border-lotus-gold/20 bg-lotus-cream/10 rounded-lg p-3 min-h-[80px] focus:outline-none focus:border-lotus-leaf focus:ring-1 focus:ring-lotus-leaf resize-none text-lotus-deep placeholder:text-lotus-stone"
+            className="w-full text-sm border border-lotus-gold/20 bg-lotus-cream/10 rounded-[5px] p-3 min-h-[80px] focus:outline-none focus:border-lotus-leaf focus:ring-1 focus:ring-lotus-leaf resize-none text-lotus-deep placeholder:text-lotus-stone"
           ></textarea>
         </div>
       </div>
@@ -209,14 +216,14 @@ export function CashierInvoiceSidebar({
         </div>
 
         {!canPay && !isPaid && (
-          <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200/50 rounded-lg p-2.5 mb-3">
+          <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200/50 rounded-[5px] p-2.5 mb-3">
             Chỉ thanh toán phần còn lại sau khi nhân viên hoàn thành dịch vụ
             (trạng thái chờ thanh toán).
           </p>
         )}
 
         {canPay && !booking.depositPaid && (
-          <p className="text-xs text-red-700 bg-red-50 border border-red-200/50 rounded-lg p-2.5 mb-3">
+          <p className="text-xs text-red-700 bg-red-50 border border-red-200/50 rounded-[5px] p-2.5 mb-3">
             Khách chưa đặt cọc online. Không thể thu phần còn lại.
           </p>
         )}
@@ -226,7 +233,7 @@ export function CashierInvoiceSidebar({
             onClick={() => onRequestDeposit(booking.id)}
             disabled={isPaying}
             className={cn(
-              "w-full py-3 rounded-xl flex items-center justify-center gap-2 text-white font-semibold text-sm transition-all shadow-md",
+              "w-full py-3 rounded-[5px] flex items-center justify-center gap-2 text-white font-semibold text-sm transition-all shadow-md",
               isPaying
                 ? "bg-lotus-stone/50 cursor-not-allowed text-white/80 shadow-none"
                 : "bg-[#005BAA] hover:bg-[#005BAA]/90 shadow-blue-500/20"
@@ -239,7 +246,7 @@ export function CashierInvoiceSidebar({
           <button
             onClick={() => onPay(booking.id, paymentMethod)}
             className={cn(
-              "w-full py-3 rounded-xl flex items-center justify-center gap-2 text-white font-semibold text-sm transition-all shadow-md",
+              "w-full py-3 rounded-[5px] flex items-center justify-center gap-2 text-white font-semibold text-sm transition-all shadow-md",
               isPaid || isPaying || !canPay || (!booking.depositPaid && booking.status !== "confirmed")
                 ? "bg-lotus-stone/50 cursor-not-allowed text-white/80 shadow-none"
                 : paymentMethod === "vnpay"
@@ -264,6 +271,7 @@ export function CashierInvoiceSidebar({
                         : `Thu phần còn lại (${amountDue.toLocaleString("vi-VN")}đ)`}
           </button>
         )}
+      </div>
       </div>
     </div>
   );

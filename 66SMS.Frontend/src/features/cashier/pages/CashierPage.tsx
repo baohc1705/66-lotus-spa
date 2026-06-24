@@ -4,8 +4,9 @@ import { toast } from "sonner";
 import { CashierHeader } from "../components/CashierHeader";
 import { CashierToolbar } from "../components/CashierToolbar";
 import { CashierGrid } from "../components/CashierGrid";
+import { CashierTimeline } from "../components/CashierTimeline";
 import { CashierInvoiceSidebar } from "../components/CashierInvoiceSidebar";
-import type { CashierBooking } from "../types";
+import type { CashierBooking, CashierViewMode } from "../types";
 import { useCashierData } from "../hooks/useCashier";
 import { CashierBookingModal } from "../components/CashierBookingModal";
 import { cashierApi } from "../api/cashier.api";
@@ -21,7 +22,16 @@ export function CashierPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
+  const [viewMode, setViewMode] = useState<CashierViewMode>(
+    () =>
+      (localStorage.getItem("cashier-view-mode") as CashierViewMode) ||
+      "timeline",
+  );
   const navigate = useNavigate();
+
+  useEffect(() => {
+    localStorage.setItem("cashier-view-mode", viewMode);
+  }, [viewMode]);
 
   const { hasRole, getEffectiveSalonId } = useAuthStore();
   const isAdmin = hasRole("Admin");
@@ -123,6 +133,8 @@ export function CashierPage() {
         currentDate={currentDate}
         onDateChange={setCurrentDate}
         onAddBooking={handleAddBooking}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
 
       {/* Main Content Area */}
@@ -146,7 +158,7 @@ export function CashierPage() {
           <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-sm text-lotus-stone">
             Không thể tải dữ liệu lưới lịch
           </div>
-        ) : (
+        ) : viewMode === "grid" ? (
           <CashierGrid
             date={currentDate}
             columns={data.columns}
@@ -155,39 +167,48 @@ export function CashierPage() {
             onEmptySlotClick={handleEmptySlotClick}
             onBookingMove={handleBookingMove}
           />
+        ) : (
+          <CashierTimeline
+            date={currentDate}
+            columns={data.columns}
+            bookings={data.bookings}
+            onBookingClick={handleBookingClick}
+            onEmptySlotClick={handleEmptySlotClick}
+            onBookingMove={handleBookingMove}
+          />
         )}
-
-        {/* Sliding Sidebar for Cashier / Invoice Details */}
-        <CashierInvoiceSidebar
-          booking={selectedBooking}
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-          onPay={handlePay}
-          onRequestDeposit={async (bookingId) => {
-            setIsPaying(true);
-            try {
-              const res = await cashierApi.updateBookingStatus(
-                bookingId,
-                APPOINTMENT_STATUS.CONFIRMED,
-                "Thu ngân xác nhận lịch — yêu cầu đặt cọc trong 24h",
-              );
-              if (res.isSuccess) {
-                toast.success("Đã xác nhận lịch và yêu cầu khách cọc.");
-                setIsSidebarOpen(false);
-                setSelectedBooking(null);
-                refetch();
-              } else {
-                toast.error(res.message || "Không thể yêu cầu cọc.");
-              }
-            } catch {
-              toast.error("Lỗi khi kết nối đến máy chủ.");
-            } finally {
-              setIsPaying(false);
-            }
-          }}
-          isPaying={isPaying}
-        />
       </div>
+
+      {/* Popup chi tiết hóa đơn — đặt ngoài vùng z-10 để không bị toolbar che */}
+      <CashierInvoiceSidebar
+        booking={selectedBooking}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        onPay={handlePay}
+        onRequestDeposit={async (bookingId) => {
+          setIsPaying(true);
+          try {
+            const res = await cashierApi.updateBookingStatus(
+              bookingId,
+              APPOINTMENT_STATUS.CONFIRMED,
+              "Thu ngân xác nhận lịch — yêu cầu đặt cọc trong 24h",
+            );
+            if (res.isSuccess) {
+              toast.success("Đã xác nhận lịch và yêu cầu khách cọc.");
+              setIsSidebarOpen(false);
+              setSelectedBooking(null);
+              refetch();
+            } else {
+              toast.error(res.message || "Không thể yêu cầu cọc.");
+            }
+          } catch {
+            toast.error("Lỗi khi kết nối đến máy chủ.");
+          } finally {
+            setIsPaying(false);
+          }
+        }}
+        isPaying={isPaying}
+      />
 
       <CashierBookingModal
         isOpen={isBookingModalOpen}

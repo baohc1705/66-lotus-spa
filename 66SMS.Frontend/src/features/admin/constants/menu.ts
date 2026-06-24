@@ -119,13 +119,13 @@ export const MENU_ITEMS: MenuItem[] = [
         label: "Phân ca",
         path: "/admin/staff/schedule",
         icon: Calendar,
-        allowedRoles: ["Admin", "Manager"],
+        allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
       },
       {
         label: "Quản lý ca",
         path: "/admin/shifts",
         icon: Clock,
-        allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
+        allowedRoles: ["Admin", "Manager"],
       },
       {
         label: "Khung giờ",
@@ -144,23 +144,26 @@ export const MENU_ITEMS: MenuItem[] = [
   {
     label: "Khách hàng",
     icon: Users,
-    allowedRoles: ["Admin", "Manager"],
+    allowedRoles: ["Admin", "Manager", "Receptionist"],
     children: [
-      { label: "Khách hàng", path: "/admin/customers/list", icon: Users },
+      { label: "Khách hàng", path: "/admin/customers/list", icon: Users, allowedRoles: ["Admin", "Manager", "Receptionist"] },
       {
         label: "Ví khách hàng",
         path: "/admin/customers/wallets",
         icon: Wallet,
+        allowedRoles: ["Admin"]
       },
       {
         label: "Thẻ thành viên",
         path: "/admin/customers/membership-cards",
         icon: CreditCard,
+        allowedRoles: ["Admin", "Manager", "Receptionist"]
       },
       {
         label: "Loại thẻ",
         path: "/admin/customers/membership-tiers",
         icon: Crown,
+         allowedRoles: ["Admin"]
       },
     ],
   },

@@ -5,6 +5,7 @@ import {
   Check,
   HelpCircle,
   ChevronRight,
+  ArrowLeft,
 } from "lucide-react";
 import { useBookingStore } from "../stores/bookingStore";
 import { useServices } from "../../services/hooks/useServices";
@@ -59,7 +60,7 @@ export const BookingServiceStep: React.FC = () => {
     <div className="bg-lotus-surface rounded-3xl p-6 sm:p-8 border border-lotus-muted/20 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
       <h3 className="text-xl font-bold text-lotus-deep font-display mb-5 flex items-center gap-2 border-b border-lotus-muted/20 pb-3">
         <Heart className="w-5 h-5 text-lotus-rose" />
-        <span>Bước 1: Chọn dịch vụ làm đẹp & chăm sóc</span>
+        <span>Bước 2: Chọn dịch vụ làm đẹp & chăm sóc</span>
       </h3>
 
       {/* Search Row */}
@@ -149,17 +150,24 @@ export const BookingServiceStep: React.FC = () => {
         )}
       </div>
 
-      <div className="flex justify-end mt-8 border-t border-lotus-muted/20 pt-5">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-lotus-muted/20 pt-5 mt-8">
+        <button
+          onClick={store.prevStep}
+          className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl font-bold transition-all bg-lotus-surface text-lotus-deep border border-lotus-muted/20 hover:bg-lotus-cream"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          Quay lại
+        </button>
         <button
           disabled={!selectedService}
           onClick={() => nextStep()}
-          className={`flex items-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl font-bold transition-all ${
+          className={`flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl font-bold transition-all ${
             selectedService
               ? "bg-lotus-rose text-white hover:bg-lotus-rose/90 shadow-md"
               : "bg-gray-100 text-gray-400 cursor-not-allowed"
           }`}
         >
-          Tiếp tục: Chọn chi nhánh
+          Tiếp tục: Chọn thời gian
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>

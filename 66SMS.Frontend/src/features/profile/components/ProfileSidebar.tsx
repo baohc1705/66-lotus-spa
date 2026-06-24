@@ -1,4 +1,4 @@
-import { User, Shield, Wallet, Bell, LogOut, Calendar, Award } from 'lucide-react'
+import { User, Wallet, Bell, LogOut, Calendar, Award, ShieldCheck, Lock } from 'lucide-react'
 import { useAuthStore } from '@/features/auth/stores/authStore'
 import { useNavigate } from 'react-router-dom'
 
@@ -21,7 +21,8 @@ export function ProfileSidebar({ activeTab, onTabChange, isCustomer = false }: P
     ...(isCustomer ? [{ id: 'membership', label: 'Hạng thành viên', icon: Award }] : []),
     { id: 'bookings', label: 'Lịch hẹn', icon: Calendar },
     { id: 'profile', label: 'Hồ sơ', icon: User },
-    { id: 'security', label: 'Bảo mật', icon: Shield },
+    { id: 'account', label: 'Tài khoản', icon: ShieldCheck },
+    { id: 'change-password', label: 'Đổi mật khẩu', icon: Lock },
     { id: 'wallet', label: 'Ví của tôi', icon: Wallet },
     { id: 'notifications', label: 'Thông báo', icon: Bell },
   ]

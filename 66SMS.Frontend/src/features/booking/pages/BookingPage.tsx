@@ -70,8 +70,8 @@ export const BookingPage: React.FC = () => {
             {/* Step Indicators */}
             <div className="flex items-center justify-center gap-1.5 sm:gap-2.5 bg-white border border-lotus-muted/20 rounded-full px-5 py-2.5 shadow-sm max-w-max mx-auto sm:mx-0">
               {[
-                { s: 0, label: "Dịch vụ" },
-                { s: 1, label: "Chi nhánh" },
+                { s: 0, label: "Chi nhánh" },
+                { s: 1, label: "Dịch vụ" },
                 { s: 2, label: "Thời gian" },
                 { s: 3, label: "Thông tin" },
               ].map((item, idx) => (
@@ -116,8 +116,8 @@ export const BookingPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* LEFT PANEL: Interactive Form Content (60%) */}
           <div className="lg:col-span-8 flex flex-col gap-6">
-            {currentStep === 0 && <BookingServiceStep />}
-            {currentStep === 1 && <BookingSalonStep />}
+            {currentStep === 0 && <BookingSalonStep />}
+            {currentStep === 1 && <BookingServiceStep />}
             {currentStep === 2 && <BookingTimeStep />}
             {currentStep === 3 && <BookingContactStep />}
           </div>

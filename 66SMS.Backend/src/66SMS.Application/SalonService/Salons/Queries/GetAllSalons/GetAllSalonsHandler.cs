@@ -2,6 +2,7 @@ using _66SMS.Application.DTOs.Salons;
 using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using AutoMapper;
 using MediatR;
 
@@ -32,6 +33,11 @@ namespace _66SMS.Application.SalonService.Salons.Queries.GetAllSalons
 
             if (request.Status.HasValue)
                 query = query.Where(x => x.Status == request.Status.Value);
+
+            if (!request.IsDeleted)
+            {
+                query = query.Where(x => x.Status != SalonConst.STATUS_DELETED);
+            }
 
             query = query.OrderByDescending(x => x.CreatedAt);
 

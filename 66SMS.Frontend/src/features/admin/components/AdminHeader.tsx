@@ -1,16 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import {
-  Menu,
-  ShoppingBag,
-  ShoppingCart,
-  Bell,
-  Settings,
-  User,
-  ChevronDown,
-  LogOut,
-} from "lucide-react";
+import { Menu, ShoppingCart, Bell, Settings, User, LogOut } from "lucide-react";
 import { MENU_ITEMS } from "../constants/menu";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { BranchSelector } from "@/shared/components/BranchSelector";
@@ -75,20 +66,12 @@ export function AdminHeader({
         <h1 className="text-lg sm:text-xl font-bold text-lotus-deep ml-1 sm:ml-2 tracking-tight">
           {currentTitle}
         </h1>
-
-        <div className="w-40 sm:w-48 md:w-56 shrink-0">
-          <BranchSelector />
-        </div>
       </div>
 
       <div className="flex items-center gap-2 sm:gap-2.5">
-        {isAdmin && (
-          <button className="flex items-center gap-2 px-4 h-10 rounded-admin bg-white/60 text-lotus-deep border border-lotus-gold/20 hover:border-lotus-gold hover:bg-lotus-cream hover:shadow-md transition-all duration-300 font-medium text-xs tracking-wide">
-            <ShoppingBag className="w-[1.05rem] h-[1.05rem] text-lotus-gold" />
-            <span className="hidden sm:inline">Bán online</span>
-            <ChevronDown className="w-3 h-3 opacity-50" />
-          </button>
-        )}
+        <div className="w-40 sm:w-48 md:w-56 shrink-0">
+          <BranchSelector />
+        </div>
 
         {(isAdmin || isReceptionist) && (
           <Link

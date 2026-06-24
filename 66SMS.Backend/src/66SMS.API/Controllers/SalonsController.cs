@@ -76,6 +76,7 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("salons", "read")]
         public async Task<IActionResult> AdminGetAll([FromQuery] GetAllSalonsQuery query)
         {
+            query.IsDeleted = false;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

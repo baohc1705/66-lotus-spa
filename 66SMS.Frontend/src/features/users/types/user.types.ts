@@ -8,15 +8,15 @@ export interface UserDto {
   lastLoginAt?: string;
   roles?: string[];
   permissions?: string[];
-  
+
   fullName?: string;
   avatarUrl?: string;
   phone?: string;
   gender?: number;
   dateOfBirth?: string;
-  
+
   profileType?: string;
-  
+
   staffInfo?: StaffProfileDto;
   customerInfo?: CustomerProfileDto;
 }
@@ -30,6 +30,7 @@ export interface StaffProfileDto {
 }
 
 export interface CustomerProfileDto {
+  id?: number;
   loyaltyPoint?: number;
   firstPurchaseAt?: string;
   source?: string;

@@ -1,12 +1,15 @@
-import { Search, Filter, ChevronLeft, ChevronRight, Calendar, Plus } from 'lucide-react'
+import { Search, Filter, ChevronLeft, ChevronRight, Calendar, Plus, Rows3, Columns3 } from 'lucide-react'
+import type { CashierViewMode } from '../types'
 
 interface CashierToolbarProps {
   currentDate: Date
   onDateChange: (date: Date) => void
   onAddBooking: () => void
+  viewMode: CashierViewMode
+  onViewModeChange: (mode: CashierViewMode) => void
 }
 
-export function CashierToolbar({ currentDate, onDateChange, onAddBooking }: CashierToolbarProps) {
+export function CashierToolbar({ currentDate, onDateChange, onAddBooking, viewMode, onViewModeChange }: CashierToolbarProps) {
   const handlePrevDay = () => {
     const prev = new Date(currentDate)
     prev.setDate(prev.getDate() - 1)
@@ -70,6 +73,34 @@ export function CashierToolbar({ currentDate, onDateChange, onAddBooking }: Cash
 
       {/* Right: Date Nav & Action */}
       <div className="flex items-center gap-4">
+        {/* View Toggle: Timeline (hàng ngang) / Cột (cũ) */}
+        <div className="flex items-center bg-lotus-cream/30 p-1 rounded-admin border border-lotus-gold/20">
+          <button
+            onClick={() => onViewModeChange('timeline')}
+            title="Nhân viên theo hàng, thời gian chạy ngang"
+            className={`flex items-center gap-1.5 px-3 py-1 text-sm font-medium rounded-md transition-all ${
+              viewMode === 'timeline'
+                ? 'bg-white shadow-sm text-lotus-deep'
+                : 'text-lotus-deep/70 hover:text-lotus-deep'
+            }`}
+          >
+            <Rows3 className="w-4 h-4" />
+            Timeline
+          </button>
+          <button
+            onClick={() => onViewModeChange('grid')}
+            title="Nhân viên theo cột, thời gian chạy dọc"
+            className={`flex items-center gap-1.5 px-3 py-1 text-sm font-medium rounded-md transition-all ${
+              viewMode === 'grid'
+                ? 'bg-white shadow-sm text-lotus-deep'
+                : 'text-lotus-deep/70 hover:text-lotus-deep'
+            }`}
+          >
+            <Columns3 className="w-4 h-4" />
+            Cột
+          </button>
+        </div>
+
         <div className="flex items-center bg-lotus-cream/30 p-1 rounded-admin border border-lotus-gold/20">
           <button 
             onClick={handleToday}

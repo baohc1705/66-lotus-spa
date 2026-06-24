@@ -1,3 +1,5 @@
+export type CashierViewMode = 'timeline' | 'grid'
+
 export type BookingStatus =
   | 'pending'
   | 'confirmed'

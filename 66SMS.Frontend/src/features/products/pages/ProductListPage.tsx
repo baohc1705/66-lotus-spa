@@ -29,7 +29,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
-// import { PermissionGate } from '@/shared/components/security/PermissionGate'
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
@@ -39,6 +38,7 @@ import { ProductFormDialog } from "../components/ProductFormDialog";
 import { ProductDetailExpanded } from "../components/ProductDetailExpanded";
 import { useAdminProducts, useDeleteProduct } from "../hooks/useProducts";
 import type { ProductDto } from "../types/product.types";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
 
 // ---- Constants ----
 
@@ -94,7 +94,9 @@ export function ProductListPage() {
 
   const currentPageIds = useMemo(
     () =>
-      products.map((p) => p.id).filter((id): id is number => id !== undefined),
+      products
+        .map((p) => p.id)
+        .filter((id): id is number => id != null),
     [products],
   );
   const isAllSelected =
@@ -183,7 +185,7 @@ export function ProductListPage() {
                 else newSet.delete(prod.id);
                 setSelectedRowIds(newSet);
               }}
-              aria-label={`Select row`}
+              aria-label={`Chọn ${prod.name ?? "sản phẩm"}`}
               onClick={(e) => e.stopPropagation()}
             />
           );
@@ -336,13 +338,13 @@ export function ProductListPage() {
                     <Eye className="w-4 h-4" />
                     {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
                   </DropdownMenuItem>
-                  {/* <PermissionGate resource="products" action="update"> */}
+                  <PermissionGate resource="products" action="update">
                   <DropdownMenuItem onClick={() => setEditProduct(prod)}>
                     <Pencil className="w-4 h-4" />
                     Chỉnh sửa
                   </DropdownMenuItem>
-                  {/* </PermissionGate> */}
-                  {/* <PermissionGate resource="products" action="delete" role="admin"> */}
+                  </PermissionGate>
+                  <PermissionGate resource="products" action="delete" role="admin">
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     variant="destructive"
@@ -351,7 +353,7 @@ export function ProductListPage() {
                     <Trash2 className="w-4 h-4" />
                     Xóa sản phẩm
                   </DropdownMenuItem>
-                  {/* </PermissionGate> */}
+                  </PermissionGate>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -429,7 +431,7 @@ export function ProductListPage() {
               }}
             />
 
-            {/* <PermissionGate resource="products" action="create"> */}
+            <PermissionGate resource="products" action="create">
             <Button
               variant="admin"
               size="sm"
@@ -439,7 +441,7 @@ export function ProductListPage() {
               <Plus className="w-3.5 h-3.5" />
               Thêm SP
             </Button>
-            {/* </PermissionGate> */}
+            </PermissionGate>
           </DataTableToolbar>
         </div>
 
@@ -469,7 +471,7 @@ export function ProductListPage() {
                   Thêm sản phẩm mới để bắt đầu quản lý kho.
                 </p>
               </div>
-              {/* <PermissionGate resource="products" action="create"> */}
+              <PermissionGate resource="products" action="create">
               <Button
                 variant="admin"
                 size="sm"
@@ -479,7 +481,7 @@ export function ProductListPage() {
                 <Plus className="w-3.5 h-3.5" />
                 Thêm sản phẩm
               </Button>
-              {/* </PermissionGate> */}
+              </PermissionGate>
             </div>
           }
           pagination={
