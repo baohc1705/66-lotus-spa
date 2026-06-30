@@ -10,6 +10,7 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.UpdateAttendance
         public int Id { get; set; }
         public DateTime? CheckInAt { get; set; }
         public DateTime? CheckOutAt { get; set; }
+        public int? Status { get; set; }
         public string? Note { get; set; }
 
         [JsonIgnore]

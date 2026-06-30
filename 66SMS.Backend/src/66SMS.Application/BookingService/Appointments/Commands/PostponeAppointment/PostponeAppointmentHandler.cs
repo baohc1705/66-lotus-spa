@@ -1,5 +1,3 @@
-using _66SMS.Application.Services.Appointments;
-using _66SMS.Application.Services.Wallets;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -8,6 +6,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Application.BookingService.Helpers;
 
 namespace _66SMS.Application.BookingService.Appointments.Commands.PostponeAppointment
 {

@@ -1,6 +1,5 @@
 using _66SMS.Application.Abstractions;
-using _66SMS.Application.Services.Appointments;
-using _66SMS.Application.Services.Wallets;
+using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;

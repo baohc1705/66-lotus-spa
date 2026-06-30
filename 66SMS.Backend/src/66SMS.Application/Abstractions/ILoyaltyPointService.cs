@@ -1,5 +1,3 @@
-using _66SMS.Domain.Entities;
-
 namespace _66SMS.Application.Abstractions
 {
     /// <summary>

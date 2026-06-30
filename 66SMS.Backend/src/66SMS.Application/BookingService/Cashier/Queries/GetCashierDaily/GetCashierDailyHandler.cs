@@ -2,13 +2,13 @@ using _66SMS.Application.DTOs.Cashier;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
-using _66SMS.Application.Services.Appointments;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using _66SMS.Application.BookingService.Helpers;
 
 namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
 {

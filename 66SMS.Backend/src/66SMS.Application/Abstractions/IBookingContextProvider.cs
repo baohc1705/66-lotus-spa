@@ -1,4 +1,4 @@
-﻿using _66SMS.Application.Services.Appointments;
+﻿using _66SMS.Application.BookingService.Helpers;
 
 namespace _66SMS.Application.Abstractions
 {

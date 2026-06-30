@@ -1,3 +1,4 @@
+using _66SMS.Application.SalonService.Helpers;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -32,17 +33,15 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.UpdateAttendance
             if (request.Note != null)
                 attendance.Note = request.Note;
 
-            // Tính lại số giờ làm & trạng thái theo giờ vào/ra hiện tại.
-            if (attendance.CheckInAt.HasValue && attendance.CheckOutAt.HasValue)
+            if (request.Status.HasValue)
             {
-                attendance.WorkedHours = Math.Round((decimal)(attendance.CheckOutAt.Value - attendance.CheckInAt.Value).TotalHours, 2);
-                attendance.Status = AttendanceConst.STATUS_CHECKED_OUT;
+                if (!IsAllowedStatus(request.Status.Value))
+                    return Result<int>.BadRequest(AttendanceConst.MSG_INVALID_STATUS, ErrorCodes.ERR_ATTENDANCE_INVALID_STATUS);
+
+                attendance.Status = request.Status.Value;
             }
-            else if (attendance.CheckInAt.HasValue)
-            {
-                attendance.WorkedHours = 0;
-                attendance.Status = AttendanceConst.STATUS_CHECKED_IN;
-            }
+
+            ApplyStatusSideEffects(attendance);
 
             attendance.UpdatedAt = DateTime.UtcNow;
             attendance.UpdatedBy = request.UpdatedBy;
@@ -59,6 +58,37 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.UpdateAttendance
             {
                 transaction.Rollback();
                 throw;
+            }
+        }
+
+        private static bool IsAllowedStatus(int status) =>
+            status == AttendanceConst.STATUS_CHECKED_IN
+            || status == AttendanceConst.STATUS_CHECKED_OUT
+            || status == AttendanceConst.STATUS_ABSENT
+            || status == AttendanceConst.STATUS_PAID_LEAVE
+            || status == AttendanceConst.STATUS_HOLIDAY
+            || status == AttendanceConst.STATUS_UNPAID_LEAVE;
+
+        private static void ApplyStatusSideEffects(Domain.Entities.Attendance attendance)
+        {
+            if (AttendanceWorkCreditCalculator.IsManualStatus(attendance.Status))
+            {
+                attendance.CheckInAt = null;
+                attendance.CheckOutAt = null;
+                attendance.WorkedHours = 0;
+                return;
+            }
+
+            if (attendance.CheckInAt.HasValue && attendance.CheckOutAt.HasValue)
+            {
+                attendance.WorkedHours = Math.Round(
+                    (decimal)(attendance.CheckOutAt.Value - attendance.CheckInAt.Value).TotalHours, 2);
+                attendance.Status = AttendanceConst.STATUS_CHECKED_OUT;
+            }
+            else if (attendance.CheckInAt.HasValue)
+            {
+                attendance.WorkedHours = 0;
+                attendance.Status = AttendanceConst.STATUS_CHECKED_IN;
             }
         }
     }

@@ -37,9 +37,15 @@ namespace _66SMS.Domain.Constants
         #endregion
 
         #region Business
-        // Quy chuẩn quy đổi công: 1 ngày công = 8 giờ; >= 4h tính 1.0 công, > 0 và < 4h tính 0.5 công.
+        // Quy đổi công: >= 8h = 1 công, >= 4h = 0.5 công, < 4h = 0 công.
         public const decimal STANDARD_HOURS_PER_DAY = 8;
         public const decimal HALF_DAY_THRESHOLD = 4;
+        // Đi muộn quá số giờ này so với giờ vào ca → tối đa 0.5 công.
+        public const decimal LATE_THRESHOLD_HOURS = 1;
+        // Giờ vào ca mặc định khi không có lịch làm việc (08:00).
+        public static readonly TimeOnly DEFAULT_SHIFT_START = new(8, 0);
+        // Mặc định trừ cả Thứ 7 khi tính ngày công chuẩn tháng.
+        public const bool DEFAULT_EXCLUDE_SATURDAY = true;
         #endregion
 
         #region Message
@@ -47,6 +53,7 @@ namespace _66SMS.Domain.Constants
         public const string MSG_ID_NOT_FOUND = $"{nameof(Entities.Payroll)} with id not found";
         public const string MSG_ALREADY_CONFIRMED = "Bảng lương đã được chốt, không thể tính lại.";
         public const string MSG_NO_ATTENDANCE = "Không có dữ liệu chấm công nào trong kỳ để tính lương.";
+        public const string MSG_INVALID_STANDARD_DAYS = "Không xác định được ngày công chuẩn của tháng.";
         public const string MSG_GENERATE_SUCCESS = "Tính lương thành công.";
         public const string MSG_CONFIRM_SUCCESS = "Chốt bảng lương thành công.";
         public const string MSG_UPDATE_SUCCESS = "Cập nhật bảng lương thành công.";

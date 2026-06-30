@@ -187,12 +187,14 @@ namespace _66SMS.Contracts.Enumerations
         ERR_ATTENDANCE_NOT_FOUND,
         ERR_ATTENDANCE_DUPLICATE,
         ERR_ATTENDANCE_NOT_CHECKED_IN,
+        ERR_ATTENDANCE_INVALID_STATUS,
         #endregion
 
         #region Payroll
         ERR_PAYROLL_NOT_FOUND,
         ERR_PAYROLL_ALREADY_CONFIRMED,
         ERR_PAYROLL_NO_ATTENDANCE,
+        ERR_PAYROLL_INVALID_STANDARD_DAYS,
         #endregion
 
         #region Promotion

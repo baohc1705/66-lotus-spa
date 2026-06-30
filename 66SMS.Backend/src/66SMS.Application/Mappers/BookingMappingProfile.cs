@@ -19,6 +19,7 @@ using _66SMS.Domain.Entities;
 using AutoMapper;
 using System.Collections.Generic;
 using System.Linq;
+using _66SMS.Application.BookingService.Helpers;
 
 namespace _66SMS.Application.Mappers
 {
@@ -106,7 +107,7 @@ namespace _66SMS.Application.Mappers
             CreateMap<Appointment, AppointmentDto>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
                 .ForMember(dest => dest.ServiceNames, opt => opt.MapFrom(src => src.Services != null ? src.Services.Select(x => x.Service != null ? x.Service.Name : "").ToList() : new List<string>()))
-                .ForMember(dest => dest.DepositPercent, opt => opt.MapFrom(src => src.DepositPercent ?? _66SMS.Application.Services.Appointments.AppointmentPaymentCalculator.DefaultDepositPercent))
+                .ForMember(dest => dest.DepositPercent, opt => opt.MapFrom(src => src.DepositPercent ?? AppointmentPaymentCalculator.DefaultDepositPercent))
                 .IgnoreNullValueTypes();
         }
     }

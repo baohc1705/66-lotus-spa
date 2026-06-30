@@ -27,7 +27,10 @@ namespace _66SMS.Domain.Constants
         #region Status
         public const int STATUS_CHECKED_IN = 1;
         public const int STATUS_CHECKED_OUT = 2;
-        public const int STATUS_ABSENT = 3;
+        public const int STATUS_ABSENT = 3;           // Vắng / nghỉ không lương = 0 công
+        public const int STATUS_PAID_LEAVE = 4;       // Nghỉ phép hưởng lương = 1 công
+        public const int STATUS_HOLIDAY = 5;          // Nghỉ lễ = 1 công
+        public const int STATUS_UNPAID_LEAVE = 6;     // Nghỉ không lương = 0 công
         #endregion
 
         #region Message
@@ -38,6 +41,8 @@ namespace _66SMS.Domain.Constants
         public const string MSG_CHECK_IN_SUCCESS = "Check-in thành công.";
         public const string MSG_CHECK_OUT_SUCCESS = "Check-out thành công.";
         public const string MSG_UPDATE_SUCCESS = "Cập nhật chấm công thành công.";
+        public const string MSG_CREATE_MANUAL_SUCCESS = "Tạo bản ghi chấm công thành công.";
+        public const string MSG_INVALID_STATUS = "Trạng thái chấm công không hợp lệ.";
         #endregion
     }
 }

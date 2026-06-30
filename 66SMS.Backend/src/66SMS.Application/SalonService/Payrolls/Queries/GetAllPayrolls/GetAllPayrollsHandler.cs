@@ -1,7 +1,9 @@
 using _66SMS.Application.DTOs.Payrolls;
+using _66SMS.Application.SalonService.Helpers;
 using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using MediatR;
 
 namespace _66SMS.Application.SalonService.Payrolls.Queries.GetAllPayrolls
@@ -58,6 +60,17 @@ namespace _66SMS.Application.SalonService.Payrolls.Queries.GetAllPayrolls
                     CreatedAt = x.CreatedAt.ToString(),
                 })
                 .ToPagedAsync(request, cancellationToken);
+
+            foreach (var item in result.Items)
+            {
+                if (item.PeriodYear.HasValue && item.PeriodMonth.HasValue)
+                {
+                    item.StandardWorkDays = PayrollCalculator.GetStandardWorkDaysInMonth(
+                        item.PeriodYear.Value,
+                        item.PeriodMonth.Value,
+                        PayrollConst.DEFAULT_EXCLUDE_SATURDAY);
+                }
+            }
 
             return Result<PagedResult<PayrollDTO>>.Success(result);
         }

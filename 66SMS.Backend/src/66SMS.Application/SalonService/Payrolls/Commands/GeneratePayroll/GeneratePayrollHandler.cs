@@ -1,3 +1,4 @@
+using _66SMS.Application.SalonService.Helpers;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -37,28 +38,43 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
 
             var rate = staff.BasicSalary ?? 0;
             var salaryType = staff.SalaryType;
+            var excludeSaturday = request.ExcludeSaturday ?? PayrollConst.DEFAULT_EXCLUDE_SATURDAY;
 
-            // Chỉ tính các ngày đã check-out (ca hoàn tất) trong kỳ.
-            var workedHoursList = await attendanceRepository
+            var attendances = await attendanceRepository
                 .AsQueryable()
+                .Include(x => x.WorkSchedule!)
+                .ThenInclude(w => w.ShiftPeriod)
                 .Where(x => x.StaffId == request.StaffId
-                    && x.CheckOutAt != null
                     && x.WorkDate.Month == request.Month
                     && x.WorkDate.Year == request.Year)
-                .Select(x => x.WorkedHours)
                 .ToListAsync(cancellationToken);
 
-            if (workedHoursList.Count == 0)
+            // Chỉ tính ca hoàn tất hoặc bản ghi nghỉ/phép/lễ do quản lý nhập.
+            var relevantAttendances = attendances
+                .Where(a => AttendanceWorkCreditCalculator.IsManualStatus(a.Status)
+                    || (a.CheckInAt.HasValue && a.CheckOutAt.HasValue))
+                .ToList();
+
+            if (relevantAttendances.Count == 0)
                 return Result<int>.BadRequest(PayrollConst.MSG_NO_ATTENDANCE, ErrorCodes.ERR_PAYROLL_NO_ATTENDANCE);
 
-            var totalHours = workedHoursList.Sum();
-            var totalWorkDays = workedHoursList.Sum(h => ConvertToWorkDay(h));
+            var totalHours = relevantAttendances
+                .Where(a => a.CheckOutAt.HasValue)
+                .Sum(a => a.WorkedHours);
+
+            var totalWorkDays = relevantAttendances
+                .Sum(a => AttendanceWorkCreditCalculator.CalculateWorkCredit(a));
+
+            var standardWorkDays = PayrollCalculator.GetStandardWorkDaysInMonth(
+                request.Year, request.Month, excludeSaturday);
+
+            if (standardWorkDays <= 0)
+                return Result<int>.BadRequest(PayrollConst.MSG_INVALID_STANDARD_DAYS, ErrorCodes.ERR_PAYROLL_INVALID_STANDARD_DAYS);
 
             var totalAmount = salaryType == PayrollConst.SALARY_TYPE_HOURLY
                 ? totalHours * rate
-                : totalWorkDays * rate;
+                : PayrollCalculator.CalculateDailySalary(rate, standardWorkDays, totalWorkDays);
 
-            // Upsert theo (staff, year, month).
             var payroll = await payrollRepository
                 .AsQueryable(asNoTracking: false)
                 .Where(x => x.StaffId == request.StaffId
@@ -86,6 +102,7 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
                         TotalWorkDays = totalWorkDays,
                         TotalAmount = totalAmount,
                         Status = PayrollConst.STATUS_DRAFT,
+                        Note = BuildPayrollNote(standardWorkDays, excludeSaturday),
                         CreatedAt = DateTime.UtcNow,
                         CreatedBy = request.CreatedBy,
                     };
@@ -98,6 +115,7 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
                     payroll.TotalHours = totalHours;
                     payroll.TotalWorkDays = totalWorkDays;
                     payroll.TotalAmount = totalAmount;
+                    payroll.Note = MergePayrollNote(payroll.Note, standardWorkDays, excludeSaturday);
                     payroll.UpdatedAt = DateTime.UtcNow;
                     payroll.UpdatedBy = request.CreatedBy;
                     payrollRepository.Update(payroll);
@@ -114,14 +132,22 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
             }
         }
 
-        // Quy đổi số giờ làm trong 1 ngày ra số công.
-        private static decimal ConvertToWorkDay(decimal workedHours)
+        private static string BuildPayrollNote(int standardWorkDays, bool excludeSaturday)
         {
-            if (workedHours >= PayrollConst.HALF_DAY_THRESHOLD)
-                return 1.0m;
-            if (workedHours > 0)
-                return 0.5m;
-            return 0m;
+            var weekendRule = excludeSaturday ? "T7+CN" : "CN";
+            return $"Ngày công chuẩn: {standardWorkDays} (trừ {weekendRule}).";
+        }
+
+        private static string? MergePayrollNote(string? existingNote, int standardWorkDays, bool excludeSaturday)
+        {
+            var standardNote = BuildPayrollNote(standardWorkDays, excludeSaturday);
+            if (string.IsNullOrWhiteSpace(existingNote))
+                return standardNote;
+
+            if (existingNote.Contains("Ngày công chuẩn:"))
+                return existingNote;
+
+            return $"{standardNote} {existingNote}".Trim();
         }
     }
 }

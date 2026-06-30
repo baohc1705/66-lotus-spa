@@ -1,9 +1,9 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.SalonService.Promotions.Commands.CreatePromotion;
-using _66SMS.Application.SalonService.Promotions.Commands.DeletePromotion;
-using _66SMS.Application.SalonService.Promotions.Commands.UpdatePromotion;
-using _66SMS.Application.SalonService.Promotions.Queries.GetAllPromotions;
-using _66SMS.Application.SalonService.Promotions.Queries.GetDetailPromotion;
+using _66SMS.Application.BookingService.Promotions.Commands.CreatePromotion;
+using _66SMS.Application.BookingService.Promotions.Commands.DeletePromotion;
+using _66SMS.Application.BookingService.Promotions.Commands.UpdatePromotion;
+using _66SMS.Application.BookingService.Promotions.Queries.GetAllPromotions;
+using _66SMS.Application.BookingService.Promotions.Queries.GetDetailPromotion;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;

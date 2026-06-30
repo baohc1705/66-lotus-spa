@@ -12,6 +12,7 @@ namespace _66SMS.Application.DTOs.Attendances
         public string? CheckInAt { get; set; }
         public string? CheckOutAt { get; set; }
         public decimal? WorkedHours { get; set; }
+        public decimal? WorkCredits { get; set; }
         public int? Status { get; set; }
         public string? Note { get; set; }
         public string? CreatedAt { get; set; }

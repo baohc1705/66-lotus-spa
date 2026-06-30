@@ -1,6 +1,6 @@
+using _66SMS.Application.BookingService.Promotions.Commands.CreatePromotion;
+using _66SMS.Application.BookingService.Promotions.Commands.UpdatePromotion;
 using _66SMS.Application.DTOs.Promotions;
-using _66SMS.Application.SalonService.Promotions.Commands.CreatePromotion;
-using _66SMS.Application.SalonService.Promotions.Commands.UpdatePromotion;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 

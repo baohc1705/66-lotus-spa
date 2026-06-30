@@ -1,6 +1,7 @@
 using _66SMS.API.Abstractions;
 using _66SMS.Application.SalonService.Attendances.Commands.CheckIn;
 using _66SMS.Application.SalonService.Attendances.Commands.CheckOut;
+using _66SMS.Application.SalonService.Attendances.Commands.CreateManualAttendance;
 using _66SMS.Application.SalonService.Attendances.Commands.UpdateAttendance;
 using _66SMS.Application.SalonService.Attendances.Queries.GetAllAttendances;
 using _66SMS.Application.SalonService.Attendances.Queries.GetDetailAttendance;
@@ -43,6 +44,20 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> CheckOut([FromBody] CheckOutCommand command)
         {
             command.UpdatedBy = jwtService.GetUserId();
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpPost("manual")]
+        [PermissionAuthorize("attendances", "create")]
+        public async Task<IActionResult> CreateManual([FromBody] CreateManualAttendanceCommand command)
+        {
+            command.CreatedBy = jwtService.GetUserId();
+
+            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            if (tokenSalonId.HasValue)
+                command.SalonId = tokenSalonId.Value;
+
             var result = await mediator.Send(command);
             return HandleResult(result);
         }

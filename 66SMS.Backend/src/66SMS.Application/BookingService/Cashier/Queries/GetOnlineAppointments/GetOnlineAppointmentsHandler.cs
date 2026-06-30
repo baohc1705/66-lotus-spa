@@ -1,5 +1,5 @@
+using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Application.DTOs.Cashier;
-using _66SMS.Application.Services.Appointments;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;

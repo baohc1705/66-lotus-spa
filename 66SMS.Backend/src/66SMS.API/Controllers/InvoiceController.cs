@@ -1,8 +1,8 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.SalonService.Invoices.Commands.CancelInvoice;
-using _66SMS.Application.SalonService.Invoices.Commands.CreateInvoice;
-using _66SMS.Application.SalonService.Invoices.Queries.GetAllInvoices;
-using _66SMS.Application.SalonService.Invoices.Queries.GetDetailInvoice;
+using _66SMS.Application.BookingService.Invoices.Commands.CancelInvoice;
+using _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice;
+using _66SMS.Application.BookingService.Invoices.Queries.GetAllInvoices;
+using _66SMS.Application.BookingService.Invoices.Queries.GetDetailInvoice;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
