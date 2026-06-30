@@ -1,10 +1,6 @@
 import {
   LayoutDashboard,
-  //MessageSquare,
   Users,
-  //Send,
-  //History,
-  //FileText,
   Calendar,
   SoapDispenserDroplet,
   Stethoscope,
@@ -19,6 +15,11 @@ import {
   Crown,
   Building2,
   ShieldCheck,
+  History,
+  Award,
+  Receipt,
+  CalendarCheck,
+  Tag,
 } from "lucide-react";
 
 export interface SubMenuItem {
@@ -94,21 +95,44 @@ export const MENU_ITEMS: MenuItem[] = [
       },
     ],
   },
-  // {
-  //   label: "Quản lý Spa",
-  //   icon: MessageSquare,
-  //   allowedRoles: ["Admin"],
-  //   children: [
-  //     { label: "Đặt lịch hẹn", path: "/admin/appointments", icon: Send },
-  //     { label: "Liệu trình", path: "/admin/treatments", icon: History },
-  //     { label: "Gói dịch vụ", path: "/admin/packages", icon: FileText },
-  //   ],
-  // },
+  {
+    label: "Liệu trình",
+    path: "/admin/treatments",
+    icon: History,
+    allowedRoles: ["Admin", "Manager"],
+  },
+  {
+    label: "Hóa đơn",
+    path: "/admin/invoices",
+    icon: Receipt,
+    allowedRoles: ["Admin", "Manager", "Receptionist"],
+  },
   {
     label: "Nhân viên",
     path: "/admin/staff/list",
     icon: Stethoscope,
     allowedRoles: ["Admin", "Manager"],
+  },
+  {
+    label: "Chấm công",
+    path: "/admin/attendance",
+    icon: CalendarCheck,
+    allowedRoles: ["Admin", "Manager", "Receptionist"],
+  },
+  {
+    label: "Lương nhân viên",
+    path: "/admin/payroll",
+    icon: Wallet,
+    allowedRoles: ["Admin", "Manager"],
+  },
+  {
+    label: "Chứng chỉ",
+    icon: Award,
+    allowedRoles: ["Admin", "Manager"],
+    children: [
+      { label: "Chứng chỉ nhân viên", path: "/admin/staff-certificates", icon: ShieldCheck },
+      { label: "Loại chứng chỉ", path: "/admin/certificate-types", icon: Award },
+    ],
   },
   {
     label: "Lịch làm việc",
@@ -140,6 +164,12 @@ export const MENU_ITEMS: MenuItem[] = [
     path: "/admin/staff/appointments",
     icon: CalendarHeart,
     allowedRoles: ["Staff"],
+  },
+  {
+    label: "Khuyến mãi",
+    path: "/admin/marketing/promotions",
+    icon: Tag,
+    allowedRoles: ["Admin", "Manager"],
   },
   {
     label: "Khách hàng",

@@ -21,7 +21,7 @@ import { useAssignManager } from '@/features/staff_salons/hooks/useStaffSalons'
 import { useStaffs } from '@/features/staffs/hooks/useStaffs'
 
 const schema = z.object({
-  staffId: z.number({ required_error: 'Vui lòng chọn nhân viên' }).min(1, 'Vui lòng chọn nhân viên'),
+  staffId: z.number().min(1, 'Vui lòng chọn nhân viên'),
 })
 type FormValues = z.infer<typeof schema>
 
@@ -37,7 +37,7 @@ export function AssignManagerDialog({ open, onOpenChange, salonId }: AssignManag
   const { data: staffsData } = useStaffs({ pageIndex: 1, pageSize: 200 })
   const staffList = staffsData?.data?.items ?? []
 
-  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<FormValues>({
+  const { handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema),
   })
 

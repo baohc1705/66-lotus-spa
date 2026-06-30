@@ -14,6 +14,7 @@ export interface StaffDto {
   hireDate: string | null;
   contractType: string | null;
   basicSalary: number | null;
+  salaryType: number | null;
   status: string | null;
   streetAddress: string | null;
   provinceCode: string | null;
@@ -39,6 +40,7 @@ export interface CreateStaffPayload {
   hireDate?: string;
   contractType?: string;
   basicSalary?: number;
+  salaryType?: number;
   status?: number;
   streetAddress?: string;
   provinceCode?: string;
@@ -59,6 +61,7 @@ export interface UpdateStaffPayload {
   hireDate?: string;
   contractType?: string;
   basicSalary?: number;
+  salaryType?: number;
   status?: number;
   streetAddress?: string;
   provinceCode?: string;

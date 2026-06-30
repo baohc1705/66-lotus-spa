@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { motion, type Variants } from 'motion/react'
-import { 
-  Activity, Users, Send, BarChart2, 
-  Plus, Calendar, Clock, ArrowUpRight, 
-  ArrowDownRight, Bed, UserCheck, CheckCircle2,
-  AlertCircle, ShieldAlert, Sparkles, RefreshCw
+import {
+  Activity, Users, Send, BarChart2,
+  Plus, Calendar, Clock, ArrowUpRight,
+  UserCheck, Sparkles, RefreshCw
 } from 'lucide-react'
 
 // Sparkline generator helper

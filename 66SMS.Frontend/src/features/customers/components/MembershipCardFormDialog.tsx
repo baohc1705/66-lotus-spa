@@ -87,6 +87,7 @@ export function MembershipCardFormDialog({
     if (card?.id) {
       const payload = {
         ...data,
+        membershipTierId: data.membershipTierId ?? undefined,
         issuedAt: data.issuedAt === "" ? undefined : data.issuedAt,
         expiresAt: data.expiresAt === "" ? undefined : data.expiresAt,
       };

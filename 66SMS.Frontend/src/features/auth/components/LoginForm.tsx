@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
 import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useLogin } from "@/features/auth/hooks/useLogin";
 import {
@@ -12,7 +11,6 @@ import { Label } from "@/shared/components/ui/label";
 import { Input } from "@/shared/components/ui/input";
 
 export const LoginForm = () => {
-  const navigate = useNavigate();
   const login = useLogin();
   const [showPassword, setShowPassword] = useState(false);
 

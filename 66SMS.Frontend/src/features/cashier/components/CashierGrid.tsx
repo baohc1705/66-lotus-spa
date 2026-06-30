@@ -17,6 +17,8 @@ interface CashierGridProps {
 }
 
 const HOURS = Array.from({ length: 15 }, (_, i) => i + 8); // 08:00 to 22:00
+// Mỗi slot 15 phút cao 30px (1 giờ = 120px)
+const SLOT_HEIGHT = 30;
 
 function timeToMins(t: string) {
   const [h, m] = t.split(":").map(Number);

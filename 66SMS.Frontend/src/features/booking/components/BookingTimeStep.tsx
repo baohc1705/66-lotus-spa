@@ -108,7 +108,7 @@ export const BookingTimeStep: React.FC = () => {
         staffId: g.selectedTechnician?.id ?? null,
         positionId: g.selectedPosition?.id || 0,
         appointmentDate: g.selectedDate!.toISOString().split("T")[0],
-        serviceId: g.selectedService!.id,
+        serviceId: g.selectedService!.id ?? 0,
       }));
 
       const res = await createSlotLock(payload);

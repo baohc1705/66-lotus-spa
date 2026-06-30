@@ -72,7 +72,7 @@ export const BookingContactStep: React.FC = () => {
           positionId: guest.selectedPosition?.id || 0,
           salonId: selectedSalon?.id ?? null,
           note: finalNote,
-          services: [{ serviceId: guest.selectedService!.id, quantity: 1 }],
+          services: [{ serviceId: guest.selectedService!.id ?? 0, quantity: 1 }],
         };
       });
 

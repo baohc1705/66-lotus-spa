@@ -192,9 +192,9 @@ export function CustomerListPage() {
           const cust = row.original;
           return (
             <Checkbox
-              checked={cust.id !== undefined && selectedRowIds.has(cust.id)}
+              checked={cust.id != null && selectedRowIds.has(cust.id)}
               onCheckedChange={(checked) => {
-                if (cust.id === undefined) return;
+                if (cust.id == null) return;
                 const newSet = new Set(selectedRowIds);
                 if (checked) newSet.add(cust.id);
                 else newSet.delete(cust.id);
@@ -317,7 +317,7 @@ export function CustomerListPage() {
         header: "Trạng thái",
         cell: ({ row }) => (
           <StatusBadge
-            status={row.original.status.toString()}
+            status={row.original.status?.toString() ?? null}
             statusMap={CUSTOMER_STATUS_MAP}
           />
         ),

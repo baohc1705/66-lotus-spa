@@ -117,7 +117,7 @@ export function BranchSelector() {
             {allSalons.map((salon) => (
               <SelectItem
                 key={salon.id}
-                value={salon.id.toString()}
+                value={salon.id?.toString() ?? ""}
                 className="text-xs font-medium focus:bg-lotus-cream/50"
               >
                 {salon.name}

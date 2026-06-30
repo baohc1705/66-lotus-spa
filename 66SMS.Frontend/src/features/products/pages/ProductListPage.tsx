@@ -177,9 +177,9 @@ export function ProductListPage() {
           const prod = row.original;
           return (
             <Checkbox
-              checked={prod.id !== undefined && selectedRowIds.has(prod.id)}
+              checked={prod.id != null && selectedRowIds.has(prod.id)}
               onCheckedChange={(checked) => {
-                if (prod.id === undefined) return;
+                if (prod.id == null) return;
                 const newSet = new Set(selectedRowIds);
                 if (checked) newSet.add(prod.id);
                 else newSet.delete(prod.id);

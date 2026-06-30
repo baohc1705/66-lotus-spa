@@ -20,6 +20,7 @@ const staffBaseSchema = z.object({
   hireDate: z.string().optional(),
   contractType: z.string().max(50, 'Tối đa 50 ký tự').optional().or(z.literal('')),
   basicSalary: z.coerce.number().min(0, 'Lương phải >= 0').optional(),
+  salaryType: z.coerce.number().min(1).max(2).optional(),
   status: z.coerce.number().min(0).optional(),
   role: z.string().optional(),
 

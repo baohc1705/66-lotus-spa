@@ -147,7 +147,7 @@ export function WorkSchedulePage() {
             >
               <option value="">-- Chọn nhân viên --</option>
               {staffList.map((emp) => (
-                <option key={emp.id} value={emp.id}>
+                <option key={emp.id} value={emp.id ?? ""}>
                   {emp.fullName}
                 </option>
               ))}

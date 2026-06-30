@@ -141,10 +141,6 @@ export const HeroSection = () => {
     setCurrentIndex((prev) => (prev - 1 + SLIDES.length) % SLIDES.length)
   }, [])
 
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index)
-  }
-
   // Auto-play interval
   useEffect(() => {
     const timer = setInterval(nextSlide, 6000)

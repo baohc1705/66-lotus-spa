@@ -33,7 +33,7 @@ const LotusPetal = ({ style, className = "" }: { style: React.CSSProperties, cla
 )
 
 /* ── Floating Background Petals (Out of Focus) ── */
-const PETALS = Array.from({ length: 8 }, (_, i) => ({
+const PETALS = Array.from({ length: 8 }, () => ({
   left: `${10 + Math.random() * 80}%`,
   animationDuration: `${14 + Math.random() * 10}s`,
   animationDelay: `-${Math.random() * 10}s`,

@@ -1,14 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
 import { cashierApi } from "../api/cashier.api";
-
-function getApiError(error: unknown, fallback: string): string {
-  if (isAxiosError(error)) {
-    const body = error.response?.data as { message?: string } | undefined;
-    if (body?.message) return body.message;
-  }
-  return error instanceof Error ? error.message : fallback;
-}
 
 export function useOnlineBookings(salonId?: number | null) {
   return useQuery({

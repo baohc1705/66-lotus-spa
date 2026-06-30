@@ -22,6 +22,12 @@ import { BookingPositionListPage } from "@/features/booking_positions";
 import { TimeSlotListPage } from "@/features/time_slots";
 import { WalletManagementPage } from "@/features/wallet";
 import { SalonListPage } from "@/features/salons";
+import { TreatmentCourseListPage } from "@/features/treatment_courses";
+import { InvoiceListPage } from "@/features/invoices";
+import { AttendanceListPage } from "@/features/attendance";
+import { PayrollListPage } from "@/features/payroll";
+import { CertificateTypesPage, StaffCertificatesPage } from "@/features/certificates";
+import { PromotionListPage } from "@/features/promotions";
 
 export const router = createBrowserRouter([
   {
@@ -142,6 +148,34 @@ export const router = createBrowserRouter([
           {
             path: "roles",
             element: <RolePermissionPage />,
+          },
+          {
+            path: "treatments",
+            element: <TreatmentCourseListPage />,
+          },
+          {
+            path: "invoices",
+            element: <InvoiceListPage />,
+          },
+          {
+            path: "certificate-types",
+            element: <CertificateTypesPage />,
+          },
+          {
+            path: "staff-certificates",
+            element: <StaffCertificatesPage />,
+          },
+          {
+            path: "attendance",
+            element: <AttendanceListPage />,
+          },
+          {
+            path: "payroll",
+            element: <PayrollListPage />,
+          },
+          {
+            path: "marketing/promotions",
+            element: <PromotionListPage />,
           },
           // Placeholders for other admin routes
         ],

@@ -202,9 +202,9 @@ export function StaffListPage() {
           const staff = row.original;
           return (
             <Checkbox
-              checked={staff.id !== undefined && selectedRowIds.has(staff.id)}
+              checked={staff.id != null && selectedRowIds.has(staff.id)}
               onCheckedChange={(checked) => {
-                if (staff.id === undefined) return;
+                if (staff.id == null) return;
                 const newSet = new Set(selectedRowIds);
                 if (checked) newSet.add(staff.id);
                 else newSet.delete(staff.id);

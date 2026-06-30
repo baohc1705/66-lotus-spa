@@ -205,7 +205,7 @@ export function ServiceDetailExpanded({
                         {prod.quantityUsed ?? "-"}
                       </td>
                       <td className="py-2.5 px-4 font-semibold text-lotus-stone text-center">
-                        {prod.quantityUsed * prod.sellingPrice}
+                        {(prod.quantityUsed ?? 0) * (prod.sellingPrice ?? 0)}
                       </td>
 
                       <td className="py-2.5 px-4">

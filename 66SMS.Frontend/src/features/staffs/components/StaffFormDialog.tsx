@@ -71,6 +71,11 @@ const STATUS_OPTIONS = [
   { value: "2", label: "Tạm nghỉ" },
 ];
 
+const SALARY_TYPE_OPTIONS = [
+  { value: "1", label: "Theo giờ" },
+  { value: "2", label: "Theo ngày công" },
+];
+
 export function StaffFormDialog({
   open,
   onOpenChange,
@@ -353,8 +358,25 @@ export function StaffFormDialog({
                   </SelectContent>
                 </Select>
               </FormField>
+              <FormField label="Loại lương">
+                <Select
+                  value={watch("salaryType")?.toString() ?? "2"}
+                  onValueChange={(v) => setValue("salaryType", Number(v))}
+                >
+                  <SelectTrigger className="h-9 text-[13px]">
+                    <SelectValue placeholder="Chọn loại lương" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SALARY_TYPE_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormField>
               <FormField
-                label="Lương cơ bản"
+                label="Đơn giá (theo giờ/ngày tùy loại lương)"
                 error={errors.basicSalary?.message}
               >
                 <Input
@@ -533,6 +555,7 @@ function getDefaultValues(
       hireDate: parseToDateInput(staff.hireDate),
       contractType: staff.contractType ?? "",
       basicSalary: staff.basicSalary ?? undefined,
+      salaryType: staff.salaryType ?? 2,
       status: staff.status ? Number(staff.status) : 1,
       role: staff.role ?? "staff",
       streetAddress: staff.streetAddress ?? "",
@@ -552,6 +575,7 @@ function getDefaultValues(
     hireDate: "",
     contractType: "",
     basicSalary: undefined,
+    salaryType: 2,
     status: 1,
     role: "staff",
     streetAddress: "",

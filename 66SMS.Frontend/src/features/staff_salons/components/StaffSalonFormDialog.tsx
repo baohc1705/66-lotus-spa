@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Dialog,
@@ -51,12 +51,12 @@ export function StaffSalonFormDialog({
   const staffList = staffsData?.data?.items ?? []
 
   const createForm = useForm<CreateStaffSalonFormValues>({
-    resolver: zodResolver(createStaffSalonSchema),
+    resolver: zodResolver(createStaffSalonSchema) as Resolver<CreateStaffSalonFormValues>,
     defaultValues: { salonId, isManager: false, startDate: '' },
   })
 
   const updateForm = useForm<UpdateStaffSalonFormValues>({
-    resolver: zodResolver(updateStaffSalonSchema),
+    resolver: zodResolver(updateStaffSalonSchema) as Resolver<UpdateStaffSalonFormValues>,
   })
 
   useEffect(() => {

@@ -3,7 +3,6 @@ import { Flower2 } from 'lucide-react'
 
 // Assets
 import spaAbout from '@/assets/spa_about.png'
-import spaFacial from '@/assets/spa_facial.png'
 import spaMassage from '@/assets/spa_massage.png'
 import aboutBgCrane from '@/assets/about_bg_crane.png'
 

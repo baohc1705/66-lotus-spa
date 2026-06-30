@@ -45,6 +45,13 @@ export const API = {
   meSalon:            '/Me/salon',
   membershipTiers:    '/membershiptiers',
   membershipCards:    '/membershipcards',
+  treatmentCourses:   '/TreatmentCourse',
+  invoices:           '/Invoice',
+  certificateTypes:   '/CertificateType',
+  staffCertificates:  '/StaffCertificate',
+  attendances:        '/Attendance',
+  payrolls:           '/Payroll',
+  promotions:         '/promotions',
   cashier: {
     daily:            '/cashier/daily',
     onlineAppointments: '/cashier/online-appointments',

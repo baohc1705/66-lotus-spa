@@ -10,10 +10,10 @@ interface OnlineBookingsDrawerProps {
   onClose: () => void;
 }
 
-enum BookingStatus {
-  Waiting = 3,
-  Cancelled = 8,
-}
+const BookingStatus = {
+  Waiting: 3,
+  Cancelled: 8,
+} as const;
 
 export function OnlineBookingsDrawer({
   isOpen,
