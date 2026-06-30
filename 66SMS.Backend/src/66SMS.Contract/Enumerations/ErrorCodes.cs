@@ -158,5 +158,47 @@ namespace _66SMS.Contracts.Enumerations
         ERR_STAFF_SALON_NOT_FOUND,
         ERR_STAFF_SALON_INVALID,
         #endregion
+
+        #region TreatmentCourse
+        ERR_TREATMENT_COURSE_NOT_FOUND,
+        ERR_TREATMENT_COURSE_INVALID,
+        #endregion
+
+        #region Certificate
+        ERR_CERTIFICATE_TYPE_NOT_FOUND,
+        ERR_CERTIFICATE_TYPE_INVALID,
+        ERR_CERTIFICATE_TYPE_CODE_EXISTED,
+        ERR_STAFF_CERTIFICATE_NOT_FOUND,
+        ERR_STAFF_CERTIFICATE_INVALID,
+        #endregion
+
+        #region Invoice
+        ERR_INVOICE_NOT_FOUND,
+        ERR_INVOICE_INVALID,
+        ERR_INVOICE_NO_ITEMS,
+        ERR_INVOICE_ALREADY_PAID,
+        ERR_INVOICE_CANNOT_CANCEL,
+        ERR_INVOICE_NOT_ENOUGH_POINTS,
+        ERR_INVOICE_ITEM_REF_NOT_FOUND,
+        ERR_INVOICE_INSUFFICIENT_STOCK,
+        #endregion
+
+        #region Attendance
+        ERR_ATTENDANCE_NOT_FOUND,
+        ERR_ATTENDANCE_DUPLICATE,
+        ERR_ATTENDANCE_NOT_CHECKED_IN,
+        #endregion
+
+        #region Payroll
+        ERR_PAYROLL_NOT_FOUND,
+        ERR_PAYROLL_ALREADY_CONFIRMED,
+        ERR_PAYROLL_NO_ATTENDANCE,
+        #endregion
+
+        #region Promotion
+        ERR_PROMOTION_NOT_FOUND,
+        ERR_PROMOTION_CODE_EXISTED,
+        ERR_PROMOTION_INVALID,
+        #endregion
     }
 }

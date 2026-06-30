@@ -15,6 +15,7 @@ namespace _66SMS.Domain.Entities
         public DateOnly? HireDate { get; set; }
         public string? ContractType { get; set; }
         public decimal? BasicSalary { get; set; }
+        public int SalaryType { get; set; }
         public int Status { get; set; }
         public string? StreetAddress { get; set; }
         public string? ProvinceCode { get; set; }

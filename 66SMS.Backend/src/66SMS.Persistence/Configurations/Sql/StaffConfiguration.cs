@@ -22,6 +22,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.HireDate).HasColumnName(StaffConst.FIELD_HIRE_DATE);
             builder.Property(x => x.ContractType).HasColumnName(StaffConst.FIELD_CONTRACT_TYPE).HasMaxLength(StaffConst.CONTRACT_TYPE_MAX_LENGTH);
             builder.Property(x => x.BasicSalary).HasColumnName(StaffConst.FIELD_BASIC_SALARY).HasColumnType("decimal(18, 0)");
+            builder.Property(x => x.SalaryType).HasColumnName(StaffConst.FIELD_SALARY_TYPE);
             builder.Property(x => x.Status).HasColumnName(StaffConst.FIELD_STATUS).HasConversion<int>();
             builder.Property(x => x.StreetAddress).HasColumnName(StaffConst.FIELD_STREET_ADDRESS).HasMaxLength(StaffConst.STREET_ADDRESS_MAX_LENGTH);
             builder.Property(x => x.ProvinceCode).HasColumnName(StaffConst.FIELD_PROVINCE_CODE).HasMaxLength(StaffConst.PROVINCE_CODE_MAX_LENGTH);

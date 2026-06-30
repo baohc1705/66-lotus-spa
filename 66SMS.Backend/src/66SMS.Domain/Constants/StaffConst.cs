@@ -16,6 +16,7 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_HIRE_DATE = "hire_date";
         public const string FIELD_CONTRACT_TYPE = "contract_type";
         public const string FIELD_BASIC_SALARY = "basic_salary";
+        public const string FIELD_SALARY_TYPE = "salary_type";
         public const string FIELD_STATUS = "status";
         public const string FIELD_STREET_ADDRESS = "street_address";
         public const string FIELD_PROVINCE_CODE = "province_code";
@@ -45,6 +46,11 @@ namespace _66SMS.Domain.Constants
         public const int STATUS_ACTIVED = 1;
         public const int STATUS_DELETED = 2;
         public const int STATUS_RESIGNED = 3;
+        #endregion
+
+        #region Salary Type
+        public const int SALARY_TYPE_HOURLY = 1;
+        public const int SALARY_TYPE_DAILY = 2;
         #endregion
 
         #region Message

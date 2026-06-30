@@ -41,6 +41,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetDetailStaff
                     HireDate = x.HireDate.ToString(),
                     ContractType = x.ContractType,
                     BasicSalary = x.BasicSalary,
+                    SalaryType = x.SalaryType,
                     Status = x.Status,
                     StreetAddress = x.StreetAddress,
                     ProvinceCode = x.ProvinceCode,

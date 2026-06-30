@@ -1,0 +1,59 @@
+using _66SMS.Contracts.Enumerations;
+using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
+
+namespace _66SMS.Application.SalonService.Attendances.Commands.CheckOut
+{
+    public class CheckOutHandler : IRequestHandler<CheckOutCommand, Result<int>>
+    {
+        private readonly IAttendanceSqlRepository attendanceRepository;
+        private readonly ISqlUnitOfWork sqlUnitOfWork;
+
+        public CheckOutHandler(IAttendanceSqlRepository attendanceRepository, ISqlUnitOfWork sqlUnitOfWork)
+        {
+            this.attendanceRepository = attendanceRepository;
+            this.sqlUnitOfWork = sqlUnitOfWork;
+        }
+
+        public async Task<Result<int>> Handle(CheckOutCommand request, CancellationToken cancellationToken)
+        {
+            var now = DateTime.Now;
+            var today = DateOnly.FromDateTime(now);
+
+            var attendance = await attendanceRepository
+                .AsQueryable(asNoTracking: false)
+                .Where(x => x.StaffId == request.StaffId
+                    && x.WorkDate == today
+                    && x.Status == AttendanceConst.STATUS_CHECKED_IN)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (attendance == null || attendance.CheckInAt == null)
+                return Result<int>.BadRequest(AttendanceConst.MSG_NOT_CHECKED_IN, ErrorCodes.ERR_ATTENDANCE_NOT_CHECKED_IN);
+
+            attendance.CheckOutAt = now;
+            attendance.WorkedHours = Math.Round((decimal)(now - attendance.CheckInAt.Value).TotalHours, 2);
+            attendance.Status = AttendanceConst.STATUS_CHECKED_OUT;
+            attendance.UpdatedAt = DateTime.UtcNow;
+            attendance.UpdatedBy = request.UpdatedBy;
+
+            using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                attendanceRepository.Update(attendance);
+                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                transaction.Commit();
+                return Result<int>.Success(attendance.Id, AttendanceConst.MSG_CHECK_OUT_SUCCESS);
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+    }
+}

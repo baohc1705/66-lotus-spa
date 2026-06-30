@@ -78,6 +78,18 @@ namespace _66SMS.Persistence.DependencyInjection
 
             services.AddScoped<IProvinceSqlRepository, ProvinceSqlRepository>();
             services.AddScoped<IWardSqlRepository, WardSqlRepository>();
+
+            services.AddScoped<ITreatmentCourseSqlRepository, TreatmentCourseSqlRepository>();
+
+            services.AddScoped<ICertificateTypeSqlRepository, CertificateTypeSqlRepository>();
+            services.AddScoped<IStaffCertificateSqlRepository, StaffCertificateSqlRepository>();
+
+            services.AddScoped<IInvoiceSqlRepository, InvoiceSqlRepository>();
+            services.AddScoped<IInvoiceItemSqlRepository, InvoiceItemSqlRepository>();
+
+            services.AddScoped<IAttendanceSqlRepository, AttendanceSqlRepository>();
+            services.AddScoped<IPayrollSqlRepository, PayrollSqlRepository>();
+            services.AddScoped<IPromotionSqlRepository, PromotionSqlRepository>();
             return services;
         }
     }

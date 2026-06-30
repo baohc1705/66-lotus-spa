@@ -11,6 +11,7 @@
     <Folder Include="Abstractions\Events\" />
     <Folder Include="Abstractions\Repositories\Mongo\Base\" />
     <Folder Include="Abstractions\Repositories\Mongo\Defines\" />
+    <Folder Include="Abstractions\Services\" />
   </ItemGroup>
 
   <ItemGroup>
