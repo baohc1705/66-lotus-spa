@@ -11,6 +11,8 @@ export interface PayrollDto {
   rate: number | null;
   totalHours: number | null;
   totalWorkDays: number | null;
+  baseAmount: number | null;
+  commissionAmount: number | null;
   totalAmount: number | null;
   standardWorkDays: number | null;
   status: number | null;

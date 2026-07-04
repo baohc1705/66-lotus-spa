@@ -1,6 +1,7 @@
 import React from "react";
 import { Sparkles, Clock, Users, Plus, Trash2, MapPin } from "lucide-react";
 import { useBookingStore } from "../stores/bookingStore";
+import { PromotionCodeInput } from "./PromotionCodeInput";
 
 export const BookingSummarySidebar: React.FC = () => {
   const {
@@ -13,7 +14,10 @@ export const BookingSummarySidebar: React.FC = () => {
   } = useBookingStore();
 
   const total = guests.reduce((sum, g) => sum + (g.selectedService?.sellingPrice || 0), 0);
-  const deposit = total * 0.3; // 30% deposit
+  const { appliedPromotion } = useBookingStore();
+  const discount = appliedPromotion ? appliedPromotion.discountAmount : 0;
+  const finalTotal = Math.max(0, total - discount);
+  const deposit = finalTotal * 0.3; // 30% deposit
 
   const formatDateString = (d: Date) => {
     return `${d.getDate().toString().padStart(2, "0")}/${(d.getMonth() + 1).toString().padStart(2, "0")}/${d.getFullYear()}`;
@@ -159,16 +163,31 @@ export const BookingSummarySidebar: React.FC = () => {
 
       {/* Footer / Total Sticky */}
       <div className="p-4 sm:p-6 bg-lotus-surface border-t border-lotus-muted/20 shrink-0">
+        <div className="mb-4">
+          <PromotionCodeInput />
+        </div>
         <div className="flex flex-col gap-2 mb-3">
           <div className="flex justify-between text-xs text-lotus-stone">
             <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5"/> Số lượng khách:</span>
             <span className="font-bold">{guests.length} khách</span>
           </div>
+
+          <div className="flex justify-between text-xs text-lotus-stone">
+            <span>Tổng tiền dịch vụ:</span>
+            <span className="font-semibold text-lotus-deep">{total.toLocaleString("vi-VN")}đ</span>
+          </div>
+
+          {discount > 0 && (
+            <div className="flex justify-between text-xs text-emerald-600 font-semibold">
+              <span>Khuyến mãi áp dụng:</span>
+              <span>-{discount.toLocaleString("vi-VN")}đ</span>
+            </div>
+          )}
           
           <div className="flex justify-between items-end mt-1 pt-2 border-t border-lotus-muted/20">
             <span className="text-sm font-bold text-lotus-deep">Tổng cộng</span>
             <span className="text-2xl font-black text-lotus-rose">
-              {total.toLocaleString("vi-VN")}đ
+              {finalTotal.toLocaleString("vi-VN")}đ
             </span>
           </div>
           <div className="flex justify-between items-center text-[11px] text-lotus-stone mt-0.5">

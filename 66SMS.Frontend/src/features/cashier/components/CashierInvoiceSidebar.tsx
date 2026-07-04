@@ -54,7 +54,9 @@ export function CashierInvoiceSidebar({
         onClick={(e) => e.stopPropagation()}
       >
       <div className="h-14 flex items-center justify-between px-5 border-b border-lotus-gold/20 bg-lotus-cream/30">
-        <h2 className="font-semibold text-lotus-deep">Chi tiết hóa đơn</h2>
+        <h2 className="font-semibold text-lotus-deep">
+          Chi tiết hóa đơn {booking.invoiceCode ? `#${booking.invoiceCode}` : ""}
+        </h2>
         <button
           onClick={onClose}
           className="w-8 h-8 flex items-center justify-center rounded-[5px] hover:bg-lotus-cream text-lotus-stone hover:text-lotus-deep transition-colors"
@@ -196,7 +198,21 @@ export function CashierInvoiceSidebar({
       <div className="p-5 border-t border-lotus-gold/20 bg-lotus-cream/30">
         <div className="space-y-2 mb-4">
           <div className="flex justify-between text-sm">
-            <span className="text-lotus-stone">Tổng dịch vụ:</span>
+            <span className="text-lotus-stone">Tổng dịch vụ (gốc):</span>
+            <span className="font-medium text-lotus-deep">
+              {(booking.totalAmount + (booking.discountAmount ?? 0)).toLocaleString("vi-VN")}đ
+            </span>
+          </div>
+          {(booking.discountAmount ?? 0) > 0 && (
+            <div className="flex justify-between text-sm">
+              <span className="text-lotus-stone">Giảm giá (khuyến mãi):</span>
+              <span className="font-medium text-lotus-rose">
+                -{(booking.discountAmount ?? 0).toLocaleString("vi-VN")}đ
+              </span>
+            </div>
+          )}
+          <div className="flex justify-between text-sm">
+            <span className="text-lotus-stone">Thực thu (sau giảm):</span>
             <span className="font-medium text-lotus-deep">
               {booking.totalAmount.toLocaleString("vi-VN")}đ
             </span>
@@ -222,9 +238,16 @@ export function CashierInvoiceSidebar({
           </p>
         )}
 
-        {canPay && !booking.depositPaid && (
-          <p className="text-xs text-red-700 bg-red-50 border border-red-200/50 rounded-[5px] p-2.5 mb-3">
-            Khách chưa đặt cọc online. Không thể thu phần còn lại.
+        {isPaid && booking.invoiceCode && (
+          <p className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200/50 rounded-[5px] p-2.5 mb-3 text-center font-medium">
+            Hóa đơn đã được phát hành thành công: #{booking.invoiceCode}
+          </p>
+        )}
+
+        {canPay && !booking.depositPaid && !!booking.depositDeadlineAt && (
+          <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200/50 rounded-[5px] p-2.5 mb-3">
+            Khách đặt lịch online nhưng chưa đặt cọc. Thu toàn bộ{" "}
+            {booking.totalAmount.toLocaleString("vi-VN")}đ.
           </p>
         )}
 
@@ -247,13 +270,13 @@ export function CashierInvoiceSidebar({
             onClick={() => onPay(booking.id, paymentMethod)}
             className={cn(
               "w-full py-3 rounded-[5px] flex items-center justify-center gap-2 text-white font-semibold text-sm transition-all shadow-md",
-              isPaid || isPaying || !canPay || (!booking.depositPaid && booking.status !== "confirmed")
+              isPaid || isPaying || !canPay
                 ? "bg-lotus-stone/50 cursor-not-allowed text-white/80 shadow-none"
                 : paymentMethod === "vnpay"
                   ? "bg-gradient-to-r from-[#005BAA] to-[#ED1B24] hover:opacity-90 shadow-blue-500/20"
                   : "bg-lotus-leaf hover:bg-lotus-leaf/90 shadow-lotus-leaf/20 hover:shadow-lotus-leaf/40",
             )}
-            disabled={isPaid || isPaying || !canPay || (!booking.depositPaid && booking.status !== "confirmed")}
+            disabled={isPaid || isPaying || !canPay}
           >
             <Check className="w-5 h-5" />
             {isPaying
@@ -262,13 +285,11 @@ export function CashierInvoiceSidebar({
                 ? "Đã thanh toán"
                 : !canPay
                   ? "Chưa thể thanh toán"
-                  : (!booking.depositPaid && booking.status !== "confirmed")
-                    ? "Chưa đặt cọc"
-                    : paymentMethod === "vnpay"
-                      ? `Thanh toán VNPAY (${amountDue.toLocaleString("vi-VN")}đ)`
-                      : paymentMethod === "wallet"
-                        ? `Trừ Ví Khách (${amountDue.toLocaleString("vi-VN")}đ)`
-                        : `Thu phần còn lại (${amountDue.toLocaleString("vi-VN")}đ)`}
+                  : paymentMethod === "vnpay"
+                    ? `Thanh toán VNPAY (${amountDue.toLocaleString("vi-VN")}đ)`
+                    : paymentMethod === "wallet"
+                      ? `Trừ Ví Khách (${amountDue.toLocaleString("vi-VN")}đ)`
+                      : `Thu phần còn lại (${amountDue.toLocaleString("vi-VN")}đ)`}
           </button>
         )}
       </div>

@@ -35,12 +35,10 @@ import {
 import {
   createStaffSchema,
   updateStaffSchema,
-  type CreateStaffFormData,
-  type UpdateStaffFormData,
   type StaffFormValues,
 } from "../schemas/staff.schema";
 
-import type { StaffDto } from "../types/staff.types";
+import type { StaffDto, CreateStaffPayload, UpdateStaffPayload } from "../types/staff.types";
 import { parseToDateInput } from "@/shared/utils/date.utils";
 import { useGetAllRoles } from "@/features/auth/hooks/useGetAllRoles";
 import { Briefcase, KeyRound, User } from "lucide-react";
@@ -144,17 +142,29 @@ export function StaffFormDialog({
         Boolean,
       );
 
-      const payload: StaffFormValues = {
-        ...data,
+      const payload: CreateStaffPayload = {
+        salonId: data.salonId,
+        fullName: data.fullName,
+        phone: data.phone,
         avatarUrl,
-        fullAddress: parts.join(", "),
         dateOfBirth: data.dateOfBirth || undefined,
+        gender: data.gender,
+        nationalId: data.nationalId || undefined,
         hireDate: data.hireDate || undefined,
+        contractType: data.contractType || undefined,
+        basicSalary: data.basicSalary,
+        salaryType: data.salaryType,
+        status: data.status,
+        streetAddress: data.streetAddress || undefined,
+        provinceCode: data.provinceCode || undefined,
+        wardCode: data.wardCode || undefined,
+        fullAddress: parts.join(", "),
+        role: data.role,
       };
 
       if (isEdit && staff?.id) {
         updateMutation.mutate(
-          { id: staff.id, payload: payload as UpdateStaffFormData },
+          { id: staff.id, payload: payload as UpdateStaffPayload },
           {
             onSuccess: (result) => {
               if (result.isSuccess) onOpenChange(false);
@@ -162,7 +172,7 @@ export function StaffFormDialog({
           },
         );
       } else {
-        createMutation.mutate(payload as CreateStaffFormData, {
+        createMutation.mutate(payload, {
           onSuccess: (result) => {
             if (result.isSuccess) onOpenChange(false);
           },
@@ -431,6 +441,8 @@ export function StaffFormDialog({
               </FormField>
             </div>
           </FormSection>
+
+          {/* KPI section removed */}
 
           {!isEdit && (
             <div className="p-3.5 bg-lotus-leaf/5 border border-lotus-leaf/10 rounded-lg text-lotus-deep/80 text-[12px] flex items-start gap-2.5">

@@ -42,6 +42,20 @@ export interface GuestAppointmentDto {
   services: { serviceId: number; quantity: number }[];
 }
 
+export interface PromotionValidationDto {
+  id: number | null;
+  code: string | null;
+  name: string | null;
+  discountType: number | null;
+  discountAmount: number;
+  finalAmount: number;
+}
+
+export interface CreateBookingPayload {
+  promotionCode?: string;
+  guests: GuestAppointmentDto[];
+}
+
 export type CreateSlotLockResponseDto = number[];
 export type BookingResponseDto = number[];
 

@@ -31,6 +31,9 @@ export interface CashierBooking {
   depositDeadlineAt?: string | null
   note?: string
   customerWalletBalance?: number
+  invoiceId?: number | null
+  invoiceCode?: string | null
+  discountAmount?: number
 }
 
 export interface StaffColumn {

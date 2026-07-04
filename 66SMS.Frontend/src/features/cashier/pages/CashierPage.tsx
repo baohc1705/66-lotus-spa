@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { CashierHeader } from "../components/CashierHeader";
 import { CashierToolbar } from "../components/CashierToolbar";
@@ -10,6 +9,7 @@ import type { CashierBooking, CashierViewMode } from "../types";
 import { useCashierData } from "../hooks/useCashier";
 import { CashierBookingModal } from "../components/CashierBookingModal";
 import { cashierApi } from "../api/cashier.api";
+import { invoiceApi } from "@/features/invoices/api/invoice.api";
 import { Loader2 } from "lucide-react";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { APPOINTMENT_STATUS } from "@/features/booking/constants/appointment.constants";
@@ -27,7 +27,6 @@ export function CashierPage() {
       (localStorage.getItem("cashier-view-mode") as CashierViewMode) ||
       "timeline",
   );
-  const navigate = useNavigate();
 
   useEffect(() => {
     localStorage.setItem("cashier-view-mode", viewMode);
@@ -44,9 +43,9 @@ export function CashierPage() {
   useEffect(() => {
     // Only admin and receptionist can access cashier page
     if (!isAdmin && !isReceptionist) {
-      navigate("/");
+      window.location.href = "/";
     }
-  }, [isAdmin, isReceptionist, navigate]);
+  }, [isAdmin, isReceptionist]);
 
   if (!isAdmin && !isReceptionist) {
     return null;
@@ -100,19 +99,47 @@ export function CashierPage() {
 
     setIsPaying(true);
     try {
-      const response = await cashierApi.payBooking(bookingId, paymentMethod);
+      let invoiceId = selectedBooking?.invoiceId;
 
-      if (response.isSuccess) {
-        toast.success(response.message || "Thanh toán thành công");
+      // 1. Tạo hóa đơn nháp từ lịch hẹn (nếu chưa có)
+      if (!invoiceId) {
+        const createRes = await invoiceApi.createFromAppointment(bookingId);
+
+        if (!createRes.isSuccess || !createRes.data) {
+          toast.error(createRes.message || "Không thể tạo hóa đơn từ lịch hẹn.");
+          setIsPaying(false);
+          return;
+        }
+
+        invoiceId = createRes.data;
+      }
+
+      // 2. Xác định phương thức thanh toán dạng số
+      let numericMethod = 1; // Tiền mặt mặc định
+      if (paymentMethod === "transfer") {
+        numericMethod = 2; // Chuyển khoản
+      } else if (paymentMethod === "wallet") {
+        numericMethod = 3; // Ví khách hàng
+      } else if (paymentMethod === "card") {
+        numericMethod = 1; // Thẻ/POS
+      }
+
+      const remainingAmount = selectedBooking?.remainingAmount ?? 0;
+
+      // 3. Tiến hành thanh toán hóa đơn
+      const payRes = await invoiceApi.payInvoice(invoiceId, numericMethod, remainingAmount);
+
+      if (payRes.isSuccess) {
+        toast.success(payRes.message || "Thanh toán thành công");
         setIsSidebarOpen(false);
         setSelectedBooking(null);
         await refetch();
         return;
       }
 
-      toast.error(response.message || "Thanh toán thất bại");
+      toast.error(payRes.message || "Thanh toán hóa đơn thất bại");
     } catch (error) {
-      console.error("Error paying booking", error);
+      console.error("Error processing payment", error);
       toast.error("Lỗi kết nối tới máy chủ");
     } finally {
       setIsPaying(false);

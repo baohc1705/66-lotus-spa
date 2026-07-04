@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { bookingApi } from "../api/booking.api";
-import type { GuestAppointmentDto, SlotLockDto } from "../types/booking.types";
+import type { GuestAppointmentDto, SlotLockDto, CreateBookingPayload } from "../types/booking.types";
 
 export const useTechnicians = (date: string | null, serviceId?: number, salonId?: number) => {
   return useQuery({
@@ -49,7 +49,7 @@ export const useCreateSlotLock = () => {
 export const useCreateBooking = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: GuestAppointmentDto[]) =>
+    mutationFn: (payload: CreateBookingPayload) =>
       bookingApi.createBooking(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["booking-timeslots"] });

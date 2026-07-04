@@ -21,4 +21,12 @@ export const invoiceApi = {
   // Hủy hóa đơn — PATCH /Invoice/{id}/cancel
   cancel: (id: number) =>
     axiosInstance.patch<Result<object>>(`${BASE}/${id}/cancel`).then(r => r.data),
+
+  // Tạo hóa đơn từ lịch hẹn — POST /Invoice/from-appointment/{appointmentId}
+  createFromAppointment: (appointmentId: number | string) =>
+    axiosInstance.post<Result<number>>(`${BASE}/from-appointment/${appointmentId}`).then(r => r.data),
+
+  // Thanh toán hóa đơn — POST /Invoice/{id}/pay
+  payInvoice: (id: number | string, paymentMethod: number, paidAmount: number, note?: string) =>
+    axiosInstance.post<Result<object>>(`${BASE}/${id}/pay`, { paymentMethod, paidAmount, note }).then(r => r.data),
 }

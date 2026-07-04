@@ -21,9 +21,11 @@ import { useAttendances, useCheckIn, useCheckOut } from "../hooks/useAttendances
 import { AttendanceFormDialog } from "../components/AttendanceFormDialog";
 import { ManualAttendanceFormDialog } from "../components/ManualAttendanceFormDialog";
 import { useAdminStaffs } from "@/features/staffs/hooks/useStaffs";
+import { useWorkSchedules } from "@/features/schedules/hooks/useSchedules";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import type { AttendanceDto } from "../types/attendance.types";
 import type { StaffDto } from "@/features/staffs/types/staff.types";
+import type { WorkScheduleDTO } from "@/features/schedules/types/schedule.types";
 import { formatDisplayDate } from "@/shared/utils/date.utils";
 
 const ATTENDANCE_STATUS_MAP: StatusMap = {
@@ -35,7 +37,15 @@ const ATTENDANCE_STATUS_MAP: StatusMap = {
   "6": { label: "Nghỉ không lương", variant: "error" },
 };
 
-// Hiển thị phần giờ (HH:mm) từ chuỗi datetime
+const formatVnd = (v?: number | null) =>
+  v !== null && v !== undefined ? new Intl.NumberFormat("vi-VN").format(v) : "—";
+
+function todayIsoDate(): string {
+  const d = new Date();
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 function displayTime(val?: string | null): string {
   if (!val) return "—";
   const d = new Date(val);
@@ -43,6 +53,8 @@ function displayTime(val?: string | null): string {
   const pad = (n: number) => n.toString().padStart(2, "0");
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
+
+// KpiBadge removed
 
 export function AttendanceListPage() {
   const [pageIndex, setPageIndex] = useState(1);
@@ -53,11 +65,26 @@ export function AttendanceListPage() {
   const [editTarget, setEditTarget] = useState<AttendanceDto | null>(null);
   const [manualOpen, setManualOpen] = useState(false);
   const [selectedStaffId, setSelectedStaffId] = useState<string>("");
+  const [selectedWorkScheduleId, setSelectedWorkScheduleId] = useState<string>("");
 
   const salonId = useAuthStore((s) => s.getEffectiveSalonId());
+  const today = todayIsoDate();
 
   const { data: staffsResult } = useAdminStaffs({ pageIndex: 1, pageSize: 200, salonId });
   const staffs = useMemo(() => staffsResult?.data?.items ?? [], [staffsResult?.data?.items]);
+
+  const { data: schedulesResult } = useWorkSchedules({
+    pageIndex: 1,
+    pageSize: 50,
+    staffId: selectedStaffId ? Number(selectedStaffId) : undefined,
+    salonId: salonId ?? undefined,
+    startDate: today,
+    endDate: today,
+  });
+  const todaySchedules = useMemo(
+    () => schedulesResult?.data?.items ?? [],
+    [schedulesResult?.data?.items],
+  );
 
   const { data: result, isLoading } = useAttendances({
     pageIndex,
@@ -76,13 +103,19 @@ export function AttendanceListPage() {
   const totalCount = paged?.totalCount ?? 0;
 
   const handleCheckIn = () => {
-    if (!selectedStaffId) return;
-    checkInMutation.mutate({ staffId: Number(selectedStaffId) });
+    if (!selectedStaffId || !selectedWorkScheduleId) return;
+    checkInMutation.mutate({
+      staffId: Number(selectedStaffId),
+      workScheduleId: Number(selectedWorkScheduleId),
+    });
   };
 
   const handleCheckOut = () => {
-    if (!selectedStaffId) return;
-    checkOutMutation.mutate({ staffId: Number(selectedStaffId) });
+    if (!selectedStaffId || !selectedWorkScheduleId) return;
+    checkOutMutation.mutate({
+      staffId: Number(selectedStaffId),
+      workScheduleId: Number(selectedWorkScheduleId),
+    });
   };
 
   const columns = useMemo<ColumnDef<AttendanceDto>[]>(
@@ -107,6 +140,13 @@ export function AttendanceListPage() {
         ),
       },
       {
+        accessorKey: "shiftName",
+        header: "Ca",
+        cell: ({ row }) => (
+          <span className="text-lotus-deep/80">{row.original.shiftName ?? "—"}</span>
+        ),
+      },
+      {
         accessorKey: "workDate",
         header: "Ngày",
         cell: ({ row }) => (
@@ -125,15 +165,7 @@ export function AttendanceListPage() {
         header: "Giờ ra",
         cell: ({ row }) => <span>{displayTime(row.original.checkOutAt)}</span>,
       },
-      {
-        accessorKey: "workedHours",
-        header: "Số giờ",
-        cell: ({ row }) => (
-          <span className="font-semibold text-lotus-deep">
-            {row.original.workedHours ?? 0}
-          </span>
-        ),
-      },
+      // KPI columns removed
       {
         accessorKey: "workCredits",
         header: "Công",
@@ -178,11 +210,16 @@ export function AttendanceListPage() {
   return (
     <div className="space-y-4">
       <div className="bg-white/70 backdrop-blur-md rounded-admin border border-stone-200/30 overflow-hidden">
-        {/* Toolbar: check-in/out + filter */}
         <div className="p-4 flex flex-wrap items-end gap-3 border-b border-stone-100">
           <div className="space-y-1">
             <label className="text-[12px] font-semibold text-lotus-deep/80">Nhân viên</label>
-            <Select value={selectedStaffId} onValueChange={setSelectedStaffId}>
+            <Select
+              value={selectedStaffId}
+              onValueChange={(v) => {
+                setSelectedStaffId(v);
+                setSelectedWorkScheduleId("");
+              }}
+            >
               <SelectTrigger className="h-9 text-[13px] w-[200px]">
                 <SelectValue placeholder="Chọn nhân viên..." />
               </SelectTrigger>
@@ -195,13 +232,32 @@ export function AttendanceListPage() {
               </SelectContent>
             </Select>
           </div>
+          <div className="space-y-1">
+            <label className="text-[12px] font-semibold text-lotus-deep/80">Ca hôm nay *</label>
+            <Select
+              value={selectedWorkScheduleId}
+              onValueChange={setSelectedWorkScheduleId}
+              disabled={!selectedStaffId}
+            >
+              <SelectTrigger className="h-9 text-[13px] w-[200px]">
+                <SelectValue placeholder={selectedStaffId ? "Chọn ca..." : "Chọn NV trước"} />
+              </SelectTrigger>
+              <SelectContent>
+                {todaySchedules.map((ws: WorkScheduleDTO) => (
+                  <SelectItem key={ws.id} value={String(ws.id)}>
+                    {ws.shift?.name ?? `Ca #${ws.id}`}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <Button
             variant="admin"
             size="sm"
             className="gap-1.5"
             onClick={handleCheckIn}
             loading={checkInMutation.isPending}
-            disabled={!selectedStaffId}
+            disabled={!selectedStaffId || !selectedWorkScheduleId}
           >
             <LogIn className="w-3.5 h-3.5" /> Check-in
           </Button>
@@ -211,7 +267,7 @@ export function AttendanceListPage() {
             className="gap-1.5"
             onClick={handleCheckOut}
             loading={checkOutMutation.isPending}
-            disabled={!selectedStaffId}
+            disabled={!selectedStaffId || !selectedWorkScheduleId}
           >
             <LogOut className="w-3.5 h-3.5" /> Check-out
           </Button>

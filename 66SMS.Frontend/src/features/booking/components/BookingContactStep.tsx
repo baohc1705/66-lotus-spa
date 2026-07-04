@@ -19,6 +19,8 @@ export const BookingContactStep: React.FC = () => {
     prevStep,
     nextStep,
     selectedSalon,
+    promotionCode,
+    appliedPromotion,
   } = useBookingStore();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -76,7 +78,10 @@ export const BookingContactStep: React.FC = () => {
         };
       });
 
-      const result = await createBooking(payload);
+      const result = await createBooking({
+        promotionCode: appliedPromotion ? promotionCode : undefined,
+        guests: payload
+      });
 
       if (result.success) {
         toast.success("Đặt lịch thành công! Cảm ơn bạn đã tin tưởng.");
@@ -90,10 +95,9 @@ export const BookingContactStep: React.FC = () => {
     }
   };
 
-  const depositPreview = guests.reduce(
-    (sum, g) => sum + Math.round((g.selectedService?.sellingPrice || 0) * 0.3),
-    0
-  );
+  const total = guests.reduce((sum, g) => sum + (g.selectedService?.sellingPrice || 0), 0);
+  const discount = appliedPromotion ? appliedPromotion.discountAmount : 0;
+  const depositPreview = Math.round(Math.max(0, total - discount) * 0.3);
 
   return (
     <div className="bg-lotus-surface rounded-3xl p-6 sm:p-8 border border-lotus-muted/20 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">

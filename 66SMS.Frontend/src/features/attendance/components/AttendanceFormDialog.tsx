@@ -12,6 +12,7 @@ import {
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
+import { Checkbox } from "@/shared/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -72,6 +73,7 @@ export function AttendanceFormDialog({
 
   const selectedStatus = watch("status");
   const isManualStatus = selectedStatus === "3" || selectedStatus === "4" || selectedStatus === "5" || selectedStatus === "6";
+  // showKpiOverride removed
 
   useEffect(() => {
     if (open) {
@@ -111,11 +113,15 @@ export function AttendanceFormDialog({
           <DialogTitle>Sửa chấm công</DialogTitle>
           <DialogDescription>
             {attendance?.staffName ?? ""} — {attendance?.workDate ?? ""}
+            {attendance?.shiftName && (
+              <span className="block">Ca: {attendance.shiftName}</span>
+            )}
             {attendance?.workCredits != null && (
               <span className="block mt-1 text-lotus-deep/70">
                 Công tính được: <strong>{attendance.workCredits}</strong>
               </span>
             )}
+            {/* KPI count removed */}
           </DialogDescription>
         </DialogHeader>
 
@@ -156,6 +162,8 @@ export function AttendanceFormDialog({
               </FormField>
             </>
           )}
+
+          {/* KPI override Checkbox removed */}
 
           <FormField label="Ghi chú" error={errors.note?.message}>
             <Input

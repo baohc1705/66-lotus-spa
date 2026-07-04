@@ -13,18 +13,21 @@ export interface AttendanceDto {
   workCredits: number | null;
   status: number | null;
   note: string | null;
+  shiftName: string | null;
   createdAt: string | null;
 }
 
 // Payload check-in
 export interface CheckInPayload {
   staffId: number;
+  workScheduleId: number;
   note?: string;
 }
 
 // Payload check-out
 export interface CheckOutPayload {
   staffId: number;
+  workScheduleId: number;
 }
 
 // Payload sửa giờ tay (quản lý)

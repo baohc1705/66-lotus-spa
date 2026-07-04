@@ -8,10 +8,13 @@ import type {
   SlotLockDto,
   GuestAppointmentDto,
   AppointmentDto,
+  CreateBookingPayload,
+  PromotionValidationDto,
 } from "../types/booking.types";
 
 const APPOINTMENT_BASE = API.appointment;
 const POSITION_BASE = API.bookingPositions;
+const PROMOTION_BASE = API.promotions;
 
 export const bookingApi = {
   getTechnicians: async (
@@ -59,13 +62,27 @@ export const bookingApi = {
   },
 
   createBooking: async (
-    payload: GuestAppointmentDto[]
+    payload: CreateBookingPayload
   ): Promise<{ success: boolean; bookingIds: number[] }> => {
     const res = await axiosInstance.post<Result<number[]>>(
       APPOINTMENT_BASE,
       payload
     );
     return { success: res.data.isSuccess, bookingIds: res.data.data || [] };
+  },
+
+  validatePromotion: async (
+    code: string,
+    orderTotal: number
+  ): Promise<PromotionValidationDto> => {
+    const res = await axiosInstance.get<Result<PromotionValidationDto>>(
+      `${PROMOTION_BASE}/validate`,
+      { params: { code, orderTotal } }
+    );
+    if (!res.data.isSuccess || !res.data.data) {
+      throw new Error(res.data.message ?? "Mã không hợp lệ");
+    }
+    return res.data.data;
   },
 
   getMyBookings: async (): Promise<AppointmentDto[]> => {

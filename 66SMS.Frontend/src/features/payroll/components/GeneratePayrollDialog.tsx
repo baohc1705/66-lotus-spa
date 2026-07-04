@@ -82,7 +82,7 @@ export function GeneratePayrollDialog({ open, onOpenChange }: GeneratePayrollDia
         <DialogHeader>
           <DialogTitle>Tính lương</DialogTitle>
           <DialogDescription>
-            Lương theo ngày công = (Lương tháng / Ngày công chuẩn) × Tổng công.
+            Lương cơ bản + hoa hồng làm dịch vụ của nhân viên trong kỳ.
           </DialogDescription>
         </DialogHeader>
 

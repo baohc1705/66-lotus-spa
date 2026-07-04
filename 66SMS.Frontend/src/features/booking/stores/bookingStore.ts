@@ -5,6 +5,7 @@ import type {
   TimeSlotDTO,
   BookingPositionDTO,
   GuestBooking,
+  PromotionValidationDto,
 } from "../types/booking.types";
 import type { ServiceDTO } from "@/features/services/types/service.types";
 import type { SalonDTO } from "@/features/salons/types/salon.types";
@@ -15,6 +16,8 @@ interface BookingState {
   guests: GuestBooking[];
   activeGuestIndex: number;
   contactInfo: BookingContactFormValues | null;
+  appliedPromotion: PromotionValidationDto | null;
+  promotionCode: string;
 
   // Actions
   setStep: (step: number) => void;
@@ -36,6 +39,10 @@ interface BookingState {
   setContactInfo: (info: BookingContactFormValues) => void;
   setGuestLockId: (guestIndex: number, lockId: number) => void;
 
+  setPromotionCode: (code: string) => void;
+  setAppliedPromotion: (promo: PromotionValidationDto | null) => void;
+  clearPromotion: () => void;
+
   resetBooking: () => void;
 }
 
@@ -54,6 +61,8 @@ const initialState = {
   guests: [createNewGuest(1)],
   activeGuestIndex: 0,
   contactInfo: null,
+  appliedPromotion: null as PromotionValidationDto | null,
+  promotionCode: "",
 };
 
 export const useBookingStore = create<BookingState>((set) => ({
@@ -76,7 +85,7 @@ export const useBookingStore = create<BookingState>((set) => ({
           selectedTimeSlot: null,
           lockId: undefined,
         }));
-        return { selectedSalon: salon, guests: newGuests };
+        return { selectedSalon: salon, guests: newGuests, appliedPromotion: null, promotionCode: "" };
       }
       return { selectedSalon: salon };
     }),
@@ -85,7 +94,7 @@ export const useBookingStore = create<BookingState>((set) => ({
     set((state) => {
       const nextId = Math.max(0, ...state.guests.map((g) => g.id)) + 1;
       const newGuests = [...state.guests, createNewGuest(nextId)];
-      return { guests: newGuests, activeGuestIndex: newGuests.length - 1 };
+      return { guests: newGuests, activeGuestIndex: newGuests.length - 1, appliedPromotion: null, promotionCode: "" };
     }),
 
   removeGuest: (index) =>
@@ -96,7 +105,7 @@ export const useBookingStore = create<BookingState>((set) => ({
       if (newActiveIndex >= newGuests.length) {
         newActiveIndex = newGuests.length - 1;
       }
-      return { guests: newGuests, activeGuestIndex: newActiveIndex };
+      return { guests: newGuests, activeGuestIndex: newActiveIndex, appliedPromotion: null, promotionCode: "" };
     }),
 
   setActiveGuest: (index) => set({ activeGuestIndex: index }),
@@ -120,7 +129,7 @@ export const useBookingStore = create<BookingState>((set) => ({
       newGuests[state.activeGuestIndex].selectedPosition = null;
       newGuests[state.activeGuestIndex].selectedTimeSlot = null;
       newGuests[state.activeGuestIndex].lockId = undefined;
-      return { guests: newGuests };
+      return { guests: newGuests, appliedPromotion: null, promotionCode: "" };
     }),
 
   selectTechnician: (technician) =>
@@ -167,6 +176,10 @@ export const useBookingStore = create<BookingState>((set) => ({
       }
       return { guests: newGuests };
     }),
+
+  setPromotionCode: (code) => set({ promotionCode: code }),
+  setAppliedPromotion: (promo) => set({ appliedPromotion: promo }),
+  clearPromotion: () => set({ appliedPromotion: null, promotionCode: "" }),
 
   resetBooking: () => set(initialState),
 }));

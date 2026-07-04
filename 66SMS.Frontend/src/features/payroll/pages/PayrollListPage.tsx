@@ -127,8 +127,22 @@ export function PayrollListPage() {
         cell: ({ row }) => <span>{row.original.totalWorkDays ?? 0}</span>,
       },
       {
+        accessorKey: "baseAmount",
+        header: "Lương CB",
+        cell: ({ row }) => <span>{formatVnd(row.original.baseAmount)}</span>,
+      },
+      {
+        accessorKey: "commissionAmount",
+        header: "Hoa hồng dịch vụ",
+        cell: ({ row }) => (
+          <span className="text-lotus-gold font-semibold">
+            {formatVnd(row.original.commissionAmount)}
+          </span>
+        ),
+      },
+      {
         accessorKey: "totalAmount",
-        header: "Thành tiền",
+        header: "Tổng",
         cell: ({ row }) => (
           <span className="font-semibold text-lotus-deep">
             {formatVnd(row.original.totalAmount)}
