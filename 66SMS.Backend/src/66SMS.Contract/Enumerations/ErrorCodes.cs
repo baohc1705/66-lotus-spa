@@ -188,6 +188,8 @@ namespace _66SMS.Contracts.Enumerations
         ERR_ATTENDANCE_DUPLICATE,
         ERR_ATTENDANCE_NOT_CHECKED_IN,
         ERR_ATTENDANCE_INVALID_STATUS,
+        ERR_ATTENDANCE_WORK_SCHEDULE_REQUIRED,
+        ERR_KPI_NOT_CONFIGURED,
         #endregion
 
         #region Payroll
@@ -201,6 +203,10 @@ namespace _66SMS.Contracts.Enumerations
         ERR_PROMOTION_NOT_FOUND,
         ERR_PROMOTION_CODE_EXISTED,
         ERR_PROMOTION_INVALID,
+        ERR_PROMOTION_EXPIRED,
+        ERR_PROMOTION_INACTIVE,
+        ERR_PROMOTION_USAGE_LIMIT,
+        ERR_PROMOTION_MIN_ORDER,
         #endregion
     }
 }

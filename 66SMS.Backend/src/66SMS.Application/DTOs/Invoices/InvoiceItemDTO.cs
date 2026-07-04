@@ -15,5 +15,7 @@ namespace _66SMS.Application.DTOs.Invoices
         public string? StaffName { get; set; }
         public string? Note { get; set; }
         public int? Status { get; set; }
+        public decimal? CommissionRate { get; set; }
+        public decimal? CommissionAmount { get; set; }
     }
 }

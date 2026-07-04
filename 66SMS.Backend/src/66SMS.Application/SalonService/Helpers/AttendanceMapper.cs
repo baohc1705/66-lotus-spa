@@ -22,10 +22,9 @@ namespace _66SMS.Application.SalonService.Helpers
                 WorkedHours = x.WorkedHours,
                 Status = x.Status,
                 Note = x.Note,
+                ShiftName = x.WorkSchedule?.ShiftPeriod?.Shift?.Name,
                 CreatedAt = x.CreatedAt.ToString(),
-                CreatedBy = x.CreatedBy,
                 UpdatedAt = x.UpdatedAt?.ToString(),
-                UpdatedBy = x.UpdatedBy,
             };
             dto.WorkCredits = AttendanceWorkCreditCalculator.CalculateWorkCredit(x);
             return dto;

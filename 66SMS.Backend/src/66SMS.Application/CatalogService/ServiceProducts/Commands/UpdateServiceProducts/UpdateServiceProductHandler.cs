@@ -31,7 +31,6 @@ namespace _66SMS.Application.CatalogService.ServiceProducts.Commands.UpdateServi
             if (request.Status.HasValue) entity.Status = request.Status.Value;
 
             entity.UpdatedAt = request.UpdatedAt;
-            entity.UpdatedBy = request.UpdatedBy;
 
             repository.Update(entity);
             await unitOfWork.SaveChangeAsync(cancellationToken);

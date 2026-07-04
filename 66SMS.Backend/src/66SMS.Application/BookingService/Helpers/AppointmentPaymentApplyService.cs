@@ -37,6 +37,9 @@ namespace _66SMS.Application.BookingService.Helpers
                 // Chuyển trạng thái sang "Chờ đến ngày" vì đã cọc xong
                 var oldStatus = appointment.Status;
                 appointment.Status = AppointmentConst.STATUS_WAITING;
+                appointment.UpdatedAt = DateTime.UtcNow;
+                appointment.UpdatedBy = appointment.CreatedByUserId;
+
                 appointment.Histories ??= new List<AppointmentHistory>();
                 appointment.Histories.Add(new AppointmentHistory
                 {
@@ -68,6 +71,10 @@ namespace _66SMS.Application.BookingService.Helpers
 
             // Ghi lịch sử trạng thái (trạng thái lịch hẹn không đổi ở bước này, chỉ ghi nhận sự kiện)
             var oldBalanceStatus = appointment.Status;
+            
+            appointment.UpdatedAt = DateTime.UtcNow;
+            appointment.UpdatedBy = appointment.CreatedByUserId;
+
             appointment.Histories ??= new List<AppointmentHistory>();
             appointment.Histories.Add(new AppointmentHistory
             {

@@ -128,6 +128,9 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PostponeAppoin
                     CreatedAt = DateTime.UtcNow,
                 });
 
+                appointment.UpdatedAt = DateTime.UtcNow;
+                appointment.UpdatedBy = request.UserId;
+
                 appointmentSqlRepository.Update(appointment);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 

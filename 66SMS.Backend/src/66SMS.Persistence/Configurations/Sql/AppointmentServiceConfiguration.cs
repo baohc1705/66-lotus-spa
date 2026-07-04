@@ -18,9 +18,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.Quantity).HasColumnName(AppointmentServiceConst.FIELD_QUANTITY);
             builder.Property(x => x.Status).HasColumnName(AppointmentServiceConst.FIELD_STATUS);
             builder.Property(x => x.CreatedAt).HasColumnName(AppointmentServiceConst.FIELD_CREATED_AT);
-            builder.Property(x => x.CreatedBy).HasColumnName(AppointmentServiceConst.FIELD_CREATED_BY);
             builder.Property(x => x.UpdatedAt).HasColumnName(AppointmentServiceConst.FIELD_UPDATED_AT);
-            builder.Property(x => x.UpdatedBy).HasColumnName(AppointmentServiceConst.FIELD_UPDATED_BY);
 
             builder.HasOne(x => x.Appointment).WithMany(x => x.Services).HasForeignKey(x => x.AppointmentId).IsRequired(false);
             builder.HasOne(x => x.Service).WithMany().HasForeignKey(x => x.ServiceId).IsRequired(false);

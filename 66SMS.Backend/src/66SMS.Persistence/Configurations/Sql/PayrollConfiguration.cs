@@ -19,6 +19,8 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.Rate).HasColumnName(PayrollConst.FIELD_RATE).HasColumnType("decimal(18, 0)");
             builder.Property(x => x.TotalHours).HasColumnName(PayrollConst.FIELD_TOTAL_HOURS).HasColumnType("decimal(7, 2)");
             builder.Property(x => x.TotalWorkDays).HasColumnName(PayrollConst.FIELD_TOTAL_WORK_DAYS).HasColumnType("decimal(5, 1)");
+            builder.Property(x => x.BaseAmount).HasColumnName(PayrollConst.FIELD_BASE_AMOUNT).HasColumnType("decimal(18, 0)");
+            builder.Property(x => x.CommissionAmount).HasColumnName(PayrollConst.FIELD_COMMISSION_AMOUNT).HasColumnType("decimal(18, 0)");
             builder.Property(x => x.TotalAmount).HasColumnName(PayrollConst.FIELD_TOTAL_AMOUNT).HasColumnType("decimal(18, 0)");
             builder.Property(x => x.Status).HasColumnName(PayrollConst.FIELD_STATUS);
             builder.Property(x => x.Note).HasColumnName(PayrollConst.FIELD_NOTE).HasMaxLength(PayrollConst.NOTE_MAX_LENGTH);

@@ -51,7 +51,8 @@ namespace _66SMS.Application.SalonService.Attendances.Queries.GetAllAttendances
                 .Include(x => x.Staff)
                 .Include(x => x.Salon)
                 .Include(x => x.WorkSchedule!)
-                .ThenInclude(w => w.ShiftPeriod);
+                .ThenInclude(w => w.ShiftPeriod!)
+                .ThenInclude(sp => sp.Shift);
 
             PagedResult<Attendance> paged = await query.ToPagedAsync(request, cancellationToken);
 

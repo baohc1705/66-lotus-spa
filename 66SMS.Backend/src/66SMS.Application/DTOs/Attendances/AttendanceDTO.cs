@@ -15,6 +15,7 @@ namespace _66SMS.Application.DTOs.Attendances
         public decimal? WorkCredits { get; set; }
         public int? Status { get; set; }
         public string? Note { get; set; }
+        public string? ShiftName { get; set; }
         public string? CreatedAt { get; set; }
         public int? CreatedBy { get; set; }
         public string? UpdatedAt { get; set; }

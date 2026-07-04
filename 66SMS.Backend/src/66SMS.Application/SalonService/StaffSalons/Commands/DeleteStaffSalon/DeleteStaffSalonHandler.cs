@@ -35,7 +35,6 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.DeleteStaffSalon
                 staffSalon.Status = StaffSalonConst.STATUS_DELETED;
                 staffSalon.EndDate = DateOnly.FromDateTime(DateTime.UtcNow);
                 staffSalon.UpdatedAt = DateTimeHelper.UtcNow();
-                staffSalon.UpdatedBy = request.UpdatedBy;
                 staffSalonSqlRepository.Update(staffSalon);
 
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

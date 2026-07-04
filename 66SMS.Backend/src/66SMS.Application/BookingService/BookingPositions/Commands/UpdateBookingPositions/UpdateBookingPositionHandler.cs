@@ -40,7 +40,6 @@ namespace _66SMS.Application.BookingService.BookingPositions.Commands.UpdateBook
 
                 mapper.Map(request, bookingPosition);
                 bookingPosition.UpdatedAt = DateTimeHelper.UtcNow();
-                bookingPosition.UpdatedBy = request.UpdatedBy;
 
                 bookingPositionSqlRepository.Update(bookingPosition);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

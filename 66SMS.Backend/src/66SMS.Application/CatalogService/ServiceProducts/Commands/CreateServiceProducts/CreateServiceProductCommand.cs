@@ -12,7 +12,7 @@ namespace _66SMS.Application.CatalogService.ServiceProducts.Commands.CreateServi
         public string? Note { get; set; }
         public int Status { get; set; } = 1;
         [JsonIgnore]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
         [JsonIgnore]
         public int? CreatedBy { get; set; }
     }

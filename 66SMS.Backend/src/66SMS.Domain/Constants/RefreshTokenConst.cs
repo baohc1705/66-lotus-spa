@@ -13,9 +13,6 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_REVOKED_BY_IP = "revoked_by_ip";
         public const string FIELD_REVOKED_AT = "revoked_at";
         public const string FIELD_CREATED_AT = "created_at";
-        public const string FIELD_CREATED_BY = "created_by";
-        public const string FIELD_UPDATED_AT = "updated_at";
-        public const string FIELD_UPDATED_BY = "updated_by";
         #endregion
 
         #region Constraint

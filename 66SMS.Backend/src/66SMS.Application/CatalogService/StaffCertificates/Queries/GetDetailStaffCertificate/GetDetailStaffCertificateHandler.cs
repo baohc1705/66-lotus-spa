@@ -40,9 +40,7 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Queries.GetDetailS
                     Note = x.Note,
                     Status = x.Status,
                     CreatedAt = x.CreatedAt.ToString(),
-                    CreatedBy = x.CreatedBy,
                     UpdatedAt = x.UpdatedAt.ToString(),
-                    UpdatedBy = x.UpdatedBy,
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

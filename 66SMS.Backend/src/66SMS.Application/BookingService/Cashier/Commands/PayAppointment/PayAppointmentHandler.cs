@@ -151,6 +151,9 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.PayAppointment
                     CreatedAt = DateTime.UtcNow
                 });
 
+                appointment.UpdatedAt = DateTime.UtcNow;
+                appointment.UpdatedBy = request.UserId;
+
                 appointmentSqlRepository.Update(appointment);
                 
                 // Gọi service để cộng điểm và kiểm tra tự động nâng hạng thẻ thành viên

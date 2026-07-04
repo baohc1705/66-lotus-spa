@@ -25,7 +25,6 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Commands.DeleteWorkSch
             {
                 workSchedule.Status = _66SMS.Domain.Constants.WorkScheduleConst.STATUS_DELETED;
                 workSchedule.UpdatedAt = DateTime.UtcNow;
-                workSchedule.UpdatedBy = request.UpdatedBy;
                 workScheduleSqlRepository.Update(workSchedule);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();

@@ -95,13 +95,9 @@ namespace _66SMS.API.Controllers
         /// <returns>Danh sách ID của các lịch hẹn vừa tạo.</returns>
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> CreateAppointment([FromBody] List<GuestAppointmentDto> guests)
+        public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentCommand command)
         {
-            var command = new CreateAppointmentCommand
-            {
-                Guests = guests,
-                CreatedByUserId = jwtService.GetUserId()
-            };
+            command.CreatedByUserId = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }

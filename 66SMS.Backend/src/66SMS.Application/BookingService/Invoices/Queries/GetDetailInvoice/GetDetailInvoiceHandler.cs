@@ -70,6 +70,8 @@ namespace _66SMS.Application.BookingService.Invoices.Queries.GetDetailInvoice
                             StaffName = i.Staff != null ? i.Staff.FullName : null,
                             Note = i.Note,
                             Status = i.Status,
+                            CommissionRate = i.CommissionRate,
+                            CommissionAmount = i.CommissionAmount,
                         }).ToList() : null,
                 })
                 .FirstOrDefaultAsync(cancellationToken);

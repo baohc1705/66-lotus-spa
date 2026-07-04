@@ -29,7 +29,6 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Commands.UpdateWorkSch
 
             mapper.Map(request, workSchedule);
             workSchedule.UpdatedAt = DateTime.UtcNow;
-            workSchedule.UpdatedBy = request.UpdatedBy;
 
             bool isDuplicate = await workScheduleSqlRepository.AnyAsync(x => x.Id != request.Id && x.StaffId == workSchedule.StaffId && x.ShiftPeriodId == workSchedule.ShiftPeriodId && x.WorkDate == workSchedule.WorkDate, cancellationToken);
             if (isDuplicate)

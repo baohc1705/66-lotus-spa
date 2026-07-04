@@ -16,17 +16,20 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
         private readonly IPayrollSqlRepository payrollRepository;
         private readonly IAttendanceSqlRepository attendanceRepository;
         private readonly IStaffSqlRepository staffRepository;
+        private readonly IInvoiceSqlRepository invoiceRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
 
         public GeneratePayrollHandler(
             IPayrollSqlRepository payrollRepository,
             IAttendanceSqlRepository attendanceRepository,
             IStaffSqlRepository staffRepository,
+            IInvoiceSqlRepository invoiceRepository,
             ISqlUnitOfWork sqlUnitOfWork)
         {
             this.payrollRepository = payrollRepository;
             this.attendanceRepository = attendanceRepository;
             this.staffRepository = staffRepository;
+            this.invoiceRepository = invoiceRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
         }
 
@@ -41,7 +44,7 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
             var excludeSaturday = request.ExcludeSaturday ?? PayrollConst.DEFAULT_EXCLUDE_SATURDAY;
 
             var attendances = await attendanceRepository
-                .AsQueryable()
+                .AsQueryable(asNoTracking: false)
                 .Include(x => x.WorkSchedule!)
                 .ThenInclude(w => w.ShiftPeriod)
                 .Where(x => x.StaffId == request.StaffId
@@ -49,7 +52,6 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
                     && x.WorkDate.Year == request.Year)
                 .ToListAsync(cancellationToken);
 
-            // Chỉ tính ca hoàn tất hoặc bản ghi nghỉ/phép/lễ do quản lý nhập.
             var relevantAttendances = attendances
                 .Where(a => AttendanceWorkCreditCalculator.IsManualStatus(a.Status)
                     || (a.CheckInAt.HasValue && a.CheckOutAt.HasValue))
@@ -71,9 +73,19 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
             if (standardWorkDays <= 0)
                 return Result<int>.BadRequest(PayrollConst.MSG_INVALID_STANDARD_DAYS, ErrorCodes.ERR_PAYROLL_INVALID_STANDARD_DAYS);
 
-            var totalAmount = salaryType == PayrollConst.SALARY_TYPE_HOURLY
+            var baseAmount = salaryType == PayrollConst.SALARY_TYPE_HOURLY
                 ? totalHours * rate
                 : PayrollCalculator.CalculateDailySalary(rate, standardWorkDays, totalWorkDays);
+
+            var commissionAmount = await invoiceRepository.AsQueryable(asNoTracking: true)
+                .Where(i => i.Status == InvoiceConst.STATUS_PAID
+                    && i.IssuedAt.Month == request.Month
+                    && i.IssuedAt.Year == request.Year)
+                .SelectMany(i => i.Items!)
+                .Where(item => item.StaffId == request.StaffId)
+                .SumAsync(item => item.CommissionAmount, cancellationToken);
+
+            var totalAmount = baseAmount + commissionAmount;
 
             var payroll = await payrollRepository
                 .AsQueryable(asNoTracking: false)
@@ -100,9 +112,11 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
                         Rate = rate,
                         TotalHours = totalHours,
                         TotalWorkDays = totalWorkDays,
+                        BaseAmount = baseAmount,
+                        CommissionAmount = commissionAmount,
                         TotalAmount = totalAmount,
                         Status = PayrollConst.STATUS_DRAFT,
-                        Note = BuildPayrollNote(standardWorkDays, excludeSaturday),
+                        Note = BuildPayrollNote(standardWorkDays, excludeSaturday, commissionAmount),
                         CreatedAt = DateTime.UtcNow,
                         CreatedBy = request.CreatedBy,
                     };
@@ -114,8 +128,10 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
                     payroll.Rate = rate;
                     payroll.TotalHours = totalHours;
                     payroll.TotalWorkDays = totalWorkDays;
+                    payroll.BaseAmount = baseAmount;
+                    payroll.CommissionAmount = commissionAmount;
                     payroll.TotalAmount = totalAmount;
-                    payroll.Note = MergePayrollNote(payroll.Note, standardWorkDays, excludeSaturday);
+                    payroll.Note = MergePayrollNote(payroll.Note, standardWorkDays, excludeSaturday, commissionAmount);
                     payroll.UpdatedAt = DateTime.UtcNow;
                     payroll.UpdatedBy = request.CreatedBy;
                     payrollRepository.Update(payroll);
@@ -132,15 +148,20 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
             }
         }
 
-        private static string BuildPayrollNote(int standardWorkDays, bool excludeSaturday)
+        private static string BuildPayrollNote(int standardWorkDays, bool excludeSaturday, decimal commissionAmount)
         {
             var weekendRule = excludeSaturday ? "T7+CN" : "CN";
-            return $"Ngày công chuẩn: {standardWorkDays} (trừ {weekendRule}).";
+            var commNote = commissionAmount > 0 ? $" Hoa hồng: {commissionAmount:N0}đ." : string.Empty;
+            return $"Ngày công chuẩn: {standardWorkDays} (trừ {weekendRule}).{commNote}";
         }
 
-        private static string? MergePayrollNote(string? existingNote, int standardWorkDays, bool excludeSaturday)
+        private static string? MergePayrollNote(
+            string? existingNote,
+            int standardWorkDays,
+            bool excludeSaturday,
+            decimal commissionAmount)
         {
-            var standardNote = BuildPayrollNote(standardWorkDays, excludeSaturday);
+            var standardNote = BuildPayrollNote(standardWorkDays, excludeSaturday, commissionAmount);
             if (string.IsNullOrWhiteSpace(existingNote))
                 return standardNote;
 

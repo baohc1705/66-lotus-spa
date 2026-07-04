@@ -21,9 +21,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.Status).HasColumnName(AttendanceConst.FIELD_STATUS);
             builder.Property(x => x.Note).HasColumnName(AttendanceConst.FIELD_NOTE).HasMaxLength(AttendanceConst.NOTE_MAX_LENGTH);
             builder.Property(x => x.CreatedAt).HasColumnName(AttendanceConst.FIELD_CREATED_AT);
-            builder.Property(x => x.CreatedBy).HasColumnName(AttendanceConst.FIELD_CREATED_BY);
             builder.Property(x => x.UpdatedAt).HasColumnName(AttendanceConst.FIELD_UPDATED_AT);
-            builder.Property(x => x.UpdatedBy).HasColumnName(AttendanceConst.FIELD_UPDATED_BY);
 
             builder.HasOne(x => x.Staff).WithMany().HasForeignKey(x => x.StaffId).IsRequired();
             builder.HasOne(x => x.Salon).WithMany().HasForeignKey(x => x.SalonId).IsRequired(false);

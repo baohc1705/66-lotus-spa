@@ -47,6 +47,11 @@ namespace _66SMS.Domain.Constants
         public const string MSG_PROMOTION_NOT_FOUND = "Không tìm thấy chương trình khuyến mãi.";
         public const string MSG_CODE_EXISTED = "Mã khuyến mãi đã tồn tại.";
         public const string MSG_INVALID = "Thông tin khuyến mãi không hợp lệ.";
+        public const string MSG_PROMOTION_EXPIRED = "Mã khuyến mãi đã hết hạn.";
+        public const string MSG_PROMOTION_INACTIVE = "Mã khuyến mãi không hoạt động.";
+        public const string MSG_PROMOTION_USAGE_LIMIT = "Mã khuyến mãi đã hết lượt sử dụng.";
+        public const string MSG_PROMOTION_MIN_ORDER = "Giá trị đơn hàng chưa đạt mức tối thiểu để áp mã.";
+        public const string MSG_PROMOTION_APPLY_SUCCESS = "Áp dụng mã khuyến mãi thành công.";
         #endregion
     }
 }

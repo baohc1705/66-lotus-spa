@@ -30,6 +30,9 @@ namespace _66SMS.Application.DTOs.Cashier
         public DateTime? DepositDeadlineAt { get; set; }
         public string? Note { get; set; }
         public decimal CustomerWalletBalance { get; set; }
+        public int? InvoiceId { get; set; }
+        public string? InvoiceCode { get; set; }
+        public decimal DiscountAmount { get; set; }
     }
 
     public class CashierDailyDto

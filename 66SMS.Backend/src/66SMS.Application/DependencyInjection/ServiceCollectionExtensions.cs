@@ -1,6 +1,7 @@
 using _66SMS.Application.Abstractions;
 using _66SMS.Application.Abstractions.Behaviors;
 using _66SMS.Application.BookingService.Helpers;
+using _66SMS.Application.SalonService.Helpers;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 

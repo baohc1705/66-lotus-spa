@@ -50,7 +50,6 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Commands.BulkCreateWor
                 {
                     var entity = mapper.Map<WorkSchedule>(schedule);
                     entity.CreatedAt = DateTime.UtcNow;
-                    entity.CreatedBy = request.CreatedBy ?? 1;
                     entity.Status = _66SMS.Domain.Constants.WorkScheduleConst.STATUS_ACTIVED;
                     validSchedules.Add(entity);
                 }

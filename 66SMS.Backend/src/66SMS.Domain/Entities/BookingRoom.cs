@@ -10,9 +10,7 @@ namespace _66SMS.Domain.Entities
         public string? Note { get; set; }
         public int Status { get; set; }
         public DateTime CreatedAt { get; set; }
-        public int? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public int? UpdatedBy { get; set; }
 
         public List<BookingPosition>? Positions { get; set; }
         public Salon? Salon { get; set; }

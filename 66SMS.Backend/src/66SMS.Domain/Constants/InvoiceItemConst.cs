@@ -16,6 +16,8 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_STAFF_ID = "staff_id";
         public const string FIELD_NOTE = "note";
         public const string FIELD_STATUS = "status";
+        public const string FIELD_COMMISSION_RATE = "commission_rate";
+        public const string FIELD_COMMISSION_AMOUNT = "commission_amount";
         #endregion
 
         #region Constraint

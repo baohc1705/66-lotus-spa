@@ -14,7 +14,9 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.UpdateAttendance
         private readonly IAttendanceSqlRepository attendanceRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
 
-        public UpdateAttendanceHandler(IAttendanceSqlRepository attendanceRepository, ISqlUnitOfWork sqlUnitOfWork)
+        public UpdateAttendanceHandler(
+            IAttendanceSqlRepository attendanceRepository,
+            ISqlUnitOfWork sqlUnitOfWork)
         {
             this.attendanceRepository = attendanceRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
@@ -44,7 +46,6 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.UpdateAttendance
             ApplyStatusSideEffects(attendance);
 
             attendance.UpdatedAt = DateTime.UtcNow;
-            attendance.UpdatedBy = request.UpdatedBy;
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try

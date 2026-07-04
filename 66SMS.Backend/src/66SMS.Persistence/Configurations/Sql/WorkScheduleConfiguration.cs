@@ -16,9 +16,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.StaffId).HasColumnName(WorkScheduleConst.FIELD_STAFF_ID);
             builder.Property(x => x.WorkDate).HasColumnName(WorkScheduleConst.FIELD_WORK_DATE);
             builder.Property(x => x.CreatedAt).HasColumnName(WorkScheduleConst.FIELD_CREATED_AT);
-            builder.Property(x => x.CreatedBy).HasColumnName(WorkScheduleConst.FIELD_CREATED_BY);
             builder.Property(x => x.UpdatedAt).HasColumnName(WorkScheduleConst.FIELD_UPDATED_AT);
-            builder.Property(x => x.UpdatedBy).HasColumnName(WorkScheduleConst.FIELD_UPDATED_BY);
 
             builder.HasOne(x => x.ShiftPeriod).WithMany(x => x.WorkSchedules).HasForeignKey(x => x.ShiftPeriodId).IsRequired();
             builder.HasOne(x => x.Staff).WithMany().HasForeignKey(x => x.StaffId).IsRequired();

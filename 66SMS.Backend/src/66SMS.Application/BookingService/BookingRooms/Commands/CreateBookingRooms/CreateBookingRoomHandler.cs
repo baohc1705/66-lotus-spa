@@ -32,7 +32,6 @@ namespace _66SMS.Application.BookingService.BookingRooms.Commands.CreateBookingR
             {
                 BookingRoom bookingRoom = mapper.Map<BookingRoom>(request);
                 bookingRoom.CreatedAt = DateTimeHelper.UtcNow();
-                bookingRoom.CreatedBy = request.CreatedBy ?? 1;
                 bookingRoom.Status = request.Status ?? _66SMS.Domain.Constants.BookingRoomConst.STATUS_ACTIVED;
 
                 bookingRoomSqlRepository.Add(bookingRoom);

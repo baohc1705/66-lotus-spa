@@ -22,6 +22,8 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.StaffId).HasColumnName(InvoiceItemConst.FIELD_STAFF_ID);
             builder.Property(x => x.Note).HasColumnName(InvoiceItemConst.FIELD_NOTE).HasMaxLength(InvoiceItemConst.NOTE_MAX_LENGTH);
             builder.Property(x => x.Status).HasColumnName(InvoiceItemConst.FIELD_STATUS);
+            builder.Property(x => x.CommissionRate).HasColumnName(InvoiceItemConst.FIELD_COMMISSION_RATE).HasColumnType("decimal(18, 0)");
+            builder.Property(x => x.CommissionAmount).HasColumnName(InvoiceItemConst.FIELD_COMMISSION_AMOUNT).HasColumnType("decimal(18, 0)");
 
             builder.HasOne(x => x.Invoice).WithMany(i => i.Items).HasForeignKey(x => x.InvoiceId).IsRequired(false);
             builder.HasOne(x => x.Staff).WithMany().HasForeignKey(x => x.StaffId).IsRequired(false);

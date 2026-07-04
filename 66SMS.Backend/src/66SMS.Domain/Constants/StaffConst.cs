@@ -58,6 +58,7 @@ namespace _66SMS.Domain.Constants
         public const string MSG_STAFF_NOT_FOUND = "Không tìm thấy nhân viên.";
         public const string MSG_STAFF_BOOKING_NOT_FOUND = "Lịch hẹn không tồn tại hoặc không thuộc về nhân viên này.";
         public const string MSG_STAFF_UPDATE_STATUS_SUCCESS = "Cập nhật trạng thái thành công.";
+        public const string MSG_KPI_INCOMPLETE = "Nếu cấu hình KPI thì phải nhập cả số lượng mục tiêu và tiền thưởng.";
         #endregion
     }
 }

@@ -9,9 +9,7 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_PERMISSION_ID = "permission_id";
         public const string FIELD_ASSIGNED_AT = "assigned_at";
         public const string FIELD_CREATED_AT = "created_at";
-        public const string FIELD_CREATED_BY = "created_by";
         public const string FIELD_UPDATED_AT = "updated_at";
-        public const string FIELD_UPDATED_BY = "updated_by";
         #endregion
 
         #region Message

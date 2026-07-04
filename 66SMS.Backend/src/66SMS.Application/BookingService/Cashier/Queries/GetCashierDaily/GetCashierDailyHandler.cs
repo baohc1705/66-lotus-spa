@@ -18,13 +18,20 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
         private readonly IStaffSqlRepository staffRepository;
         private readonly IWalletSqlRepository walletRepository;
         private readonly IStaffSalonSqlRepository staffSalonSqlRepository;
+        private readonly IInvoiceSqlRepository invoiceRepository;
 
-        public GetCashierDailyHandler(IAppointmentSqlRepository appointmentRepository, IStaffSqlRepository staffRepository, IWalletSqlRepository walletRepository, IStaffSalonSqlRepository staffSalonSqlRepository)
+        public GetCashierDailyHandler(
+            IAppointmentSqlRepository appointmentRepository,
+            IStaffSqlRepository staffRepository,
+            IWalletSqlRepository walletRepository,
+            IStaffSalonSqlRepository staffSalonSqlRepository,
+            IInvoiceSqlRepository invoiceRepository)
         {
             this.appointmentRepository = appointmentRepository;
             this.staffRepository = staffRepository;
             this.walletRepository = walletRepository;
             this.staffSalonSqlRepository = staffSalonSqlRepository;
+            this.invoiceRepository = invoiceRepository;
         }
 
         public async Task<Result<CashierDailyDto>> Handle(GetCashierDailyQuery request, CancellationToken cancellationToken)
@@ -79,6 +86,11 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
                 .Where(w => customerIds.Contains(w.CustomerId))
                 .ToDictionaryAsync(w => w.CustomerId, w => w.Balance, cancellationToken);
 
+            var appointmentIds = appointments.Select(a => a.Id).ToList();
+            var invoices = await invoiceRepository.AsQueryable(asNoTracking: true)
+                .Where(i => i.AppointmentId.HasValue && appointmentIds.Contains(i.AppointmentId.Value) && i.Status != InvoiceConst.STATUS_CANCELLED)
+                .ToDictionaryAsync(i => i.AppointmentId!.Value, i => new { i.Id, i.InvoiceCode }, cancellationToken);
+
             dto.Bookings = appointments.Select(a => {
                 string statusStr = "pending";
                 switch(a.Status)
@@ -110,6 +122,12 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
                 var startTs = a.TimeSlot?.StartTime ?? new TimeOnly(0, 0);
                 var endTs = startTs.AddMinutes(durationMins);
 
+                invoices.TryGetValue(a.Id, out var invoiceInfo);
+
+                var serviceSubTotal = a.Services?.Sum(s => (s.PriceSnapshot) * s.Quantity) ?? 0m;
+                var discountAmt = serviceSubTotal - a.TotalAmount;
+                if (discountAmt < 0) discountAmt = 0;
+
                 return new CashierBookingDto
                 {
                     Id = a.Id.ToString(),
@@ -130,7 +148,10 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
                     DepositPaid = AppointmentPaymentCalculator.HasDepositPaid(a),
                     DepositDeadlineAt = a.DepositDeadlineAt,
                     Note = a.Note,
-                    CustomerWalletBalance = a.CreatedByUser?.Customer != null && walletBalances.TryGetValue(a.CreatedByUser.Customer.Id, out var balance) ? balance : 0m
+                    CustomerWalletBalance = a.CreatedByUser?.Customer != null && walletBalances.TryGetValue(a.CreatedByUser.Customer.Id, out var balance) ? balance : 0m,
+                    InvoiceId = invoiceInfo?.Id,
+                    InvoiceCode = invoiceInfo?.InvoiceCode,
+                    DiscountAmount = discountAmt
                 };
             }).ToList();
 

@@ -66,6 +66,9 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                     appointment.DepositDeadlineAt = now.AddHours(24);
 
                     appointment.Status = AppointmentConst.STATUS_CONFIRMED;
+                    appointment.ConfirmedAt = now;
+                    appointment.UpdatedAt = now;
+                    appointment.UpdatedBy = request.UserId;
 
                     appointment.Histories ??= new List<AppointmentHistory>();
                     appointment.Histories.Add(new AppointmentHistory
@@ -88,6 +91,19 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                 var oldStatus = appointment.Status;
                 var paidBeforeCancel = appointment.PaidAmount;
                 appointment.Status = request.Status;
+
+                var nowTime = DateTime.UtcNow;
+                appointment.UpdatedAt = nowTime;
+                appointment.UpdatedBy = request.UserId;
+
+                if (request.Status == AppointmentConst.STATUS_CONFIRMED)
+                {
+                    appointment.ConfirmedAt = nowTime;
+                }
+                else if (request.Status == AppointmentConst.STATUS_COMPLETED)
+                {
+                    appointment.CompletedAt = nowTime;
+                }
 
                 // Xử lý hoàn tiền khi Hủy (Cancel)
                 if (request.Status == AppointmentConst.STATUS_CANCELLED && paidBeforeCancel > 0)

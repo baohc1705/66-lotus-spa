@@ -21,9 +21,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.Note).HasColumnName(AppointmentPaymentConst.FIELD_NOTE).HasMaxLength(AppointmentPaymentConst.NOTE_MAX_LENGTH);
             builder.Property(x => x.Status).HasColumnName(AppointmentPaymentConst.FIELD_STATUS);
             builder.Property(x => x.CreatedAt).HasColumnName(AppointmentPaymentConst.FIELD_CREATED_AT);
-            builder.Property(x => x.CreatedBy).HasColumnName(AppointmentPaymentConst.FIELD_CREATED_BY);
             builder.Property(x => x.UpdatedAt).HasColumnName(AppointmentPaymentConst.FIELD_UPDATED_AT);
-            builder.Property(x => x.UpdatedBy).HasColumnName(AppointmentPaymentConst.FIELD_UPDATED_BY);
             builder.HasOne(x => x.Appointment).WithMany(x => x.Payments).HasForeignKey(x => x.AppointmentId).IsRequired(false);
             builder.ToTable(AppointmentPaymentConst.TABLE_NAME);
         }

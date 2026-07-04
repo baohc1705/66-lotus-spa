@@ -12,6 +12,8 @@ namespace _66SMS.Domain.Entities
         public decimal Rate { get; set; }
         public decimal TotalHours { get; set; }
         public decimal TotalWorkDays { get; set; }
+        public decimal BaseAmount { get; set; }
+        public decimal CommissionAmount { get; set; }
         public decimal TotalAmount { get; set; }
         public int Status { get; set; }
         public string? Note { get; set; }

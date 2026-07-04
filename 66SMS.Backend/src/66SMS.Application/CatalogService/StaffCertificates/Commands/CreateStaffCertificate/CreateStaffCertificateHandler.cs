@@ -51,7 +51,6 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.CreateSta
                 Note = request.Note,
                 Status = request.Status ?? StaffCertificateConst.STATUS_PENDING_VERIFICATION,
                 CreatedAt = request.CreatedAt ?? DateTime.UtcNow,
-                CreatedBy = request.CreatedBy,
             };
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);

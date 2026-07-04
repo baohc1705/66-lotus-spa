@@ -13,6 +13,8 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_RATE = "rate";
         public const string FIELD_TOTAL_HOURS = "total_hours";
         public const string FIELD_TOTAL_WORK_DAYS = "total_work_days";
+        public const string FIELD_BASE_AMOUNT = "base_amount";
+        public const string FIELD_COMMISSION_AMOUNT = "commission_amount";
         public const string FIELD_TOTAL_AMOUNT = "total_amount";
         public const string FIELD_STATUS = "status";
         public const string FIELD_NOTE = "note";

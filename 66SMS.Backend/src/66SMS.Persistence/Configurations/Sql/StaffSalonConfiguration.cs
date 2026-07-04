@@ -18,9 +18,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.EndDate).HasColumnName(StaffSalonConst.FIELD_END_DATE);
             builder.Property(x => x.Status).HasColumnName(StaffSalonConst.FIELD_STATUS);
             builder.Property(x => x.CreatedAt).HasColumnName(StaffSalonConst.FIELD_CREATED_AT);
-            builder.Property(x => x.CreatedBy).HasColumnName(StaffSalonConst.FIELD_CREATED_BY);
             builder.Property(x => x.UpdatedAt).HasColumnName(StaffSalonConst.FIELD_UPDATED_AT);
-            builder.Property(x => x.UpdatedBy).HasColumnName(StaffSalonConst.FIELD_UPDATED_BY);
             builder.HasOne(x => x.Salon).WithMany(b => b.StaffSalons).HasForeignKey(x => x.SalonId).IsRequired(false);
             builder.HasOne(x => x.Staff).WithMany(s => s.StaffSalons).HasForeignKey(x => x.StaffId).IsRequired(false);
             builder.ToTable(StaffSalonConst.TABLE_NAME);

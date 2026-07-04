@@ -71,7 +71,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
                 AssignedAt = DateTimeHelper.UtcNow(),
                 AssignedBy = request.CreatedBy ?? 1,
                 CreatedAt = DateTimeHelper.UtcNow(),
-                CreatedBy = request.CreatedBy ?? 1
             };
             user.UserRoles = new List<UserRole> { userRole };
 
@@ -89,7 +88,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
                         SalonId = request.SalonId.Value,
                         StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
                         CreatedAt = DateTime.UtcNow,
-                        CreatedBy = request.CreatedBy,
                         Status = StaffSalonConst.STATUS_ACTIVE,
                     }
                 };

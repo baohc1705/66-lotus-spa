@@ -38,7 +38,6 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateStaffSalon
 
                 mapper.Map(request, staffSalon);
                 staffSalon.UpdatedAt = DateTimeHelper.UtcNow();
-                staffSalon.UpdatedBy = request.UpdatedBy;
 
                 staffSalonSqlRepository.Update(staffSalon);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

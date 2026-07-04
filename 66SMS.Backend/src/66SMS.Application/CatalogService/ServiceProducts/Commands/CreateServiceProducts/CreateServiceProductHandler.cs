@@ -26,8 +26,7 @@ namespace _66SMS.Application.CatalogService.ServiceProducts.Commands.CreateServi
                 QuantityUsed = request.QuantityUsed,
                 Note = request.Note,
                 Status = request.Status,
-                CreatedAt = request.CreatedAt,
-                CreatedBy = request.CreatedBy
+                CreatedAt = request.CreatedAt ?? DateTime.UtcNow,
             };
 
             repository.Add(entity);

@@ -1,8 +1,11 @@
 using _66SMS.API.Abstractions;
 using _66SMS.Application.BookingService.Invoices.Commands.CancelInvoice;
 using _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice;
+using _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromAppointment;
+using _66SMS.Application.BookingService.Invoices.Commands.PayInvoice;
 using _66SMS.Application.BookingService.Invoices.Queries.GetAllInvoices;
 using _66SMS.Application.BookingService.Invoices.Queries.GetDetailInvoice;
+using _66SMS.Application.BookingService.Invoices.Queries.GetInvoicePreviewFromAppointment;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
@@ -56,6 +59,38 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> AdminGetAll([FromQuery] GetAllInvoicesQuery query)
         {
             var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        [HttpPost("from-appointment/{appointmentId}")]
+        [PermissionAuthorize("invoices", "create")]
+        public async Task<IActionResult> CreateFromAppointment(int appointmentId)
+        {
+            var command = new CreateInvoiceFromAppointmentCommand
+            {
+                AppointmentId = appointmentId,
+                CashierId = jwtService.GetUserId(),
+                CreatedBy = jwtService.GetUserId()
+            };
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpPost("{id}/pay")]
+        [PermissionAuthorize("invoices", "update")]
+        public async Task<IActionResult> PayInvoice(int id, [FromBody] PayInvoiceCommand command)
+        {
+            command.Id = id;
+            command.CashierId = jwtService.GetUserId();
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpGet("from-appointment/{appointmentId}/preview")]
+        [PermissionAuthorize("invoices", "read")]
+        public async Task<IActionResult> GetPreviewFromAppointment(int appointmentId)
+        {
+            var result = await mediator.Send(new GetInvoicePreviewFromAppointmentQuery { AppointmentId = appointmentId });
             return HandleResult(result);
         }
 

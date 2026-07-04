@@ -25,7 +25,8 @@ namespace _66SMS.Application.SalonService.Attendances.Queries.GetDetailAttendanc
                 .Include(x => x.Staff)
                 .Include(x => x.Salon)
                 .Include(x => x.WorkSchedule!)
-                .ThenInclude(w => w.ShiftPeriod)
+                .ThenInclude(w => w.ShiftPeriod!)
+                .ThenInclude(sp => sp.Shift)
                 .Where(x => x.Id == request.Id)
                 .FirstOrDefaultAsync(cancellationToken);
 

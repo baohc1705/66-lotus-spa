@@ -23,7 +23,7 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CreateManualAtten
         public async Task<Result<int>> Handle(CreateManualAttendanceCommand request, CancellationToken cancellationToken)
         {
             var exists = await attendanceRepository.AnyAsync(
-                x => x.StaffId == request.StaffId && x.WorkDate == request.WorkDate, cancellationToken);
+                x => x.StaffId == request.StaffId && x.WorkDate == (request.WorkDate ?? DateOnly.FromDateTime(DateTime.UtcNow)), cancellationToken);
             if (exists)
                 return Result<int>.Conflict(AttendanceConst.MSG_DUPLICATE, ErrorCodes.ERR_ATTENDANCE_DUPLICATE);
 
@@ -31,12 +31,11 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CreateManualAtten
             {
                 StaffId = request.StaffId,
                 SalonId = request.SalonId,
-                WorkDate = request.WorkDate,
+                WorkDate = request.WorkDate ?? DateOnly.FromDateTime(DateTime.UtcNow),
                 Status = request.Status,
                 WorkedHours = 0,
                 Note = request.Note,
                 CreatedAt = DateTime.UtcNow,
-                CreatedBy = request.CreatedBy,
             };
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);

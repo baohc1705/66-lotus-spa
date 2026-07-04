@@ -6,6 +6,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
     public class CreateAppointmentCommand : IRequest<Result<List<int>>>
     {
         public int? CreatedByUserId { get; set; }
+        public string? PromotionCode { get; set; }
         public List<GuestAppointmentDto> Guests { get; set; } = new();
     }
 

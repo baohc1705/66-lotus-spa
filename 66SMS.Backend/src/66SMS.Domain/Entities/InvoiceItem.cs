@@ -15,6 +15,8 @@ namespace _66SMS.Domain.Entities
         public int? StaffId { get; set; }
         public string? Note { get; set; }
         public int Status { get; set; }
+        public decimal? CommissionRate { get; set; }
+        public decimal CommissionAmount { get; set; }
 
         public Invoice? Invoice { get; set; }
         public Staff? Staff { get; set; }

@@ -51,7 +51,6 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateManagerStat
                     em.EndDate = DateOnly.FromDateTime(DateTime.UtcNow);
                     em.Status = StaffSalonConst.STATUS_INACTIVE;
                     em.UpdatedAt = DateTimeHelper.UtcNow();
-                    em.UpdatedBy = request.CreatedBy ?? 1;
                     staffSalonSqlRepository.Update(em);
                 }
 
@@ -67,7 +66,6 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateManagerStat
                     existing.StartDate = DateOnly.FromDateTime(DateTime.UtcNow);
                     existing.EndDate = null;
                     existing.UpdatedAt = DateTimeHelper.UtcNow();
-                    existing.UpdatedBy = request.CreatedBy ?? 1;
                     staffSalonSqlRepository.Update(existing);
                 }
                 else
@@ -80,7 +78,6 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateManagerStat
                         StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
                         Status = StaffSalonConst.STATUS_ACTIVE,
                         CreatedAt = DateTimeHelper.UtcNow(),
-                        CreatedBy = request.CreatedBy ?? 1,
                     };
                     staffSalonSqlRepository.Add(staffSalon);
                 }
@@ -100,7 +97,6 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateManagerStat
                 staffSalon.EndDate = DateOnly.FromDateTime(DateTime.UtcNow);
                 staffSalon.Status = StaffSalonConst.STATUS_INACTIVE;
                 staffSalon.UpdatedAt = DateTimeHelper.UtcNow();
-                staffSalon.UpdatedBy = request.CreatedBy ?? 1;
                 staffSalonSqlRepository.Update(staffSalon);
 
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

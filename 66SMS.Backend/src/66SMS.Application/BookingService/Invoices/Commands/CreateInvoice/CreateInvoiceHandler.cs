@@ -95,6 +95,19 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
                     if (lineTotal < 0) lineTotal = 0;
                     subTotal += lineTotal;
 
+                    decimal? commissionRate = null;
+                    decimal commissionAmount = 0;
+
+                    if (i.StaffId.HasValue)
+                    {
+                        var service = await serviceRepository.FindByIdAsync(i.RefId!.Value, true, cancellationToken);
+                        if (service != null && service.CommissionRate.HasValue)
+                        {
+                            commissionRate = service.CommissionRate.Value;
+                            commissionAmount = Math.Round(lineTotal * (service.CommissionRate.Value / 100m), 0);
+                        }
+                    }
+
                     items.Add(new InvoiceItem
                     {
                         ItemType = i.ItemType!.Value,
@@ -107,6 +120,8 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
                         StaffId = i.StaffId,
                         Note = i.Note,
                         Status = InvoiceItemConst.STATUS_ACTIVE,
+                        CommissionRate = commissionRate,
+                        CommissionAmount = commissionAmount,
                     });
                 }
 
@@ -193,7 +208,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
 
                 var invoice = new Invoice
                 {
-                    InvoiceCode = $"HD-{request.IssuedAt:yyyyMMddHHmmssfff}",
+                    InvoiceCode = $"HD-{(request.IssuedAt ?? DateTime.UtcNow):yyyyMMddHHmmssfff}",
                     CustomerId = request.CustomerId,
                     CustomerName = request.CustomerName ?? customer?.FullName,
                     CustomerPhone = request.CustomerPhone ?? customer?.Phone,
@@ -215,8 +230,8 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
                     TransactionId = request.TransactionId,
                     Status = status,
                     Note = request.Note,
-                    IssuedAt = request.IssuedAt,
-                    CreatedAt = request.IssuedAt,
+                    IssuedAt = request.IssuedAt ?? DateTime.UtcNow,
+                    CreatedAt = request.IssuedAt ?? DateTime.UtcNow,
                     CreatedBy = request.CreatedBy,
                     Items = items,
                 };

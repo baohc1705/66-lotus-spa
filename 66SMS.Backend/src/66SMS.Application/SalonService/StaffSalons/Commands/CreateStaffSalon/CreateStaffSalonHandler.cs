@@ -48,7 +48,6 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.CreateStaffSalon
 
                 StaffSalon staffSalon = mapper.Map<StaffSalon>(request);
                 staffSalon.CreatedAt = DateTimeHelper.UtcNow();
-                staffSalon.CreatedBy = request.CreatedBy ?? 1;
                 staffSalon.Status = request.Status ?? StaffSalonConst.STATUS_ACTIVE;
 
                 staffSalonSqlRepository.Add(staffSalon);

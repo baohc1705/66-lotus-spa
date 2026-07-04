@@ -72,7 +72,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
                             assignment.Status = StaffSalonConst.STATUS_INACTIVE;
                             assignment.EndDate = DateOnly.FromDateTime(DateTime.UtcNow);
                             assignment.UpdatedAt = DateTime.UtcNow;
-                            assignment.UpdatedBy = request.UpdatedBy;
                             staffSalonSqlRepository.Update(assignment);
                         }
 
@@ -84,7 +83,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
                             StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
                             Status = StaffSalonConst.STATUS_ACTIVE,
                             CreatedAt = DateTime.UtcNow,
-                            CreatedBy = request.UpdatedBy ?? 1
                         };
                         staffSalonSqlRepository.Add(newAssignment);
                         await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
@@ -138,7 +136,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
                             AssignedAt = DateTime.UtcNow,
                             AssignedBy = request.UpdatedBy ?? 1,
                             CreatedAt = DateTime.UtcNow,
-                            CreatedBy = request.UpdatedBy ?? 1
                         };
                         userRoleSqlRepository.Add(userRole);
                         await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

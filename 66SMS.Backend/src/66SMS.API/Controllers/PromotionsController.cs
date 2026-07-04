@@ -4,10 +4,12 @@ using _66SMS.Application.BookingService.Promotions.Commands.DeletePromotion;
 using _66SMS.Application.BookingService.Promotions.Commands.UpdatePromotion;
 using _66SMS.Application.BookingService.Promotions.Queries.GetAllPromotions;
 using _66SMS.Application.BookingService.Promotions.Queries.GetDetailPromotion;
+using _66SMS.Application.BookingService.Promotions.Queries.ValidatePromotionCode;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace _66SMS.API.Controllers
@@ -49,6 +51,14 @@ namespace _66SMS.API.Controllers
         {
             var command = new DeletePromotionCommand { Id = id, UpdatedBy = jwtService.GetUserId() };
             var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpGet("validate")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ValidateCode([FromQuery] ValidatePromotionCodeQuery query)
+        {
+            var result = await mediator.Send(query);
             return HandleResult(result);
         }
 

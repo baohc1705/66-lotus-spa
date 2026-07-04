@@ -22,9 +22,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.Note).HasColumnName(StaffCertificateConst.FIELD_NOTE).HasMaxLength(StaffCertificateConst.NOTE_MAX_LENGTH);
             builder.Property(x => x.Status).HasColumnName(StaffCertificateConst.FIELD_STATUS);
             builder.Property(x => x.CreatedAt).HasColumnName(StaffCertificateConst.FIELD_CREATED_AT);
-            builder.Property(x => x.CreatedBy).HasColumnName(StaffCertificateConst.FIELD_CREATED_BY);
             builder.Property(x => x.UpdatedAt).HasColumnName(StaffCertificateConst.FIELD_UPDATED_AT);
-            builder.Property(x => x.UpdatedBy).HasColumnName(StaffCertificateConst.FIELD_UPDATED_BY);
 
             builder.HasOne(x => x.Staff).WithMany().HasForeignKey(x => x.StaffId).IsRequired();
             builder.HasOne(x => x.CertificateType).WithMany(c => c.StaffCertificates).HasForeignKey(x => x.CertificateTypeId).IsRequired();

@@ -54,6 +54,8 @@ namespace _66SMS.Application.SalonService.Payrolls.Queries.GetAllPayrolls
                     Rate = x.Rate,
                     TotalHours = x.TotalHours,
                     TotalWorkDays = x.TotalWorkDays,
+                    BaseAmount = x.BaseAmount,
+                    CommissionAmount = x.CommissionAmount,
                     TotalAmount = x.TotalAmount,
                     Status = x.Status,
                     Note = x.Note,

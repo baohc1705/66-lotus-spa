@@ -7,6 +7,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Application.BookingService.Helpers;
 using System.Data;
 
 namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointment
@@ -19,9 +20,20 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
         private readonly IAppointmentSlotLockSqlRepository appointmentSlotLockSqlRepository;
         private readonly IStaffSqlRepository staffSqlRepository;
         private readonly ICustomerSqlRepository customerSqlRepository;
+        private readonly IWorkScheduleSqlRepository workScheduleSqlRepository;
+        private readonly IPromotionSqlRepository promotionSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
 
-        public CreateAppointmentHandler(IAppointmentSqlRepository appointmentSqlRepository, IServiceSqlRepository serviceSqlRepository, IBookingAvailabilityService bookingAvailabilityService, IAppointmentSlotLockSqlRepository appointmentSlotLockSqlRepository, IStaffSqlRepository staffSqlRepository, ICustomerSqlRepository customerSqlRepository, ISqlUnitOfWork sqlUnitOfWork)
+        public CreateAppointmentHandler(
+            IAppointmentSqlRepository appointmentSqlRepository,
+            IServiceSqlRepository serviceSqlRepository,
+            IBookingAvailabilityService bookingAvailabilityService,
+            IAppointmentSlotLockSqlRepository appointmentSlotLockSqlRepository,
+            IStaffSqlRepository staffSqlRepository,
+            ICustomerSqlRepository customerSqlRepository,
+            IWorkScheduleSqlRepository workScheduleSqlRepository,
+            IPromotionSqlRepository promotionSqlRepository,
+            ISqlUnitOfWork sqlUnitOfWork)
         {
             this.appointmentSqlRepository = appointmentSqlRepository;
             this.serviceSqlRepository = serviceSqlRepository;
@@ -29,6 +41,8 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             this.appointmentSlotLockSqlRepository = appointmentSlotLockSqlRepository;
             this.staffSqlRepository = staffSqlRepository;
             this.customerSqlRepository = customerSqlRepository;
+            this.workScheduleSqlRepository = workScheduleSqlRepository;
+            this.promotionSqlRepository = promotionSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
         }
 
@@ -41,6 +55,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             try
             {
                 var appointmentIds = new List<int>();
+                var createdAppointments = new List<Appointment>();
 
                 // Lấy thông tin khách hàng và thẻ thành viên để tính giảm giá chung cho các lịch hẹn
                 var customer = await customerSqlRepository.AsQueryable(asNoTracking: true)
@@ -72,6 +87,10 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
 
                         // Nếu Lock hợp lệ -> Bỏ qua thuật toán tìm Staff, dùng luôn thông tin đã chốt trong Lock
                         staffId = validLock.StaffId;
+
+                        var schedule = await workScheduleSqlRepository.AsQueryable()
+                            .FirstOrDefaultAsync(x => x.StaffId == staffId && x.WorkDate == validLock.AppointmentDate && x.Status == WorkScheduleConst.STATUS_ACTIVED, cancellationToken);
+                        scheduleId = schedule?.Id;
                     }
                     else
                     {
@@ -118,7 +137,8 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                             PriceSnapshot = serviceEntity.SellingPrice,
                             DurationSnapshot = serviceEntity.DurationMins,
                             Quantity = (int)reqService.Quantity!,
-                            Status = AppointmentServiceConst.STATUS_ACTIVE // Active
+                            Status = AppointmentServiceConst.STATUS_ACTIVE, // Active
+                            CreatedAt = DateTime.UtcNow
                         });
                         totalAmount += serviceEntity.SellingPrice * (int)reqService.Quantity;
                     }
@@ -147,12 +167,15 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         TotalAmount = totalAmount,
                         PaidAmount = 0,
                         Services = appointmentServices,
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
+                        CreatedBy = request.CreatedByUserId,
+                        DepositPercent = AppointmentPaymentCalculator.DefaultDepositPercent
                     };
 
                     appointmentSqlRepository.Add(appointment);
                     await appointmentSqlRepository.SaveChangeAsync(cancellationToken);
                     appointmentIds.Add(appointment.Id);
+                    createdAppointments.Add(appointment);
 
                     // Cập nhật trạng thái Lock thành "Released" (đã dùng thành công)
                     if (validLock != null)
@@ -163,6 +186,83 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         appointmentSlotLockSqlRepository.Update(validLock);
                         await appointmentSlotLockSqlRepository.SaveChangeAsync(cancellationToken);
                     }
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.PromotionCode) && createdAppointments.Any())
+                {
+                    var code = request.PromotionCode.Trim().ToUpper();
+                    var promo = await promotionSqlRepository.AsQueryable()
+                        .Where(p => p.Code == code && p.Status != PromotionConst.STATUS_DELETED)
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    if (promo == null)
+                    {
+                        transaction.Rollback();
+                        return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_NOT_FOUND, ErrorCodes.ERR_PROMOTION_NOT_FOUND);
+                    }
+
+                    if (promo.Status != PromotionConst.STATUS_ACTIVE)
+                    {
+                        transaction.Rollback();
+                        return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_INACTIVE, ErrorCodes.ERR_PROMOTION_INACTIVE);
+                    }
+
+                    var now = DateTime.UtcNow;
+                    if (promo.StartDate > now || promo.EndDate < now)
+                    {
+                        transaction.Rollback();
+                        return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_EXPIRED, ErrorCodes.ERR_PROMOTION_EXPIRED);
+                    }
+
+                    if (promo.UsageLimit.HasValue && promo.UsedCount >= promo.UsageLimit.Value)
+                    {
+                        transaction.Rollback();
+                        return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_USAGE_LIMIT, ErrorCodes.ERR_PROMOTION_USAGE_LIMIT);
+                    }
+
+                    decimal grandTotal = createdAppointments.Sum(a => a.TotalAmount);
+
+                    if (promo.MinOrderValue.HasValue && grandTotal < promo.MinOrderValue.Value)
+                    {
+                        transaction.Rollback();
+                        return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_MIN_ORDER, ErrorCodes.ERR_PROMOTION_MIN_ORDER);
+                    }
+
+                    decimal discount = 0m;
+                    if (promo.DiscountType == PromotionConst.DISCOUNT_TYPE_PERCENT)
+                    {
+                        var percent = promo.DiscountValue ?? 0m;
+                        discount = Math.Round(grandTotal * percent / 100m, 0, MidpointRounding.AwayFromZero);
+                        if (promo.MaxDiscountAmount.HasValue && discount > promo.MaxDiscountAmount.Value)
+                        {
+                            discount = promo.MaxDiscountAmount.Value;
+                        }
+                    }
+                    else if (promo.DiscountType == PromotionConst.DISCOUNT_TYPE_FIXED)
+                    {
+                        discount = promo.DiscountValue ?? 0m;
+                        if (discount > grandTotal)
+                        {
+                            discount = grandTotal;
+                        }
+                    }
+
+                    if (discount > 0)
+                    {
+                        var firstApp = createdAppointments.First();
+                        firstApp.TotalAmount = Math.Max(0m, firstApp.TotalAmount - discount);
+                        
+                        firstApp.Note = string.IsNullOrWhiteSpace(firstApp.Note)
+                            ? $"[Đã áp dụng mã: {promo.Code} giảm {discount:N0}đ]"
+                            : $"{firstApp.Note} [Đã áp dụng mã: {promo.Code} giảm {discount:N0}đ]";
+
+                        appointmentSqlRepository.Update(firstApp);
+                        await appointmentSqlRepository.SaveChangeAsync(cancellationToken);
+                    }
+
+                    promo.UsedCount++;
+                    promotionSqlRepository.Update(promo);
+                    await promotionSqlRepository.SaveChangeAsync(cancellationToken);
                 }
 
                 transaction.Commit();

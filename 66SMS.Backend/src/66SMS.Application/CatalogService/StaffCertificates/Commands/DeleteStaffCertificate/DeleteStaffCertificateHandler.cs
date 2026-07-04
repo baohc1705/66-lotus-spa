@@ -31,7 +31,6 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.DeleteSta
             {
                 entity.Status = StaffCertificateConst.STATUS_DELETED;
                 entity.UpdatedAt = DateTime.UtcNow;
-                entity.UpdatedBy = request.UpdatedBy;
                 staffCertificateRepository.Update(entity);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
