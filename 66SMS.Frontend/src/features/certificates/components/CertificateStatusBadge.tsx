@@ -1,4 +1,5 @@
 import { Badge } from '@/shared/components/ui/badge'
+import { formatDisplayDate } from '@/shared/utils/date.utils'
 
 interface Props {
   status?: number
@@ -36,10 +37,10 @@ export function ExpiryBadge({ expiryDate }: { expiryDate?: string }) {
   const diffDays = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
   if (diffDays < 0) {
-    return <span className="text-[12px] font-medium text-red-600">{expiryDate.slice(0, 10)} (Hết hạn)</span>
+    return <span className="text-[12px] font-medium text-red-600">{formatDisplayDate(expiryDate)} (Hết hạn)</span>
   }
   if (diffDays <= 30) {
-    return <span className="text-[12px] font-medium text-yellow-600">{expiryDate.slice(0, 10)} (còn {diffDays} ngày)</span>
+    return <span className="text-[12px] font-medium text-yellow-600">{formatDisplayDate(expiryDate)} (còn {diffDays} ngày)</span>
   }
-  return <span className="text-[12px] text-stone-600">{expiryDate.slice(0, 10)}</span>
+  return <span className="text-[12px] text-stone-600">{formatDisplayDate(expiryDate)}</span>
 }

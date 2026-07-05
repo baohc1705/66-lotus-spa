@@ -33,31 +33,6 @@ export interface StaffCertificateDTO {
   updatedBy?: number;
 }
 
-export interface CreateCertificateTypePayload {
-  code: string;
-  name: string;
-  description?: string;
-  sortOrder?: number;
-  status?: number;
-}
-
-export type UpdateCertificateTypePayload = Partial<CreateCertificateTypePayload>;
-
-export interface CreateStaffCertificatePayload {
-  staffId: number;
-  certificateTypeId: number;
-  certificateName: string;
-  certificateNumber?: string;
-  issuingOrganization: string;
-  issuedDate: string;
-  expiryDate?: string;
-  documentUrl?: string;
-  note?: string;
-  status?: number;
-}
-
-export type UpdateStaffCertificatePayload = Partial<Omit<CreateStaffCertificatePayload, 'staffId'>>;
-
 export interface CertificateTypeQueryParams extends PageRequest {
   status?: number;
   filter?: string;
@@ -69,3 +44,15 @@ export interface StaffCertificateQueryParams extends PageRequest {
   expiringInDays?: number;
   filter?: string;
 }
+
+export type {
+  CreateCertificateTypePayload,
+  UpdateCertificateTypePayload,
+  CertificateTypeFormValues,
+} from "../schemas/certificateType.schema";
+
+export type {
+  CreateStaffCertificatePayload,
+  UpdateStaffCertificatePayload,
+  StaffCertificateFormValues,
+} from "../schemas/staffCertificate.schema";

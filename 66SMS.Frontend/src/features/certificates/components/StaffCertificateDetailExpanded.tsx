@@ -1,6 +1,9 @@
 import { Pencil, ExternalLink, FileText } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
 import { CertificateStatusBadge, ExpiryBadge } from './CertificateStatusBadge'
+import { formatDisplayDate } from '@/shared/utils/date.utils'
+import { PermissionGate } from '@/shared/components/security/PermissionGate'
+import { CERTIFICATE_PERM } from '../constants/certificate.permissions'
 import type { StaffCertificateDTO } from '../types/certificate.types'
 
 interface Props {
@@ -8,12 +11,9 @@ interface Props {
   onEdit: () => void
 }
 
-function formatDate(value?: string) {
-  if (!value) return '—'
-  return value.slice(0, 10)
-}
-
 export function StaffCertificateDetailExpanded({ cert, onEdit }: Props) {
+  const perm = CERTIFICATE_PERM;
+
   return (
     <div className="p-4 bg-lotus-leaf-light/20">
       <div className="flex flex-col lg:flex-row gap-5">
@@ -57,17 +57,19 @@ export function StaffCertificateDetailExpanded({ cert, onEdit }: Props) {
               <h3 className="text-[15px] font-semibold text-lotus-deep">{cert.certificateName}</h3>
               <p className="text-[12px] text-lotus-stone mt-0.5">{cert.typeName}</p>
             </div>
-            <Button variant="outline" size="sm" onClick={onEdit} className="text-[12px] gap-1.5 shrink-0">
-              <Pencil className="w-3.5 h-3.5" />Chỉnh sửa
-            </Button>
+            <PermissionGate resource={perm.resource} action={perm.update}>
+              <Button variant="outline" size="sm" onClick={onEdit} className="text-[12px] gap-1.5 shrink-0">
+                <Pencil className="w-3.5 h-3.5" />Chỉnh sửa
+              </Button>
+            </PermissionGate>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
             <DetailField label="Nhân viên" value={cert.staffName} />
             <DetailField label="Số chứng chỉ" value={cert.certificateNumber} />
             <DetailField label="Tổ chức cấp" value={cert.issuingOrganization} />
-            <DetailField label="Ngày cấp" value={formatDate(cert.issuedDate)} />
-            <DetailField label="Ngày hết hạn" value={formatDate(cert.expiryDate)} />
+            <DetailField label="Ngày cấp" value={formatDisplayDate(cert.issuedDate)} />
+            <DetailField label="Ngày hết hạn" value={formatDisplayDate(cert.expiryDate)} />
             <div className="space-y-1">
               <p className="text-[11px] font-semibold text-lotus-stone uppercase tracking-wide">Trạng thái</p>
               <div className="flex flex-wrap items-center gap-2">
@@ -89,7 +91,12 @@ export function StaffCertificateDetailExpanded({ cert, onEdit }: Props) {
   )
 }
 
-function DetailField({ label, value }: { label: string; value?: string }) {
+interface DetailFieldProps {
+  label: string;
+  value?: string | null;
+}
+
+function DetailField({ label, value }: DetailFieldProps) {
   return (
     <div className="space-y-1">
       <p className="text-[11px] font-semibold text-lotus-stone uppercase tracking-wide">{label}</p>

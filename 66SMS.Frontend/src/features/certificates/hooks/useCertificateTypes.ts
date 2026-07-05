@@ -2,32 +2,35 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import { certificateApi } from "../api/certificate.api";
-import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type {
   CertificateTypeQueryParams,
   CreateCertificateTypePayload,
   UpdateCertificateTypePayload,
 } from "../types/certificate.types";
 import type { Result } from "@/shared/types/common.types";
+import { TOAST_MSG } from "@/shared/constants/toast.messages";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
 
-const KEYS = {
+const ENTITY = "loại chứng chỉ";
+
+const CERTIFICATE_TYPE_KEYS = {
   all: ["certificate-types"] as const,
-  lists: () => [...KEYS.all, "list"] as const,
-  list: (params: CertificateTypeQueryParams) => [...KEYS.lists(), params] as const,
-  details: () => [...KEYS.all, "detail"] as const,
-  detail: (id: number) => [...KEYS.details(), id] as const,
+  lists: () => [...CERTIFICATE_TYPE_KEYS.all, "list"] as const,
+  list: (params: CertificateTypeQueryParams) => [...CERTIFICATE_TYPE_KEYS.lists(), params] as const,
+  details: () => [...CERTIFICATE_TYPE_KEYS.all, "detail"] as const,
+  detail: (id: number) => [...CERTIFICATE_TYPE_KEYS.details(), id] as const,
 };
 
 export function useCertificateTypes(params: CertificateTypeQueryParams) {
   return useQuery({
-    queryKey: KEYS.list(params),
+    queryKey: CERTIFICATE_TYPE_KEYS.list(params),
     queryFn: () => certificateApi.getAllTypes(params),
   });
 }
 
 export function useCertificateTypeDetail(id: number | null) {
   return useQuery({
-    queryKey: KEYS.detail(id!),
+    queryKey: CERTIFICATE_TYPE_KEYS.detail(id!),
     queryFn: () => certificateApi.getDetailType(id!),
     enabled: id !== null && id > 0,
   });
@@ -40,14 +43,16 @@ export function useCreateCertificateType() {
       certificateApi.createType(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: KEYS.lists() });
-        toast.success("Tạo loại chứng chỉ thành công");
+        qc.invalidateQueries({ queryKey: CERTIFICATE_TYPE_KEYS.lists() });
+        toast.success(TOAST_MSG.createSuccess(ENTITY));
       } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+        toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: (error: AxiosError<Result<unknown>>) =>
-      toast.error(getErrorMessage(error)),
+    onError: (error: AxiosError<Result<unknown>>) => {
+      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("tạo", ENTITY);
+      toast.error(msg);
+    },
   });
 }
 
@@ -58,14 +63,16 @@ export function useUpdateCertificateType() {
       certificateApi.updateType(id, payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: KEYS.all });
-        toast.success("Cập nhật loại chứng chỉ thành công");
+        qc.invalidateQueries({ queryKey: CERTIFICATE_TYPE_KEYS.all });
+        toast.success(TOAST_MSG.updateSuccess(ENTITY));
       } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+        toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: (error: AxiosError<Result<unknown>>) =>
-      toast.error(getErrorMessage(error)),
+    onError: (error: AxiosError<Result<unknown>>) => {
+      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("cập nhật", ENTITY);
+      toast.error(msg);
+    },
   });
 }
 
@@ -75,13 +82,15 @@ export function useDeleteCertificateType() {
     mutationFn: (id: number) => certificateApi.deleteType(id),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: KEYS.all });
-        toast.success("Xóa loại chứng chỉ thành công");
+        qc.invalidateQueries({ queryKey: CERTIFICATE_TYPE_KEYS.all });
+        toast.success(TOAST_MSG.deleteSuccess(ENTITY));
       } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+        toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: (error: AxiosError<Result<unknown>>) =>
-      toast.error(getErrorMessage(error)),
+    onError: (error: AxiosError<Result<unknown>>) => {
+      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("xóa", ENTITY);
+      toast.error(msg);
+    },
   });
 }
