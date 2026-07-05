@@ -36,26 +36,9 @@ export interface CustomerProfileDto {
   source?: string;
 }
 
-// Request payloads
-export interface CreateUserRequest {
-  userName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  role?: string;
-}
+export type {
+  CreateUserPayload,
+  UpdateUserPayload,
+  UserFormValues,
+} from "../schemas/user.schema";
 
-export interface UpdateUserRequest {
-  id?: number;
-  username?: string;
-  email?: string;
-  isEmailConfirmed?: boolean;
-  accessFailedCount?: number;
-  status?: number;
-  logoutEnd?: string;
-}
-
-export interface DeleteUserRequest {
-  id?: number;
-  ids?: number[];
-}

@@ -2,7 +2,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useEffect } from 'react';
 
 import { useAuthStore } from '@/features/auth/stores/authStore';
-import { useGetMe } from '@/features/users/hooks/useGetMe';
+import { useGetMe } from '@/features/users';
 
 export const ProtectedRoute = () => {
   const accessToken = useAuthStore((s) => s.accessToken);

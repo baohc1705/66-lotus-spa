@@ -22,7 +22,7 @@ import { useEffect, useCallback } from "react";
 import { formatDisplayDate, parseToDateInput } from "@/shared/utils/date.utils";
 import { useMyMembershipCard } from "../hooks/useMembershipInfo";
 import { useUpdateCustomer } from "@/features/customers/hooks/useCustomers";
-import { useUpdateStaff } from "@/features/staffs/hooks/useStaffs";
+import { useUpdateStaffMutation } from "@/features/staffs/hooks/useStaffs";
 import { useQueryClient } from "@tanstack/react-query";
 import type { CustomerDto } from "@/features/customers/types/customer.types";
 import type { StaffDto } from "@/features/staffs/types/staff.types";
@@ -43,7 +43,7 @@ export function ProfileForm({
   const qc = useQueryClient();
   const updateProfile = useUpdateProfile();
   const updateCustomer = useUpdateCustomer();
-  const updateStaff = useUpdateStaff();
+  const updateStaff = useUpdateStaffMutation();
 
   const isCustomer = initialData?.profileType === "Customer";
   const isStaff = initialData?.profileType === "Staff";

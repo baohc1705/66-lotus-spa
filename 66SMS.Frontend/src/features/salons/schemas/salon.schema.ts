@@ -1,9 +1,10 @@
 import { z } from 'zod'
+import { VALIDATION_MSG } from '@/shared/constants/validation.messages'
 
 const salonBaseSchema = z.object({
-  code: z.string().min(1, 'Mã chi nhánh không được để trống').max(32, 'Tối đa 32 ký tự'),
-  name: z.string().min(1, 'Tên chi nhánh không được để trống').max(200, 'Tối đa 200 ký tự'),
-  phone: z.string().min(1, 'Số điện thoại không được để trống').max(20, 'Tối đa 20 ký tự'),
+  code: z.string().min(1, VALIDATION_MSG.required('Mã chi nhánh')).max(32, VALIDATION_MSG.max(32)),
+  name: z.string().min(1, VALIDATION_MSG.required('Tên chi nhánh')).max(200, VALIDATION_MSG.max(200)),
+  phone: z.string().min(1, VALIDATION_MSG.required('Số điện thoại')).max(20, VALIDATION_MSG.max(20)),
   email: z.string().email('Email không hợp lệ').max(200).optional().or(z.literal('')),
   streetAddress: z.string().max(200).optional().or(z.literal('')),
   provinceCode: z.string().max(20).optional().or(z.literal('')),
@@ -20,7 +21,7 @@ const salonBaseSchema = z.object({
 export const createSalonSchema = salonBaseSchema
 
 export const updateSalonSchema = salonBaseSchema.partial().extend({
-  name: z.string().min(1, 'Tên chi nhánh không được để trống').max(200).optional(),
+  name: z.string().min(1, VALIDATION_MSG.required('Tên chi nhánh')).max(200).optional(),
 })
 
 export type CreateSalonFormValues = z.infer<typeof createSalonSchema>

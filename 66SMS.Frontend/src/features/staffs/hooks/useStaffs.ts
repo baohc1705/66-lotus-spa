@@ -1,92 +1,107 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import type { AxiosError } from 'axios'
-import { staffApi } from '../api/staff.api'
-import { getErrorMessage } from '@/shared/utils/errorUtils'
-import type { PageRequest, Result } from '@/shared/types/common.types'
-import type { CreateStaffPayload, UpdateStaffPayload } from '../types/staff.types'
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import type { AxiosError } from "axios";
+import { staffApi } from "../api/staff.api";
+import { TOAST_MSG } from "@/shared/constants/toast.messages";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
+import type { PageRequest, Result } from "@/shared/types/common.types";
+import type { CreateStaffPayload, UpdateStaffPayload } from "../types/staff.types";
 
-const STAFF_KEYS = {
-  all: ['staffs'] as const,
-  lists: () => [...STAFF_KEYS.all, 'list'] as const,
-  list: (params: PageRequest & { salonId?: number | null; role?: string | null }) => [...STAFF_KEYS.lists(), params] as const,
-  details: () => [...STAFF_KEYS.all, 'detail'] as const,
+const ENTITY = "nhân viên";
+
+export const STAFF_KEYS = {
+  all: ["staffs"] as const,
+  lists: () => [...STAFF_KEYS.all, "list"] as const,
+  list: (params: PageRequest & { salonId?: number | null; role?: string | null }) =>
+    [...STAFF_KEYS.lists(), params] as const,
+  details: () => [...STAFF_KEYS.all, "detail"] as const,
   detail: (id: number) => [...STAFF_KEYS.details(), id] as const,
-}
+};
 
-/** Hook lấy danh sách nhân viên (phân trang, search, sort) */
-export function useStaffs(params: PageRequest & { salonId?: number | null; role?: string | null }) {
+export function useStaffs(
+  params: PageRequest & { salonId?: number | null; role?: string | null },
+  enabled = true
+) {
   return useQuery({
     queryKey: STAFF_KEYS.list(params),
     queryFn: () => staffApi.getAll(params),
-  })
+    enabled,
+  });
 }
 
-export function useAdminStaffs(params: PageRequest & { salonId?: number | null; role?: string | null }) {
+export function useAdminStaffs(
+  params: PageRequest & { salonId?: number | null; role?: string | null },
+  enabled = true
+) {
   return useQuery({
     queryKey: STAFF_KEYS.list(params),
     queryFn: () => staffApi.adminGetAll(params),
-  })
+    enabled,
+  });
 }
 
-
-/** Hook lấy chi tiết nhân viên */
 export function useStaffDetail(id: number | null) {
   return useQuery({
     queryKey: STAFF_KEYS.detail(id!),
     queryFn: () => staffApi.getDetail(id!),
     enabled: id !== null && id > 0,
-  })
+  });
 }
 
-/** Hook tạo nhân viên mới */
-export function useCreateStaff() {
-  const qc = useQueryClient()
+export function useCreateStaffMutation() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: CreateStaffPayload) => staffApi.create(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: STAFF_KEYS.lists() })
-        toast.success('Tạo nhân viên thành công')
+        qc.invalidateQueries({ queryKey: STAFF_KEYS.lists() });
+        toast.success(TOAST_MSG.createSuccess(ENTITY));
       } else {
-        toast.error(result.message || 'Không thể tạo nhân viên')
+        toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
-  })
+    onError: (error: AxiosError<Result<unknown>>) => {
+      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("tạo", ENTITY);
+      toast.error(msg);
+    },
+  });
 }
 
-/** Hook cập nhật nhân viên */
-export function useUpdateStaff() {
-  const qc = useQueryClient()
+export function useUpdateStaffMutation() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: UpdateStaffPayload }) =>
       staffApi.update(id, payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: STAFF_KEYS.all })
-        toast.success('Cập nhật nhân viên thành công')
+        qc.invalidateQueries({ queryKey: STAFF_KEYS.all });
+        toast.success(TOAST_MSG.updateSuccess(ENTITY));
       } else {
-        toast.error(result.message || 'Không thể cập nhật nhân viên')
+        toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
-  })
+    onError: (error: AxiosError<Result<unknown>>) => {
+      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("cập nhật", ENTITY);
+      toast.error(msg);
+    },
+  });
 }
 
-/** Hook xóa nhân viên */
-export function useDeleteStaff() {
-  const qc = useQueryClient()
+export function useDeleteStaffMutation() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => staffApi.delete(id),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: STAFF_KEYS.lists() })
-        toast.success('Xóa nhân viên thành công')
+        qc.invalidateQueries({ queryKey: STAFF_KEYS.lists() });
+        toast.success(TOAST_MSG.deleteSuccess(ENTITY));
       } else {
-        toast.error(result.message || 'Không thể xóa nhân viên')
+        toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
-  })
+    onError: (error: AxiosError<Result<unknown>>) => {
+      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("xóa", ENTITY);
+      toast.error(msg);
+    },
+  });
 }

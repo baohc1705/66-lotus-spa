@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { SearchableSelect } from "@/shared/components/ui/searchable-select";
-import { useCreateStaff, useUpdateStaff } from "../hooks/useStaffs";
+import { useCreateStaffMutation, useUpdateStaffMutation } from "../hooks/useStaffs";
 import { uploadApi } from "@/shared/api/upload.api";
 import { ImageUpload } from "@/shared/components/ImageUpload";
 import {
@@ -87,8 +87,8 @@ export function StaffFormDialog({
   const { data: rolesResult } = useGetAllRoles();
   const roles = rolesResult?.data ?? [];
 
-  const createMutation = useCreateStaff();
-  const updateMutation = useUpdateStaff();
+  const createMutation = useCreateStaffMutation();
+  const updateMutation = useUpdateStaffMutation();
   const isPending = createMutation.isPending || updateMutation.isPending;
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);

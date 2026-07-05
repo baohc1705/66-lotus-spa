@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { VALIDATION_MSG } from '@/shared/constants/validation.messages'
 
 // Regex patterns matching backend RegexConst
 const VIETNAM_PHONE_REGEX = /^(0[2-9]|84[2-9])\d{8}$/
@@ -9,17 +10,17 @@ const staffBaseSchema = z.object({
   salonId: z.coerce.number().optional(),
 
   // Thông tin cá nhân
-  fullName: z.string().min(1, 'Họ tên không được để trống').max(100, 'Tối đa 100 ký tự'),
-  phone: z.string().min(1, 'SĐT không được để trống').regex(VIETNAM_PHONE_REGEX, 'SĐT không hợp lệ'),
+  fullName: z.string().min(1, VALIDATION_MSG.required('Họ tên')).max(100, VALIDATION_MSG.max(100)),
+  phone: z.string().min(1, VALIDATION_MSG.required('SĐT')).regex(VIETNAM_PHONE_REGEX, 'SĐT không hợp lệ'),
   dateOfBirth: z.string().optional(),
   gender: z.coerce.number().min(0).optional(),
-  nationalId: z.string().max(20, 'Tối đa 20 ký tự').optional().or(z.literal('')),
+  nationalId: z.string().max(20, VALIDATION_MSG.max(20)).optional().or(z.literal('')),
   avatarUrl: z.string().max(500).optional().or(z.literal('')),
 
   // Thông tin công việc
   hireDate: z.string().optional(),
-  contractType: z.string().max(50, 'Tối đa 50 ký tự').optional().or(z.literal('')),
-  basicSalary: z.coerce.number().min(0, 'Lương phải >= 0').optional(),
+  contractType: z.string().max(50, VALIDATION_MSG.max(50)).optional().or(z.literal('')),
+  basicSalary: z.coerce.number().min(0, VALIDATION_MSG.notNegative('Lương')).optional(),
   salaryType: z.coerce.number().min(1).max(2).optional(),
   status: z.coerce.number().min(0).optional(),
   role: z.string().optional(),
@@ -44,4 +45,3 @@ export type CreateStaffFormData = z.infer<typeof createStaffSchema>
 
 // Unified type cho Frontend Form State
 export type StaffFormValues = CreateStaffFormData
-

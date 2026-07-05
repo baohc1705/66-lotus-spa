@@ -1,62 +1,48 @@
-import { useState, useCallback, useMemo } from "react";
-import { motion, type Variants } from "motion/react";
+import { useMemo } from "react";
 import {
   useReactTable,
   getCoreRowModel,
   getExpandedRowModel,
-  type ColumnDef,
-  type VisibilityState,
 } from "@tanstack/react-table";
-import {
-  Plus,
-  MoreHorizontal,
-  Pencil,
-  Trash2,
-  Building2,
-  Eye,
-} from "lucide-react";
+import { Plus, Building2 } from "lucide-react";
 import { DataTable } from "@/shared/components/DataTable/DataTable";
 import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
 import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
 import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
+import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { SalonFormDialog } from "../components/SalonFormDialog";
-import { SalonStatusBadge } from "../components/SalonStatusBadge";
 import { SalonDetailExpanded } from "../components/SalonDetailExpanded";
-import { useAdminSalons, useDeleteSalon } from "../hooks/useSalons";
-import type { SalonDTO } from "../types/salon.types";
+import { useAdminSalons, useDeleteSalonMutation } from "../hooks/useSalons";
+import { useSalonListState } from "../hooks/useSalonListState";
+import { useActiveSalonColumns, SALON_COLUMN_LABELS } from "../components/useActiveSalonColumns";
+import { SALON_PERM } from "../constants/salon.permissions";
+import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
 
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 15 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
-  },
-};
+const ENTITY = "chi nhánh";
 
 export function SalonListPage() {
-  const [pageIndex, setPageIndex] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [filter, setFilter] = useState("");
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-
-  const [createOpen, setCreateOpen] = useState(false);
-  const [editSalon, setEditSalon] = useState<SalonDTO | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<SalonDTO | null>(null);
+  const perm = SALON_PERM;
+  const listState = useSalonListState();
+  const {
+    pageIndex,
+    setPageIndex,
+    pageSize,
+    filter,
+    columnVisibility,
+    setColumnVisibility,
+    handlePageSizeChange,
+    handleSearchChange,
+    createOpen,
+    setCreateOpen,
+    editTarget,
+    setEditTarget,
+    deleteTarget,
+    setDeleteTarget,
+  } = listState;
 
   const {
     data: salonsResult,
@@ -68,23 +54,13 @@ export function SalonListPage() {
     keyword: filter || undefined,
   });
 
-  const deleteMutation = useDeleteSalon();
+  const deleteMutation = useDeleteSalonMutation();
 
   const paged = salonsResult?.data;
   const salons = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
 
-  const handlePageSizeChange = useCallback((size: number) => {
-    setPageSize(size);
-    setPageIndex(1);
-  }, []);
-
-  const handleSearchChange = useCallback((value: string) => {
-    setFilter(value);
-    setPageIndex(1);
-  }, []);
-
-  const handleDelete = useCallback(() => {
+  const handleConfirmDelete = () => {
     if (deleteTarget?.id) {
       deleteMutation.mutate(deleteTarget.id, {
         onSuccess: (result) => {
@@ -92,112 +68,16 @@ export function SalonListPage() {
         },
       });
     }
-  }, [deleteTarget, deleteMutation]);
+  };
 
-  const columns = useMemo<ColumnDef<SalonDTO>[]>(
-    () => [
-      {
-        id: "index",
-        header: "#",
-        cell: ({ row }) => (
-          <span className="text-lotus-stone">
-            {(pageIndex - 1) * pageSize + row.index + 1}
-          </span>
-        ),
-        size: 50,
-        enableResizing: false,
-      },
-      {
-        accessorKey: "code",
-        header: "Mã",
-        cell: ({ row }) => (
-          <span className="font-mono text-[12px] bg-stone-100 px-1.5 py-0.5 rounded text-lotus-deep">
-            {row.original.code}
-          </span>
-        ),
-        size: 100,
-      },
-      {
-        accessorKey: "name",
-        header: "Tên chi nhánh",
-        cell: ({ row }) => (
-          <span className="font-bold text-lotus-deep">{row.original.name}</span>
-        ),
-        size: 200,
-      },
-      {
-        accessorKey: "phone",
-        header: "Số điện thoại",
-        cell: ({ row }) => (
-          <span className="text-lotus-deep/80">{row.original.phone}</span>
-        ),
-        size: 130,
-      },
-      {
-        accessorKey: "fullAddress",
-        header: "Địa chỉ",
-        cell: ({ row }) => (
-          <span
-            className="text-lotus-deep/70 text-[12px] block truncate"
-            style={{ maxWidth: 250 }}
-            title={row.original.fullAddress}
-          >
-            {row.original.fullAddress || row.original.streetAddress || "—"}
-          </span>
-        ),
-        size: 260,
-      },
-      {
-        accessorKey: "status",
-        header: "Trạng thái",
-        cell: ({ row }) => <SalonStatusBadge status={row.original.status} />,
-        size: 120,
-      },
-      {
-        id: "actions",
-        header: "",
-        cell: ({ row }) => {
-          const salon = row.original;
-          return (
-            <div onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <MoreHorizontal className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => row.toggleExpanded()}>
-                    <Eye className="w-4 h-4 mr-2" />
-                    {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setEditSalon(salon)}>
-                    <Pencil className="w-4 h-4 mr-2" />
-                    Chỉnh sửa
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={() => setDeleteTarget(salon)}
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Xóa chi nhánh
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          );
-        },
-        size: 50,
-        enableResizing: false,
-      },
-    ],
-    [pageIndex, pageSize],
-  );
+  const columns = useActiveSalonColumns({
+    pageIndex,
+    pageSize,
+    onEdit: setEditTarget,
+    onDelete: setDeleteTarget,
+  });
+
+  const columnLabels = useMemo(() => ({ ...SALON_COLUMN_LABELS }), []);
 
   const table = useReactTable({
     data: salons,
@@ -212,16 +92,8 @@ export function SalonListPage() {
   });
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-      className="space-y-4"
-    >
-      <motion.div
-        variants={itemVariants}
-        className="bg-white/70 backdrop-blur-md rounded-admin border border-stone-200/30 overflow-hidden relative"
-      >
+    <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+      <div className="bg-white/70 backdrop-blur-md rounded-admin border border-stone-200/30 overflow-hidden relative">
         <div className="px-4 pt-4">
           <DataTableToolbar
             searchValue={filter}
@@ -230,23 +102,19 @@ export function SalonListPage() {
           >
             <DataTableViewOptions
               table={table}
-              columnLabels={{
-                code: "Mã",
-                name: "Tên chi nhánh",
-                phone: "Số điện thoại",
-                fullAddress: "Địa chỉ",
-                status: "Trạng thái",
-              }}
+              columnLabels={columnLabels}
             />
-            <Button
-              variant="admin"
-              size="sm"
-              onClick={() => setCreateOpen(true)}
-              className="text-[12px] gap-1.5"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Thêm chi nhánh
-            </Button>
+            <PermissionGate resource={perm.resource} action={perm.create} role={perm.role}>
+              <Button
+                variant="admin"
+                size="sm"
+                onClick={() => setCreateOpen(true)}
+                className="text-[12px] gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Thêm chi nhánh
+              </Button>
+            </PermissionGate>
           </DataTableToolbar>
         </div>
 
@@ -259,7 +127,7 @@ export function SalonListPage() {
             row.original.id ? (
               <SalonDetailExpanded
                 salonId={row.original.id}
-                onEdit={(salon) => setEditSalon(salon)}
+                onEdit={setEditTarget}
               />
             ) : null
           }
@@ -276,15 +144,17 @@ export function SalonListPage() {
                   Thêm chi nhánh để bắt đầu quản lý hệ thống.
                 </p>
               </div>
-              <Button
-                variant="admin"
-                size="sm"
-                onClick={() => setCreateOpen(true)}
-                className="mt-1 text-[12px]"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Thêm chi nhánh
-              </Button>
+              <PermissionGate resource={perm.resource} action={perm.create} role={perm.role}>
+                <Button
+                  variant="admin"
+                  size="sm"
+                  onClick={() => setCreateOpen(true)}
+                  className="mt-1 text-[12px]"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Thêm chi nhánh
+                </Button>
+              </PermissionGate>
             </div>
           }
           pagination={
@@ -302,22 +172,16 @@ export function SalonListPage() {
             ) : null
           }
         />
-
-        {isFetching && !isLoading && (
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-lotus-leaf/30 overflow-hidden">
-            <div className="h-full w-1/3 bg-lotus-leaf animate-[slide_1s_ease-in-out_infinite]" />
-          </div>
-        )}
-      </motion.div>
+      </div>
 
       <SalonFormDialog open={createOpen} onOpenChange={setCreateOpen} />
 
       <SalonFormDialog
-        open={!!editSalon}
+        open={!!editTarget}
         onOpenChange={(open) => {
-          if (!open) setEditSalon(null);
+          if (!open) setEditTarget(null);
         }}
-        salon={editSalon}
+        salon={editTarget}
       />
 
       <ConfirmDialog
@@ -325,13 +189,13 @@ export function SalonListPage() {
         onOpenChange={(open) => {
           if (!open) setDeleteTarget(null);
         }}
-        onConfirm={handleDelete}
-        title="Xóa chi nhánh"
-        description={`Bạn có chắc muốn xóa chi nhánh "${deleteTarget?.name ?? ""}"? Hành động này không thể hoàn tác.`}
-        confirmLabel="Xóa"
+        onConfirm={handleConfirmDelete}
+        title={CONFIRM_MSG.deleteTitle(ENTITY)}
+        description={CONFIRM_MSG.deleteDescription(ENTITY, deleteTarget?.name ?? "")}
+        confirmLabel={COMMON_MSG.delete}
         loading={deleteMutation.isPending}
         variant="danger"
       />
-    </motion.div>
+    </TablePageShell>
   );
 }

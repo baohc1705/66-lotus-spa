@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "motion/react";
-import { User, Lock, Loader2, Camera, Save, ArrowUp } from "lucide-react";
+import { User, Lock, Loader2, Camera, Save } from "lucide-react";
 import { useProfile } from "@/features/profile/hooks/useProfile";
 import { useUpdateProfile } from "@/features/profile/hooks/useUpdateProfile";
 import { useChangePassword } from "@/features/profile/hooks/useChangePassword";
-import { useStaffDetail, useUpdateStaff } from "@/features/staffs/hooks/useStaffs";
+import { useUpdateStaffMutation } from "@/features/staffs/hooks/useStaffs";
 import {
   profileSchema,
   changePasswordSchema,
@@ -23,14 +23,11 @@ export function AdminProfilePage() {
   const [activeTab, setActiveTab] = useState<"profile" | "security">("profile");
   const qc = useQueryClient();
   const { data: profile, isLoading, isError } = useProfile();
-  
   const isStaff = profile?.profileType === "Staff";
-  const staffId = profile?.staffInfo?.id;
-  const { data: staffDetailResult } = useStaffDetail(isStaff && staffId ? staffId : null);
-  const staffDetail = staffDetailResult?.data;
+
 
   const updateProfileMutation = useUpdateProfile();
-  const updateStaffMutation = useUpdateStaff();
+  const updateStaffMutation = useUpdateStaffMutation();
   const changePasswordMutation = useChangePassword();
 
   const isProfilePending = updateProfileMutation.isPending || updateStaffMutation.isPending;

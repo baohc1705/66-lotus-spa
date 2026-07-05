@@ -3,7 +3,7 @@ import { Calendar, Menu, X, Phone, User as UserIcon } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import logoUrl from "@/assets/logo-home.png";
 import { useAuthStore } from "@/features/auth/stores/authStore";
-import { useGetMe } from "@/features/users/hooks/useGetMe";
+import { useGetMe } from "@/features/users";
 
 const NAV_ITEMS = [
   { label: "Giới Thiệu", href: "#about" },

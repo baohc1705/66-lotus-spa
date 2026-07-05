@@ -24,7 +24,7 @@ import { Textarea } from '@/shared/components/ui/textarea'
 import { Info } from 'lucide-react'
 import { ImageUpload } from '@/shared/components/ImageUpload'
 import { uploadApi } from '@/shared/api/upload.api'
-import { useCreateSalon, useUpdateSalon } from '../hooks/useSalons'
+import { useCreateSalonMutation, useUpdateSalonMutation } from '../hooks/useSalons'
 import { useProvinces, useWardsByProvince } from '@/features/address/hooks/useAddress'
 import { SearchableSelect } from '@/shared/components/ui/searchable-select'
 import {
@@ -49,8 +49,8 @@ const STATUS_OPTIONS = [
 
 export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogProps) {
   const isEdit = !!salon
-  const createMutation = useCreateSalon()
-  const updateMutation = useUpdateSalon()
+  const createMutation = useCreateSalonMutation()
+  const updateMutation = useUpdateSalonMutation()
   const isPending = createMutation.isPending || updateMutation.isPending
   const [pendingFile, setPendingFile] = useState<File | null>(null)
   const [isUploading, setIsUploading] = useState(false)
