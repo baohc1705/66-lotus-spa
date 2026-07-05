@@ -1,35 +1,45 @@
 import { z } from "zod";
+import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
 const productBaseSchema = z.object({
-  categoryId: z.coerce.number().min(1, "Vui lòng chọn danh mục"),
+  categoryId: z.coerce
+    .number()
+    .min(1, VALIDATION_MSG.selectRequired("danh mục")),
   code: z
     .string()
-    .min(1, "Mã sản phẩm không được để trống")
-    .max(50, "Tối đa 50 ký tự"),
+    .min(1, VALIDATION_MSG.required("Mã sản phẩm"))
+    .max(50, VALIDATION_MSG.max(50)),
   name: z
     .string()
-    .min(1, "Tên sản phẩm không được để trống")
-    .max(100, "Tối đa 100 ký tự"),
+    .min(1, VALIDATION_MSG.required("Tên sản phẩm"))
+    .max(100, VALIDATION_MSG.max(100)),
   description: z
     .string()
-    .max(500, "Tối đa 500 ký tự")
+    .max(500, VALIDATION_MSG.max(500))
     .optional()
     .or(z.literal("")),
   content: z.string().optional().or(z.literal("")),
   unit: z
     .string()
-    .min(1, "Đơn vị tính không được để trống")
-    .max(20, "Tối đa 20 ký tự"),
-  costPrice: z.coerce.number().min(0, "Giá vốn không được âm"),
-  sellingPrice: z.coerce.number().min(0, "Giá bán không được âm").optional(),
-  stockQuantity: z.coerce.number().min(0, "Tồn kho không được âm"),
-  minStock: z.coerce.number().min(0, "Tồn kho tối thiểu không được âm"),
+    .min(1, VALIDATION_MSG.required("Đơn vị tính"))
+    .max(20, VALIDATION_MSG.max(20)),
+  costPrice: z.coerce.number().min(0, VALIDATION_MSG.notNegative("Giá vốn")),
+  sellingPrice: z.coerce
+    .number()
+    .min(0, VALIDATION_MSG.notNegative("Giá bán"))
+    .optional(),
+  stockQuantity: z.coerce
+    .number()
+    .min(0, VALIDATION_MSG.notNegative("Tồn kho")),
+  minStock: z.coerce
+    .number()
+    .min(0, VALIDATION_MSG.notNegative("Tồn kho tối thiểu")),
   status: z.coerce.number().min(0),
   images: z
     .array(
       z.object({
         id: z.number().optional(),
-        url: z.string().min(1, "Vui lòng nhập URL").or(z.literal("")),
+        url: z.string().min(1, VALIDATION_MSG.urlRequired).or(z.literal("")),
         isPrimary: z.boolean().default(false),
       }),
     )
@@ -37,9 +47,8 @@ const productBaseSchema = z.object({
 });
 
 export const createProductSchema = productBaseSchema;
-export const updateProductSchema = productBaseSchema;
+export const updateProductSchema = productBaseSchema.partial();
 
-export type CreateProductFormData = z.infer<typeof createProductSchema>;
-export type UpdateProductFormData = z.infer<typeof updateProductSchema>;
-
-export type ProductFormValues = UpdateProductFormData;
+export type CreateProductPayload = z.infer<typeof createProductSchema>;
+export type UpdateProductPayload = z.infer<typeof updateProductSchema>;
+export type ProductFormValues = CreateProductPayload;

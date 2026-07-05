@@ -2,45 +2,37 @@ import { productCategoryApi } from "@/features/product_categories/api/productCat
 import type { PageRequest } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { TOAST_MSG } from "@/shared/constants/toast.messages";
+import { StatusActive } from "@/shared/constants/status.enum";
 import type {
   CreateProductCategoryPayload,
   UpdateProductCategoryPayload,
-} from "../types/product_category.types";
+} from "../schemas/productCategory.schema";
 
-// ---------------------------------------------------------------------------
-// Query Key Factory
-// Tổ chức cache keys theo hierarchy để invalidate linh hoạt:
-//   all     → ["product-categories"]
-//   lists() → ["product-categories", "list"]
-//   list(p) → ["product-categories", "list", { page, pageSize, ... }]
-//   details()  → ["product-categories", "detail"]
-//   detail(id) → ["product-categories", "detail", 5]
-// ---------------------------------------------------------------------------
+const ENTITY = "danh mục";
+const ENTITY_ERROR = "danh mục sản phẩm";
+
 const PRODUCT_CATEGORY_KEYS = {
   all: ["product-categories"] as const,
   lists: () => [...PRODUCT_CATEGORY_KEYS.all, "list"] as const,
   list: (params: PageRequest) =>
     [...PRODUCT_CATEGORY_KEYS.lists(), params] as const,
+  deletedLists: () => [...PRODUCT_CATEGORY_KEYS.all, "deleted"] as const,
+  deletedList: (params: PageRequest) =>
+    [...PRODUCT_CATEGORY_KEYS.deletedLists(), params] as const,
   details: () => [...PRODUCT_CATEGORY_KEYS.all, "detail"] as const,
   detail: (id: number) => [...PRODUCT_CATEGORY_KEYS.details(), id] as const,
 };
 
-// ---------------------------------------------------------------------------
-// GET LIST — phân trang
-// queryKey thay đổi theo params → mỗi bộ params có cache riêng
-// ---------------------------------------------------------------------------
-export function useProductCategories(params: PageRequest) {
+export function useProductCategories(params: PageRequest, enabled = true) {
   return useQuery({
     queryKey: PRODUCT_CATEGORY_KEYS.list(params),
     queryFn: () => productCategoryApi.getAll(params),
+    enabled,
   });
 }
 
-// ---------------------------------------------------------------------------
-// GET DETAIL — theo id
-// enabled: chỉ gọi API khi id hợp lệ (không null, không âm/0)
-// id! — non-null assertion an toàn vì đã guard bằng enabled
-// ---------------------------------------------------------------------------
 export function useProductCategoryDetail(id: number | null) {
   return useQuery({
     queryKey: PRODUCT_CATEGORY_KEYS.detail(id!),
@@ -49,13 +41,6 @@ export function useProductCategoryDetail(id: number | null) {
   });
 }
 
-// ---------------------------------------------------------------------------
-// CREATE
-// onSuccess:
-//   - API trả isSuccess=true  → invalidate lists() để refetch danh sách
-//   - API trả isSuccess=false → hiện lỗi từ server (không throw nên không vào onError)
-// onError: lỗi network / exception thật sự
-// ---------------------------------------------------------------------------
 export function useCreateProductCategory() {
   const qc = useQueryClient();
   return useMutation({
@@ -63,24 +48,18 @@ export function useCreateProductCategory() {
       productCategoryApi.create(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        // Chỉ cần refetch list, detail chưa tồn tại nên không cần invalidate
         qc.invalidateQueries({ queryKey: PRODUCT_CATEGORY_KEYS.lists() });
-        toast.success("Tạo thành công");
+        toast.success(TOAST_MSG.createSuccess(ENTITY));
       } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+        toast.error(result.message || COMMON_MSG.error);
       }
     },
     onError: () => {
-      toast.error("Có lỗi xảy ra khi tạo danh mục sản phẩm");
+      toast.error(TOAST_MSG.actionError("tạo", ENTITY_ERROR));
     },
   });
 }
 
-// ---------------------------------------------------------------------------
-// UPDATE
-// mutationFn nhận object { id, payload } vì useMutation chỉ nhận 1 argument
-// onSuccess: invalidate all → refetch cả list lẫn detail vì data có thể thay đổi ở cả 2
-// ---------------------------------------------------------------------------
 export function useUpdateProductCategory() {
   const qc = useQueryClient();
   return useMutation({
@@ -93,23 +72,18 @@ export function useUpdateProductCategory() {
     }) => productCategoryApi.update(id, payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        // invalidate all thay vì lists() vì detail cache cũng bị stale sau khi update
         qc.invalidateQueries({ queryKey: PRODUCT_CATEGORY_KEYS.all });
-        toast.success("Cập nhật thành công");
+        toast.success(TOAST_MSG.updateSuccess(ENTITY));
       } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+        toast.error(result.message || COMMON_MSG.error);
       }
     },
     onError: () => {
-      toast.error("Có lỗi xảy ra khi cập nhật danh mục sản phẩm");
+      toast.error(TOAST_MSG.actionError("cập nhật", ENTITY_ERROR));
     },
   });
 }
 
-// ---------------------------------------------------------------------------
-// DELETE
-// onSuccess: invalidate all → item bị xóa khỏi list, detail cache cũng nên bị clear
-// ---------------------------------------------------------------------------
 export function useDeleteProductCategory() {
   const qc = useQueryClient();
   return useMutation({
@@ -117,13 +91,62 @@ export function useDeleteProductCategory() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: PRODUCT_CATEGORY_KEYS.all });
-        toast.success("Xóa thành công");
+        toast.success(TOAST_MSG.deleteSuccess(ENTITY));
       } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+        toast.error(result.message || COMMON_MSG.error);
       }
     },
     onError: () => {
-      toast.error("Có lỗi xảy ra khi xóa danh mục sản phẩm");
+      toast.error(TOAST_MSG.actionError("xóa", ENTITY_ERROR));
+    },
+  });
+}
+
+export function useDeleteProductCategoryMultiples() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (ids: number[]) =>
+      productCategoryApi.deleteMultiples({ ids }),
+    onSuccess: (result) => {
+      if (result.isSuccess) {
+        qc.invalidateQueries({ queryKey: PRODUCT_CATEGORY_KEYS.all });
+        toast.success(TOAST_MSG.bulkDeleteSuccess(ENTITY));
+      } else {
+        toast.error(result.message || COMMON_MSG.error);
+      }
+    },
+    onError: () => {
+      toast.error(TOAST_MSG.actionError("xóa", ENTITY));
+    },
+  });
+}
+
+export function useDeletedProductCategories(
+  params: PageRequest,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: PRODUCT_CATEGORY_KEYS.deletedList(params),
+    queryFn: () => productCategoryApi.getAllDeleted(params),
+    enabled,
+  });
+}
+
+export function useRestoreProductCategory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      productCategoryApi.update(id, { status: StatusActive.Active }),
+    onSuccess: (result) => {
+      if (result.isSuccess) {
+        qc.invalidateQueries({ queryKey: PRODUCT_CATEGORY_KEYS.all });
+        toast.success(TOAST_MSG.restoreSuccess(ENTITY));
+      } else {
+        toast.error(result.message || COMMON_MSG.error);
+      }
+    },
+    onError: () => {
+      toast.error(TOAST_MSG.actionError("khôi phục", ENTITY));
     },
   });
 }

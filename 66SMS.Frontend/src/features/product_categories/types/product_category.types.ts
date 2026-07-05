@@ -10,17 +10,12 @@ export interface ProductCategoryDTO {
   updatedBy?: number;
 }
 
-export interface CreateProductCategoryPayload {
-  name?: string;
-  description?: string;
-  sortOrder?: number;
-  status?: number;
+export interface DeleteProductCategoryMultiplesPayload {
+  ids: number[];
 }
 
-export interface UpdateProductCategoryPayload {
-  id?: number;
-  name?: string;
-  description?: string;
-  sortOrder?: number;
-  status?: number;
-}
+export type {
+  CreateProductCategoryPayload,
+  UpdateProductCategoryPayload,
+  ProductCategoryFormValues,
+} from "../schemas/productCategory.schema";

@@ -1,18 +1,7 @@
 import { useForm, type Resolver } from "react-hook-form";
-import {
-  useCreateProductCategory,
-  useUpdateProductCategory,
-} from "../hooks/useProductCategories";
-import type { ProductCategoryDTO } from "../types/product_category.types";
-import {
-  createProductCategorySchema,
-  updateProductCategorySchema,
-  type CreateProductCategoryPayload,
-  type ProductCategoryFormValues,
-  type UpdateProductCategoryPayload,
-} from "../schemas/productCategory.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
+import { Box } from "lucide-react";
 
 import {
   Dialog,
@@ -24,11 +13,24 @@ import {
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
 import { FormSection } from "@/shared/components/forms/FormSection";
-import { Box } from "lucide-react";
 import { FormField } from "@/shared/components/forms/FormField";
 import { Input } from "@/shared/components/ui/input";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { Switch } from "@/shared/components/ui/switch";
+import { StatusActive } from "@/shared/constants/status.enum";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
+
+import {
+  useCreateProductCategory,
+  useUpdateProductCategory,
+} from "../hooks/useProductCategories";
+import type { ProductCategoryDTO } from "../types/product_category.types";
+import {
+  createProductCategorySchema,
+  type CreateProductCategoryPayload,
+  type ProductCategoryFormValues,
+  type UpdateProductCategoryPayload,
+} from "../schemas/productCategory.schema";
 
 interface ProductCategoryFormDialogProps {
   open: boolean;
@@ -46,10 +48,9 @@ export function ProductCategoryFormDialog({
   const updateMutation = useUpdateProductCategory();
   const isPending = createMutation.isPending || updateMutation.isPending;
 
-  // Dynamic schema, form based on create vs edit
   const form = useForm<ProductCategoryFormValues>({
     resolver: zodResolver(
-      isEdit ? updateProductCategorySchema : createProductCategorySchema,
+      createProductCategorySchema,
     ) as Resolver<ProductCategoryFormValues>,
     defaultValues: getDefaultValues(productCategory),
   });
@@ -91,7 +92,6 @@ export function ProductCategoryFormDialog({
     }
   };
 
-  // Return ui
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[850px]">
@@ -109,7 +109,6 @@ export function ProductCategoryFormDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* Thông tin danh mục sản phẩm */}
           <FormSection icon={Box} title="Thông tin danh mục sản phẩm">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
               <FormField
@@ -144,8 +143,13 @@ export function ProductCategoryFormDialog({
               >
                 <div className="flex items-center h-9">
                   <Switch
-                    checked={watch("status") === 1}
-                    onCheckedChange={(checked) => setValue("status", checked ? 1 : 0)}
+                    checked={watch("status") === StatusActive.Active}
+                    onCheckedChange={(checked) =>
+                      setValue(
+                        "status",
+                        checked ? StatusActive.Active : StatusActive.Inactive,
+                      )
+                    }
                   />
                 </div>
               </FormField>
@@ -159,7 +163,6 @@ export function ProductCategoryFormDialog({
                   <Textarea
                     {...register("description")}
                     placeholder="Mô tả danh mục ở đây"
-                    className=""
                   />
                 </FormField>
               </div>
@@ -174,7 +177,7 @@ export function ProductCategoryFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Hủy
+              {COMMON_MSG.cancel}
             </Button>
             <Button type="submit" variant="admin" size="sm" loading={isPending}>
               {isEdit ? "Cập nhật" : "Tạo danh mục"}
@@ -186,9 +189,6 @@ export function ProductCategoryFormDialog({
   );
 }
 
-// Helper Component
-
-// Default values
 function getDefaultValues(
   productCategory?: ProductCategoryDTO | null,
 ): ProductCategoryFormValues {
@@ -197,13 +197,13 @@ function getDefaultValues(
       name: productCategory.name ?? "",
       description: productCategory.description ?? "",
       sortOrder: productCategory.sortOrder ?? 0,
-      status: productCategory.status ?? 0,
+      status: productCategory.status ?? StatusActive.Inactive,
     };
   }
   return {
     name: "",
     description: "",
     sortOrder: 0,
-    status: 0,
+    status: StatusActive.Inactive,
   };
 }

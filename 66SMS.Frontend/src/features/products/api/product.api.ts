@@ -9,26 +9,52 @@ import type {
   ProductDto,
   CreateProductPayload,
   UpdateProductPayload,
-  ProductCategoryDto,
   GetAllProductQuery,
+  DeleteProductMultiplesPayload,
   ProductImageDto,
   CreateProductImagePayload,
   UpdateProductImagePayload,
 } from "../types/product.types";
 
 const BASE_PRODUCT = API.products;
-const BASE_CATEGORY = API.productCategories;
 const BASE_IMAGE = API.productImages;
+
+function toAdminQuery(params: PageRequest): GetAllProductQuery {
+  return {
+    pageIndex: params.pageIndex,
+    pageSize: params.pageSize,
+    keyword: params.filter || undefined,
+    orderBy: params.orderBy,
+    isDescending: params.isDescending,
+  };
+}
 
 export const productApi = {
   getAll: (params: PageRequest) =>
     axiosInstance
-      .get<Result<PagedResult<ProductDto>>>(BASE_PRODUCT, { params })
+      .get<Result<PagedResult<ProductDto>>>(BASE_PRODUCT, {
+        params: {
+          pageIndex: params.pageIndex,
+          pageSize: params.pageSize,
+          keyword: params.filter || undefined,
+          orderBy: params.orderBy,
+          isDescending: params.isDescending,
+        },
+      })
       .then((r) => r.data),
 
-  adminGetAll: (params: GetAllProductQuery) =>
+  adminGetAll: (params: PageRequest) =>
     axiosInstance
-      .get<Result<PagedResult<ProductDto>>>(`${BASE_PRODUCT}/admin`, { params })
+      .get<Result<PagedResult<ProductDto>>>(`${BASE_PRODUCT}/admin`, {
+        params: toAdminQuery(params),
+      })
+      .then((r) => r.data),
+
+  getAllDeleted: (params: PageRequest) =>
+    axiosInstance
+      .get<Result<PagedResult<ProductDto>>>(`${BASE_PRODUCT}/deleted`, {
+        params: toAdminQuery(params),
+      })
       .then((r) => r.data),
 
   getDetail: (id: number) =>
@@ -50,14 +76,10 @@ export const productApi = {
     axiosInstance
       .delete<Result<object>>(`${BASE_PRODUCT}/${id}`)
       .then((r) => r.data),
-};
 
-export const productCategoryApi = {
-  getAll: (params?: PageRequest) =>
+  deleteMultiples: (payload: DeleteProductMultiplesPayload) =>
     axiosInstance
-      .get<
-        Result<PagedResult<ProductCategoryDto>>
-      >(BASE_CATEGORY, { params: params || { pageIndex: 1, pageSize: 100 } })
+      .delete<Result<object>>(`${BASE_PRODUCT}/bulk`, { data: payload })
       .then((r) => r.data),
 };
 

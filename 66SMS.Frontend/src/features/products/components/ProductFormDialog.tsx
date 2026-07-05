@@ -11,12 +11,6 @@ import {
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/shared/components/ui/tooltip";
 import {
   Select,
   SelectContent,
@@ -25,18 +19,21 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { Textarea } from "@/shared/components/ui/textarea";
+import { FormSection } from "@/shared/components/forms/FormSection";
+import { FormField } from "@/shared/components/forms/FormField";
+import { useProductCategories } from "@/features/product_categories/hooks/useProductCategories";
+import type { ProductCategoryDTO } from "@/features/product_categories/types/product_category.types";
 import {
   useCreateProduct,
   useUpdateProduct,
-  useProductCategories,
 } from "../hooks/useProducts";
 import {
   createProductSchema,
-  updateProductSchema,
+  type CreateProductPayload,
   type ProductFormValues,
 } from "../schemas/product.schema";
-
-import type { CreateProductPayload, ProductDto } from "../types/product.types";
+import type { ProductDto } from "../types/product.types";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
 import {
   Package,
   Tag,
@@ -48,6 +45,7 @@ import {
   X,
 } from "lucide-react";
 import { uploadApi } from "@/shared/api/upload.api";
+import { StatusActive } from "@/shared/constants/status.enum";
 
 interface ProductFormDialogProps {
   open: boolean;
@@ -56,8 +54,8 @@ interface ProductFormDialogProps {
 }
 
 const STATUS_OPTIONS = [
-  { value: "1", label: "Đang bán" },
-  { value: "0", label: "Ngừng bán" },
+  { value: String(StatusActive.Active), label: "Đang bán" },
+  { value: String(StatusActive.Inactive), label: "Ngừng bán" },
 ];
 
 export function ProductFormDialog({
@@ -70,17 +68,20 @@ export function ProductFormDialog({
   const updateMutation = useUpdateProduct();
   const isPending = createMutation.isPending || updateMutation.isPending;
   const [pendingFiles, setPendingFiles] = useState<Record<number, File>>({});
-  const [imagePreviews, setImagePreviews] = useState<Record<number, string>>({});
+  const [imagePreviews, setImagePreviews] = useState<Record<number, string>>(
+    {},
+  );
   const [isUploading, setIsUploading] = useState(false);
 
-  // Fetch categories for dropdown
-  const { data: categoriesResult } = useProductCategories();
-  const categories = categoriesResult?.data?.items || [];
+  const { data: categoriesResult } = useProductCategories({
+    pageIndex: 1,
+    pageSize: 500,
+  });
+  const categories = categoriesResult?.data?.items ?? [];
 
-  // Dynamic schema & form based on create vs edit
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(
-      isEdit ? updateProductSchema : createProductSchema,
+      createProductSchema,
     ) as Resolver<ProductFormValues>,
     defaultValues: getDefaultValues(product),
   });
@@ -105,7 +106,6 @@ export function ProductFormDialog({
     name: "images",
   });
 
-  // Reset form when dialog opens/closes or product changes
   useEffect(() => {
     if (open) {
       setPendingFiles({});
@@ -117,31 +117,39 @@ export function ProductFormDialog({
   const onSubmit = async (data: ProductFormValues) => {
     setIsUploading(true);
     try {
-      const images = (await Promise.all(
-        (data.images || []).map(async (img, index) => {
-          const file = pendingFiles[index];
-          let url = img.url || '';
-          if (file) {
-            const result = await uploadApi.uploadImage(file, 'product');
-            url = (result.isSuccess && result.data) ? result.data : '';
-          }
-          return {
-            id: img.id,
-            url,
-            isPrimary: !!img.isPrimary,
-          };
-        })
-      )).filter(img => img.url !== '');
+      const images = (
+        await Promise.all(
+          (data.images || []).map(async (img, index) => {
+            const file = pendingFiles[index];
+            let url = img.url || "";
+            if (file) {
+              const result = await uploadApi.uploadImage(file, "product");
+              url = result.isSuccess && result.data ? result.data : "";
+            }
+            return {
+              id: img.id,
+              url,
+              isPrimary: !!img.isPrimary,
+            };
+          }),
+        )
+      ).filter((img) => img.url !== "");
       const payload = { ...data, images };
 
       if (isEdit && product?.id) {
         updateMutation.mutate(
           { id: product.id, payload },
-          { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false); } },
+          {
+            onSuccess: (result) => {
+              if (result.isSuccess) onOpenChange(false);
+            },
+          },
         );
       } else {
         createMutation.mutate(payload as CreateProductPayload, {
-          onSuccess: (result) => { if (result.isSuccess) onOpenChange(false); },
+          onSuccess: (result) => {
+            if (result.isSuccess) onOpenChange(false);
+          },
         });
       }
     } finally {
@@ -164,7 +172,6 @@ export function ProductFormDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* === Section: Thông tin cơ bản === */}
           <FormSection icon={Package} title="Thông tin cơ bản">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
               <FormField
@@ -194,8 +201,11 @@ export function ProductFormDialog({
                     <SelectValue placeholder="Chọn danh mục" />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id.toString()}>
+                    {categories.map((cat: ProductCategoryDTO) => (
+                      <SelectItem
+                        key={cat.id}
+                        value={cat.id!.toString()}
+                      >
                         {cat.name}
                       </SelectItem>
                     ))}
@@ -212,7 +222,6 @@ export function ProductFormDialog({
             </div>
           </FormSection>
 
-          {/* === Section: Giá & Kho === */}
           <FormSection icon={Tag} title="Giá bán & Tồn kho">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
               <FormField label="Giá vốn *" error={errors.costPrice?.message}>
@@ -231,10 +240,7 @@ export function ProductFormDialog({
                   className="h-9 text-[13px]"
                 />
               </FormField>
-              <FormField
-                label="Tồn kho *"
-                error={errors.stockQuantity?.message}
-              >
+              <FormField label="Tồn kho *" error={errors.stockQuantity?.message}>
                 <Input
                   {...register("stockQuantity")}
                   type="number"
@@ -257,29 +263,39 @@ export function ProductFormDialog({
             </div>
           </FormSection>
 
-          {/* === Section: Hình ảnh sản phẩm === */}
           <FormSection icon={ImageIcon} title="Hình ảnh sản phẩm">
             <div className="flex flex-wrap gap-3">
               {imageFields.map((field, index) => {
                 const isPrimary = watch(`images.${index}.isPrimary`);
-                const preview = imagePreviews[index] || watch(`images.${index}.url`);
+                const preview =
+                  imagePreviews[index] || watch(`images.${index}.url`);
                 return (
-                  <div key={field.id} className="flex flex-col gap-1.5 w-[110px]">
-                    {/* Image zone */}
+                  <div
+                    key={field.id}
+                    className="flex flex-col gap-1.5 w-[110px]"
+                  >
                     <div className="relative group/card">
                       <button
                         type="button"
-                        onClick={() => document.getElementById(`product-img-${index}`)?.click()}
+                        onClick={() =>
+                          document
+                            .getElementById(`product-img-${index}`)
+                            ?.click()
+                        }
                         className={[
-                          'h-[88px] w-full rounded-lg overflow-hidden transition-all',
+                          "h-[88px] w-full rounded-lg overflow-hidden transition-all",
                           preview
-                            ? 'border border-stone-200 hover:border-lotus-leaf/60'
-                            : 'border-2 border-dashed border-stone-300 bg-stone-50 hover:border-lotus-leaf hover:bg-lotus-leaf/5',
-                        ].join(' ')}
+                            ? "border border-stone-200 hover:border-lotus-leaf/60"
+                            : "border-2 border-dashed border-stone-300 bg-stone-50 hover:border-lotus-leaf hover:bg-lotus-leaf/5",
+                        ].join(" ")}
                       >
                         {preview ? (
                           <>
-                            <img src={preview} alt="" className="h-full w-full object-cover" />
+                            <img
+                              src={preview}
+                              alt=""
+                              className="h-full w-full object-cover"
+                            />
                             <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/card:opacity-100 transition-opacity rounded-lg">
                               <Camera className="h-5 w-5 text-white" />
                             </div>
@@ -287,11 +303,12 @@ export function ProductFormDialog({
                         ) : (
                           <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-stone-400 group-hover/card:text-lotus-leaf transition-colors">
                             <ImageIcon className="h-6 w-6" />
-                            <span className="text-[10px] font-medium">Chọn ảnh</span>
+                            <span className="text-[10px] font-medium">
+                              Chọn ảnh
+                            </span>
                           </div>
                         )}
                       </button>
-                      {/* Remove */}
                       <button
                         type="button"
                         onClick={() => removeImage(index)}
@@ -299,7 +316,6 @@ export function ProductFormDialog({
                       >
                         <X className="h-3 w-3" />
                       </button>
-                      {/* Primary badge */}
                       {isPrimary && (
                         <div className="absolute bottom-1.5 left-1.5 bg-lotus-leaf text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none pointer-events-none">
                           Chính
@@ -312,36 +328,46 @@ export function ProductFormDialog({
                       className="hidden"
                       id={`product-img-${index}`}
                       onChange={(e) => {
-                        const file = e.target.files?.[0]
-                        if (!file) return
-                        setPendingFiles((prev: Record<number, File>) => ({ ...prev, [index]: file }))
-                        setImagePreviews((prev: Record<number, string>) => ({ ...prev, [index]: URL.createObjectURL(file) }))
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setPendingFiles((prev) => ({ ...prev, [index]: file }));
+                        setImagePreviews((prev) => ({
+                          ...prev,
+                          [index]: URL.createObjectURL(file),
+                        }));
                       }}
                     />
-                    {/* isPrimary star */}
                     <button
                       type="button"
                       onClick={() => {
-                        const imgs = getValues('images') || []
-                        imgs.forEach((_, i) => { if (i !== index) setValue(`images.${i}.isPrimary`, false) })
-                        setValue(`images.${index}.isPrimary`, !isPrimary)
+                        const imgs = getValues("images") || [];
+                        imgs.forEach((_, i) => {
+                          if (i !== index)
+                            setValue(`images.${i}.isPrimary`, false);
+                        });
+                        setValue(`images.${index}.isPrimary`, !isPrimary);
                       }}
                       className={[
-                        'flex items-center gap-1 text-[11px] font-medium transition-colors self-start',
-                        isPrimary ? 'text-lotus-leaf' : 'text-stone-400 hover:text-stone-600',
-                      ].join(' ')}
+                        "flex items-center gap-1 text-[11px] font-medium transition-colors self-start",
+                        isPrimary
+                          ? "text-lotus-leaf"
+                          : "text-stone-400 hover:text-stone-600",
+                      ].join(" ")}
                     >
-                      <Star className={`h-3 w-3 ${isPrimary ? 'fill-lotus-leaf' : ''}`} />
-                      {isPrimary ? 'Ảnh chính' : 'Đặt chính'}
+                      <Star
+                        className={`h-3 w-3 ${isPrimary ? "fill-lotus-leaf" : ""}`}
+                      />
+                      {isPrimary ? "Ảnh chính" : "Đặt chính"}
                     </button>
                   </div>
                 );
               })}
 
-              {/* Add card */}
               <button
                 type="button"
-                onClick={() => appendImage({ url: '', isPrimary: imageFields.length === 0 })}
+                onClick={() =>
+                  appendImage({ url: "", isPrimary: imageFields.length === 0 })
+                }
                 className="flex h-[88px] w-[110px] flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-stone-300 text-stone-400 transition-all hover:border-lotus-leaf hover:bg-lotus-leaf/5 hover:text-lotus-leaf self-start"
               >
                 <Plus className="h-5 w-5" />
@@ -350,7 +376,6 @@ export function ProductFormDialog({
             </div>
           </FormSection>
 
-          {/* === Section: Trạng thái & Chi tiết === */}
           <FormSection icon={Box} title="Trạng thái & Chi tiết">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
               <FormField label="Trạng thái">
@@ -359,7 +384,7 @@ export function ProductFormDialog({
                   onValueChange={(v) => setValue("status", Number(v))}
                 >
                   <SelectTrigger className="h-9 text-[13px]">
-                    <SelectValue placeholder="Chọn trạng thái" />
+                    <SelectValue placeholder="Trạng thái" />
                   </SelectTrigger>
                   <SelectContent>
                     {STATUS_OPTIONS.map((opt) => (
@@ -370,28 +395,30 @@ export function ProductFormDialog({
                   </SelectContent>
                 </Select>
               </FormField>
-              <FormField
-                label="Mô tả ngắn"
-                error={errors.description?.message}
-                className="sm:col-span-2"
-              >
-                <Textarea
-                  {...register("description")}
-                  placeholder="Mô tả ngắn gọn về sản phẩm..."
-                  className="text-[13px] min-h-[60px] resize-none"
-                />
-              </FormField>
-              <FormField
-                label="Nội dung chi tiết"
-                error={errors.content?.message}
-                className="sm:col-span-2"
-              >
-                <Textarea
-                  {...register("content")}
-                  placeholder="Bài viết chi tiết sản phẩm..."
-                  className="text-[13px] min-h-[100px]"
-                />
-              </FormField>
+              <div className="sm:col-span-2">
+                <FormField
+                  label="Mô tả ngắn"
+                  error={errors.description?.message}
+                >
+                  <Textarea
+                    {...register("description")}
+                    placeholder="Mô tả ngắn gọn về sản phẩm..."
+                    className="text-[13px] min-h-[60px] resize-none"
+                  />
+                </FormField>
+              </div>
+              <div className="sm:col-span-2">
+                <FormField
+                  label="Nội dung chi tiết"
+                  error={errors.content?.message}
+                >
+                  <Textarea
+                    {...register("content")}
+                    placeholder="Bài viết chi tiết sản phẩm..."
+                    className="text-[13px] min-h-[100px]"
+                  />
+                </FormField>
+              </div>
             </div>
           </FormSection>
 
@@ -403,9 +430,14 @@ export function ProductFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Hủy
+              {COMMON_MSG.cancel}
             </Button>
-            <Button type="submit" variant="admin" size="sm" loading={isPending || isUploading}>
+            <Button
+              type="submit"
+              variant="admin"
+              size="sm"
+              loading={isPending || isUploading}
+            >
               {isEdit ? "Cập nhật" : "Tạo sản phẩm"}
             </Button>
           </DialogFooter>
@@ -414,72 +446,6 @@ export function ProductFormDialog({
     </Dialog>
   );
 }
-
-// ---- Helper Components ----
-
-function FormSection({
-  icon: Icon,
-  title,
-  children,
-}: {
-  icon: React.ElementType;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-stone-100">
-        <Icon className="w-4 h-4 text-lotus-leaf" />
-        <h3 className="text-[13px] font-semibold text-lotus-deep">{title}</h3>
-      </div>
-      {children}
-    </div>
-  );
-}
-
-function FormField({
-  label,
-  error,
-  tooltip,
-  className,
-  children,
-}: {
-  label: string;
-  error?: string;
-  tooltip?: string;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  const isRequired = label.includes("*");
-  const cleanLabel = label.replace("*", "").trim();
-
-  return (
-    <div className={`space-y-1 ${className ?? ""}`}>
-      <Label className="flex items-center gap-1 text-[12px] font-semibold text-lotus-deep/80">
-        {cleanLabel}
-        {isRequired &&
-          (tooltip ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="text-red-500 cursor-help hover:text-red-600 focus:outline-none select-none">
-                  *
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="max-w-xs">{tooltip}</p>
-              </TooltipContent>
-            </Tooltip>
-          ) : (
-            <span className="text-red-500">*</span>
-          ))}
-      </Label>
-      {children}
-      {error && <p className="text-[11px] text-red-500 font-medium">{error}</p>}
-    </div>
-  );
-}
-
-// ---- Default Values ----
 
 function getDefaultValues(product?: ProductDto | null): ProductFormValues {
   if (product) {
@@ -504,7 +470,7 @@ function getDefaultValues(product?: ProductDto | null): ProductFormValues {
     };
   }
   return {
-    categoryId: 0, // Should force user to select
+    categoryId: 0,
     code: "",
     name: "",
     description: "",
@@ -514,7 +480,7 @@ function getDefaultValues(product?: ProductDto | null): ProductFormValues {
     sellingPrice: 0,
     stockQuantity: 0,
     minStock: 0,
-    status: 1,
+    status: StatusActive.Active,
     images: [],
   };
 }

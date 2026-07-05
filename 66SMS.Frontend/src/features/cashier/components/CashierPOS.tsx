@@ -23,7 +23,7 @@ import { useServices } from "@/features/services/hooks/useServices";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { useTreatmentCourses } from "@/features/treatment_courses/hooks/useTreatmentCourses";
 import { useServiceCategories } from "@/features/service_categories/hooks/useServiceCategories";
-import { useProductCategories } from "@/features/products/hooks/useProducts";
+import { useProductCategories } from "@/features/product_categories/hooks/useProductCategories";
 import { useCustomers } from "@/features/customers/hooks/useCustomers";
 import { useStaffs } from "@/features/staffs/hooks/useStaffs";
 import { useCreateInvoice } from "@/features/invoices/hooks/useInvoices";
@@ -170,7 +170,10 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
   });
   const serviceCats = serviceCatsResult?.data?.items ?? [];
 
-  const { data: productCatsResult } = useProductCategories();
+  const { data: productCatsResult } = useProductCategories({
+    pageIndex: 1,
+    pageSize: 500,
+  });
   const productCats = productCatsResult?.data?.items ?? [];
 
   const { data: staffsResult } = useStaffs({

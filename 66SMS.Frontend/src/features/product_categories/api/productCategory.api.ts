@@ -7,6 +7,7 @@ import type {
 } from "@/shared/types/common.types";
 import type {
   CreateProductCategoryPayload,
+  DeleteProductCategoryMultiplesPayload,
   ProductCategoryDTO,
   UpdateProductCategoryPayload,
 } from "../types/product_category.types";
@@ -39,4 +40,16 @@ export const productCategoryApi = {
   // Delete category
   delete: (id: number) =>
     axiosInstance.delete<Result<object>>(`${BASE}/${id}`).then((r) => r.data),
+
+  // Delete multiple categories
+  deleteMultiples: (payload: DeleteProductCategoryMultiplesPayload) =>
+    axiosInstance
+      .delete<Result<object>>(`${BASE}/bulk`, { data: payload })
+      .then((r) => r.data),
+
+  // Get All Deleted
+  getAllDeleted: (params: PageRequest) =>
+    axiosInstance
+      .get<Result<PagedResult<ProductCategoryDTO>>>(`${BASE}/deleted`, { params })
+      .then((r) => r.data),
 };
