@@ -4,6 +4,7 @@ using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
+using _66SMS.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,8 +25,8 @@ namespace _66SMS.Application.CatalogService.Products.Queries.GetDetailProduct
         public async Task<Result<ProductDto>> Handle(GetDetailProductQuery request, CancellationToken cancellationToken)
         {
             ProductDto? productDto = await productSqlRepository
-                .AsQueryable()
-                .Where(x => x.Id == request.Id)
+                .AsQueryable(true)
+                .Where(x => x.Id == request.Id && x.Status != (int)StatusActiveEnum.DELETED)
                 .Select(x => new ProductDto
                 {
                     Id = x.Id,
@@ -55,7 +56,7 @@ namespace _66SMS.Application.CatalogService.Products.Queries.GetDetailProduct
 
             if (productDto == null)
             {
-                return Result<ProductDto>.NotFound(ProductConst.MSG_PRODUCT_NOT_FOUND, ErrorCodes.ERR_PRODUCT_NOT_FOUND);
+                return Result<ProductDto>.NotFound(ProductConst.MSG_PRODUCT_ID_NOT_FOUND, ErrorCodes.ERR_PRODUCT_NOT_FOUND);
             }
 
             return Result<ProductDto>.Success(productDto);

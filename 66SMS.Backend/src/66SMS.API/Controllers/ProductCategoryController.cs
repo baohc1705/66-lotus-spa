@@ -1,5 +1,6 @@
 using _66SMS.API.Abstractions;
 using _66SMS.Application.CatalogService.ProductCategories.Commands.CreateProductCategories;
+using _66SMS.Application.CatalogService.ProductCategories.Commands.DeleteProductCategoryMultiples;
 using _66SMS.Application.CatalogService.ProductCategories.Commands.DeleteProductCategories;
 using _66SMS.Application.CatalogService.ProductCategories.Commands.UpdateProductCategories;
 using _66SMS.Application.CatalogService.ProductCategories.Queries.GetAllProductCategories;
@@ -54,10 +55,29 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
+        [HttpDelete("bulk")]
+        [PermissionAuthorize("products", "delete")]
+        public async Task<IActionResult> DeleteMultiples(
+            [FromBody] DeleteProductCategoryMultiplesCommand command)
+        {
+            command.UpdatedBy = jwtService.GetUserId();
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetAll([FromQuery] GetAllProductCategoryQuery query)
         {
+            var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        [HttpGet("deleted")]
+        [PermissionAuthorize("products","read")]
+        public async Task<IActionResult> GetAllDeleted([FromQuery] GetAllProductCategoryQuery query)
+        {
+            query.IsDeleted = true;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

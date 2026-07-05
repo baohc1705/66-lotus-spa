@@ -40,7 +40,7 @@ namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
                 Product product = mapper.Map<Product>(request);
                 product.Code = request.Code ?? GenerateProductCode();
 
-                if (request.Images != null && request.Images.Any())
+                if (request.Images.Count > 0)
                 {
                     product.Images = request.Images.Select(x => new ProductImage
                     {

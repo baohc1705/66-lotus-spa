@@ -30,7 +30,7 @@ namespace _66SMS.Application.CatalogService.ProductImages.Queries.GetDetailProdu
 
             if (productImageDto == null)
             {
-                return Result<ProductImageDto>.NotFound(ProductImageConst.MSG_PRODUCT_IMAGE_NOT_FOUND, ErrorCodes.ERR_PRODUCT_IMAGE_NOT_FOUND);
+                return Result<ProductImageDto>.NotFound(ProductImageConst.MSG_PRODUCT_IMAGE_ID_NOT_FOUND, ErrorCodes.ERR_PRODUCT_IMAGE_NOT_FOUND);
             }
 
             return Result<ProductImageDto>.Success(productImageDto);

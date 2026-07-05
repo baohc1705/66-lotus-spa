@@ -2,6 +2,9 @@ using _66SMS.Domain.Abstractions.Entities;
 
 namespace _66SMS.Domain.Entities
 {
+    /// <summary>
+    /// Product entity
+    /// </summary>
     public class Product : EntityBase<int>
     {
         public int CategoryId { get; set; }

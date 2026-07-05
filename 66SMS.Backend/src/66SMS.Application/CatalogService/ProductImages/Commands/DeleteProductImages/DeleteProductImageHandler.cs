@@ -26,7 +26,7 @@ namespace _66SMS.Application.CatalogService.ProductImages.Commands.DeleteProduct
             ProductImage? productImage = await productImageSqlRepository.FindByIdAsync(request.Id);
             if (productImage == null)
             {
-                return Result<object>.NotFound(ProductImageConst.MSG_PRODUCT_IMAGE_NOT_FOUND, ErrorCodes.ERR_PRODUCT_IMAGE_NOT_FOUND);
+                return Result<object>.NotFound(ProductImageConst.MSG_PRODUCT_IMAGE_ID_NOT_FOUND, ErrorCodes.ERR_PRODUCT_IMAGE_NOT_FOUND);
             }
 
             // Hard delete

@@ -4,6 +4,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
+using _66SMS.Domain.Enums;
 using MediatR;
 using System.Data;
 
@@ -33,11 +34,11 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Commands.DeletePro
             // return not found if product category is null
             if (productCategory == null)
             {
-                return Result<object>.NotFound(ProductCategoryConst.MSG_PRODUCT_CATEGORY_NOT_FOUND, ErrorCodes.ERR_PRODUCT_CATEGORY_NOT_FOUND);
+                return Result<object>.NotFound(ProductCategoryConst.MSG_PRODUCT_CATEGORY_ID_NOT_FOUND, ErrorCodes.ERR_PRODUCT_CATEGORY_NOT_FOUND);
             }
 
             // Soft delete
-            productCategory.Status = ProductCategoryConst.STATUS_DELETED;
+            productCategory.Status = (int)StatusActiveEnum.DELETED;
             productCategory.UpdatedAt = DateTime.UtcNow;
             productCategory.UpdatedBy = request.UpdatedBy;
 

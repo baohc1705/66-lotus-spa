@@ -1,6 +1,7 @@
 using _66SMS.Application.DTOs.ProductImages;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Constants;
+using _66SMS.Domain.Enums;
 using MediatR;
 using System.Text.Json.Serialization;
 
@@ -21,11 +22,11 @@ namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
         public decimal? SellingPrice { get; set; }
         public int StockQuantity { get; set; }
         public int MinStock { get; set; }
-        public int? Status { get; set; } = ProductConst.STATUS_ACTIVED;
+        public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
         [JsonIgnore]
         public int? CreatedBy { get; set; }
         [JsonIgnore]
         public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
-        public List<ProductImageDto>? Images { get; set; }
+        public List<ProductImageDto> Images { get; set; } = new();
     }
 }

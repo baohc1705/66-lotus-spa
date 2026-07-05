@@ -1,11 +1,12 @@
 using _66SMS.API.Abstractions;
 using _66SMS.Application.CatalogService.Products.Commands.CreateProducts;
+using _66SMS.Application.CatalogService.Products.Commands.DeleteProductMultiples;
 using _66SMS.Application.CatalogService.Products.Commands.DeleteProducts;
 using _66SMS.Application.CatalogService.Products.Commands.UpdateProducts;
 using _66SMS.Application.CatalogService.Products.Queries.GetAllProducts;
 using _66SMS.Application.CatalogService.Products.Queries.GetDetailProduct;
 using _66SMS.Contracts.Abstractions;
-using _66SMS.Domain.Constants;
+using _66SMS.Domain.Enums;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
@@ -55,11 +56,30 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
+        [HttpDelete("bulk")]
+        [PermissionAuthorize("products", "delete")]
+        public async Task<IActionResult> DeleteMultiples(
+            [FromBody] DeleteProductMultiplesCommand command)
+        {
+            command.UpdatedBy = jwtService.GetUserId();
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
         [HttpGet("admin")]
         [PermissionAuthorize("products", "read")]
         public async Task<IActionResult> AdminGetAll([FromQuery] GetAllProductQuery query)
         {
             
+            var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        [HttpGet("deleted")]
+        [PermissionAuthorize("products", "read")]
+        public async Task<IActionResult> AdminGetAllDeleted([FromQuery] GetAllProductQuery query)
+        {
+            query.IsDeleted = true;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
@@ -74,7 +94,7 @@ namespace _66SMS.API.Controllers
                 Keyword = keyword,
                 MinPrice = minPrice,
                 MaxPrice = maxPrice,
-                Status = ProductConst.STATUS_ACTIVED,
+                Status = (int)StatusActiveEnum.ACTIVED,
                 OrderBy = orderBy,
                 IsDescending = isDescending ?? false,
                 PageIndex = pageIndex ?? 1,

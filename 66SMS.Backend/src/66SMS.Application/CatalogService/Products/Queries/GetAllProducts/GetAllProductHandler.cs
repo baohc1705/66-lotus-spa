@@ -4,6 +4,7 @@ using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
+using _66SMS.Domain.Enums;
 using MediatR;
 
 namespace _66SMS.Application.CatalogService.Products.Queries.GetAllProducts
@@ -37,14 +38,18 @@ namespace _66SMS.Application.CatalogService.Products.Queries.GetAllProducts
 
             if (request.IsDeleted)
             {
-                query = query.Where(x => x.Status != ProductConst.STATUS_DELETED);
+                query = query.Where(x => x.Status == (int)StatusActiveEnum.DELETED);
+            }
+            else
+            {
+                query = query.Where(x => x.Status != (int)StatusActiveEnum.DELETED);
             }
 
             if (request.Status.HasValue)
             {
                 query = query.Where(x => x.Status == request.Status);
             }
-            
+
             if (request.MinPrice.HasValue)
             {
                 query = query.Where(x => x.SellingPrice >= request.MinPrice.Value);

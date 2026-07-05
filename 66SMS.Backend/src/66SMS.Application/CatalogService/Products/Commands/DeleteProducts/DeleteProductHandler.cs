@@ -4,8 +4,8 @@ using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
+using _66SMS.Domain.Enums;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace _66SMS.Application.CatalogService.Products.Commands.DeleteProducts
@@ -38,13 +38,13 @@ namespace _66SMS.Application.CatalogService.Products.Commands.DeleteProducts
                 Product? product = await productSqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
 
                 // return not found if product is null
-                if (product == null)
+                if (product is null || product.Status == (int)StatusActiveEnum.DELETED)
                 {
-                    return Result<object>.NotFound(ProductConst.MSG_PRODUCT_NOT_FOUND, ErrorCodes.ERR_PRODUCT_NOT_FOUND);
-                }
+                   return Result<object>.NotFound(ProductConst.MSG_PRODUCT_ID_NOT_FOUND, ErrorCodes.ERR_PRODUCT_NOT_FOUND);
+                }  
 
                 // update status is deleted soft deleted
-                product.Status = ProductConst.STATUS_DELETED;
+                product.Status = (int)StatusActiveEnum.DELETED;
                 product.UpdatedAt = DateTime.UtcNow;
                 product.UpdatedBy = request.UpdatedBy;
 
@@ -52,17 +52,17 @@ namespace _66SMS.Application.CatalogService.Products.Commands.DeleteProducts
                 productSqlRepository.Update(product);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // Xóa các entity con (ProductImages)
-                List<ProductImage> productImages = await productImageSqlRepository
-                    .AsQueryable(false)
-                    .Where(x => x.ProductId == product.Id)
-                    .ToListAsync(cancellationToken);
+                // // Xóa các entity con (ProductImages)
+                // List<ProductImage> productImages = await productImageSqlRepository
+                //     .AsQueryable(false)
+                //     .Where(x => x.ProductId == product.Id)
+                //     .ToListAsync(cancellationToken);
 
-                if (productImages.Any())
-                {
-                    productImageSqlRepository.RemoveRange(productImages);
-                }
-                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                // if (productImages.Any())
+                // {
+                //     productImageSqlRepository.RemoveRange(productImages);
+                // }
+                // await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 transaction.Commit();
 

@@ -33,7 +33,7 @@ namespace _66SMS.Application.CatalogService.Products.Commands.UpdateProducts
             Product? product = await productSqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
             if (product == null)
             {
-                return Result<object>.NotFound(ProductConst.MSG_PRODUCT_NOT_FOUND, ErrorCodes.ERR_PRODUCT_NOT_FOUND);
+                return Result<object>.NotFound(ProductConst.MSG_PRODUCT_ID_NOT_FOUND, ErrorCodes.ERR_PRODUCT_NOT_FOUND);
             }
 
             mapper.Map(request, product);
