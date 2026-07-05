@@ -62,7 +62,7 @@ export function AccountPanel({ initialData }: AccountPanelProps) {
   return (
     <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="mb-8">
-        <h3 className="text-2xl font-bold text-lotus-deep mb-2 font-serif">
+        <h3 className="text-2xl font-bold text-lotus-deep mb-2 font-sans">
           Tài khoản hệ thống
         </h3>
         <p className="text-sm text-lotus-stone">

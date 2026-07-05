@@ -90,6 +90,7 @@ export interface CreateInvoicePayload {
   customerName?: string
   customerPhone?: string
   appointmentId?: number
+  salonId?: number
   discountAmount?: number
   applyMembershipDiscount?: boolean
   loyaltyPointsUsed?: number

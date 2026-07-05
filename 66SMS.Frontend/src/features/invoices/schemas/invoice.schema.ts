@@ -13,6 +13,7 @@ export const invoiceSchema = z.object({
   customerId: z.coerce.number().optional(),
   customerName: z.string().max(200).optional().or(z.literal('')),
   customerPhone: z.string().max(20).optional().or(z.literal('')),
+  salonId: z.coerce.number().optional(),
   discountAmount: z.coerce.number().min(0, 'Không âm').optional(),
   applyMembershipDiscount: z.boolean().optional(),
   loyaltyPointsUsed: z.coerce.number().min(0, 'Không âm').optional(),

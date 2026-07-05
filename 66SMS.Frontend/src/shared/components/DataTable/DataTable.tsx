@@ -35,8 +35,8 @@ export function DataTable<TData>({
   renderSubComponent,
 }: DataTableProps<TData>) {
   return (
-    <div className="flex flex-col">
-      <div className="overflow-x-auto">
+    <div className="flex flex-col w-full overflow-hidden">
+      <div className="overflow-x-auto w-full">
         <Table style={{ width: table.getCenterTotalSize(), minWidth: '100%' }}>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

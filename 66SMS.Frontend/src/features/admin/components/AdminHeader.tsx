@@ -1,19 +1,26 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { Menu, ShoppingCart, Bell, Settings, User, LogOut } from "lucide-react";
+import { Menu, ShoppingCart, Bell, Settings, User, LogOut, PanelLeft, PanelTop } from "lucide-react";
 import { MENU_ITEMS } from "../constants/menu";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { BranchSelector } from "@/shared/components/BranchSelector";
+import { AdminTopNavbar } from "./AdminTopNavbar";
+import { Logo } from "@/shared/components/Logo";
+import { cn } from "@/lib/utils";
 
 interface AdminHeaderProps {
   toggleSidebar: () => void;
   toggleMobileSidebar: () => void;
+  layoutMode: "top-nav" | "sidebar";
+  toggleLayoutMode: () => void;
 }
 
 export function AdminHeader({
-  //toggleSidebar,
+  toggleSidebar,
   toggleMobileSidebar,
+  layoutMode,
+  toggleLayoutMode,
 }: AdminHeaderProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
@@ -54,53 +61,86 @@ export function AdminHeader({
   }
 
   return (
-    <header className="h-16 bg-lotus-cream/80 backdrop-blur-xl flex items-center justify-between px-2 sm:px-4 sticky top-0 z-30 transition-all duration-300 border-b border-lotus-gold/10 shadow-sm shadow-lotus-gold/5">
-      <div className="flex items-center gap-2 sm:gap-4">
+    <header className="h-12 bg-lotus-leaf border-b border-white/10 shadow-md flex items-center justify-between px-2 sm:px-4 sticky top-0 z-30 transition-all duration-300">
+      <div className="flex items-center gap-2 sm:gap-4 h-full">
+        {/* Mobile menu trigger */}
         <button
           onClick={toggleMobileSidebar}
-          className="lg:hidden w-10 h-10 rounded-admin bg-lotus-leaf/5 text-lotus-leaf flex items-center justify-center hover:bg-lotus-leaf hover:text-white transition-all duration-300"
+          className="lg:hidden w-8 h-8 rounded-[4px] bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all duration-300"
         >
-          <Menu className="w-[18px] h-[18px]" />
+          <Menu className="w-4 h-4" />
         </button>
 
-        <h1 className="text-lg sm:text-xl font-bold text-lotus-deep ml-1 sm:ml-2 tracking-tight">
+        {/* Logo (shown on desktop if layout is top-nav, hidden if layout is sidebar because sidebar has its own logo) */}
+        {layoutMode === "top-nav" && (
+          <div className="hidden lg:flex items-center shrink-0 mr-1.5">
+            <Logo variant="light" size="sm" showTagline={false} />
+          </div>
+        )}
+
+        {/* Page Title (shown on mobile, or on desktop if layout is sidebar) */}
+        <h1 className={cn(
+          "text-sm sm:text-base font-bold text-white ml-1 tracking-tight",
+          layoutMode === "sidebar" ? "block" : "lg:hidden"
+        )}>
           {currentTitle}
         </h1>
+
+        {/* Desktop Top Navigation Bar (Mega Menus) */}
+        {layoutMode === "top-nav" && (
+          <div className="hidden lg:block h-full">
+            <AdminTopNavbar />
+          </div>
+        )}
       </div>
 
-      <div className="flex items-center gap-2 sm:gap-2.5">
-        <div className="w-40 sm:w-48 md:w-56 shrink-0">
+      <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="w-36 sm:w-44 shrink-0">
           <BranchSelector />
         </div>
 
         {(isAdmin || isReceptionist) && (
           <Link
             to="/thu-ngan"
-            className="flex items-center gap-2 px-4 h-10 rounded-admin bg-white/60 text-lotus-deep border border-lotus-gold/20 hover:border-lotus-gold hover:bg-lotus-cream hover:shadow-md transition-all duration-300 font-medium text-xs tracking-wide"
+            className="flex items-center gap-1.5 px-3 h-8 rounded-[4px] bg-white/10 text-white border border-white/10 hover:border-white/25 hover:bg-white/15 transition-all duration-300 font-medium text-xs tracking-wide whitespace-nowrap"
           >
-            <ShoppingCart className="w-[1.05rem] h-[1.05rem] text-lotus-leaf" />
+            <ShoppingCart className="w-3.5 h-3.5 text-lotus-secondary" />
             <span className="hidden sm:inline">Thu ngân</span>
           </Link>
         )}
 
-        <div className="flex items-center gap-1.5 ml-1">
-          <button className="w-10 h-10 rounded-admin bg-white/60 text-lotus-deep border border-lotus-gold/20 flex items-center justify-center hover:border-lotus-gold hover:bg-lotus-cream hover:shadow-md transition-all duration-300 relative group">
-            <Bell className="w-[18px] h-[18px] group-hover:rotate-12 transition-transform" />
-            <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 rounded-full bg-lotus-rose border border-white" />
+        <div className="flex items-center gap-1 ml-0.5">
+          <button
+            onClick={toggleLayoutMode}
+            title={layoutMode === "top-nav" ? "Chuyển sang giao diện Sidebar" : "Chuyển sang giao diện Top-Nav"}
+            className="w-8 h-8 rounded-[4px] bg-white/10 text-white border border-white/10 flex items-center justify-center hover:border-white/25 hover:bg-white/15 transition-all duration-300 relative group"
+          >
+            {layoutMode === "top-nav" ? (
+              <PanelLeft className="w-4 h-4 text-white" />
+            ) : (
+              <PanelTop className="w-4 h-4 text-white" />
+            )}
           </button>
 
-          {isAdmin && (
-            <button className="hidden sm:flex w-10 h-10 rounded-admin bg-white/60 text-lotus-deep border border-lotus-gold/20 items-center justify-center hover:border-lotus-gold hover:bg-lotus-cream hover:shadow-md transition-all duration-300 group">
-              <Settings className="w-[18px] h-[18px] group-hover:rotate-90 transition-transform duration-500" />
-            </button>
-          )}
+          <button className="w-8 h-8 rounded-[4px] bg-white/10 text-white border border-white/10 flex items-center justify-center hover:border-white/25 hover:bg-white/15 transition-all duration-300 relative group">
+            <Bell className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+            <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-lotus-primary border border-lotus-deep" />
+          </button>
 
           <div className="relative">
             <button
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="w-10 h-10 rounded-admin bg-lotus-leaf text-white flex items-center justify-center hover:bg-lotus-leaf/90 hover:shadow-lg hover:shadow-lotus-leaf/20 transition-all duration-300 ml-1 border border-lotus-leaf"
+              className="w-8 h-8 rounded-[4px] bg-white/10 text-white flex items-center justify-center hover:bg-white/15 hover:shadow-md transition-all duration-300 ml-0.5 border border-white/10 overflow-hidden"
             >
-              <User className="w-[18px] h-[18px]" />
+              {user?.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt={user.username || "Avatar"}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User className="w-4 h-4 text-white" />
+              )}
             </button>
 
             <AnimatePresence>
@@ -111,41 +151,46 @@ export function AdminHeader({
                     onClick={() => setIsProfileOpen(false)}
                   />
                   <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-3 w-64 bg-white/90 backdrop-blur-xl rounded-admin shadow-[0_20px_40px_rgba(42,31,26,0.1)] py-3 z-50 border border-lotus-gold/20"
+                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 mt-2 w-52 bg-white rounded-[4px] shadow-[0_12px_30px_rgba(0,0,0,0.12)] p-2 z-50 flex flex-col gap-0.5"
                   >
-                    <div className="px-5 py-3 border-b border-lotus-gold/10 mb-2">
-                      <p className="text-[15px] font-semibold text-lotus-deep">
+                    <div className="px-3 py-2 border-b border-lotus-surface/20 mb-1.5">
+                      <p className="text-[13px] font-semibold text-lotus-deep leading-tight">
                         {user?.username || "Tài khoản"}
                       </p>
-                      <p className="text-[13px] text-lotus-stone truncate">
+                      <p className="text-[11px] text-lotus-stone truncate mt-0.5 leading-none">
                         {user?.email || ""}
                       </p>
                     </div>
                     <Link
                       to="/admin/profile"
-                      className="w-full flex items-center gap-3 px-5 py-2.5 text-[13px] font-medium text-lotus-deep/70 hover:bg-lotus-cream hover:text-lotus-leaf transition-colors"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-[12px] text-lotus-deep/85 hover:text-lotus-primary hover:bg-lotus-cream transition-all duration-300 font-normal"
                     >
-                      <User className="w-4 h-4" />
-                      Hồ sơ cá nhân
+                      <User className="w-3.5 h-3.5 text-lotus-deep/45 group-hover:text-lotus-primary group-hover:scale-110 transition-all duration-300" />
+                      <span>Hồ sơ cá nhân</span>
                     </Link>
                     <Link
                       to="/admin/profile"
-                      className="w-full flex items-center gap-3 px-5 py-2.5 text-[13px] font-medium text-lotus-deep/70 hover:bg-lotus-cream hover:text-lotus-leaf transition-colors"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-[12px] text-lotus-deep/85 hover:text-lotus-primary hover:bg-lotus-cream transition-all duration-300 font-normal"
                     >
-                      <Settings className="w-4 h-4" />
-                      Cài đặt tài khoản
+                      <Settings className="w-3.5 h-3.5 text-lotus-deep/45 group-hover:text-lotus-primary group-hover:scale-110 transition-all duration-300" />
+                      <span>Cài đặt tài khoản</span>
                     </Link>
-                    <div className="h-px bg-lotus-gold/10 my-2" />
+                    <div className="h-px bg-lotus-surface/20 my-1" />
                     <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-3 px-5 py-2.5 text-[13px] font-medium text-lotus-rose hover:bg-lotus-rose/5 transition-colors"
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        handleLogout();
+                      }}
+                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-[12px] text-lotus-rose hover:bg-lotus-rose/5 transition-all duration-300 font-normal w-full text-left"
                     >
-                      <LogOut className="w-4 h-4" />
-                      Đăng xuất
+                      <LogOut className="w-3.5 h-3.5 text-lotus-rose/60 group-hover:scale-110 transition-all duration-300" />
+                      <span>Đăng xuất</span>
                     </button>
                   </motion.div>
                 </>

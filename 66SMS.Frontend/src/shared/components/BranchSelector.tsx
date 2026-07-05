@@ -82,9 +82,9 @@ export function BranchSelector() {
 
   if (isLoading) {
     return (
-      <div className="animate-pulse bg-lotus-leaf/10 h-10 w-full rounded-admin border border-lotus-leaf/20 flex items-center justify-center text-xs text-lotus-leaf font-medium px-4">
-        <MapPin className="w-3.5 h-3.5 text-lotus-leaf shrink-0 mr-1.5 animate-bounce" />
-        Đang tải chi nhánh...
+      <div className="animate-pulse bg-transparent h-8 w-full rounded-[4px] border border-white/20 flex items-center justify-center text-xs text-white/80 font-normal px-4">
+        <MapPin className="w-3.5 h-3.5 text-white/80 shrink-0 mr-1.5 animate-bounce" />
+        Đang tải...
       </div>
     );
   }
@@ -104,9 +104,9 @@ export function BranchSelector() {
     return (
       <div className="flex items-center gap-1.5 w-full">
         <Select value={value} onValueChange={handleValueChange}>
-          <SelectTrigger className="w-full bg-lotus-leaf/10 hover:bg-lotus-leaf/15 text-lotus-leaf border border-lotus-leaf/20 h-10 py-1.5 text-xs font-semibold focus:ring-lotus-leaf/20">
+          <SelectTrigger className="w-full !bg-transparent hover:!bg-transparent focus:!bg-transparent data-[state=open]:!bg-transparent !text-white border border-white/25 h-8 py-1 rounded-[4px] text-xs font-normal focus:ring-0 focus:ring-offset-0 [&_svg]:!text-white/80">
             <div className="flex items-center gap-1.5 truncate">
-              <MapPin className="w-3.5 h-3.5 text-lotus-leaf shrink-0" />
+              <MapPin className="w-3.5 h-3.5 text-white/80 shrink-0" />
               <SelectValue placeholder="Chọn chi nhánh" />
             </div>
           </SelectTrigger>
@@ -132,18 +132,18 @@ export function BranchSelector() {
   // Non-Admin (Manager, Staff, Receptionist) select logic
   if (assignedSalons.length === 0) {
     return (
-      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 rounded-admin border border-stone-200 h-10 w-full text-stone-400">
-        <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0" />
-        <span className="text-xs font-medium truncate">Chưa phân chi nhánh</span>
+      <div className="flex items-center gap-1.5 px-3 py-1 bg-transparent rounded-[4px] border border-white/20 h-8 w-full text-white/60">
+        <MapPin className="w-3.5 h-3.5 text-white/60 shrink-0" />
+        <span className="text-xs font-normal truncate">Chưa phân chi nhánh</span>
       </div>
     );
   }
 
   if (assignedSalons.length === 1) {
     return (
-      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-lotus-leaf/10 rounded-admin border border-lotus-leaf/20 h-10 w-full max-w-[240px] truncate shadow-sm">
-        <MapPin className="w-3.5 h-3.5 text-lotus-leaf shrink-0" />
-        <span className="text-xs font-semibold text-lotus-leaf truncate">{assignedSalons[0].name}</span>
+      <div className="flex items-center gap-1.5 px-3 py-1 bg-transparent rounded-[4px] border border-white/25 h-8 w-full max-w-[240px] truncate text-white">
+        <MapPin className="w-3.5 h-3.5 text-white/80 shrink-0" />
+        <span className="text-xs font-normal truncate">{assignedSalons[0].name}</span>
       </div>
     );
   }
@@ -157,9 +157,9 @@ export function BranchSelector() {
   return (
     <div className="flex items-center gap-1.5 w-full">
       <Select value={value} onValueChange={handleValueChange}>
-        <SelectTrigger className="w-full bg-lotus-leaf/10 hover:bg-lotus-leaf/15 text-lotus-leaf border border-lotus-leaf/20 h-10 py-1.5 text-xs font-semibold focus:ring-lotus-leaf/20">
+        <SelectTrigger className="w-full !bg-transparent hover:!bg-transparent focus:!bg-transparent data-[state=open]:!bg-transparent !text-white border border-white/25 h-8 py-1 rounded-[4px] text-xs font-normal focus:ring-0 focus:ring-offset-0 [&_svg]:!text-white/80">
           <div className="flex items-center gap-1.5 truncate">
-            <MapPin className="w-3.5 h-3.5 text-lotus-leaf shrink-0" />
+            <MapPin className="w-3.5 h-3.5 text-white/80 shrink-0" />
             <SelectValue placeholder="Chọn chi nhánh" />
           </div>
         </SelectTrigger>

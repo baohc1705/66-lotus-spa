@@ -91,8 +91,7 @@ export const RegisterPage = () => (
 
       <div className="relative z-10 flex-1 flex flex-col justify-center py-12">
         <h1
-          className="text-4xl xl:text-5xl font-bold text-white leading-tight mb-6 font-serif"
-          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+          className="text-4xl xl:text-5xl font-bold text-white leading-tight mb-6 font-sans"
         >
           Trải nghiệm{" "}
           <span
@@ -149,8 +148,7 @@ export const RegisterPage = () => (
       <div className="w-full max-w-md">
         <div className="mb-6">
           <h2
-            className="text-3xl font-bold text-[var(--spa-ui-text)] mb-2 font-serif"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+            className="text-3xl font-bold text-[var(--spa-ui-text)] mb-2 font-sans"
           >
             Tạo tài khoản mới
           </h2>

@@ -214,7 +214,7 @@ export function ProfileForm({
             </div>
 
             <div className="text-center relative z-10 space-y-2">
-              <h3 className="font-bold text-xl text-lotus-deep font-serif">
+              <h3 className="font-bold text-xl text-lotus-deep font-sans">
                 {initialData?.fullName || "Người dùng"}
               </h3>
               <p className="text-sm font-medium text-lotus-leaf inline-flex items-center justify-center gap-1.5 bg-lotus-leaf-light px-3 py-1 rounded-md">
@@ -287,7 +287,7 @@ export function ProfileForm({
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="relative z-10">
               <div className="mb-6">
-                <h3 className="text-2xl font-bold text-lotus-deep mb-2 font-serif">
+                <h3 className="text-2xl font-bold text-lotus-deep mb-2 font-sans">
                   Thông tin liên hệ
                 </h3>
                 <p className="text-lotus-stone text-sm">

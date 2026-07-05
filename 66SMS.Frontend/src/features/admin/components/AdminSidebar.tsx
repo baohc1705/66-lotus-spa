@@ -5,12 +5,14 @@ import { ChevronDown, Menu } from "lucide-react";
 import { Logo } from "@/shared/components/Logo";
 import { type SubMenuItem } from "../constants/menu";
 import { useMenuByRole } from "../hooks/useMenuByRole";
+import { cn } from "@/lib/utils";
 
 interface AdminSidebarProps {
   isOpen: boolean;
   isMobileOpen: boolean;
   setMobileOpen: (val: boolean) => void;
   toggleSidebar: () => void;
+  layoutMode: "top-nav" | "sidebar";
 }
 
 export function AdminSidebar({
@@ -18,6 +20,7 @@ export function AdminSidebar({
   isMobileOpen,
   setMobileOpen,
   toggleSidebar,
+  layoutMode,
 }: AdminSidebarProps) {
   const location = useLocation();
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
@@ -50,7 +53,15 @@ export function AdminSidebar({
 
       <motion.aside
         layout
-        className={`fixed top-0 left-0 bottom-0 z-50 flex flex-col bg-lotus-cream/95 backdrop-blur-md shadow-xl transition-all duration-500 ease-out ${isOpen ? "w-64" : "w-20"} ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+        className={cn(
+          "fixed top-0 left-0 bottom-0 z-50 flex flex-col bg-lotus-cream/95 backdrop-blur-md shadow-xl transition-all duration-500 ease-out",
+          layoutMode === "sidebar"
+            ? isOpen
+              ? "w-64 lg:translate-x-0"
+              : "w-20 lg:translate-x-0"
+            : "lg:hidden",
+          isMobileOpen ? "translate-x-0" : "-translate-x-full"
+        )}
       >
         <div
           className={`shrink-0 px-4 overflow-hidden transition-all duration-500 ${isOpen ? "justify-between" : "justify-center"}`}

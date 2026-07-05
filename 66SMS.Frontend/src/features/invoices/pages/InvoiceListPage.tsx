@@ -21,6 +21,7 @@ import { InvoiceFormDialog } from '../components/InvoiceFormDialog'
 import { InvoiceDetailExpanded } from '../components/InvoiceDetailExpanded'
 import { useInvoices, useCancelInvoice } from '../hooks/useInvoices'
 import { INVOICE_STATUS, PAYMENT_METHOD, type InvoiceDto } from '../types/invoice.types'
+import { useAuthStore } from '@/features/auth/stores/authStore'
 
 const STATUS_MAP: StatusMap = {
   '0': { label: 'Nháp', variant: 'outline' },
@@ -57,8 +58,15 @@ export function InvoiceListPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [cancelTarget, setCancelTarget] = useState<number | null>(null)
 
+  const salonId = useAuthStore((s) => s.getEffectiveSalonId())
+  const [prevSalonId, setPrevSalonId] = useState(salonId)
+  if (salonId !== prevSalonId) {
+    setPageIndex(1)
+    setPrevSalonId(salonId)
+  }
+
   const { data: result, isLoading, isFetching } = useInvoices({
-    pageIndex, pageSize, filter: filter || undefined, orderBy, isDescending,
+    pageIndex, pageSize, filter: filter || undefined, salonId: salonId || undefined, orderBy, isDescending,
   })
   const cancelMutation = useCancelInvoice()
 

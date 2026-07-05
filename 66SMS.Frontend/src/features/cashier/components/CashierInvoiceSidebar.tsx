@@ -18,6 +18,7 @@ interface CashierInvoiceSidebarProps {
   onPay: (bookingId: string, paymentMethod: string) => void;
   onRequestDeposit?: (bookingId: string) => void;
   isPaying?: boolean;
+  onRedirectToPOS?: (booking: CashierBooking) => void;
 }
 
 export function CashierInvoiceSidebar({
@@ -27,6 +28,7 @@ export function CashierInvoiceSidebar({
   onPay,
   onRequestDeposit,
   isPaying = false,
+  onRedirectToPOS,
 }: CashierInvoiceSidebarProps) {
   const [paymentMethod, setPaymentMethod] = useState("cash");
 
@@ -85,7 +87,7 @@ export function CashierInvoiceSidebar({
             <h4 className="font-semibold text-sm text-lotus-deep">
               Dịch vụ & Sản phẩm
             </h4>
-            <button className="text-xs font-medium text-lotus-leaf hover:underline flex items-center gap-1">
+            <button className="text-xs font-medium text-lotus-primary hover:underline flex items-center gap-1">
               <Plus className="w-3 h-3" /> Thêm
             </button>
           </div>
@@ -107,10 +109,10 @@ export function CashierInvoiceSidebar({
           </div>
         </div>
 
-        <div className="mb-6 p-3 rounded-[5px] bg-lotus-leaf/5 border border-lotus-leaf/20 text-sm space-y-1.5">
+        <div className="mb-6 p-3 rounded-[5px] bg-lotus-primary/5 border border-lotus-primary/20 text-sm space-y-1.5">
           <div className="flex justify-between">
             <span className="text-lotus-deep/70">Đã cọc (20%):</span>
-            <span className="font-medium text-lotus-leaf">
+            <span className="font-medium text-lotus-primary">
               {booking.depositPaid
                 ? `${Math.min(booking.paidAmount, booking.depositAmount).toLocaleString("vi-VN")}đ`
                 : "Chưa cọc"}
@@ -124,75 +126,79 @@ export function CashierInvoiceSidebar({
           </div>
         </div>
 
-        <div className="mb-6">
-          <h4 className="font-semibold text-sm text-lotus-deep mb-3">
-            Phương thức thanh toán
-          </h4>
-          <div className="grid grid-cols-2 gap-2">
-            {methods.map((method) => {
-              const Icon = method.icon;
-              const isSelected = paymentMethod === method.id;
-              return (
-                <button
-                  key={method.id}
-                  onClick={() => setPaymentMethod(method.id)}
-                  disabled={method.isWallet && (booking.customerWalletBalance || 0) < amountDue}
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-2 p-3 rounded-[5px] transition-all relative overflow-hidden",
-                    isSelected
-                      ? "border-2 border-lotus-leaf bg-lotus-leaf/5 text-lotus-leaf"
-                      : method.isWallet && (booking.customerWalletBalance || 0) < amountDue
-                        ? "border border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed opacity-60"
-                        : "border border-lotus-gold/20 hover:border-lotus-gold/40 text-lotus-stone hover:bg-lotus-cream/20",
-                  )}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span
-                    className={cn(
-                      "text-xs font-medium text-center",
-                      method.isVnpay && !isSelected && "text-[#005BAA] font-bold tracking-wide",
-                    )}
-                  >
-                    {method.label}
-                    {method.isWallet && (
-                      <span className="block text-[10px] opacity-80 mt-0.5">
-                        ({(booking.customerWalletBalance || 0).toLocaleString("vi-VN")}đ)
+        {booking.status !== "unpaid" && (
+          <>
+            <div className="mb-6">
+              <h4 className="font-semibold text-sm text-lotus-deep mb-3">
+                Phương thức thanh toán
+              </h4>
+              <div className="grid grid-cols-2 gap-2">
+                {methods.map((method) => {
+                  const Icon = method.icon;
+                  const isSelected = paymentMethod === method.id;
+                  return (
+                    <button
+                      key={method.id}
+                      onClick={() => setPaymentMethod(method.id)}
+                      disabled={method.isWallet && (booking.customerWalletBalance || 0) < amountDue}
+                      className={cn(
+                        "flex flex-col items-center justify-center gap-2 p-3 rounded-[5px] transition-all relative overflow-hidden",
+                        isSelected
+                          ? "border-2 border-lotus-primary bg-lotus-primary/5 text-lotus-primary"
+                          : method.isWallet && (booking.customerWalletBalance || 0) < amountDue
+                            ? "border border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed opacity-60"
+                            : "border border-lotus-gold/20 hover:border-lotus-gold/40 text-lotus-stone hover:bg-lotus-cream/20",
+                      )}
+                    >
+                      <Icon className="w-5 h-5" />
+                      <span
+                        className={cn(
+                          "text-xs font-medium text-center",
+                          method.isVnpay && !isSelected && "text-[#005BAA] font-bold tracking-wide",
+                        )}
+                      >
+                        {method.label}
+                        {method.isWallet && (
+                          <span className="block text-[10px] opacity-80 mt-0.5">
+                            ({(booking.customerWalletBalance || 0).toLocaleString("vi-VN")}đ)
+                          </span>
+                        )}
                       </span>
-                    )}
-                  </span>
-                  {method.isWallet && (booking.customerWalletBalance || 0) < amountDue && (
-                     <div className="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-[1px]">
-                       <span className="text-[10px] font-bold text-red-500 bg-white px-2 py-0.5 rounded border border-red-100 rotate-[-10deg]">KHÔNG ĐỦ SỐ DƯ</span>
-                     </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+                      {method.isWallet && (booking.customerWalletBalance || 0) < amountDue && (
+                         <div className="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-[1px]">
+                           <span className="text-[10px] font-bold text-red-500 bg-white px-2 py-0.5 rounded border border-red-100 rotate-[-10deg]">KHÔNG ĐỦ SỐ DƯ</span>
+                         </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
 
-          {paymentMethod === "vnpay" && (
-            <div className="mt-4 p-4 border border-[#005BAA]/20 bg-[#005BAA]/5 rounded-[5px] flex flex-col items-center justify-center relative overflow-hidden transition-all">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#005BAA] to-[#ED1B24]"></div>
-              <p className="text-sm text-center font-semibold text-gray-800">
-                Thanh toán phần còn lại qua VNPAY
-              </p>
-              <p className="text-lg font-bold text-[#005BAA] mt-2">
-                {amountDue.toLocaleString("vi-VN")}đ
-              </p>
+              {paymentMethod === "vnpay" && (
+                <div className="mt-4 p-4 border border-[#005BAA]/20 bg-[#005BAA]/5 rounded-[5px] flex flex-col items-center justify-center relative overflow-hidden transition-all">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#005BAA] to-[#ED1B24]"></div>
+                  <p className="text-sm text-center font-semibold text-gray-800">
+                    Thanh toán phần còn lại qua VNPAY
+                  </p>
+                  <p className="text-lg font-bold text-[#005BAA] mt-2">
+                    {amountDue.toLocaleString("vi-VN")}đ
+                  </p>
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        <div>
-          <h4 className="font-semibold text-sm text-lotus-deep mb-2">
-            Ghi chú
-          </h4>
-          <textarea
-            placeholder="Nhập ghi chú hóa đơn..."
-            defaultValue={booking.note || ""}
-            className="w-full text-sm border border-lotus-gold/20 bg-lotus-cream/10 rounded-[5px] p-3 min-h-[80px] focus:outline-none focus:border-lotus-leaf focus:ring-1 focus:ring-lotus-leaf resize-none text-lotus-deep placeholder:text-lotus-stone"
-          ></textarea>
-        </div>
+            <div>
+              <h4 className="font-semibold text-sm text-lotus-deep mb-2">
+                Ghi chú
+              </h4>
+              <textarea
+                placeholder="Nhập ghi chú hóa đơn..."
+                defaultValue={booking.note || ""}
+                className="w-full text-sm border border-lotus-gold/20 bg-lotus-cream/10 rounded-[5px] p-3 min-h-[80px] focus:outline-none focus:border-lotus-primary focus:ring-1 focus:ring-lotus-primary resize-none text-lotus-deep placeholder:text-lotus-stone"
+              ></textarea>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="p-5 border-t border-lotus-gold/20 bg-lotus-cream/30">
@@ -219,7 +225,7 @@ export function CashierInvoiceSidebar({
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-lotus-stone">Đã thu (cọc + tạm ứng):</span>
-            <span className="font-medium text-lotus-leaf">
+            <span className="font-medium text-lotus-primary">
               -{booking.paidAmount.toLocaleString("vi-VN")}đ
             </span>
           </div>
@@ -251,7 +257,16 @@ export function CashierInvoiceSidebar({
           </p>
         )}
 
-        {booking.status === "pending" && !booking.depositDeadlineAt && onRequestDeposit ? (
+        {booking.status === "unpaid" && onRedirectToPOS ? (
+          <button
+            onClick={() => onRedirectToPOS(booking)}
+            disabled={isPaying}
+            className="w-full py-3 rounded-[5px] bg-[#D4547E] hover:bg-[#B64269] flex items-center justify-center gap-2 text-white font-semibold text-sm transition-all shadow-md"
+          >
+            <CreditCard className="w-5 h-5" />
+            <span>Thanh toán hóa đơn tại POS</span>
+          </button>
+        ) : booking.status === "pending" && !booking.depositDeadlineAt && onRequestDeposit ? (
           <button
             onClick={() => onRequestDeposit(booking.id)}
             disabled={isPaying}
@@ -259,7 +274,7 @@ export function CashierInvoiceSidebar({
               "w-full py-3 rounded-[5px] flex items-center justify-center gap-2 text-white font-semibold text-sm transition-all shadow-md",
               isPaying
                 ? "bg-lotus-stone/50 cursor-not-allowed text-white/80 shadow-none"
-                : "bg-[#005BAA] hover:bg-[#005BAA]/90 shadow-blue-500/20"
+                : "bg-lotus-primary hover:bg-lotus-primary/90"
             )}
           >
             <Wallet className="w-5 h-5" />
@@ -272,9 +287,9 @@ export function CashierInvoiceSidebar({
               "w-full py-3 rounded-[5px] flex items-center justify-center gap-2 text-white font-semibold text-sm transition-all shadow-md",
               isPaid || isPaying || !canPay
                 ? "bg-lotus-stone/50 cursor-not-allowed text-white/80 shadow-none"
-                : paymentMethod === "vnpay"
-                  ? "bg-gradient-to-r from-[#005BAA] to-[#ED1B24] hover:opacity-90 shadow-blue-500/20"
-                  : "bg-lotus-leaf hover:bg-lotus-leaf/90 shadow-lotus-leaf/20 hover:shadow-lotus-leaf/40",
+                  : paymentMethod === "vnpay"
+                    ? "bg-gradient-to-r from-[#005BAA] to-[#ED1B24] hover:opacity-90 shadow-blue-500/20"
+                    : "bg-lotus-primary hover:bg-lotus-primary/90 shadow-lotus-primary/20 hover:shadow-lotus-primary/40",
             )}
             disabled={isPaid || isPaying || !canPay}
           >

@@ -103,8 +103,8 @@ export function BookingRoomDetailExpanded({ roomId, onEdit }: BookingRoomDetailE
           {positions.length === 0 ? (
             <div className="py-8 text-center text-lotus-stone text-sm">Chưa có vị trí nào được thiết lập trong phòng này</div>
           ) : (
-            <div className="rounded-md border border-stone-200 overflow-hidden">
-              <table className="w-full text-left text-[13px]">
+            <div className="rounded-md border border-stone-200 overflow-x-auto w-full">
+              <table className="w-full text-left text-[13px] min-w-[500px]">
                 <thead className="bg-stone-50 border-b border-stone-200 text-lotus-stone">
                   <tr>
                     <th className="py-2.5 px-4 font-semibold w-16 text-center">Thứ tự</th>

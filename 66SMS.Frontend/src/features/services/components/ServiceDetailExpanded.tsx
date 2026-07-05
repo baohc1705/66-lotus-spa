@@ -172,8 +172,8 @@ export function ServiceDetailExpanded({
               Chưa có sản phẩm tiêu hao nào được cấu hình cho dịch vụ này
             </div>
           ) : (
-            <div className="rounded-md border border-stone-200 overflow-hidden">
-              <table className="w-full text-left text-[13px]">
+            <div className="rounded-md border border-stone-200 overflow-x-auto w-full">
+              <table className="w-full text-left text-[13px] min-w-[600px]">
                 <thead className="bg-stone-50 border-b border-stone-200 text-lotus-stone">
                   <tr>
                     <th className="py-2.5 px-4 font-semibold">Tên sản phẩm</th>

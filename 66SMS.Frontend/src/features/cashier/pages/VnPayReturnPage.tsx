@@ -61,7 +61,7 @@ export function VnPayReturnPage() {
       <div className="bg-white p-8 rounded-[24px] shadow-[0_20px_40px_rgba(42,31,26,0.1)] w-full max-w-md text-center border border-lotus-gold/20">
         {status === "loading" && (
           <div className="flex flex-col items-center">
-            <Loader2 className="w-16 h-16 text-lotus-leaf animate-spin mb-4" />
+            <Loader2 className="w-16 h-16 text-lotus-primary animate-spin mb-4" />
             <h2 className="text-xl font-semibold text-lotus-deep">
               Đang xử lý kết quả...
             </h2>
@@ -71,8 +71,8 @@ export function VnPayReturnPage() {
 
         {status === "success" && (
           <div className="flex flex-col items-center animate-in fade-in zoom-in duration-300">
-            <div className="w-20 h-20 bg-lotus-leaf/10 rounded-full flex items-center justify-center mb-4 border border-lotus-leaf/20">
-              <CheckCircle2 className="w-10 h-10 text-lotus-leaf" />
+            <div className="w-20 h-20 bg-lotus-primary/10 rounded-full flex items-center justify-center mb-4 border border-lotus-primary/20">
+              <CheckCircle2 className="w-10 h-10 text-lotus-primary" />
             </div>
             <h2 className="text-2xl font-bold text-lotus-deep mb-2">
               Thanh toán thành công!
@@ -80,7 +80,7 @@ export function VnPayReturnPage() {
             <p className="text-lotus-stone mb-6">{message}</p>
             <button
               onClick={handleReturn}
-              className="px-6 py-3 bg-lotus-leaf text-white rounded-admin font-medium hover:bg-lotus-leaf/90 transition-colors w-full shadow-md shadow-lotus-leaf/20"
+              className="px-6 py-3 bg-lotus-primary text-white rounded-admin font-medium hover:bg-lotus-primary/90 transition-colors w-full shadow-md shadow-lotus-primary/20"
             >
               {returnText}
             </button>

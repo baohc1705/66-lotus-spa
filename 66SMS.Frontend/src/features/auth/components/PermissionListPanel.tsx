@@ -21,11 +21,11 @@ export function PermissionListPanel({ permissions, onAdd, onEdit, onDelete }: {
         </button>
       </div>
 
-      <div className="max-h-64 overflow-y-auto">
+      <div className="max-h-64 overflow-y-auto overflow-x-auto w-full">
         {permissions.length === 0 ? (
           <p className="p-6 text-center text-lotus-stone text-sm">Chưa có quyền nào</p>
         ) : (
-          <table className="w-full border-collapse">
+          <table className="w-full border-collapse min-w-[500px]">
             <thead>
               <tr className="bg-lotus-cream">
                 {['Tên quyền', 'Resource', 'Action', ''].map(h => (

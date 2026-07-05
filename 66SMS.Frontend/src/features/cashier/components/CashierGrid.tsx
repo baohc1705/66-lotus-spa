@@ -17,8 +17,8 @@ interface CashierGridProps {
 }
 
 const HOURS = Array.from({ length: 15 }, (_, i) => i + 8); // 08:00 to 22:00
-// Mỗi slot 15 phút cao 30px (1 giờ = 120px)
-const SLOT_HEIGHT = 30;
+// Mỗi slot 15 phút cao 20px (1 giờ = 80px)
+const SLOT_HEIGHT = 20;
 
 function timeToMins(t: string) {
   const [h, m] = t.split(":").map(Number);
@@ -146,7 +146,7 @@ export function CashierGrid({
   const currentH = currentTime.getHours();
   const currentM = currentTime.getMinutes();
   const showCurrentTime = isToday && currentH >= 8 && currentH <= 22;
-  const currentTimeY = (currentH - 8) * 120 + (currentM / 60) * 120;
+  const currentTimeY = (currentH - 8) * 80 + (currentM / 60) * 80;
 
   const handleDragStart = (e: React.DragEvent, bookingId: string) => {
     e.dataTransfer.setData("bookingId", bookingId);
@@ -184,15 +184,15 @@ export function CashierGrid({
   };
 
   return (
-    <div className="flex-1 overflow-auto scrollbar-thin bg-white relative">
+    <div className="flex-1 min-h-0 min-w-0 w-full overflow-auto scrollbar-thin bg-white relative font-sans">
       <div className="flex min-w-max">
         {/* Time Column (Y-Axis) - Sticky Left */}
-        <div className="w-16 flex-shrink-0 border-r border-lotus-gold/20 bg-lotus-cream/10 sticky left-0 z-20">
-          <div className="h-14 border-b border-lotus-gold/20 sticky top-0 bg-lotus-cream/10 z-30"></div>
+        <div className="w-16 flex-shrink-0 border-r border-stone-300/80 bg-[#FDF5F7] sticky left-0 z-30">
+          <div className="h-11 border-b border-stone-300/80 sticky top-0 left-0 bg-[#FBE5EB] z-50"></div>
           <div className="relative">
             {HOURS.map((hour) => (
-              <div key={hour} className="h-[120px] relative">
-                <span className="absolute -top-2.5 right-2 text-xs font-medium text-lotus-stone">
+              <div key={hour} className="h-[80px] relative">
+                <span className="absolute top-1 right-2 text-[10px] font-bold text-lotus-stone/85">
                   {hour.toString().padStart(2, "0")}:00
                 </span>
               </div>
@@ -200,10 +200,10 @@ export function CashierGrid({
 
             {showCurrentTime && (
               <div
-                className="absolute left-1 right-1 z-30 flex items-center justify-center pointer-events-none"
+                className="absolute left-0.5 right-0.5 z-30 flex items-center justify-center pointer-events-none"
                 style={{ top: `${currentTimeY}px` }}
               >
-                <div className="bg-lotus-rose text-white text-[10px] px-1 rounded shadow-sm font-bold -translate-y-1/2 border border-lotus-rose">
+                <div className="bg-rose-600 text-white text-[9px] px-1 rounded-[2px] shadow-sm font-bold -translate-y-1/2 border border-rose-600">
                   {currentH.toString().padStart(2, "0")}:
                   {currentM.toString().padStart(2, "0")}
                 </div>
@@ -216,10 +216,10 @@ export function CashierGrid({
         <div className="flex-1 flex relative">
           {showCurrentTime && (
             <div
-              className="absolute left-0 right-0 border-b border-lotus-rose border-dashed z-20 pointer-events-none flex items-center"
-              style={{ top: `${currentTimeY + 56}px` }}
+              className="absolute left-0 right-0 border-b border-rose-500/60 border-dashed z-20 pointer-events-none flex items-center"
+              style={{ top: `${currentTimeY + 44}px` }}
             >
-              <div className="w-1.5 h-1.5 rounded-full bg-lotus-rose absolute -left-0.5"></div>
+              <div className="w-1.5 h-1.5 rounded-full bg-rose-500 absolute -left-0.5"></div>
             </div>
           )}
 
@@ -229,30 +229,30 @@ export function CashierGrid({
             return (
               <div
                 key={col.id}
-                className="flex-1 min-w-[200px] border-r border-lotus-gold/20 border-dashed"
+                className="flex-1 min-w-[150px] border-r border-stone-300/60 border-dashed"
               >
                 {/* Column Header */}
-                <div className="h-14 bg-white border-b border-lotus-gold/20 sticky top-0 z-10 flex flex-col items-center justify-center px-2">
-                  <span className="font-semibold text-sm text-lotus-deep truncate w-full text-center">
-                    {col.name}
-                  </span>
+                <div className="h-11 bg-[#FDF5F7] border-b border-stone-300/80 sticky top-0 z-40 flex items-center justify-center gap-2.5 px-4">
                   {col.avatar ? (
                     <img
                       src={col.avatar}
                       alt={col.name}
-                      className="w-5 h-5 rounded-full mt-0.5"
+                      className="w-5 h-5 rounded-[2px]"
                     />
                   ) : (
-                    <span className="text-[10px] text-lotus-stone mt-0.5">
-                      KTV
-                    </span>
+                    <div className="w-5 h-5 rounded-[2px] bg-lotus-gold/10 flex items-center justify-center text-lotus-gold font-bold text-[9px]">
+                      {col.name.charAt(0)}
+                    </div>
                   )}
+                  <span className="font-bold text-xs text-lotus-deep truncate text-center">
+                    {col.name}
+                  </span>
                 </div>
 
                 {/* Column Cells */}
                 <div
-                  className="relative bg-white border-lotus-gold/20"
-                  style={{ height: `${HOURS.length * 120}px` }}
+                  className="relative bg-white border-stone-300/60"
+                  style={{ height: `${HOURS.length * 80}px` }}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, Number(col.id))}
                 >
@@ -260,12 +260,12 @@ export function CashierGrid({
                     {HOURS.map((hour) => (
                       <div
                         key={hour}
-                        className="h-[120px] w-full flex flex-col border-b border-lotus-gold/20"
+                        className="h-[80px] w-full flex flex-col border-b border-stone-300/60"
                       >
                         {[0, 15, 30, 45].map((min) => (
                           <div
                             key={min}
-                            className="flex-1 border-b border-lotus-gold/10 border-dashed border-opacity-40 last:border-0 relative group pointer-events-auto cursor-crosshair hover:bg-lotus-leaf/5 transition-colors"
+                            className="flex-1 border-b border-stone-300/30 border-dashed last:border-0 relative group pointer-events-auto cursor-crosshair hover:bg-lotus-primary/5 transition-colors"
                             onClick={() =>
                               onEmptySlotClick?.(
                                 Number(col.id),
@@ -273,7 +273,7 @@ export function CashierGrid({
                               )
                             }
                           >
-                            <div className="absolute left-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 bg-lotus-deep text-white text-[10px] px-1 rounded z-20 font-medium shadow-sm transition-opacity">
+                            <div className="absolute left-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 bg-lotus-deep text-white text-[9px] px-1 rounded-[2px] z-20 font-medium shadow-sm transition-opacity">
                               {hour.toString().padStart(2, "0")}:
                               {min.toString().padStart(2, "0")}
                             </div>
@@ -302,49 +302,49 @@ export function CashierGrid({
                       <div key={cluster.id}>
                         {visibleBookings.map((booking) => {
                           const startOffset =
-                            (booking.startMins - 8 * 60) * (120 / 60);
+                            (booking.startMins - 8 * 60) * (80 / 60);
                           const height =
-                            (booking.endMins - booking.startMins) * (120 / 60);
+                            (booking.endMins - booking.startMins) * (80 / 60);
                           const leftPercent = booking.colIndex * widthPercent;
                           const left = `calc(${leftPercent}% + 2px)`;
                           const width = `calc(${widthPercent}% - 4px)`;
 
                           let statusColor =
-                            "bg-gray-100 border-gray-300 text-gray-700";
-                          let statusBadge = "bg-gray-400";
+                            "bg-stone-50 border-stone-200 text-stone-700";
+                          let statusBadge = "bg-stone-400";
 
                           switch (booking.status) {
                             case "in-progress":
-                              statusColor = "bg-sky-50 border-sky-300 text-sky-600";
+                              statusColor = "bg-sky-50 border-sky-200 text-sky-700";
                               statusBadge = "bg-status-in-progress";
                               break;
                             case "not-arrived":
-                              statusColor = "bg-red-50 border-red-300 text-red-600";
+                              statusColor = "bg-red-50 border-red-200 text-red-700";
                               statusBadge = "bg-status-cancelled";
                               break;
                             case "waiting":
-                              statusColor = "bg-yellow-50 border-yellow-300 text-yellow-600";
+                              statusColor = "bg-yellow-50 border-yellow-200 text-yellow-700";
                               statusBadge = "bg-status-waiting";
                               break;
                             case "pending":
-                              statusColor = "bg-amber-50 border-amber-300 text-amber-600";
+                              statusColor = "bg-amber-50 border-amber-200 text-amber-700";
                               statusBadge = "bg-status-pending";
                               break;
                             case "confirmed":
-                              statusColor = "bg-blue-50 border-blue-300 text-blue-600";
+                              statusColor = "bg-blue-50 border-blue-200 text-blue-700";
                               statusBadge = "bg-status-confirmed";
                               break;
                             case "unpaid":
-                              statusColor = "bg-rose-50 border-rose-300 text-rose-600";
+                              statusColor = "bg-rose-50 border-rose-200 text-rose-700";
                               statusBadge = "bg-lotus-rose animate-pulse";
                               break;
                             case "paid":
                             case "completed":
-                              statusColor = "bg-emerald-50 border-emerald-300 text-emerald-600";
+                              statusColor = "bg-emerald-50 border-emerald-200 text-emerald-700";
                               statusBadge = "bg-status-completed";
                               break;
                             case "cancelled":
-                              statusColor = "bg-slate-50 border-slate-300 text-slate-600";
+                              statusColor = "bg-slate-50 border-slate-200 text-slate-700";
                               statusBadge = "bg-status-cancelled";
                               break;
                           }
@@ -359,7 +359,7 @@ export function CashierGrid({
                                 handleDragStart(e, booking.id);
                               }}
                               className={cn(
-                                "absolute rounded-admin border p-2 cursor-grab active:cursor-grabbing transition-all hover:shadow-md overflow-hidden group z-10",
+                                "absolute rounded-[3px] border px-1.5 py-0.5 cursor-grab active:cursor-grabbing transition-all hover:shadow overflow-hidden group z-10",
                                 statusColor,
                               )}
                               style={{
@@ -369,22 +369,22 @@ export function CashierGrid({
                                 width,
                               }}
                             >
-                              <div className="flex items-start justify-between mb-1">
-                                <div className="font-semibold text-sm truncate">
+                              <div className="flex items-center justify-between gap-1 leading-none">
+                                <div className="font-bold text-[10px] truncate whitespace-nowrap text-lotus-deep">
                                   {booking.customerName}
                                 </div>
                                 <div
                                   className={cn(
-                                    "w-2 h-2 rounded-full flex-shrink-0 mt-1.5",
+                                    "w-1.5 h-1.5 rounded-full flex-shrink-0",
                                     statusBadge,
                                   )}
                                 ></div>
                               </div>
-                              <div className="text-xs opacity-90 truncate">
+                              <div className="text-[9px] opacity-90 truncate whitespace-nowrap mt-0.5">
                                 {booking.serviceName}
                               </div>
-                              <div className="text-xs opacity-75 mt-1 flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
+                              <div className="text-[9px] opacity-75 mt-0.5 flex items-center gap-0.5 truncate whitespace-nowrap">
+                                <Clock className="w-2 h-2 flex-shrink-0" />
                                 {booking.startTime} - {booking.endTime}
                               </div>
                             </div>
@@ -393,13 +393,13 @@ export function CashierGrid({
 
                         {hasOverflow && (
                           <div
-                            className="absolute bg-lotus-cream/50 hover:bg-lotus-cream cursor-pointer rounded-admin border border-lotus-gold/30 flex items-center justify-center text-xs font-semibold text-lotus-deep z-10 transition-colors shadow-sm"
+                            className="absolute bg-lotus-cream/40 hover:bg-lotus-cream cursor-pointer rounded-[3px] border border-stone-200 flex items-center justify-center text-[10px] font-bold text-lotus-deep z-10 transition-colors shadow-sm"
                             style={{
-                              top: `${(cluster.startMins - 8 * 60) * 2}px`,
-                              height: `${(cluster.endMins - cluster.startMins) * 2}px`,
+                              top: `${(cluster.startMins - 8 * 60) * (80 / 60)}px`,
+                              height: `${(cluster.endMins - cluster.startMins) * (80 / 60)}px`,
                               left: `calc(${MAX_COLS * widthPercent}% + 2px)`,
                               width: `calc(${0.5 * widthPercent}% - 4px)`,
-                              minWidth: "24px",
+                              minWidth: "16px",
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
@@ -415,19 +415,19 @@ export function CashierGrid({
                             {activeOverflow?.clusterId === cluster.id &&
                               activeOverflow?.colId === col.id && (
                                 <div
-                                  className="absolute top-0 right-full mr-2 bg-white rounded-xl shadow-xl border border-lotus-gold/20 p-3 w-64 z-[60] flex flex-col gap-2 cursor-default"
+                                  className="absolute top-0 right-full mr-1.5 bg-white rounded-[3px] shadow border border-stone-200 p-2 w-56 z-[60] flex flex-col gap-1.5 cursor-default animate-in fade-in zoom-in-95 duration-100"
                                   onClick={(e) => e.stopPropagation()}
                                 >
-                                  <div className="flex justify-between items-center border-b border-lotus-gold/10 pb-2 mb-1">
-                                    <span className="font-semibold text-sm text-lotus-deep">
+                                  <div className="flex justify-between items-center border-b border-stone-100 pb-1.5 mb-0.5">
+                                    <span className="font-bold text-xs text-lotus-deep">
                                       Lịch bị ẩn ({hiddenBookings.length})
                                     </span>
                                     <button
                                       onClick={() => setActiveOverflow(null)}
-                                      className="text-lotus-stone hover:text-lotus-deep rounded-full hover:bg-lotus-cream p-1 transition-colors"
+                                      className="text-lotus-stone hover:text-lotus-deep rounded-[2px] hover:bg-lotus-cream/50 p-0.5 transition-colors"
                                     >
                                       <svg
-                                        className="w-4 h-4"
+                                        className="w-3.5 h-3.5"
                                         fill="none"
                                         viewBox="0 0 24 24"
                                         stroke="currentColor"
@@ -441,7 +441,7 @@ export function CashierGrid({
                                       </svg>
                                     </button>
                                   </div>
-                                  <div className="max-h-[300px] overflow-auto flex flex-col gap-2 scrollbar-thin">
+                                  <div className="max-h-[240px] overflow-auto flex flex-col gap-1.5 scrollbar-thin">
                                     {hiddenBookings.map((b) => (
                                       <div
                                         key={b.id}
@@ -449,16 +449,16 @@ export function CashierGrid({
                                           onBookingClick(b);
                                           setActiveOverflow(null);
                                         }}
-                                        className="bg-lotus-cream/20 border border-lotus-gold/20 rounded-admin p-2 cursor-pointer hover:bg-white hover:border-lotus-gold hover:shadow-sm transition-all text-left"
+                                        className="bg-lotus-cream/10 border border-stone-200/60 rounded-[2px] p-1.5 cursor-pointer hover:bg-lotus-cream/20 hover:border-stone-300 transition-all text-left"
                                       >
-                                        <div className="font-semibold text-sm text-lotus-deep">
+                                        <div className="font-bold text-[10px] text-lotus-deep truncate whitespace-nowrap">
                                           {b.customerName}
                                         </div>
-                                        <div className="text-xs text-lotus-deep/70 mt-0.5">
+                                        <div className="text-[9px] text-lotus-deep/75 mt-0.5 truncate whitespace-nowrap">
                                           {b.serviceName}
                                         </div>
-                                        <div className="text-xs text-lotus-stone mt-1.5 flex items-center gap-1 font-medium">
-                                          <Clock className="w-3 h-3" />
+                                        <div className="text-[9px] text-lotus-stone mt-1 flex items-center gap-0.5 font-semibold truncate whitespace-nowrap">
+                                          <Clock className="w-2 h-2" />
                                           {b.startTime} - {b.endTime}
                                         </div>
                                       </div>

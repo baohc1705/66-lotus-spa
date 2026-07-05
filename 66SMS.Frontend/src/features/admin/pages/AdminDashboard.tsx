@@ -140,7 +140,7 @@ export function AdminDashboard() {
       {/* Top Header & Action Row */}
       <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-2 pb-4">
         <div>
-          <h1 className="font-display italic text-3xl text-lotus-deep">Quản lý Spa</h1>
+          <h1 className="font-sans italic text-3xl text-lotus-deep">Quản lý Spa</h1>
           <p className="font-sans text-lotus-stone text-sm mt-1">Thông số hoạt động tổng quan và báo cáo thời gian thực.</p>
         </div>
         <div className="flex items-center gap-3">
@@ -207,7 +207,7 @@ export function AdminDashboard() {
           <motion.div variants={itemVariants} className="card-glow bg-white/70 backdrop-blur-md rounded-admin p-6 border border-stone-200/30 flex flex-col">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="font-display text-xl font-semibold text-lotus-deep">Biểu đồ gửi tin & Tỷ lệ mở</h2>
+                <h2 className="font-sans text-xl font-semibold text-lotus-deep">Biểu đồ gửi tin & Tỷ lệ mở</h2>
                 <p className="text-[12px] text-lotus-stone mt-0.5">Biểu diễn số lượng tin nhắn đã phân phối trong tuần.</p>
               </div>
               <select 
@@ -345,7 +345,7 @@ export function AdminDashboard() {
           <motion.div variants={itemVariants} className="card-glow bg-white/70 backdrop-blur-md rounded-admin p-6 border border-stone-200/30">
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h2 className="font-display text-xl font-semibold text-lotus-deep">Giám sát trạng thái phòng</h2>
+                <h2 className="font-sans text-xl font-semibold text-lotus-deep">Giám sát trạng thái phòng</h2>
                 <p className="text-[12px] text-lotus-stone mt-0.5">Trạng thái phòng trị liệu thời gian thực.</p>
               </div>
               <span className="px-2.5 py-1 bg-lotus-gold/10 text-lotus-gold text-[11px] font-bold rounded-admin uppercase tracking-wider">
@@ -424,7 +424,7 @@ export function AdminDashboard() {
           {/* Today's Appointments agenda */}
           <motion.div variants={itemVariants} className="card-glow bg-white/70 backdrop-blur-md rounded-admin p-6 border border-stone-200/30">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display text-lg font-semibold text-lotus-deep">Lịch hẹn hôm nay</h2>
+              <h2 className="font-sans text-lg font-semibold text-lotus-deep">Lịch hẹn hôm nay</h2>
               <Calendar className="w-4 h-4 text-lotus-gold" />
             </div>
 
@@ -467,7 +467,7 @@ export function AdminDashboard() {
           {/* Therapist Log and duty status */}
           <motion.div variants={itemVariants} className="card-glow bg-white/70 backdrop-blur-md rounded-admin p-6 border border-stone-200/30">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display text-lg font-semibold text-lotus-deep">Kỹ thuật viên trực ca</h2>
+              <h2 className="font-sans text-lg font-semibold text-lotus-deep">Kỹ thuật viên trực ca</h2>
               <span className="text-xs font-semibold text-lotus-leaf flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-lotus-leaf" />
                 4 nhân sự
@@ -511,7 +511,7 @@ export function AdminDashboard() {
           {/* Campaign stats with progress bars */}
           <motion.div variants={itemVariants} className="card-glow bg-white/70 backdrop-blur-md rounded-admin p-6 border border-stone-200/30">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display text-lg font-semibold text-lotus-deep">Chiến dịch gần đây</h2>
+              <h2 className="font-sans text-lg font-semibold text-lotus-deep">Chiến dịch gần đây</h2>
               <Send className="w-4 h-4 text-lotus-rose" />
             </div>
 

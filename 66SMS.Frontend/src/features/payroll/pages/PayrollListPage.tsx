@@ -187,8 +187,8 @@ export function PayrollListPage() {
   });
 
   return (
-    <div className="space-y-4">
-      <div className="bg-white/70 backdrop-blur-md rounded-admin border border-stone-200/30 overflow-hidden">
+    <div className="space-y-4 w-full max-w-full overflow-hidden">
+      <div className="bg-white/70 backdrop-blur-md rounded-admin border border-stone-200/30 overflow-hidden w-full">
         {/* Toolbar */}
         <div className="p-4 flex flex-wrap items-end gap-3 border-b border-stone-100">
           <Button

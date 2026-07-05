@@ -216,7 +216,7 @@ function TierCarousel({ sortedTiers, currentTierName, currentTierIndex, isLoadin
   if (isLoadingTiers) {
     return (
       <div>
-        <h3 className="text-lg font-bold text-lotus-deep mb-5 font-display flex items-center gap-2">
+        <h3 className="text-lg font-bold text-lotus-deep mb-5 font-sans flex items-center gap-2">
           <Gift className="w-5 h-5 text-lotus-rose" />
           Các hạng thẻ thành viên
         </h3>
@@ -232,7 +232,7 @@ function TierCarousel({ sortedTiers, currentTierName, currentTierIndex, isLoadin
   if (sortedTiers.length === 0) {
     return (
       <div>
-        <h3 className="text-lg font-bold text-lotus-deep mb-5 font-display flex items-center gap-2">
+        <h3 className="text-lg font-bold text-lotus-deep mb-5 font-sans flex items-center gap-2">
           <Gift className="w-5 h-5 text-lotus-rose" />
           Các hạng thẻ thành viên
         </h3>
@@ -258,7 +258,7 @@ function TierCarousel({ sortedTiers, currentTierName, currentTierIndex, isLoadin
 
   return (
     <div>
-      <h3 className="text-lg font-bold text-lotus-deep mb-5 font-display flex items-center gap-2">
+      <h3 className="text-lg font-bold text-lotus-deep mb-5 font-sans flex items-center gap-2">
         <Gift className="w-5 h-5 text-lotus-rose" />
         Các hạng thẻ thành viên
       </h3>
@@ -485,7 +485,7 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <ShieldAlert className="w-12 h-12 text-lotus-stone mb-4" />
-        <h3 className="text-lg font-bold text-lotus-deep font-display">Dành riêng cho Khách hàng</h3>
+        <h3 className="text-lg font-bold text-lotus-deep font-sans">Dành riêng cho Khách hàng</h3>
         <p className="text-sm text-lotus-stone max-w-sm mt-2">
           Thông tin thẻ thành viên và các ưu đãi chỉ áp dụng cho tài khoản khách hàng.
         </p>
@@ -509,7 +509,7 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
       {/* SECTION 1: Progress Tracker Timeline */}
       {sortedTiers.length > 0 && (
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm relative overflow-hidden">
-          <h3 className="text-lg font-bold text-lotus-deep mb-6 font-display flex items-center gap-2">
+          <h3 className="text-lg font-bold text-lotus-deep mb-6 font-sans flex items-center gap-2">
             <Award className="w-5 h-5 text-lotus-rose" />
             Lộ trình thăng hạng
           </h3>
@@ -592,7 +592,7 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-gray-100">
           <div>
             <span className="text-xs font-bold text-lotus-rose uppercase tracking-widest">Chi tiết hạng thẻ</span>
-            <h3 className="text-2xl font-bold text-lotus-deep font-display mt-1 flex items-center gap-2">
+            <h3 className="text-2xl font-bold text-lotus-deep font-sans mt-1 flex items-center gap-2">
               <Sparkles className="w-6 h-6 text-lotus-gold" />
               Hạng {selectedTier?.name}
             </h3>
@@ -711,7 +711,7 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
 
       {/* SECTION 4: Ưu đãi của bạn */}
       <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm relative overflow-hidden">
-        <h3 className="text-lg font-bold text-lotus-deep mb-4 font-display flex items-center gap-2">
+        <h3 className="text-lg font-bold text-lotus-deep mb-4 font-sans flex items-center gap-2">
           <Gift className="w-5 h-5 text-lotus-gold" />
           Mã giảm giá & Quà tặng của bạn
         </h3>

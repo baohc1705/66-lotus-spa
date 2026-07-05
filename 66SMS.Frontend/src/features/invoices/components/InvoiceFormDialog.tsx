@@ -25,6 +25,9 @@ import type { ServiceDTO } from '@/features/services/types/service.types'
 import type { ProductDto } from '@/features/products/types/product.types'
 import type { TreatmentCourseDto } from '@/features/treatment_courses/types/treatmentCourse.types'
 import type { StaffDto } from '@/features/staffs/types/staff.types'
+import { useSalons } from '@/features/salons/hooks/useSalons'
+import type { SalonDTO } from '@/features/salons/types/salon.types'
+import { useAuthStore } from '@/features/auth/stores/authStore'
 import {
   INVOICE_ITEM_TYPE, PAYMENT_METHOD, POINT_VALUE_VND,
   type CreateInvoicePayload,
@@ -55,6 +58,9 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
   const isPending = createMutation.isPending
 
   // Tải dữ liệu cho các ô chọn
+  const effectiveSalonId = useAuthStore((s) => s.getEffectiveSalonId())
+  const { data: salonsResult } = useSalons({ pageIndex: 1, pageSize: 100 })
+  const salons: SalonDTO[] = salonsResult?.data?.items ?? []
   const customers: CustomerDto[] = useCustomers({ pageIndex: 1, pageSize: 200 }).data?.data?.items ?? []
   const services: ServiceDTO[] = useServices({ pageIndex: 1, pageSize: 200 }).data?.data?.items ?? []
   const products: ProductDto[] = useProducts({ pageIndex: 1, pageSize: 200 }).data?.data?.items ?? []
@@ -63,15 +69,15 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceSchema) as Resolver<InvoiceFormValues>,
-    defaultValues: getDefaultValues(),
+    defaultValues: getDefaultValues(effectiveSalonId ?? undefined),
   })
 
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = form
   const { fields, append, remove } = useFieldArray({ control: form.control, name: 'items' })
 
   useEffect(() => {
-    if (open) reset(getDefaultValues())
-  }, [open, reset])
+    if (open) reset(getDefaultValues(effectiveSalonId ?? undefined))
+  }, [open, reset, effectiveSalonId])
 
   // ---- Lấy đơn giá theo loại + id (để xem trước) ----
   const getUnitPrice = (itemType: number, refId: number): number => {
@@ -112,6 +118,7 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
       customerId: data.customerId || undefined,
       customerName: data.customerName || undefined,
       customerPhone: data.customerPhone || undefined,
+      salonId: data.salonId || undefined,
       discountAmount: data.discountAmount || 0,
       applyMembershipDiscount: data.applyMembershipDiscount ?? true,
       loyaltyPointsUsed: data.loyaltyPointsUsed || 0,
@@ -156,6 +163,22 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
                   className="h-9"
                 />
               </FormField>
+              <FormField label="Chi nhánh / Salon">
+                <SearchableSelect
+                  value={watch('salonId')?.toString() ?? ''}
+                  onValueChange={(v) => setValue('salonId', v ? Number(v) : undefined)}
+                  options={salons.map((s: SalonDTO) => ({ value: String(s.id ?? ''), label: `${s.name ?? ''} — ${s.code ?? ''}` }))}
+                  placeholder="Chọn chi nhánh..."
+                  searchPlaceholder="Tìm chi nhánh..."
+                  className="h-9"
+                />
+              </FormField>
+              <FormField label="Tên khách vãng lai">
+                <Input {...register('customerName')} placeholder="VD: Chị Lan" className="h-9 text-[13px]" />
+              </FormField>
+              <FormField label="SĐT khách vãng lai">
+                <Input {...register('customerPhone')} placeholder="09xxxxxxxx" className="h-9 text-[13px]" />
+              </FormField>
               <FormField label="Hình thức TT *" error={errors.paymentMethod?.message}>
                 <Select value={watch('paymentMethod')?.toString() ?? '1'} onValueChange={(v) => setValue('paymentMethod', Number(v))}>
                   <SelectTrigger className="h-9 text-[13px]"><SelectValue /></SelectTrigger>
@@ -163,12 +186,6 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
                     {PAYMENT_OPTIONS.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
-              </FormField>
-              <FormField label="Tên khách vãng lai">
-                <Input {...register('customerName')} placeholder="VD: Chị Lan" className="h-9 text-[13px]" />
-              </FormField>
-              <FormField label="SĐT khách vãng lai">
-                <Input {...register('customerPhone')} placeholder="09xxxxxxxx" className="h-9 text-[13px]" />
               </FormField>
             </div>
           </FormSection>
@@ -345,11 +362,12 @@ function FormField({ label, error, className, children }: { label: string; error
 
 // ---- Default Values ----
 
-function getDefaultValues(): InvoiceFormValues {
+function getDefaultValues(defaultSalonId?: number): InvoiceFormValues {
   return {
     customerId: undefined,
     customerName: '',
     customerPhone: '',
+    salonId: defaultSalonId,
     discountAmount: 0,
     applyMembershipDiscount: true,
     loyaltyPointsUsed: 0,

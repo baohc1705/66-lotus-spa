@@ -170,3 +170,18 @@
 .animate-slide-in  { animation: slide-in 0.22s ease-out; }
 .animate-fade-in   { animation: fade-in  0.20s ease-out; }
 .animate-float     { animation: float-y  4s ease-in-out infinite; }
+
+/* ── Global Admin Font & Color Override ───────────────── */
+.admin-dashboard-container,
+.admin-dashboard-container * {
+  font-family: 'Be Vietnam Pro', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+.admin-dashboard-container {
+  /* Enforce Lotus Leaf Green as the primary color theme for all admin functionalities */
+  --primary: 62 122 62 !important; /* RGB representation of #3E7A3E */
+  --accent: 62 122 62 !important;
+  --lotus-primary: #3E7A3E !important;
+  --lotus-rose: #3E7A3E !important;
+  --lotus-rose-light: rgba(62, 122, 62, 0.08) !important;
+}

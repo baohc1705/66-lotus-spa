@@ -49,7 +49,7 @@ export function OnlineBookingsDrawer({
       <div className="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-[#FBF7F2] shadow-[0_20px_40px_rgba(42,31,26,0.1)] z-50 flex flex-col animate-in slide-in-from-right duration-300 border-l border-lotus-gold/20">
         <div className="h-14 flex items-center justify-between px-4 border-b border-lotus-gold/20 bg-lotus-cream">
           <h2 className="font-semibold text-lotus-deep flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-lotus-leaf" />
+            <Calendar className="w-5 h-5 text-lotus-primary" />
             Lịch online chờ xác nhận
             {bookings.length > 0 && (
               <span className="bg-lotus-rose text-white text-xs px-2 py-0.5 rounded-full">
@@ -68,14 +68,14 @@ export function OnlineBookingsDrawer({
         <div className="flex-1 overflow-y-auto p-4">
           {isLoading ? (
             <div className="flex items-center justify-center h-32">
-              <Loader2 className="w-6 h-6 animate-spin text-lotus-leaf" />
+              <Loader2 className="w-6 h-6 animate-spin text-lotus-primary" />
             </div>
           ) : isError ? (
             <div className="text-center py-8">
               <p className="text-red-500 text-sm mb-2">Lỗi khi tải lịch hẹn</p>
               <button
                 onClick={() => refetch()}
-                className="text-lotus-leaf text-sm hover:underline font-medium"
+                className="text-lotus-primary text-sm hover:underline font-medium"
               >
                 Thử lại
               </button>
@@ -155,7 +155,7 @@ export function OnlineBookingsDrawer({
                       onClick={() =>
                         handleUpdateStatus(b.id, BookingStatus.Waiting)
                       }
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-lotus-leaf text-white py-2 rounded-admin text-sm font-medium hover:bg-lotus-leaf/90 disabled:opacity-50 transition-colors shadow-sm"
+                      className="flex-1 flex items-center justify-center gap-1.5 bg-lotus-primary text-white py-2 rounded-admin text-sm font-medium hover:bg-lotus-primary/90 disabled:opacity-50 transition-colors shadow-sm"
                     >
                       {updatingId === b.id ? (
                         <Loader2 className="w-4 h-4 animate-spin" />

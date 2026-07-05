@@ -33,7 +33,7 @@ export function SecurityForm() {
   return (
     <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="mb-8">
-        <h3 className="text-2xl font-bold text-lotus-deep mb-2 flex items-center gap-2 font-serif">
+        <h3 className="text-2xl font-bold text-lotus-deep mb-2 flex items-center gap-2 font-sans">
           <Lock className="w-6 h-6 text-lotus-stone" />
           Đổi mật khẩu
         </h3>

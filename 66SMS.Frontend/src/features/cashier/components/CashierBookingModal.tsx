@@ -65,8 +65,8 @@ export function CashierBookingModal({
           <div className="relative z-10 h-full">
             {currentStep === 4 ? (
               <div className="flex flex-col items-center justify-center py-20 h-full">
-                <div className="w-20 h-20 bg-lotus-leaf/10 rounded-full flex items-center justify-center mb-6 border border-lotus-leaf/20 shadow-sm">
-                  <CheckCircle2 className="w-10 h-10 text-lotus-leaf" />
+                <div className="w-20 h-20 bg-lotus-primary/10 rounded-full flex items-center justify-center mb-6 border border-lotus-primary/20 shadow-sm">
+                  <CheckCircle2 className="w-10 h-10 text-lotus-primary" />
                 </div>
                 <h3 className="text-2xl font-bold text-lotus-deep mb-2">
                   Đặt Lịch Thành Công!
@@ -84,7 +84,7 @@ export function CashierBookingModal({
                   </Button>
                   <Button
                     onClick={onClose}
-                    className="bg-lotus-leaf text-white hover:bg-lotus-leaf/90 shadow-lotus-leaf/20 shadow-md"
+                    className="bg-lotus-primary text-white hover:bg-lotus-primary/90 shadow-lotus-primary/20 shadow-md"
                   >
                     Đóng
                   </Button>
