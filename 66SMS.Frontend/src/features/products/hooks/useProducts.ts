@@ -17,22 +17,22 @@ const ENTITY = "sản phẩm";
 const PRODUCT_KEYS = {
   all: ["products"] as const,
   lists: () => [...PRODUCT_KEYS.all, "list"] as const,
-  list: (params: PageRequest) => [...PRODUCT_KEYS.lists(), params] as const,
+  list: (params: PageRequest & { categoryId?: number }) => [...PRODUCT_KEYS.lists(), params] as const,
   deletedLists: () => [...PRODUCT_KEYS.all, "deleted"] as const,
-  deletedList: (params: PageRequest) =>
+  deletedList: (params: PageRequest & { categoryId?: number }) =>
     [...PRODUCT_KEYS.deletedLists(), params] as const,
   details: () => [...PRODUCT_KEYS.all, "detail"] as const,
   detail: (id: number) => [...PRODUCT_KEYS.details(), id] as const,
 };
 
-export function useProducts(params: PageRequest) {
+export function useProducts(params: PageRequest & { categoryId?: number }) {
   return useQuery({
     queryKey: PRODUCT_KEYS.list(params),
     queryFn: () => productApi.getAll(params),
   });
 }
 
-export function useAdminProducts(params: PageRequest, enabled = true) {
+export function useAdminProducts(params: PageRequest & { categoryId?: number }, enabled = true) {
   return useQuery({
     queryKey: PRODUCT_KEYS.list(params),
     queryFn: () => productApi.adminGetAll(params),
@@ -40,7 +40,7 @@ export function useAdminProducts(params: PageRequest, enabled = true) {
   });
 }
 
-export function useDeletedProducts(params: PageRequest, enabled = true) {
+export function useDeletedProducts(params: PageRequest & { categoryId?: number }, enabled = true) {
   return useQuery({
     queryKey: PRODUCT_KEYS.deletedList(params),
     queryFn: () => productApi.getAllDeleted(params),

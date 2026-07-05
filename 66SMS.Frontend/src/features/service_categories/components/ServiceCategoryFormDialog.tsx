@@ -93,8 +93,6 @@ export function ServiceCategoryFormDialog({
         onSuccess: (result) => {
           if (result.isSuccess) {
             onOpenChange(false);
-            // Ideally backend should return the created object including ID, 
-            // but we'll trigger onSuccess anyway for UI responsiveness
             onSuccess?.({ ...data } as ServiceCategoryDTO);
           }
         },

@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { authApi } from "@/features/auth/api/authApi";
 import { useAuthStore } from "@/features/auth/stores/authStore";
-import { usersApi } from "@/features/users/api/usersApi";
+import { usersApi } from "@/features/users/api/user.api";
 import { staffSalonApi } from "@/features/staff_salons/api/staff-salon.api";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { toast } from "sonner";

@@ -1,44 +1,49 @@
-import { useCallback, useMemo } from "react";
+import { containerVariants } from "@/shared/motion/pageVariants";
 import {
-  useReactTable,
   getCoreRowModel,
   getExpandedRowModel,
+  useReactTable,
 } from "@tanstack/react-table";
-import { Plus, Trash2, ArrowLeft, Package } from "lucide-react";
+import { ArrowLeft, Package, Plus, Trash2 } from "lucide-react";
+import { motion } from "motion/react";
+import { useCallback, useMemo } from "react";
+import { useOutletContext } from "react-router-dom";
 
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
-import { TableEmptyState } from "@/shared/components/DataTable/TableEmptyState";
-import { TableSelectionBar } from "@/shared/components/DataTable/TableSelectionBar";
-import { Button } from "@/shared/components/ui/button";
-import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
+import { DataTable } from "@/shared/components/DataTable/DataTable";
 import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
 import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
+import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
+import { TableEmptyState } from "@/shared/components/DataTable/TableEmptyState";
+import { TableSelectionBar } from "@/shared/components/DataTable/TableSelectionBar";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { Button } from "@/shared/components/ui/button";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
+import { StatusActive } from "@/shared/constants/status.enum";
 import { useRowSelection } from "@/shared/hooks/useRowSelection";
+import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
-import { ProductFormDialog } from "../components/ProductFormDialog";
+import { ProductCategorySidebar } from "../components/ProductCategorySidebar";
 import { ProductDetailExpanded } from "../components/ProductDetailExpanded";
+import { ProductFormDialog } from "../components/ProductFormDialog";
+import { ProductStatCards } from "../components/ProductStatCards";
 import {
-  useActiveProductColumns,
   PRODUCT_COLUMN_LABELS,
+  useActiveProductColumns,
 } from "../components/useActiveProductColumns";
 import { useDeletedProductColumns } from "../components/useDeletedProductColumns";
 import { PRODUCT_PERM } from "../constants/product.permissions";
+import { useProductListState } from "../hooks/useProductListState";
 import {
   useAdminProducts,
   useDeletedProducts,
   useDeleteProduct,
   useDeleteProductMultiples,
-  useUpdateProduct,
   useRestoreProduct,
+  useUpdateProduct,
 } from "../hooks/useProducts";
-import { useProductListState } from "../hooks/useProductListState";
 import type { ProductDto } from "../types/product.types";
 
 const ENTITY = "sản phẩm";
@@ -73,13 +78,17 @@ export function ProductListPage() {
     handlePageSizeChange,
     handleSearchChange,
     filter,
+    selectedCategoryId,
+    setSelectedCategoryId,
   } = listState;
 
   const activeQuery = useAdminProducts(queryParams, !showDeleted);
   const deletedQuery = useDeletedProducts(queryParams, showDeleted);
 
   const productResult = showDeleted ? deletedQuery.data : activeQuery.data;
-  const isLoading = showDeleted ? deletedQuery.isLoading : activeQuery.isLoading;
+  const isLoading = showDeleted
+    ? deletedQuery.isLoading
+    : activeQuery.isLoading;
   const isFetching = showDeleted
     ? deletedQuery.isFetching
     : activeQuery.isFetching;
@@ -87,6 +96,22 @@ export function ProductListPage() {
   const paged = productResult?.data;
   const products = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+
+  // Stat card calculations
+  const activeProductCount = useMemo(
+    () =>
+      products.filter((p: ProductDto) => p.status === StatusActive.Active)
+        .length,
+    [products],
+  );
+  const totalStock = useMemo(
+    () =>
+      products.reduce(
+        (sum: number, p: ProductDto) => sum + (p.stockQuantity ?? 0),
+        0,
+      ),
+    [products],
+  );
 
   const pageIds = useMemo(
     () =>
@@ -111,8 +136,6 @@ export function ProductListPage() {
   const restoreMutation = useRestoreProduct();
 
   const activeColumns = useActiveProductColumns({
-    pageIndex,
-    pageSize,
     orderBy,
     isDescending,
     onSort: handleSort,
@@ -133,6 +156,7 @@ export function ProductListPage() {
 
   const columns = showDeleted ? deletedColumns : activeColumns;
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: products,
     columns,
@@ -185,154 +209,201 @@ export function ProductListPage() {
 
   const columnLabels = useMemo(() => ({ ...PRODUCT_COLUMN_LABELS }), []);
 
+  const { layoutMode } = useOutletContext<{
+    layoutMode: "top-nav" | "sidebar";
+  }>();
+  const isSidebarMode = layoutMode === "sidebar";
+
   return (
-    <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-      <div className="px-4 pt-4">
-        <DataTableToolbar
-          searchValue={filter}
-          onSearchChange={handleSearchChange}
-          searchPlaceholder="Tìm theo tên, mã sản phẩm..."
+    <div className="flex h-full overflow-hidden gap-2">
+      {/* Sidebar danh mục */}
+      {!isSidebarMode && (
+        <ProductCategorySidebar
+          selectedCategoryId={selectedCategoryId}
+          onSelectCategory={setSelectedCategoryId}
+          showDeleted={showDeleted}
+        />
+      )}
+
+      {/* Right: Stats + Table */}
+      <div className="flex-1 min-w-0 flex flex-col gap-2 overflow-hidden">
+        {/* Stats row */}
+        <div className="shrink-0">
+          <ProductStatCards
+            totalProducts={totalCount}
+            activeProducts={activeProductCount}
+            totalStock={totalStock}
+            usedInInvoices={0}
+            isLoading={isLoading}
+          />
+        </div>
+
+        {/* Table card */}
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+          className={`${TABLE_STYLES.pageCard} flex-1 min-h-0 flex flex-col overflow-hidden relative`}
         >
-          {selectedCount > 0 && !showDeleted && (
-            <TableSelectionBar
-              count={selectedCount}
-              onClear={clearSelection}
-              actions={
-                <PermissionGate
-                  resource={perm.resource}
-                  action={perm.delete}
-                  role={perm.role}
-                >
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="text-[12px] h-7 px-2"
-                    onClick={() => setBulkDeleteOpen(true)}
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    Xóa đã chọn
-                  </Button>
-                </PermissionGate>
-              }
-            />
+          {/* Fetching bar */}
+          {isFetching && !isLoading && (
+            <div className={TABLE_STYLES.fetchBar}>
+              <div className={TABLE_STYLES.fetchBarInner} />
+            </div>
           )}
 
-          {!showDeleted && (
-            <DataTableViewOptions table={table} columnLabels={columnLabels} />
-          )}
-
-          <PermissionGate
-            resource={perm.resource}
-            action={perm.create}
-            role={perm.role}
-          >
-            <Button
-              variant="admin"
-              size="sm"
-              onClick={() => setCreateOpen(true)}
-              className={TABLE_STYLES.toolbarBtn}
+          {/* Toolbar */}
+          <div className="px-4 pt-3 shrink-0">
+            <DataTableToolbar
+              searchValue={filter}
+              onSearchChange={handleSearchChange}
+              searchPlaceholder="Tìm theo tên, mã sản phẩm..."
             >
-              <Plus className="w-3.5 h-3.5" />
-              Thêm sản phẩm
-            </Button>
-          </PermissionGate>
-
-          <PermissionGate
-            resource={perm.resource}
-            action={perm.read}
-            role={perm.role}
-          >
-            <Button
-              variant="admin"
-              size="sm"
-              className={TABLE_STYLES.toolbarBtn}
-              onClick={() => handleToggleView(clearSelection)}
-              title={
-                showDeleted ? "Quay lại danh sách" : "Sản phẩm đã xóa"
-              }
-            >
-              {showDeleted ? (
-                <>
-                  <ArrowLeft className="w-4 h-4" />
-                  {COMMON_MSG.back}
-                </>
-              ) : (
-                <>
-                  <Trash2 className="w-4 h-4" />
-                  {COMMON_MSG.restore}
-                </>
+              {selectedCount > 0 && !showDeleted && (
+                <TableSelectionBar
+                  count={selectedCount}
+                  onClear={clearSelection}
+                  actions={
+                    <PermissionGate
+                      resource={perm.resource}
+                      action={perm.delete}
+                      role={perm.role}
+                    >
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="text-[12px] h-7 px-2"
+                        onClick={() => setBulkDeleteOpen(true)}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Xóa đã chọn
+                      </Button>
+                    </PermissionGate>
+                  }
+                />
               )}
-            </Button>
-          </PermissionGate>
-        </DataTableToolbar>
+
+              {!showDeleted && (
+                <DataTableViewOptions
+                  table={table}
+                  columnLabels={columnLabels}
+                />
+              )}
+
+              <PermissionGate
+                resource={perm.resource}
+                action={perm.create}
+                role={perm.role}
+              >
+                <Button
+                  variant="admin"
+                  size="sm"
+                  onClick={() => setCreateOpen(true)}
+                  className={TABLE_STYLES.toolbarBtn}
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Thêm sản phẩm
+                </Button>
+              </PermissionGate>
+
+              <PermissionGate
+                resource={perm.resource}
+                action={perm.read}
+                role={perm.role}
+              >
+                <Button
+                  variant="admin"
+                  size="sm"
+                  className={TABLE_STYLES.toolbarBtn}
+                  onClick={() => handleToggleView(clearSelection)}
+                  title={showDeleted ? "Quay lại danh sách" : "Sản phẩm đã xóa"}
+                >
+                  {showDeleted ? (
+                    <>
+                      <ArrowLeft className="w-4 h-4" />
+                      {COMMON_MSG.back}
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4" />
+                      {COMMON_MSG.restore}
+                    </>
+                  )}
+                </Button>
+              </PermissionGate>
+            </DataTableToolbar>
+          </div>
+
+          {/* Table */}
+          <DataTable
+            table={table}
+            isLoading={isLoading}
+            loadingRows={
+              pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
+            }
+            onRowClick={showDeleted ? undefined : (row) => row.toggleExpanded()}
+            renderSubComponent={
+              showDeleted
+                ? undefined
+                : ({ row }) =>
+                    row.original.id ? (
+                      <ProductDetailExpanded
+                        productId={row.original.id}
+                        onEdit={(product) => setEditTarget(product)}
+                      />
+                    ) : null
+            }
+            emptyState={
+              showDeleted ? (
+                <TableEmptyState
+                  icon={Trash2}
+                  title="Không có sản phẩm đã xóa"
+                  hint="Các sản phẩm bị xóa sẽ hiển thị tại đây."
+                />
+              ) : (
+                <TableEmptyState
+                  icon={Package}
+                  title="Chưa có sản phẩm"
+                  hint="Thêm sản phẩm mới để bắt đầu quản lý kho."
+                  action={
+                    <PermissionGate
+                      resource={perm.resource}
+                      action={perm.create}
+                      role={perm.role}
+                    >
+                      <Button
+                        variant="admin"
+                        size="sm"
+                        onClick={() => setCreateOpen(true)}
+                        className="mt-1 text-[12px]"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        Thêm sản phẩm
+                      </Button>
+                    </PermissionGate>
+                  }
+                />
+              )
+            }
+            pagination={
+              paged && totalCount > 0 ? (
+                <DataTablePagination
+                  pageIndex={paged.pageIndex}
+                  pageSize={paged.pageSize}
+                  totalCount={paged.totalCount}
+                  totalPages={paged.totalPages}
+                  hasPreviousPage={paged.hasPreviousPage}
+                  hasNextPage={paged.hasNextPage}
+                  onPageChange={setPageIndex}
+                  onPageSizeChange={handlePageSizeChange}
+                />
+              ) : null
+            }
+          />
+        </motion.div>
       </div>
 
-      <DataTable
-        table={table}
-        isLoading={isLoading}
-        loadingRows={
-          pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
-        }
-        onRowClick={showDeleted ? undefined : (row) => row.toggleExpanded()}
-        renderSubComponent={
-          showDeleted
-            ? undefined
-            : ({ row }) =>
-                row.original.id ? (
-                  <ProductDetailExpanded
-                    productId={row.original.id}
-                    onEdit={(product) => setEditTarget(product)}
-                  />
-                ) : null
-        }
-        emptyState={
-          showDeleted ? (
-            <TableEmptyState
-              icon={Trash2}
-              title="Không có sản phẩm đã xóa"
-              hint="Các sản phẩm bị xóa sẽ hiển thị tại đây."
-            />
-          ) : (
-            <TableEmptyState
-              icon={Package}
-              title="Chưa có sản phẩm"
-              hint="Thêm sản phẩm mới để bắt đầu quản lý kho."
-              action={
-                <PermissionGate
-                  resource={perm.resource}
-                  action={perm.create}
-                  role={perm.role}
-                >
-                  <Button
-                    variant="admin"
-                    size="sm"
-                    onClick={() => setCreateOpen(true)}
-                    className="mt-1 text-[12px]"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    Thêm sản phẩm
-                  </Button>
-                </PermissionGate>
-              }
-            />
-          )
-        }
-        pagination={
-          paged && totalCount > 0 ? (
-            <DataTablePagination
-              pageIndex={paged.pageIndex}
-              pageSize={paged.pageSize}
-              totalCount={paged.totalCount}
-              totalPages={paged.totalPages}
-              hasPreviousPage={paged.hasPreviousPage}
-              hasNextPage={paged.hasNextPage}
-              onPageChange={setPageIndex}
-              onPageSizeChange={handlePageSizeChange}
-            />
-          ) : null
-        }
-      />
-
+      {/* Dialogs */}
       <ProductFormDialog open={createOpen} onOpenChange={setCreateOpen} />
 
       <ProductFormDialog
@@ -385,6 +456,6 @@ export function ProductListPage() {
         loading={restoreMutation.isPending}
         variant="default"
       />
-    </TablePageShell>
+    </div>
   );
 }

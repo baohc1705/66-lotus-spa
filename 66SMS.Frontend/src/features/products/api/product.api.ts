@@ -19,18 +19,19 @@ import type {
 const BASE_PRODUCT = API.products;
 const BASE_IMAGE = API.productImages;
 
-function toAdminQuery(params: PageRequest): GetAllProductQuery {
+function toAdminQuery(params: PageRequest & { categoryId?: number }): GetAllProductQuery {
   return {
     pageIndex: params.pageIndex,
     pageSize: params.pageSize,
     keyword: params.filter || undefined,
     orderBy: params.orderBy,
     isDescending: params.isDescending,
+    categoryId: params.categoryId,
   };
 }
 
 export const productApi = {
-  getAll: (params: PageRequest) =>
+  getAll: (params: PageRequest & { categoryId?: number }) =>
     axiosInstance
       .get<Result<PagedResult<ProductDto>>>(BASE_PRODUCT, {
         params: {
@@ -39,18 +40,19 @@ export const productApi = {
           keyword: params.filter || undefined,
           orderBy: params.orderBy,
           isDescending: params.isDescending,
+          categoryId: params.categoryId,
         },
       })
       .then((r) => r.data),
 
-  adminGetAll: (params: PageRequest) =>
+  adminGetAll: (params: PageRequest & { categoryId?: number }) =>
     axiosInstance
       .get<Result<PagedResult<ProductDto>>>(`${BASE_PRODUCT}/admin`, {
         params: toAdminQuery(params),
       })
       .then((r) => r.data),
 
-  getAllDeleted: (params: PageRequest) =>
+  getAllDeleted: (params: PageRequest & { categoryId?: number }) =>
     axiosInstance
       .get<Result<PagedResult<ProductDto>>>(`${BASE_PRODUCT}/deleted`, {
         params: toAdminQuery(params),

@@ -1,15 +1,13 @@
-import { useMemo } from "react";
-import type { ColumnDef, Row } from "@tanstack/react-table";
 import type { UseMutationResult } from "@tanstack/react-query";
-import {
-  MoreHorizontal,
-  Pencil,
-  Trash2,
-  Package,
-  Eye,
-} from "lucide-react";
+import type { ColumnDef, Row } from "@tanstack/react-table";
+import { Eye, MoreHorizontal, Package, Pencil, Trash2 } from "lucide-react";
+import { useMemo } from "react";
 
+import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
+import { MutedCell, TextCell } from "@/shared/components/DataTable/tableCells";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Button } from "@/shared/components/ui/button";
+import { Checkbox } from "@/shared/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,22 +15,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
-import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Switch } from "@/shared/components/ui/switch";
-import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import {
-  IndexCell,
-  MutedCell,
-  TextCell,
-} from "@/shared/components/DataTable/tableCells";
-import { StatusActive } from "@/shared/constants/status.enum";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { StatusActive } from "@/shared/constants/status.enum";
 import type { Result } from "@/shared/types/common.types";
 
 import { PRODUCT_PERM } from "../constants/product.permissions";
-import type { ProductDto } from "../types/product.types";
 import type { UpdateProductPayload } from "../schemas/product.schema";
+import type { ProductDto } from "../types/product.types";
 
 export const PRODUCT_COLUMN_LABELS = {
   code: "Mã SP",
@@ -45,8 +35,6 @@ export const PRODUCT_COLUMN_LABELS = {
 } as const;
 
 interface UseActiveProductColumnsParams {
-  pageIndex: number;
-  pageSize: number;
   orderBy?: string;
   isDescending: boolean;
   onSort: (column: string) => void;
@@ -72,8 +60,6 @@ function formatPrice(value: number | null | undefined) {
 }
 
 export function useActiveProductColumns({
-  pageIndex,
-  pageSize,
   orderBy,
   isDescending,
   onSort,
@@ -114,19 +100,6 @@ export function useActiveProductColumns({
           );
         },
         size: 40,
-        enableResizing: false,
-      },
-      {
-        id: "index",
-        header: "#",
-        cell: ({ row }) => (
-          <IndexCell
-            pageIndex={pageIndex}
-            pageSize={pageSize}
-            rowIndex={row.index}
-          />
-        ),
-        size: 50,
         enableResizing: false,
       },
       {
@@ -274,10 +247,7 @@ export function useActiveProductColumns({
                     <Eye className="w-4 h-4" />
                     {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
                   </DropdownMenuItem>
-                  <PermissionGate
-                    resource={perm.resource}
-                    action={perm.update}
-                  >
+                  <PermissionGate resource={perm.resource} action={perm.update}>
                     <DropdownMenuItem onClick={() => onEdit(item)}>
                       <Pencil className="w-4 h-4" />
                       {COMMON_MSG.edit}
@@ -307,8 +277,6 @@ export function useActiveProductColumns({
       },
     ],
     [
-      pageIndex,
-      pageSize,
       orderBy,
       isDescending,
       onSort,

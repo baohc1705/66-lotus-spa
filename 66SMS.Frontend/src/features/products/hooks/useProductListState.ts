@@ -10,6 +10,7 @@ export function useProductListState() {
   const [deleteTarget, setDeleteTarget] = useState<ProductDto | null>(null);
   const [restoreTarget, setRestoreTarget] = useState<ProductDto | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 
   const handleToggleView = useCallback(
     (onClearSelection: () => void) => {
@@ -20,8 +21,14 @@ export function useProductListState() {
     [table],
   );
 
+  const queryParams = {
+    ...table.queryParams,
+    ...(selectedCategoryId != null ? { categoryId: selectedCategoryId } : {}),
+  };
+
   return {
     ...table,
+    queryParams,
     showDeleted,
     createOpen,
     setCreateOpen,
@@ -34,5 +41,7 @@ export function useProductListState() {
     bulkDeleteOpen,
     setBulkDeleteOpen,
     handleToggleView,
+    selectedCategoryId,
+    setSelectedCategoryId,
   };
 }
