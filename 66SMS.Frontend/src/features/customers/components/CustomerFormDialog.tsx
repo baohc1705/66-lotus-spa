@@ -11,12 +11,6 @@ import {
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/shared/components/ui/tooltip";
 import {
   Select,
   SelectContent,
@@ -26,6 +20,8 @@ import {
 } from "@/shared/components/ui/select";
 import { SearchableSelect } from "@/shared/components/ui/searchable-select";
 import { Textarea } from "@/shared/components/ui/textarea";
+import { FormSection } from "@/shared/components/forms/FormSection";
+import { FormField } from "@/shared/components/forms/FormField";
 import { useCreateCustomer, useUpdateCustomer } from "../hooks/useCustomers";
 import {
   useProvinces,
@@ -52,6 +48,7 @@ import { ImageUpload } from "@/shared/components/ImageUpload";
 import { uploadApi } from "@/shared/api/upload.api";
 import axiosInstance from "@/shared/api/axiosInstance";
 import { API } from "@/shared/api/endpoints";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 interface CustomerFormDialogProps {
   open: boolean;
@@ -138,11 +135,11 @@ export function CustomerFormDialog({
       const parts = [data.streetAddress, wardName, provinceName].filter(
         Boolean,
       );
-      const payload = { 
-        ...data, 
-        avatarUrl, 
+      const payload = {
+        ...data,
+        avatarUrl,
         fullAddress: parts.join(", "),
-        dateOfBirth: data.dateOfBirth ? data.dateOfBirth : undefined
+        dateOfBirth: data.dateOfBirth ? data.dateOfBirth : undefined,
       };
 
       if (isEdit && customer?.id) {
@@ -290,24 +287,24 @@ export function CustomerFormDialog({
                   className="h-9"
                 />
               </FormField>
-              <FormField
-                label="Số nhà, tên đường"
-                error={errors.streetAddress?.message}
-                className="sm:col-span-2"
-              >
-                <Input
-                  {...register("streetAddress")}
-                  placeholder="123 Đường ABC"
-                  className="h-9 text-[13px]"
-                />
-              </FormField>
+              <div className="sm:col-span-2">
+                <FormField
+                  label="Số nhà, tên đường"
+                  error={errors.streetAddress?.message}
+                >
+                  <Input
+                    {...register("streetAddress")}
+                    placeholder="123 Đường ABC"
+                    className="h-9 text-[13px]"
+                  />
+                </FormField>
+              </div>
             </div>
           </FormSection>
 
           {/* === Section: Thông tin khách hàng === */}
           <FormSection icon={ShoppingBag} title="Thông tin khách hàng">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-              {/* Điểm tích lũy được quản lý tự động bởi hệ thống */}
               <FormField label="Nguồn khách">
                 <Select
                   value={watch("source") ?? ""}
@@ -342,21 +339,20 @@ export function CustomerFormDialog({
                   </SelectContent>
                 </Select>
               </FormField>
-              <FormField
-                label="Ghi chú"
-                error={errors.note?.message}
-                className="sm:col-span-2"
-              >
-                <Textarea
-                  {...register("note")}
-                  placeholder="Ghi chú thêm về khách hàng..."
-                  className="text-[13px] min-h-[60px] resize-none"
-                />
-              </FormField>
+              <div className="sm:col-span-2">
+                <FormField
+                  label="Ghi chú"
+                  error={errors.note?.message}
+                >
+                  <Textarea
+                    {...register("note")}
+                    placeholder="Ghi chú thêm về khách hàng..."
+                    className="text-[13px] min-h-[60px] resize-none"
+                  />
+                </FormField>
+              </div>
             </div>
           </FormSection>
-
-          {/* Note: Account creation is handled via public registration only */}
 
           <DialogFooter>
             <Button
@@ -366,7 +362,7 @@ export function CustomerFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Hủy
+              {COMMON_MSG.cancel}
             </Button>
             <Button
               type="submit"
@@ -382,72 +378,6 @@ export function CustomerFormDialog({
     </Dialog>
   );
 }
-
-// ---- Helper Components ----
-
-function FormSection({
-  icon: Icon,
-  title,
-  children,
-}: {
-  icon: React.ElementType;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-stone-100">
-        <Icon className="w-4 h-4 text-lotus-leaf" />
-        <h3 className="text-[13px] font-semibold text-lotus-deep">{title}</h3>
-      </div>
-      {children}
-    </div>
-  );
-}
-
-function FormField({
-  label,
-  error,
-  tooltip,
-  className,
-  children,
-}: {
-  label: string;
-  error?: string;
-  tooltip?: string;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  const isRequired = label.includes("*");
-  const cleanLabel = label.replace("*", "").trim();
-
-  return (
-    <div className={`space-y-1 ${className ?? ""}`}>
-      <Label className="flex items-center gap-1 text-[12px] font-semibold text-lotus-deep/80">
-        {cleanLabel}
-        {isRequired &&
-          (tooltip ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="text-red-500 cursor-help hover:text-red-600 focus:outline-none select-none">
-                  *
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="max-w-xs">{tooltip}</p>
-              </TooltipContent>
-            </Tooltip>
-          ) : (
-            <span className="text-red-500">*</span>
-          ))}
-      </Label>
-      {children}
-      {error && <p className="text-[11px] text-red-500 font-medium">{error}</p>}
-    </div>
-  );
-}
-
-// ---- Default Values ----
 
 function getDefaultValues(customer?: CustomerDto | null): CustomerFormValues {
   if (customer) {

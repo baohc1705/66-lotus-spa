@@ -1,24 +1,29 @@
-import { Pencil, CreditCard, User, Crown, Calendar, CalendarClock } from 'lucide-react'
-import { Button } from '@/shared/components/ui/button'
-import { Skeleton } from '@/shared/components/ui/skeleton'
-import { PermissionGate } from '@/shared/components/security/PermissionGate'
-import { useMembershipCardDetail } from '../hooks/useMembershipCards'
-import type { MembershipCardDto } from '../types/membershipCard.types'
+import { Pencil, CreditCard, User, Crown, Calendar, CalendarClock } from "lucide-react";
+import { Button } from "@/shared/components/ui/button";
+import { Skeleton } from "@/shared/components/ui/skeleton";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { useMembershipCardDetail } from "../hooks/useMembershipCards";
+import type { MembershipCardDto } from "../types/membershipCard.types";
+import { CUSTOMER_PERM } from "../constants/customer.permissions";
 
 const STATUS_MAP: Record<number, string> = {
-  0: 'Ngưng hoạt động',
-  1: 'Hoạt động',
-  2: 'Tạm khóa',
-}
+  0: "Ngưng hoạt động",
+  1: "Hoạt động",
+  2: "Tạm khóa",
+};
 
 interface MembershipCardDetailExpandedProps {
-  cardId: number
-  onEdit?: (card: MembershipCardDto) => void
+  cardId: number;
+  onEdit?: (card: MembershipCardDto) => void;
 }
 
-export function MembershipCardDetailExpanded({ cardId, onEdit }: MembershipCardDetailExpandedProps) {
-  const { data: result, isLoading } = useMembershipCardDetail(cardId)
-  const card = result?.data
+export function MembershipCardDetailExpanded({
+  cardId,
+  onEdit,
+}: MembershipCardDetailExpandedProps) {
+  const { data: result, isLoading } = useMembershipCardDetail(cardId);
+  const card = result?.data;
+  const perm = CUSTOMER_PERM;
 
   if (isLoading) {
     return (
@@ -31,11 +36,15 @@ export function MembershipCardDetailExpanded({ cardId, onEdit }: MembershipCardD
           <Skeleton className="h-16" />
         </div>
       </div>
-    )
+    );
   }
 
   if (!card) {
-    return <div className="p-6 text-center text-lotus-stone text-sm bg-stone-50/30">Không tìm thấy thông tin thẻ thành viên</div>
+    return (
+      <div className="p-6 text-center text-lotus-stone text-sm bg-stone-50/30">
+        Không tìm thấy thông tin thẻ thành viên
+      </div>
+    );
   }
 
   return (
@@ -47,13 +56,27 @@ export function MembershipCardDetailExpanded({ cardId, onEdit }: MembershipCardD
             <CreditCard className="w-6 h-6 text-violet-500" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-base font-bold text-lotus-deep truncate">Mã thẻ: {card.cardCode}</h3>
+            <h3 className="text-base font-bold text-lotus-deep truncate">
+              Mã thẻ: {card.cardCode}
+            </h3>
             <p className="text-[12px] font-medium text-lotus-stone mt-0.5">
-              Trạng thái: <span className={card.status === 1 ? 'text-green-600' : 'text-amber-600'}>{STATUS_MAP[card.status] ?? 'Không rõ'}</span>
+              Trạng thái:{" "}
+              <span
+                className={
+                  card.status === 1 ? "text-green-600" : "text-amber-600"
+                }
+              >
+                {STATUS_MAP[card.status] ?? "Không rõ"}
+              </span>
             </p>
           </div>
-          <PermissionGate resource="customers" action="update">
-            <Button variant="admin" size="sm" onClick={() => onEdit?.(card)} className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-[13px] gap-1.5 rounded-md transition-opacity shrink-0">
+          <PermissionGate resource={perm.resource} action={perm.update}>
+            <Button
+              variant="admin"
+              size="sm"
+              onClick={() => onEdit?.(card)}
+              className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-[13px] gap-1.5 rounded-md transition-opacity shrink-0"
+            >
               <Pencil className="w-3.5 h-3.5" />
               Chỉnh sửa
             </Button>
@@ -62,26 +85,58 @@ export function MembershipCardDetailExpanded({ cardId, onEdit }: MembershipCardD
 
         {/* Grid info */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <DetailCard icon={User} label="Khách hàng" value={card.customerName ?? '—'} />
-          <DetailCard icon={Crown} label="Loại thẻ" value={card.tierName ?? '—'} />
-          <DetailCard icon={Calendar} label="Ngày cấp" value={card.issuedAt ? new Date(card.issuedAt).toLocaleDateString('vi-VN') : '—'} />
-          <DetailCard icon={CalendarClock} label="Ngày hết hạn" value={card.expiresAt ? new Date(card.expiresAt).toLocaleDateString('vi-VN') : 'Vĩnh viễn'} />
+          <DetailCard
+            icon={User}
+            label="Khách hàng"
+            value={card.customerName ?? "—"}
+          />
+          <DetailCard icon={Crown} label="Loại thẻ" value={card.tierName ?? "—"} />
+          <DetailCard
+            icon={Calendar}
+            label="Ngày cấp"
+            value={
+              card.issuedAt
+                ? new Date(card.issuedAt).toLocaleDateString("vi-VN")
+                : "—"
+            }
+          />
+          <DetailCard
+            icon={CalendarClock}
+            label="Ngày hết hạn"
+            value={
+              card.expiresAt
+                ? new Date(card.expiresAt).toLocaleDateString("vi-VN")
+                : "Vĩnh viễn"
+            }
+          />
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-function DetailCard({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
+function DetailCard({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="bg-white rounded-lg p-3 border border-stone-100 shadow-sm flex items-start gap-3">
       <div className="w-8 h-8 rounded-md bg-stone-50 flex items-center justify-center shrink-0 text-lotus-stone">
         <Icon className="w-4 h-4" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[11px] font-medium text-lotus-stone truncate mb-0.5">{label}</p>
-        <p className="text-[14px] font-semibold text-lotus-deep truncate">{value}</p>
+        <p className="text-[11px] font-medium text-lotus-stone truncate mb-0.5">
+          {label}
+        </p>
+        <p className="text-[14px] font-semibold text-lotus-deep truncate">
+          {value}
+        </p>
       </div>
     </div>
-  )
+  );
 }

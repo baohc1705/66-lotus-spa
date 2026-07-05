@@ -11,12 +11,6 @@ import {
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/shared/components/ui/tooltip";
 import {
   Select,
   SelectContent,
@@ -24,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
+import { FormField } from "@/shared/components/forms/FormField";
 import { useUpdateMembershipCard } from "../hooks/useMembershipCards";
 import { useMembershipTiers } from "../hooks/useMembershipTiers";
 import {
@@ -32,7 +27,7 @@ import {
 } from "../schemas/membershipCard.schema";
 import type { MembershipCardDto } from "../types/membershipCard.types";
 import type { MembershipTierDto } from "../types/membershipTier.types";
-import { Info } from "lucide-react";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 interface MembershipCardFormDialogProps {
   open: boolean;
@@ -187,23 +182,25 @@ export function MembershipCardFormDialog({
               />
             </FormField>
 
-            <FormField label="Trạng thái" className="sm:col-span-2">
-              <Select
-                value={watch("status")?.toString() ?? "1"}
-                onValueChange={(v) => setValue("status", Number(v))}
-              >
-                <SelectTrigger className="h-9 text-[13px]">
-                  <SelectValue placeholder="Chọn trạng thái" />
-                </SelectTrigger>
-                <SelectContent>
-                  {STATUS_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormField>
+            <div className="sm:col-span-2">
+              <FormField label="Trạng thái">
+                <Select
+                  value={watch("status")?.toString() ?? "1"}
+                  onValueChange={(v) => setValue("status", Number(v))}
+                >
+                  <SelectTrigger className="h-9 text-[13px]">
+                    <SelectValue placeholder="Chọn trạng thái" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STATUS_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormField>
+            </div>
           </div>
 
           <DialogFooter>
@@ -214,7 +211,7 @@ export function MembershipCardFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Hủy
+              {COMMON_MSG.cancel}
             </Button>
             <Button type="submit" variant="admin" size="sm" loading={isPending}>
               Cập nhật thẻ
@@ -223,44 +220,6 @@ export function MembershipCardFormDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function FormField({
-  label,
-  error,
-  tooltip,
-  className,
-  children,
-}: {
-  label: string;
-  error?: string;
-  tooltip?: string;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  const isRequired = label.includes("*");
-  const cleanLabel = label.replace("*", "").trim();
-
-  return (
-    <div className={`space-y-1.5 ${className ?? ""}`}>
-      <Label className="flex items-center gap-1.5 text-[12px] font-semibold text-lotus-deep/80">
-        {cleanLabel}
-        {isRequired && <span className="text-red-500">*</span>}
-        {tooltip && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Info className="w-3.5 h-3.5 text-lotus-stone cursor-help hover:text-lotus-leaf transition-colors" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="max-w-xs text-xs">{tooltip}</p>
-            </TooltipContent>
-          </Tooltip>
-        )}
-      </Label>
-      {children}
-      {error && <p className="text-[11px] text-red-500 font-medium">{error}</p>}
-    </div>
   );
 }
 
