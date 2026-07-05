@@ -2,6 +2,9 @@ using _66SMS.Domain.Abstractions.Entities;
 
 namespace _66SMS.Domain.Entities
 {
+    /// <summary>
+    /// Attendance entity 
+    /// </summary>
     public class Attendance : EntityBase<int>
     {
         public int StaffId { get; set; }

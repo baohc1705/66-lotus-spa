@@ -10,20 +10,24 @@ namespace _66SMS.Application.CommonService.Provinces.Queries.GetAllProvinces
 {
     public class GetAllProvincesHandler : IRequestHandler<GetAllProvincesQuery, Result<List<ProvinceDto>>>
     {
-        private readonly IProvinceSqlRepository _provinceRepository;
-        private readonly IMapper _mapper;
+        private readonly IProvinceSqlRepository provinceRepository;
+        private readonly IMapper mapper;
 
         public GetAllProvincesHandler(IProvinceSqlRepository provinceRepository, IMapper mapper)
         {
-            _provinceRepository = provinceRepository;
-            _mapper = mapper;
+            this.provinceRepository = provinceRepository;
+            this.mapper = mapper;
         }
 
         public async Task<Result<List<ProvinceDto>>> Handle(GetAllProvincesQuery request, CancellationToken cancellationToken)
         {
-            var list = await _provinceRepository.AsQueryable()
+            var list = await provinceRepository.AsQueryable()
                 .OrderBy(x => x.Name)
-                .ProjectTo<ProvinceDto>(_mapper.ConfigurationProvider)
+                .Select(x => new ProvinceDto{
+                    Code = x.Id,
+                    Name = x.Name,
+                    FullName = x.FullName,
+                })
                 .ToListAsync(cancellationToken);
 
             return Result<List<ProvinceDto>>.Success(list);

@@ -15,10 +15,13 @@ namespace _66SMS.Application.CommonService.Media.Commands.UploadImages
 
         public async Task<Result<List<string>>> Handle(UploadImagesCommand request, CancellationToken cancellationToken)
         {
+            // Create list to store the URLs of the uploaded images
             var urls = new List<string>();
 
+            // Upload each image
             foreach (var item in request.Items)
             {
+                // Upload image
                 var uploadResult = await fileStorageService.UploadImageAsync(new FileUploadRequest
                 {
                     Content = item.Content,
@@ -27,12 +30,15 @@ namespace _66SMS.Application.CommonService.Media.Commands.UploadImages
                     Folder = request.Folder
                 }, cancellationToken);
 
+                // Check upload result
                 if (!uploadResult.Success)
-                    return Result<List<string>>.BadRequest(uploadResult.Error ?? $"Upload ảnh '{item.FileName}' thất bại.");
+                    return Result<List<string>>.BadRequest(uploadResult.Error ?? $"Upload image '{item.FileName}' failed.");
 
+                // Add the URL of the uploaded image to the list
                 urls.Add(uploadResult.Url);
             }
 
+            // Return the URLs of the uploaded images
             return Result<List<string>>.Success(urls);
         }
     }

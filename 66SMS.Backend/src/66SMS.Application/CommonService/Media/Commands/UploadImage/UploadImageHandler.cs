@@ -4,6 +4,9 @@ using MediatR;
 
 namespace _66SMS.Application.CommonService.Media.Commands.UploadImage
 {
+    /// <summary>
+    /// Handler to upload an image to the media storage
+    /// </summary>
     public class UploadImageHandler : IRequestHandler<UploadImageCommand, Result<string>>
     {
         private readonly IFileStorageService fileStorageService;
@@ -15,6 +18,7 @@ namespace _66SMS.Application.CommonService.Media.Commands.UploadImage
 
         public async Task<Result<string>> Handle(UploadImageCommand request, CancellationToken cancellationToken)
         {
+            // Create request to upload image
             var uploadResult = await fileStorageService.UploadImageAsync(new FileUploadRequest
             {
                 Content = request.Content,
@@ -23,13 +27,11 @@ namespace _66SMS.Application.CommonService.Media.Commands.UploadImage
                 Folder = request.Folder
             }, cancellationToken);
 
+            // Check upload result
             if (!uploadResult.Success)
                 return Result<string>.BadRequest(uploadResult.Error ?? "Upload ảnh thất bại.");
 
-            // EXTENSION POINT: sau khi upload thành công, publish event ImageUploaded
-            // qua MassTransit/RabbitMQ để xử lý hậu kỳ (resize, watermark, dọn ảnh mồ côi v.v.)
-            // PublicId = uploadResult.PublicId — dùng cho Quartz job dọn ảnh mồ côi sau này
-
+            // Return the URL of the uploaded image
             return Result<string>.Success(uploadResult.Url);
         }
     }

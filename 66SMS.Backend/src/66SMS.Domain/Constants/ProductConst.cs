@@ -29,15 +29,8 @@ namespace _66SMS.Domain.Constants
         public const int UNIT_MAX_LENGTH = 30;
         #endregion
 
-        #region Status
-        public const int STATUS_INACTIVED = 0;
-        public const int STATUS_ACTIVED = 1;
-        public const int STATUS_DELETED = 2;
-        #endregion
-
         #region Message
         public const string MSG_PRODUCT_ID_NOT_FOUND = $"{nameof(Entities.Product)} with id not found";
-        public const string MSG_PRODUCT_NOT_FOUND = "Product not found.";
         #endregion
     }
 }
