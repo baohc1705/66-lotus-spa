@@ -36,6 +36,9 @@ namespace _66SMS.Application.BookingService.Invoices.Queries.GetAllInvoices
             if (request.SalonId.HasValue)
                 query = query.Where(x => x.SalonId == request.SalonId);
 
+            if (request.PaymentMethod.HasValue)
+                query = query.Where(x => x.PaymentMethod == request.PaymentMethod);
+
             if (request.FromDate.HasValue)
                 query = query.Where(x => x.IssuedAt >= request.FromDate);
 

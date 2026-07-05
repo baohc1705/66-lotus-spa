@@ -11,5 +11,6 @@ namespace _66SMS.Application.BookingService.Invoices.Queries.GetAllInvoices
         public int? SalonId { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
+        public int? PaymentMethod { get; set; }
     }
 }

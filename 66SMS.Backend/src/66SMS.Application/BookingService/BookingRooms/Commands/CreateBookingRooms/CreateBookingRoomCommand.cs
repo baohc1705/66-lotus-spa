@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using _66SMS.Contracts.Shared;
 using MediatR;
 
@@ -10,7 +11,7 @@ namespace _66SMS.Application.BookingService.BookingRooms.Commands.CreateBookingR
         public string? ImageUrl { get; set; }
         public string? Note { get; set; }
         public int? Status { get; set; }
-        [System.Text.Json.Serialization.JsonIgnore]
+        [JsonIgnore]
         public int? CreatedBy { get; set; }
     }
 }

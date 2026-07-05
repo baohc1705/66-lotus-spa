@@ -35,6 +35,16 @@ namespace _66SMS.Application.CustomerService.Customers.Queries.GetAllCustomer
                 query = query.Where(x => x.Status == request.Status);
             }
 
+            if (request.Gender != null)
+            {
+                query = query.Where(x => x.Gender == request.Gender);
+            }
+
+            if (!string.IsNullOrEmpty(request.Source))
+            {
+                query = query.Where(x => x.Source == request.Source);
+            }
+
             // order
             query = request.OrderBy?.ToLower() switch
             {

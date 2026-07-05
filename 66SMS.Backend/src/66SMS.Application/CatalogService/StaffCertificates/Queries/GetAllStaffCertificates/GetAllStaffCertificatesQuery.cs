@@ -9,6 +9,7 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Queries.GetAllStaf
         public int? StaffId { get; set; }
         public int? Status { get; set; }
         public int? ExpiringInDays { get; set; }
+        public int? CertificateTypeId { get; set; }
         public bool IsDeleted { get; set; } = false;
     }
 }

@@ -10,5 +10,7 @@ namespace _66SMS.Application.CustomerService.Customers.Queries.GetAllCustomer
     public class GetAllCustomerQuery : PageRequest, IRequest<Result<PagedResult<CustomerDTO>>>
     {
         public int? Status {  get; set; }
+        public int? Gender { get; set; }
+        public string? Source { get; set; }
     }
 }
