@@ -22,6 +22,9 @@ import {
 } from "@/shared/components/ui/select";
 import { SearchableSelect } from "@/shared/components/ui/searchable-select";
 import { Plus, Trash2, Leaf, ListOrdered } from "lucide-react";
+import { FormSection } from "@/shared/components/forms/FormSection";
+import { FormField } from "@/shared/components/forms/FormField";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
 import {
   treatmentCourseSchema,
   type TreatmentCourseFormValues,
@@ -31,7 +34,7 @@ import {
   useUpdateTreatmentCourse,
 } from "../hooks/useTreatmentCourses";
 import { useServices } from "@/features/services/hooks/useServices";
-import type { TreatmentCourseDto } from "../types/treatmentCourse.types";
+import type { TreatmentCourseDto, TreatmentCourseItemDto, TreatmentCourseItemPayload } from "../types/treatmentCourse.types";
 import type { ServiceDTO } from "@/features/services/types/service.types";
 import type { ServiceCategoryDTO } from "@/features/service_categories/types/service_category.types";
 import type {
@@ -109,7 +112,7 @@ export function TreatmentCourseFormDialog({
         imageUrl: data.imageUrl || undefined,
         sortOrder: data.sortOrder,
         status: data.status,
-        items: data.items.map((i) => ({
+        items: data.items.map((i: TreatmentCourseItemPayload) => ({
           serviceId: i.serviceId,
           sessionNumber: i.sessionNumber,
           quantity: i.quantity,
@@ -137,7 +140,7 @@ export function TreatmentCourseFormDialog({
         imageUrl: data.imageUrl || undefined,
         sortOrder: data.sortOrder,
         status: data.status ?? 1,
-        items: data.items.map((i) => ({
+        items: data.items.map((i: TreatmentCourseItemPayload) => ({
           serviceId: i.serviceId,
           sessionNumber: i.sessionNumber,
           quantity: i.quantity,
@@ -246,17 +249,18 @@ export function TreatmentCourseFormDialog({
                   className="h-9 text-[13px]"
                 />
               </FormField>
-              <FormField
-                label="Mô tả"
-                error={errors.description?.message}
-                className="sm:col-span-2"
-              >
-                <Textarea
-                  {...register("description")}
-                  placeholder="Mô tả ngắn về liệu trình..."
-                  className="text-[13px] min-h-[60px] resize-none"
-                />
-              </FormField>
+              <div className="sm:col-span-2">
+                <FormField
+                  label="Mô tả"
+                  error={errors.description?.message}
+                >
+                  <Textarea
+                    {...register("description")}
+                    placeholder="Mô tả ngắn về liệu trình..."
+                    className="text-[13px] min-h-[60px] resize-none"
+                  />
+                </FormField>
+              </div>
             </div>
           </FormSection>
 
@@ -386,7 +390,7 @@ export function TreatmentCourseFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Hủy
+              {COMMON_MSG.cancel}
             </Button>
             <Button type="submit" variant="admin" size="sm" loading={isPending}>
               {isEdit ? "Cập nhật" : "Tạo liệu trình"}
@@ -395,53 +399,6 @@ export function TreatmentCourseFormDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
-}
-
-// ---- Helper Components ----
-
-function FormSection({
-  icon: Icon,
-  title,
-  children,
-}: {
-  icon: React.ElementType;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-stone-100">
-        <Icon className="w-4 h-4 text-lotus-leaf" />
-        <h3 className="text-[13px] font-semibold text-lotus-deep">{title}</h3>
-      </div>
-      {children}
-    </div>
-  );
-}
-
-function FormField({
-  label,
-  error,
-  className,
-  children,
-}: {
-  label: string;
-  error?: string;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  const isRequired = label.includes("*");
-  const cleanLabel = label.replace("*", "").trim();
-  return (
-    <div className={`space-y-1 ${className ?? ""}`}>
-      <Label className="text-[12px] font-semibold text-lotus-deep/80">
-        {cleanLabel}
-        {isRequired && <span className="text-red-500 ml-0.5">*</span>}
-      </Label>
-      {children}
-      {error && <p className="text-[11px] text-red-500 font-medium">{error}</p>}
-    </div>
   );
 }
 
@@ -462,7 +419,7 @@ function getDefaultValues(
       imageUrl: course.imageUrl ?? "",
       sortOrder: course.sortOrder ?? undefined,
       status: course.status ?? 1,
-      items: (course.items ?? []).map((i) => ({
+      items: (course.items ?? []).map((i: TreatmentCourseItemDto) => ({
         serviceId: i.serviceId ?? 0,
         sessionNumber: i.sessionNumber ?? 0,
         quantity: i.quantity ?? 1,
