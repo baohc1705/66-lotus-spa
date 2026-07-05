@@ -54,13 +54,13 @@ export function AdminSidebar({
       <motion.aside
         layout
         className={cn(
-          "fixed top-0 left-0 bottom-0 z-50 flex flex-col bg-lotus-cream/95 backdrop-blur-md shadow-xl transition-all duration-500 ease-out",
+          "fixed top-0 left-0 bottom-0 z-50 flex flex-col bg-white backdrop-blur-md shadow-xl transition-all duration-500 ease-out",
           layoutMode === "sidebar"
             ? isOpen
               ? "w-64 lg:translate-x-0"
               : "w-20 lg:translate-x-0"
             : "lg:hidden",
-          isMobileOpen ? "translate-x-0" : "-translate-x-full"
+          isMobileOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div

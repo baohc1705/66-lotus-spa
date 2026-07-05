@@ -8,6 +8,7 @@ export function useStaffListState() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<StaffDto | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<StaffDto | null>(null);
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
 
   const salonId = useAuthStore((s) => s.getEffectiveSalonId());
 
@@ -26,5 +27,7 @@ export function useStaffListState() {
     setEditTarget,
     deleteTarget,
     setDeleteTarget,
+    selectedRole,
+    setSelectedRole,
   };
 }

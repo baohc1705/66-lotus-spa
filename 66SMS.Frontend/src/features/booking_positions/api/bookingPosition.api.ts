@@ -15,7 +15,7 @@ const BASE = API.bookingPositions;
 
 export const bookingPositionApi = {
   // Get All
-  getAll: (params: PageRequest) =>
+  getAll: (params: PageRequest & { roomId?: number }) =>
     axiosInstance
       .get<Result<PagedResult<BookingPositionDTO>>>(BASE, { params })
       .then((r) => r.data),

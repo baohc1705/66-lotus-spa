@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { useOutletContext } from "react-router-dom";
 import { motion, type Variants } from "motion/react";
 import {
   useReactTable,
@@ -14,7 +15,6 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  X,
   MapPin,
 } from "lucide-react";
 
@@ -34,8 +34,11 @@ import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagi
 import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Switch } from "@/shared/components/ui/switch";
+import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 import { BookingPositionFormDialog } from "../components/BookingPositionFormDialog";
+import { BookingRoomSidebar } from "../components/BookingRoomSidebar";
+import { BookingPositionStatCards } from "../components/BookingPositionStatCards";
 import {
   useBookingPositions,
   useDeleteBookingPosition,
@@ -46,15 +49,6 @@ import type { BookingPositionDTO } from "../types/booking_position.types";
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 15 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
-  },
 };
 
 export function BookingPositionListPage() {
@@ -70,6 +64,12 @@ export function BookingPositionListPage() {
   const [deleteTarget, setDeleteTarget] = useState<BookingPositionDTO | null>(null);
 
   const [selectedRowIds, setSelectedRowIds] = useState<Set<number>>(new Set());
+  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
+
+  const handleSelectRoom = useCallback((id: number | null) => {
+    setSelectedRoomId(id);
+    setPageIndex(1);
+  }, []);
 
   const {
     data: positionResult,
@@ -81,8 +81,14 @@ export function BookingPositionListPage() {
     filter: filter || undefined,
     orderBy,
     isDescending,
+    roomId: selectedRoomId ?? undefined,
   });
-  
+
+  const { data: allPositionsResult, isLoading: isLoadingAll } = useBookingPositions({
+    pageIndex: 1,
+    pageSize: 10000,
+  });
+
   const deleteMutation = useDeleteBookingPosition();
   const updateMutation = useUpdateBookingPosition();
 
@@ -90,11 +96,23 @@ export function BookingPositionListPage() {
   const positions = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
 
+  const allPositions = useMemo(() => allPositionsResult?.data?.items ?? [], [allPositionsResult]);
+
+  const totalPositionsCount = allPositions.length;
+  const activePositionsCount = useMemo(
+    () => allPositions.filter((p) => p.status === 1).length,
+    [allPositions],
+  );
+  const maintenancePositionsCount = useMemo(
+    () => allPositions.filter((p) => p.status === 0).length,
+    [allPositions],
+  );
+
   const currentPageIds = useMemo(
     () => positions.map((c) => c.id).filter((id): id is number => id !== undefined),
     [positions],
   );
-  
+
   const isAllSelected =
     currentPageIds.length > 0 &&
     currentPageIds.every((id) => selectedRowIds.has(id));
@@ -204,7 +222,7 @@ export function BookingPositionListPage() {
         header: () => (
           <button
             onClick={() => handleSort("name")}
-            className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors"
+            className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors text-[13px] font-semibold"
           >
             Tên vị trí <SortIcon column="name" />
           </button>
@@ -231,7 +249,7 @@ export function BookingPositionListPage() {
         header: () => (
           <button
             onClick={() => handleSort("sortOrder")}
-            className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors"
+            className="flex items-center gap-1.5 hover:text-lotus-leaf transition-colors text-[13px] font-semibold"
           >
             Thứ tự <SortIcon column="sortOrder" />
           </button>
@@ -333,6 +351,7 @@ export function BookingPositionListPage() {
     ],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: positions,
     columns,
@@ -345,81 +364,77 @@ export function BookingPositionListPage() {
     onColumnVisibilityChange: setColumnVisibility,
   });
 
+  const { layoutMode } = useOutletContext<{
+    layoutMode: "top-nav" | "sidebar";
+  }>();
+  const isSidebarMode = layoutMode === "sidebar";
+
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-      className="space-y-4"
-    >
-      <motion.div
-        variants={itemVariants}
-        className="bg-white/70 backdrop-blur-md rounded-admin border border-stone-200/30 overflow-hidden"
-      >
-        <div className="px-4 pt-4">
-          <DataTableToolbar
-            searchValue={filter}
-            onSearchChange={handleSearchChange}
-            searchPlaceholder="Tìm kiếm vị trí..."
-          >
-            {selectedRowIds.size > 0 && (
-              <div className="flex items-center gap-2 mr-auto text-[13px] text-lotus-deep font-medium bg-lotus-cream/50 px-3 py-1.5 rounded-lg border border-stone-200/50">
-                <span>Đã chọn {selectedRowIds.size}</span>
-                <button
-                  onClick={() => setSelectedRowIds(new Set())}
-                  className="text-lotus-stone hover:text-lotus-deep ml-1 transition-colors"
-                  title="Bỏ chọn tất cả"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            )}
+    <div className="flex h-full overflow-hidden gap-2">
+      {/* Sidebar phòng */}
+      {!isSidebarMode && (
+        <BookingRoomSidebar
+          selectedRoomId={selectedRoomId}
+          onSelectRoom={handleSelectRoom}
+        />
+      )}
 
-            <DataTableViewOptions
-              table={table}
-              columnLabels={{
-                name: "Tên vị trí",
-                roomName: "Phòng dịch vụ",
-                sortOrder: "Thứ tự",
-                status: "Trạng thái",
-              }}
-            />
-
-            <PermissionGate
-              resource="booking_positions"
-              action="create"
-              role="admin"
-            >
-              <Button
-                variant="admin"
-                size="sm"
-                onClick={() => setCreateOpen(true)}
-                className="text-[12px] gap-1.5"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Thêm vị trí
-              </Button>
-            </PermissionGate>
-          </DataTableToolbar>
+      {/* Right container: Table */}
+      <div className="flex-1 min-w-0 flex flex-col gap-2 overflow-hidden">
+        {/* Stats row */}
+        <div className="shrink-0">
+          <BookingPositionStatCards
+            totalPositions={totalPositionsCount}
+            activePositions={activePositionsCount}
+            maintenancePositions={maintenancePositionsCount}
+            isLoading={isLoadingAll}
+          />
         </div>
 
-        <DataTable
-          table={table}
-          isLoading={isLoading}
-          loadingRows={pageSize > 5 ? 5 : pageSize}
-          emptyState={
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
-                <MapPin className="w-7 h-7 text-lotus-stone" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-lotus-deep">
-                  Chưa có vị trí dịch vụ
-                </p>
-                <p className="text-[12px] text-lotus-stone mt-0.5">
-                  Thêm vị trí mới để sử dụng dịch vụ.
-                </p>
-              </div>
+        {/* Table card */}
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+          className={`${TABLE_STYLES.pageCard} flex-1 min-h-0 flex flex-col overflow-hidden relative`}
+        >
+          {/* Fetching bar */}
+          {isFetching && !isLoading && (
+            <div className={TABLE_STYLES.fetchBar}>
+              <div className={TABLE_STYLES.fetchBarInner} />
+            </div>
+          )}
+
+          {/* Toolbar */}
+          <div className="px-4 pt-3 shrink-0">
+            <DataTableToolbar
+              searchValue={filter}
+              onSearchChange={handleSearchChange}
+              searchPlaceholder="Tìm kiếm vị trí..."
+            >
+              {selectedRowIds.size > 0 && (
+                <div className="flex items-center gap-2 mr-auto text-[13px] text-lotus-deep font-medium bg-lotus-cream/50 px-3 py-1.5 rounded-lg border border-stone-200/50">
+                  <span>Đã chọn {selectedRowIds.size}</span>
+                  <button
+                    onClick={() => setSelectedRowIds(new Set())}
+                    className="text-lotus-stone hover:text-lotus-deep ml-1 transition-colors"
+                    title="Bỏ chọn tất cả"
+                  >
+                    Bỏ chọn
+                  </button>
+                </div>
+              )}
+
+              <DataTableViewOptions
+                table={table}
+                columnLabels={{
+                  name: "Tên vị trí",
+                  roomName: "Phòng dịch vụ",
+                  sortOrder: "Thứ tự",
+                  status: "Trạng thái",
+                }}
+              />
+
               <PermissionGate
                 resource="booking_positions"
                 action="create"
@@ -429,36 +444,67 @@ export function BookingPositionListPage() {
                   variant="admin"
                   size="sm"
                   onClick={() => setCreateOpen(true)}
-                  className="mt-1 text-[12px]"
+                  className={TABLE_STYLES.toolbarBtn}
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Thêm vị trí
                 </Button>
               </PermissionGate>
-            </div>
-          }
-          pagination={
-            paged && totalCount > 0 ? (
-              <DataTablePagination
-                pageIndex={paged.pageIndex}
-                pageSize={paged.pageSize}
-                totalCount={paged.totalCount}
-                totalPages={paged.totalPages}
-                hasPreviousPage={paged.hasPreviousPage}
-                hasNextPage={paged.hasNextPage}
-                onPageChange={setPageIndex}
-                onPageSizeChange={handlePageSizeChange}
-              />
-            ) : null
-          }
-        />
-
-        {isFetching && !isLoading && (
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-lotus-leaf/30 overflow-hidden">
-            <div className="h-full w-1/3 bg-lotus-leaf animate-[slide_1s_ease-in-out_infinite]" />
+            </DataTableToolbar>
           </div>
-        )}
-      </motion.div>
+
+          {/* Table */}
+          <DataTable
+            table={table}
+            isLoading={isLoading}
+            loadingRows={pageSize > 5 ? 5 : pageSize}
+            emptyState={
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
+                  <MapPin className="w-7 h-7 text-lotus-stone" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-lotus-deep">
+                    Chưa có vị trí dịch vụ
+                  </p>
+                  <p className="text-[12px] text-lotus-stone mt-0.5">
+                    Thêm vị trí mới để sử dụng dịch vụ.
+                  </p>
+                </div>
+                <PermissionGate
+                  resource="booking_positions"
+                  action="create"
+                  role="admin"
+                >
+                  <Button
+                    variant="admin"
+                    size="sm"
+                    onClick={() => setCreateOpen(true)}
+                    className="mt-1 text-[12px]"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Thêm vị trí
+                  </Button>
+                </PermissionGate>
+              </div>
+            }
+            pagination={
+              paged && totalCount > 0 ? (
+                <DataTablePagination
+                  pageIndex={paged.pageIndex}
+                  pageSize={paged.pageSize}
+                  totalCount={paged.totalCount}
+                  totalPages={paged.totalPages}
+                  hasPreviousPage={paged.hasPreviousPage}
+                  hasNextPage={paged.hasNextPage}
+                  onPageChange={setPageIndex}
+                  onPageSizeChange={handlePageSizeChange}
+                />
+              ) : null
+            }
+          />
+        </motion.div>
+      </div>
 
       <BookingPositionFormDialog
         open={createOpen}
@@ -485,6 +531,7 @@ export function BookingPositionListPage() {
         loading={deleteMutation.isPending}
         variant="danger"
       />
-    </motion.div>
+    </div>
   );
 }
+export default BookingPositionListPage;

@@ -109,4 +109,5 @@ export interface GetAllInvoicesQuery extends PageRequest {
   salonId?: number
   fromDate?: string
   toDate?: string
+  paymentMethod?: number
 }

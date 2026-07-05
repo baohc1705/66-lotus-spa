@@ -42,6 +42,7 @@ export interface StaffCertificateQueryParams extends PageRequest {
   staffId?: number;
   status?: number;
   expiringInDays?: number;
+  certificateTypeId?: number;
   filter?: string;
 }
 

@@ -10,12 +10,12 @@ import type {
 const BOOKING_POSITION_KEYS = {
   all: ["booking-positions"] as const,
   lists: () => [...BOOKING_POSITION_KEYS.all, "list"] as const,
-  list: (params: PageRequest) => [...BOOKING_POSITION_KEYS.lists(), params] as const,
+  list: (params: PageRequest & { roomId?: number }) => [...BOOKING_POSITION_KEYS.lists(), params] as const,
   details: () => [...BOOKING_POSITION_KEYS.all, "detail"] as const,
   detail: (id: number) => [...BOOKING_POSITION_KEYS.details(), id] as const,
 };
 
-export function useBookingPositions(params: PageRequest) {
+export function useBookingPositions(params: PageRequest & { roomId?: number }) {
   return useQuery({
     queryKey: BOOKING_POSITION_KEYS.list(params),
     queryFn: () => bookingPositionApi.getAll(params),

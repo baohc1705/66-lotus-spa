@@ -5,6 +5,9 @@ import {
   getExpandedRowModel,
 } from "@tanstack/react-table";
 import { Plus, Users } from "lucide-react";
+import { motion } from "motion/react";
+import { useOutletContext } from "react-router-dom";
+
 import { DataTable } from "@/shared/components/DataTable/DataTable";
 import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
 import { Button } from "@/shared/components/ui/button";
@@ -12,10 +15,14 @@ import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
 import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
-import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
 import { TableSelectionBar } from "@/shared/components/DataTable/TableSelectionBar";
+import { containerVariants } from "@/shared/motion/pageVariants";
+import { TABLE_STYLES } from "@/shared/styles/table.styles";
+
 import { StaffFormDialog } from "../components/StaffFormDialog";
 import { StaffDetailExpanded } from "../components/StaffDetailExpanded";
+import { StaffStatCards } from "../components/StaffStatCards";
+import { StaffCategorySidebar } from "../components/StaffCategorySidebar";
 import { useDeleteStaffMutation, useAdminStaffs } from "../hooks/useStaffs";
 import { useStaffListState } from "../hooks/useStaffListState";
 import { useActiveStaffColumns, STAFF_COLUMN_LABELS } from "../components/useActiveStaffColumns";
@@ -23,6 +30,7 @@ import { useRowSelection } from "@/shared/hooks/useRowSelection";
 import { STAFF_PERM } from "../constants/staff.permissions";
 import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
+import type { StaffDto } from "../types/staff.types";
 
 const ENTITY = "nhân viên";
 
@@ -48,6 +56,8 @@ export function StaffListPage() {
     setEditTarget,
     deleteTarget,
     setDeleteTarget,
+    selectedRole,
+    setSelectedRole,
   } = listState;
 
   const {
@@ -61,6 +71,7 @@ export function StaffListPage() {
     orderBy,
     isDescending,
     salonId,
+    role: selectedRole || undefined,
   });
 
   const deleteMutation = useDeleteStaffMutation();
@@ -68,6 +79,29 @@ export function StaffListPage() {
   const paged = staffsResult?.data;
   const staffs = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+
+  // Stat card calculations
+  const activeStaffs = useMemo(
+    () => staffs.filter((s: StaffDto) => s.status === "1").length,
+    [staffs],
+  );
+
+  const inactiveStaffs = useMemo(
+    () => staffs.filter((s: StaffDto) => s.status === "0").length,
+    [staffs],
+  );
+
+  const avgSalary = useMemo(() => {
+    const withSalary = staffs.filter(
+      (s: StaffDto) => s.basicSalary != null && s.basicSalary > 0,
+    );
+    if (withSalary.length === 0) return 0;
+    const total = withSalary.reduce(
+      (sum: number, s: StaffDto) => sum + (s.basicSalary ?? 0),
+      0,
+    );
+    return Math.round(total / withSalary.length);
+  }, [staffs]);
 
   const pageIds = useMemo(
     () =>
@@ -122,97 +156,141 @@ export function StaffListPage() {
     onColumnVisibilityChange: setColumnVisibility,
   });
 
+  const { layoutMode } = useOutletContext<{
+    layoutMode: "top-nav" | "sidebar";
+  }>();
+  const isSidebarMode = layoutMode === "sidebar";
+
   return (
-    <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-      <div className="bg-white/70 backdrop-blur-md rounded-admin border border-stone-200/30 overflow-hidden relative">
-        <div className="px-4 pt-4">
-          <DataTableToolbar
-            searchValue={filter}
-            onSearchChange={handleSearchChange}
-            searchPlaceholder="Tìm theo tên, SĐT, email, mã NV..."
-          >
-            {selectedCount > 0 && (
-              <TableSelectionBar
-                count={selectedCount}
-                onClear={clearSelection}
-              />
-            )}
+    <div className="flex h-full overflow-hidden gap-2">
+      {/* Sidebar danh mục vai trò */}
+      {!isSidebarMode && (
+        <StaffCategorySidebar
+          selectedRole={selectedRole}
+          onSelectRole={setSelectedRole}
+          salonId={salonId}
+        />
+      )}
 
-            <DataTableViewOptions
-              table={table}
-              columnLabels={columnLabels}
-            />
-
-            <PermissionGate resource={perm.resource} action={perm.create} role={perm.role}>
-              <Button
-                variant="admin"
-                size="sm"
-                onClick={() => setCreateOpen(true)}
-                className="text-[12px] gap-1.5"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Thêm NV
-              </Button>
-            </PermissionGate>
-          </DataTableToolbar>
+      {/* Right: Stats + Table */}
+      <div className="flex-1 min-w-0 flex flex-col gap-2 overflow-hidden">
+        {/* Stats row */}
+        <div className="shrink-0">
+          <StaffStatCards
+            totalStaffs={totalCount}
+            activeStaffs={activeStaffs}
+            inactiveStaffs={inactiveStaffs}
+            avgSalary={avgSalary}
+            isLoading={isLoading}
+          />
         </div>
 
-        <DataTable
-          table={table}
-          isLoading={isLoading}
-          loadingRows={pageSize > 5 ? 5 : pageSize}
-          onRowClick={(row) => row.toggleExpanded()}
-          renderSubComponent={({ row }) =>
-            row.original.id ? (
-              <StaffDetailExpanded
-                staffId={row.original.id}
-                onEdit={setEditTarget}
+        {/* Table card */}
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+          className={`${TABLE_STYLES.pageCard} flex-1 min-h-0 flex flex-col overflow-hidden relative`}
+        >
+          {/* Fetching bar */}
+          {isFetching && !isLoading && (
+            <div className={TABLE_STYLES.fetchBar}>
+              <div className={TABLE_STYLES.fetchBarInner} />
+            </div>
+          )}
+
+          {/* Toolbar */}
+          <div className="px-4 pt-3 shrink-0">
+            <DataTableToolbar
+              searchValue={filter}
+              onSearchChange={handleSearchChange}
+              searchPlaceholder="Tìm theo tên, SĐT, email, mã NV..."
+            >
+              {selectedCount > 0 && (
+                <TableSelectionBar
+                  count={selectedCount}
+                  onClear={clearSelection}
+                />
+              )}
+
+              <DataTableViewOptions
+                table={table}
+                columnLabels={columnLabels}
               />
-            ) : null
-          }
-          emptyState={
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
-                <Users className="w-7 h-7 text-lotus-stone" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-lotus-deep">
-                  Chưa có nhân viên
-                </p>
-                <p className="text-[12px] text-lotus-stone mt-0.5">
-                  Thêm nhân viên mới để bắt đầu quản lý.
-                </p>
-              </div>
+
               <PermissionGate resource={perm.resource} action={perm.create} role={perm.role}>
                 <Button
                   variant="admin"
                   size="sm"
                   onClick={() => setCreateOpen(true)}
-                  className="mt-1 text-[12px]"
+                  className={TABLE_STYLES.toolbarBtn}
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  Thêm nhân viên
+                  Thêm NV
                 </Button>
               </PermissionGate>
-            </div>
-          }
-          pagination={
-            paged && totalCount > 0 ? (
-              <DataTablePagination
-                pageIndex={paged.pageIndex}
-                pageSize={paged.pageSize}
-                totalCount={paged.totalCount}
-                totalPages={paged.totalPages}
-                hasPreviousPage={paged.hasPreviousPage}
-                hasNextPage={paged.hasNextPage}
-                onPageChange={setPageIndex}
-                onPageSizeChange={handlePageSizeChange}
-              />
-            ) : null
-          }
-        />
+            </DataTableToolbar>
+          </div>
+
+          {/* Table */}
+          <DataTable
+            table={table}
+            isLoading={isLoading}
+            loadingRows={pageSize > 5 ? 5 : pageSize}
+            onRowClick={(row) => row.toggleExpanded()}
+            renderSubComponent={({ row }) =>
+              row.original.id ? (
+                <StaffDetailExpanded
+                  staffId={row.original.id}
+                  onEdit={setEditTarget}
+                />
+              ) : null
+            }
+            emptyState={
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
+                  <Users className="w-7 h-7 text-lotus-stone" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-lotus-deep">
+                    Chưa có nhân viên
+                  </p>
+                  <p className="text-[12px] text-lotus-stone mt-0.5">
+                    Thêm nhân viên mới để bắt đầu quản lý.
+                  </p>
+                </div>
+                <PermissionGate resource={perm.resource} action={perm.create} role={perm.role}>
+                  <Button
+                    variant="admin"
+                    size="sm"
+                    onClick={() => setCreateOpen(true)}
+                    className="mt-1 text-[12px]"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Thêm nhân viên
+                  </Button>
+                </PermissionGate>
+              </div>
+            }
+            pagination={
+              paged && totalCount > 0 ? (
+                <DataTablePagination
+                  pageIndex={paged.pageIndex}
+                  pageSize={paged.pageSize}
+                  totalCount={paged.totalCount}
+                  totalPages={paged.totalPages}
+                  hasPreviousPage={paged.hasPreviousPage}
+                  hasNextPage={paged.hasNextPage}
+                  onPageChange={setPageIndex}
+                  onPageSizeChange={handlePageSizeChange}
+                />
+              ) : null
+            }
+          />
+        </motion.div>
       </div>
 
+      {/* Dialogs */}
       <StaffFormDialog open={createOpen} onOpenChange={setCreateOpen} />
 
       <StaffFormDialog
@@ -235,6 +313,6 @@ export function StaffListPage() {
         loading={deleteMutation.isPending}
         variant="danger"
       />
-    </TablePageShell>
+    </div>
   );
 }
