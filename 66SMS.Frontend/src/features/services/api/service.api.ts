@@ -14,16 +14,38 @@ import type {
   UpdateServiceImagePayload,
   CreateServiceProductPayload,
   UpdateServiceProductPayload,
+  DeleteServiceMultiplesPayload,
 } from "../types/service.types";
 
 const BASE = API.services;
 
+function toAdminQuery(params: PageRequest & { categoryId?: number }): GetAllServiceQuery {
+  return {
+    pageIndex: params.pageIndex,
+    pageSize: params.pageSize,
+    keyword: params.filter || undefined,
+    orderBy: params.orderBy,
+    isDescending: params.isDescending,
+    categoryId: params.categoryId,
+  };
+}
+
 export const serviceApi = {
   // Get All
-  getAll: (params: PageRequest) =>
+  getAll: (params: PageRequest & { categoryId?: number }) =>
     axiosInstance
-      .get<Result<PagedResult<ServiceDTO>>>(BASE, { params })
+      .get<Result<PagedResult<ServiceDTO>>>(BASE, {
+        params: {
+          pageIndex: params.pageIndex,
+          pageSize: params.pageSize,
+          keyword: params.filter || undefined,
+          orderBy: params.orderBy,
+          isDescending: params.isDescending,
+          categoryId: params.categoryId,
+        },
+      })
       .then((r) => r.data),
+
   // Get Detail
   getDetail: (id: number) =>
     axiosInstance.get<Result<ServiceDTO>>(`${BASE}/${id}`).then((r) => r.data),
@@ -43,9 +65,25 @@ export const serviceApi = {
     axiosInstance.delete<Result<object>>(`${BASE}/${id}`).then((r) => r.data),
 
   // Admin Get All
-  adminGetAll: (params: GetAllServiceQuery) =>
+  adminGetAll: (params: PageRequest & { categoryId?: number }) =>
     axiosInstance
-      .get<Result<PagedResult<ServiceDTO>>>(`${BASE}/admin`, { params })
+      .get<Result<PagedResult<ServiceDTO>>>(`${BASE}/admin`, {
+        params: toAdminQuery(params),
+      })
+      .then((r) => r.data),
+
+  // Delete Multiple Services
+  deleteMultiples: (payload: DeleteServiceMultiplesPayload) =>
+    axiosInstance
+      .delete<Result<object>>(`${BASE}/bulk`, { data: payload })
+      .then((r) => r.data),
+
+  // Get All Deleted
+  getAllDeleted: (params: PageRequest & { categoryId?: number }) =>
+    axiosInstance
+      .get<Result<PagedResult<ServiceDTO>>>(`${BASE}/deleted`, {
+        params: toAdminQuery(params),
+      })
       .then((r) => r.data),
 };
 

@@ -7,6 +7,7 @@ import type {
 } from "@/shared/types/common.types";
 import type {
   CreateServiceCategoryPayload,
+  DeleteServiceCategoryMultiplesPayload,
   ServiceCategoryDTO,
   UpdateServiceCategoryPayload,
 } from "../types/service_category.types";
@@ -19,11 +20,13 @@ export const serviceCategoryApi = {
     axiosInstance
       .get<Result<PagedResult<ServiceCategoryDTO>>>(BASE, { params })
       .then((r) => r.data),
+
   // Admin Get All
   adminGetAll: (params: PageRequest) =>
     axiosInstance
       .get<Result<PagedResult<ServiceCategoryDTO>>>(`${BASE}/admin`, { params })
       .then((r) => r.data),
+
   // Get Detail
   getDetail: (id: number) =>
     axiosInstance
@@ -43,4 +46,16 @@ export const serviceCategoryApi = {
   // Delete category
   delete: (id: number) =>
     axiosInstance.delete<Result<object>>(`${BASE}/${id}`).then((r) => r.data),
+
+  // Delete multiple categories
+  deleteMultiples: (payload: DeleteServiceCategoryMultiplesPayload) =>
+    axiosInstance
+      .delete<Result<object>>(`${BASE}/bulk`, { data: payload })
+      .then((r) => r.data),
+
+  // Get All Deleted
+  getAllDeleted: (params: PageRequest) =>
+    axiosInstance
+      .get<Result<PagedResult<ServiceCategoryDTO>>>(`${BASE}/deleted`, { params })
+      .then((r) => r.data),
 };

@@ -10,7 +10,8 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { useServiceDetail } from "../hooks/useServices";
-import type { ServiceDTO } from "../types/service.types";
+import type { ServiceDTO, ServiceProductResponse } from "../types/service.types";
+import { SERVICE_PERM } from "../constants/service.permissions";
 
 interface ServiceDetailExpandedProps {
   serviceId: number;
@@ -147,7 +148,7 @@ export function ServiceDetailExpanded({
 
             {/* Actions */}
             <div className="flex items-end justify-end mt-2 pt-4 border-t border-stone-100/80">
-              <PermissionGate resource="services" action="update">
+              <PermissionGate resource={SERVICE_PERM.resource} action={SERVICE_PERM.update}>
                 <Button
                   variant="admin"
                   size="sm"
@@ -187,7 +188,7 @@ export function ServiceDetailExpanded({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100 bg-white">
-                  {products.map((prod) => (
+                  {products.map((prod: ServiceProductResponse) => (
                     <tr
                       key={prod.id || prod.productId}
                       className="hover:bg-stone-50/50 transition-colors"

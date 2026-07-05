@@ -29,6 +29,8 @@ import { FormField } from "@/shared/components/forms/FormField";
 import { Input } from "@/shared/components/ui/input";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { Switch } from "@/shared/components/ui/switch";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
+
 
 interface ServiceCategoryFormDialogProps {
   open: boolean;
@@ -181,7 +183,7 @@ export function ServiceCategoryFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Hủy
+              {COMMON_MSG.cancel}
             </Button>
             <Button type="submit" variant="admin" size="sm" loading={isPending}>
               {isEdit ? "Cập nhật" : "Tạo nhóm dịch vụ"}

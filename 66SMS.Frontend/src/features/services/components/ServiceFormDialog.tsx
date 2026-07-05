@@ -4,7 +4,10 @@ import {
   useUpdateService,
 } from "@/features/services/hooks/useServices";
 import { serviceProductApi, serviceImageApi } from "@/features/services/api/service.api";
-import type { ServiceDTO } from "../types/service.types";
+import type { ServiceDTO, ServiceImageResponse, ServiceProductResponse } from "../types/service.types";
+import type { ServiceCategoryDTO } from "@/features/service_categories/types/service_category.types";
+import type { ProductDto } from "@/features/products/types/product.types";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
 import {
   createServiceSchema,
   updateServiceSchema,
@@ -140,7 +143,7 @@ export function ServiceFormDialog({
     if (watchProducts) {
       watchProducts.forEach((vp) => {
         if (vp.productId && vp.quantityUsed) {
-          const product = products.find((p) => p.id === vp.productId);
+          const product = products.find((p: ProductDto) => p.id === vp.productId);
           if (product?.costPrice) {
             productsCost += product.costPrice * vp.quantityUsed;
           }
@@ -172,7 +175,7 @@ export function ServiceFormDialog({
         const formProducts = data.serviceProducts || [];
         
         // Delete
-        const toDeleteProducts = existingProducts.filter(ep => !formProducts.some(fp => fp.id === ep.id));
+        const toDeleteProducts = existingProducts.filter((ep: ServiceProductResponse) => !formProducts.some((fp) => fp.id === ep.id));
         for (const p of toDeleteProducts) {
           if (p.id) await serviceProductApi.delete(p.id);
         }
@@ -201,7 +204,7 @@ export function ServiceFormDialog({
         const formImages = images;
 
         // Delete
-        const toDeleteImages = existingImages.filter(ei => !formImages.some(fi => fi.id === ei.id));
+        const toDeleteImages = existingImages.filter((ei: ServiceImageResponse) => !formImages.some((fi) => fi.id === ei.id));
         for (const img of toDeleteImages) {
           if (img.id) await serviceImageApi.delete(img.id);
         }
@@ -313,7 +316,7 @@ export function ServiceFormDialog({
                           <SelectValue placeholder="Chọn nhóm dịch vụ" />
                         </SelectTrigger>
                         <SelectContent>
-                          {categories.map((c) => (
+                          {categories.map((c: ServiceCategoryDTO) => (
                             <SelectItem
                               key={c.id}
                               value={c.id?.toString() || ""}
@@ -443,7 +446,7 @@ export function ServiceFormDialog({
                   const errorObj = errors.serviceProducts?.[index];
                   const productId = watch(`serviceProducts.${index}.productId`);
                   const quantity = watch(`serviceProducts.${index}.quantityUsed`) || 0;
-                  const selectedProduct = products.find((p) => p.id === productId);
+                  const selectedProduct = products.find((p: ProductDto) => p.id === productId);
                   const costPrice = selectedProduct?.costPrice || 0;
                   const total = costPrice * quantity;
 
@@ -461,7 +464,7 @@ export function ServiceFormDialog({
                               parseInt(val),
                             );
                             const prod = products.find(
-                              (p) => p.id === parseInt(val),
+                              (p: ProductDto) => p.id === parseInt(val),
                             );
                             if (prod)
                               setValue(
@@ -474,7 +477,7 @@ export function ServiceFormDialog({
                             <SelectValue placeholder="Chọn sản phẩm" />
                           </SelectTrigger>
                           <SelectContent>
-                            {products.map((p) => (
+                            {products.map((p: ProductDto) => (
                               <SelectItem
                                 key={p.id}
                                 value={p.id?.toString() || ""}
@@ -652,7 +655,7 @@ export function ServiceFormDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={isPending}
               >
-                Hủy
+                {COMMON_MSG.cancel}
               </Button>
               <Button
                 type="submit"
@@ -671,9 +674,9 @@ export function ServiceFormDialog({
       <ServiceCategoryFormDialog
         open={categoryOpen}
         onOpenChange={setCategoryOpen}
-        onSuccess={(cat) => {
+        onSuccess={(cat: ServiceCategoryDTO) => {
           if (cat.id) {
-            setValue("categoryId", cat.id);
+            setValue("categoryId", cat.id ?? 0);
           }
         }}
       />
@@ -696,14 +699,14 @@ function getDefaultValues(service?: ServiceDTO | null): ServiceFormValues {
       sortOrder: service.sortOrder ?? 0,
       status: service.status ?? 0,
       images:
-        service.images?.map((i) => ({
+        service.images?.map((i: ServiceImageResponse) => ({
           id: i.id,
           url: i.url || "",
           sortOrder: i.sortOrder || 0,
           isPrimary: i.isPrimary || false,
         })) ?? [],
       serviceProducts:
-        service.serviceProducts?.map((sp) => ({
+        service.serviceProducts?.map((sp: ServiceProductResponse) => ({
           id: sp.id,
           productId: sp.productId ?? 0,
           quantityUsed: sp.quantityUsed ?? 1,

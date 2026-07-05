@@ -52,37 +52,6 @@ export interface ServiceProductPayload {
   note?: string;
 }
 
-export interface CreateServicePayload {
-  categoryId?: number;
-  code?: string;
-  name?: string;
-  description?: string;
-  content?: string;
-  durationMins?: number;
-  costPrice?: number;
-  sellingPrice?: number;
-  commissionRate?: number;
-  sortOrder?: number;
-  status?: number;
-  serviceImages?: ServiceImagePayload[];
-  serviceProducts?: ServiceProductPayload[];
-}
-
-export interface UpdateServicePayload {
-  id?: number;
-  categoryId?: number;
-  code?: string;
-  name?: string;
-  description?: string;
-  content?: string;
-  durationMins?: number;
-  costPrice?: number;
-  sellingPrice?: number;
-  commissionRate?: number;
-  sortOrder?: number;
-  status?: number;
-}
-
 export interface GetAllServiceQuery extends PageRequest {
   categoryId?: number;
   keyword?: string;
@@ -119,3 +88,13 @@ export interface UpdateServiceProductPayload {
   note?: string;
   status?: number;
 }
+
+export interface DeleteServiceMultiplesPayload {
+  ids: number[];
+}
+
+export type {
+  CreateServicePayload,
+  UpdateServicePayload,
+  ServiceFormValues,
+} from "../schemas/service.schema";

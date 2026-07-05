@@ -1,62 +1,100 @@
-import { useEffect } from 'react'
-import { useForm, useFieldArray, type Resolver } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from "react";
+import { useForm, useFieldArray, type Resolver } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
-} from '@/shared/components/ui/dialog'
-import { Button } from '@/shared/components/ui/button'
-import { Input } from '@/shared/components/ui/input'
-import { Label } from '@/shared/components/ui/label'
-import { Textarea } from '@/shared/components/ui/textarea'
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { Textarea } from "@/shared/components/ui/textarea";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/shared/components/ui/select'
-import { SearchableSelect } from '@/shared/components/ui/searchable-select'
-import { Plus, Trash2, Leaf, ListOrdered } from 'lucide-react'
-import { treatmentCourseSchema, type TreatmentCourseFormValues } from '../schemas/treatmentCourse.schema'
-import { useCreateTreatmentCourse, useUpdateTreatmentCourse } from '../hooks/useTreatmentCourses'
-import { useServices } from '@/features/services/hooks/useServices'
-import { useServiceCategoriesAdmin } from '@/features/service_categories/hooks/useServiceCategories'
-import type { TreatmentCourseDto } from '../types/treatmentCourse.types'
-import type { ServiceDTO } from '@/features/services/types/service.types'
-import type { ServiceCategoryDTO } from '@/features/service_categories/types/service_category.types'
-import type { CreateTreatmentCoursePayload, UpdateTreatmentCoursePayload } from '../types/treatmentCourse.types'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
+import { SearchableSelect } from "@/shared/components/ui/searchable-select";
+import { Plus, Trash2, Leaf, ListOrdered } from "lucide-react";
+import {
+  treatmentCourseSchema,
+  type TreatmentCourseFormValues,
+} from "../schemas/treatmentCourse.schema";
+import {
+  useCreateTreatmentCourse,
+  useUpdateTreatmentCourse,
+} from "../hooks/useTreatmentCourses";
+import { useServices } from "@/features/services/hooks/useServices";
+import type { TreatmentCourseDto } from "../types/treatmentCourse.types";
+import type { ServiceDTO } from "@/features/services/types/service.types";
+import type { ServiceCategoryDTO } from "@/features/service_categories/types/service_category.types";
+import type {
+  CreateTreatmentCoursePayload,
+  UpdateTreatmentCoursePayload,
+} from "../types/treatmentCourse.types";
+import { useServiceCategories } from "@/features/service_categories/hooks/useServiceCategories";
 
 interface Props {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  course?: TreatmentCourseDto | null
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  course?: TreatmentCourseDto | null;
 }
 
 const STATUS_OPTIONS = [
-  { value: '0', label: 'Ngưng hoạt động' },
-  { value: '1', label: 'Hoạt động' },
-]
+  { value: "0", label: "Ngưng hoạt động" },
+  { value: "1", label: "Hoạt động" },
+];
 
-export function TreatmentCourseFormDialog({ open, onOpenChange, course }: Props) {
-  const isEdit = !!course
-  const createMutation = useCreateTreatmentCourse()
-  const updateMutation = useUpdateTreatmentCourse()
-  const isPending = createMutation.isPending || updateMutation.isPending
+export function TreatmentCourseFormDialog({
+  open,
+  onOpenChange,
+  course,
+}: Props) {
+  const isEdit = !!course;
+  const createMutation = useCreateTreatmentCourse();
+  const updateMutation = useUpdateTreatmentCourse();
+  const isPending = createMutation.isPending || updateMutation.isPending;
 
-  const servicesQuery = useServices({ pageIndex: 1, pageSize: 200 })
-  const services: ServiceDTO[] = servicesQuery.data?.data?.items ?? []
+  const servicesQuery = useServices({ pageIndex: 1, pageSize: 200 });
+  const services: ServiceDTO[] = servicesQuery.data?.data?.items ?? [];
 
-  const categoriesQuery = useServiceCategoriesAdmin({ pageIndex: 1, pageSize: 200 })
-  const categories: ServiceCategoryDTO[] = categoriesQuery.data?.data?.items ?? []
+  const categoriesQuery = useServiceCategories({
+    pageIndex: 1,
+    pageSize: 200,
+  });
+  const categories: ServiceCategoryDTO[] =
+    categoriesQuery.data?.data?.items ?? [];
 
   const form = useForm<TreatmentCourseFormValues>({
-    resolver: zodResolver(treatmentCourseSchema) as Resolver<TreatmentCourseFormValues>,
+    resolver: zodResolver(
+      treatmentCourseSchema,
+    ) as Resolver<TreatmentCourseFormValues>,
     defaultValues: getDefaultValues(course),
-  })
+  });
 
-  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = form
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+    watch,
+  } = form;
 
-  const { fields, append, remove } = useFieldArray({ control: form.control, name: 'items' })
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "items",
+  });
 
   useEffect(() => {
-    if (open) reset(getDefaultValues(course))
-  }, [open, course, reset])
+    if (open) reset(getDefaultValues(course));
+  }, [open, course, reset]);
 
   const onSubmit = (data: TreatmentCourseFormValues) => {
     if (isEdit && course?.id) {
@@ -71,17 +109,22 @@ export function TreatmentCourseFormDialog({ open, onOpenChange, course }: Props)
         imageUrl: data.imageUrl || undefined,
         sortOrder: data.sortOrder,
         status: data.status,
-        items: data.items.map(i => ({
+        items: data.items.map((i) => ({
           serviceId: i.serviceId,
           sessionNumber: i.sessionNumber,
           quantity: i.quantity,
           note: i.note || undefined,
           status: i.status ?? 1,
         })),
-      }
-      updateMutation.mutate({ id: course.id, payload }, {
-        onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) },
-      })
+      };
+      updateMutation.mutate(
+        { id: course.id, payload },
+        {
+          onSuccess: (result) => {
+            if (result.isSuccess) onOpenChange(false);
+          },
+        },
+      );
     } else {
       const payload: CreateTreatmentCoursePayload = {
         code: data.code,
@@ -94,27 +137,33 @@ export function TreatmentCourseFormDialog({ open, onOpenChange, course }: Props)
         imageUrl: data.imageUrl || undefined,
         sortOrder: data.sortOrder,
         status: data.status ?? 1,
-        items: data.items.map(i => ({
+        items: data.items.map((i) => ({
           serviceId: i.serviceId,
           sessionNumber: i.sessionNumber,
           quantity: i.quantity,
           note: i.note || undefined,
           status: i.status ?? 1,
         })),
-      }
+      };
       createMutation.mutate(payload, {
-        onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) },
-      })
+        onSuccess: (result) => {
+          if (result.isSuccess) onOpenChange(false);
+        },
+      });
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Chỉnh sửa liệu trình' : 'Thêm liệu trình mới'}</DialogTitle>
+          <DialogTitle>
+            {isEdit ? "Chỉnh sửa liệu trình" : "Thêm liệu trình mới"}
+          </DialogTitle>
           <DialogDescription>
-            {isEdit ? `Cập nhật thông tin liệu trình "${course?.name ?? ''}"` : 'Điền thông tin để tạo liệu trình mới'}
+            {isEdit
+              ? `Cập nhật thông tin liệu trình "${course?.name ?? ""}"`
+              : "Điền thông tin để tạo liệu trình mới"}
           </DialogDescription>
         </DialogHeader>
 
@@ -123,22 +172,50 @@ export function TreatmentCourseFormDialog({ open, onOpenChange, course }: Props)
           <FormSection icon={Leaf} title="Thông tin liệu trình">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
               <FormField label="Mã liệu trình *" error={errors.code?.message}>
-                <Input {...register('code')} placeholder="LT001" className="h-9 text-[13px]" />
+                <Input
+                  {...register("code")}
+                  placeholder="LT001"
+                  className="h-9 text-[13px]"
+                />
               </FormField>
               <FormField label="Tên liệu trình *" error={errors.name?.message}>
-                <Input {...register('name')} placeholder="Trị mụn chuyên sâu" className="h-9 text-[13px]" />
+                <Input
+                  {...register("name")}
+                  placeholder="Trị mụn chuyên sâu"
+                  className="h-9 text-[13px]"
+                />
               </FormField>
-              <FormField label="Giá gốc *" error={errors.originalPrice?.message}>
-                <Input {...register('originalPrice')} type="number" min={0} placeholder="0" className="h-9 text-[13px]" />
+              <FormField
+                label="Giá gốc *"
+                error={errors.originalPrice?.message}
+              >
+                <Input
+                  {...register("originalPrice")}
+                  type="number"
+                  min={0}
+                  placeholder="0"
+                  className="h-9 text-[13px]"
+                />
               </FormField>
               <FormField label="Giá bán *" error={errors.sellingPrice?.message}>
-                <Input {...register('sellingPrice')} type="number" min={0} placeholder="0" className="h-9 text-[13px]" />
+                <Input
+                  {...register("sellingPrice")}
+                  type="number"
+                  min={0}
+                  placeholder="0"
+                  className="h-9 text-[13px]"
+                />
               </FormField>
               <FormField label="Nhóm dịch vụ">
                 <SearchableSelect
-                  value={watch('categoryId')?.toString() ?? ''}
-                  onValueChange={(v) => setValue('categoryId', v ? Number(v) : undefined)}
-                  options={categories.map((c: ServiceCategoryDTO) => ({ value: String(c.id ?? ''), label: c.name ?? '' }))}
+                  value={watch("categoryId")?.toString() ?? ""}
+                  onValueChange={(v) =>
+                    setValue("categoryId", v ? Number(v) : undefined)
+                  }
+                  options={categories.map((c: ServiceCategoryDTO) => ({
+                    value: String(c.id ?? ""),
+                    label: c.name ?? "",
+                  }))}
                   placeholder="Chọn nhóm dịch vụ"
                   searchPlaceholder="Tìm nhóm..."
                   className="h-9"
@@ -146,24 +223,39 @@ export function TreatmentCourseFormDialog({ open, onOpenChange, course }: Props)
               </FormField>
               <FormField label="Trạng thái">
                 <Select
-                  value={watch('status')?.toString() ?? '1'}
-                  onValueChange={(v) => setValue('status', Number(v))}
+                  value={watch("status")?.toString() ?? "1"}
+                  onValueChange={(v) => setValue("status", Number(v))}
                 >
                   <SelectTrigger className="h-9 text-[13px]">
                     <SelectValue placeholder="Chọn trạng thái" />
                   </SelectTrigger>
                   <SelectContent>
-                    {STATUS_OPTIONS.map(opt => (
-                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                    {STATUS_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </FormField>
               <FormField label="Thứ tự sắp xếp">
-                <Input {...register('sortOrder')} type="number" placeholder="0" className="h-9 text-[13px]" />
+                <Input
+                  {...register("sortOrder")}
+                  type="number"
+                  placeholder="0"
+                  className="h-9 text-[13px]"
+                />
               </FormField>
-              <FormField label="Mô tả" error={errors.description?.message} className="sm:col-span-2">
-                <Textarea {...register('description')} placeholder="Mô tả ngắn về liệu trình..." className="text-[13px] min-h-[60px] resize-none" />
+              <FormField
+                label="Mô tả"
+                error={errors.description?.message}
+                className="sm:col-span-2"
+              >
+                <Textarea
+                  {...register("description")}
+                  placeholder="Mô tả ngắn về liệu trình..."
+                  className="text-[13px] min-h-[60px] resize-none"
+                />
               </FormField>
             </div>
           </FormSection>
@@ -171,45 +263,87 @@ export function TreatmentCourseFormDialog({ open, onOpenChange, course }: Props)
           {/* Danh sách buổi */}
           <FormSection icon={ListOrdered} title="Danh sách buổi dịch vụ">
             {errors.items?.root?.message && (
-              <p className="text-[11px] text-red-500 font-medium mb-2">{errors.items.root.message}</p>
+              <p className="text-[11px] text-red-500 font-medium mb-2">
+                {errors.items.root.message}
+              </p>
             )}
-            {typeof errors.items?.message === 'string' && (
-              <p className="text-[11px] text-red-500 font-medium mb-2">{errors.items.message}</p>
+            {typeof errors.items?.message === "string" && (
+              <p className="text-[11px] text-red-500 font-medium mb-2">
+                {errors.items.message}
+              </p>
             )}
             <div className="space-y-3">
               {fields.map((field, index) => (
-                <div key={field.id} className="grid grid-cols-12 gap-2 items-start p-3 bg-stone-50 rounded-lg border border-stone-200">
+                <div
+                  key={field.id}
+                  className="grid grid-cols-12 gap-2 items-start p-3 bg-stone-50 rounded-lg border border-stone-200"
+                >
                   <div className="col-span-1 flex items-center justify-center h-9">
-                    <span className="text-[12px] font-semibold text-lotus-stone">#{index + 1}</span>
+                    <span className="text-[12px] font-semibold text-lotus-stone">
+                      #{index + 1}
+                    </span>
                   </div>
                   <div className="col-span-4">
-                    <Label className="text-[11px] text-lotus-deep/70 mb-1 block">Dịch vụ *</Label>
+                    <Label className="text-[11px] text-lotus-deep/70 mb-1 block">
+                      Dịch vụ *
+                    </Label>
                     <SearchableSelect
-                      value={watch(`items.${index}.serviceId`)?.toString() ?? ''}
-                      onValueChange={(v) => setValue(`items.${index}.serviceId`, Number(v))}
-                      options={services.map((s: ServiceDTO) => ({ value: String(s.id ?? ''), label: s.name ?? '' }))}
+                      value={
+                        watch(`items.${index}.serviceId`)?.toString() ?? ""
+                      }
+                      onValueChange={(v) =>
+                        setValue(`items.${index}.serviceId`, Number(v))
+                      }
+                      options={services.map((s: ServiceDTO) => ({
+                        value: String(s.id ?? ""),
+                        label: s.name ?? "",
+                      }))}
                       placeholder="Chọn dịch vụ"
                       searchPlaceholder="Tìm dịch vụ..."
                       className="h-9"
                     />
                     {errors.items?.[index]?.serviceId && (
-                      <p className="text-[11px] text-red-500 mt-0.5">{errors.items[index]?.serviceId?.message}</p>
+                      <p className="text-[11px] text-red-500 mt-0.5">
+                        {errors.items[index]?.serviceId?.message}
+                      </p>
                     )}
                   </div>
                   <div className="col-span-2">
-                    <Label className="text-[11px] text-lotus-deep/70 mb-1 block">Buổi thứ *</Label>
-                    <Input {...register(`items.${index}.sessionNumber`)} type="number" min={1} className="h-9 text-[13px]" />
+                    <Label className="text-[11px] text-lotus-deep/70 mb-1 block">
+                      Buổi thứ *
+                    </Label>
+                    <Input
+                      {...register(`items.${index}.sessionNumber`)}
+                      type="number"
+                      min={1}
+                      className="h-9 text-[13px]"
+                    />
                     {errors.items?.[index]?.sessionNumber && (
-                      <p className="text-[11px] text-red-500 mt-0.5">{errors.items[index]?.sessionNumber?.message}</p>
+                      <p className="text-[11px] text-red-500 mt-0.5">
+                        {errors.items[index]?.sessionNumber?.message}
+                      </p>
                     )}
                   </div>
                   <div className="col-span-2">
-                    <Label className="text-[11px] text-lotus-deep/70 mb-1 block">Số lần</Label>
-                    <Input {...register(`items.${index}.quantity`)} type="number" min={1} className="h-9 text-[13px]" />
+                    <Label className="text-[11px] text-lotus-deep/70 mb-1 block">
+                      Số lần
+                    </Label>
+                    <Input
+                      {...register(`items.${index}.quantity`)}
+                      type="number"
+                      min={1}
+                      className="h-9 text-[13px]"
+                    />
                   </div>
                   <div className="col-span-2">
-                    <Label className="text-[11px] text-lotus-deep/70 mb-1 block">Ghi chú</Label>
-                    <Input {...register(`items.${index}.note`)} placeholder="Ghi chú..." className="h-9 text-[13px]" />
+                    <Label className="text-[11px] text-lotus-deep/70 mb-1 block">
+                      Ghi chú
+                    </Label>
+                    <Input
+                      {...register(`items.${index}.note`)}
+                      placeholder="Ghi chú..."
+                      className="h-9 text-[13px]"
+                    />
                   </div>
                   <div className="col-span-1 flex items-end justify-center h-9 mt-5">
                     <Button
@@ -229,7 +363,15 @@ export function TreatmentCourseFormDialog({ open, onOpenChange, course }: Props)
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => append({ serviceId: 0, sessionNumber: fields.length + 1, quantity: 1, note: '', status: 1 })}
+              onClick={() =>
+                append({
+                  serviceId: 0,
+                  sessionNumber: fields.length + 1,
+                  quantity: 1,
+                  note: "",
+                  status: 1,
+                })
+              }
               className="mt-3 text-[12px] gap-1.5"
             >
               <Plus className="w-3.5 h-3.5" /> Thêm buổi
@@ -237,22 +379,36 @@ export function TreatmentCourseFormDialog({ open, onOpenChange, course }: Props)
           </FormSection>
 
           <DialogFooter>
-            <Button type="button" variant="outline" size="sm" onClick={() => onOpenChange(false)} disabled={isPending}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => onOpenChange(false)}
+              disabled={isPending}
+            >
               Hủy
             </Button>
             <Button type="submit" variant="admin" size="sm" loading={isPending}>
-              {isEdit ? 'Cập nhật' : 'Tạo liệu trình'}
+              {isEdit ? "Cập nhật" : "Tạo liệu trình"}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
 // ---- Helper Components ----
 
-function FormSection({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) {
+function FormSection({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon: React.ElementType;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <div className="flex items-center gap-2 mb-3 pb-2 border-b border-stone-100">
@@ -261,58 +417,71 @@ function FormSection({ icon: Icon, title, children }: { icon: React.ElementType;
       </div>
       {children}
     </div>
-  )
+  );
 }
 
-function FormField({ label, error, className, children }: { label: string; error?: string; className?: string; children: React.ReactNode }) {
-  const isRequired = label.includes('*')
-  const cleanLabel = label.replace('*', '').trim()
+function FormField({
+  label,
+  error,
+  className,
+  children,
+}: {
+  label: string;
+  error?: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const isRequired = label.includes("*");
+  const cleanLabel = label.replace("*", "").trim();
   return (
-    <div className={`space-y-1 ${className ?? ''}`}>
+    <div className={`space-y-1 ${className ?? ""}`}>
       <Label className="text-[12px] font-semibold text-lotus-deep/80">
-        {cleanLabel}{isRequired && <span className="text-red-500 ml-0.5">*</span>}
+        {cleanLabel}
+        {isRequired && <span className="text-red-500 ml-0.5">*</span>}
       </Label>
       {children}
       {error && <p className="text-[11px] text-red-500 font-medium">{error}</p>}
     </div>
-  )
+  );
 }
 
 // ---- Default Values ----
 
-function getDefaultValues(course?: TreatmentCourseDto | null): TreatmentCourseFormValues {
+function getDefaultValues(
+  course?: TreatmentCourseDto | null,
+): TreatmentCourseFormValues {
   if (course) {
     return {
-      code: course.code ?? '',
-      name: course.name ?? '',
-      description: course.description ?? '',
-      content: course.content ?? '',
+      code: course.code ?? "",
+      name: course.name ?? "",
+      description: course.description ?? "",
+      content: course.content ?? "",
       categoryId: course.categoryId ?? undefined,
       originalPrice: course.originalPrice ?? 0,
       sellingPrice: course.sellingPrice ?? 0,
-      imageUrl: course.imageUrl ?? '',
+      imageUrl: course.imageUrl ?? "",
       sortOrder: course.sortOrder ?? undefined,
       status: course.status ?? 1,
-      items: (course.items ?? []).map(i => ({
+      items: (course.items ?? []).map((i) => ({
         serviceId: i.serviceId ?? 0,
         sessionNumber: i.sessionNumber ?? 0,
         quantity: i.quantity ?? 1,
-        note: i.note ?? '',
+        note: i.note ?? "",
         status: i.status ?? 1,
       })),
-    }
+    };
   }
   return {
-    code: '',
-    name: '',
-    description: '',
-    content: '',
+    code: "",
+    name: "",
+    description: "",
+    content: "",
     categoryId: undefined,
     originalPrice: 0,
     sellingPrice: 0,
-    imageUrl: '',
+    imageUrl: "",
     sortOrder: undefined,
     status: 1,
     items: [],
-  }
+  };
 }

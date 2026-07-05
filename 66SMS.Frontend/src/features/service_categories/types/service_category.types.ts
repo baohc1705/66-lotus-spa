@@ -10,17 +10,12 @@ export interface ServiceCategoryDTO {
   updatedBy?: number;
 }
 
-export interface CreateServiceCategoryPayload {
-  name?: string;
-  description?: string;
-  sortOrder?: number;
-  status?: number;
+export interface DeleteServiceCategoryMultiplesPayload {
+  ids: number[];
 }
 
-export interface UpdateServiceCategoryPayload {
-  id?: number;
-  name?: string;
-  description?: string;
-  sortOrder?: number;
-  status?: number;
-}
+export type {
+  CreateServiceCategoryPayload,
+  UpdateServiceCategoryPayload,
+  ServiceCategoryFormValues,
+} from "../schemas/serviceCategory.schema";
