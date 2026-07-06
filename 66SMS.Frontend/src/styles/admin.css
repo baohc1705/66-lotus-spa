@@ -1,0 +1,225 @@
+/* ═══════════════════════════════════════════════════════
+   Admin Dashboard — single source for admin UI styles
+   Sửa giao diện admin chỉ tại file này.
+   ═══════════════════════════════════════════════════════ */
+
+@layer base {
+  :root {
+    --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "DM Mono", ui-monospace, SFMono-Regular, monospace;
+
+    --background: 253 251 251;
+    --foreground: 30 23 24;
+    --card: 255 255 255;
+    --card-foreground: 30 23 24;
+    --popover: 255 255 255;
+    --popover-foreground: 30 23 24;
+    --primary: 210 91 124;
+    --primary-foreground: 255 255 255;
+    --secondary: 247 229 233;
+    --secondary-foreground: 30 23 24;
+    --muted: 248 240 242;
+    --muted-foreground: 180 160 165;
+    --accent: 210 91 124;
+    --accent-foreground: 255 255 255;
+    --destructive: 239 68 68;
+    --border: 235 222 225;
+    --input: 235 222 225;
+    --ring: 210 91 124;
+    --radius: 0.625rem;
+    --admin-radius: 10px;
+
+    --lotus-primary: #d25b7c;
+    --lotus-secondary: #eaa9ba;
+    --lotus-background: #fdfbfb;
+    --lotus-foreground: #1e1718;
+    --lotus-accent: #b08d57;
+    --lotus-highlight: #e8c87a;
+    --lotus-muted: #b4a0a5;
+    --lotus-surface: #f7e5e9;
+
+    --status-pending: 245 158 11;
+    --status-confirmed: 59 130 246;
+    --status-waiting: 234 179 8;
+    --status-in-progress: 14 165 233;
+    --status-completed: 74 122 89;
+    --status-cancelled: 239 68 68;
+
+    --lotus-admin-text-xs: 10px;
+    --lotus-admin-text-base: 11px;
+    --lotus-admin-text-md: 12px;
+    --lotus-admin-text-lg: 13px;
+    --lotus-admin-radius-xs: 4px;
+    --lotus-admin-radius-sm: 5px;
+    --lotus-admin-cell-max: 300px;
+    --lotus-admin-dialog-max-h: 90vh;
+    --lotus-admin-textarea-min-h: 80px;
+  }
+
+  * {
+    box-sizing: border-box;
+    border-color: var(--lotus-muted);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: var(--font-sans);
+  }
+
+  body {
+    background-color: var(--lotus-background);
+    color: var(--lotus-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+}
+
+@layer utilities {
+  .text-lotus-admin-xs {
+    font-size: var(--lotus-admin-text-xs);
+  }
+  .text-lotus-admin-base {
+    font-size: var(--lotus-admin-text-base);
+  }
+  .text-lotus-admin-md {
+    font-size: var(--lotus-admin-text-md);
+  }
+  .text-lotus-admin-lg {
+    font-size: var(--lotus-admin-text-lg);
+  }
+  .rounded-lotus-admin-xs {
+    border-radius: var(--lotus-admin-radius-xs);
+  }
+  .rounded-lotus-admin-sm {
+    border-radius: var(--lotus-admin-radius-sm);
+  }
+  .max-w-lotus-admin-cell {
+    max-width: var(--lotus-admin-cell-max);
+  }
+  .max-h-lotus-admin-dialog {
+    max-height: var(--lotus-admin-dialog-max-h);
+  }
+  .min-h-lotus-admin-textarea {
+    min-height: var(--lotus-admin-textarea-min-h);
+  }
+}
+
+@layer components {
+  /* ── Form ── */
+  .lotus-admin-input {
+    @apply h-9 w-full text-lotus-admin-lg;
+  }
+  .lotus-admin-textarea {
+    @apply w-full text-lotus-admin-lg min-h-lotus-admin-textarea resize-none;
+  }
+  .lotus-admin-textarea-short {
+    @apply w-full text-lotus-admin-lg min-h-16 resize-none;
+  }
+  .lotus-admin-select-trigger {
+    @apply h-9 w-full text-lotus-admin-lg;
+  }
+  .lotus-admin-form-label {
+    @apply flex items-center gap-1 text-lotus-admin-md font-semibold;
+    color: color-mix(in srgb, var(--lotus-deep) 80%, transparent);
+  }
+  .lotus-admin-form-error {
+    @apply text-lotus-admin-base text-red-500 font-medium;
+  }
+  .lotus-admin-form-section-title {
+    @apply text-lotus-admin-lg font-semibold text-lotus-deep;
+  }
+
+  /* ── Buttons ── */
+  .lotus-admin-btn-toolbar {
+    @apply text-lotus-admin-md h-7 px-2;
+  }
+  .lotus-admin-btn-toolbar-action {
+    @apply text-lotus-admin-md gap-1.5;
+  }
+
+  /* ── DataTable ── */
+  .lotus-admin-table-page-card {
+    @apply relative bg-white rounded-admin border border-stone-200/30 overflow-hidden;
+  }
+  .lotus-admin-table-fetch-bar {
+    @apply absolute top-0 left-0 right-0 h-0.5 bg-lotus-leaf overflow-hidden;
+  }
+  .lotus-admin-table-fetch-bar-inner {
+    @apply h-full w-1/3 bg-lotus-leaf animate-[slide_1s_ease-in-out_infinite];
+  }
+  .lotus-admin-table-cell-index {
+    @apply text-lotus-stone;
+  }
+  .lotus-admin-table-cell-name {
+    @apply font-semibold text-lotus-deep;
+  }
+  .lotus-admin-table-cell-muted {
+    @apply text-lotus-deep;
+  }
+  .lotus-admin-table-cell-muted-sm {
+    @apply text-lotus-deep text-lotus-admin-md;
+  }
+  .lotus-admin-table-cell-truncate {
+    @apply text-lotus-deep truncate max-w-lotus-admin-cell inline-block;
+  }
+  .lotus-admin-table-toolbar-btn {
+    @apply text-lotus-admin-md gap-1.5;
+  }
+  .lotus-admin-table-selection-bar {
+    @apply flex items-center gap-2 mr-auto text-lotus-admin-lg text-lotus-deep font-medium bg-lotus-cream px-3 py-1.5 rounded-lg border border-stone-200/50;
+  }
+  .lotus-admin-table-sort-btn {
+    @apply flex items-center gap-1.5 hover:text-lotus-leaf transition-colors;
+  }
+
+  /* ── Category sidebar ── */
+  .lotus-admin-sidebar-search {
+    @apply w-full text-lotus-admin-md h-8 pl-8 pr-3 bg-stone-50 border border-stone-200 rounded focus:outline-none focus:ring-1 focus:ring-lotus-leaf focus:border-lotus-leaf placeholder:text-stone-400 text-stone-700;
+  }
+  .lotus-admin-sidebar-item {
+    @apply w-full flex items-center justify-between gap-2 px-3 py-1.5 text-lotus-admin-lg transition-all duration-150 rounded;
+  }
+  .lotus-admin-sidebar-badge {
+    @apply text-lotus-admin-base shrink-0 font-medium px-1.5 py-0.5 rounded-full;
+  }
+  .lotus-admin-sidebar-add-btn {
+    @apply w-full text-lotus-admin-md h-8 gap-1.5 justify-center font-bold;
+  }
+
+  /* ── Cashier shell ── */
+  .lotus-cashier-header {
+    background-image: linear-gradient(
+      to right,
+      var(--lotus-cashier-header-from),
+      var(--lotus-cashier-header-via),
+      var(--lotus-cashier-header-to)
+    );
+  }
+}
+
+/* Admin dashboard theme override */
+.admin-dashboard-container,
+.admin-dashboard-container * {
+  font-family:
+    "Be Vietnam Pro",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif !important;
+}
+
+.admin-dashboard-container {
+  --primary: 62 122 62 !important;
+  --accent: 62 122 62 !important;
+  --lotus-primary: #3e7a3e !important;
+  --lotus-rose: #3e7a3e !important;
+  --lotus-rose-light: rgba(62, 122, 62, 0.08) !important;
+}

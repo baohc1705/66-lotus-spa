@@ -58,7 +58,7 @@ export function useActiveCertificateTypeColumns({
         accessorKey: "code",
         header: cols.code,
         cell: ({ row }) => (
-          <span className="font-mono text-[12px] bg-stone-100 px-1.5 py-0.5 rounded text-lotus-deep font-medium">
+          <span className="font-mono text-lotus-admin-md bg-stone-100 px-1.5 py-0.5 rounded text-lotus-deep font-medium">
             {row.original.code}
           </span>
         ),
@@ -76,7 +76,7 @@ export function useActiveCertificateTypeColumns({
         accessorKey: "description",
         header: cols.description,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/70 text-[12px]">{row.original.description || "—"}</span>
+          <span className="text-lotus-deep/70 text-lotus-admin-md">{row.original.description || "—"}</span>
         ),
         size: 280,
       },
@@ -90,8 +90,8 @@ export function useActiveCertificateTypeColumns({
               variant="outline"
               className={
                 s === 1
-                  ? "bg-green-100 text-green-700 border-green-200 text-[11px]"
-                  : "bg-stone-100 text-stone-500 border-stone-200 text-[11px]"
+                  ? "bg-green-100 text-green-700 border-green-200 text-lotus-admin-base"
+                  : "bg-stone-100 text-stone-500 border-stone-200 text-lotus-admin-base"
               }
             >
               {s === 1 ? "Hoạt động" : "Tạm đóng"}

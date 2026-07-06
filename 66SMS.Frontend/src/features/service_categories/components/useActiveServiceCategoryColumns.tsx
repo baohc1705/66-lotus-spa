@@ -27,7 +27,7 @@ import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type { Result } from "@/shared/types/common.types";
 
 import { SERVICE_CATEGORY_PERM } from "../constants/serviceCategory.permissions";
-import type { ServiceCategoryDTO } from "../types/service_category.types";
+import type { ServiceCategoryDto } from "../types/serviceCategory.types";
 import type { UpdateServiceCategoryPayload } from "../schemas/serviceCategory.schema";
 
 export const SERVICE_CATEGORY_COLUMN_LABELS = {
@@ -45,11 +45,10 @@ interface UseActiveServiceCategoryColumnsParams {
   onSort: (column: string) => void;
   headerChecked: boolean | "indeterminate";
   selectedRowIds: Set<number>;
-  pageIds: number[];
   onToggleAll: (checked: boolean | "indeterminate") => void;
   onToggleOne: (id: number, checked: boolean) => void;
-  onEdit: (item: ServiceCategoryDTO) => void;
-  onDelete: (item: ServiceCategoryDTO) => void;
+  onEdit: (item: ServiceCategoryDto) => void;
+  onDelete: (item: ServiceCategoryDto) => void;
   updateMutation: UseMutationResult<
     Result<object>,
     Error,
@@ -74,7 +73,7 @@ export function useActiveServiceCategoryColumns({
   const cols = SERVICE_CATEGORY_COLUMN_LABELS;
   const perm = SERVICE_CATEGORY_PERM;
 
-  return useMemo<ColumnDef<ServiceCategoryDTO>[]>(
+  return useMemo<ColumnDef<ServiceCategoryDto>[]>(
     () => [
       {
         id: "select",

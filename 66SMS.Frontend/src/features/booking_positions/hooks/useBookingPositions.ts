@@ -1,5 +1,8 @@
+import type { AxiosError } from 'axios';
+import { createEntityQueryKeys } from '@/shared/utils/queryKeys';
+import { getErrorMessage } from '@/shared/utils/errorUtils';
 import { bookingPositionApi } from "@/features/booking_positions/api/bookingPosition.api";
-import type { PageRequest } from "@/shared/types/common.types";
+import type { PageRequest, Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";
@@ -11,13 +14,7 @@ import type {
 
 const ENTITY = "vị trí dịch vụ";
 
-const BOOKING_POSITION_KEYS = {
-  all: ["booking-positions"] as const,
-  lists: () => [...BOOKING_POSITION_KEYS.all, "list"] as const,
-  list: (params: PageRequest & { roomId?: number }) => [...BOOKING_POSITION_KEYS.lists(), params] as const,
-  details: () => [...BOOKING_POSITION_KEYS.all, "detail"] as const,
-  detail: (id: number) => [...BOOKING_POSITION_KEYS.details(), id] as const,
-};
+export const BOOKING_POSITION_KEYS = createEntityQueryKeys<PageRequest & { roomId?: number }>("booking-positions");
 
 export function useBookingPositions(params: PageRequest & { roomId?: number }) {
   return useQuery({
@@ -28,7 +25,7 @@ export function useBookingPositions(params: PageRequest & { roomId?: number }) {
 
 export function useAdminBookingPositions(params: PageRequest & { roomId?: number }, enabled = true) {
   return useQuery({
-    queryKey: BOOKING_POSITION_KEYS.list(params),
+    queryKey: BOOKING_POSITION_KEYS.adminList(params),
     queryFn: () => bookingPositionApi.getAll(params),
     enabled,
   });
@@ -55,8 +52,8 @@ export function useCreateBookingPosition() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("tạo", ENTITY));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
     },
   });
 }
@@ -79,8 +76,8 @@ export function useUpdateBookingPosition() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("cập nhật", ENTITY));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
     },
   });
 }
@@ -97,8 +94,8 @@ export function useDeleteBookingPosition() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("xóa", ENTITY));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }

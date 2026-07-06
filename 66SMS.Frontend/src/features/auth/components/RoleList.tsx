@@ -41,7 +41,7 @@ export function RoleList({ roles, activeRoleId, onSelectRole, onCreateRole, onEd
 
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-bold text-lotus-deep truncate">{role.name}</div>
-                <div className="text-[11px] text-lotus-stone mt-0.5">
+                <div className="text-lotus-admin-base text-lotus-stone mt-0.5">
                   {role.roleUsers?.length ?? 0} thành viên · {role.rolePermissions?.length ?? 0} quyền
                 </div>
               </div>
@@ -69,7 +69,7 @@ export function RoleList({ roles, activeRoleId, onSelectRole, onCreateRole, onEd
 
       {/* Legend */}
       <div className="mt-1 bg-white border border-border rounded-xl p-3">
-        <div className="text-[10px] font-bold uppercase tracking-widest text-lotus-stone mb-2">Chú thích</div>
+        <div className="text-lotus-admin-xs font-bold uppercase tracking-widest text-lotus-stone mb-2">Chú thích</div>
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-lotus-leaf shrink-0" />

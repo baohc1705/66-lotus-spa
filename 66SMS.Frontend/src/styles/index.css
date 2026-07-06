@@ -1,93 +1,18 @@
-/* Google Fonts CDN definitions */
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "./admin.css";
+@import "./tokens.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    /* ── Centralized Typography (Cấu hình phông chữ tập trung) ── */
-    --font-sans:          "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
-    --font-display:       "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
-    --font-mono:          "DM Mono", ui-monospace, SFMono-Regular, monospace;
-
-    /* ── Shadcn token overrides (Hoa Sen Spa — Đồng Tháp) ── */
-    --background:         253 251 251; /* lotus-background — trắng cánh sen mềm mại */
-    --foreground:         30  23  24;  /* lotus-foreground — đen bùn sen sâu lắng */
-    --card:               255 255 255;
-    --card-foreground:    30  23  24;
-    --popover:            255 255 255;
-    --popover-foreground: 30  23  24;
-
-    --primary:            210 91  124; /* lotus-primary — hồng sen đậm thanh lịch */
-    --primary-foreground: 255 255 255;
-
-    --secondary:          247 229 233; /* lotus-secondary — hồng sen cực nhạt */
-    --secondary-foreground: 30  23  24;
-
-    --muted:              248 240 242;
-    --muted-foreground:   180 160 165; /* lotus-muted */
-
-    --accent:             210 91  124;
-    --accent-foreground:  255 255 255;
-
-    --destructive:        239 68 68;
-    --border:             235 222 225;
-    --input:              235 222 225;
-    --ring:               210 91  124;
-
-    --radius: 0.625rem;
-    --admin-radius: 10px;
-
-    /* ── Hoa Sen Spa Brand — Đồng Tháp Palette ── */
-    --lotus-primary:      #D25B7C;  /* hồng sen đậm thanh lịch   */
-    --lotus-secondary:    #EAA9BA;  /* hồng sen nhẹ thanh tao    */
-    --lotus-background:   #FDFBFB;  /* trắng cánh sen mềm mại    */
-    --lotus-foreground:   #1E1718;  /* đen bùn hoa sen sâu lắng  */
-    --lotus-accent:       #B08D57;  /* vàng nhụy sen quý phái    */
-    --lotus-highlight:    #E8C87A;  /* vàng sáng nhị hoa rực rỡ  */
-    --lotus-muted:        #B4A0A5;  /* sương hồng nhạt muted     */
-    --lotus-surface:      #F7E5E9;  /* hồng sen cực nhạt         */
-
-    /* ── Status Colors (Vòng đời lịch hẹn) ── */
-    --status-pending:     245 158 11;  /* amber-500 */
-    --status-confirmed:   59  130 246; /* blue-500 */
-    --status-waiting:     234 179 8;   /* yellow-500 */
-    --status-in-progress: 14  165 233; /* sky-500 */
-    --status-completed:   74  122 89;  /* lotus-leaf */
-    --status-cancelled:   239 68  68;  /* red-500 */
-  }
-
-  * {
-    box-sizing: border-box;
-    border-color: var(--lotus-muted);
-  }
-
-  html {
-    scroll-behavior: smooth;
-    font-family: var(--font-sans);
-  }
-
-  body {
-    background-color: var(--lotus-background);
-    color: var(--lotus-foreground);
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  .font-display {
-    font-family: var(--font-display);
-  }
-}
-
-/* ── Custom scrollbar ─────────────────────────────────── */
-::-webkit-scrollbar        { width: 5px; height: 5px; }
-::-webkit-scrollbar-track  { background: var(--lotus-background); }
-::-webkit-scrollbar-thumb  { background: var(--lotus-muted); border-radius: 9999px; }
+/* ── Global scrollbar ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--lotus-background); }
+::-webkit-scrollbar-thumb { background: var(--lotus-muted); border-radius: 9999px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--lotus-primary); }
 
 .hide-scrollbar::-webkit-scrollbar,
@@ -95,7 +20,7 @@
 .hide-scrollbar,
 .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* ── Hero gradients ────────────────────────────────────── */
+/* ── Shared decorative utilities ── */
 .hero-top-vignette {
   background: linear-gradient(
     to bottom,
@@ -114,7 +39,6 @@
   );
 }
 
-/* ── Lotus watermark utility ───────────────────────────── */
 .lotus-bg-pattern {
   position: relative;
   overflow: hidden;
@@ -129,7 +53,6 @@
 }
 .lotus-bg-pattern > * { position: relative; z-index: 1; }
 
-/* ── Crane watermark utility ───────────────────────────── */
 .crane-bg-mark {
   position: relative;
   overflow: hidden;
@@ -149,39 +72,23 @@
 }
 .crane-bg-mark > * { position: relative; z-index: 1; }
 
-/* ── Animations ─────────────────────────────────────────── */
 @keyframes slide-in {
   from { transform: translateY(-16px); opacity: 0; }
-  to   { transform: translateY(0);     opacity: 1; }
+  to { transform: translateY(0); opacity: 1; }
 }
 @keyframes fade-in {
   from { opacity: 0; }
-  to   { opacity: 1; }
+  to { opacity: 1; }
 }
 @keyframes float-y {
   0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-12px); }
+  50% { transform: translateY(-12px); }
 }
 @keyframes shimmer {
   from { background-position: -200% center; }
-  to   { background-position:  200% center; }
+  to { background-position: 200% center; }
 }
 
-.animate-slide-in  { animation: slide-in 0.22s ease-out; }
-.animate-fade-in   { animation: fade-in  0.20s ease-out; }
-.animate-float     { animation: float-y  4s ease-in-out infinite; }
-
-/* ── Global Admin Font & Color Override ───────────────── */
-.admin-dashboard-container,
-.admin-dashboard-container * {
-  font-family: 'Be Vietnam Pro', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-}
-
-.admin-dashboard-container {
-  /* Enforce Lotus Leaf Green as the primary color theme for all admin functionalities */
-  --primary: 62 122 62 !important; /* RGB representation of #3E7A3E */
-  --accent: 62 122 62 !important;
-  --lotus-primary: #3E7A3E !important;
-  --lotus-rose: #3E7A3E !important;
-  --lotus-rose-light: rgba(62, 122, 62, 0.08) !important;
-}
+.animate-slide-in { animation: slide-in 0.22s ease-out; }
+.animate-fade-in { animation: fade-in 0.20s ease-out; }
+.animate-float { animation: float-y 4s ease-in-out infinite; }

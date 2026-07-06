@@ -17,7 +17,8 @@ import {
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { IndexCell } from "@/shared/components/DataTable/tableCells";
+import { IndexCell, PriceCell } from "@/shared/components/DataTable/tableCells";
+import { GENDER_MAP } from "@/shared/constants/display.const";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { formatDate } from "@/shared/utils/date.utils";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
@@ -42,11 +43,7 @@ export const STAFF_STATUS_MAP: StatusMap = {
   "2": { label: "Nghỉ việc", variant: "error" },
 };
 
-const GENDER_MAP: Record<string, string> = {
-  "0": "Nam",
-  "1": "Nữ",
-  "2": "Khác",
-};
+
 
 interface UseActiveStaffColumnsParams {
   pageIndex: number;
@@ -158,12 +155,12 @@ export function useActiveStaffColumns({
                     className="w-8 h-8 object-cover"
                   />
                 ) : (
-                  <span className="text-[11px] font-bold text-lotus-leaf">
+                  <span className="text-lotus-admin-base font-bold text-lotus-leaf">
                     {(staff.fullName ?? "?").charAt(0).toUpperCase()}
                   </span>
                 )}
               </div>
-              <span className="text-[13px] font-semibold text-lotus-deep truncate max-w-[140px]">
+              <span className="text-lotus-admin-lg font-semibold text-lotus-deep truncate max-w-[140px]">
                 {staff.fullName ?? "—"}
               </span>
             </div>
@@ -222,14 +219,7 @@ export function useActiveStaffColumns({
       {
         accessorKey: "basicSalary",
         header: cols.basicSalary,
-        cell: ({ row }) => (
-          <span className="font-semibold text-lotus-deep">
-            {row.original.basicSalary !== null &&
-            row.original.basicSalary !== undefined
-              ? new Intl.NumberFormat("vi-VN").format(row.original.basicSalary)
-              : "—"}
-          </span>
-        ),
+        cell: ({ row }) => <PriceCell value={row.original.basicSalary} />,
         size: 100,
       },
       {

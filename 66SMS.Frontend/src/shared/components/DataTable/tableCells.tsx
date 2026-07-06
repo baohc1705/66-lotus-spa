@@ -1,6 +1,6 @@
 import { EMPTY_CELL } from "@/shared/constants/display.const";
 import { formatDateTimeDisplay } from "@/shared/utils/date.utils";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
+import { formatCurrency } from "@/shared/utils/currency";
 
 export function IndexCell({
   pageIndex,
@@ -12,7 +12,7 @@ export function IndexCell({
   rowIndex: number;
 }) {
   return (
-    <span className={TABLE_STYLES.cellIndex}>
+    <span className="lotus-admin-table-cell-index">
       {(pageIndex - 1) * pageSize + rowIndex + 1}
     </span>
   );
@@ -20,19 +20,31 @@ export function IndexCell({
 
 export function NameCell({ value }: { value?: string | null }) {
   return (
-    <span className={TABLE_STYLES.cellName}>{value ?? EMPTY_CELL}</span>
+    <span className="lotus-admin-table-cell-name">{value ?? EMPTY_CELL}</span>
   );
 }
 
 export function TextCell({ value }: { value?: string | null }) {
   return (
-    <span className={TABLE_STYLES.cellTruncate}>{value || EMPTY_CELL}</span>
+    <span className="lotus-admin-table-cell-truncate">
+      {value || EMPTY_CELL}
+    </span>
   );
 }
 
 export function MutedCell({ value }: { value?: string | number | null }) {
   return (
-    <span className={TABLE_STYLES.cellMuted}>
+    <span className="lotus-admin-table-cell-muted">{value ?? EMPTY_CELL}</span>
+  );
+}
+
+export function MutedSmallCell({
+  value,
+}: {
+  value?: string | number | null;
+}) {
+  return (
+    <span className="lotus-admin-table-cell-muted-sm">
       {value ?? EMPTY_CELL}
     </span>
   );
@@ -40,8 +52,16 @@ export function MutedCell({ value }: { value?: string | number | null }) {
 
 export function DateTimeCell({ value }: { value?: string | null }) {
   return (
-    <span className={TABLE_STYLES.cellMutedSmall}>
+    <span className="lotus-admin-table-cell-muted-sm">
       {formatDateTimeDisplay(value)}
+    </span>
+  );
+}
+
+export function PriceCell({ value }: { value?: number | null }) {
+  return (
+    <span className="lotus-admin-table-cell-muted-sm">
+      {formatCurrency(value)}
     </span>
   );
 }

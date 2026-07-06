@@ -1,19 +1,17 @@
+import type { AxiosError } from 'axios';
+import { createEntityQueryKeys } from '@/shared/utils/queryKeys';
+import { getErrorMessage } from '@/shared/utils/errorUtils';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { invoiceApi } from "../api/invoice.api";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type { CreateInvoicePayload, GetAllInvoicesQuery } from "../types/invoice.types";
+import type { Result } from "@/shared/types/common.types";
 
 const ENTITY = "hóa đơn";
 
-const KEYS = {
-  all: ["invoices"] as const,
-  lists: () => [...KEYS.all, "list"] as const,
-  list: (params: GetAllInvoicesQuery) => [...KEYS.lists(), params] as const,
-  details: () => [...KEYS.all, "detail"] as const,
-  detail: (id: number) => [...KEYS.details(), id] as const,
-};
+export const KEYS = createEntityQueryKeys<GetAllInvoicesQuery>("keys");
 
 export function useInvoices(params: GetAllInvoicesQuery) {
   return useQuery({
@@ -24,7 +22,7 @@ export function useInvoices(params: GetAllInvoicesQuery) {
 
 export function useAdminInvoices(params: GetAllInvoicesQuery, enabled = true) {
   return useQuery({
-    queryKey: KEYS.list(params),
+    queryKey: KEYS.adminList(params),
     queryFn: () => invoiceApi.getAll(params),
     enabled,
   });
@@ -50,8 +48,8 @@ export function useCreateInvoice() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("lập", ENTITY));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("lập", ENTITY)));
     },
   });
 }
@@ -68,8 +66,8 @@ export function useCancelInvoice() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.subActionError("hủy", ENTITY));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.subActionError("hủy", ENTITY)));
     },
   });
 }

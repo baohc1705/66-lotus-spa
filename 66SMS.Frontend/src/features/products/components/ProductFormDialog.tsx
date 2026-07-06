@@ -10,19 +10,19 @@ import {
   DialogFooter,
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { Textarea } from "@/shared/components/ui/textarea";
 import { FormSection } from "@/shared/components/forms/FormSection";
 import { FormField } from "@/shared/components/forms/FormField";
+import { AdminInput } from "@/shared/components/forms/AdminInput";
+import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
+import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import { useProductCategories } from "@/features/product_categories/hooks/useProductCategories";
-import type { ProductCategoryDTO } from "@/features/product_categories/types/product_category.types";
+import type { ProductCategoryDto } from "@/features/product_categories/types/productCategory.types";
 import {
   useCreateProduct,
   useUpdateProduct,
@@ -179,17 +179,15 @@ export function ProductFormDialog({
                 tooltip="Mã định danh duy nhất (SKU)"
                 error={errors.code?.message}
               >
-                <Input
+                <AdminInput
                   {...register("code")}
                   placeholder="SP001"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField label="Tên sản phẩm *" error={errors.name?.message}>
-                <Input
+                <AdminInput
                   {...register("name")}
                   placeholder="Tên sản phẩm..."
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField label="Danh mục *" error={errors.categoryId?.message}>
@@ -197,11 +195,11 @@ export function ProductFormDialog({
                   value={watch("categoryId")?.toString() ?? ""}
                   onValueChange={(v) => setValue("categoryId", Number(v))}
                 >
-                  <SelectTrigger className="h-9 text-[13px]">
+                  <AdminSelectTrigger>
                     <SelectValue placeholder="Chọn danh mục" />
-                  </SelectTrigger>
+                  </AdminSelectTrigger>
                   <SelectContent>
-                    {categories.map((cat: ProductCategoryDTO) => (
+                    {categories.map((cat: ProductCategoryDto) => (
                       <SelectItem
                         key={cat.id}
                         value={cat.id!.toString()}
@@ -213,10 +211,9 @@ export function ProductFormDialog({
                 </Select>
               </FormField>
               <FormField label="Đơn vị tính *" error={errors.unit?.message}>
-                <Input
+                <AdminInput
                   {...register("unit")}
                   placeholder="Cái, Hộp, Chai..."
-                  className="h-9 text-[13px]"
                 />
               </FormField>
             </div>
@@ -225,27 +222,24 @@ export function ProductFormDialog({
           <FormSection icon={Tag} title="Giá bán & Tồn kho">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
               <FormField label="Giá vốn *" error={errors.costPrice?.message}>
-                <Input
+                <AdminInput
                   {...register("costPrice")}
                   type="number"
                   placeholder="0"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField label="Giá bán" error={errors.sellingPrice?.message}>
-                <Input
+                <AdminInput
                   {...register("sellingPrice")}
                   type="number"
                   placeholder="0"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField label="Tồn kho *" error={errors.stockQuantity?.message}>
-                <Input
+                <AdminInput
                   {...register("stockQuantity")}
                   type="number"
                   placeholder="0"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField
@@ -253,11 +247,10 @@ export function ProductFormDialog({
                 tooltip="Cảnh báo khi số lượng dưới mức này"
                 error={errors.minStock?.message}
               >
-                <Input
+                <AdminInput
                   {...register("minStock")}
                   type="number"
                   placeholder="0"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
             </div>
@@ -303,7 +296,7 @@ export function ProductFormDialog({
                         ) : (
                           <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-stone-400 group-hover/card:text-lotus-leaf transition-colors">
                             <ImageIcon className="h-6 w-6" />
-                            <span className="text-[10px] font-medium">
+                            <span className="text-lotus-admin-xs font-medium">
                               Chọn ảnh
                             </span>
                           </div>
@@ -317,7 +310,7 @@ export function ProductFormDialog({
                         <X className="h-3 w-3" />
                       </button>
                       {isPrimary && (
-                        <div className="absolute bottom-1.5 left-1.5 bg-lotus-leaf text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none pointer-events-none">
+                        <div className="absolute bottom-1.5 left-1.5 bg-lotus-leaf text-white text-lotus-admin-xs font-bold px-1.5 py-0.5 rounded-full leading-none pointer-events-none">
                           Chính
                         </div>
                       )}
@@ -348,7 +341,7 @@ export function ProductFormDialog({
                         setValue(`images.${index}.isPrimary`, !isPrimary);
                       }}
                       className={[
-                        "flex items-center gap-1 text-[11px] font-medium transition-colors self-start",
+                        "flex items-center gap-1 text-lotus-admin-base font-medium transition-colors self-start",
                         isPrimary
                           ? "text-lotus-leaf"
                           : "text-stone-400 hover:text-stone-600",
@@ -371,7 +364,7 @@ export function ProductFormDialog({
                 className="flex h-[88px] w-[110px] flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-stone-300 text-stone-400 transition-all hover:border-lotus-leaf hover:bg-lotus-leaf/5 hover:text-lotus-leaf self-start"
               >
                 <Plus className="h-5 w-5" />
-                <span className="text-[10px] font-medium">Thêm ảnh</span>
+                <span className="text-lotus-admin-xs font-medium">Thêm ảnh</span>
               </button>
             </div>
           </FormSection>
@@ -383,9 +376,9 @@ export function ProductFormDialog({
                   value={watch("status")?.toString() ?? "1"}
                   onValueChange={(v) => setValue("status", Number(v))}
                 >
-                  <SelectTrigger className="h-9 text-[13px]">
+                  <AdminSelectTrigger>
                     <SelectValue placeholder="Trạng thái" />
-                  </SelectTrigger>
+                  </AdminSelectTrigger>
                   <SelectContent>
                     {STATUS_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>
@@ -400,10 +393,10 @@ export function ProductFormDialog({
                   label="Mô tả ngắn"
                   error={errors.description?.message}
                 >
-                  <Textarea
+                  <AdminTextarea
                     {...register("description")}
                     placeholder="Mô tả ngắn gọn về sản phẩm..."
-                    className="text-[13px] min-h-[60px] resize-none"
+                    className="min-h-[60px] resize-none"
                   />
                 </FormField>
               </div>
@@ -412,10 +405,10 @@ export function ProductFormDialog({
                   label="Nội dung chi tiết"
                   error={errors.content?.message}
                 >
-                  <Textarea
+                  <AdminTextarea
                     {...register("content")}
                     placeholder="Bài viết chi tiết sản phẩm..."
-                    className="text-[13px] min-h-[100px]"
+                    className="min-h-[100px]"
                   />
                 </FormField>
               </div>

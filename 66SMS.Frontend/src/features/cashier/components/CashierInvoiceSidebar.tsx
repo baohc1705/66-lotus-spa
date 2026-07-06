@@ -154,19 +154,19 @@ export function CashierInvoiceSidebar({
                       <span
                         className={cn(
                           "text-xs font-medium text-center",
-                          method.isVnpay && !isSelected && "text-[#005BAA] font-bold tracking-wide",
+                          method.isVnpay && !isSelected && "text-lotus-vnpay font-bold tracking-wide",
                         )}
                       >
                         {method.label}
                         {method.isWallet && (
-                          <span className="block text-[10px] opacity-80 mt-0.5">
+                          <span className="block text-lotus-admin-xs opacity-80 mt-0.5">
                             ({(booking.customerWalletBalance || 0).toLocaleString("vi-VN")}đ)
                           </span>
                         )}
                       </span>
                       {method.isWallet && (booking.customerWalletBalance || 0) < amountDue && (
                          <div className="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-[1px]">
-                           <span className="text-[10px] font-bold text-red-500 bg-white px-2 py-0.5 rounded border border-red-100 rotate-[-10deg]">KHÔNG ĐỦ SỐ DƯ</span>
+                           <span className="text-lotus-admin-xs font-bold text-red-500 bg-white px-2 py-0.5 rounded border border-red-100 rotate-[-10deg]">KHÔNG ĐỦ SỐ DƯ</span>
                          </div>
                       )}
                     </button>
@@ -175,12 +175,12 @@ export function CashierInvoiceSidebar({
               </div>
 
               {paymentMethod === "vnpay" && (
-                <div className="mt-4 p-4 border border-[#005BAA]/20 bg-[#005BAA]/5 rounded-[5px] flex flex-col items-center justify-center relative overflow-hidden transition-all">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#005BAA] to-[#ED1B24]"></div>
+                <div className="mt-4 p-4 border border-lotus-vnpay/20 bg-lotus-vnpay/5 rounded-[5px] flex flex-col items-center justify-center relative overflow-hidden transition-all">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-lotus-vnpay to-lotus-vnpay-red"></div>
                   <p className="text-sm text-center font-semibold text-gray-800">
                     Thanh toán phần còn lại qua VNPAY
                   </p>
-                  <p className="text-lg font-bold text-[#005BAA] mt-2">
+                  <p className="text-lg font-bold text-lotus-vnpay mt-2">
                     {amountDue.toLocaleString("vi-VN")}đ
                   </p>
                 </div>
@@ -261,7 +261,7 @@ export function CashierInvoiceSidebar({
           <button
             onClick={() => onRedirectToPOS(booking)}
             disabled={isPaying}
-            className="w-full py-3 rounded-[5px] bg-[#D4547E] hover:bg-[#B64269] flex items-center justify-center gap-2 text-white font-semibold text-sm transition-all shadow-md"
+            className="w-full py-3 rounded-[5px] bg-lotus-rose hover:bg-lotus-rose/90 flex items-center justify-center gap-2 text-white font-semibold text-sm transition-all shadow-md"
           >
             <CreditCard className="w-5 h-5" />
             <span>Thanh toán hóa đơn tại POS</span>
@@ -288,7 +288,7 @@ export function CashierInvoiceSidebar({
               isPaid || isPaying || !canPay
                 ? "bg-lotus-stone/50 cursor-not-allowed text-white/80 shadow-none"
                   : paymentMethod === "vnpay"
-                    ? "bg-gradient-to-r from-[#005BAA] to-[#ED1B24] hover:opacity-90 shadow-blue-500/20"
+                    ? "bg-gradient-to-r from-lotus-vnpay to-lotus-vnpay-red hover:opacity-90 shadow-lotus-vnpay/20"
                     : "bg-lotus-primary hover:bg-lotus-primary/90 shadow-lotus-primary/20 hover:shadow-lotus-primary/40",
             )}
             disabled={isPaid || isPaying || !canPay}

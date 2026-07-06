@@ -1,3 +1,5 @@
+import { AdminInput } from '@/shared/components/forms/AdminInput';
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect, useMemo } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,12 +12,10 @@ import {
   DialogFooter,
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
 import { FormField } from "@/shared/components/forms/FormField";
@@ -132,10 +132,9 @@ export function MembershipCardFormDialog({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
             <FormField label="Mã thẻ *" error={errors.cardCode?.message}>
-              <Input
+              <AdminInput
                 {...register("cardCode")}
                 placeholder="Nhập mã thẻ"
-                className="h-9 text-[13px]"
               />
             </FormField>
 
@@ -147,9 +146,9 @@ export function MembershipCardFormDialog({
                 value={watch("membershipTierId")?.toString() ?? ""}
                 onValueChange={(v) => setValue("membershipTierId", Number(v))}
               >
-                <SelectTrigger className="h-9 text-[13px]">
+                <AdminSelectTrigger>
                   <SelectValue placeholder="Chọn loại thẻ" />
-                </SelectTrigger>
+                </AdminSelectTrigger>
                 <SelectContent>
                   {tiers.map((tier: MembershipTierDto) => (
                     <SelectItem key={tier.id} value={tier.id!.toString()}>
@@ -161,11 +160,10 @@ export function MembershipCardFormDialog({
             </FormField>
 
             <FormField label="Ngày cấp" error={errors.issuedAt?.message}>
-              <Input
+              <AdminInput
                 type="datetime-local"
                 value={getDatetimeLocalFormat(watch("issuedAt"))}
                 onChange={(e) => handleDateChange("issuedAt", e.target.value)}
-                className="h-9 text-[13px]"
               />
             </FormField>
 
@@ -174,11 +172,10 @@ export function MembershipCardFormDialog({
               tooltip="Để trống nếu thẻ có giá trị vĩnh viễn"
               error={errors.expiresAt?.message}
             >
-              <Input
+              <AdminInput
                 type="datetime-local"
                 value={getDatetimeLocalFormat(watch("expiresAt"))}
                 onChange={(e) => handleDateChange("expiresAt", e.target.value)}
-                className="h-9 text-[13px]"
               />
             </FormField>
 
@@ -188,9 +185,9 @@ export function MembershipCardFormDialog({
                   value={watch("status")?.toString() ?? "1"}
                   onValueChange={(v) => setValue("status", Number(v))}
                 >
-                  <SelectTrigger className="h-9 text-[13px]">
+                  <AdminSelectTrigger>
                     <SelectValue placeholder="Chọn trạng thái" />
-                  </SelectTrigger>
+                  </AdminSelectTrigger>
                   <SelectContent>
                     {STATUS_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>

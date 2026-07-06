@@ -1,3 +1,6 @@
+import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+import { AdminInput } from '@/shared/components/forms/AdminInput';
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,14 +13,13 @@ import {
   DialogFooter,
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
+
 import { Label } from "@/shared/components/ui/label";
-import { Textarea } from "@/shared/components/ui/textarea";
+
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
 import { useUpdatePayroll } from "../hooks/usePayrolls";
@@ -114,25 +116,23 @@ export function EditPayrollDialog({
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <FormField label="Lương cơ bản (VND)" error={errors.baseAmount?.message}>
-            <Input
+            <AdminInput
               type="number"
-              className="h-9 text-[13px]"
               placeholder="Nhập lương cơ bản..."
               {...register("baseAmount", { valueAsNumber: true })}
             />
           </FormField>
 
           <FormField label="Hoa hồng dịch vụ (VND)" error={errors.commissionAmount?.message}>
-            <Input
+            <AdminInput
               type="number"
-              className="h-9 text-[13px]"
               placeholder="Nhập hoa hồng..."
               {...register("commissionAmount", { valueAsNumber: true })}
             />
           </FormField>
 
           <div className="bg-lotus-cream/40 border border-stone-200/50 rounded-lg p-3 space-y-1">
-            <span className="text-[12px] font-semibold text-lotus-deep/70">
+            <span className="text-lotus-admin-md font-semibold text-lotus-deep/70">
               Tổng thực nhận (Dự kiến):
             </span>
             <div className="text-lg font-bold text-lotus-deep">
@@ -141,8 +141,8 @@ export function EditPayrollDialog({
           </div>
 
           <FormField label="Ghi chú" error={errors.note?.message}>
-            <Textarea
-              className="text-[13px] resize-none"
+            <AdminTextarea
+              className="text-lotus-admin-lg resize-none"
               rows={3}
               placeholder="Nhập ghi chú..."
               {...register("note")}
@@ -154,9 +154,9 @@ export function EditPayrollDialog({
               value={watch("status") ? String(watch("status")) : "1"}
               onValueChange={(v) => setValue("status", Number(v))}
             >
-              <SelectTrigger className="h-9 text-[13px]">
+              <AdminSelectTrigger>
                 <SelectValue placeholder="Chọn trạng thái..." />
-              </SelectTrigger>
+              </AdminSelectTrigger>
               <SelectContent>
                 <SelectItem value="1">Nháp</SelectItem>
                 <SelectItem value="2">Đã chốt (Khóa)</SelectItem>
@@ -202,11 +202,11 @@ function FormField({
 }) {
   return (
     <div className={`space-y-1 ${className ?? ""}`}>
-      <Label className="text-[12px] font-semibold text-lotus-deep/80">
+      <Label className="text-lotus-admin-md font-semibold text-lotus-deep/80">
         {label}
       </Label>
       {children}
-      {error && <p className="text-[11px] text-red-500 font-medium">{error}</p>}
+      {error && <p className="text-lotus-admin-base text-red-500 font-medium">{error}</p>}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { Coins, FileCheck, Clock, Ban } from "lucide-react";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { formatCurrency } from "@/shared/utils/currency";
 
 interface InvoiceStatCardsProps {
   paidRevenue: number;
@@ -50,7 +51,9 @@ function StatCard({
             style={{ color: valueColor }}
           >
             {typeof value === "number"
-              ? value.toLocaleString("vi-VN") + (isCurrency ? "đ" : "")
+              ? isCurrency
+                ? formatCurrency(value)
+                : value.toLocaleString("vi-VN")
               : value}
           </p>
         )}

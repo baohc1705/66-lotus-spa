@@ -1,16 +1,16 @@
 import { useState, useCallback } from "react";
 import { useTableQueryParams } from "@/shared/hooks/useTableQueryParams";
-import type { ProductCategoryDTO } from "../types/product_category.types";
+import type { ProductCategoryDto } from "../types/productCategory.types";
 
 export function useProductCategoryListState() {
   const table = useTableQueryParams();
   const [showDeleted, setShowDeleted] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<ProductCategoryDTO | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<ProductCategoryDTO | null>(
+  const [editTarget, setEditTarget] = useState<ProductCategoryDto | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ProductCategoryDto | null>(
     null,
   );
-  const [restoreTarget, setRestoreTarget] = useState<ProductCategoryDTO | null>(
+  const [restoreTarget, setRestoreTarget] = useState<ProductCategoryDto | null>(
     null,
   );
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);

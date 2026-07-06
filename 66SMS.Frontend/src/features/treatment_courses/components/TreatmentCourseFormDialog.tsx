@@ -10,14 +10,13 @@ import {
   DialogFooter,
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
-import { Textarea } from "@/shared/components/ui/textarea";
+import { AdminInput } from "@/shared/components/forms/AdminInput";
+import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
+import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
 import { SearchableSelect } from "@/shared/components/ui/searchable-select";
@@ -35,8 +34,8 @@ import {
 } from "../hooks/useTreatmentCourses";
 import { useServices } from "@/features/services/hooks/useServices";
 import type { TreatmentCourseDto, TreatmentCourseItemDto, TreatmentCourseItemPayload } from "../types/treatmentCourse.types";
-import type { ServiceDTO } from "@/features/services/types/service.types";
-import type { ServiceCategoryDTO } from "@/features/service_categories/types/service_category.types";
+import type { ServiceDto } from "@/features/services/types/service.types";
+import type { ServiceCategoryDto } from "@/features/service_categories/types/serviceCategory.types";
 import type {
   CreateTreatmentCoursePayload,
   UpdateTreatmentCoursePayload,
@@ -59,19 +58,20 @@ export function TreatmentCourseFormDialog({
   onOpenChange,
   course,
 }: Props) {
+  "use no memo";
   const isEdit = !!course;
   const createMutation = useCreateTreatmentCourse();
   const updateMutation = useUpdateTreatmentCourse();
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   const servicesQuery = useServices({ pageIndex: 1, pageSize: 200 });
-  const services: ServiceDTO[] = servicesQuery.data?.data?.items ?? [];
+  const services: ServiceDto[] = servicesQuery.data?.data?.items ?? [];
 
   const categoriesQuery = useServiceCategories({
     pageIndex: 1,
     pageSize: 200,
   });
-  const categories: ServiceCategoryDTO[] =
+  const categories: ServiceCategoryDto[] =
     categoriesQuery.data?.data?.items ?? [];
 
   const form = useForm<TreatmentCourseFormValues>({
@@ -175,38 +175,34 @@ export function TreatmentCourseFormDialog({
           <FormSection icon={Leaf} title="Thông tin liệu trình">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
               <FormField label="Mã liệu trình *" error={errors.code?.message}>
-                <Input
+                <AdminInput
                   {...register("code")}
                   placeholder="LT001"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField label="Tên liệu trình *" error={errors.name?.message}>
-                <Input
+                <AdminInput
                   {...register("name")}
                   placeholder="Trị mụn chuyên sâu"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField
                 label="Giá gốc *"
                 error={errors.originalPrice?.message}
               >
-                <Input
+                <AdminInput
                   {...register("originalPrice")}
                   type="number"
                   min={0}
                   placeholder="0"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField label="Giá bán *" error={errors.sellingPrice?.message}>
-                <Input
+                <AdminInput
                   {...register("sellingPrice")}
                   type="number"
                   min={0}
                   placeholder="0"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField label="Nhóm dịch vụ">
@@ -215,13 +211,12 @@ export function TreatmentCourseFormDialog({
                   onValueChange={(v) =>
                     setValue("categoryId", v ? Number(v) : undefined)
                   }
-                  options={categories.map((c: ServiceCategoryDTO) => ({
+                  options={categories.map((c: ServiceCategoryDto) => ({
                     value: String(c.id ?? ""),
                     label: c.name ?? "",
                   }))}
                   placeholder="Chọn nhóm dịch vụ"
                   searchPlaceholder="Tìm nhóm..."
-                  className="h-9"
                 />
               </FormField>
               <FormField label="Trạng thái">
@@ -229,9 +224,9 @@ export function TreatmentCourseFormDialog({
                   value={watch("status")?.toString() ?? "1"}
                   onValueChange={(v) => setValue("status", Number(v))}
                 >
-                  <SelectTrigger className="h-9 text-[13px]">
+                  <AdminSelectTrigger>
                     <SelectValue placeholder="Chọn trạng thái" />
-                  </SelectTrigger>
+                  </AdminSelectTrigger>
                   <SelectContent>
                     {STATUS_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>
@@ -241,12 +236,13 @@ export function TreatmentCourseFormDialog({
                   </SelectContent>
                 </Select>
               </FormField>
-              <FormField label="Thứ tự sắp xếp">
-                <Input
+              <FormField
+                label="Thứ tự sắp xếp"
+              >
+                <AdminInput
                   {...register("sortOrder")}
                   type="number"
                   placeholder="0"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <div className="sm:col-span-2">
@@ -254,10 +250,10 @@ export function TreatmentCourseFormDialog({
                   label="Mô tả"
                   error={errors.description?.message}
                 >
-                  <Textarea
+                  <AdminTextarea
                     {...register("description")}
                     placeholder="Mô tả ngắn về liệu trình..."
-                    className="text-[13px] min-h-[60px] resize-none"
+                    className="min-h-[60px] resize-none"
                   />
                 </FormField>
               </div>
@@ -267,12 +263,12 @@ export function TreatmentCourseFormDialog({
           {/* Danh sách buổi */}
           <FormSection icon={ListOrdered} title="Danh sách buổi dịch vụ">
             {errors.items?.root?.message && (
-              <p className="text-[11px] text-red-500 font-medium mb-2">
+              <p className="text-lotus-admin-base text-red-500 font-medium mb-2">
                 {errors.items.root.message}
               </p>
             )}
             {typeof errors.items?.message === "string" && (
-              <p className="text-[11px] text-red-500 font-medium mb-2">
+              <p className="text-lotus-admin-base text-red-500 font-medium mb-2">
                 {errors.items.message}
               </p>
             )}
@@ -282,15 +278,11 @@ export function TreatmentCourseFormDialog({
                   key={field.id}
                   className="grid grid-cols-12 gap-2 items-start p-3 bg-stone-50 rounded-lg border border-stone-200"
                 >
-                  <div className="col-span-1 flex items-center justify-center h-9">
-                    <span className="text-[12px] font-semibold text-lotus-stone">
+                    <p className="text-lotus-admin-base font-semibold text-lotus-stone">
                       #{index + 1}
-                    </span>
-                  </div>
+                    </p>
                   <div className="col-span-4">
-                    <Label className="text-[11px] text-lotus-deep/70 mb-1 block">
-                      Dịch vụ *
-                    </Label>
+                    <p className="lotus-admin-form-label mb-1">Dịch vụ *</p>
                     <SearchableSelect
                       value={
                         watch(`items.${index}.serviceId`)?.toString() ?? ""
@@ -298,58 +290,48 @@ export function TreatmentCourseFormDialog({
                       onValueChange={(v) =>
                         setValue(`items.${index}.serviceId`, Number(v))
                       }
-                      options={services.map((s: ServiceDTO) => ({
+                      options={services.map((s: ServiceDto) => ({
                         value: String(s.id ?? ""),
                         label: s.name ?? "",
                       }))}
                       placeholder="Chọn dịch vụ"
                       searchPlaceholder="Tìm dịch vụ..."
-                      className="h-9"
                     />
                     {errors.items?.[index]?.serviceId && (
-                      <p className="text-[11px] text-red-500 mt-0.5">
+                      <p className="text-lotus-admin-base text-red-500 mt-0.5">
                         {errors.items[index]?.serviceId?.message}
                       </p>
                     )}
                   </div>
                   <div className="col-span-2">
-                    <Label className="text-[11px] text-lotus-deep/70 mb-1 block">
-                      Buổi thứ *
-                    </Label>
-                    <Input
+                    <p className="lotus-admin-form-label mb-1">Buổi thứ *</p>
+                    <AdminInput
                       {...register(`items.${index}.sessionNumber`)}
                       type="number"
                       min={1}
-                      className="h-9 text-[13px]"
                     />
                     {errors.items?.[index]?.sessionNumber && (
-                      <p className="text-[11px] text-red-500 mt-0.5">
+                      <p className="text-lotus-admin-base text-red-500 mt-0.5">
                         {errors.items[index]?.sessionNumber?.message}
                       </p>
                     )}
                   </div>
                   <div className="col-span-2">
-                    <Label className="text-[11px] text-lotus-deep/70 mb-1 block">
-                      Số lần
-                    </Label>
-                    <Input
+                    <p className="lotus-admin-form-label mb-1">Số lần</p>
+                    <AdminInput
                       {...register(`items.${index}.quantity`)}
                       type="number"
                       min={1}
-                      className="h-9 text-[13px]"
                     />
                   </div>
                   <div className="col-span-2">
-                    <Label className="text-[11px] text-lotus-deep/70 mb-1 block">
-                      Ghi chú
-                    </Label>
-                    <Input
+                    <p className="lotus-admin-form-label mb-1">Ghi chú</p>
+                    <AdminInput
                       {...register(`items.${index}.note`)}
                       placeholder="Ghi chú..."
-                      className="h-9 text-[13px]"
                     />
                   </div>
-                  <div className="col-span-1 flex items-end justify-center h-9 mt-5">
+                  <div className="col-span-1 flex items-end justify-center mt-5">
                     <Button
                       type="button"
                       variant="ghost"
@@ -376,7 +358,7 @@ export function TreatmentCourseFormDialog({
                   status: 1,
                 })
               }
-              className="mt-3 text-[12px] gap-1.5"
+              className="mt-3 text-lotus-admin-md gap-1.5"
             >
               <Plus className="w-3.5 h-3.5" /> Thêm buổi
             </Button>

@@ -1,10 +1,10 @@
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
 import {
@@ -72,7 +72,7 @@ export function CustomerCrmList({
               placeholder="Tìm kiếm khách hàng..."
               value={filter}
               onChange={(e) => onFilterChange(e.target.value)}
-              className="pl-8 text-[13px] h-9 focus-visible:ring-lotus-leaf"
+              className="pl-8 text-lotus-admin-lg h-9 focus-visible:ring-lotus-leaf"
             />
           </div>
 
@@ -107,7 +107,7 @@ export function CustomerCrmList({
         {showAdvancedFilter && (
           <div className="grid grid-cols-2 gap-2 pt-1 border-t border-stone-100 animate-in fade-in slide-in-from-top-1 duration-200">
             <div>
-              <label className="text-[10px] font-bold text-stone-400 block mb-1 uppercase">
+              <label className="text-lotus-admin-xs font-bold text-stone-400 block mb-1 uppercase">
                 Giới tính
               </label>
               <Select
@@ -118,9 +118,9 @@ export function CustomerCrmList({
                   onSelectGender(val === "all" ? null : parseInt(val))
                 }
               >
-                <SelectTrigger className="h-8 text-xs">
+                <AdminSelectTrigger className="h-8 text-xs">
                   <SelectValue placeholder="Tất cả" />
-                </SelectTrigger>
+                </AdminSelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tất cả</SelectItem>
                   <SelectItem value="0">Nam</SelectItem>
@@ -130,7 +130,7 @@ export function CustomerCrmList({
               </Select>
             </div>
             <div>
-              <label className="text-[10px] font-bold text-stone-400 block mb-1 uppercase">
+              <label className="text-lotus-admin-xs font-bold text-stone-400 block mb-1 uppercase">
                 Nguồn khách
               </label>
               <Select
@@ -139,9 +139,9 @@ export function CustomerCrmList({
                   onSelectSource(val === "all" ? null : val)
                 }
               >
-                <SelectTrigger className="h-8 text-xs">
+                <AdminSelectTrigger className="h-8 text-xs">
                   <SelectValue placeholder="Tất cả" />
-                </SelectTrigger>
+                </AdminSelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tất cả</SelectItem>
                   <SelectItem value="Walk-in">Đến trực tiếp</SelectItem>
@@ -155,7 +155,7 @@ export function CustomerCrmList({
         )}
 
         <div className="flex items-center justify-between gap-2 pt-1">
-          <span className="text-[11px] text-stone-400 font-medium">
+          <span className="text-lotus-admin-base text-stone-400 font-medium">
             {showDeleted ? "Khách hàng đã xóa" : "Khách hàng hoạt động"}
           </span>
           {!showDeleted && (
@@ -206,7 +206,7 @@ export function CustomerCrmList({
                       className="w-10 h-10 object-cover"
                     />
                   ) : (
-                    <span className="text-[13px] font-bold text-stone-500">
+                    <span className="text-lotus-admin-lg font-bold text-stone-500">
                       {(cust.fullName ?? "?").charAt(0).toUpperCase()}
                     </span>
                   )}
@@ -214,18 +214,18 @@ export function CustomerCrmList({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <span
-                      className={`text-[13px] font-bold truncate ${isSelected ? "text-lotus-leaf" : "text-stone-900"}`}
+                      className={`text-lotus-admin-lg font-bold truncate ${isSelected ? "text-lotus-leaf" : "text-stone-900"}`}
                     >
                       {cust.fullName || "—"}
                     </span>
-                    <span className="text-[10px] text-stone-400 font-mono shrink-0">
+                    <span className="text-lotus-admin-xs text-stone-400 font-mono shrink-0">
                       {code}
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-xs text-stone-500 mt-0.5">
                     <span className="truncate">{cust.phone || "—"}</span>
                     {cust.loyaltyPoint != null && cust.loyaltyPoint > 0 && (
-                      <span className="text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200/50 px-1 rounded">
+                      <span className="text-lotus-admin-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/50 px-1 rounded">
                         {cust.loyaltyPoint} điểm
                       </span>
                     )}

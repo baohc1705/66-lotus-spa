@@ -266,10 +266,10 @@ export function AttendanceListPage() {
   };
 
   const handleCardClick = (ws: WorkScheduleDTO) => {
-    let att = ws.id ? scheduleAttendanceMap.get(ws.id) : null;
+    let att = (ws.id ? scheduleAttendanceMap.get(ws.id) : null) ?? null;
     if (!att && ws.staffId && ws.workDate) {
       const dateStr = formatDate(ws.workDate).format("YYYY-MM-DD");
-      att = fallbackAttendanceMap.get(`${ws.staffId}_${dateStr}`) || null;
+      att = fallbackAttendanceMap.get(`${ws.staffId}_${dateStr}`) ?? null;
     }
     setSelectedSchedule(ws);
     setSelectedAttendance(att);
@@ -416,7 +416,7 @@ export function AttendanceListPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm kiếm nhân viên..."
-                className="pl-9 pr-4 py-2 bg-white border border-stone-200/50 rounded-xl text-[13px] focus:outline-none focus:ring-1 focus:ring-lotus-leaf w-full transition-all placeholder:text-stone-400"
+                className="pl-9 pr-4 py-2 bg-white border border-stone-200/50 rounded-xl text-lotus-admin-lg focus:outline-none focus:ring-1 focus:ring-lotus-leaf w-full transition-all placeholder:text-stone-400"
               />
             </div>
           )}
@@ -480,7 +480,7 @@ export function AttendanceListPage() {
             >
               <ChevronLeft size={16} />
             </button>
-            <div className="px-4 text-[13px] font-bold text-stone-800 select-none min-w-[200px] text-center border-x border-stone-100">
+            <div className="px-4 text-lotus-admin-lg font-bold text-stone-800 select-none min-w-[200px] text-center border-x border-stone-100">
               {weekLabel}
             </div>
             <button
@@ -495,7 +495,7 @@ export function AttendanceListPage() {
           <button
             type="button"
             onClick={handleThisWeek}
-            className="text-[13px] font-bold text-stone-600 hover:text-lotus-deep border border-stone-200/60 hover:bg-stone-50 px-4 h-9 rounded-xl transition-all shadow-sm"
+            className="text-lotus-admin-lg font-bold text-stone-600 hover:text-lotus-deep border border-stone-200/60 hover:bg-stone-50 px-4 h-9 rounded-xl transition-all shadow-sm"
           >
             Tuần này
           </button>
@@ -514,10 +514,10 @@ export function AttendanceListPage() {
         </div>
       ) : (
         <div className="overflow-x-auto border border-stone-200/50 bg-white rounded shadow-sm">
-          <table className="w-full text-[13px] text-left table-fixed min-w-[1000px]">
+          <table className="w-full text-lotus-admin-lg text-left table-fixed min-w-[1000px]">
             <thead className="bg-stone-50 border-b border-stone-200/60">
               <tr>
-                <th className="w-48 py-4 px-4 font-bold text-stone-700 border-r border-stone-200/50 text-[12px] uppercase tracking-wider">
+                <th className="w-48 py-4 px-4 font-bold text-stone-700 border-r border-stone-200/50 text-lotus-admin-md uppercase tracking-wider">
                   Ca làm việc
                 </th>
                 {days.map((day, i) => (
@@ -532,7 +532,7 @@ export function AttendanceListPage() {
                           : "text-stone-800"
                       }`}
                     >
-                      <span className="text-[11px] font-medium opacity-80 uppercase">
+                      <span className="text-lotus-admin-base font-medium opacity-80 uppercase">
                         {getDayName(day)}
                       </span>
                       <span className="text-sm font-extrabold">
@@ -561,7 +561,7 @@ export function AttendanceListPage() {
                       <div className="font-extrabold text-stone-800">
                         {shift.name}
                       </div>
-                      <div className="text-[11px] text-stone-500 mt-1.5 flex items-center gap-1.5">
+                      <div className="text-lotus-admin-base text-stone-500 mt-1.5 flex items-center gap-1.5">
                         <Clock size={12} className="text-stone-400" />
                         <span className="px-1.5 py-0.5 bg-stone-100 rounded font-bold text-stone-700">
                           {period.shiftStart?.substring(0, 5)}
@@ -587,7 +587,7 @@ export function AttendanceListPage() {
                             key={i}
                             className="py-3 px-2 border-r border-stone-200/50 last:border-0 align-top bg-stone-50/40"
                           >
-                            <div className="flex h-full items-center justify-center text-[11px] text-stone-400 italic">
+                            <div className="flex h-full items-center justify-center text-lotus-admin-base text-stone-400 italic">
                               Không áp dụng
                             </div>
                           </td>
@@ -604,7 +604,7 @@ export function AttendanceListPage() {
                         >
                           <div className="flex flex-col gap-2 p-0.5 min-h-[110px]">
                             {cellSchedules.length === 0 ? (
-                              <div className="text-[11px] text-stone-300 text-center py-10 italic">
+                              <div className="text-lotus-admin-base text-stone-300 text-center py-10 italic">
                                 Không có lịch
                               </div>
                             ) : (
@@ -620,14 +620,14 @@ export function AttendanceListPage() {
                                     onClick={() => handleCardClick(ws)}
                                     className={card.className}
                                   >
-                                    <div className="font-bold text-stone-800 text-[12px] truncate">
+                                    <div className="font-bold text-stone-800 text-lotus-admin-md truncate">
                                       {ws.staffName}
                                     </div>
-                                    <div className="text-[11px] font-mono text-stone-600 font-semibold mt-1">
+                                    <div className="text-lotus-admin-base font-mono text-stone-600 font-semibold mt-1">
                                       {card.timeText}
                                     </div>
                                     <div
-                                      className={`text-[10px] mt-1 ${card.statusColorClass}`}
+                                      className={`text-lotus-admin-xs mt-1 ${card.statusColorClass}`}
                                     >
                                       {card.statusText}
                                     </div>

@@ -1,6 +1,5 @@
 import { motion } from "motion/react";
 import { containerVariants, itemVariants } from "@/shared/motion/pageVariants";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 interface TablePageShellProps {
   children: React.ReactNode;
@@ -20,11 +19,11 @@ export function TablePageShell({
       variants={containerVariants}
       className="space-y-4"
     >
-      <motion.div variants={itemVariants} className={TABLE_STYLES.pageCard}>
+      <motion.div variants={itemVariants} className="lotus-admin-table-page-card">
         {children}
         {isFetching && !isLoading && (
-          <div className={TABLE_STYLES.fetchBar}>
-            <div className={TABLE_STYLES.fetchBarInner} />
+          <div className="lotus-admin-table-fetch-bar">
+            <div className="lotus-admin-table-fetch-bar-inner" />
           </div>
         )}
       </motion.div>

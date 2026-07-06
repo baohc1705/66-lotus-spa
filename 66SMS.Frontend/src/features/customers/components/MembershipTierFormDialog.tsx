@@ -1,3 +1,6 @@
+import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+import { AdminInput } from '@/shared/components/forms/AdminInput';
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,15 +13,12 @@ import {
   DialogFooter,
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { Textarea } from "@/shared/components/ui/textarea";
 import { FormField } from "@/shared/components/forms/FormField";
 import {
   useCreateMembershipTier,
@@ -118,10 +118,9 @@ export function MembershipTierFormDialog({
                 tooltip="Ví dụ: Vàng, Bạc, Kim cương..."
                 error={errors.name?.message}
               >
-                <Input
+                <AdminInput
                   {...register("name")}
                   placeholder="Vàng"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
             </div>
@@ -131,11 +130,10 @@ export function MembershipTierFormDialog({
               tooltip="Mức chi tiêu tối thiểu để đạt loại thẻ này"
               error={errors.minSpending?.message}
             >
-              <Input
+              <AdminInput
                 {...register("minSpending")}
                 type="number"
                 placeholder="0"
-                className="h-9 text-[13px]"
               />
             </FormField>
 
@@ -144,11 +142,10 @@ export function MembershipTierFormDialog({
               tooltip="Phần trăm giảm giá áp dụng cho hóa đơn"
               error={errors.discountPercent?.message}
             >
-              <Input
+              <AdminInput
                 {...register("discountPercent")}
                 type="number"
                 placeholder="0"
-                className="h-9 text-[13px]"
               />
             </FormField>
 
@@ -157,12 +154,11 @@ export function MembershipTierFormDialog({
               tooltip="Hệ số nhân điểm thưởng khi mua hàng (ví dụ: x1.5)"
               error={errors.pointMultiplier?.message}
             >
-              <Input
+              <AdminInput
                 {...register("pointMultiplier")}
                 type="number"
                 step="0.1"
                 placeholder="1.0"
-                className="h-9 text-[13px]"
               />
             </FormField>
 
@@ -171,9 +167,9 @@ export function MembershipTierFormDialog({
                 value={statusValue?.toString() ?? "1"}
                 onValueChange={(v) => setValue("status", Number(v))}
               >
-                <SelectTrigger className="h-9 text-[13px]">
+                <AdminSelectTrigger>
                   <SelectValue placeholder="Chọn trạng thái" />
-                </SelectTrigger>
+                </AdminSelectTrigger>
                 <SelectContent>
                   {STATUS_OPTIONS.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
@@ -189,10 +185,10 @@ export function MembershipTierFormDialog({
                 label="Quyền lợi chi tiết"
                 error={errors.benefits?.message}
               >
-                <Textarea
+                <AdminTextarea
                   {...register("benefits")}
                   placeholder="- Giảm 10% các dịch vụ chăm sóc da&#10;- Quà tặng sinh nhật"
-                  className="text-[13px] min-h-[80px]"
+                  className="text-lotus-admin-lg min-h-[80px]"
                 />
               </FormField>
             </div>

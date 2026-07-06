@@ -266,15 +266,15 @@ export function CashierTimeline({
         {/* Header: thước thời gian (trục X) */}
         <div className="flex sticky top-0 z-40 bg-white">
           <div
-            className="flex-shrink-0 h-10 border-b border-r border-stone-300/80 bg-[#FBE5EB] sticky left-0 z-50 flex items-center px-4"
+            className="flex-shrink-0 h-10 border-b border-r border-stone-300/80 bg-lotus-rose-light/50 sticky left-0 z-50 flex items-center px-4"
             style={{ width: `${STAFF_COL_WIDTH}px` }}
           >
-            <span className="text-[11px] font-bold text-lotus-stone">
+            <span className="text-lotus-admin-base font-bold text-lotus-stone">
               Nhân viên
             </span>
           </div>
           <div
-            className="relative h-10 border-b border-stone-300/80 bg-[#FDF5F7]"
+            className="relative h-10 border-b border-stone-300/80 bg-lotus-rose-light/20"
             style={{ width: `${laneWidth}px` }}
           >
             {HOURS.map((hour, i) => (
@@ -283,7 +283,7 @@ export function CashierTimeline({
                 className="absolute top-0 h-full border-l border-stone-300/60 flex items-center"
                 style={{ left: `${i * HOUR_WIDTH}px`, width: `${HOUR_WIDTH}px` }}
               >
-                <span className="text-[10px] font-bold text-lotus-stone/80 pl-2">
+                <span className="text-lotus-admin-xs font-bold text-lotus-stone/80 pl-2">
                   {hour.toString().padStart(2, "0")}:00
                 </span>
               </div>
@@ -293,7 +293,7 @@ export function CashierTimeline({
                 className="absolute top-0 z-40 -translate-x-1/2 pointer-events-none"
                 style={{ left: `${currentTimeX}px` }}
               >
-                <div className="bg-rose-600 text-white text-[9px] px-1 rounded-[2px] shadow-sm font-bold mt-2 border border-rose-600">
+                <div className="bg-rose-600 text-white text-lotus-admin-xs px-1 rounded-[2px] shadow-sm font-bold mt-2 border border-rose-600">
                   {currentH.toString().padStart(2, "0")}:
                   {currentM.toString().padStart(2, "0")}
                 </div>
@@ -317,7 +317,7 @@ export function CashierTimeline({
             >
               {/* Cột nhân viên cố định bên trái */}
               <div
-                className="flex-shrink-0 border-r border-stone-300/80 bg-[#FDF5F7] sticky left-0 z-30 flex items-center gap-2 px-4"
+                className="flex-shrink-0 border-r border-stone-300/80 bg-lotus-rose-light/20 sticky left-0 z-30 flex items-center gap-2 px-4"
                 style={{ width: `${STAFF_COL_WIDTH}px` }}
               >
                 {col.avatar ? (
@@ -335,7 +335,7 @@ export function CashierTimeline({
                   <p className="font-bold text-xs text-lotus-deep truncate whitespace-nowrap">
                     {col.name}
                   </p>
-                  <p className="text-[9px] text-lotus-stone">KTV</p>
+                  <p className="text-lotus-admin-xs text-lotus-stone">KTV</p>
                 </div>
               </div>
 
@@ -414,7 +414,7 @@ export function CashierTimeline({
                         }}
                       >
                         <div className="flex items-center justify-between gap-1 leading-none">
-                          <span className="font-bold text-[10px] truncate whitespace-nowrap text-lotus-deep">
+                          <span className="font-bold text-lotus-admin-xs truncate whitespace-nowrap text-lotus-deep">
                             {booking.customerName}
                           </span>
                           <span
@@ -424,10 +424,10 @@ export function CashierTimeline({
                             )}
                           />
                         </div>
-                        <div className="text-[9px] opacity-90 truncate whitespace-nowrap mt-0.5">
+                        <div className="text-lotus-admin-xs opacity-90 truncate whitespace-nowrap mt-0.5">
                           {booking.serviceName}
                         </div>
-                        <div className="text-[9px] opacity-75 flex items-center gap-0.5 truncate whitespace-nowrap mt-0.5">
+                        <div className="text-lotus-admin-xs opacity-75 flex items-center gap-0.5 truncate whitespace-nowrap mt-0.5">
                           <Clock className="w-2 h-2 flex-shrink-0" />
                           {booking.startTime} - {booking.endTime}
                         </div>

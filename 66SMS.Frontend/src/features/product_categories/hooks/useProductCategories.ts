@@ -1,29 +1,21 @@
 import { productCategoryApi } from "@/features/product_categories/api/productCategory.api";
-import type { PageRequest } from "@/shared/types/common.types";
+import type { PageRequest, Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import type { AxiosError } from "axios";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";
 import { StatusActive } from "@/shared/constants/status.enum";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
 import type {
   CreateProductCategoryPayload,
   UpdateProductCategoryPayload,
-} from "../schemas/productCategory.schema";
+} from "../types/productCategory.types";
 
 const ENTITY = "danh mục";
-const ENTITY_ERROR = "danh mục sản phẩm";
 
-const PRODUCT_CATEGORY_KEYS = {
-  all: ["product-categories"] as const,
-  lists: () => [...PRODUCT_CATEGORY_KEYS.all, "list"] as const,
-  list: (params: PageRequest) =>
-    [...PRODUCT_CATEGORY_KEYS.lists(), params] as const,
-  deletedLists: () => [...PRODUCT_CATEGORY_KEYS.all, "deleted"] as const,
-  deletedList: (params: PageRequest) =>
-    [...PRODUCT_CATEGORY_KEYS.deletedLists(), params] as const,
-  details: () => [...PRODUCT_CATEGORY_KEYS.all, "detail"] as const,
-  detail: (id: number) => [...PRODUCT_CATEGORY_KEYS.details(), id] as const,
-};
+export const PRODUCT_CATEGORY_KEYS = createEntityQueryKeys<PageRequest>("product-categories");
 
 export function useProductCategories(params: PageRequest, enabled = true) {
   return useQuery({
@@ -54,8 +46,8 @@ export function useCreateProductCategory() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("tạo", ENTITY_ERROR));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
     },
   });
 }
@@ -78,8 +70,8 @@ export function useUpdateProductCategory() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("cập nhật", ENTITY_ERROR));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
     },
   });
 }
@@ -96,8 +88,8 @@ export function useDeleteProductCategory() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("xóa", ENTITY_ERROR));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }
@@ -115,8 +107,8 @@ export function useDeleteProductCategoryMultiples() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("xóa", ENTITY));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }
@@ -145,8 +137,8 @@ export function useRestoreProductCategory() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("khôi phục", ENTITY));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)));
     },
   });
 }

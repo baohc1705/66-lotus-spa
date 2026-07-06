@@ -90,7 +90,7 @@ export function CertificateTypesPage() {
           >
             <DataTableViewOptions table={table} columnLabels={columnLabels} />
             <PermissionGate resource={perm.resource} action={perm.create}>
-              <Button variant="admin" size="sm" onClick={() => setCreateOpen(true)} className="text-[12px] gap-1.5">
+              <Button variant="admin" size="sm" onClick={() => setCreateOpen(true)} className="lotus-admin-table-toolbar-btn">
                 <Plus className="w-3.5 h-3.5" />Thêm loại chứng chỉ
               </Button>
             </PermissionGate>
@@ -108,7 +108,7 @@ export function CertificateTypesPage() {
               hint="Thêm loại chứng chỉ để quản lý bằng cấp nhân viên."
               action={
                 <PermissionGate resource={perm.resource} action={perm.create}>
-                  <Button variant="admin" size="sm" onClick={() => setCreateOpen(true)} className="mt-1 text-[12px]">
+                  <Button variant="admin" size="sm" onClick={() => setCreateOpen(true)} className="mt-1 text-lotus-admin-md">
                     <Plus className="w-3.5 h-3.5" />Thêm loại chứng chỉ
                   </Button>
                 </PermissionGate>

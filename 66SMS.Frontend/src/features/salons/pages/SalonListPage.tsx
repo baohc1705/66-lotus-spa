@@ -109,7 +109,7 @@ export function SalonListPage() {
                 variant="admin"
                 size="sm"
                 onClick={() => setCreateOpen(true)}
-                className="text-[12px] gap-1.5"
+                className="lotus-admin-table-toolbar-btn"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Thêm chi nhánh
@@ -140,7 +140,7 @@ export function SalonListPage() {
                 <p className="text-sm font-semibold text-lotus-deep">
                   Chưa có chi nhánh
                 </p>
-                <p className="text-[12px] text-lotus-stone mt-0.5">
+                <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
                   Thêm chi nhánh để bắt đầu quản lý hệ thống.
                 </p>
               </div>
@@ -149,7 +149,7 @@ export function SalonListPage() {
                   variant="admin"
                   size="sm"
                   onClick={() => setCreateOpen(true)}
-                  className="mt-1 text-[12px]"
+                  className="mt-1 text-lotus-admin-md"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Thêm chi nhánh

@@ -1,3 +1,4 @@
+import { AdminInput } from '@/shared/components/forms/AdminInput';
 import { useForm, type Resolver } from "react-hook-form";
 import {
   useCreateTimeSlot,
@@ -27,7 +28,6 @@ import { Button } from "@/shared/components/ui/button";
 import { FormSection } from "@/shared/components/forms/FormSection";
 import { Clock } from "lucide-react";
 import { FormField } from "@/shared/components/forms/FormField";
-import { Input } from "@/shared/components/ui/input";
 
 interface TimeSlotFormDialogProps {
   open: boolean;
@@ -121,10 +121,9 @@ export function TimeSlotFormDialog({
                 tooltip="Chọn thời gian bắt đầu khung giờ"
                 error={errors.startTime?.message}
               >
-                <Input
+                <AdminInput
                   {...register("startTime")}
                   type="time"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
 
@@ -133,10 +132,9 @@ export function TimeSlotFormDialog({
                 tooltip="Chọn thời gian kết thúc khung giờ"
                 error={errors.endTime?.message}
               >
-                <Input
+                <AdminInput
                   {...register("endTime")}
                   type="time"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
             </div>

@@ -1,3 +1,6 @@
+import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+import { AdminInput } from '@/shared/components/forms/AdminInput';
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Calendar, Clock, AlertCircle } from "lucide-react";
@@ -9,14 +12,13 @@ import {
   DialogFooter,
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
+
 import { Label } from "@/shared/components/ui/label";
-import { Textarea } from "@/shared/components/ui/textarea";
+
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
 import {
@@ -330,13 +332,13 @@ export function AttendanceDailyDialog({
               <DialogTitle className="text-lg font-bold text-lotus-deep">Chấm công</DialogTitle>
               <div className="flex items-center gap-2 mt-1.5">
                 <span className="text-sm font-semibold text-stone-800">{schedule.staffName}</span>
-                <span className="text-[11px] text-stone-400 font-mono">NV{String(schedule.staffId).padStart(5, "0")}</span>
+                <span className="text-lotus-admin-base text-stone-400 font-mono">NV{String(schedule.staffId).padStart(5, "0")}</span>
                 {attendance ? (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-600 border border-emerald-100">
+                  <span className="px-2 py-0.5 rounded-full text-lotus-admin-xs font-semibold bg-emerald-50 text-emerald-600 border border-emerald-100">
                     Đã chấm công
                   </span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-600 border border-amber-100">
+                  <span className="px-2 py-0.5 rounded-full text-lotus-admin-xs font-semibold bg-amber-50 text-amber-600 border border-amber-100">
                     Chưa chấm công
                   </span>
                 )}
@@ -346,7 +348,7 @@ export function AttendanceDailyDialog({
         </DialogHeader>
 
         {/* Info Grid */}
-        <div className="p-5 pb-2 grid grid-cols-1 md:grid-cols-2 gap-4 text-[13px] border-b border-stone-100 mt-2 bg-stone-50/50">
+        <div className="p-5 pb-2 grid grid-cols-1 md:grid-cols-2 gap-4 text-lotus-admin-lg border-b border-stone-100 mt-2 bg-stone-50/50">
           <div className="flex items-center gap-2 text-stone-600">
             <Calendar size={15} className="text-lotus-stone" />
             <span className="font-medium text-stone-500">Thời gian:</span>
@@ -368,7 +370,7 @@ export function AttendanceDailyDialog({
           <button
             type="button"
             onClick={() => setActiveTab("attendance")}
-            className={`py-3 text-[13px] font-semibold border-b-2 transition-colors ${
+            className={`py-3 text-lotus-admin-lg font-semibold border-b-2 transition-colors ${
               activeTab === "attendance"
                 ? "border-lotus-leaf text-lotus-leaf"
                 : "border-transparent text-stone-400 hover:text-stone-600"
@@ -379,7 +381,7 @@ export function AttendanceDailyDialog({
           <button
             type="button"
             onClick={() => setActiveTab("history")}
-            className={`py-3 px-6 text-[13px] font-semibold border-b-2 transition-colors ${
+            className={`py-3 px-6 text-lotus-admin-lg font-semibold border-b-2 transition-colors ${
               activeTab === "history"
                 ? "border-lotus-leaf text-lotus-leaf"
                 : "border-transparent text-stone-400 hover:text-stone-600"
@@ -395,7 +397,7 @@ export function AttendanceDailyDialog({
               !isAdminOrManager ? (
                 <div className="space-y-4">
                   {!isToday ? (
-                    <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-amber-50 border border-amber-200/50 text-amber-800 text-[13px] leading-relaxed">
+                    <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-amber-50 border border-amber-200/50 text-amber-800 text-lotus-admin-lg leading-relaxed">
                       <AlertCircle size={16} className="shrink-0 mt-0.5 text-amber-600" />
                       <span>
                         Lịch làm việc này thuộc ngày khác. Bạn không thể thực hiện tự chấm công hoặc thay đổi giờ của ngày đã qua / ngày sắp tới.
@@ -404,35 +406,35 @@ export function AttendanceDailyDialog({
                   ) : (
                     <div className="space-y-4">
                       {!attendance ? (
-                        <div className="bg-amber-50/50 border border-amber-200 p-4 rounded-2xl text-[13px] text-amber-800 space-y-2">
+                        <div className="bg-amber-50/50 border border-amber-200 p-4 rounded-2xl text-lotus-admin-lg text-amber-800 space-y-2">
                           <p className="font-semibold">Bạn chưa ghi nhận bắt đầu ca làm việc (Check-in).</p>
-                          <p className="text-[12px] opacity-80">Bấm nút "Check-in" ở dưới để bắt đầu ca làm việc của bạn.</p>
+                          <p className="text-lotus-admin-md opacity-80">Bấm nút "Check-in" ở dưới để bắt đầu ca làm việc của bạn.</p>
                         </div>
                       ) : !attendance.checkOutAt ? (
-                        <div className="bg-lotus-leaf/5 border border-lotus-leaf/30 p-4 rounded-2xl text-[13px] text-lotus-leaf space-y-2">
+                        <div className="bg-lotus-leaf/5 border border-lotus-leaf/30 p-4 rounded-2xl text-lotus-admin-lg text-lotus-leaf space-y-2">
                           <p className="font-semibold">Bạn đã Check-in thành công!</p>
-                          <p className="text-[12px] opacity-80">
+                          <p className="text-lotus-admin-md opacity-80">
                             Thời gian vào: <span className="font-mono font-bold">{new Date(attendance.checkInAt!).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}</span>
                           </p>
-                          <p className="text-[12px] opacity-85">Bấm nút "Check-out" ở dưới để kết thúc ca làm việc của bạn.</p>
+                          <p className="text-lotus-admin-md opacity-85">Bấm nút "Check-out" ở dưới để kết thúc ca làm việc của bạn.</p>
                         </div>
                       ) : (
-                        <div className="bg-stone-50 border border-stone-200 p-4 rounded-2xl text-[13px] text-stone-600 space-y-1.5">
+                        <div className="bg-stone-50 border border-stone-200 p-4 rounded-2xl text-lotus-admin-lg text-stone-600 space-y-1.5">
                           <p className="font-bold text-stone-800">Bạn đã hoàn thành chấm công ngày hôm nay!</p>
-                          <p className="text-[12px]">Giờ vào: <span className="font-mono font-semibold">{new Date(attendance.checkInAt!).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}</span></p>
-                          <p className="text-[12px]">Giờ ra: <span className="font-mono font-semibold">{new Date(attendance.checkOutAt!).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}</span></p>
+                          <p className="text-lotus-admin-md">Giờ vào: <span className="font-mono font-semibold">{new Date(attendance.checkInAt!).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}</span></p>
+                          <p className="text-lotus-admin-md">Giờ ra: <span className="font-mono font-semibold">{new Date(attendance.checkOutAt!).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}</span></p>
                         </div>
                       )}
 
                       {/* Note */}
                       {(!attendance || !attendance.checkOutAt) && (
                         <div className="space-y-1.5">
-                          <Label className="text-[12px] font-bold text-stone-500 uppercase tracking-wider">
+                          <Label className="text-lotus-admin-md font-bold text-stone-500 uppercase tracking-wider">
                             Ghi chú (Không bắt buộc)
                           </Label>
-                          <Textarea
+                          <AdminTextarea
                             placeholder="Nhập ghi chú chấm công (nếu có)..."
-                            className="border-stone-200/80 rounded-xl min-h-[80px] text-[13px]"
+                            className="border-stone-200/80 rounded-xl min-h-[80px] text-lotus-admin-lg"
                             {...register("note")}
                           />
                         </div>
@@ -444,7 +446,7 @@ export function AttendanceDailyDialog({
                 <>
                   {/* Warning for past days */}
                   {!isToday && !attendance && (
-                    <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50/70 border border-amber-200/50 text-amber-800 text-[12px] leading-relaxed">
+                    <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50/70 border border-amber-200/50 text-amber-800 text-lotus-admin-md leading-relaxed">
                       <AlertCircle size={16} className="shrink-0 mt-0.5 text-amber-600" />
                       <span>
                         Hệ thống chỉ cho phép ghi nhận <strong>Đi làm (Check-in)</strong> vào ngày hiện tại. Đối với ngày trong quá khứ/tương lai, vui lòng chọn hình thức Nghỉ.
@@ -454,12 +456,12 @@ export function AttendanceDailyDialog({
 
                   {/* Radio selection */}
                   <div className="space-y-2">
-                    <Label className="text-[12px] font-bold text-stone-500 uppercase tracking-wider">
+                    <Label className="text-lotus-admin-md font-bold text-stone-500 uppercase tracking-wider">
                       Loại chấm công
                     </Label>
                     <div className="grid grid-cols-3 gap-2">
                       <label
-                        className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-[13px] font-semibold cursor-pointer transition-all ${
+                        className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-lotus-admin-lg font-semibold cursor-pointer transition-all ${
                           mode === "working"
                             ? "bg-lotus-leaf/5 border-lotus-leaf text-lotus-leaf shadow-sm"
                             : "border-stone-200/80 bg-white text-stone-600 hover:bg-stone-50"
@@ -475,7 +477,7 @@ export function AttendanceDailyDialog({
                       </label>
 
                       <label
-                        className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-[13px] font-semibold cursor-pointer transition-all ${
+                        className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-lotus-admin-lg font-semibold cursor-pointer transition-all ${
                           mode === "paid_leave"
                             ? "bg-lotus-leaf/5 border-lotus-leaf text-lotus-leaf shadow-sm"
                             : "border-stone-200/80 bg-white text-stone-600 hover:bg-stone-50"
@@ -491,7 +493,7 @@ export function AttendanceDailyDialog({
                       </label>
 
                       <label
-                        className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-[13px] font-semibold cursor-pointer transition-all ${
+                        className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-lotus-admin-lg font-semibold cursor-pointer transition-all ${
                           mode === "unpaid_leave"
                             ? "bg-lotus-leaf/5 border-lotus-leaf text-lotus-leaf shadow-sm"
                             : "border-stone-200/80 bg-white text-stone-600 hover:bg-stone-50"
@@ -511,14 +513,14 @@ export function AttendanceDailyDialog({
                   {/* Sub Options for Leave */}
                   {mode === "paid_leave" && (
                     <div className="space-y-1.5 animate-in slide-in-from-top-1 duration-200">
-                      <Label className="text-[12px] font-semibold text-stone-500">Chi tiết phép</Label>
+                      <Label className="text-lotus-admin-md font-semibold text-stone-500">Chi tiết phép</Label>
                       <Select
                         value={subStatus}
                         onValueChange={(val) => setValue("subStatus", val)}
                       >
-                        <SelectTrigger className="h-10 text-[13px] border-stone-200/80 rounded-xl">
+                        <AdminSelectTrigger className="h-10 text-lotus-admin-lg border-stone-200/80 rounded-xl">
                           <SelectValue />
-                        </SelectTrigger>
+                        </AdminSelectTrigger>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="4">Nghỉ phép hưởng lương (1 công)</SelectItem>
                           <SelectItem value="5">Nghỉ lễ (1 công)</SelectItem>
@@ -529,14 +531,14 @@ export function AttendanceDailyDialog({
 
                   {mode === "unpaid_leave" && (
                     <div className="space-y-1.5 animate-in slide-in-from-top-1 duration-200">
-                      <Label className="text-[12px] font-semibold text-stone-500">Chi tiết nghỉ</Label>
+                      <Label className="text-lotus-admin-md font-semibold text-stone-500">Chi tiết nghỉ</Label>
                       <Select
                         value={subStatus}
                         onValueChange={(val) => setValue("subStatus", val)}
                       >
-                        <SelectTrigger className="h-10 text-[13px] border-stone-200/80 rounded-xl">
+                        <AdminSelectTrigger className="h-10 text-lotus-admin-lg border-stone-200/80 rounded-xl">
                           <SelectValue />
-                        </SelectTrigger>
+                        </AdminSelectTrigger>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="3">Vắng / nghỉ không lương (0 công)</SelectItem>
                           <SelectItem value="6">Nghỉ không lương (0 công)</SelectItem>
@@ -556,11 +558,11 @@ export function AttendanceDailyDialog({
                             {...register("checkInEnabled")}
                             disabled={!isToday && !attendance}
                           />
-                          <span className="text-[13px] font-bold text-stone-700">Giờ vào</span>
+                          <span className="text-lotus-admin-lg font-bold text-stone-700">Giờ vào</span>
                         </label>
-                        <Input
+                        <AdminInput
                           type="time"
-                          className="h-10 text-[13px] border-stone-200/80 rounded-xl"
+                          className="h-10 text-lotus-admin-lg border-stone-200/80 rounded-xl"
                           {...register("checkInTime")}
                           disabled={!checkInEnabled || (!isToday && !attendance)}
                         />
@@ -574,11 +576,11 @@ export function AttendanceDailyDialog({
                             {...register("checkOutEnabled")}
                             disabled={!isToday && !attendance}
                           />
-                          <span className="text-[13px] font-bold text-stone-700">Giờ ra</span>
+                          <span className="text-lotus-admin-lg font-bold text-stone-700">Giờ ra</span>
                         </label>
-                        <Input
+                        <AdminInput
                           type="time"
-                          className="h-10 text-[13px] border-stone-200/80 rounded-xl"
+                          className="h-10 text-lotus-admin-lg border-stone-200/80 rounded-xl"
                           {...register("checkOutTime")}
                           disabled={!checkOutEnabled || (!isToday && !attendance)}
                         />
@@ -588,12 +590,12 @@ export function AttendanceDailyDialog({
 
                   {/* Note */}
                   <div className="space-y-1.5">
-                    <Label className="text-[12px] font-bold text-stone-500 uppercase tracking-wider">
+                    <Label className="text-lotus-admin-md font-bold text-stone-500 uppercase tracking-wider">
                       Ghi chú
                     </Label>
-                    <Textarea
+                    <AdminTextarea
                       placeholder="Nhập ghi chú chấm công..."
-                      className="border-stone-200/80 rounded-xl min-h-[80px] text-[13px]"
+                      className="border-stone-200/80 rounded-xl min-h-[80px] text-lotus-admin-lg"
                       {...register("note")}
                     />
                   </div>
@@ -603,7 +605,7 @@ export function AttendanceDailyDialog({
               /* History Tab */
               <div className="space-y-3 py-2">
                 {attendance ? (
-                  <div className="border border-stone-200/60 rounded-xl p-4 bg-stone-50/50 space-y-2.5 text-[13px]">
+                  <div className="border border-stone-200/60 rounded-xl p-4 bg-stone-50/50 space-y-2.5 text-lotus-admin-lg">
                     <div className="flex items-center justify-between border-b border-stone-150 pb-2">
                       <span className="font-semibold text-stone-500">Người chấm công:</span>
                       <span className="font-bold text-stone-800">{attendance.staffName}</span>
@@ -645,7 +647,7 @@ export function AttendanceDailyDialog({
                 variant="outline"
                 size="sm"
                 onClick={() => onOpenChange(false)}
-                className="h-9 px-4 rounded-xl text-[13px]"
+                className="h-9 px-4 rounded-xl text-lotus-admin-lg"
               >
                 Bỏ qua
               </Button>
@@ -657,7 +659,7 @@ export function AttendanceDailyDialog({
                   type="submit"
                   variant="admin"
                   size="sm"
-                  className="h-9 px-5 rounded-xl text-[13px]"
+                  className="h-9 px-5 rounded-xl text-lotus-admin-lg"
                   loading={isPending}
                 >
                   {isAdminOrManager ? "Lưu" : !attendance ? "Check-in" : "Check-out"}

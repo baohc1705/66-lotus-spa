@@ -64,7 +64,7 @@ export function StaffScheduleToolbar({
             className={cn(
               "px-3 py-1.5 text-sm font-medium rounded-md transition-all",
               viewMode === "day"
-                ? "bg-white text-[#1A56DB] shadow-sm"
+                ? "bg-white text-blue-600 shadow-sm"
                 : "text-gray-600 hover:text-gray-900",
             )}
           >
@@ -76,7 +76,7 @@ export function StaffScheduleToolbar({
             className={cn(
               "px-3 py-1.5 text-sm font-medium rounded-md transition-all",
               viewMode === "week"
-                ? "bg-white text-[#1A56DB] shadow-sm"
+                ? "bg-white text-blue-600 shadow-sm"
                 : "text-gray-600 hover:text-gray-900",
             )}
           >
@@ -115,7 +115,7 @@ export function StaffScheduleToolbar({
           className={cn(
             "px-3 py-1.5 text-sm font-medium rounded-lg border transition-all",
             isToday
-              ? "bg-[#1A56DB] text-white border-[#1A56DB]"
+              ? "bg-blue-600 text-white border-blue-600"
               : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-white",
           )}
         >

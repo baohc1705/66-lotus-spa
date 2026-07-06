@@ -12,16 +12,15 @@ import {
   NameCell,
   TextCell,
 } from "@/shared/components/DataTable/tableCells";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 import { CATEGORY_COLUMN_LABELS } from "./useActiveCategoryColumns";
 import { PRODUCT_CATEGORY_PERM } from "../constants/productCategory.permissions";
-import type { ProductCategoryDTO } from "../types/product_category.types";
+import type { ProductCategoryDto } from "../types/productCategory.types";
 
 interface UseDeletedCategoryColumnsParams {
   pageIndex: number;
   pageSize: number;
-  onRestore: (item: ProductCategoryDTO) => void;
+  onRestore: (item: ProductCategoryDto) => void;
 }
 
 export function useDeletedCategoryColumns({
@@ -32,7 +31,7 @@ export function useDeletedCategoryColumns({
   const cols = CATEGORY_COLUMN_LABELS;
   const perm = PRODUCT_CATEGORY_PERM;
 
-  return useMemo<ColumnDef<ProductCategoryDTO>[]>(
+  return useMemo<ColumnDef<ProductCategoryDto>[]>(
     () => [
       {
         id: "index",
@@ -83,7 +82,7 @@ export function useDeletedCategoryColumns({
             <Button
               variant="outline"
               size="sm"
-              className={TABLE_STYLES.toolbarBtn}
+              className="lotus-admin-table-toolbar-btn"
               onClick={() => onRestore(row.original)}
             >
               <RotateCcw className="w-3.5 h-3.5" />

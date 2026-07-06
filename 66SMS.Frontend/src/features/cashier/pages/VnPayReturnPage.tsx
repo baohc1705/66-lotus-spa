@@ -57,7 +57,7 @@ export function VnPayReturnPage() {
     phase === "deposit" ? "Quay lại trang cá nhân" : "Quay lại trang thu ngân";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FBF7F2]">
+    <div className="min-h-screen flex items-center justify-center bg-lotus-cream">
       <div className="bg-white p-8 rounded-[24px] shadow-[0_20px_40px_rgba(42,31,26,0.1)] w-full max-w-md text-center border border-lotus-gold/20">
         {status === "loading" && (
           <div className="flex flex-col items-center">

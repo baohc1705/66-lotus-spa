@@ -15,7 +15,6 @@ import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 import { ServiceCategoryFormDialog } from "../components/ServiceCategoryFormDialog";
 import {
@@ -34,7 +33,7 @@ import {
 } from "../hooks/useServiceCategories";
 import { useServiceCategoryListState } from "../hooks/useServiceCategoryListState";
 import { useRowSelection } from "@/shared/hooks/useRowSelection";
-import type { ServiceCategoryDTO } from "../types/service_category.types";
+import type { ServiceCategoryDto } from "../types/serviceCategory.types";
 
 const ENTITY = "nhóm dịch vụ";
 const ENTITY_SUBJECT = "Nhóm dịch vụ";
@@ -42,6 +41,7 @@ const DELETE_WARNING = "Các dịch vụ thuộc nhóm này có thể bị ảnh
 const BULK_DELETE_WARNING = "Các dịch vụ thuộc các nhóm này có thể bị ảnh hưởng.";
 
 export function ServiceCategoryListPage() {
+  "use no memo";
   const perm = SERVICE_CATEGORY_PERM;
 
   const listState = useServiceCategoryListState();
@@ -86,7 +86,7 @@ export function ServiceCategoryListPage() {
   const pageIds = useMemo(
     () =>
       categories
-        .map((c: ServiceCategoryDTO) => c.id)
+        .map((c: ServiceCategoryDto) => c.id)
         .filter((id): id is number => id !== undefined),
     [categories],
   );
@@ -113,7 +113,6 @@ export function ServiceCategoryListPage() {
     onSort: handleSort,
     headerChecked,
     selectedRowIds,
-    pageIds,
     onToggleAll: toggleAll,
     onToggleOne: toggleOne,
     onEdit: setEditTarget,
@@ -193,7 +192,7 @@ export function ServiceCategoryListPage() {
                   <Button
                     variant="destructive"
                     size="sm"
-                    className="text-[12px] h-7 px-2"
+                    className="lotus-admin-btn-toolbar"
                     onClick={() => setBulkDeleteOpen(true)}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -217,7 +216,7 @@ export function ServiceCategoryListPage() {
               variant="admin"
               size="sm"
               onClick={() => setCreateOpen(true)}
-              className={TABLE_STYLES.toolbarBtn}
+              className="lotus-admin-table-toolbar-btn"
             >
               <Plus className="w-3.5 h-3.5" />
               Thêm nhóm dịch vụ
@@ -232,7 +231,7 @@ export function ServiceCategoryListPage() {
             <Button
               variant="admin"
               size="sm"
-              className={TABLE_STYLES.toolbarBtn}
+              className="lotus-admin-table-toolbar-btn"
               onClick={() => handleToggleView(clearSelection)}
               title={showDeleted ? "Quay lại danh sách" : "Nhóm dịch vụ đã xóa"}
             >
@@ -280,7 +279,7 @@ export function ServiceCategoryListPage() {
                     variant="admin"
                     size="sm"
                     onClick={() => setCreateOpen(true)}
-                    className="mt-1 text-[12px]"
+                    className="mt-1 text-lotus-admin-md"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Thêm nhóm dịch vụ

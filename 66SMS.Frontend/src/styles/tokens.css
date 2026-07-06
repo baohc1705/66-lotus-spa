@@ -1,7 +1,6 @@
 /* ═══════════════════════════════════════════════════════
-   Hoa Sen Spa — Design Tokens
-   Nguồn duy nhất cho màu sắc, font, và animation
-   Fonts đã khai báo tại src/fonts.css (local woff2)
+   LANDING PAGE ONLY — không dùng trong admin CRUD
+   Fonts đã khai báo tại index.css (Google Fonts CDN)
    ═══════════════════════════════════════════════════════ */
 
 :root {
@@ -18,6 +17,46 @@
   --lotus-stone:       #8A7E76;
   --lotus-surface:     #FFFFFF;
   --lotus-error:       #EF4444;
+
+  /* ── Cashier / VNPay (dùng token, không hardcode hex trong component) ── */
+  --lotus-vnpay:              #005BAA;
+  --lotus-vnpay-red:          #ED1B24;
+  --lotus-rose-dark:          #B64269;
+  --lotus-cashier-header-from: #200A1C;
+  --lotus-cashier-header-via:  #35152B;
+  --lotus-cashier-header-to:   #911F43;
+
+  /* ── Membership tier cards (profile) ── */
+  --membership-bronze-bg:      #FFFBF5;
+  --membership-bronze-bg-end:  #E5BE90;
+  --membership-bronze-border:  #8B5A2B;
+  --membership-bronze-accent:  #C8863C;
+  --membership-bronze-text:    #2C1A0A;
+  --membership-silver-bg:      #F8FAFC;
+  --membership-silver-bg-end:  #CBD5E1;
+  --membership-silver-border:  #9E9E9E;
+  --membership-silver-accent:  #C8C8C8;
+  --membership-silver-text:    #1C1C1E;
+  --membership-gold-bg:        #FFFDF0;
+  --membership-gold-bg-end:    #E3C567;
+  --membership-gold-border:    #C9960C;
+  --membership-gold-accent:    #E8BB3A;
+  --membership-gold-text:      #1A1200;
+  --membership-platinum-bg:    #F8FAFC;
+  --membership-platinum-bg-end:#C8CBD4;
+  --membership-platinum-border:#C8CBD4;
+  --membership-platinum-accent:#DDE0EA;
+  --membership-platinum-text:  #111215;
+  --membership-diamond-bg:     #F0F9FF;
+  --membership-diamond-bg-end: #A3E0F8;
+  --membership-diamond-border: #6DCEF5;
+  --membership-diamond-accent: #A3E0F8;
+  --membership-diamond-text:   #0A1626;
+  --membership-default-bg:     #FAF5FF;
+  --membership-default-bg-end: #E9D5FF;
+  --membership-default-border: #A78BFA;
+  --membership-default-accent: #C4B5FD;
+  --membership-default-text:   #4C1D95;
 
   /* ── Typography ── */
   --font-display: 'Playfair Display', Georgia, serif;

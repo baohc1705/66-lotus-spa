@@ -54,7 +54,7 @@ export function CashierHeader({ activeTab = "calendar", onTabChange }: CashierHe
   const cashierName = user?.username || "Thu ngân";
 
   return (
-    <header className="h-15 py-3 bg-gradient-to-r from-[#200A1C] via-[#35152B] to-[#911F43] border-b border-purple-950/40 text-white flex items-center justify-between px-4 sticky top-0 z-50 shadow-md font-sans">
+    <header className="lotus-cashier-header h-15 py-3 border-b border-purple-950/40 text-white flex items-center justify-between px-4 sticky top-0 z-50 shadow-md font-sans">
       {/* Left side: Logo & Tabs */}
       <div className="flex items-center gap-4 h-full">
         {/* Lotus Spa Logo */}
@@ -135,7 +135,7 @@ export function CashierHeader({ activeTab = "calendar", onTabChange }: CashierHe
             className="flex items-center gap-2 text-left hover:opacity-90 transition-opacity focus:outline-none"
           >
             <div className="text-right hidden sm:block">
-              <div className="text-[10px] text-white/60 font-bold uppercase tracking-wider">
+              <div className="text-lotus-admin-xs text-white/60 font-bold uppercase tracking-wider">
                 Thu ngân
               </div>
               <div className="leading-none text-white font-bold text-xs whitespace-nowrap">
@@ -158,7 +158,7 @@ export function CashierHeader({ activeTab = "calendar", onTabChange }: CashierHe
                   <p className="text-xs font-bold text-lotus-deep truncate">
                     {user?.username || "Tài khoản"}
                   </p>
-                  <p className="text-[10px] text-lotus-stone truncate">
+                  <p className="text-lotus-admin-xs text-lotus-stone truncate">
                     {user?.email || ""}
                   </p>
                 </div>

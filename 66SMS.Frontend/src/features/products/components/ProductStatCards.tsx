@@ -1,11 +1,10 @@
-import { Package, TrendingUp, Warehouse, ShoppingBag } from "lucide-react";
+import { Package, TrendingUp, Warehouse } from "lucide-react";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
 interface ProductStatCardsProps {
   totalProducts: number;
   activeProducts: number;
   totalStock: number;
-  usedInInvoices: number;
   isLoading: boolean;
 }
 
@@ -59,11 +58,10 @@ export function ProductStatCards({
   totalProducts,
   activeProducts,
   totalStock,
-  usedInInvoices,
   isLoading,
 }: ProductStatCardsProps) {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
       <StatCard
         label="Tổng số sản phẩm"
         value={totalProducts}
@@ -89,15 +87,6 @@ export function ProductStatCards({
         iconBg="#ffedd5"
         iconColor="#ea580c"
         valueColor="#c2410c"
-        isLoading={isLoading}
-      />
-      <StatCard
-        label="Số lượng SP đã sử dụng"
-        value={usedInInvoices}
-        icon={ShoppingBag}
-        iconBg="#ede9fe"
-        iconColor="#7c3aed"
-        valueColor="#6d28d9"
         isLoading={isLoading}
       />
     </div>

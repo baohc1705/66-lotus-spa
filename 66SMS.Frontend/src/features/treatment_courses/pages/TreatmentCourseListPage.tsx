@@ -15,7 +15,6 @@ import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 import { TreatmentCourseFormDialog } from "../components/TreatmentCourseFormDialog";
 import { TreatmentCourseDetailExpanded } from "../components/TreatmentCourseDetailExpanded";
@@ -195,7 +194,7 @@ export function TreatmentCourseListPage() {
                   <Button
                     variant="destructive"
                     size="sm"
-                    className="text-[12px] h-7 px-2"
+                    className="lotus-admin-btn-toolbar"
                     onClick={() => setBulkDeleteOpen(true)}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -219,7 +218,7 @@ export function TreatmentCourseListPage() {
               variant="admin"
               size="sm"
               onClick={() => setCreateOpen(true)}
-              className={TABLE_STYLES.toolbarBtn}
+              className="lotus-admin-table-toolbar-btn"
             >
               <Plus className="w-3.5 h-3.5" />
               Thêm liệu trình
@@ -234,7 +233,7 @@ export function TreatmentCourseListPage() {
             <Button
               variant="admin"
               size="sm"
-              className={TABLE_STYLES.toolbarBtn}
+              className="lotus-admin-table-toolbar-btn"
               onClick={() => handleToggleView(clearSelection)}
               title={showDeleted ? "Quay lại danh sách" : "Liệu trình đã xóa"}
             >
@@ -294,7 +293,7 @@ export function TreatmentCourseListPage() {
                     variant="admin"
                     size="sm"
                     onClick={() => setCreateOpen(true)}
-                    className="mt-1 text-[12px]"
+                    className="mt-1 text-lotus-admin-md"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Thêm liệu trình

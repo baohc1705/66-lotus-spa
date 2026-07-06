@@ -125,7 +125,7 @@ export const BookingContactStep: React.FC = () => {
               Họ và tên người đặt *
               <span className="group relative cursor-pointer text-gray-400 hover:text-gray-600">
                 <Info className="w-3.5 h-3.5" />
-                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:block bg-gray-800 text-white text-[10px] py-1 px-2.5 rounded whitespace-nowrap z-50">
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:block bg-gray-800 text-white text-lotus-admin-xs py-1 px-2.5 rounded whitespace-nowrap z-50">
                   Người đại diện đặt lịch
                 </span>
               </span>
@@ -150,7 +150,7 @@ export const BookingContactStep: React.FC = () => {
               Số điện thoại người đặt *
               <span className="group relative cursor-pointer text-gray-400 hover:text-gray-600">
                 <Info className="w-3.5 h-3.5" />
-                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:block bg-gray-800 text-white text-[10px] py-1 px-2.5 rounded whitespace-nowrap z-50">
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:block bg-gray-800 text-white text-lotus-admin-xs py-1 px-2.5 rounded whitespace-nowrap z-50">
                   Để hệ thống gửi SMS xác nhận lập tức
                 </span>
               </span>

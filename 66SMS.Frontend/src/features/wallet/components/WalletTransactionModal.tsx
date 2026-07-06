@@ -1,3 +1,4 @@
+import { formatCurrency } from '@/shared/utils/currency';
 import { useState } from 'react'
 import { X, ArrowDownLeft, ArrowUpRight, Plus, Loader2 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -6,12 +7,6 @@ import type { AdminWalletTransactionDto } from '../types/wallet.types'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-  }).format(value)
-}
 
 interface WalletTransactionModalProps {
   walletId: number | null

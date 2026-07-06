@@ -1,3 +1,4 @@
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useSalons } from "@/features/salons/hooks/useSalons";
 import { useAdminStaffs } from "@/features/staffs/hooks/useStaffs";
@@ -10,7 +11,6 @@ import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
 import {
@@ -104,7 +104,7 @@ export function PayrollListPage() {
         accessorKey: "staffName",
         header: "Nhân viên",
         cell: ({ row }) => (
-          <span className="text-[13px] font-semibold text-lotus-deep">
+          <span className="text-lotus-admin-lg font-semibold text-lotus-deep">
             {row.original.staffName ?? "—"}
           </span>
         ),
@@ -191,7 +191,7 @@ export function PayrollListPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="gap-1 text-[12px] h-8 px-2 text-lotus-deep hover:text-lotus-deep hover:bg-lotus-stone/10"
+                className="gap-1 text-lotus-admin-md h-8 px-2 text-lotus-deep hover:text-lotus-deep hover:bg-lotus-stone/10"
                 onClick={() => setEditingPayroll(p)}
               >
                 <Pencil className="w-3.5 h-3.5" /> Sửa
@@ -199,7 +199,7 @@ export function PayrollListPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="gap-1 text-[12px] h-8 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+                className="gap-1 text-lotus-admin-md h-8 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
                 onClick={() => confirmMutation.mutate(p.id!)}
                 loading={confirmMutation.isPending}
               >
@@ -228,7 +228,7 @@ export function PayrollListPage() {
           <Button
             variant="admin"
             size="sm"
-            className="gap-1.5"
+            className="lotus-admin-table-toolbar-btn gap-1.5"
             onClick={() => setGenerateOpen(true)}
           >
             <Calculator className="w-3.5 h-3.5" /> Tính lương
@@ -237,7 +237,7 @@ export function PayrollListPage() {
           <div className="ml-auto flex items-end gap-3">
             {!headerSalonId && (
               <div className="space-y-1">
-                <label className="text-[12px] font-semibold text-lotus-deep/80">
+                <label className="text-lotus-admin-md font-semibold text-lotus-deep/80">
                   Chi nhánh
                 </label>
                 <Select
@@ -248,9 +248,9 @@ export function PayrollListPage() {
                     setPageIndex(1);
                   }}
                 >
-                  <SelectTrigger className="h-9 text-[13px] w-[180px]">
+                  <AdminSelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Tất cả" />
-                  </SelectTrigger>
+                  </AdminSelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Tất cả chi nhánh</SelectItem>
                     {salons.map((s) => (
@@ -263,7 +263,7 @@ export function PayrollListPage() {
               </div>
             )}
             <div className="space-y-1">
-              <label className="text-[12px] font-semibold text-lotus-deep/80">
+              <label className="text-lotus-admin-md font-semibold text-lotus-deep/80">
                 Nhân viên
               </label>
               <Select
@@ -273,9 +273,9 @@ export function PayrollListPage() {
                   setPageIndex(1);
                 }}
               >
-                <SelectTrigger className="h-9 text-[13px] w-[180px]">
+                <AdminSelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Tất cả" />
-                </SelectTrigger>
+                </AdminSelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tất cả</SelectItem>
                   {staffs.map((s: StaffDto) => (
@@ -287,7 +287,7 @@ export function PayrollListPage() {
               </Select>
             </div>
             <div className="space-y-1">
-              <label className="text-[12px] font-semibold text-lotus-deep/80">
+              <label className="text-lotus-admin-md font-semibold text-lotus-deep/80">
                 Tháng
               </label>
               <Select
@@ -297,9 +297,9 @@ export function PayrollListPage() {
                   setPageIndex(1);
                 }}
               >
-                <SelectTrigger className="h-9 text-[13px] w-[120px]">
+                <AdminSelectTrigger className="w-[120px]">
                   <SelectValue placeholder="Tất cả" />
-                </SelectTrigger>
+                </AdminSelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tất cả</SelectItem>
                   {months.map((m) => (
@@ -311,7 +311,7 @@ export function PayrollListPage() {
               </Select>
             </div>
             <div className="space-y-1">
-              <label className="text-[12px] font-semibold text-lotus-deep/80">
+              <label className="text-lotus-admin-md font-semibold text-lotus-deep/80">
                 Năm
               </label>
               <Select
@@ -321,9 +321,9 @@ export function PayrollListPage() {
                   setPageIndex(1);
                 }}
               >
-                <SelectTrigger className="h-9 text-[13px] w-[120px]">
+                <AdminSelectTrigger className="w-[120px]">
                   <SelectValue placeholder="Tất cả" />
-                </SelectTrigger>
+                </AdminSelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tất cả</SelectItem>
                   {years.map((y) => (

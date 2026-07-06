@@ -1,3 +1,5 @@
+import { AdminInput } from '@/shared/components/forms/AdminInput';
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { Button } from "@/shared/components/ui/button";
 import {
   Dialog,
@@ -7,13 +9,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
-import { Input } from "@/shared/components/ui/input";
+
 import { Label } from "@/shared/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -134,9 +135,9 @@ export function AttendanceFormDialog({
               value={selectedStatus}
               onValueChange={(v) => setValue("status", v)}
             >
-              <SelectTrigger className="h-9 text-[13px]">
+              <AdminSelectTrigger>
                 <SelectValue placeholder="Chọn trạng thái..." />
-              </SelectTrigger>
+              </AdminSelectTrigger>
               <SelectContent>
                 {STATUS_OPTIONS.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
@@ -150,17 +151,15 @@ export function AttendanceFormDialog({
           {!isManualStatus && (
             <>
               <FormField label="Giờ vào" error={errors.checkInAt?.message}>
-                <Input
+                <AdminInput
                   {...register("checkInAt")}
                   type="datetime-local"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField label="Giờ ra" error={errors.checkOutAt?.message}>
-                <Input
+                <AdminInput
                   {...register("checkOutAt")}
                   type="datetime-local"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
             </>
@@ -169,10 +168,9 @@ export function AttendanceFormDialog({
           {/* KPI override Checkbox removed */}
 
           <FormField label="Ghi chú" error={errors.note?.message}>
-            <Input
+            <AdminInput
               {...register("note")}
               placeholder="Ghi chú (nếu có)"
-              className="h-9 text-[13px]"
             />
           </FormField>
 
@@ -214,11 +212,11 @@ function FormField({
 }) {
   return (
     <div className={`space-y-1 ${className ?? ""}`}>
-      <Label className="text-[12px] font-semibold text-lotus-deep/80">
+      <Label className="text-lotus-admin-md font-semibold text-lotus-deep/80">
         {label}
       </Label>
       {children}
-      {error && <p className="text-[11px] text-red-500 font-medium">{error}</p>}
+      {error && <p className="text-lotus-admin-base text-red-500 font-medium">{error}</p>}
     </div>
   );
 }

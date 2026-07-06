@@ -1,3 +1,4 @@
+import { formatCurrency } from '@/shared/utils/currency';
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getAdminWallets } from '../api/wallet.api'
@@ -5,12 +6,6 @@ import type { AdminWalletDto } from '../types/wallet.types'
 import { WalletTransactionModal } from '../components/WalletTransactionModal'
 import { Loader2, Search, Wallet } from 'lucide-react'
 
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-  }).format(value)
-}
 
 export function WalletManagementPage() {
   const [searchTerm, setSearchTerm] = useState('')

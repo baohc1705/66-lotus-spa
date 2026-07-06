@@ -1,5 +1,4 @@
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 interface SortableColumnHeaderProps {
   label: string;
@@ -29,7 +28,7 @@ export function SortableColumnHeader({
     <button
       type="button"
       onClick={() => onSort(column)}
-      className={TABLE_STYLES.sortBtn}
+      className="lotus-admin-table-sort-btn"
     >
       {label} {icon}
     </button>

@@ -23,7 +23,6 @@ import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { useRowSelection } from "@/shared/hooks/useRowSelection";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 import { ProductCategorySidebar } from "../components/ProductCategorySidebar";
 import { ProductDetailExpanded } from "../components/ProductDetailExpanded";
@@ -233,7 +232,6 @@ export function ProductListPage() {
             totalProducts={totalCount}
             activeProducts={activeProductCount}
             totalStock={totalStock}
-            usedInInvoices={0}
             isLoading={isLoading}
           />
         </div>
@@ -243,12 +241,12 @@ export function ProductListPage() {
           initial="hidden"
           animate="visible"
           variants={containerVariants}
-          className={`${TABLE_STYLES.pageCard} flex-1 min-h-0 flex flex-col overflow-hidden relative`}
+          className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative"
         >
           {/* Fetching bar */}
           {isFetching && !isLoading && (
-            <div className={TABLE_STYLES.fetchBar}>
-              <div className={TABLE_STYLES.fetchBarInner} />
+            <div className="lotus-admin-table-fetch-bar">
+              <div className="lotus-admin-table-fetch-bar-inner" />
             </div>
           )}
 
@@ -272,7 +270,7 @@ export function ProductListPage() {
                       <Button
                         variant="destructive"
                         size="sm"
-                        className="text-[12px] h-7 px-2"
+                        className="lotus-admin-btn-toolbar"
                         onClick={() => setBulkDeleteOpen(true)}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -299,7 +297,7 @@ export function ProductListPage() {
                   variant="admin"
                   size="sm"
                   onClick={() => setCreateOpen(true)}
-                  className={TABLE_STYLES.toolbarBtn}
+                  className="lotus-admin-table-toolbar-btn"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Thêm sản phẩm
@@ -314,7 +312,7 @@ export function ProductListPage() {
                 <Button
                   variant="admin"
                   size="sm"
-                  className={TABLE_STYLES.toolbarBtn}
+                  className="lotus-admin-table-toolbar-btn"
                   onClick={() => handleToggleView(clearSelection)}
                   title={showDeleted ? "Quay lại danh sách" : "Sản phẩm đã xóa"}
                 >
@@ -375,7 +373,7 @@ export function ProductListPage() {
                         variant="admin"
                         size="sm"
                         onClick={() => setCreateOpen(true)}
-                        className="mt-1 text-[12px]"
+                        className="mt-1 text-lotus-admin-md"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         Thêm sản phẩm

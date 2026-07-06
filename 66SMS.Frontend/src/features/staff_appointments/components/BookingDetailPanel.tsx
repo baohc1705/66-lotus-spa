@@ -61,8 +61,8 @@ export function BookingDetailPanel({
 
         <div className="flex-1 overflow-y-auto p-5 space-y-5">
           <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
-            <div className="w-10 h-10 rounded-full bg-[#1A56DB]/10 flex items-center justify-center">
-              <User className="w-5 h-5 text-[#1A56DB]" />
+            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+              <User className="w-5 h-5 text-blue-600" />
             </div>
             <div>
               <p className="font-semibold text-gray-900">{booking.customerName}</p>
@@ -85,7 +85,7 @@ export function BookingDetailPanel({
             </div>
 
             <div className="flex items-start gap-3">
-              <Clock className="w-5 h-5 text-[#1A56DB] shrink-0 mt-0.5" />
+              <Clock className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide">Thời gian</p>
                 <p className="font-medium text-gray-900">
@@ -137,7 +137,7 @@ export function BookingDetailPanel({
                 type="button"
                 disabled={isUpdating}
                 onClick={() => onStartService(booking.id)}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#1A56DB] text-white font-semibold text-sm hover:bg-[#1A56DB]/90 disabled:opacity-50 transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-600/90 disabled:opacity-50 transition-colors"
               >
                 {isUpdating ? (
                   <Loader2 className="w-5 h-5 animate-spin" />

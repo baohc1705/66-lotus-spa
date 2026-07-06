@@ -7,10 +7,8 @@ import {
   Printer,
   ChevronDown,
   Barcode,
-  Coins,
   DollarSign,
   CreditCard,
-  Percent,
   X,
   User as UserIcon,
   SlidersHorizontal,
@@ -29,10 +27,14 @@ import { useStaffs } from "@/features/staffs/hooks/useStaffs";
 import { useCreateInvoice } from "@/features/invoices/hooks/useInvoices";
 import { invoiceApi } from "@/features/invoices/api/invoice.api";
 import { cashierApi } from "@/features/cashier/api/cashier.api";
-import { POINT_VALUE_VND, PAYMENT_METHOD, type InvoiceDto } from "@/features/invoices/types/invoice.types";
+import {
+  POINT_VALUE_VND,
+  PAYMENT_METHOD,
+  type InvoiceDto,
+} from "@/features/invoices/types/invoice.types";
 import type { CustomerDto } from "@/features/customers/types/customer.types";
 import type { StaffDto } from "@/features/staffs/types/staff.types";
-import type { ServiceDTO } from "@/features/services/types/service.types";
+import type { ServiceDto } from "@/features/services/types/service.types";
 import type { ProductDto } from "@/features/products/types/product.types";
 import type { TreatmentCourseDto } from "@/features/treatment_courses/types/treatmentCourse.types";
 import { useAuthStore } from "@/features/auth/stores/authStore";
@@ -51,7 +53,7 @@ interface POSOrderItem {
 interface POSOrder {
   id: string;
   code: string;
-  customer: CustomerDto | null;
+  customer: Partial<CustomerDto> | null;
   items: POSOrderItem[];
   discountAmount: number;
   useLoyaltyPoints: boolean;
@@ -61,12 +63,34 @@ interface POSOrder {
   invoiceId?: number | null;
 }
 
+function getCatalogItemImageUrl(
+  item: ServiceDto | ProductDto | TreatmentCourseDto,
+): string | undefined {
+  if (item && typeof item === "object") {
+    if ("imageUrl" in item && item.imageUrl) {
+      return item.imageUrl;
+    }
+    if (
+      "images" in item &&
+      Array.isArray(item.images) &&
+      item.images.length > 0
+    ) {
+      const primary = item.images.find((img) => img.isPrimary);
+      return primary?.url || item.images[0]?.url;
+    }
+  }
+  return undefined;
+}
+
 interface CashierPOSProps {
   checkoutInvoice?: InvoiceDto | null;
   onClearCheckoutInvoice?: () => void;
 }
 
-export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierPOSProps = {}) {
+export function CashierPOS({
+  checkoutInvoice,
+  onClearCheckoutInvoice,
+}: CashierPOSProps = {}) {
   const qc = useAuthStore();
   const effectiveSalonId = qc.getEffectiveSalonId();
   const cashierName = qc.user?.username || "Thu ngân";
@@ -85,9 +109,11 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
     },
   ]);
   const [activeOrderId, setActiveOrderId] = useState<string>("1");
-  const [activeTab, setActiveTab] = useState<"services" | "products" | "courses">("services");
+  const [activeTab, setActiveTab] = useState<
+    "services" | "products" | "courses"
+  >("services");
   const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
-  
+
   // Search states
   const [searchQuery, setSearchQuery] = useState("");
   const [customerSearch, setCustomerSearch] = useState("");
@@ -106,7 +132,9 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
       const orderId = `appointment-${checkoutInvoice.id}`;
       const newOrder: POSOrder = {
         id: orderId,
-        code: checkoutInvoice.invoiceCode || `HĐ Lịch #${checkoutInvoice.appointmentId}`,
+        code:
+          checkoutInvoice.invoiceCode ||
+          `HĐ Lịch #${checkoutInvoice.appointmentId}`,
         customer: checkoutInvoice.customerId
           ? {
               id: checkoutInvoice.customerId,
@@ -133,15 +161,17 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
         invoiceId: checkoutInvoice.id,
       };
 
-      setOrders((prev) => {
-        const filtered = prev.filter((o) => o.id !== orderId);
-        return [...filtered, newOrder];
-      });
-      setActiveOrderId(orderId);
+      setTimeout(() => {
+        setOrders((prev) => {
+          const filtered = prev.filter((o) => o.id !== orderId);
+          return [...filtered, newOrder];
+        });
+        setActiveOrderId(orderId);
 
-      if (onClearCheckoutInvoice) {
-        onClearCheckoutInvoice();
-      }
+        if (onClearCheckoutInvoice) {
+          onClearCheckoutInvoice();
+        }
+      }, 0);
     }
   }, [checkoutInvoice, onClearCheckoutInvoice]);
 
@@ -150,37 +180,38 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
     pageIndex: 1,
     pageSize: 200,
   });
-  const services = servicesResult?.data?.items ?? [];
+  const services = useMemo(() => servicesResult?.data?.items ?? [], [servicesResult?.data?.items]);
 
   const { data: productsResult, isLoading: loadingProducts } = useProducts({
     pageIndex: 1,
     pageSize: 200,
   });
-  const products = productsResult?.data?.items ?? [];
+  const products = useMemo(() => productsResult?.data?.items ?? [], [productsResult?.data?.items]);
 
-  const { data: coursesResult, isLoading: loadingCourses } = useTreatmentCourses({
-    pageIndex: 1,
-    pageSize: 200,
-  });
-  const courses = coursesResult?.data?.items ?? [];
+  const { data: coursesResult, isLoading: loadingCourses } =
+    useTreatmentCourses({
+      pageIndex: 1,
+      pageSize: 200,
+    });
+  const courses = useMemo(() => coursesResult?.data?.items ?? [], [coursesResult?.data?.items]);
 
   const { data: serviceCatsResult } = useServiceCategories({
     pageIndex: 1,
     pageSize: 100,
   });
-  const serviceCats = serviceCatsResult?.data?.items ?? [];
+  const serviceCats = useMemo(() => serviceCatsResult?.data?.items ?? [], [serviceCatsResult?.data?.items]);
 
   const { data: productCatsResult } = useProductCategories({
     pageIndex: 1,
     pageSize: 500,
   });
-  const productCats = productCatsResult?.data?.items ?? [];
+  const productCats = useMemo(() => productCatsResult?.data?.items ?? [], [productCatsResult?.data?.items]);
 
   const { data: staffsResult } = useStaffs({
     pageIndex: 1,
     pageSize: 100,
   });
-  const staffs = staffsResult?.data?.items ?? [];
+  const staffs = useMemo(() => staffsResult?.data?.items ?? [], [staffsResult?.data?.items]);
 
   // Live filter query for customers
   const { data: customersResult } = useCustomers({
@@ -188,7 +219,7 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
     pageSize: 100,
     filter: customerSearch || undefined,
   });
-  const customerList = customersResult?.data?.items ?? [];
+  const customerList = useMemo(() => customersResult?.data?.items ?? [], [customersResult?.data?.items]);
 
   const createInvoiceMutation = useCreateInvoice();
 
@@ -206,15 +237,25 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
 
   const pointsUsed = useMemo(() => {
     if (!activeOrder.useLoyaltyPoints || !activeOrder.customer) return 0;
-    const maxPointsAllowed = Math.floor((subTotal - activeOrder.discountAmount) / POINT_VALUE_VND);
+    const maxPointsAllowed = Math.floor(
+      (subTotal - activeOrder.discountAmount) / POINT_VALUE_VND,
+    );
     const customerPoints = activeOrder.customer.loyaltyPoint ?? 0;
     return Math.max(0, Math.min(customerPoints, maxPointsAllowed));
-  }, [activeOrder.useLoyaltyPoints, activeOrder.customer, subTotal, activeOrder.discountAmount]);
+  }, [
+    activeOrder.useLoyaltyPoints,
+    activeOrder.customer,
+    subTotal,
+    activeOrder.discountAmount,
+  ]);
 
   const pointsDiscountValue = pointsUsed * POINT_VALUE_VND;
 
   const totalAmount = useMemo(() => {
-    return Math.max(0, subTotal - activeOrder.discountAmount - pointsDiscountValue);
+    return Math.max(
+      0,
+      subTotal - activeOrder.discountAmount - pointsDiscountValue,
+    );
   }, [subTotal, activeOrder.discountAmount, pointsDiscountValue]);
 
   // Methods to manipulate orders
@@ -244,19 +285,26 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
     const idx = orders.findIndex((o: POSOrder) => o.id === id);
     const newOrders = orders.filter((o: POSOrder) => o.id !== id);
     setOrders(newOrders);
-    
+
     // Set active order to neighbor
     const newActiveId = newOrders[idx - 1]?.id || newOrders[0]?.id;
     setActiveOrderId(newActiveId);
     toast.success("Đã hủy đơn hàng nháp.");
   };
 
-  const addToCart = (item: { itemType: number; id: number; name: string; code: string; price: number; imageUrl?: string }) => {
+  const addToCart = (item: {
+    itemType: number;
+    id: number;
+    name: string;
+    code: string;
+    price: number;
+    imageUrl?: string;
+  }) => {
     setOrders((prev: POSOrder[]) => {
       return prev.map((o: POSOrder) => {
         if (o.id !== activeOrderId) return o;
         const existingIdx = o.items.findIndex(
-          (i: POSOrderItem) => i.itemType === item.itemType && i.id === item.id
+          (i: POSOrderItem) => i.itemType === item.itemType && i.id === item.id,
         );
         if (existingIdx > -1) {
           const newItems = [...o.items];
@@ -286,7 +334,11 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
     });
   };
 
-  const updateCartItemQuantity = (itemType: number, id: number, val: number) => {
+  const updateCartItemQuantity = (
+    itemType: number,
+    id: number,
+    val: number,
+  ) => {
     setOrders((prev: POSOrder[]) => {
       return prev.map((o: POSOrder) => {
         if (o.id !== activeOrderId) return o;
@@ -304,7 +356,11 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
     });
   };
 
-  const updateCartItemStaff = (itemType: number, id: number, staffId: number) => {
+  const updateCartItemStaff = (
+    itemType: number,
+    id: number,
+    staffId: number,
+  ) => {
     const staff = staffs.find((s: StaffDto) => s.id === staffId);
     setOrders((prev: POSOrder[]) => {
       return prev.map((o: POSOrder) => {
@@ -376,7 +432,9 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
     };
 
     if (payload.items.length === 0) {
-      toast.error("Vui lòng chọn ít nhất 1 sản phẩm hoặc dịch vụ để thanh toán.");
+      toast.error(
+        "Vui lòng chọn ít nhất 1 sản phẩm hoặc dịch vụ để thanh toán.",
+      );
       return;
     }
 
@@ -384,13 +442,16 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
       if (activeOrder.appointmentId) {
         setIsPayingInvoice(true);
         try {
-          const response = await cashierApi.createVnPayUrl(activeOrder.appointmentId);
+          const response = await cashierApi.createVnPayUrl(
+            activeOrder.appointmentId,
+          );
           if (response.isSuccess && response.data) {
             window.location.href = response.data;
             return;
           }
           toast.error(
-            response.message || "Có lỗi xảy ra khi tạo liên kết thanh toán VNPAY"
+            response.message ||
+              "Có lỗi xảy ra khi tạo liên kết thanh toán VNPAY",
           );
         } catch (err) {
           console.error("Error creating VNPAY URL", err);
@@ -399,7 +460,9 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
           setIsPayingInvoice(false);
         }
       } else {
-        toast.error("Thanh toán VNPAY hiện tại chỉ khả dụng đối với đơn hàng tạo từ lịch hẹn.");
+        toast.error(
+          "Thanh toán VNPAY hiện tại chỉ khả dụng đối với đơn hàng tạo từ lịch hẹn.",
+        );
       }
       return;
     }
@@ -411,7 +474,7 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
           activeOrder.invoiceId,
           activeOrder.paymentMethod,
           payload.paidAmount,
-          payload.note
+          payload.note,
         );
         if (result.isSuccess) {
           toast.success(result.message || "Thanh toán hóa đơn thành công.");
@@ -475,20 +538,30 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
   const filteredCatalogItems = useMemo(() => {
     const q = searchQuery.toLowerCase();
     if (activeTab === "services") {
-      return services.filter((s: ServiceDTO) => {
-        const matchQ = s.name?.toLowerCase().includes(q) || s.code?.toLowerCase().includes(q);
-        const matchCat = activeCategoryId ? s.categoryId === activeCategoryId : true;
+      return services.filter((s: ServiceDto) => {
+        const matchQ =
+          s.name?.toLowerCase().includes(q) ||
+          s.code?.toLowerCase().includes(q);
+        const matchCat = activeCategoryId
+          ? s.categoryId === activeCategoryId
+          : true;
         return matchQ && matchCat;
       });
     } else if (activeTab === "products") {
       return products.filter((p: ProductDto) => {
-        const matchQ = p.name?.toLowerCase().includes(q) || p.code?.toLowerCase().includes(q);
-        const matchCat = activeCategoryId ? p.categoryId === activeCategoryId : true;
+        const matchQ =
+          p.name?.toLowerCase().includes(q) ||
+          p.code?.toLowerCase().includes(q);
+        const matchCat = activeCategoryId
+          ? p.categoryId === activeCategoryId
+          : true;
         return matchQ && matchCat;
       });
     } else {
       return courses.filter((c: TreatmentCourseDto) => {
-        return c.name?.toLowerCase().includes(q) || c.code?.toLowerCase().includes(q);
+        return (
+          c.name?.toLowerCase().includes(q) || c.code?.toLowerCase().includes(q)
+        );
       });
     }
   }, [activeTab, activeCategoryId, searchQuery, services, products, courses]);
@@ -504,8 +577,8 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
           className={cn(
             "px-3 py-1 rounded-full text-xs font-semibold tracking-wide border transition-all duration-200",
             activeCategoryId === null
-              ? "bg-[#D4547E] text-white border-[#D4547E] shadow-sm"
-              : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50"
+              ? "bg-lotus-rose text-white border-lotus-rose shadow-sm"
+              : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50",
           )}
         >
           Tất cả
@@ -517,8 +590,8 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
             className={cn(
               "px-3 py-1 rounded-full text-xs font-semibold tracking-wide border transition-all duration-200",
               activeCategoryId === c.id
-                ? "bg-[#D4547E] text-white border-[#D4547E] shadow-sm"
-                : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50"
+                ? "bg-lotus-rose text-white border-lotus-rose shadow-sm"
+                : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50",
             )}
           >
             {c.name}
@@ -529,8 +602,7 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
   };
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 min-w-0 w-full bg-[#FBF7F2] font-sans p-2 gap-2 relative z-10 overflow-hidden">
-      
+    <div className="flex-1 flex flex-col min-h-0 min-w-0 w-full bg-lotus-cream font-sans p-2 gap-2 relative z-10 overflow-hidden">
       {/* ── SECTION 1: THANH NGANG (Top Bar) ── */}
       <div className="bg-white border border-stone-200 rounded-[3px] p-2 shadow-sm shrink-0 flex items-center justify-between gap-3 relative">
         {/* Left: Customer search */}
@@ -547,7 +619,7 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
             }}
             onFocus={() => setShowCustomerDropdown(true)}
             placeholder="Tìm khách hàng theo tên hoặc số điện thoại"
-            className="w-full text-xs bg-stone-50 border border-stone-300 rounded-[3px] py-2 pl-9 pr-4 text-lotus-deep focus:outline-none focus:border-[#D4547E] focus:ring-1 focus:ring-[#D4547E] transition shadow-inner"
+            className="w-full text-xs bg-stone-50 border border-stone-300 rounded-[3px] py-2 pl-9 pr-4 text-lotus-deep focus:outline-none focus:border-lotus-rose focus:ring-1 focus:ring-lotus-rose transition shadow-inner"
           />
 
           {/* Customer Dropdown Results */}
@@ -573,13 +645,15 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                       <div>
                         <div className="font-bold flex items-center gap-1.5">
                           {c.fullName}
-                          <span className="text-[10px] text-stone-400 font-normal">
+                          <span className="text-lotus-admin-xs text-stone-400 font-normal">
                             (CS{String(c.id).padStart(5, "0")})
                           </span>
                         </div>
-                        <div className="text-[11px] text-stone-500 mt-0.5">{c.phone}</div>
+                        <div className="text-lotus-admin-base text-stone-500 mt-0.5">
+                          {c.phone}
+                        </div>
                       </div>
-                      <div className="text-[10px] text-lotus-gold font-bold">
+                      <div className="text-lotus-admin-xs text-lotus-gold font-bold">
                         {c.loyaltyPoint ?? 0} điểm
                       </div>
                     </button>
@@ -594,14 +668,14 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
         <div className="flex items-center gap-2">
           <button
             onClick={() => toast.info("Tính năng Danh sách đơn hàng...")}
-            className="flex items-center gap-1.5 bg-[#D4547E] hover:bg-[#B64269] text-white px-3.5 py-1.5 rounded-[3px] text-xs font-bold transition shadow-sm"
+            className="flex items-center gap-1.5 bg-lotus-rose hover:bg-lotus-rose/90 text-white px-3.5 py-1.5 rounded-[3px] text-xs font-bold transition shadow-sm"
           >
             <span>Danh sách đơn hàng</span>
           </button>
-          
+
           <button
             onClick={handleCreateNewOrder}
-            className="flex items-center gap-1.5 bg-[#D4547E] hover:bg-[#B64269] text-white px-3.5 py-1.5 rounded-[3px] text-xs font-bold transition shadow-sm"
+            className="flex items-center gap-1.5 bg-lotus-rose hover:bg-lotus-rose/90 text-white px-3.5 py-1.5 rounded-[3px] text-xs font-bold transition shadow-sm"
           >
             <Plus className="w-4 h-4" />
             <span>Tạo Đơn Hàng</span>
@@ -611,34 +685,39 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
 
       {/* Bottom area: Columns split 50/50 */}
       <div className="flex-1 flex min-h-0 min-w-0 w-full gap-2 relative lg:grid lg:grid-cols-12">
-        
         {/* ── SECTION 2: KHUNG BÊN TRÁI (Left Panel - 50%) ── */}
         <div className="lg:col-span-6 bg-white border border-stone-200 rounded-[3px] shadow-sm flex flex-col overflow-hidden h-full">
           {/* Order selection header inside Left Column */}
           <div className="p-3 bg-white border-b border-stone-150 flex items-center justify-between shrink-0 flex-wrap gap-2">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="font-bold text-sm text-[#D4547E] flex items-center gap-1">
+              <span className="font-bold text-sm text-lotus-rose flex items-center gap-1">
                 <span>{activeOrder.code}</span>
               </span>
               {/* Stars rating */}
               <div className="flex items-center gap-0.5 text-stone-300">
                 {[1, 2, 3, 4, 5].map((i: number) => (
-                  <span key={i} className="text-sm">★</span>
+                  <span key={i} className="text-sm">
+                    ★
+                  </span>
                 ))}
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2">
-              <span className="text-[11px] text-stone-500 flex items-center gap-1">
+              <span className="text-lotus-admin-base text-stone-500 flex items-center gap-1">
                 Chờ thanh toán
-                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#D4547E] text-white text-[9px] font-bold">2</span>
+                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-lotus-rose text-white text-lotus-admin-xs font-bold">
+                  2
+                </span>
               </span>
-              
+
               <div className="relative">
                 <select
                   value={activeOrderId}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setActiveOrderId(e.target.value)}
-                  className="appearance-none bg-[#D4547E] hover:bg-[#B64269] text-white rounded-[3px] py-1 pl-2.5 pr-8 text-[11px] font-bold shadow-sm focus:outline-none cursor-pointer"
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                    setActiveOrderId(e.target.value)
+                  }
+                  className="appearance-none bg-lotus-rose hover:bg-lotus-rose/90 text-white rounded-[3px] py-1 pl-2.5 pr-8 text-lotus-admin-base font-bold shadow-sm focus:outline-none cursor-pointer"
                 >
                   {orders.map((o: POSOrder) => (
                     <option key={o.id} value={o.id}>
@@ -656,31 +735,42 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
             {/* Left Part: Customer Basic */}
             <div className="col-span-6 flex items-start gap-2.5 border-r border-stone-200 pr-2">
               <div className="w-10 h-10 rounded-full bg-stone-100 border border-stone-200 flex items-center justify-center text-stone-500 font-bold shrink-0 shadow-inner">
-                {activeOrder.customer?.fullName?.charAt(0) || <UserIcon className="w-5 h-5 text-stone-400" />}
+                {activeOrder.customer?.fullName?.charAt(0) || (
+                  <UserIcon className="w-5 h-5 text-stone-400" />
+                )}
               </div>
               <div className="space-y-0.5 min-w-0">
-                <div className="font-bold text-[#D4547E] flex items-center gap-1">
-                  <span className="truncate">{activeOrder.customer?.fullName || "Khách vãng lai"}</span>
+                <div className="font-bold text-lotus-rose flex items-center gap-1">
+                  <span className="truncate">
+                    {activeOrder.customer?.fullName || "Khách vãng lai"}
+                  </span>
                 </div>
-                <div className="text-[11px] text-stone-500 font-medium">
+                <div className="text-lotus-admin-base text-stone-500 font-medium">
                   {activeOrder.customer?.phone || "Chưa có SĐT"}
                 </div>
-                <div className="text-[11px] text-stone-500">
-                  Mã: <span className="font-medium">CS{String(activeOrder.customer?.id || 0).padStart(6, "0")}</span>
+                <div className="text-lotus-admin-base text-stone-500">
+                  Mã:{" "}
+                  <span className="font-medium">
+                    CS{String(activeOrder.customer?.id || 0).padStart(6, "0")}
+                  </span>
                 </div>
-                <div className="text-[11px] text-red-500 font-bold flex items-center gap-1">
+                <div className="text-lotus-admin-base text-red-500 font-bold flex items-center gap-1">
                   Điểm: {activeOrder.customer?.loyaltyPoint ?? 0} điểm
                 </div>
               </div>
             </div>
 
             {/* Right Part: Booking Metadata */}
-            <div className="col-span-6 space-y-1 relative text-[11px]">
+            <div className="col-span-6 space-y-1 relative text-lotus-admin-base">
               {/* Call Client Button */}
               {activeOrder.customer && (
-                <button 
-                  onClick={() => toast.success(`Đang gọi khách hàng: ${activeOrder.customer?.phone}`)}
-                  className="absolute top-0 right-0 bg-[#D4547E] hover:bg-[#B64269] text-white font-bold py-0.5 px-2 rounded-[3px] text-[10px] shadow-sm"
+                <button
+                  onClick={() =>
+                    toast.success(
+                      `Đang gọi khách hàng: ${activeOrder.customer?.phone}`,
+                    )
+                  }
+                  className="absolute top-0 right-0 bg-lotus-rose hover:bg-lotus-rose/90 text-white font-bold py-0.5 px-2 rounded-[3px] text-lotus-admin-xs shadow-sm"
                 >
                   Gọi điện
                 </button>
@@ -699,12 +789,17 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
               <div className="flex justify-between gap-1 text-stone-500">
                 <span>Giờ vào/ra:</span>
                 <span className="font-semibold text-stone-700 flex items-center gap-0.5">
-                  {new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}
+                  {new Date().toLocaleTimeString("vi-VN", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </span>
               </div>
               <div className="flex justify-between gap-1 text-stone-500">
                 <span>N.viên thu ngân:</span>
-                <span className="font-semibold text-stone-700 truncate">{cashierName}</span>
+                <span className="font-semibold text-stone-700 truncate">
+                  {cashierName}
+                </span>
               </div>
             </div>
           </div>
@@ -716,12 +811,14 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                 <div className="w-16 h-16 rounded-full bg-stone-50 flex items-center justify-center mb-2.5">
                   <Barcode className="w-8 h-8 text-stone-300" />
                 </div>
-                <p className="text-xs font-semibold text-stone-500">Đơn hàng chưa có sản phẩm & dịch vụ nào.</p>
+                <p className="text-xs font-semibold text-stone-500">
+                  Đơn hàng chưa có sản phẩm & dịch vụ nào.
+                </p>
               </div>
             ) : (
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-stone-50/80 border-b border-stone-150 text-[10px] text-stone-500 font-bold uppercase tracking-wider sticky top-0 z-10 backdrop-blur-sm">
+                  <tr className="bg-stone-50/80 border-b border-stone-150 text-lotus-admin-xs text-stone-500 font-bold uppercase tracking-wider sticky top-0 z-10 backdrop-blur-sm">
                     <th className="py-2.5 px-3">Sản phẩm & dịch vụ</th>
                     <th className="py-2.5 px-2 text-center w-24">Số lượng</th>
                     <th className="py-2.5 px-2 text-center w-24">Nhân viên</th>
@@ -730,20 +827,26 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                 </thead>
                 <tbody className="divide-y divide-stone-150 text-xs">
                   {activeOrder.items.map((item: POSOrderItem) => (
-                    <tr key={`${item.itemType}-${item.id}`} className="hover:bg-stone-50/50 group transition-colors">
+                    <tr
+                      key={`${item.itemType}-${item.id}`}
+                      className="hover:bg-stone-50/50 group transition-colors"
+                    >
                       <td className="py-3 px-3">
                         <div className="font-bold text-lotus-deep leading-tight">
                           {item.name}
                         </div>
-                        <div className="text-[10px] text-stone-400 font-medium mt-0.5">
-                          Mã: {item.code} | Giá: {item.price.toLocaleString("vi-VN")}đ
+                        <div className="text-lotus-admin-xs text-stone-400 font-medium mt-0.5">
+                          Mã: {item.code} | Giá:{" "}
+                          {item.price.toLocaleString("vi-VN")}đ
                         </div>
                       </td>
                       <td className="py-3 px-2 text-center">
                         <div className="flex items-center justify-center border border-stone-200 rounded-[3px] bg-white w-20 mx-auto shadow-inner">
                           <button
                             type="button"
-                            onClick={() => updateCartItemQuantity(item.itemType, item.id, -1)}
+                            onClick={() =>
+                              updateCartItemQuantity(item.itemType, item.id, -1)
+                            }
                             className="px-2 py-1 text-stone-500 hover:bg-stone-100 hover:text-stone-800 font-bold text-xs"
                           >
                             -
@@ -753,7 +856,9 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                           </span>
                           <button
                             type="button"
-                            onClick={() => updateCartItemQuantity(item.itemType, item.id, 1)}
+                            onClick={() =>
+                              updateCartItemQuantity(item.itemType, item.id, 1)
+                            }
                             className="px-2 py-1 text-stone-500 hover:bg-stone-100 hover:text-stone-800 font-bold text-xs"
                           >
                             +
@@ -764,11 +869,18 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                         <div className="inline-block relative">
                           <select
                             value={item.staffId || ""}
-                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                            onChange={(
+                              e: React.ChangeEvent<HTMLSelectElement>,
+                            ) => {
                               const val = e.target.value;
-                              if (val) updateCartItemStaff(item.itemType, item.id, Number(val));
+                              if (val)
+                                updateCartItemStaff(
+                                  item.itemType,
+                                  item.id,
+                                  Number(val),
+                                );
                             }}
-                            className="appearance-none bg-stone-50 border border-stone-200 rounded-[3px] py-1 pl-2 pr-6 text-[10px] font-bold text-lotus-deep shadow-sm cursor-pointer hover:bg-stone-100 focus:outline-none"
+                            className="appearance-none bg-stone-50 border border-stone-200 rounded-[3px] py-1 pl-2 pr-6 text-lotus-admin-xs font-bold text-lotus-deep shadow-sm cursor-pointer hover:bg-stone-100 focus:outline-none"
                           >
                             <option value="">Chọn...</option>
                             {staffs.map((s: StaffDto) => (
@@ -782,10 +894,21 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                       </td>
                       <td className="py-3 px-3 text-right font-bold text-lotus-deep">
                         <div className="flex items-center justify-end gap-1.5">
-                          <span>{(item.price * item.quantity).toLocaleString("vi-VN")}đ</span>
+                          <span>
+                            {(item.price * item.quantity).toLocaleString(
+                              "vi-VN",
+                            )}
+                            đ
+                          </span>
                           <button
                             type="button"
-                            onClick={() => updateCartItemQuantity(item.itemType, item.id, -item.quantity)}
+                            onClick={() =>
+                              updateCartItemQuantity(
+                                item.itemType,
+                                item.id,
+                                -item.quantity,
+                              )
+                            }
                             className="p-1 text-stone-400 hover:text-lotus-error transition-colors rounded hover:bg-stone-100"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -803,7 +926,9 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
           <div className="p-3 bg-white border-t border-stone-150 shrink-0 text-xs space-y-1.5">
             <div className="flex justify-between items-center text-stone-650 font-medium">
               <span>Thành tiền</span>
-              <span className="font-bold text-stone-800">{subTotal.toLocaleString("vi-VN")} đ</span>
+              <span className="font-bold text-stone-800">
+                {subTotal.toLocaleString("vi-VN")} đ
+              </span>
             </div>
             <div className="flex justify-between items-center text-stone-650 font-medium">
               <button
@@ -813,13 +938,21 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                 }}
                 className="text-red-500 hover:underline flex items-center gap-0.5"
               >
-                Giảm giá <span className="text-[10px] text-stone-400 font-normal">(Thêm giảm giá)</span>
+                Giảm giá{" "}
+                <span className="text-lotus-admin-xs text-stone-400 font-normal">
+                  (Thêm giảm giá)
+                </span>
               </button>
-              <span className="font-bold text-red-500">-{activeOrder.discountAmount.toLocaleString("vi-VN")} đ</span>
+              <span className="font-bold text-red-500">
+                -{activeOrder.discountAmount.toLocaleString("vi-VN")} đ
+              </span>
             </div>
             <div className="flex justify-between items-center text-stone-650 font-medium">
               <button className="text-blue-500 hover:underline flex items-center gap-0.5">
-                Thẻ giảm giá/voucher <span className="text-[10px] text-stone-400 font-normal">(Chọn thẻ)</span>
+                Thẻ giảm giá/voucher{" "}
+                <span className="text-lotus-admin-xs text-stone-400 font-normal">
+                  (Chọn thẻ)
+                </span>
               </button>
               <span className="font-bold text-stone-800">0 đ</span>
             </div>
@@ -827,19 +960,22 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
             <div className="flex justify-between items-center pt-2 border-t border-stone-150 text-sm font-bold text-lotus-deep">
               <div className="flex items-center gap-2">
                 <span className="text-base font-bold">Tổng tiền</span>
-                {activeOrder.customer && (activeOrder.customer.loyaltyPoint ?? 0) > 0 && (
-                  <label className="flex items-center gap-1 text-[11px] text-stone-500 font-normal cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={activeOrder.useLoyaltyPoints}
-                      onChange={toggleLoyaltyPoints}
-                      className="w-3.5 h-3.5 text-[#D4547E] border-stone-300 rounded focus:ring-[#D4547E]"
-                    />
-                    <span>Điểm thưởng: {pointsUsed} điểm</span>
-                  </label>
-                )}
+                {activeOrder.customer &&
+                  (activeOrder.customer.loyaltyPoint ?? 0) > 0 && (
+                    <label className="flex items-center gap-1 text-lotus-admin-base text-stone-500 font-normal cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={activeOrder.useLoyaltyPoints}
+                        onChange={toggleLoyaltyPoints}
+                        className="w-3.5 h-3.5 text-lotus-rose border-stone-300 rounded focus:ring-lotus-rose"
+                      />
+                      <span>Điểm thưởng: {pointsUsed} điểm</span>
+                    </label>
+                  )}
               </div>
-              <span className="text-lg font-bold text-[#D4547E]">{totalAmount.toLocaleString("vi-VN")} đ</span>
+              <span className="text-lg font-bold text-lotus-rose">
+                {totalAmount.toLocaleString("vi-VN")} đ
+              </span>
             </div>
 
             {/* Checkout / Control Buttons */}
@@ -848,7 +984,7 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                 {/* Huy Button */}
                 <button
                   onClick={() => handleRemoveOrder(activeOrderId)}
-                  className="bg-orange-700 hover:bg-orange-800 text-white py-2 px-3 rounded-[3px] flex items-center justify-center gap-1 text-[11px] font-bold shadow-sm"
+                  className="bg-orange-700 hover:bg-orange-800 text-white py-2 px-3 rounded-[3px] flex items-center justify-center gap-1 text-lotus-admin-base font-bold shadow-sm"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Hủy</span>
@@ -856,8 +992,10 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
 
                 {/* Hoa Hong Button */}
                 <button
-                  onClick={() => toast.info("Tính năng hoa hồng & doanh thu...")}
-                  className="bg-[#D4547E] hover:bg-[#B64269] text-white py-2 px-2.5 rounded-[3px] flex items-center justify-center gap-1 text-[11px] font-bold shadow-sm flex-1"
+                  onClick={() =>
+                    toast.info("Tính năng hoa hồng & doanh thu...")
+                  }
+                  className="bg-lotus-rose hover:bg-lotus-rose/90 text-white py-2 px-2.5 rounded-[3px] flex items-center justify-center gap-1 text-lotus-admin-base font-bold shadow-sm flex-1"
                 >
                   <span>Hoa hồng & doanh thu</span>
                 </button>
@@ -866,7 +1004,7 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                 <div className="relative">
                   <button
                     onClick={() => toast.info("Tính năng mở rộng...")}
-                    className="bg-[#D4547E] hover:bg-[#B64269] text-white py-2 px-3 rounded-[3px] text-[11px] font-bold shadow-sm"
+                    className="bg-lotus-rose hover:bg-lotus-rose/90 text-white py-2 px-3 rounded-[3px] text-lotus-admin-base font-bold shadow-sm"
                   >
                     ... ▾
                   </button>
@@ -877,7 +1015,7 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                 {/* In Hoa Don */}
                 <button
                   onClick={() => window.print()}
-                  className="bg-[#D4547E] hover:bg-[#B64269] text-white py-2 px-3 rounded-[3px] flex items-center justify-center gap-1.5 text-[11px] font-bold shadow-sm"
+                  className="bg-lotus-rose hover:bg-lotus-rose/90 text-white py-2 px-3 rounded-[3px] flex items-center justify-center gap-1.5 text-lotus-admin-base font-bold shadow-sm"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>In hóa đơn ▾</span>
@@ -894,7 +1032,7 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                     setIsCheckoutModalOpen(true);
                   }}
                   disabled={createInvoiceMutation.isPending || isPayingInvoice}
-                  className="bg-[#D4547E] hover:bg-[#B64269] text-white py-2 px-4 rounded-[3px] flex items-center justify-center gap-1.5 text-[11px] font-bold shadow-sm disabled:opacity-50"
+                  className="bg-lotus-rose hover:bg-lotus-rose/90 text-white py-2 px-4 rounded-[3px] flex items-center justify-center gap-1.5 text-lotus-admin-base font-bold shadow-sm disabled:opacity-50"
                 >
                   <span>Thanh toán</span>
                 </button>
@@ -915,9 +1053,11 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setSearchQuery(e.target.value)
+                }
                 placeholder="Quét mã hoặc Tìm kiếm theo tên hoặc mã sản phẩm & dịch vụ"
-                className="w-full text-xs bg-stone-50 border border-stone-300 rounded-[3px] py-2.5 pl-9 pr-4 text-lotus-deep focus:outline-none focus:border-[#D4547E] focus:ring-1 focus:ring-[#D4547E] transition shadow-inner"
+                className="w-full text-xs bg-stone-50 border border-stone-300 rounded-[3px] py-2.5 pl-9 pr-4 text-lotus-deep focus:outline-none focus:border-lotus-rose focus:ring-1 focus:ring-lotus-rose transition shadow-inner"
               />
             </div>
 
@@ -931,14 +1071,19 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                 className={cn(
                   "flex-1 py-2 text-xs font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 focus:outline-none",
                   activeTab === "services"
-                    ? "bg-gradient-to-r from-[#D4547E] to-[#B64269] text-white shadow-md transform scale-[1.02]"
-                    : "text-stone-500 hover:bg-stone-200/50 hover:text-stone-700"
+                    ? "bg-gradient-to-r from-lotus-rose to-lotus-rose-dark text-white shadow-md transform scale-[1.02]"
+                    : "text-stone-500 hover:bg-stone-200/50 hover:text-stone-700",
                 )}
               >
-                <Sparkles className={cn("w-3.5 h-3.5 transition-transform duration-200", activeTab === "services" && "animate-pulse")} />
+                <Sparkles
+                  className={cn(
+                    "w-3.5 h-3.5 transition-transform duration-200",
+                    activeTab === "services" && "animate-pulse",
+                  )}
+                />
                 <span>Dịch vụ</span>
               </button>
-              
+
               <button
                 onClick={() => {
                   setActiveTab("products");
@@ -947,14 +1092,14 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                 className={cn(
                   "flex-1 py-2 text-xs font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 focus:outline-none",
                   activeTab === "products"
-                    ? "bg-gradient-to-r from-[#D4547E] to-[#B64269] text-white shadow-md transform scale-[1.02]"
-                    : "text-stone-500 hover:bg-stone-200/50 hover:text-stone-700"
+                    ? "bg-gradient-to-r from-lotus-rose to-lotus-rose-dark text-white shadow-md transform scale-[1.02]"
+                    : "text-stone-500 hover:bg-stone-200/50 hover:text-stone-700",
                 )}
               >
                 <Package className="w-3.5 h-3.5" />
                 <span>Sản phẩm</span>
               </button>
-              
+
               <button
                 onClick={() => {
                   setActiveTab("courses");
@@ -963,8 +1108,8 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                 className={cn(
                   "flex-1 py-2 text-xs font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 focus:outline-none",
                   activeTab === "courses"
-                    ? "bg-gradient-to-r from-[#D4547E] to-[#B64269] text-white shadow-md transform scale-[1.02]"
-                    : "text-stone-500 hover:bg-stone-200/50 hover:text-stone-700"
+                    ? "bg-gradient-to-r from-lotus-rose to-lotus-rose-dark text-white shadow-md transform scale-[1.02]"
+                    : "text-stone-500 hover:bg-stone-200/50 hover:text-stone-700",
                 )}
               >
                 <CreditCard className="w-3.5 h-3.5" />
@@ -981,93 +1126,113 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
             {loadingServices || loadingProducts || loadingCourses ? (
               <div className="grid grid-cols-2 gap-3">
                 {[1, 2, 3, 4].map((i: number) => (
-                  <div key={i} className="bg-white border border-stone-150 h-28 rounded-[3px] animate-pulse" />
+                  <div
+                    key={i}
+                    className="bg-white border border-stone-150 h-28 rounded-[3px] animate-pulse"
+                  />
                 ))}
               </div>
             ) : filteredCatalogItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center text-stone-400 py-12">
                 <SlidersHorizontal className="w-10 h-10 text-stone-300 mb-2" />
-                <p className="text-xs font-semibold">Không tìm thấy kết quả phù hợp</p>
+                <p className="text-xs font-semibold">
+                  Không tìm thấy kết quả phù hợp
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3">
-                {filteredCatalogItems.map((item: ServiceDTO | ProductDto | TreatmentCourseDto) => {
-                  const itemType =
-                    activeTab === "services" ? 1 : activeTab === "products" ? 2 : 3;
-                  const id = item.id!;
-                  
-                  // Count current instances in cart
-                  const cartQty = activeOrder.items.find(
-                    (i: POSOrderItem) => i.itemType === itemType && i.id === id
-                  )?.quantity || 0;
+                {filteredCatalogItems.map(
+                  (item: ServiceDto | ProductDto | TreatmentCourseDto) => {
+                    const itemType =
+                      activeTab === "services"
+                        ? 1
+                        : activeTab === "products"
+                          ? 2
+                          : 3;
+                    const id = item.id!;
+                    const imageUrl = getCatalogItemImageUrl(item);
 
-                  return (
-                    <div
-                      key={id}
-                      onClick={() =>
-                        addToCart({
-                          itemType,
-                          id,
-                          name: item.name!,
-                          code: item.code!,
-                          price: item.sellingPrice!,
-                          imageUrl: item.imageUrl || undefined,
-                        })
-                      }
-                      className={cn(
-                        "bg-white border rounded-[3px] p-2 flex items-start gap-2.5 cursor-pointer hover:shadow-sm transition-all duration-150 select-none relative min-h-[72px]",
-                        cartQty > 0 ? "border-[#D4547E] ring-1 ring-[#D4547E]/40" : "border-stone-200"
-                      )}
-                    >
-                      {/* Badge count overlay */}
-                      {cartQty > 0 && (
-                        <div className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-[#D4547E] text-white flex items-center justify-center text-[10px] font-bold shadow-sm z-10">
-                          {cartQty}
-                        </div>
-                      )}
+                    // Count current instances in cart
+                    const cartQty =
+                      activeOrder.items.find(
+                        (i: POSOrderItem) =>
+                          i.itemType === itemType && i.id === id,
+                      )?.quantity || 0;
 
-                      {/* Thumbnail image */}
-                      <div className="w-12 h-12 rounded-[3px] overflow-hidden bg-stone-100 flex items-center justify-center shrink-0 shadow-inner">
-                        {item.imageUrl ? (
-                          <img
-                            src={item.imageUrl}
-                            alt={item.name}
-                            className="w-full h-full object-cover"
-                            onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                              e.currentTarget.src = ""; // Clear if broken
-                              e.currentTarget.className = "hidden";
-                            }}
-                          />
-                        ) : (
-                          <span className="text-[8px] text-stone-400 font-bold uppercase tracking-wider text-center">
-                            IMAGE
-                          </span>
+                    return (
+                      <div
+                        key={id}
+                        onClick={() =>
+                          addToCart({
+                            itemType,
+                            id,
+                            name: item.name!,
+                            code: item.code!,
+                            price: item.sellingPrice!,
+                            imageUrl: imageUrl,
+                          })
+                        }
+                        className={cn(
+                          "bg-white border rounded-[3px] p-2 flex items-start gap-2.5 cursor-pointer hover:shadow-sm transition-all duration-150 select-none relative min-h-[72px]",
+                          cartQty > 0
+                            ? "border-lotus-rose ring-1 ring-lotus-rose/40"
+                            : "border-stone-200",
                         )}
-                      </div>
+                      >
+                        {/* Badge count overlay */}
+                        {cartQty > 0 && (
+                          <div className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-lotus-rose text-white flex items-center justify-center text-lotus-admin-xs font-bold shadow-sm z-10">
+                            {cartQty}
+                          </div>
+                        )}
 
-                      <div className="flex-1 min-w-0 space-y-0.5">
-                        <div className="font-bold text-[11px] text-lotus-deep uppercase tracking-wide truncate">
-                          {item.name}
+                        {/* Thumbnail image */}
+                        <div className="w-12 h-12 rounded-[3px] overflow-hidden bg-stone-100 flex items-center justify-center shrink-0 shadow-inner">
+                          {imageUrl ? (
+                            <img
+                              src={imageUrl}
+                              alt={item.name ?? undefined}
+                              className="w-full h-full object-cover"
+                              onError={(
+                                e: React.SyntheticEvent<HTMLImageElement>,
+                              ) => {
+                                e.currentTarget.src = ""; // Clear if broken
+                                e.currentTarget.className = "hidden";
+                              }}
+                            />
+                          ) : (
+                            <span className="text-lotus-admin-xs text-stone-400 font-bold uppercase tracking-wider text-center">
+                              IMAGE
+                            </span>
+                          )}
                         </div>
-                        <div className="text-[10px] text-stone-400 font-medium">
-                          {item.code}
-                        </div>
-                        <div className="text-[11px] font-bold text-stone-800 pt-1">
-                          {item.sellingPrice?.toLocaleString("vi-VN")} đ
+
+                        <div className="flex-1 min-w-0 space-y-0.5">
+                          <div className="font-bold text-lotus-admin-base text-lotus-deep uppercase tracking-wide truncate">
+                            {item.name}
+                          </div>
+                          <div className="text-lotus-admin-xs text-stone-400 font-medium">
+                            {item.code}
+                          </div>
+                          <div className="text-lotus-admin-base font-bold text-stone-800 pt-1">
+                            {item.sellingPrice?.toLocaleString("vi-VN")} đ
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  },
+                )}
               </div>
             )}
           </div>
 
           {/* Footer info inside Right Column */}
-          <div className="bg-white border-t border-stone-150 p-2.5 text-[10px] text-stone-500 font-medium flex items-center justify-between shrink-0">
+          <div className="bg-white border-t border-stone-150 p-2.5 text-lotus-admin-xs text-stone-500 font-medium flex items-center justify-between shrink-0">
             <button
-              onClick={() => toast.info("Đang hiển thị danh sách thẻ khách hàng...")}
-              className="text-[#D4547E] hover:underline font-bold"
+              onClick={() =>
+                toast.info("Đang hiển thị danh sách thẻ khách hàng...")
+              }
+              className="text-lotus-rose hover:underline font-bold"
             >
               Danh sách khách hàng dùng thẻ
             </button>
@@ -1081,7 +1246,9 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
         <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white border border-stone-200 rounded-[3px] shadow-2xl max-w-sm w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-4 bg-stone-50 border-b border-stone-150 flex items-center justify-between">
-              <span className="font-bold text-xs text-lotus-deep uppercase tracking-wider">Áp dụng giảm giá</span>
+              <span className="font-bold text-xs text-lotus-deep uppercase tracking-wider">
+                Áp dụng giảm giá
+              </span>
               <button
                 onClick={() => setIsDiscountModalOpen(false)}
                 className="text-stone-400 hover:text-stone-600 transition"
@@ -1089,16 +1256,20 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                 <X className="w-4 h-4" />
               </button>
             </div>
-            
+
             <div className="p-4 space-y-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">Số tiền giảm (VND)</label>
+                <label className="text-lotus-admin-xs font-bold text-stone-500 uppercase tracking-wider">
+                  Số tiền giảm (VND)
+                </label>
                 <input
                   type="number"
                   value={tempDiscount}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTempDiscount(Number(e.target.value))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setTempDiscount(Number(e.target.value))
+                  }
                   placeholder="Nhập số tiền..."
-                  className="w-full text-sm border border-stone-300 rounded-[3px] p-2 text-lotus-deep focus:outline-none focus:border-[#D4547E]"
+                  className="w-full text-sm border border-stone-300 rounded-[3px] p-2 text-lotus-deep focus:outline-none focus:border-lotus-rose"
                 />
               </div>
             </div>
@@ -1116,7 +1287,7 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                   setIsDiscountModalOpen(false);
                   toast.success("Đã áp dụng giảm giá!");
                 }}
-                className="px-4 py-2 bg-[#D4547E] text-white rounded-[3px] text-xs font-bold hover:bg-[#B64269] transition"
+                className="px-4 py-2 bg-lotus-rose text-white rounded-[3px] text-xs font-bold hover:bg-lotus-rose/90 transition"
               >
                 Xác nhận
               </button>
@@ -1130,7 +1301,9 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
         <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white border border-stone-200 rounded-[3px] shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-4 bg-stone-50 border-b border-stone-150 flex items-center justify-between">
-              <span className="font-bold text-xs text-lotus-deep uppercase tracking-wider">Xác nhận thanh toán</span>
+              <span className="font-bold text-xs text-lotus-deep uppercase tracking-wider">
+                Xác nhận thanh toán
+              </span>
               <button
                 onClick={() => setIsCheckoutModalOpen(false)}
                 className="text-stone-400 hover:text-stone-600 transition"
@@ -1138,9 +1311,9 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                 <X className="w-4 h-4" />
               </button>
             </div>
-            
+
             <div className="p-4 space-y-4">
-              <div className="p-3 bg-[#FAF0F4] rounded-[3px] border border-[#D4547E]/10">
+              <div className="p-3 bg-lotus-rose-light rounded-[3px] border border-lotus-rose/10">
                 <div className="flex justify-between items-center text-xs font-semibold text-stone-600">
                   <span>Khách hàng:</span>
                   <span className="font-bold text-lotus-deep">
@@ -1149,7 +1322,7 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
                 </div>
                 <div className="flex justify-between items-center text-xs font-semibold text-stone-600 mt-1">
                   <span>Số tiền cần thanh toán:</span>
-                  <span className="font-bold text-[#D4547E] text-sm">
+                  <span className="font-bold text-lotus-rose text-sm">
                     {totalAmount.toLocaleString("vi-VN")}đ
                   </span>
                 </div>
@@ -1157,27 +1330,43 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
 
               {/* Payment Method Selector */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">Phương thức thanh toán</label>
+                <label className="text-lotus-admin-xs font-bold text-stone-500 uppercase tracking-wider">
+                  Phương thức thanh toán
+                </label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { method: PAYMENT_METHOD.CASH, label: "Tiền mặt", icon: DollarSign },
-                    { method: PAYMENT_METHOD.BANK_TRANSFER, label: "Chuyển khoản", icon: ArrowRight },
-                    { method: PAYMENT_METHOD.VNPAY, label: "VNPAY QR", icon: CreditCard },
+                    {
+                      method: PAYMENT_METHOD.CASH,
+                      label: "Tiền mặt",
+                      icon: DollarSign,
+                    },
+                    {
+                      method: PAYMENT_METHOD.BANK_TRANSFER,
+                      label: "Chuyển khoản",
+                      icon: ArrowRight,
+                    },
+                    {
+                      method: PAYMENT_METHOD.VNPAY,
+                      label: "VNPAY QR",
+                      icon: CreditCard,
+                    },
                   ].map((item) => (
                     <button
                       key={item.method}
                       onClick={() =>
                         setOrders((prev: POSOrder[]) =>
                           prev.map((o: POSOrder) =>
-                            o.id === activeOrderId ? { ...o, paymentMethod: item.method } : o
-                          )
+                            o.id === activeOrderId
+                              ? { ...o, paymentMethod: item.method }
+                              : o,
+                          ),
                         )
                       }
                       className={cn(
                         "flex items-center gap-2 p-2.5 border rounded-[3px] text-xs font-bold transition duration-200",
                         activeOrder.paymentMethod === item.method
-                          ? "border-[#D4547E] bg-[#FAF0F4]/40 text-[#D4547E]"
-                          : "border-stone-200 bg-white text-stone-600 hover:bg-stone-50"
+                          ? "border-lotus-rose bg-lotus-rose-light/40 text-lotus-rose"
+                          : "border-stone-200 bg-white text-stone-600 hover:bg-stone-50",
                       )}
                     >
                       <item.icon className="w-4 h-4 shrink-0" />
@@ -1189,41 +1378,50 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
 
               {/* Amount paid by customer */}
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">Khách thanh toán (VND)</label>
+                <label className="text-lotus-admin-xs font-bold text-stone-500 uppercase tracking-wider">
+                  Khách thanh toán (VND)
+                </label>
                 <input
                   type="number"
                   value={tempPaidAmount}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTempPaidAmount(Number(e.target.value))}
-                  className="w-full text-sm border border-stone-300 rounded-[3px] p-2 font-bold text-lotus-deep focus:outline-none focus:border-[#D4547E]"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setTempPaidAmount(Number(e.target.value))
+                  }
+                  className="w-full text-sm border border-stone-300 rounded-[3px] p-2 font-bold text-lotus-deep focus:outline-none focus:border-lotus-rose"
                 />
               </div>
 
               {/* Note / Memo */}
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">Ghi chú đơn hàng</label>
+                <label className="text-lotus-admin-xs font-bold text-stone-500 uppercase tracking-wider">
+                  Ghi chú đơn hàng
+                </label>
                 <textarea
                   value={activeOrder.note}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
                     const val = e.target.value;
                     setOrders((prev: POSOrder[]) =>
-                      prev.map((o: POSOrder) => (o.id === activeOrderId ? { ...o, note: val } : o))
+                      prev.map((o: POSOrder) =>
+                        o.id === activeOrderId ? { ...o, note: val } : o,
+                      ),
                     );
                   }}
                   placeholder="Ghi chú thêm về dịch vụ, yêu cầu khách hàng..."
                   rows={2}
-                  className="w-full text-xs border border-stone-300 rounded-[3px] p-2 text-lotus-deep focus:outline-none focus:border-[#D4547E] placeholder:text-stone-400"
+                  className="w-full text-xs border border-stone-300 rounded-[3px] p-2 text-lotus-deep focus:outline-none focus:border-lotus-rose placeholder:text-stone-400"
                 />
               </div>
 
               {/* Change computation if paying cash */}
-              {activeOrder.paymentMethod === PAYMENT_METHOD.CASH && tempPaidAmount > totalAmount && (
-                <div className="flex justify-between items-center text-xs font-bold text-stone-600 border-t border-dashed border-stone-200 pt-3">
-                  <span>Tiền thừa trả khách:</span>
-                  <span className="text-lotus-leaf text-sm font-bold">
-                    {(tempPaidAmount - totalAmount).toLocaleString("vi-VN")}đ
-                  </span>
-                </div>
-              )}
+              {activeOrder.paymentMethod === PAYMENT_METHOD.CASH &&
+                tempPaidAmount > totalAmount && (
+                  <div className="flex justify-between items-center text-xs font-bold text-stone-600 border-t border-dashed border-stone-200 pt-3">
+                    <span>Tiền thừa trả khách:</span>
+                    <span className="text-lotus-leaf text-sm font-bold">
+                      {(tempPaidAmount - totalAmount).toLocaleString("vi-VN")}đ
+                    </span>
+                  </div>
+                )}
             </div>
 
             <div className="p-3 bg-stone-50 border-t border-stone-150 flex justify-end gap-2">
@@ -1236,7 +1434,7 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
               <button
                 onClick={handleCheckoutSubmit}
                 disabled={createInvoiceMutation.isPending || isPayingInvoice}
-                className="px-5 py-2 bg-[#D4547E] text-white rounded-[3px] text-xs font-bold hover:bg-[#B64269] transition flex items-center gap-1.5 disabled:opacity-50"
+                className="px-5 py-2 bg-lotus-rose text-white rounded-[3px] text-xs font-bold hover:bg-lotus-rose/90 transition flex items-center gap-1.5 disabled:opacity-50"
               >
                 {(createInvoiceMutation.isPending || isPayingInvoice) && (
                   <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -1247,7 +1445,6 @@ export function CashierPOS({ checkoutInvoice, onClearCheckoutInvoice }: CashierP
           </div>
         </div>
       )}
-
     </div>
   );
 }

@@ -100,7 +100,7 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
             </h2>
 
             {isCustomer ? (
-              <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#A36A43] text-white text-xs font-bold shadow-sm">
+              <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-lotus-gold text-white text-xs font-bold shadow-sm">
                 <Star className="w-3.5 h-3.5 fill-white text-white" />
                 Hạng {currentTierName}
               </div>
@@ -129,13 +129,13 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
             <div className="flex items-center justify-between text-xs text-gray-500 mb-1.5">
               <span>
                 Hiện tại:{" "}
-                <span className="text-[#A36A43] font-bold">
+                <span className="text-lotus-gold font-bold">
                   {currentTierName}
                 </span>
               </span>
               <span>
                 Mục tiêu:{" "}
-                <span className="text-[#4F46E5] font-bold">
+                <span className="text-indigo-600 font-bold">
                   {nextTier ? nextTier.name : "Bạc"}
                 </span>
               </span>
@@ -183,7 +183,7 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
               <p className="text-lg md:text-xl font-extrabold text-gray-900">
                 {bookings.length}
               </p>
-              <p className="text-[10px] md:text-xs text-gray-500 font-semibold tracking-wide uppercase">
+              <p className="text-lotus-admin-xs md:text-xs text-gray-500 font-semibold tracking-wide uppercase">
                 Lịch hẹn
               </p>
             </div>
@@ -193,7 +193,7 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
               <p className="text-lg md:text-xl font-extrabold text-gray-900">
                 {loyaltyPoints}
               </p>
-              <p className="text-[10px] md:text-xs text-gray-500 font-semibold tracking-wide uppercase">
+              <p className="text-lotus-admin-xs md:text-xs text-gray-500 font-semibold tracking-wide uppercase">
                 Điểm thưởng
               </p>
             </div>
@@ -203,7 +203,7 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
               <p className="text-lg md:text-xl font-extrabold text-gray-900">
                 {formatCurrency(calculatedSpending)}
               </p>
-              <p className="text-[10px] md:text-xs text-gray-500 font-semibold tracking-wide uppercase">
+              <p className="text-lotus-admin-xs md:text-xs text-gray-500 font-semibold tracking-wide uppercase">
                 Chi tiêu tích lũy
               </p>
             </div>
@@ -216,7 +216,7 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
               <p className="text-base md:text-lg font-bold text-gray-900">
                 {bookings.length || 0}
               </p>
-              <p className="text-[10px] text-gray-500 font-semibold uppercase">
+              <p className="text-lotus-admin-xs text-gray-500 font-semibold uppercase">
                 Lịch hẹn
               </p>
             </div>
@@ -226,7 +226,7 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
               <p className="text-sm md:text-base font-bold text-gray-900">
                 {profile?.staffInfo?.contractType || "---"}
               </p>
-              <p className="text-[10px] text-gray-500 font-semibold uppercase">
+              <p className="text-lotus-admin-xs text-gray-500 font-semibold uppercase">
                 Hợp đồng
               </p>
             </div>
@@ -240,7 +240,7 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
                     )
                   : "---"}
               </p>
-              <p className="text-[10px] text-gray-500 font-semibold uppercase">
+              <p className="text-lotus-admin-xs text-gray-500 font-semibold uppercase">
                 Ngày làm
               </p>
             </div>

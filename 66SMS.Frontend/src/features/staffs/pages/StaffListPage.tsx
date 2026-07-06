@@ -17,7 +17,6 @@ import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagi
 import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
 import { TableSelectionBar } from "@/shared/components/DataTable/TableSelectionBar";
 import { containerVariants } from "@/shared/motion/pageVariants";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 import { StaffFormDialog } from "../components/StaffFormDialog";
 import { StaffDetailExpanded } from "../components/StaffDetailExpanded";
@@ -190,12 +189,12 @@ export function StaffListPage() {
           initial="hidden"
           animate="visible"
           variants={containerVariants}
-          className={`${TABLE_STYLES.pageCard} flex-1 min-h-0 flex flex-col overflow-hidden relative`}
+          className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative"
         >
           {/* Fetching bar */}
           {isFetching && !isLoading && (
-            <div className={TABLE_STYLES.fetchBar}>
-              <div className={TABLE_STYLES.fetchBarInner} />
+            <div className="lotus-admin-table-fetch-bar">
+              <div className="lotus-admin-table-fetch-bar-inner" />
             </div>
           )}
 
@@ -223,7 +222,7 @@ export function StaffListPage() {
                   variant="admin"
                   size="sm"
                   onClick={() => setCreateOpen(true)}
-                  className={TABLE_STYLES.toolbarBtn}
+                  className="lotus-admin-table-toolbar-btn"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Thêm NV
@@ -255,7 +254,7 @@ export function StaffListPage() {
                   <p className="text-sm font-semibold text-lotus-deep">
                     Chưa có nhân viên
                   </p>
-                  <p className="text-[12px] text-lotus-stone mt-0.5">
+                  <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
                     Thêm nhân viên mới để bắt đầu quản lý.
                   </p>
                 </div>
@@ -264,7 +263,7 @@ export function StaffListPage() {
                     variant="admin"
                     size="sm"
                     onClick={() => setCreateOpen(true)}
-                    className="mt-1 text-[12px]"
+                    className="mt-1 text-lotus-admin-md"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Thêm nhân viên

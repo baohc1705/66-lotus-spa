@@ -1,13 +1,8 @@
+import { formatCurrency } from '@/shared/utils/currency';
 import { useQuery } from '@tanstack/react-query'
 import { getMyWallet, getMyWalletTransactions } from '../../wallet/api/wallet.api'
 import type { WalletTransactionDto } from '../../wallet/types/wallet.types'
 import { Loader2, ArrowDownLeft, ArrowUpRight, Wallet } from 'lucide-react'
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-  }).format(value)
-}
 
 export function MyWalletPanel() {
   const { data: walletData, isLoading: isLoadingWallet } = useQuery({

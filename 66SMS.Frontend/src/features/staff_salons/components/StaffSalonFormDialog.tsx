@@ -1,3 +1,4 @@
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect } from 'react'
 import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -16,7 +17,6 @@ import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select'
 import { useCreateStaffSalon, useUpdateStaffSalon } from '../hooks/useStaffSalons'
@@ -130,7 +130,7 @@ export function StaffSalonFormDialog({
                 value={String(updateForm.watch('status') ?? '')}
                 onValueChange={(v) => updateForm.setValue('status', Number(v))}
               >
-                <SelectTrigger><SelectValue placeholder="Chọn trạng thái" /></SelectTrigger>
+                <AdminSelectTrigger><SelectValue placeholder="Chọn trạng thái" /></AdminSelectTrigger>
                 <SelectContent>
                   <SelectItem value="0">Không hoạt động</SelectItem>
                   <SelectItem value="1">Đang làm việc</SelectItem>
@@ -152,9 +152,9 @@ export function StaffSalonFormDialog({
                 value={String(createForm.watch('staffId') ?? '')}
                 onValueChange={(v) => createForm.setValue('staffId', Number(v))}
               >
-                <SelectTrigger>
+                <AdminSelectTrigger>
                   <SelectValue placeholder="Chọn nhân viên" />
-                </SelectTrigger>
+                </AdminSelectTrigger>
                 <SelectContent>
                   {staffList.map((s) => (
                     <SelectItem key={s.id} value={String(s.id)}>

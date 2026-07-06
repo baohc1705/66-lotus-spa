@@ -15,6 +15,7 @@ import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColu
 import { IndexCell } from "@/shared/components/DataTable/tableCells";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { GENDER_MAP } from "@/shared/constants/display.const";
 import { CUSTOMER_PERM } from "../constants/customer.permissions";
 import type { CustomerDto } from "../types/customer.types";
 
@@ -34,11 +35,7 @@ export const CUSTOMER_STATUS_MAP: StatusMap = {
   "2": { label: "Tạm khóa", variant: "warning" },
 };
 
-const GENDER_MAP: Record<string, string> = {
-  "0": "Nam",
-  "1": "Nữ",
-  "2": "Khác",
-};
+
 
 interface UseActiveCustomerColumnsParams {
   pageIndex: number;
@@ -134,12 +131,12 @@ export function useActiveCustomerColumns({
                     className="w-8 h-8 object-cover"
                   />
                 ) : (
-                  <span className="text-[11px] font-bold text-amber-600">
+                  <span className="text-lotus-admin-base font-bold text-amber-600">
                     {(cust.fullName ?? "?").charAt(0).toUpperCase()}
                   </span>
                 )}
               </div>
-              <span className="text-[13px] font-semibold text-lotus-deep truncate max-w-[140px]">
+              <span className="text-lotus-admin-lg font-semibold text-lotus-deep truncate max-w-[140px]">
                 {cust.fullName ?? "—"}
               </span>
             </div>

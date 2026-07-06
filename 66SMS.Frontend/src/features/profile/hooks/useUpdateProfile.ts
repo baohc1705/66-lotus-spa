@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import type { Result } from "@/shared/types/common.types";
 
+import { getErrorMessage } from "@/shared/utils/errorUtils";
+
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
 
@@ -18,8 +20,7 @@ export function useUpdateProfile() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? "Không thể kết nối đến máy chủ";
-      toast.error(msg);
+      toast.error(getErrorMessage(error, "Không thể kết nối đến máy chủ"));
     },
   });
 }

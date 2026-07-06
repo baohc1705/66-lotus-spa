@@ -68,7 +68,7 @@ export const PromotionCodeInput: React.FC = () => {
           <div className="text-xs">
             <div className="font-bold text-emerald-800 flex items-center gap-1.5">
               <span>Mã: {promotionCode}</span>
-              <span className="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded text-[10px] font-medium">
+              <span className="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded text-lotus-admin-xs font-medium">
                 Đã áp dụng
               </span>
             </div>
@@ -118,7 +118,7 @@ export const PromotionCodeInput: React.FC = () => {
         </button>
       </div>
       {error && (
-        <span className="text-[10px] text-red-500 font-bold ml-1 animate-in fade-in duration-200">
+        <span className="text-lotus-admin-xs text-red-500 font-bold ml-1 animate-in fade-in duration-200">
           {error}
         </span>
       )}

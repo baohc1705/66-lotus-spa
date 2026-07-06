@@ -1,46 +1,40 @@
-import { productApi, productImageApi } from "@/features/products/api/product.api";
-import type { PageRequest } from "@/shared/types/common.types";
+import { productApi } from "@/features/products/api/product.api";
+import type { PageRequest, Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import type { AxiosError } from "axios";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";
 import { StatusActive } from "@/shared/constants/status.enum";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
 import type {
   CreateProductPayload,
   UpdateProductPayload,
-  CreateProductImagePayload,
-  UpdateProductImagePayload,
 } from "../types/product.types";
 
 const ENTITY = "sản phẩm";
 
-const PRODUCT_KEYS = {
-  all: ["products"] as const,
-  lists: () => [...PRODUCT_KEYS.all, "list"] as const,
-  list: (params: PageRequest & { categoryId?: number }) => [...PRODUCT_KEYS.lists(), params] as const,
-  deletedLists: () => [...PRODUCT_KEYS.all, "deleted"] as const,
-  deletedList: (params: PageRequest & { categoryId?: number }) =>
-    [...PRODUCT_KEYS.deletedLists(), params] as const,
-  details: () => [...PRODUCT_KEYS.all, "detail"] as const,
-  detail: (id: number) => [...PRODUCT_KEYS.details(), id] as const,
-};
+type ProductParams = PageRequest & { categoryId?: number };
 
-export function useProducts(params: PageRequest & { categoryId?: number }) {
+export const PRODUCT_KEYS = createEntityQueryKeys<ProductParams>("products");
+
+export function useProducts(params: ProductParams) {
   return useQuery({
     queryKey: PRODUCT_KEYS.list(params),
     queryFn: () => productApi.getAll(params),
   });
 }
 
-export function useAdminProducts(params: PageRequest & { categoryId?: number }, enabled = true) {
+export function useAdminProducts(params: ProductParams, enabled = true) {
   return useQuery({
-    queryKey: PRODUCT_KEYS.list(params),
+    queryKey: PRODUCT_KEYS.adminList(params),
     queryFn: () => productApi.adminGetAll(params),
     enabled,
   });
 }
 
-export function useDeletedProducts(params: PageRequest & { categoryId?: number }, enabled = true) {
+export function useDeletedProducts(params: ProductParams, enabled = true) {
   return useQuery({
     queryKey: PRODUCT_KEYS.deletedList(params),
     queryFn: () => productApi.getAllDeleted(params),
@@ -62,14 +56,14 @@ export function useCreateProduct() {
     mutationFn: (payload: CreateProductPayload) => productApi.create(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: PRODUCT_KEYS.lists() });
+        qc.invalidateQueries({ queryKey: PRODUCT_KEYS.all });
         toast.success(TOAST_MSG.createSuccess(ENTITY));
       } else {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("tạo", ENTITY));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
     },
   });
 }
@@ -92,8 +86,8 @@ export function useUpdateProduct() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("cập nhật", ENTITY));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
     },
   });
 }
@@ -110,8 +104,8 @@ export function useDeleteProduct() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("xóa", ENTITY));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }
@@ -128,8 +122,8 @@ export function useDeleteProductMultiples() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("xóa", ENTITY));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }
@@ -147,69 +141,8 @@ export function useRestoreProduct() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("khôi phục", ENTITY));
-    },
-  });
-}
-
-export function useCreateProductImage() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (payload: CreateProductImagePayload) =>
-      productImageApi.create(payload),
-    onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: PRODUCT_KEYS.all });
-        toast.success(TOAST_MSG.subActionSuccess("Thêm", "ảnh"));
-      } else {
-        toast.error(result.message || COMMON_MSG.error);
-      }
-    },
-    onError: () => {
-      toast.error(TOAST_MSG.subActionError("thêm", "ảnh"));
-    },
-  });
-}
-
-export function useUpdateProductImage() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      id,
-      payload,
-    }: {
-      id: number;
-      payload: UpdateProductImagePayload;
-    }) => productImageApi.update(id, payload),
-    onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: PRODUCT_KEYS.all });
-        toast.success(TOAST_MSG.subActionSuccess("Cập nhật", "ảnh"));
-      } else {
-        toast.error(result.message || COMMON_MSG.error);
-      }
-    },
-    onError: () => {
-      toast.error(TOAST_MSG.subActionError("cập nhật", "ảnh"));
-    },
-  });
-}
-
-export function useDeleteProductImage() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (id: number) => productImageApi.delete(id),
-    onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: PRODUCT_KEYS.all });
-        toast.success(TOAST_MSG.subActionSuccess("Xóa", "ảnh"));
-      } else {
-        toast.error(result.message || COMMON_MSG.error);
-      }
-    },
-    onError: () => {
-      toast.error(TOAST_MSG.subActionError("xóa", "ảnh"));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)));
     },
   });
 }

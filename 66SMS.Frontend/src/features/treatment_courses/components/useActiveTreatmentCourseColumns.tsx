@@ -18,6 +18,7 @@ import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColu
 import {
   DateTimeCell,
   IndexCell,
+  PriceCell,
 } from "@/shared/components/DataTable/tableCells";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
@@ -55,14 +56,6 @@ interface UseActiveTreatmentCourseColumnsParams {
   >;
 }
 
-function formatPrice(value: number | null | undefined) {
-  if (value == null) return "—";
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(value);
-}
-
 export function useActiveTreatmentCourseColumns({
   pageIndex,
   pageSize,
@@ -95,7 +88,11 @@ export function useActiveTreatmentCourseColumns({
           const item = row.original;
           return (
             <Checkbox
-              checked={item.id !== undefined && item.id !== null && selectedRowIds.has(item.id)}
+              checked={
+                item.id !== undefined &&
+                item.id !== null &&
+                selectedRowIds.has(item.id)
+              }
               onCheckedChange={(checked) => {
                 if (item.id === undefined || item.id === null) return;
                 onToggleOne(item.id, checked === true);
@@ -152,11 +149,11 @@ export function useActiveTreatmentCourseColumns({
         ),
         cell: ({ row }) => (
           <div>
-            <p className="text-[13px] font-semibold text-lotus-deep truncate max-w-[200px]">
+            <p className="text-lotus-admin-lg font-semibold text-lotus-deep truncate max-w-[200px]">
               {row.original.name ?? "—"}
             </p>
             {row.original.categoryName && (
-              <p className="text-[11px] text-lotus-stone">
+              <p className="text-lotus-admin-base text-lotus-stone">
                 {row.original.categoryName}
               </p>
             )}
@@ -177,21 +174,13 @@ export function useActiveTreatmentCourseColumns({
       {
         accessorKey: "sellingPrice",
         header: cols.sellingPrice,
-        cell: ({ row }) => (
-          <span className="text-lotus-deep font-semibold">
-            {formatPrice(row.original.sellingPrice)}
-          </span>
-        ),
+        cell: ({ row }) => <PriceCell value={row.original.sellingPrice} />,
         size: 120,
       },
       {
         accessorKey: "originalPrice",
         header: cols.originalPrice,
-        cell: ({ row }) => (
-          <span className="text-lotus-stone line-through text-[12px]">
-            {formatPrice(row.original.originalPrice)}
-          </span>
-        ),
+        cell: ({ row }) => <PriceCell value={row.original.originalPrice} />,
         size: 120,
       },
       {
@@ -253,10 +242,7 @@ export function useActiveTreatmentCourseColumns({
                     <Eye className="w-4 h-4" />
                     {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
                   </DropdownMenuItem>
-                  <PermissionGate
-                    resource={perm.resource}
-                    action={perm.update}
-                  >
+                  <PermissionGate resource={perm.resource} action={perm.update}>
                     <DropdownMenuItem onClick={() => onEdit(item)}>
                       <Pencil className="w-4 h-4" />
                       {COMMON_MSG.edit}

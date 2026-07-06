@@ -7,13 +7,9 @@ import type {
 } from "@/shared/types/common.types";
 import type {
   CreateServicePayload,
-  ServiceDTO,
+  ServiceDto,
   UpdateServicePayload,
   GetAllServiceQuery,
-  CreateServiceImagePayload,
-  UpdateServiceImagePayload,
-  CreateServiceProductPayload,
-  UpdateServiceProductPayload,
   DeleteServiceMultiplesPayload,
 } from "../types/service.types";
 
@@ -34,7 +30,7 @@ export const serviceApi = {
   // Get All
   getAll: (params: PageRequest & { categoryId?: number }) =>
     axiosInstance
-      .get<Result<PagedResult<ServiceDTO>>>(BASE, {
+      .get<Result<PagedResult<ServiceDto>>>(BASE, {
         params: {
           pageIndex: params.pageIndex,
           pageSize: params.pageSize,
@@ -48,7 +44,7 @@ export const serviceApi = {
 
   // Get Detail
   getDetail: (id: number) =>
-    axiosInstance.get<Result<ServiceDTO>>(`${BASE}/${id}`).then((r) => r.data),
+    axiosInstance.get<Result<ServiceDto>>(`${BASE}/${id}`).then((r) => r.data),
 
   // Create Service
   create: (payload: CreateServicePayload) =>
@@ -67,7 +63,7 @@ export const serviceApi = {
   // Admin Get All
   adminGetAll: (params: PageRequest & { categoryId?: number }) =>
     axiosInstance
-      .get<Result<PagedResult<ServiceDTO>>>(`${BASE}/admin`, {
+      .get<Result<PagedResult<ServiceDto>>>(`${BASE}/admin`, {
         params: toAdminQuery(params),
       })
       .then((r) => r.data),
@@ -81,30 +77,8 @@ export const serviceApi = {
   // Get All Deleted
   getAllDeleted: (params: PageRequest & { categoryId?: number }) =>
     axiosInstance
-      .get<Result<PagedResult<ServiceDTO>>>(`${BASE}/deleted`, {
+      .get<Result<PagedResult<ServiceDto>>>(`${BASE}/deleted`, {
         params: toAdminQuery(params),
       })
       .then((r) => r.data),
-};
-
-export const serviceImageApi = {
-  create: (payload: CreateServiceImagePayload) =>
-    axiosInstance.post<Result<number>>(API.serviceImages, payload).then((r) => r.data),
-
-  update: (id: number, payload: UpdateServiceImagePayload) =>
-    axiosInstance.patch<Result<object>>(`${API.serviceImages}/${id}`, payload).then((r) => r.data),
-
-  delete: (id: number) =>
-    axiosInstance.delete<Result<object>>(`${API.serviceImages}/${id}`).then((r) => r.data),
-};
-
-export const serviceProductApi = {
-  create: (payload: CreateServiceProductPayload) =>
-    axiosInstance.post<Result<number>>(API.serviceProducts, payload).then((r) => r.data),
-
-  update: (id: number, payload: UpdateServiceProductPayload) =>
-    axiosInstance.patch<Result<object>>(`${API.serviceProducts}/${id}`, payload).then((r) => r.data),
-
-  delete: (id: number) =>
-    axiosInstance.delete<Result<object>>(`${API.serviceProducts}/${id}`).then((r) => r.data),
 };

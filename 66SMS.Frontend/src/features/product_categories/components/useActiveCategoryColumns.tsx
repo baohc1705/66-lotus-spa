@@ -31,7 +31,7 @@ import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type { Result } from "@/shared/types/common.types";
 
 import { PRODUCT_CATEGORY_PERM } from "../constants/productCategory.permissions";
-import type { ProductCategoryDTO } from "../types/product_category.types";
+import type { ProductCategoryDto } from "../types/productCategory.types";
 import type { UpdateProductCategoryPayload } from "../schemas/productCategory.schema";
 
 export const CATEGORY_COLUMN_LABELS = {
@@ -49,11 +49,10 @@ interface UseActiveCategoryColumnsParams {
   onSort: (column: string) => void;
   headerChecked: boolean | "indeterminate";
   selectedRowIds: Set<number>;
-  pageIds: number[];
   onToggleAll: (checked: boolean | "indeterminate") => void;
   onToggleOne: (id: number, checked: boolean) => void;
-  onEdit: (item: ProductCategoryDTO) => void;
-  onDelete: (item: ProductCategoryDTO) => void;
+  onEdit: (item: ProductCategoryDto) => void;
+  onDelete: (item: ProductCategoryDto) => void;
   updateMutation: UseMutationResult<
     Result<object>,
     Error,
@@ -69,7 +68,6 @@ export function useActiveCategoryColumns({
   onSort,
   headerChecked,
   selectedRowIds,
-  pageIds,
   onToggleAll,
   onToggleOne,
   onEdit,
@@ -78,7 +76,7 @@ export function useActiveCategoryColumns({
 }: UseActiveCategoryColumnsParams) {
   const cols = CATEGORY_COLUMN_LABELS;
 
-  return useMemo<ColumnDef<ProductCategoryDTO>[]>(
+  return useMemo<ColumnDef<ProductCategoryDto>[]>(
     () => [
       {
         id: "select",
@@ -255,7 +253,6 @@ export function useActiveCategoryColumns({
       onSort,
       headerChecked,
       selectedRowIds,
-      pageIds,
       onToggleAll,
       onToggleOne,
       onEdit,

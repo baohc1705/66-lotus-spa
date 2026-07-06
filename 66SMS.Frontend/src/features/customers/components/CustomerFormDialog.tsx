@@ -1,3 +1,6 @@
+import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+import { AdminInput } from '@/shared/components/forms/AdminInput';
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect, useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,16 +13,13 @@ import {
   DialogFooter,
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
 import { SearchableSelect } from "@/shared/components/ui/searchable-select";
-import { Textarea } from "@/shared/components/ui/textarea";
 import { FormSection } from "@/shared/components/forms/FormSection";
 import { FormField } from "@/shared/components/forms/FormField";
 import { useCreateCustomer, useUpdateCustomer } from "../hooks/useCustomers";
@@ -211,10 +211,9 @@ export function CustomerFormDialog({
                 tooltip="Vui lòng nhập họ và tên đầy đủ của khách hàng"
                 error={errors.fullName?.message}
               >
-                <Input
+                <AdminInput
                   {...register("fullName")}
                   placeholder="Nguyễn Văn A"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField
@@ -222,17 +221,15 @@ export function CustomerFormDialog({
                 tooltip="Số điện thoại phải có 10 chữ số"
                 error={errors.phone?.message}
               >
-                <Input
+                <AdminInput
                   {...register("phone")}
                   placeholder="0901234567"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField label="Ngày sinh" error={errors.dateOfBirth?.message}>
-                <Input
+                <AdminInput
                   {...register("dateOfBirth")}
                   type="date"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField label="Giới tính">
@@ -240,9 +237,9 @@ export function CustomerFormDialog({
                   value={watch("gender")?.toString() ?? ""}
                   onValueChange={(v) => setValue("gender", Number(v))}
                 >
-                  <SelectTrigger className="h-9 text-[13px]">
+                  <AdminSelectTrigger>
                     <SelectValue placeholder="Chọn giới tính" />
-                  </SelectTrigger>
+                  </AdminSelectTrigger>
                   <SelectContent>
                     {GENDER_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>
@@ -292,10 +289,9 @@ export function CustomerFormDialog({
                   label="Số nhà, tên đường"
                   error={errors.streetAddress?.message}
                 >
-                  <Input
+                  <AdminInput
                     {...register("streetAddress")}
                     placeholder="123 Đường ABC"
-                    className="h-9 text-[13px]"
                   />
                 </FormField>
               </div>
@@ -310,9 +306,9 @@ export function CustomerFormDialog({
                   value={watch("source") ?? ""}
                   onValueChange={(v) => setValue("source", v)}
                 >
-                  <SelectTrigger className="h-9 text-[13px]">
+                  <AdminSelectTrigger>
                     <SelectValue placeholder="Chọn nguồn" />
-                  </SelectTrigger>
+                  </AdminSelectTrigger>
                   <SelectContent>
                     {SOURCE_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>
@@ -327,9 +323,9 @@ export function CustomerFormDialog({
                   value={watch("status")?.toString() ?? "1"}
                   onValueChange={(v) => setValue("status", Number(v))}
                 >
-                  <SelectTrigger className="h-9 text-[13px]">
+                  <AdminSelectTrigger>
                     <SelectValue placeholder="Chọn trạng thái" />
-                  </SelectTrigger>
+                  </AdminSelectTrigger>
                   <SelectContent>
                     {STATUS_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>
@@ -344,10 +340,10 @@ export function CustomerFormDialog({
                   label="Ghi chú"
                   error={errors.note?.message}
                 >
-                  <Textarea
+                  <AdminTextarea
                     {...register("note")}
                     placeholder="Ghi chú thêm về khách hàng..."
-                    className="text-[13px] min-h-[60px] resize-none"
+                    className="text-lotus-admin-lg min-h-[60px] resize-none"
                   />
                 </FormField>
               </div>

@@ -1,5 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import type { AxiosError } from "axios";
 import { cashierApi } from "../api/cashier.api";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
+import type { Result } from "@/shared/types/common.types";
 
 export function useOnlineBookings(salonId?: number | null) {
   return useQuery({
@@ -35,9 +39,11 @@ export function useUpdateBookingStatus() {
       return res.data;
     },
     onSuccess: () => {
-      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ["cashier-online-bookings"] });
       queryClient.invalidateQueries({ queryKey: ["cashier-daily"] });
+    },
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, "Cập nhật trạng thái thất bại"));
     },
   });
 }

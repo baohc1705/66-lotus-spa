@@ -7,7 +7,7 @@ import type {
   GuestBooking,
   PromotionValidationDto,
 } from "../types/booking.types";
-import type { ServiceDTO } from "@/features/services/types/service.types";
+import type { ServiceDto } from "@/features/services/types/service.types";
 import type { SalonDTO } from "@/features/salons/types/salon.types";
 
 interface BookingState {
@@ -31,7 +31,7 @@ interface BookingState {
 
   // Update active guest
   updateActiveGuest: (updates: Partial<GuestBooking>) => void;
-  selectService: (service: ServiceDTO) => void;
+  selectService: (service: ServiceDto) => void;
   selectTechnician: (technician: TechnicianDTO | null) => void;
   selectPosition: (position: BookingPositionDTO | null) => void;
   selectDate: (date: Date) => void;

@@ -17,7 +17,6 @@ import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Button } from "@/shared/components/ui/button";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 import { InvoiceDetailExpanded } from "../components/InvoiceDetailExpanded";
 import { InvoiceFilterSidebar } from "../components/InvoiceFilterSidebar";
@@ -147,7 +146,7 @@ export function InvoiceListPage() {
   return (
     <TablePageShell isFetching={isFetching} isLoading={isLoading}>
       <div className="flex h-full overflow-hidden gap-6 items-start">
-        {/* Sidebar bộ lọc */}
+        {/* Sidebar bá»™ lá»c */}
         {!isSidebarMode && (
           <InvoiceFilterSidebar
             selectedStatus={selectedStatus}
@@ -180,7 +179,7 @@ export function InvoiceListPage() {
                   variant="admin"
                   size="sm"
                   onClick={() => setCreateOpen(true)}
-                  className="h-8 text-[13px] gap-1.5"
+                  className="lotus-admin-table-toolbar-btn"
                 >
                   <Plus className="w-4 h-4" /> Lập hóa đơn
                 </Button>
@@ -188,7 +187,7 @@ export function InvoiceListPage() {
             </div>
           </DataTableToolbar>
 
-          <div className={TABLE_STYLES.pageCard}>
+          <div className="lotus-admin-table-page-card">
             <DataTable
               table={table}
               isLoading={isLoading}
@@ -210,7 +209,7 @@ export function InvoiceListPage() {
                     <p className="text-sm font-semibold text-lotus-deep">
                       Chưa có hóa đơn
                     </p>
-                    <p className="text-[12px] text-lotus-stone mt-0.5">
+                    <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
                       Lập hóa đơn mới để bắt đầu.
                     </p>
                   </div>
@@ -219,7 +218,7 @@ export function InvoiceListPage() {
                       variant="admin"
                       size="sm"
                       onClick={() => setCreateOpen(true)}
-                      className="mt-1 text-[12px]"
+                      className="mt-1 text-lotus-admin-md"
                     >
                       <Plus className="w-3.5 h-3.5" /> Lập hóa đơn
                     </Button>

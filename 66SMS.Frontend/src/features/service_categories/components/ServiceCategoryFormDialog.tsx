@@ -3,7 +3,7 @@ import {
   useCreateServiceCategory,
   useUpdateServiceCategory,
 } from "../hooks/useServiceCategories";
-import type { ServiceCategoryDTO } from "../types/service_category.types";
+import type { ServiceCategoryDto } from "../types/serviceCategory.types";
 import {
   createServiceCategorySchema,
   updateServiceCategorySchema,
@@ -26,8 +26,8 @@ import { Button } from "@/shared/components/ui/button";
 import { FormSection } from "@/shared/components/forms/FormSection";
 import { Box } from "lucide-react";
 import { FormField } from "@/shared/components/forms/FormField";
-import { Input } from "@/shared/components/ui/input";
-import { Textarea } from "@/shared/components/ui/textarea";
+import { AdminInput } from "@/shared/components/forms/AdminInput";
+import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
 import { Switch } from "@/shared/components/ui/switch";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 
@@ -35,8 +35,8 @@ import { COMMON_MSG } from "@/shared/constants/common.messages";
 interface ServiceCategoryFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  serviceCategory?: ServiceCategoryDTO | null;
-  onSuccess?: (category: ServiceCategoryDTO) => void;
+  serviceCategory?: ServiceCategoryDto | null;
+  onSuccess?: (category: ServiceCategoryDto) => void;
 }
 
 export function ServiceCategoryFormDialog({
@@ -83,7 +83,7 @@ export function ServiceCategoryFormDialog({
           onSuccess: (result) => {
             if (result.isSuccess) {
               onOpenChange(false);
-              onSuccess?.({ ...serviceCategory, ...data } as ServiceCategoryDTO);
+              onSuccess?.({ ...serviceCategory, ...data } as ServiceCategoryDto);
             }
           },
         },
@@ -93,7 +93,7 @@ export function ServiceCategoryFormDialog({
         onSuccess: (result) => {
           if (result.isSuccess) {
             onOpenChange(false);
-            onSuccess?.({ ...data } as ServiceCategoryDTO);
+            onSuccess?.({ ...data } as ServiceCategoryDto);
           }
         },
       });
@@ -124,10 +124,9 @@ export function ServiceCategoryFormDialog({
                 tooltip="Vui lòng nhập vào tên nhóm dịch vụ"
                 error={errors.name?.message}
               >
-                <Input
+                <AdminInput
                   {...register("name")}
                   placeholder="Chăm sóc da cơ bản"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
 
@@ -136,11 +135,10 @@ export function ServiceCategoryFormDialog({
                 tooltip="Số nhỏ sẽ được ưu tiên hiển thị trước"
                 error={errors.sortOrder?.message}
               >
-                <Input
+                <AdminInput
                   {...register("sortOrder", { valueAsNumber: true })}
                   type="number"
                   placeholder="0"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
 
@@ -163,10 +161,9 @@ export function ServiceCategoryFormDialog({
                   tooltip="Không dài quá 500 ký tự"
                   error={errors.description?.message}
                 >
-                  <Textarea
+                  <AdminTextarea
                     {...register("description")}
                     placeholder="Mô tả nhóm dịch vụ ở đây"
-                    className=""
                   />
                 </FormField>
               </div>
@@ -194,7 +191,7 @@ export function ServiceCategoryFormDialog({
 }
 
 function getDefaultValues(
-  serviceCategory?: ServiceCategoryDTO | null,
+  serviceCategory?: ServiceCategoryDto | null,
 ): ServiceCategoryFormValues {
   if (serviceCategory) {
     return {

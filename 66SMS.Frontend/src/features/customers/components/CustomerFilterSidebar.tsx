@@ -40,13 +40,13 @@ export function CustomerFilterSidebar({
       {/* Title */}
       <div className="px-4 py-3 border-b border-stone-100 shrink-0 flex items-center gap-2">
         <Filter className="w-4 h-4 text-lotus-leaf" />
-        <span className="text-[13px] font-bold text-lotus-deep">Bộ lọc khách hàng</span>
+        <span className="text-lotus-admin-lg font-bold text-lotus-deep">Bộ lọc khách hàng</span>
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-5">
         {/* Section 1: Giới tính */}
         <div className="space-y-1.5">
-          <p className="text-[11px] font-bold text-stone-400 tracking-wider uppercase px-2">
+          <p className="text-lotus-admin-base font-bold text-stone-400 tracking-wider uppercase px-2">
             Giới tính
           </p>
           <div className="space-y-0.5">
@@ -57,7 +57,7 @@ export function CustomerFilterSidebar({
                   key={opt.label}
                   type="button"
                   onClick={() => onSelectGender(opt.value)}
-                  className={`w-full flex items-center gap-2 px-3 py-1.5 text-[13px] transition-all duration-150 rounded ${
+                  className={`lotus-admin-sidebar-item ${
                     isActive
                       ? "bg-lotus-leaf/10 text-lotus-leaf font-semibold border-l-[3px] border-lotus-leaf"
                       : "text-lotus-deep/70 hover:bg-lotus-leaf/5 hover:text-lotus-leaf border-l-[3px] border-transparent"
@@ -77,7 +77,7 @@ export function CustomerFilterSidebar({
 
         {/* Section 2: Nguồn khách */}
         <div className="space-y-1.5">
-          <p className="text-[11px] font-bold text-stone-400 tracking-wider uppercase px-2">
+          <p className="text-lotus-admin-base font-bold text-stone-400 tracking-wider uppercase px-2">
             Nguồn khách
           </p>
           <div className="space-y-0.5">
@@ -89,7 +89,7 @@ export function CustomerFilterSidebar({
                   key={opt.label}
                   type="button"
                   onClick={() => onSelectSource(opt.value)}
-                  className={`w-full flex items-center gap-2 px-3 py-1.5 text-[13px] transition-all duration-150 rounded ${
+                  className={`lotus-admin-sidebar-item ${
                     isActive
                       ? "bg-lotus-leaf/10 text-lotus-leaf font-semibold border-l-[3px] border-lotus-leaf"
                       : "text-lotus-deep/70 hover:bg-lotus-leaf/5 hover:text-lotus-leaf border-l-[3px] border-transparent"

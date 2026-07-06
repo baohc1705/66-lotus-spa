@@ -1,3 +1,5 @@
+import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+import { AdminInput } from '@/shared/components/forms/AdminInput';
 import { useForm, type Resolver } from "react-hook-form";
 import {
   useCreateBookingRoom,
@@ -26,8 +28,6 @@ import { Button } from "@/shared/components/ui/button";
 import { FormSection } from "@/shared/components/forms/FormSection";
 import { DoorOpen } from "lucide-react";
 import { FormField } from "@/shared/components/forms/FormField";
-import { Input } from "@/shared/components/ui/input";
-import { Textarea } from "@/shared/components/ui/textarea";
 import { Switch } from "@/shared/components/ui/switch";
 import { ImageUpload } from "@/shared/components/ImageUpload";
 import { uploadApi } from "@/shared/api/upload.api";
@@ -121,10 +121,9 @@ export function BookingRoomFormDialog({
                 tooltip="Vui lòng nhập vào tên phòng dịch vụ"
                 error={errors.name?.message}
               >
-                <Input
+                <AdminInput
                   {...register("name")}
                   placeholder="Phòng VIP 1"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
 
@@ -156,7 +155,7 @@ export function BookingRoomFormDialog({
                   tooltip="Ghi chú không dài quá 500 ký tự"
                   error={errors.note?.message}
                 >
-                  <Textarea
+                  <AdminTextarea
                     {...register("note")}
                     placeholder="Ghi chú ở đây"
                     className=""

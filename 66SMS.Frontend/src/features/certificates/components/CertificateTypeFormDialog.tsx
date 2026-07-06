@@ -1,3 +1,6 @@
+import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+import { AdminInput } from '@/shared/components/forms/AdminInput';
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect } from 'react'
 import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -11,13 +14,12 @@ import {
   DialogFooter,
 } from '@/shared/components/ui/dialog'
 import { Button } from '@/shared/components/ui/button'
-import { Input } from '@/shared/components/ui/input'
-import { Textarea } from '@/shared/components/ui/textarea'
+
+
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select'
 import { FormSection } from '@/shared/components/forms/FormSection'
@@ -93,23 +95,23 @@ export function CertificateTypeFormDialog({ open, onOpenChange, item }: Props) {
           <FormSection icon={Award} title="Thông tin loại chứng chỉ">
             <div className="space-y-4">
               <FormField label="Mã loại *" error={errors.code?.message}>
-                <Input {...register('code')} placeholder="MASSAGE" className="h-9 text-[13px]" />
+                <AdminInput {...register('code')} placeholder="MASSAGE" />
               </FormField>
               <FormField label="Tên loại chứng chỉ *" error={errors.name?.message}>
-                <Input {...register('name')} placeholder="Chứng chỉ Massage Trị liệu" className="h-9 text-[13px]" />
+                <AdminInput {...register('name')} placeholder="Chứng chỉ Massage Trị liệu" />
               </FormField>
               <FormField label="Mô tả" error={errors.description?.message}>
-                <Textarea {...register('description')} placeholder="Mô tả loại chứng chỉ..." className="text-[13px] min-h-[72px]" />
+                <AdminTextarea {...register('description')} placeholder="Mô tả loại chứng chỉ..." className="text-lotus-admin-lg min-h-[72px]" />
               </FormField>
               <div className="grid grid-cols-2 gap-4">
                 <FormField label="Thứ tự hiển thị" error={errors.sortOrder?.message}>
-                  <Input {...register('sortOrder')} type="number" placeholder="0" className="h-9 text-[13px]" />
+                  <AdminInput {...register('sortOrder')} type="number" placeholder="0" />
                 </FormField>
                 <FormField label="Trạng thái" error={errors.status?.message}>
                   <Select value={watch('status')?.toString()} onValueChange={(v) => setValue('status', Number(v))}>
-                    <SelectTrigger className="h-9 text-[13px]">
+                    <AdminSelectTrigger>
                       <SelectValue placeholder="Chọn trạng thái" />
-                    </SelectTrigger>
+                    </AdminSelectTrigger>
                     <SelectContent>
                       <SelectItem value="1">Hoạt động</SelectItem>
                       <SelectItem value="0">Tạm đóng</SelectItem>

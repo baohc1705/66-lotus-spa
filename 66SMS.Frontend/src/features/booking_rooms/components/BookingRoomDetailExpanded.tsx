@@ -49,8 +49,8 @@ export function BookingRoomDetailExpanded({ roomId, onEdit }: BookingRoomDetailE
         {/* Tab Headers */}
         <div className="px-4 pt-2 sticky top-0 bg-stone-50/95 backdrop-blur-sm z-10">
           <TabsList className="h-10 border-b border-stone-200/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
-            <TabsTrigger value="info" className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors">Thông tin chung</TabsTrigger>
-            <TabsTrigger value="positions" className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors">Danh sách vị trí ({positions.length})</TabsTrigger>
+            <TabsTrigger value="info" className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors">Thông tin chung</TabsTrigger>
+            <TabsTrigger value="positions" className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors">Danh sách vị trí ({positions.length})</TabsTrigger>
           </TabsList>
         </div>
 
@@ -68,7 +68,7 @@ export function BookingRoomDetailExpanded({ roomId, onEdit }: BookingRoomDetailE
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-base font-bold text-lotus-deep truncate">{room.name ?? '—'}</h3>
-                <p className="text-[12px] text-lotus-stone mt-0.5">
+                <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
                   Trạng thái: {room.status === 1 ? 'Hoạt động' : 'Ngưng hoạt động'}
                 </p>
               </div>
@@ -89,7 +89,7 @@ export function BookingRoomDetailExpanded({ roomId, onEdit }: BookingRoomDetailE
             {/* Actions */}
             <div className="flex items-end justify-end mt-2 pt-4 border-t border-stone-100/80">
               <PermissionGate resource="booking_rooms" action="update">
-                <Button variant="admin" size="sm" onClick={() => onEdit?.(room)} className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-[13px] gap-1.5 rounded-md transition-opacity">
+                <Button variant="admin" size="sm" onClick={() => onEdit?.(room)} className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-lotus-admin-lg gap-1.5 rounded-md transition-opacity">
                   <Pencil className="w-3.5 h-3.5" />
                   Cập nhật
                 </Button>
@@ -104,7 +104,7 @@ export function BookingRoomDetailExpanded({ roomId, onEdit }: BookingRoomDetailE
             <div className="py-8 text-center text-lotus-stone text-sm">Chưa có vị trí nào được thiết lập trong phòng này</div>
           ) : (
             <div className="rounded-md border border-stone-200 overflow-x-auto w-full">
-              <table className="w-full text-left text-[13px] min-w-[500px]">
+              <table className="w-full text-left text-lotus-admin-lg min-w-[500px]">
                 <thead className="bg-stone-50 border-b border-stone-200 text-lotus-stone">
                   <tr>
                     <th className="py-2.5 px-4 font-semibold w-16 text-center">Thứ tự</th>
@@ -142,8 +142,8 @@ export function BookingRoomDetailExpanded({ roomId, onEdit }: BookingRoomDetailE
 function DetailField({ label, value }: { label: string; value: string | null | undefined }) {
   return (
     <div className="py-3.5 border-b border-stone-100/80 last:border-b-0 group">
-      <p className="text-[12px] text-lotus-stone mb-1">{label}</p>
-      <p className="text-[13px] font-medium text-lotus-deep truncate">{value || '—'}</p>
+      <p className="text-lotus-admin-md text-lotus-stone mb-1">{label}</p>
+      <p className="text-lotus-admin-lg font-medium text-lotus-deep truncate">{value || '—'}</p>
     </div>
   )
 }

@@ -96,7 +96,7 @@ export function ServiceCategorySidebar({
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               placeholder="Tìm danh mục..."
-              className="w-full h-8 pl-8 pr-3 text-[12px] bg-stone-50 border border-stone-200 rounded focus:outline-none focus:ring-1 focus:ring-lotus-leaf/40 focus:border-lotus-leaf/60 placeholder:text-stone-400 text-stone-700"
+              className="lotus-admin-sidebar-search"
             />
           </div>
         </div>
@@ -107,7 +107,7 @@ export function ServiceCategorySidebar({
           <button
             type="button"
             onClick={() => onSelectCategory(null)}
-            className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 text-[13px] transition-all duration-150 rounded ${
+            className={`lotus-admin-sidebar-item ${
               selectedCategoryId === null
                 ? "bg-lotus-leaf/10 text-lotus-leaf font-semibold border-l-[3px] border-lotus-leaf"
                 : "text-lotus-deep/70 hover:bg-lotus-leaf/5 hover:text-lotus-leaf border-l-[3px] border-transparent"
@@ -124,7 +124,7 @@ export function ServiceCategorySidebar({
               <span className="truncate">Tất cả dịch vụ</span>
             </div>
             <span
-              className={`text-[11px] shrink-0 font-medium px-1.5 py-0.5 rounded-full ${
+              className={`lotus-admin-sidebar-badge ${
                 selectedCategoryId === null
                   ? "bg-lotus-leaf/20 text-lotus-leaf"
                   : "bg-stone-100 text-stone-500"
@@ -153,7 +153,7 @@ export function ServiceCategorySidebar({
                   key={cat.id}
                   type="button"
                   onClick={() => onSelectCategory(cat.id ?? null)}
-                  className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 text-[13px] transition-all duration-150 rounded group ${
+                  className={`lotus-admin-sidebar-item group ${
                     isActive
                       ? "bg-lotus-leaf/10 text-lotus-leaf font-semibold border-l-[3px] border-lotus-leaf"
                       : "text-lotus-deep/70 hover:bg-lotus-leaf/5 hover:text-lotus-leaf border-l-[3px] border-transparent"
@@ -170,7 +170,7 @@ export function ServiceCategorySidebar({
                     <span className="truncate">{cat.name ?? "—"}</span>
                   </div>
                   <span
-                    className={`text-[11px] shrink-0 font-medium px-1.5 py-0.5 rounded-full ${
+                    className={`lotus-admin-sidebar-badge ${
                       isActive
                         ? "bg-lotus-leaf/20 text-lotus-leaf"
                         : "bg-stone-100 text-stone-500"
@@ -188,7 +188,7 @@ export function ServiceCategorySidebar({
         <div className="px-3 py-2 shrink-0 mt-auto">
           <Button
             variant="admin"
-            className="w-full h-8 text-[12px] gap-1.5 justify-center font-bold"
+            className="lotus-admin-sidebar-add-btn"
             onClick={() => setCreateCategoryOpen(true)}
           >
             <Plus className="w-3.5 h-3.5" />

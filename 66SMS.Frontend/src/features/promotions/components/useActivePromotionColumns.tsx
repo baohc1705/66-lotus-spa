@@ -12,7 +12,7 @@ import {
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { IndexCell } from "@/shared/components/DataTable/tableCells";
+import { IndexCell, PriceCell } from "@/shared/components/DataTable/tableCells";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { PROMOTION_PERM } from "../constants/promotion.permissions";
 import type { PromotionDto } from "../types/promotion.types";
@@ -86,7 +86,7 @@ export function useActivePromotionColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="font-mono text-[12px] font-semibold text-lotus-deep">
+          <span className="font-mono text-lotus-admin-md font-semibold text-lotus-deep">
             {row.original.code ?? "—"}
           </span>
         ),
@@ -104,7 +104,7 @@ export function useActivePromotionColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="text-[13px] font-semibold text-lotus-deep truncate max-w-[200px] block">
+          <span className="text-lotus-admin-lg font-semibold text-lotus-deep truncate max-w-[200px] block">
             {row.original.name ?? "—"}
           </span>
         ),
@@ -119,7 +119,7 @@ export function useActivePromotionColumns({
           if (!info) return <span className="text-lotus-stone">—</span>;
           return (
             <span
-              className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${info.color}`}
+              className={`px-2 py-0.5 rounded-full text-lotus-admin-base font-semibold ${info.color}`}
             >
               {info.label}
             </span>
@@ -135,11 +135,7 @@ export function useActivePromotionColumns({
           if (p.discountType === 1)
             return <span className="text-lotus-deep">{p.discountValue ?? 0}%</span>;
           if (p.discountType === 2)
-            return (
-              <span className="text-lotus-deep">
-                {(p.discountValue ?? 0).toLocaleString("vi-VN")} ₫
-              </span>
-            );
+            return <PriceCell value={p.discountValue} />;
           if (p.discountType === 3)
             return (
               <span className="text-lotus-deep">
@@ -164,7 +160,7 @@ export function useActivePromotionColumns({
         cell: ({ row }) => {
           const p = row.original;
           return (
-            <div className="text-[12px] text-lotus-deep/70 leading-5">
+            <div className="text-lotus-admin-md text-lotus-deep/70 leading-5">
               <div>{p.startDate ?? "—"}</div>
               <div>→ {p.endDate ?? "—"}</div>
             </div>

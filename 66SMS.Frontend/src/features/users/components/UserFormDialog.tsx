@@ -1,3 +1,5 @@
+import { AdminInput } from '@/shared/components/forms/AdminInput';
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,12 +12,10 @@ import {
   DialogFooter,
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
 import { FormSection } from "@/shared/components/forms/FormSection";
@@ -139,10 +139,9 @@ export function UserFormDialog({
                   label="Tên tài khoản"
                   error={updateForm.formState.errors.username?.message}
                 >
-                  <Input
+                  <AdminInput
                     {...updateForm.register("username")}
                     placeholder="Tên tài khoản..."
-                    className="h-9 text-[13px]"
                   />
                 </FormField>
 
@@ -150,10 +149,9 @@ export function UserFormDialog({
                   label="Email"
                   error={updateForm.formState.errors.email?.message}
                 >
-                  <Input
+                  <AdminInput
                     {...updateForm.register("email")}
                     placeholder="Email..."
-                    className="h-9 text-[13px]"
                   />
                 </FormField>
 
@@ -164,9 +162,9 @@ export function UserFormDialog({
                       updateForm.setValue("status", Number(v))
                     }
                   >
-                    <SelectTrigger className="h-9 text-[13px]">
+                    <AdminSelectTrigger>
                       <SelectValue placeholder="Chọn trạng thái" />
-                    </SelectTrigger>
+                    </AdminSelectTrigger>
                     <SelectContent>
                       {STATUS_OPTIONS.map((opt) => (
                         <SelectItem key={opt.value} value={opt.value}>
@@ -205,10 +203,9 @@ export function UserFormDialog({
                   label="Tên tài khoản *"
                   error={createForm.formState.errors.userName?.message}
                 >
-                  <Input
+                  <AdminInput
                     {...createForm.register("userName")}
                     placeholder="Tên tài khoản..."
-                    className="h-9 text-[13px]"
                   />
                 </FormField>
 
@@ -216,10 +213,9 @@ export function UserFormDialog({
                   label="Email *"
                   error={createForm.formState.errors.email?.message}
                 >
-                  <Input
+                  <AdminInput
                     {...createForm.register("email")}
                     placeholder="Email..."
-                    className="h-9 text-[13px]"
                   />
                 </FormField>
               </div>
@@ -231,11 +227,10 @@ export function UserFormDialog({
                   label="Mật khẩu *"
                   error={createForm.formState.errors.password?.message}
                 >
-                  <Input
+                  <AdminInput
                     type="password"
                     {...createForm.register("password")}
                     placeholder="Mật khẩu..."
-                    className="h-9 text-[13px]"
                   />
                 </FormField>
 
@@ -243,11 +238,10 @@ export function UserFormDialog({
                   label="Xác nhận mật khẩu *"
                   error={createForm.formState.errors.confirmPassword?.message}
                 >
-                  <Input
+                  <AdminInput
                     type="password"
                     {...createForm.register("confirmPassword")}
                     placeholder="Xác nhận mật khẩu..."
-                    className="h-9 text-[13px]"
                   />
                 </FormField>
 
@@ -256,9 +250,9 @@ export function UserFormDialog({
                     value={createForm.watch("role") ?? "staff"}
                     onValueChange={(v) => createForm.setValue("role", v)}
                   >
-                    <SelectTrigger className="h-9 text-[13px]">
+                    <AdminSelectTrigger>
                       <SelectValue placeholder="Chọn vai trò" />
-                    </SelectTrigger>
+                    </AdminSelectTrigger>
                     <SelectContent>
                       <SelectItem value="admin">Admin</SelectItem>
                       <SelectItem value="staff">Nhân viên</SelectItem>

@@ -111,7 +111,7 @@ export function useActiveMembershipCardColumns({
         accessorKey: "issuedAt",
         header: cols.issuedAt,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80 text-[13px]">
+          <span className="text-lotus-deep/80 text-lotus-admin-lg">
             {row.original.issuedAt
               ? new Date(row.original.issuedAt).toLocaleDateString("vi-VN")
               : "—"}
@@ -123,7 +123,7 @@ export function useActiveMembershipCardColumns({
         accessorKey: "expiresAt",
         header: cols.expiresAt,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80 text-[13px]">
+          <span className="text-lotus-deep/80 text-lotus-admin-lg">
             {row.original.expiresAt
               ? new Date(row.original.expiresAt).toLocaleDateString("vi-VN")
               : "Vĩnh viễn"}

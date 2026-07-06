@@ -1,4 +1,4 @@
-export interface ServiceCategoryDTO {
+export interface ServiceCategoryDto {
   id?: number;
   name?: string;
   description?: string;

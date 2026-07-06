@@ -157,7 +157,6 @@ export function ShiftFormDialog({
                 <Input
                   {...register("name")}
                   placeholder="Ca Sáng"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
 
@@ -185,7 +184,6 @@ export function ShiftFormDialog({
                 <Input
                   type="time"
                   {...register("shiftStart")}
-                  className="h-9 text-[13px]"
                 />
               </FormField>
 
@@ -197,7 +195,6 @@ export function ShiftFormDialog({
                 <Input
                   type="time"
                   {...register("shiftEnd")}
-                  className="h-9 text-[13px]"
                 />
               </FormField>
 
@@ -209,7 +206,6 @@ export function ShiftFormDialog({
                 <Input
                   type="date"
                   {...register("effectiveFrom")}
-                  className="h-9 text-[13px]"
                 />
               </FormField>
 
@@ -221,7 +217,6 @@ export function ShiftFormDialog({
                 <Input
                   type="date"
                   {...register("effectiveTo")}
-                  className="h-9 text-[13px]"
                 />
               </FormField>
             </div>

@@ -132,13 +132,13 @@ export function StaffWeekGrid({
                 <div
                   className={cn(
                     "h-14 border-b border-[var(--color-border)] sticky top-0 z-10 flex flex-col items-center justify-center px-1",
-                    header.isToday ? "bg-[#1A56DB]/10" : "bg-white",
+                    header.isToday ? "bg-blue-50" : "bg-white",
                   )}
                 >
                   <span
                     className={cn(
                       "text-xs font-semibold uppercase",
-                      header.isToday ? "text-[#1A56DB]" : "text-gray-500",
+                      header.isToday ? "text-blue-600" : "text-gray-500",
                     )}
                   >
                     {header.weekday}
@@ -146,7 +146,7 @@ export function StaffWeekGrid({
                   <span
                     className={cn(
                       "text-sm font-medium",
-                      header.isToday ? "text-[#1A56DB]" : "text-gray-900",
+                      header.isToday ? "text-blue-600" : "text-gray-900",
                     )}
                   >
                     {header.label}
@@ -204,10 +204,10 @@ export function StaffWeekGrid({
                             )}
                           />
                         </div>
-                        <div className="text-[10px] opacity-90 truncate">
+                        <div className="text-lotus-admin-xs opacity-90 truncate">
                           {booking.serviceName}
                         </div>
-                        <div className="text-[10px] opacity-75 mt-0.5 flex items-center gap-0.5">
+                        <div className="text-lotus-admin-xs opacity-75 mt-0.5 flex items-center gap-0.5">
                           <Clock className="w-2.5 h-2.5" />
                           {booking.startTime}–{booking.endTime}
                         </div>

@@ -14,8 +14,8 @@ import {
 import { Button } from "@/shared/components/ui/button";
 import { FormSection } from "@/shared/components/forms/FormSection";
 import { FormField } from "@/shared/components/forms/FormField";
-import { Input } from "@/shared/components/ui/input";
-import { Textarea } from "@/shared/components/ui/textarea";
+import { AdminInput } from "@/shared/components/forms/AdminInput";
+import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
 import { Switch } from "@/shared/components/ui/switch";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
@@ -24,7 +24,7 @@ import {
   useCreateProductCategory,
   useUpdateProductCategory,
 } from "../hooks/useProductCategories";
-import type { ProductCategoryDTO } from "../types/product_category.types";
+import type { ProductCategoryDto } from "../types/productCategory.types";
 import {
   createProductCategorySchema,
   type CreateProductCategoryPayload,
@@ -35,7 +35,7 @@ import {
 interface ProductCategoryFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  productCategory?: ProductCategoryDTO | null;
+  productCategory?: ProductCategoryDto | null;
 }
 
 export function ProductCategoryFormDialog({
@@ -116,10 +116,9 @@ export function ProductCategoryFormDialog({
                 tooltip="Vui lòng nhập vào tên danh mục sản phẩm"
                 error={errors.name?.message}
               >
-                <Input
+                <AdminInput
                   {...register("name")}
                   placeholder="Chăm sóc da"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
 
@@ -128,11 +127,10 @@ export function ProductCategoryFormDialog({
                 tooltip="Số nhỏ sẽ được ưu tiên hiển thị trước"
                 error={errors.sortOrder?.message}
               >
-                <Input
+                <AdminInput
                   {...register("sortOrder", { valueAsNumber: true })}
                   type="number"
                   placeholder="0"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
 
@@ -160,7 +158,7 @@ export function ProductCategoryFormDialog({
                   tooltip="Danh mục không dài quá 500 ký tự"
                   error={errors.description?.message}
                 >
-                  <Textarea
+                  <AdminTextarea
                     {...register("description")}
                     placeholder="Mô tả danh mục ở đây"
                   />
@@ -190,7 +188,7 @@ export function ProductCategoryFormDialog({
 }
 
 function getDefaultValues(
-  productCategory?: ProductCategoryDTO | null,
+  productCategory?: ProductCategoryDto | null,
 ): ProductCategoryFormValues {
   if (productCategory) {
     return {

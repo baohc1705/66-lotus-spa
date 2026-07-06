@@ -105,7 +105,7 @@ export function useActiveShiftColumns({
             ? formatDate(currentPeriod.effectiveTo).format("DD/MM/YYYY")
             : "Vô thời hạn";
           return (
-            <span className="text-lotus-deep/80 text-[13px]">
+            <span className="text-lotus-deep/80 text-lotus-admin-lg">
               {from} - {to}
             </span>
           );

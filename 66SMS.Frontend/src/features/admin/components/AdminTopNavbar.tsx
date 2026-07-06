@@ -73,7 +73,7 @@ export function AdminTopNavbar() {
             {tab.path ? (
               <Link
                 to={tab.path}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] font-sans text-[13px] font-normal whitespace-nowrap transition-all duration-300 ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] font-sans text-lotus-admin-lg font-normal whitespace-nowrap transition-all duration-300 ${
                   isActive
                     ? "text-white"
                     : "text-white/85 hover:text-white hover:bg-white/10"
@@ -90,7 +90,7 @@ export function AdminTopNavbar() {
               </Link>
             ) : (
               <button
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] font-sans text-[13px] font-normal whitespace-nowrap transition-all duration-300 outline-none ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] font-sans text-lotus-admin-lg font-normal whitespace-nowrap transition-all duration-300 outline-none ${
                   isActive
                     ? "text-white"
                     : isTabOpen
@@ -141,7 +141,7 @@ export function AdminTopNavbar() {
 
                     return (
                       <div key={col.title} className="flex flex-col">
-                        <span className="text-[11px] font-medium text-lotus-stone/85 mb-2 select-none whitespace-nowrap capitalize">
+                        <span className="text-lotus-admin-base font-medium text-lotus-stone/85 mb-2 select-none whitespace-nowrap capitalize">
                           {col.title.toLowerCase()}
                         </span>
                         <ul className="space-y-0.5">
@@ -154,7 +154,7 @@ export function AdminTopNavbar() {
                                 <Link
                                   to={item.path}
                                   onClick={() => setActiveTab(null)}
-                                  className={`group flex items-center gap-2 px-2 py-1 rounded-[4px] text-[12px] transition-all duration-300 ${
+                                  className={`group flex items-center gap-2 px-2 py-1 rounded-[4px] text-lotus-admin-md transition-all duration-300 ${
                                     isItemActive
                                       ? "bg-lotus-surface/30 text-lotus-primary font-semibold"
                                       : "text-lotus-deep/80 hover:text-lotus-primary hover:bg-lotus-cream"

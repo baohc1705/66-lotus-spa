@@ -23,7 +23,6 @@ import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { useRowSelection } from "@/shared/hooks/useRowSelection";
 import { containerVariants } from "@/shared/motion/pageVariants";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 import { ServiceCategorySidebar } from "../components/ServiceCategorySidebar";
 import { ServiceDetailExpanded } from "../components/ServiceDetailExpanded";
@@ -44,7 +43,7 @@ import {
   useRestoreService,
 } from "../hooks/useServices";
 import { useServiceListState } from "../hooks/useServiceListState";
-import type { ServiceDTO } from "../types/service.types";
+import type { ServiceDto } from "../types/service.types";
 
 const ENTITY = "dịch vụ";
 const ENTITY_SUBJECT = "Dịch vụ";
@@ -104,7 +103,7 @@ export function ServiceListPage() {
   // Stat card calculations
   const activeServiceCount = useMemo(
     () =>
-      services.filter((s: ServiceDTO) => s.status === StatusActive.Active)
+      services.filter((s: ServiceDto) => s.status === StatusActive.Active)
         .length,
     [services],
   );
@@ -112,7 +111,7 @@ export function ServiceListPage() {
   const servicesWithProducts = useMemo(
     () =>
       services.filter(
-        (s: ServiceDTO) =>
+        (s: ServiceDto) =>
           s.serviceProducts != null && s.serviceProducts.length > 0,
       ).length,
     [services],
@@ -120,11 +119,11 @@ export function ServiceListPage() {
 
   const avgDurationMins = useMemo(() => {
     const withDuration = services.filter(
-      (s: ServiceDTO) => (s.durationMins ?? 0) > 0,
+      (s: ServiceDto) => (s.durationMins ?? 0) > 0,
     );
     if (withDuration.length === 0) return 0;
     const total = withDuration.reduce(
-      (sum: number, s: ServiceDTO) => sum + (s.durationMins ?? 0),
+      (sum: number, s: ServiceDto) => sum + (s.durationMins ?? 0),
       0,
     );
     return Math.round(total / withDuration.length);
@@ -133,7 +132,7 @@ export function ServiceListPage() {
   const pageIds = useMemo(
     () =>
       services
-        .map((s: ServiceDTO) => s.id)
+        .map((s: ServiceDto) => s.id)
         .filter((id): id is number => id !== undefined),
     [services],
   );
@@ -262,12 +261,12 @@ export function ServiceListPage() {
           initial="hidden"
           animate="visible"
           variants={containerVariants}
-          className={`${TABLE_STYLES.pageCard} flex-1 min-h-0 flex flex-col overflow-hidden relative`}
+          className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative"
         >
           {/* Fetching bar */}
           {isFetching && !isLoading && (
-            <div className={TABLE_STYLES.fetchBar}>
-              <div className={TABLE_STYLES.fetchBarInner} />
+            <div className="lotus-admin-table-fetch-bar">
+              <div className="lotus-admin-table-fetch-bar-inner" />
             </div>
           )}
 
@@ -291,7 +290,7 @@ export function ServiceListPage() {
                       <Button
                         variant="destructive"
                         size="sm"
-                        className="text-[12px] h-7 px-2"
+                        className="lotus-admin-btn-toolbar"
                         onClick={() => setBulkDeleteOpen(true)}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -318,7 +317,7 @@ export function ServiceListPage() {
                   variant="admin"
                   size="sm"
                   onClick={() => setCreateOpen(true)}
-                  className={TABLE_STYLES.toolbarBtn}
+                  className="lotus-admin-table-toolbar-btn"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Thêm dịch vụ
@@ -333,7 +332,7 @@ export function ServiceListPage() {
                 <Button
                   variant="admin"
                   size="sm"
-                  className={TABLE_STYLES.toolbarBtn}
+                  className="lotus-admin-table-toolbar-btn"
                   onClick={() => handleToggleView(clearSelection)}
                   title={showDeleted ? "Quay lại danh sách" : "Dịch vụ đã xóa"}
                 >
@@ -394,7 +393,7 @@ export function ServiceListPage() {
                         variant="admin"
                         size="sm"
                         onClick={() => setCreateOpen(true)}
-                        className="mt-1 text-[12px]"
+                        className="mt-1 text-lotus-admin-md"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         Thêm dịch vụ

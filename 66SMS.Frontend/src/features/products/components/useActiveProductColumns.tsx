@@ -4,7 +4,7 @@ import { Eye, MoreHorizontal, Package, Pencil, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { MutedCell, TextCell } from "@/shared/components/DataTable/tableCells";
+import { MutedCell, PriceCell, TextCell } from "@/shared/components/DataTable/tableCells";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
@@ -51,13 +51,7 @@ interface UseActiveProductColumnsParams {
   >;
 }
 
-function formatPrice(value: number | null | undefined) {
-  if (value == null) return "—";
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(value);
-}
+
 
 export function useActiveProductColumns({
   orderBy,
@@ -139,7 +133,7 @@ export function useActiveProductColumns({
                   <Package className="w-4 h-4 text-stone-400" />
                 )}
               </div>
-              <span className="text-[13px] font-semibold text-lotus-deep truncate max-w-[180px]">
+              <span className="text-lotus-admin-lg font-semibold text-lotus-deep truncate max-w-[180px]">
                 {prod.name ?? "—"}
               </span>
             </div>
@@ -187,11 +181,7 @@ export function useActiveProductColumns({
       {
         accessorKey: "sellingPrice",
         header: cols.sellingPrice,
-        cell: ({ row }) => (
-          <span className="font-semibold text-lotus-deep">
-            {formatPrice(row.original.sellingPrice)}
-          </span>
-        ),
+        cell: ({ row }) => <PriceCell value={row.original.sellingPrice} />,
         size: 120,
       },
       {

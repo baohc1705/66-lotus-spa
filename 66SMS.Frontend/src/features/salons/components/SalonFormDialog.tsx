@@ -1,3 +1,6 @@
+import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+import { AdminInput } from '@/shared/components/forms/AdminInput';
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect, useState } from 'react'
 import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -10,17 +13,14 @@ import {
   DialogFooter,
 } from '@/shared/components/ui/dialog'
 import { Button } from '@/shared/components/ui/button'
-import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/shared/components/ui/tooltip'
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select'
-import { Textarea } from '@/shared/components/ui/textarea'
 import { Info } from 'lucide-react'
 import { ImageUpload } from '@/shared/components/ImageUpload'
 import { uploadApi } from '@/shared/api/upload.api'
@@ -129,31 +129,31 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
 
           {/* Thông tin cơ bản */}
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-lotus-stone mb-3">
+            <p className="text-lotus-admin-base font-semibold uppercase tracking-wider text-lotus-stone mb-3">
               Thông tin cơ bản
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-4">
               <FormField label="Mã chi nhánh *" error={errors.code?.message}>
-                <Input {...register('code')} placeholder="CN001" className="h-9 text-[13px]" />
+                <AdminInput {...register('code')} placeholder="CN001" />
               </FormField>
               <FormField label="Tên chi nhánh *" error={errors.name?.message} className="sm:col-span-2">
-                <Input {...register('name')} placeholder="Chi nhánh Quận 1" className="h-9 text-[13px]" />
+                <AdminInput {...register('name')} placeholder="Chi nhánh Quận 1" />
               </FormField>
               <FormField label="Số điện thoại *" error={errors.phone?.message}>
-                <Input {...register('phone')} placeholder="0901234567" className="h-9 text-[13px]" />
+                <AdminInput {...register('phone')} placeholder="0901234567" />
               </FormField>
               <FormField label="Email" error={errors.email?.message}>
-                <Input {...register('email')} placeholder="chinhanh@spa.vn" className="h-9 text-[13px]" />
+                <AdminInput {...register('email')} placeholder="chinhanh@spa.vn" />
               </FormField>
               <FormField label="Mã số thuế" error={errors.taxCode?.message}>
-                <Input {...register('taxCode')} placeholder="0123456789" className="h-9 text-[13px]" />
+                <AdminInput {...register('taxCode')} placeholder="0123456789" />
               </FormField>
             </div>
           </div>
 
           {/* Địa chỉ */}
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-lotus-stone mb-3">
+            <p className="text-lotus-admin-base font-semibold uppercase tracking-wider text-lotus-stone mb-3">
               Địa chỉ
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
@@ -182,14 +182,14 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
                 />
               </FormField>
               <FormField label="Số nhà, tên đường" error={errors.streetAddress?.message} className="sm:col-span-2">
-                <Input {...register('streetAddress')} placeholder="123 Nguyễn Trãi" className="h-9 text-[13px]" />
+                <AdminInput {...register('streetAddress')} placeholder="123 Nguyễn Trãi" />
               </FormField>
             </div>
           </div>
 
           {/* Mô tả & Trạng thái */}
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-lotus-stone mb-3">
+            <p className="text-lotus-admin-base font-semibold uppercase tracking-wider text-lotus-stone mb-3">
               Mô tả & Trạng thái
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-4">
@@ -198,19 +198,19 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
                 tooltip='Chuỗi số thứ trong tuần, ví dụ "1234567" = tất cả các ngày'
                 error={errors.workingDays?.message}
               >
-                <Input {...register('workingDays')} placeholder="1234567" className="h-9 text-[13px]" />
+                <AdminInput {...register('workingDays')} placeholder="1234567" />
               </FormField>
               <FormField label="Thứ tự hiển thị" error={errors.sortOrder?.message}>
-                <Input {...register('sortOrder')} type="number" placeholder="0" className="h-9 text-[13px]" />
+                <AdminInput {...register('sortOrder')} type="number" placeholder="0" />
               </FormField>
               <FormField label="Trạng thái">
                 <Select
                   value={statusValue?.toString() ?? '1'}
                   onValueChange={(v) => setValue('status', Number(v))}
                 >
-                  <SelectTrigger className="h-9 text-[13px]">
+                  <AdminSelectTrigger>
                     <SelectValue placeholder="Chọn trạng thái" />
-                  </SelectTrigger>
+                  </AdminSelectTrigger>
                   <SelectContent>
                     {STATUS_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>
@@ -221,10 +221,10 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
                 </Select>
               </FormField>
               <FormField label="Mô tả" error={errors.description?.message} className="sm:col-span-3">
-                <Textarea
+                <AdminTextarea
                   {...register('description')}
                   placeholder="Mô tả chi nhánh..."
-                  className="text-[13px] min-h-[80px]"
+                  className="text-lotus-admin-lg min-h-[80px]"
                 />
               </FormField>
             </div>
@@ -268,7 +268,7 @@ function FormField({
 
   return (
     <div className={`space-y-1.5 ${className ?? ''}`}>
-      <Label className="flex items-center gap-1.5 text-[12px] font-semibold text-lotus-deep/80">
+      <Label className="flex items-center gap-1.5 text-lotus-admin-md font-semibold text-lotus-deep/80">
         {cleanLabel}
         {isRequired && <span className="text-red-500">*</span>}
         {tooltip && (
@@ -283,7 +283,7 @@ function FormField({
         )}
       </Label>
       {children}
-      {error && <p className="text-[11px] text-red-500 font-medium">{error}</p>}
+      {error && <p className="text-lotus-admin-base text-red-500 font-medium">{error}</p>}
     </div>
   )
 }

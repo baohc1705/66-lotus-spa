@@ -17,7 +17,7 @@ export interface ServiceProductResponse {
   status?: number;
 }
 
-export interface ServiceDTO {
+export interface ServiceDto {
   id?: number;
   categoryId?: number;
   categoryName?: string;

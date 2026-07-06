@@ -81,7 +81,7 @@ export function AdminLayout() {
   }
 
   return (
-    <div className="admin-dashboard-container min-h-screen bg-lotus-cream font-sans text-[#2A1F1A] overflow-clip flex selection:bg-lotus-rose-light selection:text-lotus-rose">
+    <div className="admin-dashboard-container min-h-screen bg-lotus-cream font-sans text-lotus-deep overflow-clip flex selection:bg-lotus-rose-light selection:text-lotus-rose">
       {/* Decorative Background Elements for Luxury Feel */}
       <div className="fixed top-0 left-0 w-[50vw] h-[50vw] rounded-full bg-lotus-rose/5 blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
       <div className="fixed bottom-0 right-0 w-[40vw] h-[40vw] rounded-full bg-lotus-gold/5 blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3" />

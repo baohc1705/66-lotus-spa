@@ -157,17 +157,17 @@ export function AdminHeader({
                     className="absolute right-0 mt-2 w-52 bg-white rounded-[4px] shadow-[0_12px_30px_rgba(0,0,0,0.12)] p-2 z-50 flex flex-col gap-0.5"
                   >
                     <div className="px-3 py-2 border-b border-lotus-surface/20 mb-1.5">
-                      <p className="text-[13px] font-semibold text-lotus-deep leading-tight">
+                      <p className="text-lotus-admin-lg font-semibold text-lotus-deep leading-tight">
                         {user?.username || "Tài khoản"}
                       </p>
-                      <p className="text-[11px] text-lotus-stone truncate mt-0.5 leading-none">
+                      <p className="text-lotus-admin-base text-lotus-stone truncate mt-0.5 leading-none">
                         {user?.email || ""}
                       </p>
                     </div>
                     <Link
                       to="/admin/profile"
                       onClick={() => setIsProfileOpen(false)}
-                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-[12px] text-lotus-deep/85 hover:text-lotus-primary hover:bg-lotus-cream transition-all duration-300 font-normal"
+                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-lotus-admin-md text-lotus-deep/85 hover:text-lotus-primary hover:bg-lotus-cream transition-all duration-300 font-normal"
                     >
                       <User className="w-3.5 h-3.5 text-lotus-deep/45 group-hover:text-lotus-primary group-hover:scale-110 transition-all duration-300" />
                       <span>Hồ sơ cá nhân</span>
@@ -175,7 +175,7 @@ export function AdminHeader({
                     <Link
                       to="/admin/profile"
                       onClick={() => setIsProfileOpen(false)}
-                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-[12px] text-lotus-deep/85 hover:text-lotus-primary hover:bg-lotus-cream transition-all duration-300 font-normal"
+                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-lotus-admin-md text-lotus-deep/85 hover:text-lotus-primary hover:bg-lotus-cream transition-all duration-300 font-normal"
                     >
                       <Settings className="w-3.5 h-3.5 text-lotus-deep/45 group-hover:text-lotus-primary group-hover:scale-110 transition-all duration-300" />
                       <span>Cài đặt tài khoản</span>
@@ -186,7 +186,7 @@ export function AdminHeader({
                         setIsProfileOpen(false);
                         handleLogout();
                       }}
-                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-[12px] text-lotus-rose hover:bg-lotus-rose/5 transition-all duration-300 font-normal w-full text-left"
+                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-lotus-admin-md text-lotus-rose hover:bg-lotus-rose/5 transition-all duration-300 font-normal w-full text-left"
                     >
                       <LogOut className="w-3.5 h-3.5 text-lotus-rose/60 group-hover:scale-110 transition-all duration-300" />
                       <span>Đăng xuất</span>

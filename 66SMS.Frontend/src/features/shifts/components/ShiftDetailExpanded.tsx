@@ -23,8 +23,8 @@ export function ShiftDetailExpanded({ shift }: ShiftDetailExpandedProps) {
             <Clock className="w-6 h-6 text-lotus-leaf" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-lotus-deep">{shift.name ?? 'Ca làm việc'}</h3>
-            <p className="text-[13px] text-lotus-stone mt-0.5">
+            <h3 className="text-lotus-admin-lg font-bold text-lotus-deep">{shift.name ?? 'Ca làm việc'}</h3>
+            <p className="text-lotus-admin-lg text-lotus-stone mt-0.5">
               {shift.description || 'Không có mô tả cho ca làm việc này.'}
             </p>
           </div>
@@ -34,11 +34,11 @@ export function ShiftDetailExpanded({ shift }: ShiftDetailExpandedProps) {
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-2">
             <History className="w-4 h-4 text-lotus-stone" />
-            <h4 className="text-[13px] font-semibold text-lotus-deep">Lịch sử thời gian áp dụng</h4>
+            <h4 className="text-lotus-admin-lg font-semibold text-lotus-deep">Lịch sử thời gian áp dụng</h4>
           </div>
 
           {periods.length === 0 ? (
-            <p className="text-[13px] text-lotus-stone">Chưa có dữ liệu thời gian.</p>
+            <p className="text-lotus-admin-lg text-lotus-stone">Chưa có dữ liệu thời gian.</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {periods.map((period, index) => {
@@ -56,7 +56,7 @@ export function ShiftDetailExpanded({ shift }: ShiftDetailExpandedProps) {
                     {/* Active Badge */}
                     {isActive && (
                       <div className="absolute -top-2.5 -right-2.5">
-                        <span className="flex items-center gap-1 bg-lotus-leaf text-white text-[10px] font-medium px-2 py-1 rounded-full shadow-sm">
+                        <span className="flex items-center gap-1 bg-lotus-leaf text-white text-lotus-admin-xs font-medium px-2 py-1 rounded-full shadow-sm">
                           <CheckCircle2 className="w-3 h-3" />
                           Đang áp dụng
                         </span>
@@ -65,7 +65,7 @@ export function ShiftDetailExpanded({ shift }: ShiftDetailExpandedProps) {
 
                     <div className="flex flex-col gap-3">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 text-[15px] font-bold text-lotus-deep">
+                        <div className="flex items-center gap-1.5 text-lotus-admin-lg font-bold text-lotus-deep">
                           <Clock className="w-4 h-4 text-lotus-stone" />
                           {startTime} - {endTime}
                         </div>
@@ -74,11 +74,11 @@ export function ShiftDetailExpanded({ shift }: ShiftDetailExpandedProps) {
                       <div className="h-px w-full bg-stone-100"></div>
 
                       <div className="flex flex-col gap-1.5">
-                        <div className="flex items-center gap-2 text-[12px] text-lotus-stone">
+                        <div className="flex items-center gap-2 text-lotus-admin-md text-lotus-stone">
                           <CalendarCheck className="w-3.5 h-3.5 opacity-70" />
                           <span>Áp dụng từ: <span className="font-medium text-lotus-deep/80">{fromDate}</span></span>
                         </div>
-                        <div className="flex items-center gap-2 text-[12px] text-lotus-stone">
+                        <div className="flex items-center gap-2 text-lotus-admin-md text-lotus-stone">
                           <CalendarCheck className="w-3.5 h-3.5 opacity-70" />
                           <span>Kết thúc: <span className="font-medium text-lotus-deep/80">{toDate}</span></span>
                         </div>

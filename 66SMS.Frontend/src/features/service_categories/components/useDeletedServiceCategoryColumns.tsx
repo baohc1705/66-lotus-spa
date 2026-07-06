@@ -12,16 +12,15 @@ import {
   NameCell,
   TextCell,
 } from "@/shared/components/DataTable/tableCells";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 import { SERVICE_CATEGORY_COLUMN_LABELS } from "./useActiveServiceCategoryColumns";
 import { SERVICE_CATEGORY_PERM } from "../constants/serviceCategory.permissions";
-import type { ServiceCategoryDTO } from "../types/service_category.types";
+import type { ServiceCategoryDto } from "../types/serviceCategory.types";
 
 interface UseDeletedServiceCategoryColumnsParams {
   pageIndex: number;
   pageSize: number;
-  onRestore: (item: ServiceCategoryDTO) => void;
+  onRestore: (item: ServiceCategoryDto) => void;
 }
 
 export function useDeletedServiceCategoryColumns({
@@ -32,7 +31,7 @@ export function useDeletedServiceCategoryColumns({
   const cols = SERVICE_CATEGORY_COLUMN_LABELS;
   const perm = SERVICE_CATEGORY_PERM;
 
-  return useMemo<ColumnDef<ServiceCategoryDTO>[]>(
+  return useMemo<ColumnDef<ServiceCategoryDto>[]>(
     () => [
       {
         id: "index",
@@ -83,7 +82,7 @@ export function useDeletedServiceCategoryColumns({
             <Button
               variant="outline"
               size="sm"
-              className={TABLE_STYLES.toolbarBtn}
+              className="lotus-admin-table-toolbar-btn"
               onClick={() => onRestore(row.original)}
             >
               <RotateCcw className="w-3.5 h-3.5" />

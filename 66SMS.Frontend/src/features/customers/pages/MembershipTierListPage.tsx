@@ -18,7 +18,6 @@ import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 import { MembershipTierFormDialog } from "../components/MembershipTierFormDialog";
 import { MembershipTierDetailExpanded } from "../components/MembershipTierDetailExpanded";
@@ -103,7 +102,10 @@ export function MembershipTierListPage() {
     });
   }, [deleteTarget, deleteMutation, setDeleteTarget]);
 
-  const columnLabels = useMemo(() => ({ ...MEMBERSHIP_TIER_COLUMN_LABELS }), []);
+  const columnLabels = useMemo(
+    () => ({ ...MEMBERSHIP_TIER_COLUMN_LABELS }),
+    [],
+  );
 
   return (
     <TablePageShell isFetching={isFetching} isLoading={isLoading}>
@@ -120,7 +122,7 @@ export function MembershipTierListPage() {
               variant="admin"
               size="sm"
               onClick={() => setCreateOpen(true)}
-              className={TABLE_STYLES.toolbarBtn}
+              className="lotus-admin-table-toolbar-btn"
             >
               <Plus className="w-3.5 h-3.5" />
               Thêm loại thẻ
@@ -155,7 +157,7 @@ export function MembershipTierListPage() {
                   variant="admin"
                   size="sm"
                   onClick={() => setCreateOpen(true)}
-                  className="mt-1 text-[12px]"
+                  className="mt-1 text-lotus-admin-md"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Thêm loại thẻ

@@ -1,15 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { isAxiosError } from 'axios'
+import type { AxiosError } from 'axios'
 import { toast } from 'sonner'
+import { getErrorMessage } from '@/shared/utils/errorUtils'
+import type { Result } from '@/shared/types/common.types'
 import { staffScheduleApi } from '../api'
-
-function getApiError(error: unknown, fallback: string): string {
-  if (isAxiosError(error)) {
-    const body = error.response?.data as { message?: string } | undefined
-    if (body?.message) return body.message
-  }
-  return error instanceof Error ? error.message : fallback
-}
 
 export function useUpdateMyBookingStatus() {
   const queryClient = useQueryClient()
@@ -36,8 +30,8 @@ export function useUpdateMyBookingStatus() {
       queryClient.invalidateQueries({ queryKey: ['staff-schedule-weekly'] })
       queryClient.invalidateQueries({ queryKey: ['cashier-daily'] })
     },
-    onError: (error) => {
-      toast.error(getApiError(error, 'Cập nhật trạng thái thất bại'))
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, 'Cập nhật trạng thái thất bại'))
     },
   })
 }

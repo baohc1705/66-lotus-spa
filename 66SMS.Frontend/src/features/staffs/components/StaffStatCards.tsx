@@ -1,5 +1,6 @@
 import { Users, UserCheck, UserMinus, DollarSign } from "lucide-react";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { formatCurrency } from "@/shared/utils/currency";
 
 interface StaffStatCardsProps {
   totalStaffs: number;
@@ -93,7 +94,7 @@ export function StaffStatCards({
       />
       <StatCard
         label="Lương cơ bản TB"
-        value={avgSalary > 0 ? `${avgSalary.toLocaleString("vi-VN")} đ` : "—"}
+        value={avgSalary > 0 ? formatCurrency(avgSalary) : "—"}
         icon={DollarSign}
         iconBg="#ede9fe"
         iconColor="#7c3aed"

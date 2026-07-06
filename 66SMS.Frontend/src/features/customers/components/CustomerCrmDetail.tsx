@@ -7,6 +7,7 @@ import {
   TabsTrigger,
 } from "@/shared/components/ui/tabs";
 import { formatDisplayDate } from "@/shared/utils/date.utils";
+import { GENDER_MAP } from "@/shared/constants/display.const";
 import {
   Award,
   CalendarRange,
@@ -27,11 +28,7 @@ interface CustomerCrmDetailProps {
   onDelete: (customer: CustomerDto) => void;
 }
 
-const GENDER_MAP: Record<string, string> = {
-  0: "Nam",
-  1: "Nữ",
-  2: "Khác",
-};
+
 
 export function CustomerCrmDetail({
   customerId,
@@ -141,10 +138,10 @@ export function CustomerCrmDetail({
               </p>
             </div>
             <div className="flex flex-wrap gap-1.5 mt-2">
-              <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/50 px-2 py-0.5 rounded">
+              <span className="text-lotus-admin-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/50 px-2 py-0.5 rounded">
                 Hạng Thường
               </span>
-              <button className="text-[11px] text-lotus-leaf hover:underline font-medium">
+              <button className="text-lotus-admin-base text-lotus-leaf hover:underline font-medium">
                 + Thêm nhóm khách hàng
               </button>
             </div>
@@ -154,7 +151,7 @@ export function CustomerCrmDetail({
             <span className="text-base font-black leading-none">
               {customer.loyaltyPoint ?? 0}
             </span>
-            <span className="text-[8px] mt-0.5 uppercase tracking-wider font-semibold">
+            <span className="text-lotus-admin-xs mt-0.5 uppercase tracking-wider font-semibold">
               Điểm
             </span>
           </div>
@@ -328,7 +325,7 @@ function DetailFieldItem({
     <div
       className={`space-y-0.5 border-b border-stone-100/60 pb-1.5 last:border-b-0 ${className}`}
     >
-      <span className="text-[10px] text-stone-400 font-bold uppercase tracking-wider block">
+      <span className="text-lotus-admin-xs text-stone-400 font-bold uppercase tracking-wider block">
         {label}
       </span>
       <div className="flex items-center gap-1.5 justify-between">
@@ -336,7 +333,7 @@ function DetailFieldItem({
           {value || "—"}
         </span>
         {canPrint && value && value !== "—" && (
-          <button className="text-[10px] bg-stone-100 text-stone-600 hover:bg-stone-200 px-1.5 py-0.5 rounded font-bold shrink-0">
+          <button className="text-lotus-admin-xs bg-stone-100 text-stone-600 hover:bg-stone-200 px-1.5 py-0.5 rounded font-bold shrink-0">
             In mã
           </button>
         )}

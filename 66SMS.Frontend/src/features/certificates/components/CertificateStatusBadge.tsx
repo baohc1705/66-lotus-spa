@@ -19,7 +19,7 @@ export function CertificateStatusBadge({ status }: Props) {
   const config = statusLabels[status] ?? { label: 'Không rõ', className: 'bg-stone-100 text-stone-500' }
 
   return (
-    <Badge variant="outline" className={`text-[11px] font-medium ${config.className}`}>
+    <Badge variant="outline" className={`text-lotus-admin-base font-medium ${config.className}`}>
       {config.label}
     </Badge>
   )
@@ -28,7 +28,7 @@ export function CertificateStatusBadge({ status }: Props) {
 export function ExpiryBadge({ expiryDate }: { expiryDate?: string }) {
   if (!expiryDate) {
     return (
-      <span className="text-[12px] text-stone-400">Không hết hạn</span>
+      <span className="text-lotus-admin-md text-stone-400">Không hết hạn</span>
     )
   }
 
@@ -37,10 +37,10 @@ export function ExpiryBadge({ expiryDate }: { expiryDate?: string }) {
   const diffDays = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
   if (diffDays < 0) {
-    return <span className="text-[12px] font-medium text-red-600">{formatDisplayDate(expiryDate)} (Hết hạn)</span>
+    return <span className="text-lotus-admin-md font-medium text-red-600">{formatDisplayDate(expiryDate)} (Hết hạn)</span>
   }
   if (diffDays <= 30) {
-    return <span className="text-[12px] font-medium text-yellow-600">{formatDisplayDate(expiryDate)} (còn {diffDays} ngày)</span>
+    return <span className="text-lotus-admin-md font-medium text-yellow-600">{formatDisplayDate(expiryDate)} (còn {diffDays} ngày)</span>
   }
-  return <span className="text-[12px] text-stone-600">{formatDisplayDate(expiryDate)}</span>
+  return <span className="text-lotus-admin-md text-stone-600">{formatDisplayDate(expiryDate)}</span>
 }

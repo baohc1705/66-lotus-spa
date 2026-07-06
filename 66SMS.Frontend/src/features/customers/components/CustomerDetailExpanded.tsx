@@ -8,17 +8,7 @@ import { formatDisplayDate } from "@/shared/utils/date.utils";
 import type { CustomerDto } from "../types/customer.types";
 import { CUSTOMER_PERM } from "../constants/customer.permissions";
 
-const GENDER_MAP: Record<string, string> = {
-  "0": "Nam",
-  "1": "Nữ",
-  "2": "Khác",
-};
-
-const STATUS_MAP: Record<string, string> = {
-  "0": "Ngưng hoạt động",
-  "1": "Hoạt động",
-  "2": "Tạm khóa",
-};
+import { GENDER_MAP, STATUS_MAP } from "@/shared/constants/display.const";
 
 interface CustomerDetailExpandedProps {
   customerId: number;
@@ -65,25 +55,25 @@ export function CustomerDetailExpanded({
           <TabsList className="h-10 border-b border-stone-200/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
             <TabsTrigger
               value="info"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Thông tin
             </TabsTrigger>
             <TabsTrigger
               value="purchase"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Lịch sử mua hàng
             </TabsTrigger>
             <TabsTrigger
               value="appointments"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Lịch hẹn
             </TabsTrigger>
             <TabsTrigger
               value="loyalty"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Tích lũy & Ưu đãi
             </TabsTrigger>
@@ -110,7 +100,7 @@ export function CustomerDetailExpanded({
                 <h3 className="text-base font-bold text-lotus-deep truncate">
                   {customer.fullName ?? "—"}
                 </h3>
-                <p className="text-[12px] text-lotus-stone mt-0.5">
+                <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
                   Điểm: {customer.loyaltyPoint ?? 0}
                 </p>
               </div>
@@ -158,7 +148,7 @@ export function CustomerDetailExpanded({
 
             {/* Note & Actions */}
             <div className="flex items-end justify-between mt-2 pt-4 border-t border-stone-100/80">
-              <div className="flex items-start gap-2 text-[13px] text-lotus-deep flex-1 min-w-0">
+              <div className="flex items-start gap-2 text-lotus-admin-lg text-lotus-deep flex-1 min-w-0">
                 <Pencil className="w-4 h-4 text-lotus-stone shrink-0 mt-0.5" />
                 <div>
                   <span className="font-semibold">Ghi chú:</span>
@@ -172,7 +162,7 @@ export function CustomerDetailExpanded({
                   variant="admin"
                   size="sm"
                   onClick={() => onEdit?.(customer)}
-                  className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-[13px] gap-1.5 ml-auto rounded-md transition-opacity"
+                  className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-lotus-admin-lg gap-1.5 ml-auto rounded-md transition-opacity"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                   Cập nhật
@@ -214,8 +204,8 @@ function DetailField({
 }) {
   return (
     <div className="py-3.5 border-b border-stone-100/80 last:border-b-0 group">
-      <p className="text-[12px] text-lotus-stone mb-1">{label}</p>
-      <p className="text-[13px] font-medium text-lotus-deep truncate">
+      <p className="text-lotus-admin-md text-lotus-stone mb-1">{label}</p>
+      <p className="text-lotus-admin-lg font-medium text-lotus-deep truncate">
         {value || "—"}
       </p>
     </div>

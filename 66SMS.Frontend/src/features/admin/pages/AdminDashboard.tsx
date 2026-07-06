@@ -144,11 +144,11 @@ export function AdminDashboard() {
           <p className="font-sans text-lotus-stone text-sm mt-1">Thông số hoạt động tổng quan và báo cáo thời gian thực.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 h-11 bg-lotus-leaf text-white rounded-admin hover:bg-lotus-leaf/90 hover:shadow-lg transition-all duration-300 text-[13px] font-semibold">
+          <button className="flex items-center gap-2 px-4 h-11 bg-lotus-leaf text-white rounded-admin hover:bg-lotus-leaf/90 hover:shadow-lg transition-all duration-300 text-lotus-admin-lg font-semibold">
             <Plus className="w-4 h-4" />
             Lịch hẹn mới
           </button>
-          <button className="flex items-center gap-2 px-4 h-11 bg-lotus-rose-light text-lotus-rose rounded-admin hover:bg-lotus-rose-light/70 transition-all duration-300 text-[13px] font-semibold">
+          <button className="flex items-center gap-2 px-4 h-11 bg-lotus-rose-light text-lotus-rose rounded-admin hover:bg-lotus-rose-light/70 transition-all duration-300 text-lotus-admin-lg font-semibold">
             <Sparkles className="w-4 h-4" />
             Chiến dịch mới
           </button>
@@ -178,7 +178,7 @@ export function AdminDashboard() {
             
             <div className="flex items-end justify-between mt-3">
               <div>
-                <p className="text-[11px] text-lotus-stone font-semibold uppercase tracking-wider">{stat.label}</p>
+                <p className="text-lotus-admin-base text-lotus-stone font-semibold uppercase tracking-wider">{stat.label}</p>
                 <p className="text-2xl font-bold text-lotus-deep tracking-tight mt-0.5">{stat.value}</p>
               </div>
               {/* Sparkline mini chart */}
@@ -208,7 +208,7 @@ export function AdminDashboard() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="font-sans text-xl font-semibold text-lotus-deep">Biểu đồ gửi tin & Tỷ lệ mở</h2>
-                <p className="text-[12px] text-lotus-stone mt-0.5">Biểu diễn số lượng tin nhắn đã phân phối trong tuần.</p>
+                <p className="text-lotus-admin-md text-lotus-stone mt-0.5">Biểu diễn số lượng tin nhắn đã phân phối trong tuần.</p>
               </div>
               <select 
                 value={timeRange} 
@@ -252,7 +252,7 @@ export function AdminDashboard() {
                       y={getY(v) + 4} 
                       textAnchor="end" 
                       fill="var(--lotus-stone)" 
-                      className="text-[10px] font-medium"
+                      className="text-lotus-admin-xs font-medium"
                     >
                       {v >= 1000 ? `${v/1000}k` : v}
                     </text>
@@ -275,7 +275,7 @@ export function AdminDashboard() {
                       y="230" 
                       textAnchor="middle" 
                       fill="var(--lotus-stone)" 
-                      className="text-[11px] font-semibold"
+                      className="text-lotus-admin-base font-semibold"
                     >
                       {d.day}
                     </text>
@@ -346,9 +346,9 @@ export function AdminDashboard() {
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h2 className="font-sans text-xl font-semibold text-lotus-deep">Giám sát trạng thái phòng</h2>
-                <p className="text-[12px] text-lotus-stone mt-0.5">Trạng thái phòng trị liệu thời gian thực.</p>
+                <p className="text-lotus-admin-md text-lotus-stone mt-0.5">Trạng thái phòng trị liệu thời gian thực.</p>
               </div>
-              <span className="px-2.5 py-1 bg-lotus-gold/10 text-lotus-gold text-[11px] font-bold rounded-admin uppercase tracking-wider">
+              <span className="px-2.5 py-1 bg-lotus-gold/10 text-lotus-gold text-lotus-admin-base font-bold rounded-admin uppercase tracking-wider">
                 6 phòng hoạt động
               </span>
             </div>
@@ -380,16 +380,16 @@ export function AdminDashboard() {
                     <div className="flex items-start justify-between">
                       <div>
                         <h4 className="font-semibold text-sm text-lotus-deep">{room.name}</h4>
-                        <span className="text-[10px] text-lotus-stone font-medium">{room.type}</span>
+                        <span className="text-lotus-admin-xs text-lotus-stone font-medium">{room.type}</span>
                       </div>
-                      <span className={`px-2 py-0.5 rounded-admin text-[10px] font-bold border uppercase tracking-wider ${statusBg}`}>
+                      <span className={`px-2 py-0.5 rounded-admin text-lotus-admin-xs font-bold border uppercase tracking-wider ${statusBg}`}>
                         {statusLabel}
                       </span>
                     </div>
 
                     {isOccupied ? (
                       <div className="space-y-1.5 mt-2">
-                        <div className="flex justify-between text-[11px] font-semibold text-lotus-deep">
+                        <div className="flex justify-between text-lotus-admin-base font-semibold text-lotus-deep">
                           <span className="truncate max-w-[100px]">{room.service}</span>
                           <span>{room.timeRemaining}p nữa</span>
                         </div>
@@ -400,13 +400,13 @@ export function AdminDashboard() {
                             style={{ width: `${( (room.duration - room.timeRemaining) / room.duration ) * 100}%` }}
                           />
                         </div>
-                        <div className="text-[10px] text-lotus-stone flex items-center gap-1.5 font-medium mt-1">
+                        <div className="text-lotus-admin-xs text-lotus-stone flex items-center gap-1.5 font-medium mt-1">
                           <UserCheck className="w-3 h-3 text-lotus-leaf" />
                           <span>KTV: {room.therapist}</span>
                         </div>
                       </div>
                     ) : (
-                      <div className="text-[11px] text-lotus-stone font-medium mt-4 flex items-center justify-center border border-dashed border-stone-200/30 rounded-admin p-3 bg-lotus-cream/30">
+                      <div className="text-lotus-admin-base text-lotus-stone font-medium mt-4 flex items-center justify-center border border-dashed border-stone-200/30 rounded-admin p-3 bg-lotus-cream/30">
                         {isCleaning ? 'Đang dọn dẹp vệ sinh...' : isMaintenance ? 'Đang bảo dưỡng thiết bị...' : 'Sẵn sàng phục vụ'}
                       </div>
                     )}
@@ -443,17 +443,17 @@ export function AdminDashboard() {
                   <div key={i} className="flex gap-3 p-3 rounded-admin bg-white/40 border border-stone-200/30 hover:bg-white/80 transition-colors">
                     <div className="flex flex-col items-center justify-center shrink-0 w-12 border-r border-stone-200/50 pr-2">
                       <Clock className="w-3.5 h-3.5 text-lotus-gold mb-0.5" />
-                      <span className="text-[12px] font-bold text-lotus-deep">{app.time}</span>
+                      <span className="text-lotus-admin-md font-bold text-lotus-deep">{app.time}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1">
                         <h4 className="font-semibold text-xs text-lotus-deep truncate">{app.client}</h4>
-                        <span className={`px-1.5 py-0.5 text-[9px] font-bold uppercase border rounded-admin ${badgeStyle} shrink-0`}>
+                        <span className={`px-1.5 py-0.5 text-lotus-admin-xs font-bold uppercase border rounded-admin ${badgeStyle} shrink-0`}>
                           {app.statusText}
                         </span>
                       </div>
-                      <p className="text-[11px] text-lotus-deep/80 font-medium truncate mt-0.5">{app.service}</p>
-                      <div className="flex justify-between text-[10px] text-lotus-stone mt-1.5">
+                      <p className="text-lotus-admin-base text-lotus-deep/80 font-medium truncate mt-0.5">{app.service}</p>
+                      <div className="flex justify-between text-lotus-admin-xs text-lotus-stone mt-1.5">
                         <span>{app.room}</span>
                         <span className="font-semibold text-lotus-leaf">KTV: {app.therapist}</span>
                       </div>
@@ -494,13 +494,13 @@ export function AdminDashboard() {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-xs text-lotus-deep">{therapist.name}</span>
-                        <span className="text-[10px] text-lotus-gold font-bold">{therapist.rating}</span>
+                        <span className="text-lotus-admin-xs text-lotus-gold font-bold">{therapist.rating}</span>
                       </div>
-                      <p className="text-[10px] text-lotus-stone mt-0.5 truncate max-w-[180px]">{therapist.service}</p>
+                      <p className="text-lotus-admin-xs text-lotus-stone mt-0.5 truncate max-w-[180px]">{therapist.service}</p>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
                       <span className={`w-1.5 h-1.5 rounded-full ${dotStyle}`} />
-                      <span className={`text-[11px] font-semibold uppercase ${textStyle}`}>{therapist.statusText}</span>
+                      <span className={`text-lotus-admin-base font-semibold uppercase ${textStyle}`}>{therapist.statusText}</span>
                     </div>
                   </div>
                 )
@@ -521,9 +521,9 @@ export function AdminDashboard() {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <h4 className="text-xs font-semibold text-lotus-deep hover:text-lotus-leaf transition-colors cursor-pointer line-clamp-1">{cam.name}</h4>
-                      <p className="text-[10px] text-lotus-stone mt-0.5">{cam.time}</p>
+                      <p className="text-lotus-admin-xs text-lotus-stone mt-0.5">{cam.time}</p>
                     </div>
-                    <span className="px-2 py-0.5 bg-lotus-leaf/10 text-lotus-leaf text-[9px] font-bold rounded-admin uppercase shrink-0">
+                    <span className="px-2 py-0.5 bg-lotus-leaf/10 text-lotus-leaf text-lotus-admin-xs font-bold rounded-admin uppercase shrink-0">
                       {cam.statusText}
                     </span>
                   </div>
@@ -535,7 +535,7 @@ export function AdminDashboard() {
                         style={{ width: cam.successRate }}
                       />
                     </div>
-                    <span className="text-[10px] font-bold text-lotus-deep shrink-0">{cam.successRate} thành công ({cam.sent})</span>
+                    <span className="text-lotus-admin-xs font-bold text-lotus-deep shrink-0">{cam.successRate} thành công ({cam.sent})</span>
                   </div>
                 </div>
               ))}

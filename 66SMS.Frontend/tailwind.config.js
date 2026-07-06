@@ -80,6 +80,9 @@ export default {
         'lotus-stone':      'var(--lotus-stone)',
         'lotus-rose-light': 'var(--lotus-rose-light)',
         'lotus-error':      'var(--lotus-error)',
+        'lotus-vnpay':      'var(--lotus-vnpay)',
+        'lotus-vnpay-red':  'var(--lotus-vnpay-red)',
+        'lotus-rose-dark':  'var(--lotus-rose-dark)',
       },
       boxShadow: {
         jade:      '0 4px 24px 0 rgba(210, 91, 124, 0.12)', /* shadow hồng sen nhạt */

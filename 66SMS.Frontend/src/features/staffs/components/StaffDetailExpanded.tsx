@@ -11,12 +11,7 @@ import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { useStaffDetail } from "../hooks/useStaffs";
 import type { StaffDto } from "../types/staff.types";
 import { formatDisplayDate } from "@/shared/utils/date.utils";
-
-const GENDER_MAP: Record<string, string> = {
-  "0": "Nam",
-  "1": "Nữ",
-  "2": "Khác",
-};
+import { GENDER_MAP } from "@/shared/constants/display.const";
 
 interface StaffDetailExpandedProps {
   staffId: number;
@@ -62,31 +57,31 @@ export function StaffDetailExpanded({
           <TabsList className="h-10 border-b border-stone-200/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
             <TabsTrigger
               value="info"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Thông tin
             </TabsTrigger>
             <TabsTrigger
               value="schedule"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Lịch làm việc
             </TabsTrigger>
             <TabsTrigger
               value="salary_config"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Thiết lập lương
             </TabsTrigger>
             <TabsTrigger
               value="payslip"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Phiếu lương
             </TabsTrigger>
             <TabsTrigger
               value="debt"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Nợ và tạm ứng
             </TabsTrigger>
@@ -113,7 +108,7 @@ export function StaffDetailExpanded({
                 <h3 className="text-base font-bold text-lotus-deep truncate">
                   {staff.fullName ?? "—"}
                 </h3>
-                <p className="text-[12px] text-lotus-stone mt-0.5">
+                <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
                   Mã nhân viên: {staff.code ?? "—"}
                 </p>
               </div>
@@ -152,7 +147,7 @@ export function StaffDetailExpanded({
 
             {/* Note & Actions */}
             <div className="flex items-end justify-between mt-2 pt-4 border-t border-stone-100/80">
-              <div className="flex items-center gap-2 text-[13px] text-lotus-deep">
+              <div className="flex items-center gap-2 text-lotus-admin-lg text-lotus-deep">
                 <Pencil className="w-4 h-4 text-lotus-stone" />
                 <span className="font-semibold">Ghi chú:</span>
               </div>
@@ -161,7 +156,7 @@ export function StaffDetailExpanded({
                   variant="admin"
                   size="sm"
                   onClick={() => onEdit?.(staff)}
-                  className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-[13px] gap-1.5 ml-auto rounded-md transition-opacity"
+                  className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-lotus-admin-lg gap-1.5 ml-auto rounded-md transition-opacity"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                   Cập nhật
@@ -209,8 +204,8 @@ function DetailField({
 }) {
   return (
     <div className="py-3.5 border-b border-stone-100/80 last:border-b-0 group">
-      <p className="text-[12px] text-lotus-stone mb-1">{label}</p>
-      <p className="text-[13px] font-medium text-lotus-deep truncate">
+      <p className="text-lotus-admin-md text-lotus-stone mb-1">{label}</p>
+      <p className="text-lotus-admin-lg font-medium text-lotus-deep truncate">
         {value || "—"}
       </p>
     </div>

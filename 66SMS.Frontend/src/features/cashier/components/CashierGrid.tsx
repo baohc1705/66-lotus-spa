@@ -187,12 +187,12 @@ export function CashierGrid({
     <div className="flex-1 min-h-0 min-w-0 w-full overflow-auto scrollbar-thin bg-white relative font-sans">
       <div className="flex min-w-max">
         {/* Time Column (Y-Axis) - Sticky Left */}
-        <div className="w-16 flex-shrink-0 border-r border-stone-300/80 bg-[#FDF5F7] sticky left-0 z-30">
-          <div className="h-11 border-b border-stone-300/80 sticky top-0 left-0 bg-[#FBE5EB] z-50"></div>
+        <div className="w-16 flex-shrink-0 border-r border-stone-300/80 bg-lotus-rose-light/20 sticky left-0 z-30">
+          <div className="h-11 border-b border-stone-300/80 sticky top-0 left-0 bg-lotus-rose-light/50 z-50"></div>
           <div className="relative">
             {HOURS.map((hour) => (
               <div key={hour} className="h-[80px] relative">
-                <span className="absolute top-1 right-2 text-[10px] font-bold text-lotus-stone/85">
+                <span className="absolute top-1 right-2 text-lotus-admin-xs font-bold text-lotus-stone/85">
                   {hour.toString().padStart(2, "0")}:00
                 </span>
               </div>
@@ -203,7 +203,7 @@ export function CashierGrid({
                 className="absolute left-0.5 right-0.5 z-30 flex items-center justify-center pointer-events-none"
                 style={{ top: `${currentTimeY}px` }}
               >
-                <div className="bg-rose-600 text-white text-[9px] px-1 rounded-[2px] shadow-sm font-bold -translate-y-1/2 border border-rose-600">
+                <div className="bg-rose-600 text-white text-lotus-admin-xs px-1 rounded-[2px] shadow-sm font-bold -translate-y-1/2 border border-rose-600">
                   {currentH.toString().padStart(2, "0")}:
                   {currentM.toString().padStart(2, "0")}
                 </div>
@@ -232,7 +232,7 @@ export function CashierGrid({
                 className="flex-1 min-w-[150px] border-r border-stone-300/60 border-dashed"
               >
                 {/* Column Header */}
-                <div className="h-11 bg-[#FDF5F7] border-b border-stone-300/80 sticky top-0 z-40 flex items-center justify-center gap-2.5 px-4">
+                <div className="h-11 bg-lotus-rose-light/20 border-b border-stone-300/80 sticky top-0 z-40 flex items-center justify-center gap-2.5 px-4">
                   {col.avatar ? (
                     <img
                       src={col.avatar}
@@ -240,7 +240,7 @@ export function CashierGrid({
                       className="w-5 h-5 rounded-[2px]"
                     />
                   ) : (
-                    <div className="w-5 h-5 rounded-[2px] bg-lotus-gold/10 flex items-center justify-center text-lotus-gold font-bold text-[9px]">
+                    <div className="w-5 h-5 rounded-[2px] bg-lotus-gold/10 flex items-center justify-center text-lotus-gold font-bold text-lotus-admin-xs">
                       {col.name.charAt(0)}
                     </div>
                   )}
@@ -273,7 +273,7 @@ export function CashierGrid({
                               )
                             }
                           >
-                            <div className="absolute left-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 bg-lotus-deep text-white text-[9px] px-1 rounded-[2px] z-20 font-medium shadow-sm transition-opacity">
+                            <div className="absolute left-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 bg-lotus-deep text-white text-lotus-admin-xs px-1 rounded-[2px] z-20 font-medium shadow-sm transition-opacity">
                               {hour.toString().padStart(2, "0")}:
                               {min.toString().padStart(2, "0")}
                             </div>
@@ -370,7 +370,7 @@ export function CashierGrid({
                               }}
                             >
                               <div className="flex items-center justify-between gap-1 leading-none">
-                                <div className="font-bold text-[10px] truncate whitespace-nowrap text-lotus-deep">
+                                <div className="font-bold text-lotus-admin-xs truncate whitespace-nowrap text-lotus-deep">
                                   {booking.customerName}
                                 </div>
                                 <div
@@ -380,10 +380,10 @@ export function CashierGrid({
                                   )}
                                 ></div>
                               </div>
-                              <div className="text-[9px] opacity-90 truncate whitespace-nowrap mt-0.5">
+                              <div className="text-lotus-admin-xs opacity-90 truncate whitespace-nowrap mt-0.5">
                                 {booking.serviceName}
                               </div>
-                              <div className="text-[9px] opacity-75 mt-0.5 flex items-center gap-0.5 truncate whitespace-nowrap">
+                              <div className="text-lotus-admin-xs opacity-75 mt-0.5 flex items-center gap-0.5 truncate whitespace-nowrap">
                                 <Clock className="w-2 h-2 flex-shrink-0" />
                                 {booking.startTime} - {booking.endTime}
                               </div>
@@ -393,7 +393,7 @@ export function CashierGrid({
 
                         {hasOverflow && (
                           <div
-                            className="absolute bg-lotus-cream/40 hover:bg-lotus-cream cursor-pointer rounded-[3px] border border-stone-200 flex items-center justify-center text-[10px] font-bold text-lotus-deep z-10 transition-colors shadow-sm"
+                            className="absolute bg-lotus-cream/40 hover:bg-lotus-cream cursor-pointer rounded-[3px] border border-stone-200 flex items-center justify-center text-lotus-admin-xs font-bold text-lotus-deep z-10 transition-colors shadow-sm"
                             style={{
                               top: `${(cluster.startMins - 8 * 60) * (80 / 60)}px`,
                               height: `${(cluster.endMins - cluster.startMins) * (80 / 60)}px`,
@@ -451,13 +451,13 @@ export function CashierGrid({
                                         }}
                                         className="bg-lotus-cream/10 border border-stone-200/60 rounded-[2px] p-1.5 cursor-pointer hover:bg-lotus-cream/20 hover:border-stone-300 transition-all text-left"
                                       >
-                                        <div className="font-bold text-[10px] text-lotus-deep truncate whitespace-nowrap">
+                                        <div className="font-bold text-lotus-admin-xs text-lotus-deep truncate whitespace-nowrap">
                                           {b.customerName}
                                         </div>
-                                        <div className="text-[9px] text-lotus-deep/75 mt-0.5 truncate whitespace-nowrap">
+                                        <div className="text-lotus-admin-xs text-lotus-deep/75 mt-0.5 truncate whitespace-nowrap">
                                           {b.serviceName}
                                         </div>
-                                        <div className="text-[9px] text-lotus-stone mt-1 flex items-center gap-0.5 font-semibold truncate whitespace-nowrap">
+                                        <div className="text-lotus-admin-xs text-lotus-stone mt-1 flex items-center gap-0.5 font-semibold truncate whitespace-nowrap">
                                           <Clock className="w-2 h-2" />
                                           {b.startTime} - {b.endTime}
                                         </div>

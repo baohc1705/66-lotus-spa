@@ -6,20 +6,26 @@ import { TOAST_MSG } from "@/shared/constants/toast.messages";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type { PageRequest, Result } from "@/shared/types/common.types";
 import type { CreateStaffPayload, UpdateStaffPayload } from "../types/staff.types";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
 
 const ENTITY = "nhân viên";
+
+type StaffParams = PageRequest & { salonId?: number | null; role?: string | null };
 
 export const STAFF_KEYS = {
   all: ["staffs"] as const,
   lists: () => [...STAFF_KEYS.all, "list"] as const,
-  list: (params: PageRequest & { salonId?: number | null; role?: string | null }) =>
+  list: (params: StaffParams) =>
     [...STAFF_KEYS.lists(), params] as const,
+  adminLists: () => [...STAFF_KEYS.all, "adminList"] as const,
+  adminList: (params: StaffParams) =>
+    [...STAFF_KEYS.adminLists(), params] as const,
   details: () => [...STAFF_KEYS.all, "detail"] as const,
   detail: (id: number) => [...STAFF_KEYS.details(), id] as const,
 };
 
 export function useStaffs(
-  params: PageRequest & { salonId?: number | null; role?: string | null },
+  params: StaffParams,
   enabled = true
 ) {
   return useQuery({
@@ -30,11 +36,11 @@ export function useStaffs(
 }
 
 export function useAdminStaffs(
-  params: PageRequest & { salonId?: number | null; role?: string | null },
+  params: StaffParams,
   enabled = true
 ) {
   return useQuery({
-    queryKey: STAFF_KEYS.list(params),
+    queryKey: STAFF_KEYS.adminList(params),
     queryFn: () => staffApi.adminGetAll(params),
     enabled,
   });
@@ -61,8 +67,7 @@ export function useCreateStaffMutation() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("tạo", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
     },
   });
 }
@@ -81,8 +86,7 @@ export function useUpdateStaffMutation() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("cập nhật", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
     },
   });
 }
@@ -100,8 +104,7 @@ export function useDeleteStaffMutation() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("xóa", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }

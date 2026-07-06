@@ -1,4 +1,4 @@
-import type { ServiceDTO } from "../../services/types/service.types";
+import type { ServiceDto } from "../../services/types/service.types";
 
 export interface TechnicianDTO {
   id?: number;
@@ -61,7 +61,7 @@ export type BookingResponseDto = number[];
 
 export interface GuestBooking {
   id: number;
-  selectedService: ServiceDTO | null;
+  selectedService: ServiceDto | null;
   selectedTechnician: TechnicianDTO | null;
   selectedPosition: BookingPositionDTO | null;
   selectedDate: Date | null;

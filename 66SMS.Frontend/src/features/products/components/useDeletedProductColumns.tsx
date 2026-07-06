@@ -8,9 +8,9 @@ import { COMMON_MSG } from "@/shared/constants/common.messages";
 import {
   DateTimeCell,
   IndexCell,
+  PriceCell,
   TextCell,
 } from "@/shared/components/DataTable/tableCells";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 import { PRODUCT_COLUMN_LABELS } from "./useActiveProductColumns";
 import { PRODUCT_PERM } from "../constants/product.permissions";
@@ -22,13 +22,7 @@ interface UseDeletedProductColumnsParams {
   onRestore: (item: ProductDto) => void;
 }
 
-function formatPrice(value: number | null | undefined) {
-  if (value == null) return "—";
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(value);
-}
+
 
 export function useDeletedProductColumns({
   pageIndex,
@@ -58,7 +52,7 @@ export function useDeletedProductColumns({
         header: cols.code,
         cell: ({ row }) => (
           <span className="text-lotus-deep/80 font-medium">
-            {row.original.code ?? "—"}
+            {row.original.code ?? "â€”"}
           </span>
         ),
         size: 100,
@@ -82,8 +76,8 @@ export function useDeletedProductColumns({
                   <Package className="w-4 h-4 text-stone-400" />
                 )}
               </div>
-              <span className="text-[13px] font-semibold text-lotus-deep truncate max-w-[180px]">
-                {prod.name ?? "—"}
+              <span className="text-lotus-admin-lg font-semibold text-lotus-deep truncate max-w-[180px]">
+                {prod.name ?? "â€”"}
               </span>
             </div>
           );
@@ -99,11 +93,7 @@ export function useDeletedProductColumns({
       {
         accessorKey: "sellingPrice",
         header: cols.sellingPrice,
-        cell: ({ row }) => (
-          <span className="font-semibold text-lotus-deep">
-            {formatPrice(row.original.sellingPrice)}
-          </span>
-        ),
+        cell: ({ row }) => <PriceCell value={row.original.sellingPrice} />,
         size: 120,
       },
       {
@@ -124,7 +114,7 @@ export function useDeletedProductColumns({
             <Button
               variant="outline"
               size="sm"
-              className={TABLE_STYLES.toolbarBtn}
+              className="lotus-admin-table-toolbar-btn"
               onClick={() => onRestore(row.original)}
             >
               <RotateCcw className="w-3.5 h-3.5" />

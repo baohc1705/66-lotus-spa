@@ -15,7 +15,6 @@ import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 import { useRowSelection } from "@/shared/hooks/useRowSelection";
 
 import { UserFormDialog } from "../components/UserFormDialog";
@@ -69,10 +68,8 @@ export function UserListPage() {
 
   const pageIds = useMemo(
     () =>
-      users
-        .map((u: UserDto) => u.id)
-        .filter((id): id is number => id != null),
-    [users]
+      users.map((u: UserDto) => u.id).filter((id): id is number => id != null),
+    [users],
   );
 
   const {
@@ -131,7 +128,12 @@ export function UserListPage() {
         }
       },
     });
-  }, [selectedRowIds, deleteMultiplesMutation, setBulkDeleteOpen, clearSelection]);
+  }, [
+    selectedRowIds,
+    deleteMultiplesMutation,
+    setBulkDeleteOpen,
+    clearSelection,
+  ]);
 
   const columnLabels = useMemo(() => ({ ...USER_COLUMN_LABELS }), []);
 
@@ -139,7 +141,9 @@ export function UserListPage() {
     <TablePageShell isFetching={isFetching} isLoading={isLoading}>
       <div className="px-6 pt-6">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-semibold text-lotus-deep">Quản lý người dùng</h1>
+          <h1 className="text-2xl font-semibold text-lotus-deep">
+            Quản lý người dùng
+          </h1>
         </div>
         <DataTableToolbar
           searchValue={filter}
@@ -159,7 +163,7 @@ export function UserListPage() {
                   <Button
                     variant="destructive"
                     size="sm"
-                    className="text-[12px] h-7 px-2"
+                    className="text-lotus-admin-md h-7 px-2"
                     onClick={() => setBulkDeleteOpen(true)}
                   >
                     <Trash2 className="w-3.5 h-3.5 animate-pulse" />
@@ -181,7 +185,7 @@ export function UserListPage() {
               variant="admin"
               size="sm"
               onClick={() => setCreateOpen(true)}
-              className={TABLE_STYLES.toolbarBtn}
+              className="lotus-admin-table-toolbar-btn"
             >
               <Plus className="w-3.5 h-3.5" />
               Thêm người dùng
@@ -211,7 +215,7 @@ export function UserListPage() {
                   variant="admin"
                   size="sm"
                   onClick={() => setCreateOpen(true)}
-                  className="mt-1 text-[12px]"
+                  className="mt-1 text-lotus-admin-md"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Thêm người dùng
@@ -266,7 +270,7 @@ export function UserListPage() {
         title={CONFIRM_MSG.deleteTitle(ENTITY)}
         description={CONFIRM_MSG.deleteDescription(
           ENTITY,
-          deleteTarget?.username ?? ""
+          deleteTarget?.username ?? "",
         )}
         confirmLabel={COMMON_MSG.delete}
         loading={deleteMutation.isPending}

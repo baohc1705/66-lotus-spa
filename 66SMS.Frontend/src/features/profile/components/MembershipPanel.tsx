@@ -27,104 +27,97 @@ const getTierStyle = (tierName: string): TierStyle => {
   
   if (name.includes('đồng') || name.includes('bronze')) {
     return {
-      bgGradient: 'from-[#FFFBF5] via-[#F5D5A8] to-[#E5BE90]',
-      borderColor: 'border-[#CD7F32]/30',
-      accentColor: 'text-[#8B5A2B]',
-      textColor: 'text-[#2C1A0A]',
-      glowColor: 'shadow-[#CD7F32]/10',
-      chipColor: 'bg-gradient-to-br from-[#CD7F32] to-[#A0522D]',
-      // Light card
-      cardBg: '#FFFBF5',
-      cardBgEnd: '#E5BE90',
-      cardBorder: '#8B5A2B',
-      cardAccent: '#C8863C',
-      cardText: '#2C1A0A',
+      bgGradient: 'from-amber-50 via-amber-200 to-amber-300',
+      borderColor: 'border-amber-700/30',
+      accentColor: 'text-amber-800',
+      textColor: 'text-amber-950',
+      glowColor: 'shadow-amber-700/10',
+      chipColor: 'bg-gradient-to-br from-amber-600 to-amber-800',
+      cardBg: 'var(--membership-bronze-bg)',
+      cardBgEnd: 'var(--membership-bronze-bg-end)',
+      cardBorder: 'var(--membership-bronze-border)',
+      cardAccent: 'var(--membership-bronze-accent)',
+      cardText: 'var(--membership-bronze-text)',
       cardGlow: 'rgba(139, 90, 43, 0.15)',
     }
   }
   if (name.includes('bạc') || name.includes('silver')) {
     return {
-      bgGradient: 'from-[#F8FAFC] via-[#E2E8F0] to-[#CBD5E1]',
+      bgGradient: 'from-slate-50 via-slate-200 to-slate-300',
       borderColor: 'border-slate-300',
       accentColor: 'text-slate-600',
-      textColor: 'text-[#1C1C1E]',
+      textColor: 'text-slate-900',
       glowColor: 'shadow-slate-300/10',
-      chipColor: 'bg-gradient-to-br from-[#9E9E9E] to-[#6B7280]',
-      // Light card
-      cardBg: '#F8FAFC',
-      cardBgEnd: '#CBD5E1',
-      cardBorder: '#9E9E9E',
-      cardAccent: '#C8C8C8',
-      cardText: '#1C1C1E',
+      chipColor: 'bg-gradient-to-br from-slate-400 to-slate-600',
+      cardBg: 'var(--membership-silver-bg)',
+      cardBgEnd: 'var(--membership-silver-bg-end)',
+      cardBorder: 'var(--membership-silver-border)',
+      cardAccent: 'var(--membership-silver-accent)',
+      cardText: 'var(--membership-silver-text)',
       cardGlow: 'rgba(158, 158, 158, 0.15)',
     }
   }
   if (name.includes('vàng') || name.includes('gold')) {
     return {
-      bgGradient: 'from-[#FFFDF0] via-[#F7E08A] to-[#E3C567]',
-      borderColor: 'border-[#C9960C]/40',
-      accentColor: 'text-[#966D03]',
-      textColor: 'text-[#1A1200]',
-      glowColor: 'shadow-[#C9960C]/25',
-      chipColor: 'bg-gradient-to-br from-[#E8BB3A] to-[#C9960C]',
-      // Light card
-      cardBg: '#FFFDF0',
-      cardBgEnd: '#E3C567',
-      cardBorder: '#C9960C',
-      cardAccent: '#E8BB3A',
-      cardText: '#1A1200',
+      bgGradient: 'from-yellow-50 via-yellow-200 to-yellow-400',
+      borderColor: 'border-yellow-600/40',
+      accentColor: 'text-yellow-800',
+      textColor: 'text-yellow-950',
+      glowColor: 'shadow-yellow-600/25',
+      chipColor: 'bg-gradient-to-br from-yellow-500 to-yellow-700',
+      cardBg: 'var(--membership-gold-bg)',
+      cardBgEnd: 'var(--membership-gold-bg-end)',
+      cardBorder: 'var(--membership-gold-border)',
+      cardAccent: 'var(--membership-gold-accent)',
+      cardText: 'var(--membership-gold-text)',
       cardGlow: 'rgba(201, 150, 12, 0.2)',
     }
   }
   if (name.includes('bạch kim') || name.includes('platinum')) {
     return {
-      bgGradient: 'from-[#F8FAFC] via-[#E2E5ED] to-[#C8CBD4]',
+      bgGradient: 'from-slate-50 via-slate-200 to-slate-400',
       borderColor: 'border-slate-300',
-      accentColor: 'text-[#475569]',
-      textColor: 'text-[#111215]',
+      accentColor: 'text-slate-600',
+      textColor: 'text-slate-900',
       glowColor: 'shadow-slate-300/10',
-      chipColor: 'bg-gradient-to-br from-[#C8CBD4] to-[#475569]',
-      // Light card
-      cardBg: '#F8FAFC',
-      cardBgEnd: '#C8CBD4',
-      cardBorder: '#C8CBD4',
-      cardAccent: '#DDE0EA',
-      cardText: '#111215',
+      chipColor: 'bg-gradient-to-br from-slate-300 to-slate-600',
+      cardBg: 'var(--membership-platinum-bg)',
+      cardBgEnd: 'var(--membership-platinum-bg-end)',
+      cardBorder: 'var(--membership-platinum-border)',
+      cardAccent: 'var(--membership-platinum-accent)',
+      cardText: 'var(--membership-platinum-text)',
       cardGlow: 'rgba(200, 203, 212, 0.15)',
     }
   }
   if (name.includes('kim cương') || name.includes('diamond')) {
     return {
-      bgGradient: 'from-[#F0F9FF] via-[#D6F1FF] to-[#A3E0F8]',
-      borderColor: 'border-[#6DCEF5]/40',
-      accentColor: 'text-[#0369A1]',
-      textColor: 'text-[#0A1626]',
-      glowColor: 'shadow-[#6DCEF5]/25',
-      chipColor: 'bg-gradient-to-br from-[#6DCEF5] to-[#0A1626]',
-      // Light card
-      cardBg: '#F0F9FF',
-      cardBgEnd: '#A3E0F8',
-      cardBorder: '#6DCEF5',
-      cardAccent: '#A3E0F8',
-      cardText: '#0A1626',
+      bgGradient: 'from-sky-50 via-sky-200 to-sky-300',
+      borderColor: 'border-sky-400/40',
+      accentColor: 'text-sky-800',
+      textColor: 'text-sky-950',
+      glowColor: 'shadow-sky-400/25',
+      chipColor: 'bg-gradient-to-br from-sky-400 to-sky-900',
+      cardBg: 'var(--membership-diamond-bg)',
+      cardBgEnd: 'var(--membership-diamond-bg-end)',
+      cardBorder: 'var(--membership-diamond-border)',
+      cardAccent: 'var(--membership-diamond-accent)',
+      cardText: 'var(--membership-diamond-text)',
       cardGlow: 'rgba(109, 206, 245, 0.2)',
     }
   }
   
-  // Default/Thường/Standard
   return {
-    bgGradient: 'from-[#FAF5FF] via-[#F3E8FF] to-[#E9D5FF]',
+    bgGradient: 'from-purple-50 via-purple-200 to-purple-300',
     borderColor: 'border-purple-300',
     accentColor: 'text-purple-700',
     textColor: 'text-purple-950',
     glowColor: 'shadow-purple-300/10',
-    chipColor: 'bg-gradient-to-br from-[#A78BFA] to-[#6D28D9]',
-    // Light card
-    cardBg: '#FAF5FF',
-    cardBgEnd: '#E9D5FF',
-    cardBorder: '#A78BFA',
-    cardAccent: '#C4B5FD',
-    cardText: '#1A1028',
+    chipColor: 'bg-gradient-to-br from-purple-400 to-purple-700',
+    cardBg: 'var(--membership-default-bg)',
+    cardBgEnd: 'var(--membership-default-bg-end)',
+    cardBorder: 'var(--membership-default-border)',
+    cardAccent: 'var(--membership-default-accent)',
+    cardText: 'var(--membership-default-text)',
     cardGlow: 'rgba(167, 139, 250, 0.15)',
   }
 }
@@ -361,11 +354,11 @@ function TierCarousel({ sortedTiers, currentTierName, currentTierIndex, isLoadin
 
                     {/* Top: Brand + Tier Badge */}
                     <div className="flex justify-between items-start mb-3 relative z-[1] pr-8">
-                      <p className="text-[10px] font-extrabold tracking-widest uppercase" style={{ color: `${style.cardText}90` }}>
+                      <p className="text-lotus-admin-xs font-extrabold tracking-widest uppercase" style={{ color: `${style.cardText}90` }}>
                         HOA SEN SPA
                       </p>
                       <span
-                        className="text-[9px] font-bold px-2.5 py-0.5 rounded-full shadow-sm"
+                        className="text-lotus-admin-xs font-bold px-2.5 py-0.5 rounded-full shadow-sm"
                         style={{
                           background: `linear-gradient(135deg, ${style.cardAccent}, ${style.cardBorder})`,
                           color: '#fff',
@@ -382,20 +375,20 @@ function TierCarousel({ sortedTiers, currentTierName, currentTierIndex, isLoadin
                           className="w-6 h-6 rounded-full flex items-center justify-center"
                           style={{ background: `${style.cardBorder}20` }}
                         >
-                          <span className="text-[8px]" style={{ color: style.cardBorder }}>👤</span>
+                          <span className="text-lotus-admin-xs" style={{ color: style.cardBorder }}>👤</span>
                         </div>
                         <p className="text-xs font-bold truncate" style={{ color: style.cardText }}>
                           {holderName}
                         </p>
                       </div>
-                      <p className="text-[10px] font-medium" style={{ color: `${style.cardText}B0` }}>
+                      <p className="text-lotus-admin-xs font-medium" style={{ color: `${style.cardText}B0` }}>
                         Mã thẻ: <span className="font-bold" style={{ color: style.cardBorder }}>{card?.cardCode || 'HS-668899'}</span>
                       </p>
                     </div>
 
                     {/* Bottom: Status hint / Upgrade condition */}
                     <div className="mt-auto pt-3 relative z-[1]" style={{ borderTop: `1px solid ${style.cardBorder}20` }}>
-                      <p className="text-[9px] font-medium" style={{ color: `${style.cardText}90` }}>
+                      <p className="text-lotus-admin-xs font-medium" style={{ color: `${style.cardText}90` }}>
                         {isCurrent ? (
                           <span className="flex items-center gap-1 text-emerald-600 font-bold">
                             <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -561,7 +554,7 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
                       <p className={`text-xs font-bold ${isCurrent ? 'text-lotus-gold' : 'text-lotus-deep'}`}>
                         {tier.name}
                       </p>
-                      <p className="text-[10px] text-lotus-stone font-medium mt-0.5">
+                      <p className="text-lotus-admin-xs text-lotus-stone font-medium mt-0.5">
                         {tier.minSpending === 0 ? 'Mở đầu' : `${formatCurrency(tier.minSpending)}`}
                       </p>
                     </div>
@@ -602,21 +595,21 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
             <div className="flex flex-wrap gap-3">
               {/* Spending Condition */}
               <div className="px-4 py-2 rounded-xl bg-gray-50 border border-gray-100">
-                <p className="text-[10px] text-lotus-stone uppercase font-bold tracking-wider">Chi tiêu tối thiểu</p>
+                <p className="text-lotus-admin-xs text-lotus-stone uppercase font-bold tracking-wider">Chi tiêu tối thiểu</p>
                 <p className="text-sm font-extrabold text-lotus-deep mt-0.5">
                   {selectedTier.minSpending === 0 ? 'Mở đầu (Miễn phí)' : formatCurrency(selectedTier.minSpending)}
                 </p>
               </div>
               {/* Discount */}
               <div className="px-4 py-2 rounded-xl bg-lotus-rose/5 border border-lotus-rose/10">
-                <p className="text-[10px] text-lotus-rose uppercase font-bold tracking-wider">Ưu đãi giảm giá</p>
+                <p className="text-lotus-admin-xs text-lotus-rose uppercase font-bold tracking-wider">Ưu đãi giảm giá</p>
                 <p className="text-sm font-extrabold text-lotus-rose mt-0.5">
                   {selectedTier.discountPercent}% hóa đơn
                 </p>
               </div>
               {/* Point multiplier */}
               <div className="px-4 py-2 rounded-xl bg-lotus-gold/5 border border-lotus-gold/10">
-                <p className="text-[10px] text-lotus-gold uppercase font-bold tracking-wider">Tích điểm</p>
+                <p className="text-lotus-admin-xs text-lotus-gold uppercase font-bold tracking-wider">Tích điểm</p>
                 <p className="text-sm font-extrabold text-lotus-gold mt-0.5">
                   Nhân hệ số x{selectedTier.pointMultiplier}
                 </p>

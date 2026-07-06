@@ -171,7 +171,7 @@ export const BookingTimeStep: React.FC = () => {
                       : "bg-lotus-surface text-lotus-deep border-lotus-muted/20 hover:bg-lotus-rose/5"
                 }`}
               >
-                <span className="text-[10px] font-semibold opacity-80">
+                <span className="text-lotus-admin-xs font-semibold opacity-80">
                   {d.dayName}
                 </span>
                 <span className="text-base font-extrabold mt-0.5">
@@ -179,7 +179,7 @@ export const BookingTimeStep: React.FC = () => {
                 </span>
 
                 {d.isBookedOut && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-red-100 text-red-600 border border-red-200 text-[8px] font-bold rounded px-1 scale-90 whitespace-nowrap">
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-red-100 text-red-600 border border-red-200 text-lotus-admin-xs font-bold rounded px-1 scale-90 whitespace-nowrap">
                     Hết chỗ
                   </span>
                 )}
@@ -234,7 +234,7 @@ export const BookingTimeStep: React.FC = () => {
                       <MapPin className="w-3.5 h-3.5 text-lotus-rose-light" />
                       <h4 className="font-bold text-xs truncate">{pos.name}</h4>
                     </div>
-                    <p className="text-[10px] text-lotus-stone truncate ml-5">
+                    <p className="text-lotus-admin-xs text-lotus-stone truncate ml-5">
                       {pos.roomName}
                     </p>
                   </div>
@@ -303,11 +303,11 @@ export const BookingTimeStep: React.FC = () => {
                       <h4 className="font-bold text-lotus-deep text-xs truncate">
                         {tech.name || "Kỹ thuật viên"}
                       </h4>
-                      <p className="text-[10px] text-lotus-stone truncate mt-0.5">
+                      <p className="text-lotus-admin-xs text-lotus-stone truncate mt-0.5">
                         {tech.role || "Nhân viên"}
                       </p>
 
-                      <span className="inline-block text-[9px] font-bold px-1.5 py-0.5 rounded mt-1.5 border bg-emerald-50 text-emerald-600 border-emerald-200">
+                      <span className="inline-block text-lotus-admin-xs font-bold px-1.5 py-0.5 rounded mt-1.5 border bg-emerald-50 text-emerald-600 border-emerald-200">
                         {tech.slotsLeft !== undefined ? `Còn ${tech.slotsLeft} slot` : "Sẵn sàng"}
                       </span>
                     </div>
@@ -325,7 +325,7 @@ export const BookingTimeStep: React.FC = () => {
           <p className="text-xs text-lotus-stone font-bold uppercase tracking-wider">
             4. Chọn khung giờ phục vụ:
           </p>
-          <div className="flex items-center gap-3 text-[10px] text-lotus-stone">
+          <div className="flex items-center gap-3 text-lotus-admin-xs text-lotus-stone">
             <div className="flex items-center gap-1">
               <span className="w-2.5 h-2.5 rounded-full bg-lotus-surface border border-lotus-muted/30 inline-block"></span>
               Trống
@@ -383,7 +383,7 @@ export const BookingTimeStep: React.FC = () => {
                   className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition-all border flex flex-col items-center justify-center gap-0.5 ${classes}`}
                 >
                   <span>{slot.time}</span>
-                  <span className="text-[7px] uppercase font-bold tracking-wider opacity-90 scale-90">
+                  <span className="text-lotus-admin-xs uppercase font-bold tracking-wider opacity-90 scale-90">
                     {label}
                   </span>
                 </button>

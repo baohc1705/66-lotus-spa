@@ -14,13 +14,13 @@ export function StaffSalonStatusBadge({ status, isManager }: StaffSalonStatusBad
   return (
     <div className="flex items-center gap-1.5">
       {isManager && (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border bg-violet-100 text-violet-700 border-violet-200">
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-lotus-admin-base font-medium border bg-violet-100 text-violet-700 border-violet-200">
           Quản lý
         </span>
       )}
       {config ? (
         <span
-          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border ${config.className}`}
+          className={`inline-flex items-center px-2 py-0.5 rounded-full text-lotus-admin-base font-medium border ${config.className}`}
         >
           {config.label}
         </span>

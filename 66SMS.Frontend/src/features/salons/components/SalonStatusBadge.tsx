@@ -14,7 +14,7 @@ export function SalonStatusBadge({ status }: SalonStatusBadgeProps) {
   if (!config) return <span className="text-stone-400 text-xs">—</span>
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border ${config.className}`}
+      className={`inline-flex items-center px-2 py-0.5 rounded-full text-lotus-admin-base font-medium border ${config.className}`}
     >
       {config.label}
     </span>

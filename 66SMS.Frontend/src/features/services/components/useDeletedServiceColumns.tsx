@@ -10,25 +10,17 @@ import {
   IndexCell,
   MutedCell,
   NameCell,
+  PriceCell,
 } from "@/shared/components/DataTable/tableCells";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 import { SERVICE_COLUMN_LABELS } from "./useActiveServiceColumns";
 import { SERVICE_PERM } from "../constants/service.permissions";
-import type { ServiceDTO } from "../types/service.types";
+import type { ServiceDto } from "../types/service.types";
 
 interface UseDeletedServiceColumnsParams {
   pageIndex: number;
   pageSize: number;
-  onRestore: (item: ServiceDTO) => void;
-}
-
-function formatPrice(value: number | null | undefined) {
-  if (value == null) return "—";
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(value);
+  onRestore: (item: ServiceDto) => void;
 }
 
 export function useDeletedServiceColumns({
@@ -39,7 +31,7 @@ export function useDeletedServiceColumns({
   const cols = SERVICE_COLUMN_LABELS;
   const perm = SERVICE_PERM;
 
-  return useMemo<ColumnDef<ServiceDTO>[]>(
+  return useMemo<ColumnDef<ServiceDto>[]>(
     () => [
       {
         id: "index",
@@ -79,21 +71,13 @@ export function useDeletedServiceColumns({
       {
         accessorKey: "costPrice",
         header: cols.costPrice,
-        cell: ({ row }) => (
-          <span className="text-stone-600 font-medium">
-            {formatPrice(row.original.costPrice)}
-          </span>
-        ),
+        cell: ({ row }) => <PriceCell value={row.original.costPrice} />,
         size: 110,
       },
       {
         accessorKey: "sellingPrice",
         header: cols.sellingPrice,
-        cell: ({ row }) => (
-          <span className="text-lotus-deep font-medium">
-            {formatPrice(row.original.sellingPrice)}
-          </span>
-        ),
+        cell: ({ row }) => <PriceCell value={row.original.sellingPrice} />,
         size: 110,
       },
       {
@@ -124,7 +108,7 @@ export function useDeletedServiceColumns({
             <Button
               variant="outline"
               size="sm"
-              className={TABLE_STYLES.toolbarBtn}
+              className="lotus-admin-table-toolbar-btn"
               onClick={() => onRestore(row.original)}
             >
               <RotateCcw className="w-3.5 h-3.5" />

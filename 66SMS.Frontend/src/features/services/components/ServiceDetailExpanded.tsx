@@ -10,12 +10,13 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { useServiceDetail } from "../hooks/useServices";
-import type { ServiceDTO, ServiceProductResponse } from "../types/service.types";
+import type { ServiceDto, ServiceProductResponse } from "../types/service.types";
 import { SERVICE_PERM } from "../constants/service.permissions";
+import { formatCurrency } from "@/shared/utils/currency";
 
 interface ServiceDetailExpandedProps {
   serviceId: number;
-  onEdit?: (service: ServiceDTO) => void;
+  onEdit?: (service: ServiceDto) => void;
 }
 
 const PRODUCT_STATUS_MAP: StatusMap = {
@@ -68,13 +69,13 @@ export function ServiceDetailExpanded({
           <TabsList className="h-10 border-b border-stone-200/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
             <TabsTrigger
               value="info"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Thông tin chung
             </TabsTrigger>
             <TabsTrigger
               value="products"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-[13px] font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Sản phẩm tiêu hao ({products.length})
             </TabsTrigger>
@@ -98,10 +99,10 @@ export function ServiceDetailExpanded({
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-base font-bold text-lotus-deep truncate">
+                <h3 className="text-lotus-admin-lg font-bold text-lotus-deep truncate">
                   {service.name ?? "—"}
                 </h3>
-                <p className="text-[12px] text-lotus-stone mt-0.5">
+                <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
                   Mã: {service.code || "—"} · Thời gian:{" "}
                   {service.durationMins || 0} phút
                 </p>
@@ -118,11 +119,7 @@ export function ServiceDetailExpanded({
                 <DetailField label="Mô tả ngắn" value={service.description} />
                 <DetailField
                   label="Giá cơ bản"
-                  value={
-                    service.costPrice
-                      ? `${service.costPrice.toLocaleString()} ₫`
-                      : "—"
-                  }
+                  value={formatCurrency(service.costPrice)}
                 />
               </div>
               <div className="flex flex-col">
@@ -137,11 +134,7 @@ export function ServiceDetailExpanded({
                 <DetailField label="Nội dung" value={service.content} />
                 <DetailField
                   label="Giá bán"
-                  value={
-                    service.sellingPrice
-                      ? `${service.sellingPrice.toLocaleString()} ₫`
-                      : "—"
-                  }
+                  value={formatCurrency(service.sellingPrice)}
                 />
               </div>
             </div>
@@ -153,7 +146,7 @@ export function ServiceDetailExpanded({
                   variant="admin"
                   size="sm"
                   onClick={() => onEdit?.(service)}
-                  className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-[13px] gap-1.5 rounded-md transition-opacity"
+                  className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-lotus-admin-lg gap-1.5 rounded-md transition-opacity"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                   Cập nhật
@@ -174,7 +167,7 @@ export function ServiceDetailExpanded({
             </div>
           ) : (
             <div className="rounded-md border border-stone-200 overflow-x-auto w-full">
-              <table className="w-full text-left text-[13px] min-w-[600px]">
+              <table className="w-full text-left text-lotus-admin-lg min-w-[600px]">
                 <thead className="bg-stone-50 border-b border-stone-200 text-lotus-stone">
                   <tr>
                     <th className="py-2.5 px-4 font-semibold">Tên sản phẩm</th>
@@ -199,14 +192,14 @@ export function ServiceDetailExpanded({
                           {prod.productName || "—"}
                         </div>
                       </td>
-                      <td className="py-2.5 px-4 font-semibold text-lotus-stone text-center">
-                        {prod.sellingPrice ?? "-"}
+                      <td className="py-2.5 px-4 font-semibold text-lotus-stone">
+                        {formatCurrency(prod.sellingPrice)}
                       </td>
                       <td className="py-2.5 px-4 font-semibold text-lotus-stone text-center">
                         {prod.quantityUsed ?? "-"}
                       </td>
-                      <td className="py-2.5 px-4 font-semibold text-lotus-stone text-center">
-                        {(prod.quantityUsed ?? 0) * (prod.sellingPrice ?? 0)}
+                      <td className="py-2.5 px-4 font-semibold text-lotus-stone">
+                        {formatCurrency((prod.quantityUsed ?? 0) * (prod.sellingPrice ?? 0))}
                       </td>
 
                       <td className="py-2.5 px-4">
@@ -242,8 +235,8 @@ function DetailField({
 }) {
   return (
     <div className="py-3.5 border-b border-stone-100/80 last:border-b-0 group">
-      <p className="text-[12px] text-lotus-stone mb-1">{label}</p>
-      <p className="text-[13px] font-medium text-lotus-deep truncate">
+      <p className="text-lotus-admin-md text-lotus-stone mb-1">{label}</p>
+      <p className="text-lotus-admin-lg font-medium text-lotus-deep truncate">
         {value || "—"}
       </p>
     </div>

@@ -64,7 +64,7 @@ export function CertificateTypeSidebar({
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             placeholder="Tìm loại chứng chỉ..."
-            className="w-full h-8 pl-8 pr-3 text-[12px] bg-stone-50 border border-stone-200 rounded focus:outline-none focus:ring-1 focus:ring-lotus-leaf/40 focus:border-lotus-leaf/60 placeholder:text-stone-400 text-stone-700"
+            className="lotus-admin-sidebar-search"
           />
         </div>
       </div>
@@ -75,7 +75,7 @@ export function CertificateTypeSidebar({
         <button
           type="button"
           onClick={() => onSelectType(null)}
-          className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 text-[13px] transition-all duration-150 rounded ${
+          className={`lotus-admin-sidebar-item ${
             selectedTypeId === null
               ? "bg-lotus-leaf/10 text-lotus-leaf font-semibold border-l-[3px] border-lotus-leaf"
               : "text-lotus-deep/70 hover:bg-lotus-leaf/5 hover:text-lotus-leaf border-l-[3px] border-transparent"
@@ -90,7 +90,7 @@ export function CertificateTypeSidebar({
             <span className="truncate">Tất cả loại</span>
           </div>
           <span
-            className={`text-[11px] shrink-0 font-medium px-1.5 py-0.5 rounded-full ${
+            className={`lotus-admin-sidebar-badge ${
               selectedTypeId === null
                 ? "bg-lotus-leaf/20 text-lotus-leaf"
                 : "bg-stone-100 text-stone-500"
@@ -115,7 +115,7 @@ export function CertificateTypeSidebar({
                 key={type.id}
                 type="button"
                 onClick={() => onSelectType(type.id ?? null)}
-                className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 text-[13px] transition-all duration-150 rounded group ${
+                className={`lotus-admin-sidebar-item group ${
                   isActive
                     ? "bg-lotus-leaf/10 text-lotus-leaf font-semibold border-l-[3px] border-lotus-leaf"
                     : "text-lotus-deep/70 hover:bg-lotus-leaf/5 hover:text-lotus-leaf border-l-[3px] border-transparent"
@@ -132,7 +132,7 @@ export function CertificateTypeSidebar({
                   <span className="truncate">{type.name ?? "—"}</span>
                 </div>
                 <span
-                  className={`text-[11px] shrink-0 font-medium px-1.5 py-0.5 rounded-full ${
+                  className={`lotus-admin-sidebar-badge ${
                     isActive
                       ? "bg-lotus-leaf/20 text-lotus-leaf"
                       : "bg-stone-100 text-stone-500"

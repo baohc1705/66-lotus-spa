@@ -46,7 +46,7 @@ export function OnlineBookingsDrawer({
         className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 transition-opacity"
         onClick={onClose}
       />
-      <div className="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-[#FBF7F2] shadow-[0_20px_40px_rgba(42,31,26,0.1)] z-50 flex flex-col animate-in slide-in-from-right duration-300 border-l border-lotus-gold/20">
+      <div className="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-lotus-cream shadow-[0_20px_40px_rgba(42,31,26,0.1)] z-50 flex flex-col animate-in slide-in-from-right duration-300 border-l border-lotus-gold/20">
         <div className="h-14 flex items-center justify-between px-4 border-b border-lotus-gold/20 bg-lotus-cream">
           <h2 className="font-semibold text-lotus-deep flex items-center gap-2">
             <Calendar className="w-5 h-5 text-lotus-primary" />

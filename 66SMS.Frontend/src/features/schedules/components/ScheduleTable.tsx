@@ -186,7 +186,7 @@ export function ScheduleTable({
             <tr key={`${shift.id}_${period.id}_${index}`}>
               <td className="py-3 px-4 border-r border-stone-200/50 align-top bg-stone-50/30">
                 <div className="font-bold text-lotus-deep">{shift.name}</div>
-                <div className="text-[12px] text-lotus-stone mt-1 flex items-center gap-1">
+                <div className="text-lotus-admin-md text-lotus-stone mt-1 flex items-center gap-1">
                   <span className="px-1.5 py-0.5 bg-lotus-cream rounded font-medium text-lotus-deep">
                     {period.shiftStart?.substring(0, 5)}
                   </span>
@@ -210,7 +210,7 @@ export function ScheduleTable({
                       key={i}
                       className="py-2 px-2 border-r border-stone-200/50 last:border-0 align-top bg-stone-100/50"
                     >
-                      <div className="flex h-full items-center justify-center text-[11px] text-stone-400">
+                      <div className="flex h-full items-center justify-center text-lotus-admin-base text-stone-400">
                         Không áp dụng
                       </div>
                     </td>
@@ -238,7 +238,7 @@ export function ScheduleTable({
                                 ? handleDragStart(e, ws)
                                 : e.preventDefault()
                             }
-                            className={`px-2.5 py-1.5 bg-white text-lotus-deep rounded-md text-[12px] font-medium border border-stone-200 shadow-sm truncate transition-colors flex items-center justify-between group/item ${
+                            className={`px-2.5 py-1.5 bg-white text-lotus-deep rounded-md text-lotus-admin-md font-medium border border-stone-200 shadow-sm truncate transition-colors flex items-center justify-between group/item ${
                               canEdit
                                 ? "cursor-grab active:cursor-grabbing hover:border-lotus-gold"
                                 : ""
@@ -275,7 +275,7 @@ export function ScheduleTable({
                                   .filter((id): id is number => id != null),
                               })
                             }
-                            className="flex items-center gap-1 text-[12px] font-semibold text-lotus-leaf hover:text-lotus-deep bg-lotus-cream hover:bg-lotus-cream/80 px-3 py-1.5 rounded-full transition-colors w-full justify-center border border-lotus-leaf/20"
+                            className="flex items-center gap-1 text-lotus-admin-md font-semibold text-lotus-leaf hover:text-lotus-deep bg-lotus-cream hover:bg-lotus-cream/80 px-3 py-1.5 rounded-full transition-colors w-full justify-center border border-lotus-leaf/20"
                           >
                             <Plus size={12} /> Thêm nhân viên
                           </button>
@@ -311,7 +311,7 @@ export function ScheduleTable({
                 <div className="font-bold text-lotus-deep">
                   {staff.fullName}
                 </div>
-                <div className="text-[12px] text-lotus-stone mt-1">
+                <div className="text-lotus-admin-md text-lotus-stone mt-1">
                   {staff.code || "Nhân viên"}
                 </div>
               </td>
@@ -330,7 +330,7 @@ export function ScheduleTable({
                         {cellSchedules.map((ws) => (
                           <div
                             key={ws.id}
-                            className="px-2.5 py-1.5 bg-lotus-leaf/10 text-lotus-leaf rounded-md text-[12px] font-medium border border-lotus-leaf/20 shadow-sm truncate"
+                            className="px-2.5 py-1.5 bg-lotus-leaf/10 text-lotus-leaf rounded-md text-lotus-admin-md font-medium border border-lotus-leaf/20 shadow-sm truncate"
                             title={ws.shift?.name}
                           >
                             {ws.shift?.name || "Ca làm việc"}
@@ -370,7 +370,7 @@ export function ScheduleTable({
           <tr key={`${shift.id}_${period.id}_${index}`}>
             <td className="py-3 px-4 border-r border-stone-200/50 align-top bg-stone-50/30">
               <div className="font-bold text-lotus-deep">{shift.name}</div>
-              <div className="text-[12px] text-lotus-stone mt-1 flex items-center gap-1">
+              <div className="text-lotus-admin-md text-lotus-stone mt-1 flex items-center gap-1">
                 <span className="px-1.5 py-0.5 bg-lotus-cream rounded font-medium text-lotus-deep">
                   {period.shiftStart?.substring(0, 5)}
                 </span>
@@ -394,7 +394,7 @@ export function ScheduleTable({
                     key={i}
                     className="py-2 px-2 border-r border-stone-200/50 last:border-0 align-top bg-stone-100/50"
                   >
-                    <div className="flex h-full items-center justify-center text-[11px] text-stone-400">
+                    <div className="flex h-full items-center justify-center text-lotus-admin-base text-stone-400">
                       Không áp dụng
                     </div>
                   </td>
@@ -417,7 +417,7 @@ export function ScheduleTable({
                         <div className="p-1.5 bg-lotus-leaf/10 rounded-full text-lotus-leaf">
                           <Check size={18} className="stroke-[3px]" />
                         </div>
-                        <span className="text-[11px] font-semibold">
+                        <span className="text-lotus-admin-base font-semibold">
                           Ca làm việc
                         </span>
                       </div>
@@ -477,7 +477,7 @@ export function ScheduleTable({
   return (
     <>
       <div className="overflow-x-auto border border-stone-200/50 rounded-sm bg-white/70 shadow-sm ">
-        <table className="w-full text-[13px] text-left table-fixed">
+        <table className="w-full text-lotus-admin-lg text-left table-fixed">
           <thead className="bg-lotus-cream/50 border-b border-stone-200/50">
             <tr>
               <th className="w-48 py-4 px-4 font-semibold text-lotus-deep border-r border-stone-200/50">

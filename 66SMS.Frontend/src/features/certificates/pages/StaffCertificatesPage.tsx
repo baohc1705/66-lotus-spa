@@ -31,13 +31,12 @@ import { CERTIFICATE_PERM } from "../constants/certificate.permissions";
 import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 interface Props {
   staffId?: number;
 }
 
-const ENTITY = "chứng chỉ";
+const ENTITY = "chá»©ng chá»‰";
 
 export function StaffCertificatesPage({ staffId }: Props) {
   const perm = CERTIFICATE_PERM;
@@ -128,7 +127,7 @@ export function StaffCertificatesPage({ staffId }: Props) {
 
   return (
     <div className="flex h-full overflow-hidden gap-2">
-      {/* Sidebar loại chứng chỉ */}
+      {/* Sidebar loáº¡i chá»©ng chá»‰ */}
       {!isSidebarMode && (
         <CertificateTypeSidebar
           selectedTypeId={selectedCertificateTypeId}
@@ -150,11 +149,11 @@ export function StaffCertificatesPage({ staffId }: Props) {
         </div>
 
         {/* Table card */}
-        <div className={`${TABLE_STYLES.pageCard} flex-1 min-h-0 flex flex-col overflow-hidden relative`}>
+        <div className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative">
           {/* Fetching bar */}
           {isFetching && !isLoading && (
-            <div className={TABLE_STYLES.fetchBar}>
-              <div className={TABLE_STYLES.fetchBarInner} />
+            <div className="lotus-admin-table-fetch-bar">
+              <div className="lotus-admin-table-fetch-bar-inner" />
             </div>
           )}
 
@@ -170,7 +169,7 @@ export function StaffCertificatesPage({ staffId }: Props) {
                   variant="admin"
                   size="sm"
                   onClick={() => setCreateOpen(true)}
-                  className="text-[12px] gap-1.5"
+                  className="lotus-admin-table-toolbar-btn"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Thêm chứng chỉ
@@ -201,7 +200,7 @@ export function StaffCertificatesPage({ staffId }: Props) {
                       variant="admin"
                       size="sm"
                       onClick={() => setCreateOpen(true)}
-                      className="mt-1 text-[12px]"
+                      className="mt-1 text-lotus-admin-md"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       Thêm chứng chỉ

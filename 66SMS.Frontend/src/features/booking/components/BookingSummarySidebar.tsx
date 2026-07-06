@@ -47,7 +47,7 @@ export const BookingSummarySidebar: React.FC = () => {
             <div>
               <div className="text-xs font-bold text-lotus-deep">{selectedSalon.name}</div>
               {selectedSalon.fullAddress && (
-                <div className="text-[10px] text-lotus-stone line-clamp-1">{selectedSalon.fullAddress}</div>
+                <div className="text-lotus-admin-xs text-lotus-stone line-clamp-1">{selectedSalon.fullAddress}</div>
               )}
             </div>
           </div>
@@ -118,7 +118,7 @@ export const BookingSummarySidebar: React.FC = () => {
                             <Clock className="w-3.5 h-3.5 text-lotus-rose-light" />
                             {guest.selectedService.durationMins} phút
                           </span>
-                          <span className="inline-block bg-lotus-rose/5 px-1.5 py-0.5 rounded border border-lotus-muted/20 text-[9px] uppercase tracking-wide">
+                          <span className="inline-block bg-lotus-rose/5 px-1.5 py-0.5 rounded border border-lotus-muted/20 text-lotus-admin-xs uppercase tracking-wide">
                             {guest.selectedService.categoryName || "Dịch vụ"}
                           </span>
                         </div>
@@ -132,7 +132,7 @@ export const BookingSummarySidebar: React.FC = () => {
                         {guest.selectedDate && guest.selectedTimeSlot && (
                           <div className="flex justify-between items-center">
                             <span className="text-lotus-stone">Thời gian:</span>
-                            <span className="font-bold text-lotus-rose bg-lotus-rose/10 px-1.5 py-0.5 rounded text-[11px]">
+                            <span className="font-bold text-lotus-rose bg-lotus-rose/10 px-1.5 py-0.5 rounded text-lotus-admin-base">
                               {guest.selectedTimeSlot.time} · {formatDateString(guest.selectedDate)}
                             </span>
                           </div>
@@ -190,14 +190,14 @@ export const BookingSummarySidebar: React.FC = () => {
               {finalTotal.toLocaleString("vi-VN")}đ
             </span>
           </div>
-          <div className="flex justify-between items-center text-[11px] text-lotus-stone mt-0.5">
+          <div className="flex justify-between items-center text-lotus-admin-base text-lotus-stone mt-0.5">
             <span>Thanh toán cọc (30%):</span>
             <span className="font-bold text-lotus-deep">{deposit.toLocaleString("vi-VN")}đ</span>
           </div>
         </div>
       </div>
 
-      <div className="bg-lotus-rose/5 p-3 text-[10px] text-lotus-stone leading-relaxed text-center border-t border-lotus-muted/20 shrink-0">
+      <div className="bg-lotus-rose/5 p-3 text-lotus-admin-xs text-lotus-stone leading-relaxed text-center border-t border-lotus-muted/20 shrink-0">
         Miễn phí hủy lịch trước 2 giờ · Bảo mật thông tin tuyệt đối
       </div>
     </div>

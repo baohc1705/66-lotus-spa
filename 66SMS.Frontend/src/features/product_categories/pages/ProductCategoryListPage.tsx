@@ -1,40 +1,39 @@
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { ArrowLeft, Box, Plus, Trash2 } from "lucide-react";
 import { useCallback, useMemo } from "react";
-import { useReactTable, getCoreRowModel } from "@tanstack/react-table";
-import { Plus, Trash2, ArrowLeft, Box } from "lucide-react";
 
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
-import { TableEmptyState } from "@/shared/components/DataTable/TableEmptyState";
-import { TableSelectionBar } from "@/shared/components/DataTable/TableSelectionBar";
-import { Button } from "@/shared/components/ui/button";
-import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
+import { DataTable } from "@/shared/components/DataTable/DataTable";
 import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
 import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
+import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
+import { TableEmptyState } from "@/shared/components/DataTable/TableEmptyState";
+import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
+import { TableSelectionBar } from "@/shared/components/DataTable/TableSelectionBar";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { Button } from "@/shared/components/ui/button";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
+import { useRowSelection } from "@/shared/hooks/useRowSelection";
 import { ProductCategoryFormDialog } from "../components/ProductCategoryFormDialog";
 import {
-  useActiveCategoryColumns,
   CATEGORY_COLUMN_LABELS,
+  useActiveCategoryColumns,
 } from "../components/useActiveCategoryColumns";
 import { useDeletedCategoryColumns } from "../components/useDeletedCategoryColumns";
 import { PRODUCT_CATEGORY_PERM } from "../constants/productCategory.permissions";
 import {
-  useProductCategories,
   useDeletedProductCategories,
   useDeleteProductCategory,
   useDeleteProductCategoryMultiples,
-  useUpdateProductCategory,
+  useProductCategories,
   useRestoreProductCategory,
+  useUpdateProductCategory,
 } from "../hooks/useProductCategories";
 import { useProductCategoryListState } from "../hooks/useProductCategoryListState";
-import { useRowSelection } from "@/shared/hooks/useRowSelection";
-import type { ProductCategoryDTO } from "../types/product_category.types";
+import type { ProductCategoryDto } from "../types/productCategory.types";
 
 const ENTITY = "danh mục";
 const ENTITY_SUBJECT = "Danh mục";
@@ -92,7 +91,7 @@ export function ProductCategoryListPage() {
   const pageIds = useMemo(
     () =>
       categories
-        .map((c: ProductCategoryDTO) => c.id)
+        .map((c: ProductCategoryDto) => c.id)
         .filter((id): id is number => id !== undefined),
     [categories],
   );
@@ -119,7 +118,6 @@ export function ProductCategoryListPage() {
     onSort: handleSort,
     headerChecked,
     selectedRowIds,
-    pageIds,
     onToggleAll: toggleAll,
     onToggleOne: toggleOne,
     onEdit: setEditTarget,
@@ -204,7 +202,7 @@ export function ProductCategoryListPage() {
                   <Button
                     variant="destructive"
                     size="sm"
-                    className="text-[12px] h-7 px-2"
+                    className="lotus-admin-btn-toolbar"
                     onClick={() => setBulkDeleteOpen(true)}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -228,7 +226,7 @@ export function ProductCategoryListPage() {
               variant="admin"
               size="sm"
               onClick={() => setCreateOpen(true)}
-              className={TABLE_STYLES.toolbarBtn}
+              className="lotus-admin-table-toolbar-btn"
             >
               <Plus className="w-3.5 h-3.5" />
               Thêm danh mục
@@ -243,9 +241,11 @@ export function ProductCategoryListPage() {
             <Button
               variant="admin"
               size="sm"
-              className={TABLE_STYLES.toolbarBtn}
+              className="lotus-admin-table-toolbar-btn"
               onClick={() => handleToggleView(clearSelection)}
-              title={showDeleted ? "Quay lại danh sách" : "Danh mục đã xóa"}
+              title={
+                showDeleted ? "Quay lại danh sách" : "Danh mục đã xóa"
+              }
             >
               {showDeleted ? (
                 <>
@@ -291,7 +291,7 @@ export function ProductCategoryListPage() {
                     variant="admin"
                     size="sm"
                     onClick={() => setCreateOpen(true)}
-                    className="mt-1 text-[12px]"
+                    className="mt-1 text-lotus-admin-md"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Thêm danh mục
@@ -317,7 +317,10 @@ export function ProductCategoryListPage() {
         }
       />
 
-      <ProductCategoryFormDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <ProductCategoryFormDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+      />
 
       <ProductCategoryFormDialog
         open={!!editTarget}

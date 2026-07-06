@@ -14,7 +14,6 @@ import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagi
 import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
 import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
 import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
@@ -114,7 +113,7 @@ export function ShiftListPage() {
               variant="admin"
               size="sm"
               onClick={() => setCreateOpen(true)}
-              className="h-8 text-[13px] gap-1.5"
+              className="lotus-admin-table-toolbar-btn"
             >
               <Plus className="w-4 h-4" />
               Thêm ca làm việc
@@ -123,7 +122,7 @@ export function ShiftListPage() {
         </div>
       </DataTableToolbar>
 
-      <div className={TABLE_STYLES.pageCard}>
+      <div className="lotus-admin-table-page-card">
         <DataTable
           table={table}
           isLoading={isLoading}

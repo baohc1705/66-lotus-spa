@@ -1,6 +1,5 @@
 import { X } from "lucide-react";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 interface TableSelectionBarProps {
   count: number;
@@ -14,7 +13,7 @@ export function TableSelectionBar({
   actions,
 }: TableSelectionBarProps) {
   return (
-    <div className={TABLE_STYLES.selectionBar}>
+    <div className="lotus-admin-table-selection-bar">
       <span>{COMMON_MSG.selected(count)}</span>
       {actions}
       <button

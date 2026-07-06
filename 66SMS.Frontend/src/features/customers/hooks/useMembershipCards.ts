@@ -1,3 +1,5 @@
+import { createEntityQueryKeys } from '@/shared/utils/queryKeys';
+import { getErrorMessage } from '@/shared/utils/errorUtils';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
@@ -12,14 +14,7 @@ import type {
 
 const ENTITY = "thẻ thành viên";
 
-const CARD_KEYS = {
-  all: ["membershipCards"] as const,
-  lists: () => [...CARD_KEYS.all, "list"] as const,
-  list: (params: MembershipCardQueryParams) =>
-    [...CARD_KEYS.lists(), params] as const,
-  details: () => [...CARD_KEYS.all, "detail"] as const,
-  detail: (id: number) => [...CARD_KEYS.details(), id] as const,
-};
+export const CARD_KEYS = createEntityQueryKeys<MembershipCardQueryParams>("cards");
 
 export function useMembershipCards(params: MembershipCardQueryParams) {
   return useQuery({
@@ -55,8 +50,7 @@ export function useUpdateMembershipCard() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("cập nhật", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
     },
   });
 }

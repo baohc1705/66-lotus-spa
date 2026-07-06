@@ -1,3 +1,6 @@
+import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+import { AdminInput } from '@/shared/components/forms/AdminInput';
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect, useState } from 'react'
 import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -11,13 +14,12 @@ import {
   DialogFooter,
 } from '@/shared/components/ui/dialog'
 import { Button } from '@/shared/components/ui/button'
-import { Input } from '@/shared/components/ui/input'
-import { Textarea } from '@/shared/components/ui/textarea'
+
+
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select'
 import { FormSection } from '@/shared/components/forms/FormSection'
@@ -165,9 +167,9 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
                     value={watch('staffId') ? watch('staffId').toString() : undefined}
                     onValueChange={(v) => setValue('staffId', Number(v))}
                   >
-                    <SelectTrigger className="h-9 text-[13px]">
+                    <AdminSelectTrigger>
                       <SelectValue placeholder="Chọn nhân viên" />
-                    </SelectTrigger>
+                    </AdminSelectTrigger>
                     <SelectContent>
                       {staffs.map((s: StaffDto) => (
                         <SelectItem key={s.id} value={s.id!.toString()}>{s.fullName}</SelectItem>
@@ -182,9 +184,9 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
                     value={watch('certificateTypeId')?.toString() ?? ''}
                     onValueChange={(v) => setValue('certificateTypeId', Number(v))}
                   >
-                    <SelectTrigger className="h-9 text-[13px]">
+                    <AdminSelectTrigger>
                       <SelectValue placeholder="Chọn loại chứng chỉ" />
-                    </SelectTrigger>
+                    </AdminSelectTrigger>
                     <SelectContent>
                       {types.map((t: CertificateTypeDTO) => (
                         <SelectItem key={t.id} value={t.id!.toString()}>{t.name}</SelectItem>
@@ -194,9 +196,9 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
                 </FormField>
                 <FormField label="Trạng thái" error={errors.status?.message}>
                   <Select value={watch('status')?.toString()} onValueChange={(v) => setValue('status', Number(v))}>
-                    <SelectTrigger className="h-9 text-[13px]">
+                    <AdminSelectTrigger>
                       <SelectValue placeholder="Chọn trạng thái" />
-                    </SelectTrigger>
+                    </AdminSelectTrigger>
                     <SelectContent>
                       {STATUS_OPTIONS.map((opt) => (
                         <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
@@ -207,24 +209,24 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
               </div>
 
               <FormField label="Tên chứng chỉ *" error={errors.certificateName?.message}>
-                <Input {...register('certificateName')} placeholder="Chứng chỉ Massage Trị liệu Quốc tế" className="h-9 text-[13px]" />
+                <AdminInput {...register('certificateName')} placeholder="Chứng chỉ Massage Trị liệu Quốc tế" />
               </FormField>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField label="Số chứng chỉ" error={errors.certificateNumber?.message}>
-                  <Input {...register('certificateNumber')} placeholder="VN-2024-12345" className="h-9 text-[13px]" />
+                  <AdminInput {...register('certificateNumber')} placeholder="VN-2024-12345" />
                 </FormField>
                 <FormField label="Tổ chức cấp *" error={errors.issuingOrganization?.message}>
-                  <Input {...register('issuingOrganization')} placeholder="Bộ Y tế / CIDESCO" className="h-9 text-[13px]" />
+                  <AdminInput {...register('issuingOrganization')} placeholder="Bộ Y tế / CIDESCO" />
                 </FormField>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField label="Ngày cấp *" error={errors.issuedDate?.message}>
-                  <Input {...register('issuedDate')} type="date" className="h-9 text-[13px]" />
+                  <AdminInput {...register('issuedDate')} type="date" />
                 </FormField>
                 <FormField label="Ngày hết hạn (để trống nếu không hết hạn)" error={errors.expiryDate?.message}>
-                  <Input {...register('expiryDate')} type="date" className="h-9 text-[13px]" />
+                  <AdminInput {...register('expiryDate')} type="date" />
                 </FormField>
               </div>
 
@@ -251,7 +253,7 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
                       ) : (
                         <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-stone-400 group-hover/card:text-lotus-leaf transition-colors">
                           <ImageIcon className="h-6 w-6" />
-                          <span className="text-[11px] font-medium">Chọn ảnh</span>
+                          <span className="text-lotus-admin-base font-medium">Chọn ảnh</span>
                         </div>
                       )}
                     </button>
@@ -269,7 +271,7 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
                       </button>
                     )}
                   </div>
-                  <p className="text-[11px] text-lotus-stone mt-1">
+                  <p className="text-lotus-admin-base text-lotus-stone mt-1">
                     Tải ảnh scan/chụp chứng chỉ (JPG, PNG, WEBP).
                   </p>
                   <input
@@ -288,7 +290,7 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
               </FormField>
 
               <FormField label="Ghi chú" error={errors.note?.message}>
-                <Textarea {...register('note')} placeholder="Ghi chú thêm..." className="text-[13px] min-h-[64px]" />
+                <AdminTextarea {...register('note')} placeholder="Ghi chú thêm..." className="text-lotus-admin-lg min-h-[64px]" />
               </FormField>
             </div>
           </FormSection>

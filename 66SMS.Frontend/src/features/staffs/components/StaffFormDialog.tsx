@@ -10,8 +10,8 @@ import {
   DialogFooter,
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
+import { AdminInput } from "@/shared/components/forms/AdminInput";
+import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import {
   Tooltip,
   TooltipTrigger,
@@ -21,7 +21,6 @@ import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
 import { SearchableSelect } from "@/shared/components/ui/searchable-select";
@@ -213,10 +212,9 @@ export function StaffFormDialog({
                 tooltip="Vui lòng nhập họ và tên đầy đủ của nhân viên"
                 error={errors.fullName?.message}
               >
-                <Input
+                <AdminInput
                   {...register("fullName")}
                   placeholder="Nguyễn Văn A"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField
@@ -224,17 +222,15 @@ export function StaffFormDialog({
                 tooltip="Số điện thoại phải có 10 chữ số"
                 error={errors.phone?.message}
               >
-                <Input
+                <AdminInput
                   {...register("phone")}
                   placeholder="0901234567"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField label="Ngày sinh" error={errors.dateOfBirth?.message}>
-                <Input
+                <AdminInput
                   {...register("dateOfBirth")}
                   type="date"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField label="Giới tính">
@@ -242,9 +238,9 @@ export function StaffFormDialog({
                   value={watch("gender")?.toString() ?? ""}
                   onValueChange={(v) => setValue("gender", Number(v))}
                 >
-                  <SelectTrigger className="h-9 text-[13px]">
+                  <AdminSelectTrigger>
                     <SelectValue placeholder="Chọn giới tính" />
-                  </SelectTrigger>
+                  </AdminSelectTrigger>
                   <SelectContent>
                     {GENDER_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>
@@ -255,10 +251,9 @@ export function StaffFormDialog({
                 </Select>
               </FormField>
               <FormField label="CMND/CCCD" error={errors.nationalId?.message}>
-                <Input
+                <AdminInput
                   {...register("nationalId")}
                   placeholder="012345678901"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField
@@ -277,7 +272,6 @@ export function StaffFormDialog({
                   }))}
                   placeholder="Chọn tỉnh/thành phố"
                   searchPlaceholder="Tìm tỉnh/thành phố..."
-                  className="h-9"
                 />
               </FormField>
               <FormField label="Phường/Xã" error={errors.wardCode?.message}>
@@ -291,7 +285,6 @@ export function StaffFormDialog({
                   placeholder="Chọn phường/xã"
                   searchPlaceholder="Tìm phường/xã..."
                   disabled={!watch("provinceCode") || wardsQuery.isLoading}
-                  className="h-9"
                 />
               </FormField>
               <FormField
@@ -299,10 +292,9 @@ export function StaffFormDialog({
                 error={errors.streetAddress?.message}
                 className="sm:col-span-2"
               >
-                <Input
+                <AdminInput
                   {...register("streetAddress")}
                   placeholder="123 Đường ABC"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
             </div>
@@ -324,7 +316,7 @@ export function StaffFormDialog({
                   onValueChange={(v) => setValue("salonId", Number(v))}
                   disabled={salonsResult === undefined}
                 >
-                  <SelectTrigger className="h-9 text-[13px]">
+                  <AdminSelectTrigger>
                     <SelectValue
                       placeholder={
                         salonsResult === undefined
@@ -334,7 +326,7 @@ export function StaffFormDialog({
                             : "Chọn chi nhánh..."
                       }
                     />
-                  </SelectTrigger>
+                  </AdminSelectTrigger>
                   <SelectContent>
                     {salons.map((s) => (
                       <SelectItem key={s.id} value={String(s.id)}>
@@ -345,10 +337,9 @@ export function StaffFormDialog({
                 </Select>
               </FormField>
               <FormField label="Ngày vào làm" error={errors.hireDate?.message}>
-                <Input
+                <AdminInput
                   {...register("hireDate")}
                   type="date"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField label="Loại hợp đồng">
@@ -356,9 +347,9 @@ export function StaffFormDialog({
                   value={watch("contractType") ?? ""}
                   onValueChange={(v) => setValue("contractType", v)}
                 >
-                  <SelectTrigger className="h-9 text-[13px]">
+                  <AdminSelectTrigger>
                     <SelectValue placeholder="Chọn loại HĐ" />
-                  </SelectTrigger>
+                  </AdminSelectTrigger>
                   <SelectContent>
                     {CONTRACT_TYPE_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>
@@ -373,9 +364,9 @@ export function StaffFormDialog({
                   value={watch("salaryType")?.toString() ?? "2"}
                   onValueChange={(v) => setValue("salaryType", Number(v))}
                 >
-                  <SelectTrigger className="h-9 text-[13px]">
+                  <AdminSelectTrigger>
                     <SelectValue placeholder="Chọn loại lương" />
-                  </SelectTrigger>
+                  </AdminSelectTrigger>
                   <SelectContent>
                     {SALARY_TYPE_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>
@@ -389,11 +380,10 @@ export function StaffFormDialog({
                 label="Đơn giá (theo giờ/ngày tùy loại lương)"
                 error={errors.basicSalary?.message}
               >
-                <Input
+                <AdminInput
                   {...register("basicSalary")}
                   type="number"
                   placeholder="10000000"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
               <FormField label="Trạng thái">
@@ -401,9 +391,9 @@ export function StaffFormDialog({
                   value={watch("status")?.toString() ?? "1"}
                   onValueChange={(v) => setValue("status", Number(v))}
                 >
-                  <SelectTrigger className="h-9 text-[13px]">
+                  <AdminSelectTrigger>
                     <SelectValue placeholder="Chọn trạng thái" />
-                  </SelectTrigger>
+                  </AdminSelectTrigger>
                   <SelectContent>
                     {STATUS_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>
@@ -419,7 +409,7 @@ export function StaffFormDialog({
                   onValueChange={(v) => setValue("role", v)}
                   disabled={rolesResult === undefined}
                 >
-                  <SelectTrigger className="h-9 text-[13px]">
+                  <AdminSelectTrigger>
                     <SelectValue
                       placeholder={
                         rolesResult === undefined
@@ -429,7 +419,7 @@ export function StaffFormDialog({
                             : "Chọn vai trò..."
                       }
                     />
-                  </SelectTrigger>
+                  </AdminSelectTrigger>
                   <SelectContent>
                     {roles.map((r) => (
                       <SelectItem key={r.id} value={r.name}>
@@ -445,7 +435,7 @@ export function StaffFormDialog({
           {/* KPI section removed */}
 
           {!isEdit && (
-            <div className="p-3.5 bg-lotus-leaf/5 border border-lotus-leaf/10 rounded-lg text-lotus-deep/80 text-[12px] flex items-start gap-2.5">
+            <div className="p-3.5 bg-lotus-leaf/5 border border-lotus-leaf/10 rounded-lg text-lotus-deep/80 text-lotus-admin-md flex items-start gap-2.5">
               <KeyRound className="w-4 h-4 text-lotus-leaf mt-0.5 shrink-0" />
               <div>
                 <p className="font-semibold text-lotus-deep">
@@ -500,7 +490,7 @@ function FormSection({
     <div>
       <div className="flex items-center gap-2 mb-3 pb-2 border-b border-stone-100">
         <Icon className="w-4 h-4 text-lotus-leaf" />
-        <h3 className="text-[13px] font-semibold text-lotus-deep">{title}</h3>
+        <h3 className="text-lotus-admin-lg font-semibold text-lotus-deep">{title}</h3>
       </div>
       {children}
     </div>
@@ -525,7 +515,7 @@ function FormField({
 
   return (
     <div className={`space-y-1 ${className ?? ""}`}>
-      <Label className="flex items-center gap-1 text-[12px] font-semibold text-lotus-deep/80">
+      <label className="flex items-center gap-1 text-lotus-admin-md font-semibold text-lotus-deep/80">
         {cleanLabel}
         {isRequired &&
           (tooltip ? (
@@ -542,9 +532,9 @@ function FormField({
           ) : (
             <span className="text-red-500">*</span>
           ))}
-      </Label>
+      </label>
       {children}
-      {error && <p className="text-[11px] text-red-500 font-medium">{error}</p>}
+      {error && <p className="text-lotus-admin-base text-red-500 font-medium">{error}</p>}
     </div>
   );
 }

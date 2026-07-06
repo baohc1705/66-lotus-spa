@@ -9,17 +9,11 @@ import {
   DateTimeCell,
   IndexCell,
 } from "@/shared/components/DataTable/tableCells";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
 
 import { CUSTOMER_COLUMN_LABELS } from "./useActiveCustomerColumns";
 import { CUSTOMER_PERM } from "../constants/customer.permissions";
 import type { CustomerDto } from "../types/customer.types";
-
-const GENDER_MAP: Record<string, string> = {
-  "0": "Nam",
-  "1": "Nữ",
-  "2": "Khác",
-};
+import { GENDER_MAP } from "@/shared/constants/display.const";
 
 interface UseDeletedCustomerColumnsParams {
   pageIndex: number;
@@ -65,13 +59,13 @@ export function useDeletedCustomerColumns({
                     className="w-8 h-8 object-cover"
                   />
                 ) : (
-                  <span className="text-[11px] font-bold text-amber-600">
+                  <span className="text-lotus-admin-base font-bold text-amber-600">
                     {(cust.fullName ?? "?").charAt(0).toUpperCase()}
                   </span>
                 )}
               </div>
-              <span className="text-[13px] font-semibold text-lotus-deep truncate max-w-[140px]">
-                {cust.fullName ?? "—"}
+              <span className="text-lotus-admin-lg font-semibold text-lotus-deep truncate max-w-[140px]">
+                {cust.fullName ?? "â€”"}
               </span>
             </div>
           );
@@ -82,7 +76,9 @@ export function useDeletedCustomerColumns({
         accessorKey: "phone",
         header: cols.phone,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80">{row.original.phone ?? "—"}</span>
+          <span className="text-lotus-deep/80">
+            {row.original.phone ?? "â€”"}
+          </span>
         ),
         size: 110,
       },
@@ -90,7 +86,9 @@ export function useDeletedCustomerColumns({
         accessorKey: "email",
         header: cols.email,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/70">{row.original.email ?? "—"}</span>
+          <span className="text-lotus-deep/70">
+            {row.original.email ?? "â€”"}
+          </span>
         ),
         size: 180,
       },
@@ -99,7 +97,7 @@ export function useDeletedCustomerColumns({
         header: cols.gender,
         cell: ({ row }) => (
           <span className="text-lotus-deep/70">
-            {GENDER_MAP[row.original.gender ?? ""] ?? "—"}
+            {GENDER_MAP[row.original.gender ?? ""] ?? "â€”"}
           </span>
         ),
         size: 90,
@@ -132,7 +130,7 @@ export function useDeletedCustomerColumns({
             <Button
               variant="outline"
               size="sm"
-              className={TABLE_STYLES.toolbarBtn}
+              className="lotus-admin-table-toolbar-btn"
               onClick={() => onRestore(row.original)}
             >
               <RotateCcw className="w-3.5 h-3.5" />

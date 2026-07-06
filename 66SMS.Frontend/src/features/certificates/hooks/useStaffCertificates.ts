@@ -10,6 +10,7 @@ import type {
 import type { Result } from "@/shared/types/common.types";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
 
 const ENTITY = "chứng chỉ";
 
@@ -50,8 +51,7 @@ export function useCreateStaffCertificate() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("tạo", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
     },
   });
 }
@@ -70,8 +70,7 @@ export function useUpdateStaffCertificate() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("cập nhật", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
     },
   });
 }
@@ -89,8 +88,7 @@ export function useDeleteStaffCertificate() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("xóa", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }

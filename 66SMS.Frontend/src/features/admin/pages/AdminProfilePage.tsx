@@ -224,7 +224,7 @@ export function AdminProfilePage() {
           {/* Menu Card */}
           <div className="bg-white/70 backdrop-blur-md rounded-admin border-0 shadow-sm overflow-hidden">
             <div className="px-4 py-2.5 border-b border-stone-200/30 bg-white/30">
-              <span className="text-[11px] font-bold text-lotus-stone uppercase tracking-wider block">Menu</span>
+              <span className="text-lotus-admin-base font-bold text-lotus-stone uppercase tracking-wider block">Menu</span>
             </div>
             <nav className="flex flex-col">
               <button

@@ -12,7 +12,7 @@ import {
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { IndexCell } from "@/shared/components/DataTable/tableCells";
+import { IndexCell, PriceCell, DateTimeCell } from "@/shared/components/DataTable/tableCells";
 import { INVOICE_PERM } from "../constants/invoice.permissions";
 import { INVOICE_STATUS, PAYMENT_METHOD, type InvoiceDto } from "../types/invoice.types";
 
@@ -87,7 +87,7 @@ export function useActiveInvoiceColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="font-mono text-[12px] text-lotus-stone">
+          <span className="font-mono text-lotus-admin-md text-lotus-stone">
             {row.original.invoiceCode ?? "—"}
           </span>
         ),
@@ -98,11 +98,11 @@ export function useActiveInvoiceColumns({
         header: cols.customerName,
         cell: ({ row }) => (
           <div>
-            <p className="text-[13px] font-semibold text-lotus-deep truncate max-w-[180px]">
+            <p className="text-lotus-admin-lg font-semibold text-lotus-deep truncate max-w-[180px]">
               {row.original.customerName ?? "Khách vãng lai"}
             </p>
             {row.original.customerPhone && (
-              <p className="text-[11px] text-lotus-stone">
+              <p className="text-lotus-admin-base text-lotus-stone">
                 {row.original.customerPhone}
               </p>
             )}
@@ -121,18 +121,14 @@ export function useActiveInvoiceColumns({
             onSort={onSort}
           />
         ),
-        cell: ({ row }) => (
-          <span className="text-lotus-deep font-semibold">
-            {(row.original.totalAmount ?? 0).toLocaleString("vi-VN")}đ
-          </span>
-        ),
+        cell: ({ row }) => <PriceCell value={row.original.totalAmount} />,
         size: 130,
       },
       {
         accessorKey: "paymentMethod",
         header: cols.paymentMethod,
         cell: ({ row }) => (
-          <span className="text-[12px] text-lotus-stone">
+          <span className="text-lotus-admin-md text-lotus-stone">
             {PAYMENT_LABEL[row.original.paymentMethod ?? 0] ?? "—"}
           </span>
         ),
@@ -160,14 +156,7 @@ export function useActiveInvoiceColumns({
             onSort={onSort}
           />
         ),
-        cell: ({ row }) => {
-          const d = row.original.issuedAt;
-          return (
-            <span className="text-[12px] text-lotus-stone">
-              {d ? new Date(d).toLocaleString("vi-VN") : "—"}
-            </span>
-          );
-        },
+        cell: ({ row }) => <DateTimeCell value={row.original.issuedAt} />,
         size: 150,
       },
       {

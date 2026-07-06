@@ -144,11 +144,11 @@ export function StaffAppointmentsPage() {
   return (
     <div className="flex flex-col gap-4 h-[calc(100vh-8rem)] min-h-[500px]">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#1A56DB]/10 flex items-center justify-center">
-          <CalendarDays className="w-5 h-5 text-[#1A56DB]" />
+        <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+          <CalendarDays className="w-5 h-5 text-blue-600" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#2B3674]">Lịch hẹn của tôi</h1>
+          <h1 className="text-xl font-bold text-lotus-deep">Lịch hẹn của tôi</h1>
           <p className="text-sm text-gray-500">
             Xem lịch hẹn khách theo ngày hoặc tuần — nhấn &quot;Hôm nay&quot; để
             về ngày hiện tại
@@ -164,10 +164,10 @@ export function StaffAppointmentsPage() {
         weekLabel={weekLabel}
       />
 
-      <div className="flex-1 flex flex-col min-h-0 bg-[#F4F7FE] rounded-xl overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 bg-blue-50 rounded-xl overflow-hidden">
         {isLoadingStaff || schedule.isLoading ? (
           <div className="flex-1 flex items-center justify-center bg-white rounded-xl border border-[var(--color-border)]">
-            <Loader2 className="w-8 h-8 text-[#1A56DB] animate-spin" />
+            <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
           </div>
         ) : schedule.isError ? (
           <div className="flex-1 flex items-center justify-center bg-white rounded-xl border text-red-500 text-sm gap-2">
@@ -175,7 +175,7 @@ export function StaffAppointmentsPage() {
             <button
               type="button"
               onClick={() => schedule.refetch()}
-              className="underline text-[#1A56DB]"
+              className="underline text-blue-600"
             >
               Thử lại
             </button>

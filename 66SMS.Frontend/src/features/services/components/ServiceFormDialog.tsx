@@ -3,9 +3,8 @@ import {
   useCreateService,
   useUpdateService,
 } from "@/features/services/hooks/useServices";
-import { serviceProductApi, serviceImageApi } from "@/features/services/api/service.api";
-import type { ServiceDTO, ServiceImageResponse, ServiceProductResponse } from "../types/service.types";
-import type { ServiceCategoryDTO } from "@/features/service_categories/types/service_category.types";
+import type { ServiceDto, ServiceImageResponse, ServiceProductResponse } from "../types/service.types";
+import type { ServiceCategoryDto } from "@/features/service_categories/types/serviceCategory.types";
 import type { ProductDto } from "@/features/products/types/product.types";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import {
@@ -38,57 +37,48 @@ import {
   Star,
   X,
 } from "lucide-react";
-import { uploadApi } from "@/shared/api/upload.api";
 import { FormField } from "@/shared/components/forms/FormField";
-import { Input } from "@/shared/components/ui/input";
-import { Textarea } from "@/shared/components/ui/textarea";
+import { AdminInput } from "@/shared/components/forms/AdminInput";
+import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
+import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
+import { formatCurrency } from "@/shared/utils/currency";
 import { Switch } from "@/shared/components/ui/switch";
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
 import { useServiceCategories } from "@/features/service_categories/hooks/useServiceCategories";
-import { useProducts } from "@/features/products/hooks/useProducts";
+import { useAdminProducts } from "@/features/products/hooks/useProducts";
 import { ServiceCategoryFormDialog } from "@/features/service_categories/components/ServiceCategoryFormDialog";
 
 interface ServiceFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  service?: ServiceDTO | null;
+  service?: ServiceDto | null;
+  onSuccess?: (service: ServiceDto) => void;
 }
 
 export function ServiceFormDialog({
   open,
   onOpenChange,
   service,
+  onSuccess,
 }: ServiceFormDialogProps) {
   const isEdit = !!service;
   const createMutation = useCreateService();
   const updateMutation = useUpdateService();
   const isPending = createMutation.isPending || updateMutation.isPending;
-  const [pendingFiles, setPendingFiles] = useState<Record<number, File>>({});
   const [imagePreviews, setImagePreviews] = useState<Record<number, string>>({});
-  const [isUploading, setIsUploading] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
 
   // Fetch lookups
-  const { data: categoriesData } = useServiceCategories({
-    pageIndex: 1,
-    pageSize: 500,
-  });
-  const categories = useMemo(
-    () => categoriesData?.data?.items ?? [],
-    [categoriesData],
-  );
+  const { data: categoriesResult } = useServiceCategories({ pageIndex: 1, pageSize: 100 });
+  const categories = useMemo(() => categoriesResult?.data?.items ?? [], [categoriesResult]);
 
-  const { data: productsData } = useProducts({ pageIndex: 1, pageSize: 500 });
-  const products = useMemo(
-    () => productsData?.data?.items ?? [],
-    [productsData],
-  );
+  const { data: productsResult } = useAdminProducts({ pageIndex: 1, pageSize: 1000 });
+  const products = useMemo(() => productsResult?.data?.items ?? [], [productsResult]);
 
   const form = useForm<ServiceFormValues>({
     resolver: zodResolver(
@@ -99,22 +89,13 @@ export function ServiceFormDialog({
 
   const {
     register,
-    control,
     handleSubmit,
     formState: { errors },
     reset,
     setValue,
     watch,
-  } = form;
-
-  const {
-    fields: imageFields,
-    append: appendImage,
-    remove: removeImage,
-  } = useFieldArray({
     control,
-    name: "images",
-  });
+  } = form;
 
   const {
     fields: productFields,
@@ -125,140 +106,67 @@ export function ServiceFormDialog({
     name: "serviceProducts",
   });
 
+  const {
+    fields: imageFields,
+    append: appendImage,
+    remove: removeImage,
+  } = useFieldArray({
+    control,
+    name: "images",
+  });
+
   useEffect(() => {
     if (open) {
-      setPendingFiles({});
       setImagePreviews({});
       reset(getDefaultValues(service));
     }
   }, [open, service, reset]);
 
-  // Handle dynamic pricing calculation
+  // Recalculate selling price from cost price + sum of product cost
   const watchProducts = watch("serviceProducts");
   const watchCostPrice = watch("costPrice");
   const serializedProducts = JSON.stringify(watchProducts);
 
   useEffect(() => {
     let productsCost = 0;
-    if (watchProducts) {
-      watchProducts.forEach((vp) => {
-        if (vp.productId && vp.quantityUsed) {
-          const product = products.find((p: ProductDto) => p.id === vp.productId);
-          if (product?.costPrice) {
-            productsCost += product.costPrice * vp.quantityUsed;
-          }
+    if (watchProducts && watchProducts.length > 0) {
+      for (const p of watchProducts) {
+        const prod = products.find((prodItem) => prodItem.id === p.productId);
+        if (prod && prod.costPrice) {
+          productsCost += prod.costPrice * (p.quantityUsed || 0);
         }
-      });
+      }
     }
     const base = watchCostPrice || 0;
     setValue("sellingPrice", base + productsCost, { shouldValidate: true, shouldDirty: true });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serializedProducts, watchCostPrice, products, setValue]);
 
-  const onSubmit = async (data: ServiceFormValues) => {
-    setIsUploading(true);
-    try {
-      const images = await Promise.all(
-        (data.images || []).map(async (img, index) => {
-          const file = pendingFiles[index];
-          if (file) {
-            const result = await uploadApi.uploadImage(file, 'service');
-            return { id: img.id, url: (result.isSuccess && result.data) ? result.data : '', sortOrder: img.sortOrder, isPrimary: img.isPrimary };
-          }
-          return { id: img.id, url: img.url, sortOrder: img.sortOrder, isPrimary: img.isPrimary };
-        })
-      );
-      
-      if (isEdit && service?.id) {
-        // Sync Service Products
-        const existingProducts = service.serviceProducts || [];
-        const formProducts = data.serviceProducts || [];
-        
-        // Delete
-        const toDeleteProducts = existingProducts.filter((ep: ServiceProductResponse) => !formProducts.some((fp) => fp.id === ep.id));
-        for (const p of toDeleteProducts) {
-          if (p.id) await serviceProductApi.delete(p.id);
-        }
-        
-        // Create / Update
-        for (const fp of formProducts) {
-          if (fp.id) {
-            await serviceProductApi.update(fp.id, {
-              serviceId: service.id,
-              productId: fp.productId,
-              quantityUsed: fp.quantityUsed,
-              note: fp.note,
-            });
-          } else {
-            await serviceProductApi.create({
-              serviceId: service.id,
-              productId: fp.productId,
-              quantityUsed: fp.quantityUsed,
-              note: fp.note,
-            });
-          }
-        }
-
-        // Sync Service Images
-        const existingImages = service.images || [];
-        const formImages = images;
-
-        // Delete
-        const toDeleteImages = existingImages.filter((ei: ServiceImageResponse) => !formImages.some((fi) => fi.id === ei.id));
-        for (const img of toDeleteImages) {
-          if (img.id) await serviceImageApi.delete(img.id);
-        }
-
-        // Create / Update
-        for (const fi of formImages) {
-          if (fi.id) {
-            await serviceImageApi.update(fi.id, {
-              serviceId: service.id,
-              url: fi.url,
-              sortOrder: fi.sortOrder,
-              isPrimary: fi.isPrimary,
-            });
-          } else {
-            if (fi.url) {
-              await serviceImageApi.create({
-                serviceId: service.id,
-                url: fi.url,
-                sortOrder: fi.sortOrder || 0,
-                isPrimary: fi.isPrimary || false,
-              });
+  const onSubmit = (data: ServiceFormValues) => {
+    if (isEdit && service?.id) {
+      updateMutation.mutate(
+        {
+          id: service.id,
+          payload: data as UpdateServicePayload,
+        },
+        {
+          onSuccess: (result) => {
+            if (result.isSuccess) {
+              onOpenChange(false);
+              onSuccess?.({ ...service, ...data } as ServiceDto);
             }
+          },
+        },
+      );
+    } else {
+      createMutation.mutate(data as CreateServicePayload, {
+        onSuccess: (result) => {
+          if (result.isSuccess) {
+            onOpenChange(false);
+            onSuccess?.({ ...data } as ServiceDto);
           }
-        }
-
-        const payload = {
-          ...data,
-          // Remove images and serviceProducts from payload because UpdateServiceCommand doesn't take them
-        };
-
-        updateMutation.mutate(
-          { id: service.id, payload: payload as UpdateServicePayload },
-          { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false); } },
-        );
-      } else {
-        const payload = {
-          ...data,
-          serviceImages: images.map(img => ({
-            url: img.url,
-            sortOrder: img.sortOrder,
-            isPrimary: img.isPrimary
-          })),
-          serviceProducts: data.serviceProducts?.map((sp) => ({
-            productId: sp.productId,
-            quantityUsed: sp.quantityUsed,
-            note: sp.note,
-          })),
-        };
-        createMutation.mutate(payload as CreateServicePayload, {
-          onSuccess: (result) => { if (result.isSuccess) onOpenChange(false); },
-        });
-      }
-    } finally {
-      setIsUploading(false);
+        },
+      });
     }
   };
 
@@ -285,18 +193,16 @@ export function ServiceFormDialog({
                   tooltip="Để trống hệ thống sẽ tự sinh"
                   error={errors.code?.message}
                 >
-                  <Input
+                  <AdminInput
                     {...register("code")}
                     placeholder="Ví dụ: DV001"
-                    className="h-9"
                   />
                 </FormField>
 
                 <FormField label="Tên dịch vụ *" error={errors.name?.message}>
-                  <Input
+                  <AdminInput
                     {...register("name")}
                     placeholder="Nhập tên dịch vụ"
-                    className="h-9"
                   />
                 </FormField>
 
@@ -312,11 +218,11 @@ export function ServiceFormDialog({
                           setValue("categoryId", parseInt(val))
                         }
                       >
-                        <SelectTrigger className="h-9">
+                        <AdminSelectTrigger>
                           <SelectValue placeholder="Chọn nhóm dịch vụ" />
-                        </SelectTrigger>
+                        </AdminSelectTrigger>
                         <SelectContent>
-                          {categories.map((c: ServiceCategoryDTO) => (
+                          {categories.map((c: ServiceCategoryDto) => (
                             <SelectItem
                               key={c.id}
                               value={c.id?.toString() || ""}
@@ -331,7 +237,7 @@ export function ServiceFormDialog({
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="h-9 px-3 shrink-0"
+                      className="shrink-0"
                       onClick={() => setCategoryOpen(true)}
                     >
                       <Plus className="w-4 h-4 mr-1" />
@@ -344,11 +250,10 @@ export function ServiceFormDialog({
                   label="Thời gian (phút)"
                   error={errors.durationMins?.message}
                 >
-                  <Input
+                  <AdminInput
                     {...register("durationMins", { valueAsNumber: true })}
                     type="number"
                     placeholder="60"
-                    className="h-9"
                   />
                 </FormField>
 
@@ -357,11 +262,10 @@ export function ServiceFormDialog({
                   tooltip="Giá vốn của dịch vụ (Chưa bao gồm sản phẩm đi kèm)"
                   error={errors.costPrice?.message}
                 >
-                  <Input
+                  <AdminInput
                     {...register("costPrice", { valueAsNumber: true })}
                     type="number"
                     placeholder="0"
-                    className="h-9"
                   />
                 </FormField>
 
@@ -370,11 +274,11 @@ export function ServiceFormDialog({
                   tooltip="Giá bán = Giá vốn + Chi phí sản phẩm tiêu hao"
                   error={errors.sellingPrice?.message}
                 >
-                  <Input
+                  <AdminInput
                     {...register("sellingPrice", { valueAsNumber: true })}
                     type="number"
                     disabled
-                    className="h-9 bg-stone-50"
+                    className="bg-stone-50"
                   />
                 </FormField>
 
@@ -382,11 +286,10 @@ export function ServiceFormDialog({
                   label="Tỷ lệ hoa hồng (%)"
                   error={errors.commissionRate?.message}
                 >
-                  <Input
+                  <AdminInput
                     {...register("commissionRate", { valueAsNumber: true })}
                     type="number"
                     placeholder="0"
-                    className="h-9"
                   />
                 </FormField>
 
@@ -394,11 +297,10 @@ export function ServiceFormDialog({
                   label="Thứ tự hiển thị"
                   error={errors.sortOrder?.message}
                 >
-                  <Input
+                  <AdminInput
                     {...register("sortOrder", { valueAsNumber: true })}
                     type="number"
                     placeholder="0"
-                    className="h-9"
                   />
                 </FormField>
 
@@ -407,7 +309,7 @@ export function ServiceFormDialog({
                     label="Mô tả ngắn"
                     error={errors.description?.message}
                   >
-                    <Textarea
+                    <AdminTextarea
                       {...register("description")}
                       placeholder="Mô tả ngắn..."
                     />
@@ -419,7 +321,7 @@ export function ServiceFormDialog({
                     label="Nội dung chi tiết"
                     error={errors.content?.message}
                   >
-                    <Textarea
+                    <AdminTextarea
                       {...register("content")}
                       placeholder="Nội dung chi tiết dịch vụ..."
                       className="min-h-[100px]"
@@ -463,26 +365,18 @@ export function ServiceFormDialog({
                               `serviceProducts.${index}.productId`,
                               parseInt(val),
                             );
-                            const prod = products.find(
-                              (p: ProductDto) => p.id === parseInt(val),
-                            );
-                            if (prod)
-                              setValue(
-                                `serviceProducts.${index}.costPrice`,
-                                prod.costPrice ?? undefined,
-                              );
                           }}
                         >
-                          <SelectTrigger className="h-9">
+                          <AdminSelectTrigger>
                             <SelectValue placeholder="Chọn sản phẩm" />
-                          </SelectTrigger>
+                          </AdminSelectTrigger>
                           <SelectContent>
                             {products.map((p: ProductDto) => (
                               <SelectItem
                                 key={p.id}
                                 value={p.id?.toString() || ""}
                               >
-                                {p.name} - {p.costPrice?.toLocaleString() || 0}đ
+                                {p.name} - {formatCurrency(p.costPrice)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -495,14 +389,13 @@ export function ServiceFormDialog({
                       </div>
 
                       <div className="col-span-2">
-                        <Input
+                        <AdminInput
                           {...register(
                             `serviceProducts.${index}.quantityUsed`,
                             { valueAsNumber: true },
                           )}
                           type="number"
                           placeholder="SL"
-                          className="h-9"
                         />
                         {errorObj?.quantityUsed && (
                           <span className="text-red-500 text-xs mt-1 block">
@@ -512,16 +405,15 @@ export function ServiceFormDialog({
                       </div>
 
                       <div className="col-span-3">
-                         <div className="h-9 flex items-center justify-end px-3 bg-stone-100 rounded-md border border-transparent text-[13px] text-stone-700 font-medium">
-                           {total > 0 ? `${total.toLocaleString()} đ` : '0 đ'}
+                         <div className="lotus-admin-select-trigger flex items-center justify-end bg-stone-100 border border-transparent text-lotus-admin-md text-stone-700 font-medium">
+                           {formatCurrency(total > 0 ? total : 0)}
                          </div>
                       </div>
 
                       <div className="col-span-2">
-                        <Input
+                        <AdminInput
                           {...register(`serviceProducts.${index}.note`)}
                           placeholder="Ghi chú"
-                          className="h-9"
                         />
                       </div>
 
@@ -559,10 +451,8 @@ export function ServiceFormDialog({
                 {imageFields.map((field, index) => {
                   const isPrimary = watch(`images.${index}.isPrimary`);
                   const preview = imagePreviews[index] || watch(`images.${index}.url`);
-                  //const errorObj = errors.images?.[index];
                   return (
                     <div key={field.id} className="flex flex-col gap-1.5 w-[110px]">
-                      {/* Image zone */}
                       <div className="relative group/card">
                         <button
                           type="button"
@@ -584,11 +474,10 @@ export function ServiceFormDialog({
                           ) : (
                             <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-stone-400 group-hover/card:text-lotus-leaf transition-colors">
                               <ImageIcon className="h-6 w-6" />
-                              <span className="text-[10px] font-medium">Chọn ảnh</span>
+                              <span className="text-lotus-admin-xs font-medium">Chọn ảnh</span>
                             </div>
                           )}
                         </button>
-                        {/* Remove */}
                         <button
                           type="button"
                           onClick={() => removeImage(index)}
@@ -596,9 +485,8 @@ export function ServiceFormDialog({
                         >
                           <X className="h-3 w-3" />
                         </button>
-                        {/* Primary badge */}
                         {isPrimary && (
-                          <div className="absolute bottom-1.5 left-1.5 bg-lotus-leaf text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none pointer-events-none">
+                          <div className="absolute bottom-1.5 left-1.5 bg-lotus-leaf text-white text-lotus-admin-xs font-bold px-1.5 py-0.5 rounded-full leading-none pointer-events-none">
                             Chính
                           </div>
                         )}
@@ -611,11 +499,9 @@ export function ServiceFormDialog({
                         onChange={(e) => {
                           const file = e.target.files?.[0]
                           if (!file) return
-                          setPendingFiles((prev: Record<number, File>) => ({ ...prev, [index]: file }))
                           setImagePreviews((prev: Record<number, string>) => ({ ...prev, [index]: URL.createObjectURL(file) }))
                         }}
                       />
-                      {/* isPrimary star */}
                       <button
                         type="button"
                         onClick={() => {
@@ -624,7 +510,7 @@ export function ServiceFormDialog({
                           setValue(`images.${index}.isPrimary`, !isPrimary);
                         }}
                         className={[
-                          'flex items-center gap-1 text-[11px] font-medium transition-colors self-start',
+                          'flex items-center gap-1 text-lotus-admin-base font-medium transition-colors self-start',
                           isPrimary ? 'text-lotus-leaf' : 'text-stone-400 hover:text-stone-600',
                         ].join(' ')}
                       >
@@ -635,14 +521,13 @@ export function ServiceFormDialog({
                   );
                 })}
 
-                {/* Add card */}
                 <button
                   type="button"
                   onClick={() => appendImage({ url: '', isPrimary: imageFields.length === 0, sortOrder: 0 })}
                   className="flex h-[88px] w-[110px] flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-stone-300 text-stone-400 transition-all hover:border-lotus-leaf hover:bg-lotus-leaf/5 hover:text-lotus-leaf self-start"
                 >
                   <Plus className="h-5 w-5" />
-                  <span className="text-[10px] font-medium">Thêm ảnh</span>
+                  <span className="text-lotus-admin-xs font-medium">Thêm ảnh</span>
                 </button>
               </div>
             </FormSection>
@@ -661,7 +546,7 @@ export function ServiceFormDialog({
                 type="submit"
                 variant="admin"
                 size="sm"
-                loading={isPending || isUploading}
+                loading={isPending}
               >
                 {isEdit ? "Cập nhật" : "Tạo dịch vụ"}
               </Button>
@@ -670,21 +555,18 @@ export function ServiceFormDialog({
         </DialogContent>
       </Dialog>
 
-      {/* Nested Category Dialog */}
       <ServiceCategoryFormDialog
         open={categoryOpen}
         onOpenChange={setCategoryOpen}
-        onSuccess={(cat: ServiceCategoryDTO) => {
-          if (cat.id) {
-            setValue("categoryId", cat.id ?? 0);
-          }
+        onSuccess={(cat: ServiceCategoryDto) => {
+          setValue("categoryId", cat.id!);
         }}
       />
     </>
   );
 }
 
-function getDefaultValues(service?: ServiceDTO | null): ServiceFormValues {
+function getDefaultValues(service?: ServiceDto | null): ServiceFormValues {
   if (service) {
     return {
       categoryId: service.categoryId ?? 0,
@@ -711,7 +593,7 @@ function getDefaultValues(service?: ServiceDTO | null): ServiceFormValues {
           productId: sp.productId ?? 0,
           quantityUsed: sp.quantityUsed ?? 1,
           note: sp.note ?? "",
-          costPrice: 0, // Will be populated on select/load if needed
+          costPrice: 0,
         })) ?? [],
     };
   }

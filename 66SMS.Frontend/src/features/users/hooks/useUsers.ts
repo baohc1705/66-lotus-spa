@@ -1,3 +1,5 @@
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
@@ -6,17 +8,16 @@ import type { PageRequest, Result } from "@/shared/types/common.types";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";
 import { useAuthStore } from "@/features/auth/stores/authStore";
-import type { CreateUserPayload, UpdateUserPayload } from "../schemas/user.schema";
+import type {
+  CreateUserPayload,
+  UpdateUserPayload,
+} from "../types/user.types";
 
 const ENTITY = "người dùng";
 
 export const USER_KEYS = {
-  all: ["users"] as const,
-  me: () => [...USER_KEYS.all, "me"] as const,
-  lists: () => [...USER_KEYS.all, "list"] as const,
-  list: (params: PageRequest) => [...USER_KEYS.lists(), params] as const,
-  details: () => [...USER_KEYS.all, "detail"] as const,
-  detail: (id: number) => [...USER_KEYS.details(), id] as const,
+  ...createEntityQueryKeys<PageRequest>("users"),
+  me: () => ["users", "me"] as const,
 };
 
 export function useGetMe() {
@@ -54,8 +55,7 @@ export function useCreateUser() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("tạo", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
     },
   });
 }
@@ -73,8 +73,9 @@ export function useUpdateUser() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("cập nhật", ENTITY);
-      toast.error(msg);
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+      );
     },
   });
 }
@@ -92,8 +93,7 @@ export function useDeleteUser() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("xóa", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }
@@ -111,8 +111,7 @@ export function useDeleteUserMultiples() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("xóa", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }

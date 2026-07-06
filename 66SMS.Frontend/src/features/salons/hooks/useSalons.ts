@@ -1,3 +1,5 @@
+import { createEntityQueryKeys } from '@/shared/utils/queryKeys';
+import { getErrorMessage } from '@/shared/utils/errorUtils';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
@@ -13,13 +15,7 @@ import type { Result } from "@/shared/types/common.types";
 
 const ENTITY = "chi nhánh";
 
-export const SALON_KEYS = {
-  all: ["salons"] as const,
-  lists: () => [...SALON_KEYS.all, "list"] as const,
-  list: (params: SalonQueryParams) => [...SALON_KEYS.lists(), params] as const,
-  details: () => [...SALON_KEYS.all, "detail"] as const,
-  detail: (id: number) => [...SALON_KEYS.details(), id] as const,
-};
+export const SALON_KEYS = createEntityQueryKeys<SalonQueryParams>("salons");
 
 export function useSalons(params: SalonQueryParams, enabled = true) {
   return useQuery({
@@ -31,7 +27,7 @@ export function useSalons(params: SalonQueryParams, enabled = true) {
 
 export function useAdminSalons(params: SalonQueryParams, enabled = true) {
   return useQuery({
-    queryKey: SALON_KEYS.list(params),
+    queryKey: SALON_KEYS.adminList(params),
     queryFn: () => salonApi.getAdminAll(params),
     enabled,
   });
@@ -58,8 +54,7 @@ export function useCreateSalonMutation() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("tạo", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
     },
   });
 }
@@ -83,8 +78,7 @@ export function useUpdateSalonMutation() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("cập nhật", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
     },
   });
 }
@@ -102,8 +96,7 @@ export function useDeleteSalonMutation() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("xóa", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }

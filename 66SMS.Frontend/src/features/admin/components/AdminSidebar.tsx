@@ -112,7 +112,7 @@ export function AdminSidebar({
                               className={`w-[1.125rem] h-[1.125rem] shrink-0 transition-transform duration-300 ${isActive ? "scale-110" : ""}`}
                             />
                             {isOpen && (
-                              <span className="font-sans font-medium text-[13px] tracking-wide whitespace-nowrap">
+                              <span className="font-sans font-medium text-lotus-admin-lg tracking-wide whitespace-nowrap">
                                 {item.label}
                               </span>
                             )}
@@ -168,7 +168,7 @@ export function AdminSidebar({
                           className={`w-[1.125rem] h-[1.125rem] shrink-0 transition-transform duration-300 ${isActive ? "scale-110" : ""}`}
                         />
                         {isOpen && (
-                          <span className="font-sans font-medium text-[13px] tracking-wide whitespace-nowrap">
+                          <span className="font-sans font-medium text-lotus-admin-lg tracking-wide whitespace-nowrap">
                             {item.label}
                           </span>
                         )}

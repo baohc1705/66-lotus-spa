@@ -64,7 +64,7 @@ export function useActiveSalonColumns({
         accessorKey: "code",
         header: cols.code,
         cell: ({ row }) => (
-          <span className="font-mono text-[12px] bg-stone-100 px-1.5 py-0.5 rounded text-lotus-deep">
+          <span className="font-mono text-lotus-admin-md bg-stone-100 px-1.5 py-0.5 rounded text-lotus-deep">
             {row.original.code}
           </span>
         ),
@@ -91,7 +91,7 @@ export function useActiveSalonColumns({
         header: cols.fullAddress,
         cell: ({ row }) => (
           <span
-            className="text-lotus-deep/70 text-[12px] block truncate"
+            className="text-lotus-deep/70 text-lotus-admin-md block truncate"
             style={{ maxWidth: 250 }}
             title={row.original.fullAddress}
           >

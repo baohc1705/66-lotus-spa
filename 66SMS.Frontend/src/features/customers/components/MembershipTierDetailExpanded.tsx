@@ -58,7 +58,7 @@ export function MembershipTierDetailExpanded({
             <h3 className="text-base font-bold text-lotus-deep truncate">
               {tier.name}
             </h3>
-            <p className="text-[12px] font-medium text-lotus-stone mt-0.5">
+            <p className="text-lotus-admin-md font-medium text-lotus-stone mt-0.5">
               Trạng thái:{" "}
               <span
                 className={
@@ -89,10 +89,10 @@ export function MembershipTierDetailExpanded({
             value={`x${tier.pointMultiplier}`}
           />
           <div className="flex flex-col">
-            <p className="text-[12px] font-medium text-lotus-stone mb-1">
+            <p className="text-lotus-admin-md font-medium text-lotus-stone mb-1">
               Ngày tạo
             </p>
-            <p className="text-[13px] text-lotus-deep font-medium">
+            <p className="text-lotus-admin-lg text-lotus-deep font-medium">
               {tier.createdAt || "—"}
             </p>
           </div>
@@ -101,10 +101,10 @@ export function MembershipTierDetailExpanded({
         {/* Benefits & Actions */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mt-2 pt-4 border-t border-stone-100/80">
           <div className="flex-1">
-            <p className="text-[12px] font-medium text-lotus-stone mb-1">
+            <p className="text-lotus-admin-md font-medium text-lotus-stone mb-1">
               Quyền lợi chi tiết
             </p>
-            <p className="text-[13px] text-lotus-deep whitespace-pre-wrap">
+            <p className="text-lotus-admin-lg text-lotus-deep whitespace-pre-wrap">
               {tier.benefits || "Chưa cập nhật quyền lợi"}
             </p>
           </div>
@@ -113,7 +113,7 @@ export function MembershipTierDetailExpanded({
               variant="admin"
               size="sm"
               onClick={() => onEdit?.(tier)}
-              className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-[13px] gap-1.5 rounded-md transition-opacity shrink-0"
+              className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-lotus-admin-lg gap-1.5 rounded-md transition-opacity shrink-0"
             >
               <Pencil className="w-3.5 h-3.5" />
               Chỉnh sửa
@@ -140,10 +140,10 @@ function DetailCard({
         <Icon className="w-4 h-4" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[11px] font-medium text-lotus-stone truncate mb-0.5">
+        <p className="text-lotus-admin-base font-medium text-lotus-stone truncate mb-0.5">
           {label}
         </p>
-        <p className="text-[14px] font-semibold text-lotus-deep truncate">
+        <p className="text-lotus-admin-lg font-semibold text-lotus-deep truncate">
           {value}
         </p>
       </div>

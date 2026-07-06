@@ -2,7 +2,7 @@ import axiosInstance from "@/shared/api/axiosInstance";
 import { API } from "@/shared/api/endpoints";
 import type { Result, PagedResult, PageRequest } from "@/shared/types/common.types";
 import type { UserDto } from "../types/user.types";
-import type { CreateUserPayload, UpdateUserPayload } from "../schemas/user.schema";
+import type { CreateUserPayload, UpdateUserPayload } from "../types/user.types";
 
 export const usersApi = {
   getMe: () =>

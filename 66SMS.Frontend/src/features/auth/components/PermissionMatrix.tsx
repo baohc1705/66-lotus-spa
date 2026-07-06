@@ -46,11 +46,11 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
           <div className="flex gap-2.5 shrink-0">
             <div className="text-center bg-lotus-cream border border-border rounded-lg px-3.5 py-1.5">
               <div className="text-base font-bold text-lotus-deep leading-none">{selectedRole.roleUsers?.length ?? 0}</div>
-              <div className="text-[10px] text-lotus-stone mt-0.5">thành viên</div>
+              <div className="text-lotus-admin-xs text-lotus-stone mt-0.5">thành viên</div>
             </div>
             <div className="text-center bg-[rgba(62,122,62,0.06)] border border-lotus-leaf/30 rounded-lg px-3.5 py-1.5">
               <div className="text-base font-bold text-lotus-leaf leading-none">{checkedIds.size}</div>
-              <div className="text-[10px] text-lotus-stone mt-0.5">quyền</div>
+              <div className="text-lotus-admin-xs text-lotus-stone mt-0.5">quyền</div>
             </div>
           </div>
         </div>
@@ -69,14 +69,14 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
             <table className="w-full border-collapse min-w-[400px]">
               <thead>
                 <tr className="bg-lotus-cream">
-                  <th className="px-3.5 py-2.5 text-left text-[11px] font-bold text-lotus-stone uppercase tracking-wide border-b border-border w-44">
+                  <th className="px-3.5 py-2.5 text-left text-lotus-admin-base font-bold text-lotus-stone uppercase tracking-wide border-b border-border w-44">
                     Tài nguyên
                   </th>
-                  <th className="px-2 py-2.5 text-center text-[11px] font-bold text-lotus-stone uppercase tracking-wide border-b border-border min-w-[70px]">
+                  <th className="px-2 py-2.5 text-center text-lotus-admin-base font-bold text-lotus-stone uppercase tracking-wide border-b border-border min-w-[70px]">
                     Tất cả
                   </th>
                   {actions.map(a => (
-                    <th key={a} className="px-2 py-2.5 text-center text-[11px] font-bold text-lotus-stone uppercase tracking-wide border-b border-border min-w-[76px]">
+                    <th key={a} className="px-2 py-2.5 text-center text-lotus-admin-base font-bold text-lotus-stone uppercase tracking-wide border-b border-border min-w-[76px]">
                       {a}
                     </th>
                   ))}

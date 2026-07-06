@@ -1,3 +1,5 @@
+import { AdminInput } from '@/shared/components/forms/AdminInput';
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,13 +12,12 @@ import {
   DialogFooter,
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
+
 import { Label } from "@/shared/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
 import { useCreateManualAttendance } from "../hooks/useAttendances";
@@ -101,9 +102,9 @@ export function ManualAttendanceFormDialog({
               value={watch("staffId") ? String(watch("staffId")) : ""}
               onValueChange={(v) => setValue("staffId", Number(v))}
             >
-              <SelectTrigger className="h-9 text-[13px]">
+              <AdminSelectTrigger>
                 <SelectValue placeholder="Chọn nhân viên..." />
-              </SelectTrigger>
+              </AdminSelectTrigger>
               <SelectContent>
                 {staffs.map((s: StaffDto) => (
                   <SelectItem key={s.id} value={String(s.id)}>
@@ -115,7 +116,7 @@ export function ManualAttendanceFormDialog({
           </FormField>
 
           <FormField label="Ngày" error={errors.workDate?.message}>
-            <Input {...register("workDate")} type="date" className="h-9 text-[13px]" />
+            <AdminInput {...register("workDate")} type="date" />
           </FormField>
 
           <FormField label="Loại" error={errors.status?.message}>
@@ -123,9 +124,9 @@ export function ManualAttendanceFormDialog({
               value={String(watch("status") || "")}
               onValueChange={(v) => setValue("status", Number(v))}
             >
-              <SelectTrigger className="h-9 text-[13px]">
+              <AdminSelectTrigger>
                 <SelectValue placeholder="Chọn loại..." />
-              </SelectTrigger>
+              </AdminSelectTrigger>
               <SelectContent>
                 {MANUAL_STATUS_OPTIONS.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
@@ -137,10 +138,9 @@ export function ManualAttendanceFormDialog({
           </FormField>
 
           <FormField label="Ghi chú" error={errors.note?.message}>
-            <Input
+            <AdminInput
               {...register("note")}
               placeholder="Ghi chú (nếu có)"
-              className="h-9 text-[13px]"
             />
           </FormField>
 
@@ -177,9 +177,9 @@ function FormField({
 }) {
   return (
     <div className={`space-y-1 ${className ?? ""}`}>
-      <Label className="text-[12px] font-semibold text-lotus-deep/80">{label}</Label>
+      <Label className="text-lotus-admin-md font-semibold text-lotus-deep/80">{label}</Label>
       {children}
-      {error && <p className="text-[11px] text-red-500 font-medium">{error}</p>}
+      {error && <p className="text-lotus-admin-base text-red-500 font-medium">{error}</p>}
     </div>
   );
 }

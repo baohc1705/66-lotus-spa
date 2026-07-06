@@ -29,7 +29,7 @@ export function CashierBookingModal({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 sm:p-6 transition-opacity animate-in fade-in">
-      <div className="relative w-full max-w-6xl max-h-[90vh] bg-[#FBF7F2] rounded-[24px] shadow-[0_32px_64px_rgba(42,31,26,0.15)] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 border border-lotus-gold/20">
+      <div className="relative w-full max-w-6xl max-h-[90vh] bg-lotus-cream rounded-[24px] shadow-[0_32px_64px_rgba(42,31,26,0.15)] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 border border-lotus-gold/20">
         {/* Header */}
         <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-lotus-gold/10 bg-lotus-cream/80 z-10">
           <h2 className="text-xl font-bold text-lotus-deep">
@@ -44,7 +44,7 @@ export function CashierBookingModal({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar relative bg-[#FBF7F2]">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar relative bg-lotus-cream">
           {/* Decorative Background */}
           <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-[0.03]">
             <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">

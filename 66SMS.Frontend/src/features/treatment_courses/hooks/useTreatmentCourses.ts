@@ -6,6 +6,8 @@ import type { PageRequest, Result } from "@/shared/types/common.types";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type {
   CreateTreatmentCoursePayload,
   UpdateTreatmentCoursePayload,
@@ -13,19 +15,11 @@ import type {
 
 const ENTITY = "liệu trình";
 
-const KEYS = {
-  all: ["treatment-courses"] as const,
-  lists: () => [...KEYS.all, "list"] as const,
-  list: (params: PageRequest) => [...KEYS.lists(), params] as const,
-  deletedLists: () => [...KEYS.all, "deleted"] as const,
-  deletedList: (params: PageRequest) => [...KEYS.deletedLists(), params] as const,
-  details: () => [...KEYS.all, "detail"] as const,
-  detail: (id: number) => [...KEYS.details(), id] as const,
-};
+export const TREATMENT_COURSE_KEYS = createEntityQueryKeys<PageRequest>("treatment-courses");
 
 export function useTreatmentCourses(params: PageRequest, enabled = true) {
   return useQuery({
-    queryKey: KEYS.list(params),
+    queryKey: TREATMENT_COURSE_KEYS.list(params),
     queryFn: () => treatmentCourseApi.getAll(params),
     enabled,
   });
@@ -33,7 +27,7 @@ export function useTreatmentCourses(params: PageRequest, enabled = true) {
 
 export function useAdminTreatmentCourses(params: PageRequest, enabled = true) {
   return useQuery({
-    queryKey: KEYS.list(params),
+    queryKey: TREATMENT_COURSE_KEYS.adminList(params),
     queryFn: () => treatmentCourseApi.adminGetAll(params),
     enabled,
   });
@@ -41,7 +35,7 @@ export function useAdminTreatmentCourses(params: PageRequest, enabled = true) {
 
 export function useDeletedTreatmentCourses(params: PageRequest, enabled = true) {
   return useQuery({
-    queryKey: KEYS.deletedList(params),
+    queryKey: TREATMENT_COURSE_KEYS.deletedList(params),
     queryFn: () => treatmentCourseApi.getAllDeleted(params),
     enabled,
   });
@@ -49,7 +43,7 @@ export function useDeletedTreatmentCourses(params: PageRequest, enabled = true) 
 
 export function useTreatmentCourseDetail(id: number | null) {
   return useQuery({
-    queryKey: KEYS.detail(id!),
+    queryKey: TREATMENT_COURSE_KEYS.detail(id!),
     queryFn: () => treatmentCourseApi.getDetail(id!),
     enabled: id !== null && id > 0,
   });
@@ -62,15 +56,14 @@ export function useCreateTreatmentCourse() {
       treatmentCourseApi.create(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: KEYS.lists() });
+        qc.invalidateQueries({ queryKey: TREATMENT_COURSE_KEYS.all });
         toast.success(TOAST_MSG.createSuccess(ENTITY));
       } else {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("tạo", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
     },
   });
 }
@@ -87,15 +80,14 @@ export function useUpdateTreatmentCourse() {
     }) => treatmentCourseApi.update(id, payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: KEYS.all });
+        qc.invalidateQueries({ queryKey: TREATMENT_COURSE_KEYS.all });
         toast.success(TOAST_MSG.updateSuccess(ENTITY));
       } else {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("cập nhật", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
     },
   });
 }
@@ -106,15 +98,14 @@ export function useDeleteTreatmentCourse() {
     mutationFn: (id: number) => treatmentCourseApi.delete(id),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: KEYS.all });
+        qc.invalidateQueries({ queryKey: TREATMENT_COURSE_KEYS.all });
         toast.success(TOAST_MSG.deleteSuccess(ENTITY));
       } else {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("xóa", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }
@@ -125,15 +116,14 @@ export function useDeleteTreatmentCourseMultiples() {
     mutationFn: (ids: number[]) => treatmentCourseApi.deleteMultiples({ ids }),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: KEYS.all });
+        qc.invalidateQueries({ queryKey: TREATMENT_COURSE_KEYS.all });
         toast.success(TOAST_MSG.bulkDeleteSuccess(ENTITY));
       } else {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("xóa", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }
@@ -145,15 +135,14 @@ export function useRestoreTreatmentCourse() {
       treatmentCourseApi.update(id, { status: StatusActive.Active }),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: KEYS.all });
+        qc.invalidateQueries({ queryKey: TREATMENT_COURSE_KEYS.all });
         toast.success(TOAST_MSG.restoreSuccess(ENTITY));
       } else {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("khôi phục", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)));
     },
   });
 }

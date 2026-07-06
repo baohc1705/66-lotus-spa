@@ -132,7 +132,7 @@ export function WorkSchedulePage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm kiếm nhân viên..."
-                className="pl-9 pr-4 py-2 bg-white border border-stone-200/50 rounded-lg text-[13px] focus:outline-none focus:ring-1 focus:ring-lotus-leaf w-full transition-shadow placeholder:text-stone-400"
+                className="pl-9 pr-4 py-2 bg-white border border-stone-200/50 rounded-lg text-lotus-admin-lg focus:outline-none focus:ring-1 focus:ring-lotus-leaf w-full transition-shadow placeholder:text-stone-400"
               />
             </div>
           )}
@@ -141,7 +141,7 @@ export function WorkSchedulePage() {
             <div className="flex bg-stone-100 p-0.5 rounded-lg border border-stone-200/50 h-9">
               <button
                 onClick={() => setViewMode("shift")}
-                className={`flex items-center gap-1.5 px-3 rounded-md text-[13px] font-semibold transition-colors ${
+                className={`flex items-center gap-1.5 px-3 rounded-md text-lotus-admin-lg font-semibold transition-colors ${
                   viewMode === "shift"
                     ? "bg-white text-lotus-leaf shadow-sm"
                     : "text-lotus-stone hover:text-lotus-deep"
@@ -152,7 +152,7 @@ export function WorkSchedulePage() {
               </button>
               <button
                 onClick={() => setViewMode("staff")}
-                className={`flex items-center gap-1.5 px-3 rounded-md text-[13px] font-semibold transition-colors ${
+                className={`flex items-center gap-1.5 px-3 rounded-md text-lotus-admin-lg font-semibold transition-colors ${
                   viewMode === "staff"
                     ? "bg-white text-lotus-leaf shadow-sm"
                     : "text-lotus-stone hover:text-lotus-deep"
@@ -163,7 +163,7 @@ export function WorkSchedulePage() {
               </button>
               <button
                 onClick={() => setViewMode("single")}
-                className={`flex items-center gap-1.5 px-3 rounded-md text-[13px] font-semibold transition-colors ${
+                className={`flex items-center gap-1.5 px-3 rounded-md text-lotus-admin-lg font-semibold transition-colors ${
                   viewMode === "single"
                     ? "bg-white text-lotus-leaf shadow-sm"
                     : "text-lotus-stone hover:text-lotus-deep"
@@ -181,7 +181,7 @@ export function WorkSchedulePage() {
               onChange={(e) =>
                 setSelectedStaffId(Number(e.target.value) || null)
               }
-              className="px-3 py-1.5 border border-stone-200/50 rounded-lg bg-white text-[13px] font-semibold h-9 focus:outline-none focus:ring-1 focus:ring-lotus-leaf text-lotus-deep"
+              className="px-3 py-1.5 border border-stone-200/50 rounded-lg bg-white text-lotus-admin-lg font-semibold h-9 focus:outline-none focus:ring-1 focus:ring-lotus-leaf text-lotus-deep"
             >
               <option value="">-- Chọn nhân viên --</option>
               {staffList.map((emp) => (
@@ -202,7 +202,7 @@ export function WorkSchedulePage() {
               <ChevronLeft size={16} />
             </button>
 
-            <div className="px-4 text-[13px] font-semibold text-lotus-deep select-none min-w-[170px] text-center border-x border-stone-100">
+            <div className="px-4 text-lotus-admin-lg font-semibold text-lotus-deep select-none min-w-[170px] text-center border-x border-stone-100">
               {weekLabel}
             </div>
 
@@ -217,7 +217,7 @@ export function WorkSchedulePage() {
           <Button
             onClick={handleThisWeek}
             variant="outline"
-            className="text-[13px] h-9"
+            className="text-lotus-admin-lg h-9"
           >
             Tuần này
           </Button>
@@ -226,7 +226,7 @@ export function WorkSchedulePage() {
             <Button
               onClick={() => setIsRepeatDialogOpen(true)}
               variant="outline"
-              className="text-[13px] h-9 gap-1.5"
+              className="text-lotus-admin-lg h-9 gap-1.5"
               disabled={!schedulesData?.data?.items?.length}
               title={
                 !schedulesData?.data?.items?.length

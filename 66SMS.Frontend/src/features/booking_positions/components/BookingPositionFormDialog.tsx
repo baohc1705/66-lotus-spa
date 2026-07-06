@@ -1,3 +1,5 @@
+import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+import { AdminInput } from '@/shared/components/forms/AdminInput';
 import { useForm, type Resolver } from "react-hook-form";
 import {
   useCreateBookingPosition,
@@ -27,8 +29,6 @@ import { Button } from "@/shared/components/ui/button";
 import { FormSection } from "@/shared/components/forms/FormSection";
 import { MapPin, Check, ChevronDown, Search } from "lucide-react";
 import { FormField } from "@/shared/components/forms/FormField";
-import { Input } from "@/shared/components/ui/input";
-import { Textarea } from "@/shared/components/ui/textarea";
 import { Switch } from "@/shared/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
@@ -151,7 +151,7 @@ export function BookingPositionFormDialog({
                 <div className="relative" ref={dropdownRef}>
                   <div
                     className={cn(
-                      "flex w-full items-center justify-between gap-2 rounded-md bg-stone-100/80 px-3 py-2 text-[13px] text-lotus-deep outline-none cursor-pointer border border-transparent hover:bg-stone-100 focus-within:bg-white focus-within:ring-2 focus-within:ring-lotus-leaf/30 transition-all",
+                      "flex w-full items-center justify-between gap-2 rounded-md bg-stone-100/80 px-3 py-2 text-lotus-admin-lg text-lotus-deep outline-none cursor-pointer border border-transparent hover:bg-stone-100 focus-within:bg-white focus-within:ring-2 focus-within:ring-lotus-leaf/30 transition-all",
                       dropdownOpen && "bg-white ring-2 ring-lotus-leaf/30"
                     )}
                     onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -166,7 +166,7 @@ export function BookingPositionFormDialog({
                         <Search className="w-4 h-4 mr-2 text-lotus-stone" />
                         <input
                           autoFocus
-                          className="w-full bg-transparent outline-none text-[13px] placeholder:text-lotus-stone"
+                          className="w-full bg-transparent outline-none text-lotus-admin-lg placeholder:text-lotus-stone"
                           placeholder="Tìm phòng..."
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
@@ -174,13 +174,13 @@ export function BookingPositionFormDialog({
                       </div>
                       <div className="max-h-48 overflow-y-auto p-1">
                         {filteredRooms.length === 0 ? (
-                          <div className="px-3 py-2 text-[13px] text-lotus-stone text-center">Không tìm thấy phòng</div>
+                          <div className="px-3 py-2 text-lotus-admin-lg text-lotus-stone text-center">Không tìm thấy phòng</div>
                         ) : (
                           filteredRooms.map((room) => (
                             <div
                               key={room.id}
                               className={cn(
-                                "flex items-center justify-between px-3 py-2 text-[13px] rounded-sm cursor-pointer hover:bg-lotus-cream/50",
+                                "flex items-center justify-between px-3 py-2 text-lotus-admin-lg rounded-sm cursor-pointer hover:bg-lotus-cream/50",
                                 selectedRoomId === room.id ? "bg-lotus-cream/30 text-lotus-leaf font-medium" : "text-lotus-deep"
                               )}
                               onClick={() => {
@@ -205,10 +205,9 @@ export function BookingPositionFormDialog({
                 tooltip="Vui lòng nhập vào tên vị trí dịch vụ"
                 error={errors.name?.message}
               >
-                <Input
+                <AdminInput
                   {...register("name")}
                   placeholder="Giường 1"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
 
@@ -217,11 +216,10 @@ export function BookingPositionFormDialog({
                 tooltip="Số nhỏ sẽ được ưu tiên hiển thị trước"
                 error={errors.sortOrder?.message}
               >
-                <Input
+                <AdminInput
                   {...register("sortOrder", { valueAsNumber: true })}
                   type="number"
                   placeholder="0"
-                  className="h-9 text-[13px]"
                 />
               </FormField>
 
@@ -244,7 +242,7 @@ export function BookingPositionFormDialog({
                   tooltip="Ghi chú không dài quá 500 ký tự"
                   error={errors.note?.message}
                 >
-                  <Textarea
+                  <AdminTextarea
                     {...register("note")}
                     placeholder="Ghi chú ở đây"
                     className=""

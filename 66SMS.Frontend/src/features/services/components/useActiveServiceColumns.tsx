@@ -20,13 +20,14 @@ import {
   IndexCell,
   MutedCell,
   NameCell,
+  PriceCell,
 } from "@/shared/components/DataTable/tableCells";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type { Result } from "@/shared/types/common.types";
 
 import { SERVICE_PERM } from "../constants/service.permissions";
-import type { ServiceDTO } from "../types/service.types";
+import type { ServiceDto } from "../types/service.types";
 import type { UpdateServicePayload } from "../schemas/service.schema";
 
 export const SERVICE_COLUMN_LABELS = {
@@ -49,8 +50,8 @@ interface UseActiveServiceColumnsParams {
   selectedRowIds: Set<number>;
   onToggleAll: (checked: boolean | "indeterminate") => void;
   onToggleOne: (id: number, checked: boolean) => void;
-  onEdit: (item: ServiceDTO) => void;
-  onDelete: (item: ServiceDTO) => void;
+  onEdit: (item: ServiceDto) => void;
+  onDelete: (item: ServiceDto) => void;
   updateMutation: UseMutationResult<
     Result<object>,
     Error,
@@ -58,13 +59,7 @@ interface UseActiveServiceColumnsParams {
   >;
 }
 
-function formatPrice(value: number | null | undefined) {
-  if (value == null) return "—";
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(value);
-}
+
 
 export function useActiveServiceColumns({
   pageIndex,
@@ -83,7 +78,7 @@ export function useActiveServiceColumns({
   const cols = SERVICE_COLUMN_LABELS;
   const perm = SERVICE_PERM;
 
-  return useMemo<ColumnDef<ServiceDTO>[]>(
+  return useMemo<ColumnDef<ServiceDto>[]>(
     () => [
       {
         id: "select",
@@ -173,11 +168,7 @@ export function useActiveServiceColumns({
             onSort={onSort}
           />
         ),
-        cell: ({ row }) => (
-          <span className="text-stone-600 font-medium">
-            {formatPrice(row.original.costPrice)}
-          </span>
-        ),
+        cell: ({ row }) => <PriceCell value={row.original.costPrice} />,
         size: 110,
       },
       {
@@ -191,11 +182,7 @@ export function useActiveServiceColumns({
             onSort={onSort}
           />
         ),
-        cell: ({ row }) => (
-          <span className="text-lotus-deep font-medium">
-            {formatPrice(row.original.sellingPrice)}
-          </span>
-        ),
+        cell: ({ row }) => <PriceCell value={row.original.sellingPrice} />,
         size: 110,
       },
       {

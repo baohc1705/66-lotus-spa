@@ -1,3 +1,5 @@
+import { createEntityQueryKeys } from '@/shared/utils/queryKeys';
+import { getErrorMessage } from '@/shared/utils/errorUtils';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
@@ -13,13 +15,7 @@ import type {
 
 const ENTITY = "khách hàng";
 
-const CUSTOMER_KEYS = {
-  all: ["customers"] as const,
-  lists: () => [...CUSTOMER_KEYS.all, "list"] as const,
-  list: (params: PageRequest) => [...CUSTOMER_KEYS.lists(), params] as const,
-  details: () => [...CUSTOMER_KEYS.all, "detail"] as const,
-  detail: (id: number) => [...CUSTOMER_KEYS.details(), id] as const,
-};
+export const CUSTOMER_KEYS = createEntityQueryKeys<PageRequest>("customers");
 
 /** Hook lấy danh sách khách hàng (phân trang, search, sort) */
 export function useCustomers(params: PageRequest) {
@@ -52,8 +48,7 @@ export function useCreateCustomer() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("tạo", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
     },
   });
 }
@@ -78,8 +73,7 @@ export function useUpdateCustomer() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("cập nhật", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
     },
   });
 }
@@ -98,8 +92,7 @@ export function useDeleteCustomer() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("xóa", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }
@@ -119,9 +112,7 @@ export function useRestoreCustomer() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg =
-        error.response?.data?.message ?? TOAST_MSG.actionError("khôi phục", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)));
     },
   });
 }

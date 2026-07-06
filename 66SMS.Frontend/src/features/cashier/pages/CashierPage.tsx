@@ -194,7 +194,7 @@ export function CashierPage() {
   };
 
   return (
-    <div className="h-screen w-full flex flex-col bg-[#FBF7F2] overflow-hidden font-sans text-lotus-deep relative">
+    <div className="h-screen w-full flex flex-col bg-lotus-cream overflow-hidden font-sans text-lotus-deep relative">
       {/* Decorative Background Elements for Luxury Feel */}
       <div className="absolute top-0 left-0 w-[50vw] h-[50vw] rounded-full bg-lotus-rose/5 blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2 z-0" />
       <div className="absolute bottom-0 right-0 w-[40vw] h-[40vw] rounded-full bg-lotus-gold/5 blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3 z-0" />

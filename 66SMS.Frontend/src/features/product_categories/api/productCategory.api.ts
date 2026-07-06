@@ -8,9 +8,9 @@ import type {
 import type {
   CreateProductCategoryPayload,
   DeleteProductCategoryMultiplesPayload,
-  ProductCategoryDTO,
+  ProductCategoryDto,
   UpdateProductCategoryPayload,
-} from "../types/product_category.types";
+} from "../types/productCategory.types";
 
 const BASE = API.productCategories;
 
@@ -18,13 +18,13 @@ export const productCategoryApi = {
   // Get All
   getAll: (params: PageRequest) =>
     axiosInstance
-      .get<Result<PagedResult<ProductCategoryDTO>>>(BASE, { params })
+      .get<Result<PagedResult<ProductCategoryDto>>>(BASE, { params })
       .then((r) => r.data),
 
   // Get Detail
   getDetail: (id: number) =>
     axiosInstance
-      .get<Result<ProductCategoryDTO>>(`${BASE}/${id}`)
+      .get<Result<ProductCategoryDto>>(`${BASE}/${id}`)
       .then((r) => r.data),
 
   // Create Category
@@ -50,6 +50,6 @@ export const productCategoryApi = {
   // Get All Deleted
   getAllDeleted: (params: PageRequest) =>
     axiosInstance
-      .get<Result<PagedResult<ProductCategoryDTO>>>(`${BASE}/deleted`, { params })
+      .get<Result<PagedResult<ProductCategoryDto>>>(`${BASE}/deleted`, { params })
       .then((r) => r.data),
 };

@@ -77,19 +77,19 @@ export function CustomerCrmActivity({ customerId }: CustomerCrmActivityProps) {
                     <span className="font-bold text-stone-800">
                       07/07/2026 - 08:00
                     </span>
-                    <p className="text-[11px] text-stone-500 mt-0.5">
+                    <p className="text-lotus-admin-base text-stone-500 mt-0.5">
                       @ HoaSenSpa
                     </p>
                   </div>
-                  <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/50 px-1.5 py-0.5 rounded">
+                  <span className="text-lotus-admin-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/50 px-1.5 py-0.5 rounded">
                     Hoàn thành
                   </span>
                 </div>
                 <div className="flex justify-between items-center mt-2 pt-2 border-t border-stone-100">
-                  <button className="text-[11px] text-blue-600 hover:underline flex items-center gap-1 font-semibold">
+                  <button className="text-lotus-admin-base text-blue-600 hover:underline flex items-center gap-1 font-semibold">
                     <Phone className="w-3 h-3" /> Gọi điện
                   </button>
-                  <button className="text-[10px] text-stone-400 hover:text-stone-600 hover:underline font-medium">
+                  <button className="text-lotus-admin-xs text-stone-400 hover:text-stone-600 hover:underline font-medium">
                     * Xem lịch hẹn cũ 6 tháng gần đây
                   </button>
                 </div>
@@ -146,7 +146,7 @@ export function CustomerCrmActivity({ customerId }: CustomerCrmActivityProps) {
               icon={BellRing}
               iconColor="text-orange-500"
               action={
-                <button className="text-[11px] text-lotus-leaf hover:underline font-semibold flex items-center">
+                <button className="text-lotus-admin-base text-lotus-leaf hover:underline font-semibold flex items-center">
                   Xem toàn bộ <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               }
@@ -162,7 +162,7 @@ export function CustomerCrmActivity({ customerId }: CustomerCrmActivityProps) {
               icon={Notebook}
               iconColor="text-indigo-500"
               action={
-                <button className="text-[11px] text-lotus-leaf hover:underline font-semibold flex items-center">
+                <button className="text-lotus-admin-base text-lotus-leaf hover:underline font-semibold flex items-center">
                   Xem chi tiết <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               }
@@ -181,7 +181,7 @@ export function CustomerCrmActivity({ customerId }: CustomerCrmActivityProps) {
             <p className="font-medium text-stone-500 mb-1">
               Chưa có hình ảnh nào của khách hàng
             </p>
-            <p className="text-[11px]">
+            <p className="text-lotus-admin-base">
               Tải lên hình ảnh trước/sau điều trị, ảnh thẻ của khách hàng tại
               đây.
             </p>
@@ -215,7 +215,7 @@ function SectionCard({
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-1.5">
           <Icon className={`w-4 h-4 ${iconColor}`} />
-          <span className="text-[12px] font-bold text-stone-800">{title}</span>
+          <span className="text-lotus-admin-md font-bold text-stone-800">{title}</span>
         </div>
         {action}
       </div>

@@ -1,5 +1,8 @@
+import type { AxiosError } from 'axios';
+import { createEntityQueryKeys } from '@/shared/utils/queryKeys';
+import { getErrorMessage } from '@/shared/utils/errorUtils';
 import { timeSlotApi } from "@/features/time_slots/api/timeSlot.api";
-import type { PageRequest } from "@/shared/types/common.types";
+import type { PageRequest, Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";
@@ -11,13 +14,7 @@ import type {
 
 const ENTITY = "khung giờ";
 
-const TIME_SLOT_KEYS = {
-  all: ["time-slots"] as const,
-  lists: () => [...TIME_SLOT_KEYS.all, "list"] as const,
-  list: (params: PageRequest) => [...TIME_SLOT_KEYS.lists(), params] as const,
-  details: () => [...TIME_SLOT_KEYS.all, "detail"] as const,
-  detail: (id: number) => [...TIME_SLOT_KEYS.details(), id] as const,
-};
+export const TIME_SLOT_KEYS = createEntityQueryKeys<PageRequest>("time-slots");
 
 export function useTimeSlots(params: PageRequest) {
   return useQuery({
@@ -28,7 +25,7 @@ export function useTimeSlots(params: PageRequest) {
 
 export function useAdminTimeSlots(params: PageRequest, enabled = true) {
   return useQuery({
-    queryKey: TIME_SLOT_KEYS.list(params),
+    queryKey: TIME_SLOT_KEYS.adminList(params),
     queryFn: () => timeSlotApi.getAll(params),
     enabled,
   });
@@ -55,8 +52,8 @@ export function useCreateTimeSlot() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("tạo", ENTITY));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
     },
   });
 }
@@ -79,8 +76,8 @@ export function useUpdateTimeSlot() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("cập nhật", ENTITY));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
     },
   });
 }
@@ -97,8 +94,8 @@ export function useDeleteTimeSlot() {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: () => {
-      toast.error(TOAST_MSG.actionError("xóa", ENTITY));
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }

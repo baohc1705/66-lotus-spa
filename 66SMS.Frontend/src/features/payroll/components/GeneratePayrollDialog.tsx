@@ -1,3 +1,4 @@
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,7 +17,6 @@ import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
 import { useGeneratePayroll } from "../hooks/usePayrolls";
@@ -92,9 +92,9 @@ export function GeneratePayrollDialog({ open, onOpenChange }: GeneratePayrollDia
               value={watch("staffId") ? String(watch("staffId")) : ""}
               onValueChange={(v) => setValue("staffId", Number(v))}
             >
-              <SelectTrigger className="h-9 text-[13px]">
+              <AdminSelectTrigger>
                 <SelectValue placeholder="Chọn nhân viên..." />
-              </SelectTrigger>
+              </AdminSelectTrigger>
               <SelectContent>
                 {staffs.map((s: StaffDto) => (
                   <SelectItem key={s.id} value={String(s.id)}>
@@ -111,9 +111,9 @@ export function GeneratePayrollDialog({ open, onOpenChange }: GeneratePayrollDia
                 value={String(watch("month"))}
                 onValueChange={(v) => setValue("month", Number(v))}
               >
-                <SelectTrigger className="h-9 text-[13px]">
+                <AdminSelectTrigger>
                   <SelectValue />
-                </SelectTrigger>
+                </AdminSelectTrigger>
                 <SelectContent>
                   {months.map((m) => (
                     <SelectItem key={m} value={String(m)}>
@@ -128,9 +128,9 @@ export function GeneratePayrollDialog({ open, onOpenChange }: GeneratePayrollDia
                 value={String(watch("year"))}
                 onValueChange={(v) => setValue("year", Number(v))}
               >
-                <SelectTrigger className="h-9 text-[13px]">
+                <AdminSelectTrigger>
                   <SelectValue />
-                </SelectTrigger>
+                </AdminSelectTrigger>
                 <SelectContent>
                   {years.map((y) => (
                     <SelectItem key={y} value={String(y)}>
@@ -148,7 +148,7 @@ export function GeneratePayrollDialog({ open, onOpenChange }: GeneratePayrollDia
               checked={watch("excludeSaturday") ?? true}
               onCheckedChange={(checked) => setValue("excludeSaturday", checked === true)}
             />
-            <Label htmlFor="excludeSaturday" className="text-[13px] cursor-pointer">
+            <Label htmlFor="excludeSaturday" className="text-lotus-admin-lg cursor-pointer">
               Trừ cả Thứ 7 khi tính ngày công chuẩn (chỉ giữ T2–T6)
             </Label>
           </div>
@@ -186,9 +186,9 @@ function FormField({
 }) {
   return (
     <div className={`space-y-1 ${className ?? ""}`}>
-      <Label className="text-[12px] font-semibold text-lotus-deep/80">{label}</Label>
+      <Label className="text-lotus-admin-md font-semibold text-lotus-deep/80">{label}</Label>
       {children}
-      {error && <p className="text-[11px] text-red-500 font-medium">{error}</p>}
+      {error && <p className="text-lotus-admin-base text-red-500 font-medium">{error}</p>}
     </div>
   );
 }

@@ -9,13 +9,13 @@ import {
   DialogFooter,
 } from '@/shared/components/ui/dialog'
 import { Button } from '@/shared/components/ui/button'
-import { Input } from '@/shared/components/ui/input'
-import { Label } from '@/shared/components/ui/label'
+import { AdminInput } from '@/shared/components/forms/AdminInput'
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger'
+import { FormField } from '@/shared/components/forms/FormField'
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select'
 import { useCreatePromotion, useUpdatePromotion } from '../hooks/usePromotions'
@@ -29,23 +29,6 @@ interface PromotionFormDialogProps {
   promotion?: PromotionDto | null
 }
 
-// Helper component FormField có className
-interface FormFieldProps {
-  label: string
-  error?: string
-  children: React.ReactNode
-  className?: string
-}
-
-function FormField({ label, error, children, className }: FormFieldProps) {
-  return (
-    <div className={`space-y-1 ${className ?? ''}`}>
-      <Label className="text-[13px] font-medium text-lotus-deep">{label}</Label>
-      {children}
-      {error && <p className="text-[12px] text-red-500">{error}</p>}
-    </div>
-  )
-}
 
 function getDefaultValues(promotion?: PromotionDto | null): PromotionFormValues {
   if (!promotion) {
@@ -136,16 +119,16 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
           {/* Row 1: code + name */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField label="Mã khuyến mãi *" error={errors.code?.message}>
-              <Input {...register('code')} placeholder="VD: SUMMER2025" className="text-[13px]" />
+              <AdminInput {...register('code')} placeholder="VD: SUMMER2025" />
             </FormField>
             <FormField label="Tên chương trình *" error={errors.name?.message}>
-              <Input {...register('name')} placeholder="Nhập tên..." className="text-[13px]" />
+              <AdminInput {...register('name')} placeholder="Nhập tên..." />
             </FormField>
           </div>
 
           {/* Description */}
           <FormField label="Mô tả" error={errors.description?.message}>
-            <Input {...register('description')} placeholder="Mô tả ngắn..." className="text-[13px]" />
+            <AdminInput {...register('description')} placeholder="Mô tả ngắn..." />
           </FormField>
 
           {/* Row 2: discountType + status */}
@@ -155,9 +138,9 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
                 value={String(discountType)}
                 onValueChange={(val) => setValue('discountType', Number(val))}
               >
-                <SelectTrigger className="text-[13px]">
+                <AdminSelectTrigger>
                   <SelectValue placeholder="Chọn kiểu giảm" />
-                </SelectTrigger>
+                </AdminSelectTrigger>
                 <SelectContent>
                   {DISCOUNT_TYPE_OPTIONS.map((opt) => (
                     <SelectItem key={opt.value} value={String(opt.value)}>
@@ -173,9 +156,9 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
                 value={String(watch('status') ?? 1)}
                 onValueChange={(val) => setValue('status', Number(val))}
               >
-                <SelectTrigger className="text-[13px]">
+                <AdminSelectTrigger>
                   <SelectValue />
-                </SelectTrigger>
+                </AdminSelectTrigger>
                 <SelectContent>
                   {STATUS_OPTIONS.map((opt) => (
                     <SelectItem key={opt.value} value={String(opt.value)}>
@@ -191,23 +174,21 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
           {discountType === 1 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField label="Phần trăm giảm (%) *" error={errors.discountValue?.message}>
-                <Input
+                <AdminInput
                   type="number"
                   step="0.01"
                   min="0.01"
                   max="100"
                   {...register('discountValue')}
                   placeholder="VD: 10"
-                  className="text-[13px]"
                 />
               </FormField>
               <FormField label="Giảm tối đa (VNĐ)" error={errors.maxDiscountAmount?.message}>
-                <Input
+                <AdminInput
                   type="number"
                   min="0"
                   {...register('maxDiscountAmount')}
                   placeholder="Để trống = không giới hạn"
-                  className="text-[13px]"
                 />
               </FormField>
             </div>
@@ -215,12 +196,11 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
 
           {discountType === 2 && (
             <FormField label="Số tiền giảm (VNĐ) *" error={errors.discountValue?.message}>
-              <Input
+              <AdminInput
                 type="number"
                 min="0"
                 {...register('discountValue')}
                 placeholder="VD: 50000"
-                className="text-[13px]"
               />
             </FormField>
           )}
@@ -228,21 +208,19 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
           {discountType === 3 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField label="Số lượng mua (X) *" error={errors.buyQuantity?.message}>
-                <Input
+                <AdminInput
                   type="number"
                   min="1"
                   {...register('buyQuantity')}
                   placeholder="VD: 2"
-                  className="text-[13px]"
                 />
               </FormField>
               <FormField label="Số lượng tặng (Y) *" error={errors.getQuantity?.message}>
-                <Input
+                <AdminInput
                   type="number"
                   min="1"
                   {...register('getQuantity')}
                   placeholder="VD: 1"
-                  className="text-[13px]"
                 />
               </FormField>
             </div>
@@ -251,21 +229,19 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
           {/* Row: minOrderValue + usageLimit */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField label="Đơn hàng tối thiểu (VNĐ)" error={errors.minOrderValue?.message}>
-              <Input
+              <AdminInput
                 type="number"
                 min="0"
                 {...register('minOrderValue')}
                 placeholder="Để trống = không giới hạn"
-                className="text-[13px]"
               />
             </FormField>
             <FormField label="Giới hạn sử dụng" error={errors.usageLimit?.message}>
-              <Input
+              <AdminInput
                 type="number"
                 min="1"
                 {...register('usageLimit')}
                 placeholder="Để trống = không giới hạn"
-                className="text-[13px]"
               />
             </FormField>
           </div>
@@ -273,17 +249,15 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
           {/* Row: startDate + endDate */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField label="Ngày bắt đầu *" error={errors.startDate?.message}>
-              <Input
+              <AdminInput
                 type="datetime-local"
                 {...register('startDate')}
-                className="text-[13px]"
               />
             </FormField>
             <FormField label="Ngày kết thúc *" error={errors.endDate?.message}>
-              <Input
+              <AdminInput
                 type="datetime-local"
                 {...register('endDate')}
-                className="text-[13px]"
               />
             </FormField>
           </div>

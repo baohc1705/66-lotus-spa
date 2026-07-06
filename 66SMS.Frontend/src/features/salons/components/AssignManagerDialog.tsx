@@ -1,3 +1,4 @@
+import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -14,7 +15,6 @@ import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select'
 import { useAssignManager } from '@/features/staff_salons/hooks/useStaffSalons'
@@ -67,9 +67,9 @@ export function AssignManagerDialog({ open, onOpenChange, salonId }: AssignManag
               value={String(watch('staffId') ?? '')}
               onValueChange={(v) => setValue('staffId', Number(v), { shouldValidate: true })}
             >
-              <SelectTrigger>
+              <AdminSelectTrigger>
                 <SelectValue placeholder="Chọn nhân viên..." />
-              </SelectTrigger>
+              </AdminSelectTrigger>
               <SelectContent>
                 {staffList.map((s) => (
                   <SelectItem key={s.id} value={String(s.id)}>

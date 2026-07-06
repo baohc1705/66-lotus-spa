@@ -169,14 +169,14 @@ export function AddStaffDialog({
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
                   placeholder="Tìm theo tên hoặc mã nhân viên..."
-                  className="w-full pl-8 pr-3 py-1.5 border border-stone-200 rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-lotus-leaf bg-white"
+                  className="w-full pl-8 pr-3 py-1.5 border border-stone-200 rounded-lg text-lotus-admin-lg focus:outline-none focus:ring-2 focus:ring-lotus-leaf bg-white"
                 />
               </div>
               <button
                 type="button"
                 onClick={toggleAll}
                 disabled={filteredStaffs.length === 0}
-                className="flex items-center gap-1.5 text-[12px] font-semibold text-lotus-leaf hover:text-lotus-deep transition-colors whitespace-nowrap disabled:opacity-40"
+                className="flex items-center gap-1.5 text-lotus-admin-md font-semibold text-lotus-leaf hover:text-lotus-deep transition-colors whitespace-nowrap disabled:opacity-40"
               >
                 {allFilteredSelected ? (
                   <CheckSquare size={14} />
@@ -190,11 +190,11 @@ export function AddStaffDialog({
             {/* Staff list */}
             <div className="border border-stone-200 rounded-lg overflow-hidden">
               {isLoadingStaffs ? (
-                <div className="py-8 text-center text-[13px] text-stone-400">
+                <div className="py-8 text-center text-lotus-admin-lg text-stone-400">
                   Đang tải danh sách nhân viên...
                 </div>
               ) : filteredStaffs.length === 0 ? (
-                <div className="py-8 text-center text-[13px] text-stone-400">
+                <div className="py-8 text-center text-lotus-admin-lg text-stone-400">
                   {searchText
                     ? "Không tìm thấy nhân viên phù hợp"
                     : "Tất cả nhân viên đã được xếp ca này"}
@@ -232,11 +232,11 @@ export function AddStaffDialog({
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <span className="text-[13px] font-medium text-lotus-deep truncate block">
+                            <span className="text-lotus-admin-lg font-medium text-lotus-deep truncate block">
                               {staff.fullName}
                             </span>
                             {staff.code && (
-                              <span className="text-[11px] text-stone-400">
+                              <span className="text-lotus-admin-base text-stone-400">
                                 {staff.code}
                               </span>
                             )}
@@ -252,14 +252,14 @@ export function AddStaffDialog({
             {/* Selected count + validation */}
             <div className="mt-2 flex items-center justify-between min-h-[20px]">
               {selectedIds.length > 0 ? (
-                <span className="text-[12px] text-lotus-leaf font-medium">
+                <span className="text-lotus-admin-md text-lotus-leaf font-medium">
                   Đã chọn {selectedIds.length} nhân viên
                 </span>
               ) : (
                 <span />
               )}
               {validationError && (
-                <span className="text-[12px] text-red-500">{validationError}</span>
+                <span className="text-lotus-admin-md text-red-500">{validationError}</span>
               )}
             </div>
           </FormSection>

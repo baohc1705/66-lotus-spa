@@ -59,7 +59,7 @@ export function MembershipCardDetailExpanded({
             <h3 className="text-base font-bold text-lotus-deep truncate">
               Mã thẻ: {card.cardCode}
             </h3>
-            <p className="text-[12px] font-medium text-lotus-stone mt-0.5">
+            <p className="text-lotus-admin-md font-medium text-lotus-stone mt-0.5">
               Trạng thái:{" "}
               <span
                 className={
@@ -75,7 +75,7 @@ export function MembershipCardDetailExpanded({
               variant="admin"
               size="sm"
               onClick={() => onEdit?.(card)}
-              className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-[13px] gap-1.5 rounded-md transition-opacity shrink-0"
+              className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-lotus-admin-lg gap-1.5 rounded-md transition-opacity shrink-0"
             >
               <Pencil className="w-3.5 h-3.5" />
               Chỉnh sửa
@@ -130,10 +130,10 @@ function DetailCard({
         <Icon className="w-4 h-4" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[11px] font-medium text-lotus-stone truncate mb-0.5">
+        <p className="text-lotus-admin-base font-medium text-lotus-stone truncate mb-0.5">
           {label}
         </p>
-        <p className="text-[14px] font-semibold text-lotus-deep truncate">
+        <p className="text-lotus-admin-lg font-semibold text-lotus-deep truncate">
           {value}
         </p>
       </div>

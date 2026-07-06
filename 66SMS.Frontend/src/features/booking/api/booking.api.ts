@@ -6,7 +6,6 @@ import type {
   TimeSlotDTO,
   BookingPositionDTO,
   SlotLockDto,
-  GuestAppointmentDto,
   AppointmentDto,
   CreateBookingPayload,
   PromotionValidationDto,

@@ -1,3 +1,4 @@
+import { formatCurrency } from '@/shared/utils/currency';
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -61,13 +62,7 @@ export function MyBookingsPanel() {
     return booking.status === APPOINTMENT_STATUS.WAITING;
   };
 
-  const formatCurrency = (amount?: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(amount || 0);
-  };
-
+  
   const handlePostpone = async (
     e: React.MouseEvent,
     appointmentId: number,

@@ -6,24 +6,16 @@ import type { AxiosError } from "axios";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";
 import { StatusActive } from "@/shared/constants/status.enum";
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type {
   CreateServiceCategoryPayload,
   UpdateServiceCategoryPayload,
-} from "../types/service_category.types";
+} from "../types/serviceCategory.types";
 
 const ENTITY = "nhóm dịch vụ";
 
-const SERVICE_CATEGORY_KEYS = {
-  all: ["service-categories"] as const,
-  lists: () => [...SERVICE_CATEGORY_KEYS.all, "list"] as const,
-  list: (params: PageRequest) =>
-    [...SERVICE_CATEGORY_KEYS.lists(), params] as const,
-  deletedLists: () => [...SERVICE_CATEGORY_KEYS.all, "deleted"] as const,
-  deletedList: (params: PageRequest) =>
-    [...SERVICE_CATEGORY_KEYS.deletedLists(), params] as const,
-  details: () => [...SERVICE_CATEGORY_KEYS.all, "detail"] as const,
-  detail: (id: number) => [...SERVICE_CATEGORY_KEYS.details(), id] as const,
-};
+export const SERVICE_CATEGORY_KEYS = createEntityQueryKeys<PageRequest>("service-categories");
 
 export function useServiceCategories(params: PageRequest, enabled = true) {
   return useQuery({
@@ -35,7 +27,7 @@ export function useServiceCategories(params: PageRequest, enabled = true) {
 
 export function useAdminServiceCategories(params: PageRequest, enabled = true) {
   return useQuery({
-    queryKey: SERVICE_CATEGORY_KEYS.list(params),
+    queryKey: SERVICE_CATEGORY_KEYS.adminList(params),
     queryFn: () => serviceCategoryApi.adminGetAll(params),
     enabled,
   });
@@ -64,17 +56,20 @@ export function useCreateServiceCategory() {
       serviceCategoryApi.create(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: SERVICE_CATEGORY_KEYS.lists() });
+        qc.invalidateQueries({ queryKey: SERVICE_CATEGORY_KEYS.all });
         toast.success(TOAST_MSG.createSuccess(ENTITY));
       } else {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("tạo", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
     },
   });
+}
+
+export function useServiceCategoryMutations() {
+  // Provided for component reference compatibility if needed
 }
 
 export function useUpdateServiceCategory() {
@@ -96,8 +91,7 @@ export function useUpdateServiceCategory() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("cập nhật", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
     },
   });
 }
@@ -115,8 +109,7 @@ export function useDeleteServiceCategory() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("xóa", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }
@@ -135,8 +128,7 @@ export function useDeleteServiceCategoryMultiples() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("xóa", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }
@@ -155,8 +147,7 @@ export function useRestoreServiceCategory() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      const msg = error.response?.data?.message ?? TOAST_MSG.actionError("khôi phục", ENTITY);
-      toast.error(msg);
+      toast.error(getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)));
     },
   });
 }
