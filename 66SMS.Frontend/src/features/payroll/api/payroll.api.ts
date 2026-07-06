@@ -18,6 +18,13 @@ export interface PayrollListParams extends PageRequest {
   status?: number | null;
 }
 
+export interface UpdatePayrollPayload {
+  baseAmount?: number;
+  commissionAmount?: number;
+  note?: string;
+  status?: number;
+}
+
 export const payrollApi = {
   // GET /Payroll/admin — danh sách bảng lương (phân trang)
   getAll: (params: PayrollListParams) =>
@@ -37,7 +44,7 @@ export const payrollApi = {
   confirm: (id: number) =>
     axiosInstance.post<Result<number>>(`${BASE}/${id}/confirm`).then((r) => r.data),
 
-  // PUT /Payroll/:id — cập nhật ghi chú
-  update: (id: number, note: string) =>
-    axiosInstance.put<Result<number>>(`${BASE}/${id}`, { note }).then((r) => r.data),
+  // PUT /Payroll/:id — cập nhật bảng lương
+  update: (id: number, payload: UpdatePayrollPayload) =>
+    axiosInstance.put<Result<number>>(`${BASE}/${id}`, payload).then((r) => r.data),
 };

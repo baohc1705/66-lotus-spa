@@ -1,5 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Search, Users, Briefcase, User, Copy } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  Users,
+  Briefcase,
+  User,
+  Copy,
+} from "lucide-react";
 import { formatDate } from "@/shared/utils/date.utils";
 
 import { useShifts } from "@/features/shifts/hooks/useShifts";
@@ -12,16 +20,33 @@ import { useAuthStore } from "@/features/auth/stores/authStore";
 
 export function WorkSchedulePage() {
   const salonId = useAuthStore((s) => s.getEffectiveSalonId());
+  const { user, hasRole } = useAuthStore();
+  const isAdminOrManager = hasRole("Admin") || hasRole("Manager");
+  const currentStaffId = user?.staffInfo?.id;
 
   const [currentDate, setCurrentDate] = useState(
     formatDate().startOf("isoWeek"),
   );
-  
-  const [viewMode, setViewMode] = useState<"shift" | "staff" | "single">("shift");
+
+  const [viewMode, setViewMode] = useState<"shift" | "staff" | "single">(
+    isAdminOrManager ? "shift" : "single",
+  );
   const [isRepeatDialogOpen, setIsRepeatDialogOpen] = useState(false);
-  const [selectedStaffId, setSelectedStaffId] = useState<number | null>(null);
+  const [selectedStaffId, setSelectedStaffId] = useState<number | null>(
+    isAdminOrManager ? null : (currentStaffId ?? null),
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+
+  // Sync state if user info loads asynchronously
+  useEffect(() => {
+    if (!isAdminOrManager) {
+      setViewMode("single");
+      if (currentStaffId) {
+        setSelectedStaffId(currentStaffId);
+      }
+    }
+  }, [isAdminOrManager, currentStaffId]);
 
   // Debounce for search query to avoid spamming the database
   useEffect(() => {
@@ -52,7 +77,13 @@ export function WorkSchedulePage() {
       staffId: selectedStaffId || undefined,
       salonId: salonId || undefined,
     };
-  }, [startDateStr, endDateStr, debouncedSearchQuery, selectedStaffId, salonId]);
+  }, [
+    startDateStr,
+    endDateStr,
+    debouncedSearchQuery,
+    selectedStaffId,
+    salonId,
+  ]);
 
   const { data: shiftsData, isLoading: isLoadingShifts } = useShifts({
     pageIndex: 1,
@@ -80,8 +111,9 @@ export function WorkSchedulePage() {
     "DD/MM/YYYY",
   )} - ${currentDate.endOf("isoWeek").format("DD/MM/YYYY")})`;
 
-  const isPageLoading = isLoadingShifts || isLoadingSchedules || isLoadingStaffs;
-  
+  const isPageLoading =
+    isLoadingShifts || isLoadingSchedules || isLoadingStaffs;
+
   const staffList = staffsData?.data?.items || [];
 
   return (
@@ -89,60 +121,66 @@ export function WorkSchedulePage() {
       {/* Header & Controls */}
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-4 rounded-admin border border-stone-200/30">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full xl:w-auto">
-          <div className="relative w-full sm:w-64">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-lotus-stone"
-              size={16}
-            />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Tìm kiếm nhân viên..."
-              className="pl-9 pr-4 py-2 bg-white border border-stone-200/50 rounded-lg text-[13px] focus:outline-none focus:ring-1 focus:ring-lotus-leaf w-full transition-shadow placeholder:text-stone-400"
-            />
-          </div>
+          {isAdminOrManager && (
+            <div className="relative w-full sm:w-64">
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-lotus-stone"
+                size={16}
+              />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Tìm kiếm nhân viên..."
+                className="pl-9 pr-4 py-2 bg-white border border-stone-200/50 rounded-lg text-[13px] focus:outline-none focus:ring-1 focus:ring-lotus-leaf w-full transition-shadow placeholder:text-stone-400"
+              />
+            </div>
+          )}
 
-          <div className="flex bg-stone-100 p-0.5 rounded-lg border border-stone-200/50 h-9">
-            <button
-              onClick={() => setViewMode("shift")}
-              className={`flex items-center gap-1.5 px-3 rounded-md text-[13px] font-semibold transition-colors ${
-                viewMode === "shift"
-                  ? "bg-white text-lotus-leaf shadow-sm"
-                  : "text-lotus-stone hover:text-lotus-deep"
-              }`}
-            >
-              <Briefcase size={14} />
-              <span>Xem theo ca</span>
-            </button>
-            <button
-              onClick={() => setViewMode("staff")}
-              className={`flex items-center gap-1.5 px-3 rounded-md text-[13px] font-semibold transition-colors ${
-                viewMode === "staff"
-                  ? "bg-white text-lotus-leaf shadow-sm"
-                  : "text-lotus-stone hover:text-lotus-deep"
-              }`}
-            >
-              <Users size={14} />
-              <span>Xem theo nhân viên</span>
-            </button>
-            <button
-              onClick={() => setViewMode("single")}
-              className={`flex items-center gap-1.5 px-3 rounded-md text-[13px] font-semibold transition-colors ${
-                viewMode === "single"
-                  ? "bg-white text-lotus-leaf shadow-sm"
-                  : "text-lotus-stone hover:text-lotus-deep"
-              }`}
-            >
-              <User size={14} />
-              <span>Xem cá nhân</span>
-            </button>
-          </div>
+          {isAdminOrManager && (
+            <div className="flex bg-stone-100 p-0.5 rounded-lg border border-stone-200/50 h-9">
+              <button
+                onClick={() => setViewMode("shift")}
+                className={`flex items-center gap-1.5 px-3 rounded-md text-[13px] font-semibold transition-colors ${
+                  viewMode === "shift"
+                    ? "bg-white text-lotus-leaf shadow-sm"
+                    : "text-lotus-stone hover:text-lotus-deep"
+                }`}
+              >
+                <Briefcase size={14} />
+                <span>Xem theo ca</span>
+              </button>
+              <button
+                onClick={() => setViewMode("staff")}
+                className={`flex items-center gap-1.5 px-3 rounded-md text-[13px] font-semibold transition-colors ${
+                  viewMode === "staff"
+                    ? "bg-white text-lotus-leaf shadow-sm"
+                    : "text-lotus-stone hover:text-lotus-deep"
+                }`}
+              >
+                <Users size={14} />
+                <span>Xem theo nhân viên</span>
+              </button>
+              <button
+                onClick={() => setViewMode("single")}
+                className={`flex items-center gap-1.5 px-3 rounded-md text-[13px] font-semibold transition-colors ${
+                  viewMode === "single"
+                    ? "bg-white text-lotus-leaf shadow-sm"
+                    : "text-lotus-stone hover:text-lotus-deep"
+                }`}
+              >
+                <User size={14} />
+                <span>Xem cá nhân</span>
+              </button>
+            </div>
+          )}
 
-          {viewMode === "single" && (
+          {isAdminOrManager && viewMode === "single" && (
             <select
               value={selectedStaffId || ""}
-              onChange={(e) => setSelectedStaffId(Number(e.target.value) || null)}
+              onChange={(e) =>
+                setSelectedStaffId(Number(e.target.value) || null)
+              }
               className="px-3 py-1.5 border border-stone-200/50 rounded-lg bg-white text-[13px] font-semibold h-9 focus:outline-none focus:ring-1 focus:ring-lotus-leaf text-lotus-deep"
             >
               <option value="">-- Chọn nhân viên --</option>
@@ -184,20 +222,22 @@ export function WorkSchedulePage() {
             Tuần này
           </Button>
 
-          <Button
-            onClick={() => setIsRepeatDialogOpen(true)}
-            variant="outline"
-            className="text-[13px] h-9 gap-1.5"
-            disabled={!schedulesData?.data?.items?.length}
-            title={
-              !schedulesData?.data?.items?.length
-                ? "Chưa có lịch trong tuần này để lặp"
-                : "Lặp lại lịch tuần này sang các tuần sau"
-            }
-          >
-            <Copy size={14} />
-            Lặp lịch
-          </Button>
+          {isAdminOrManager && (
+            <Button
+              onClick={() => setIsRepeatDialogOpen(true)}
+              variant="outline"
+              className="text-[13px] h-9 gap-1.5"
+              disabled={!schedulesData?.data?.items?.length}
+              title={
+                !schedulesData?.data?.items?.length
+                  ? "Chưa có lịch trong tuần này để lặp"
+                  : "Lặp lại lịch tuần này sang các tuần sau"
+              }
+            >
+              <Copy size={14} />
+              Lặp lịch
+            </Button>
+          )}
         </div>
       </div>
 
@@ -227,7 +267,7 @@ export function WorkSchedulePage() {
           weekStart={currentDate}
           viewMode={viewMode}
           selectedStaffId={selectedStaffId}
-          canEdit={true}
+          canEdit={isAdminOrManager}
         />
       )}
     </div>

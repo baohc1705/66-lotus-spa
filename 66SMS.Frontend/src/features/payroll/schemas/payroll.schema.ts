@@ -9,3 +9,13 @@ export const generatePayrollSchema = z.object({
 });
 
 export type GeneratePayrollFormData = z.infer<typeof generatePayrollSchema>;
+
+// Schema cho form chỉnh sửa bảng lương
+export const editPayrollSchema = z.object({
+  baseAmount: z.coerce.number().min(0, "Lương cơ bản không được âm"),
+  commissionAmount: z.coerce.number().min(0, "Hoa hồng không được âm"),
+  note: z.string().optional(),
+  status: z.coerce.number().min(1).max(2),
+});
+
+export type EditPayrollFormData = z.infer<typeof editPayrollSchema>;

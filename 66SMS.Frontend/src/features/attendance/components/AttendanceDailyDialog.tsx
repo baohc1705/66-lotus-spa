@@ -29,6 +29,7 @@ import type { AttendanceDto } from "../types/attendance.types";
 import type { WorkScheduleDTO } from "@/features/schedules/types/schedule.types";
 import { formatDisplayDate } from "@/shared/utils/date.utils";
 import { toast } from "sonner";
+import { useAuthStore } from "@/features/auth/stores/authStore";
 
 interface AttendanceDailyDialogProps {
   open: boolean;
@@ -67,6 +68,9 @@ export function AttendanceDailyDialog({
   attendance,
   onSuccess,
 }: AttendanceDailyDialogProps) {
+  const { hasRole } = useAuthStore();
+  const isAdminOrManager = hasRole("Admin") || hasRole("Manager");
+
   const checkInMutation = useCheckIn();
   const checkOutMutation = useCheckOut();
   const updateMutation = useUpdateAttendance();
@@ -161,6 +165,44 @@ export function AttendanceDailyDialog({
 
   const handleFormSubmit = (data: FormFields) => {
     if (!schedule.staffId) return;
+
+    if (!isAdminOrManager) {
+      if (!isToday) return;
+
+      if (!attendance) {
+        checkInMutation.mutate(
+          {
+            staffId: schedule.staffId,
+            workScheduleId: schedule.id!,
+            note: data.note || undefined,
+          },
+          {
+            onSuccess: (res) => {
+              if (res.isSuccess) {
+                onOpenChange(false);
+                onSuccess?.();
+              }
+            },
+          }
+        );
+      } else if (!attendance.checkOutAt) {
+        checkOutMutation.mutate(
+          {
+            staffId: schedule.staffId,
+            workScheduleId: schedule.id!,
+          },
+          {
+            onSuccess: (res) => {
+              if (res.isSuccess) {
+                onOpenChange(false);
+                onSuccess?.();
+              }
+            },
+          }
+        );
+      }
+      return;
+    }
 
     let targetStatus = 1; // Default CheckIn
     if (data.mode === "working") {
@@ -350,163 +392,213 @@ export function AttendanceDailyDialog({
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <div className="p-5 space-y-4 max-h-[350px] overflow-y-auto">
             {activeTab === "attendance" ? (
-              <>
-                {/* Warning for past days */}
-                {!isToday && !attendance && (
-                  <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50/70 border border-amber-200/50 text-amber-800 text-[12px] leading-relaxed">
-                    <AlertCircle size={16} className="shrink-0 mt-0.5 text-amber-600" />
-                    <span>
-                      Hệ thống chỉ cho phép ghi nhận <strong>Đi làm (Check-in)</strong> vào ngày hiện tại. Đối với ngày trong quá khứ/tương lai, bạn chỉ có thể chọn <strong>Nghỉ có phép</strong> hoặc <strong>Nghỉ không phép</strong>.
-                    </span>
-                  </div>
-                )}
-
-                {/* Radio selection */}
-                <div className="space-y-2">
-                  <Label className="text-[12px] font-bold text-stone-500 uppercase tracking-wider">
-                    Loại chấm công
-                  </Label>
-                  <div className="grid grid-cols-3 gap-2">
-                    <label
-                      className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-[13px] font-semibold cursor-pointer transition-all ${
-                        mode === "working"
-                          ? "bg-lotus-leaf/5 border-lotus-leaf text-lotus-leaf shadow-sm"
-                          : "border-stone-200/80 bg-white text-stone-600 hover:bg-stone-50"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        value="working"
-                        className="sr-only"
-                        {...register("mode")}
-                      />
-                      Đi làm
-                    </label>
-
-                    <label
-                      className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-[13px] font-semibold cursor-pointer transition-all ${
-                        mode === "paid_leave"
-                          ? "bg-lotus-leaf/5 border-lotus-leaf text-lotus-leaf shadow-sm"
-                          : "border-stone-200/80 bg-white text-stone-600 hover:bg-stone-50"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        value="paid_leave"
-                        className="sr-only"
-                        {...register("mode")}
-                      />
-                      Nghỉ có phép
-                    </label>
-
-                    <label
-                      className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-[13px] font-semibold cursor-pointer transition-all ${
-                        mode === "unpaid_leave"
-                          ? "bg-lotus-leaf/5 border-lotus-leaf text-lotus-leaf shadow-sm"
-                          : "border-stone-200/80 bg-white text-stone-600 hover:bg-stone-50"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        value="unpaid_leave"
-                        className="sr-only"
-                        {...register("mode")}
-                      />
-                      Nghỉ không phép
-                    </label>
-                  </div>
-                </div>
-
-                {/* Sub Options for Leave */}
-                {mode === "paid_leave" && (
-                  <div className="space-y-1.5 animate-in slide-in-from-top-1 duration-200">
-                    <Label className="text-[12px] font-semibold text-stone-500">Chi tiết phép</Label>
-                    <Select
-                      value={subStatus}
-                      onValueChange={(val) => setValue("subStatus", val)}
-                    >
-                      <SelectTrigger className="h-10 text-[13px] border-stone-200/80 rounded-xl">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="rounded-xl">
-                        <SelectItem value="4">Nghỉ phép hưởng lương (1 công)</SelectItem>
-                        <SelectItem value="5">Nghỉ lễ (1 công)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-
-                {mode === "unpaid_leave" && (
-                  <div className="space-y-1.5 animate-in slide-in-from-top-1 duration-200">
-                    <Label className="text-[12px] font-semibold text-stone-500">Chi tiết nghỉ</Label>
-                    <Select
-                      value={subStatus}
-                      onValueChange={(val) => setValue("subStatus", val)}
-                    >
-                      <SelectTrigger className="h-10 text-[13px] border-stone-200/80 rounded-xl">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="rounded-xl">
-                        <SelectItem value="3">Vắng / nghỉ không lương (0 công)</SelectItem>
-                        <SelectItem value="6">Nghỉ không lương (0 công)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-
-                {/* Check-in / Check-out Times */}
-                {mode === "working" && (
-                  <div className="grid grid-cols-2 gap-4 pt-1 animate-in slide-in-from-top-1 duration-200">
-                    <div className="space-y-2 border border-stone-200/70 p-3.5 rounded-2xl bg-white/50">
-                      <label className="flex items-center gap-2 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          className="rounded text-lotus-leaf focus:ring-lotus-leaf border-stone-300 w-4 h-4"
-                          {...register("checkInEnabled")}
-                          disabled={!isToday && !attendance}
-                        />
-                        <span className="text-[13px] font-bold text-stone-700">Giờ vào</span>
-                      </label>
-                      <Input
-                        type="time"
-                        className="h-10 text-[13px] border-stone-200/80 rounded-xl"
-                        {...register("checkInTime")}
-                        disabled={!checkInEnabled || (!isToday && !attendance)}
-                      />
+              !isAdminOrManager ? (
+                <div className="space-y-4">
+                  {!isToday ? (
+                    <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-amber-50 border border-amber-200/50 text-amber-800 text-[13px] leading-relaxed">
+                      <AlertCircle size={16} className="shrink-0 mt-0.5 text-amber-600" />
+                      <span>
+                        Lịch làm việc này thuộc ngày khác. Bạn không thể thực hiện tự chấm công hoặc thay đổi giờ của ngày đã qua / ngày sắp tới.
+                      </span>
                     </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {!attendance ? (
+                        <div className="bg-amber-50/50 border border-amber-200 p-4 rounded-2xl text-[13px] text-amber-800 space-y-2">
+                          <p className="font-semibold">Bạn chưa ghi nhận bắt đầu ca làm việc (Check-in).</p>
+                          <p className="text-[12px] opacity-80">Bấm nút "Check-in" ở dưới để bắt đầu ca làm việc của bạn.</p>
+                        </div>
+                      ) : !attendance.checkOutAt ? (
+                        <div className="bg-lotus-leaf/5 border border-lotus-leaf/30 p-4 rounded-2xl text-[13px] text-lotus-leaf space-y-2">
+                          <p className="font-semibold">Bạn đã Check-in thành công!</p>
+                          <p className="text-[12px] opacity-80">
+                            Thời gian vào: <span className="font-mono font-bold">{new Date(attendance.checkInAt!).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}</span>
+                          </p>
+                          <p className="text-[12px] opacity-85">Bấm nút "Check-out" ở dưới để kết thúc ca làm việc của bạn.</p>
+                        </div>
+                      ) : (
+                        <div className="bg-stone-50 border border-stone-200 p-4 rounded-2xl text-[13px] text-stone-600 space-y-1.5">
+                          <p className="font-bold text-stone-800">Bạn đã hoàn thành chấm công ngày hôm nay!</p>
+                          <p className="text-[12px]">Giờ vào: <span className="font-mono font-semibold">{new Date(attendance.checkInAt!).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}</span></p>
+                          <p className="text-[12px]">Giờ ra: <span className="font-mono font-semibold">{new Date(attendance.checkOutAt!).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}</span></p>
+                        </div>
+                      )}
 
-                    <div className="space-y-2 border border-stone-200/70 p-3.5 rounded-2xl bg-white/50">
-                      <label className="flex items-center gap-2 cursor-pointer select-none">
+                      {/* Note */}
+                      {(!attendance || !attendance.checkOutAt) && (
+                        <div className="space-y-1.5">
+                          <Label className="text-[12px] font-bold text-stone-500 uppercase tracking-wider">
+                            Ghi chú (Không bắt buộc)
+                          </Label>
+                          <Textarea
+                            placeholder="Nhập ghi chú chấm công (nếu có)..."
+                            className="border-stone-200/80 rounded-xl min-h-[80px] text-[13px]"
+                            {...register("note")}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  {/* Warning for past days */}
+                  {!isToday && !attendance && (
+                    <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50/70 border border-amber-200/50 text-amber-800 text-[12px] leading-relaxed">
+                      <AlertCircle size={16} className="shrink-0 mt-0.5 text-amber-600" />
+                      <span>
+                        Hệ thống chỉ cho phép ghi nhận <strong>Đi làm (Check-in)</strong> vào ngày hiện tại. Đối với ngày trong quá khứ/tương lai, vui lòng chọn hình thức Nghỉ.
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Radio selection */}
+                  <div className="space-y-2">
+                    <Label className="text-[12px] font-bold text-stone-500 uppercase tracking-wider">
+                      Loại chấm công
+                    </Label>
+                    <div className="grid grid-cols-3 gap-2">
+                      <label
+                        className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-[13px] font-semibold cursor-pointer transition-all ${
+                          mode === "working"
+                            ? "bg-lotus-leaf/5 border-lotus-leaf text-lotus-leaf shadow-sm"
+                            : "border-stone-200/80 bg-white text-stone-600 hover:bg-stone-50"
+                        }`}
+                      >
                         <input
-                          type="checkbox"
-                          className="rounded text-lotus-leaf focus:ring-lotus-leaf border-stone-300 w-4 h-4"
-                          {...register("checkOutEnabled")}
-                          disabled={!isToday && !attendance}
+                          type="radio"
+                          value="working"
+                          className="sr-only"
+                          {...register("mode")}
                         />
-                        <span className="text-[13px] font-bold text-stone-700">Giờ ra</span>
+                        Đi làm
                       </label>
-                      <Input
-                        type="time"
-                        className="h-10 text-[13px] border-stone-200/80 rounded-xl"
-                        {...register("checkOutTime")}
-                        disabled={!checkOutEnabled || (!isToday && !attendance)}
-                      />
+
+                      <label
+                        className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-[13px] font-semibold cursor-pointer transition-all ${
+                          mode === "paid_leave"
+                            ? "bg-lotus-leaf/5 border-lotus-leaf text-lotus-leaf shadow-sm"
+                            : "border-stone-200/80 bg-white text-stone-600 hover:bg-stone-50"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          value="paid_leave"
+                          className="sr-only"
+                          {...register("mode")}
+                        />
+                        Nghỉ có phép
+                      </label>
+
+                      <label
+                        className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-[13px] font-semibold cursor-pointer transition-all ${
+                          mode === "unpaid_leave"
+                            ? "bg-lotus-leaf/5 border-lotus-leaf text-lotus-leaf shadow-sm"
+                            : "border-stone-200/80 bg-white text-stone-600 hover:bg-stone-50"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          value="unpaid_leave"
+                          className="sr-only"
+                          {...register("mode")}
+                        />
+                        Nghỉ không phép
+                      </label>
                     </div>
                   </div>
-                )}
 
-                {/* Note */}
-                <div className="space-y-1.5">
-                  <Label className="text-[12px] font-bold text-stone-500 uppercase tracking-wider">
-                    Ghi chú
-                  </Label>
-                  <Textarea
-                    placeholder="Nhập ghi chú chấm công..."
-                    className="border-stone-200/80 rounded-xl min-h-[80px] text-[13px]"
-                    {...register("note")}
-                  />
-                </div>
-              </>
+                  {/* Sub Options for Leave */}
+                  {mode === "paid_leave" && (
+                    <div className="space-y-1.5 animate-in slide-in-from-top-1 duration-200">
+                      <Label className="text-[12px] font-semibold text-stone-500">Chi tiết phép</Label>
+                      <Select
+                        value={subStatus}
+                        onValueChange={(val) => setValue("subStatus", val)}
+                      >
+                        <SelectTrigger className="h-10 text-[13px] border-stone-200/80 rounded-xl">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl">
+                          <SelectItem value="4">Nghỉ phép hưởng lương (1 công)</SelectItem>
+                          <SelectItem value="5">Nghỉ lễ (1 công)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {mode === "unpaid_leave" && (
+                    <div className="space-y-1.5 animate-in slide-in-from-top-1 duration-200">
+                      <Label className="text-[12px] font-semibold text-stone-500">Chi tiết nghỉ</Label>
+                      <Select
+                        value={subStatus}
+                        onValueChange={(val) => setValue("subStatus", val)}
+                      >
+                        <SelectTrigger className="h-10 text-[13px] border-stone-200/80 rounded-xl">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl">
+                          <SelectItem value="3">Vắng / nghỉ không lương (0 công)</SelectItem>
+                          <SelectItem value="6">Nghỉ không lương (0 công)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* Check-in / Check-out Times */}
+                  {mode === "working" && (
+                    <div className="grid grid-cols-2 gap-4 pt-1 animate-in slide-in-from-top-1 duration-200">
+                      <div className="space-y-2 border border-stone-200/70 p-3.5 rounded-2xl bg-white/50">
+                        <label className="flex items-center gap-2 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            className="rounded text-lotus-leaf focus:ring-lotus-leaf border-stone-300 w-4 h-4"
+                            {...register("checkInEnabled")}
+                            disabled={!isToday && !attendance}
+                          />
+                          <span className="text-[13px] font-bold text-stone-700">Giờ vào</span>
+                        </label>
+                        <Input
+                          type="time"
+                          className="h-10 text-[13px] border-stone-200/80 rounded-xl"
+                          {...register("checkInTime")}
+                          disabled={!checkInEnabled || (!isToday && !attendance)}
+                        />
+                      </div>
+
+                      <div className="space-y-2 border border-stone-200/70 p-3.5 rounded-2xl bg-white/50">
+                        <label className="flex items-center gap-2 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            className="rounded text-lotus-leaf focus:ring-lotus-leaf border-stone-300 w-4 h-4"
+                            {...register("checkOutEnabled")}
+                            disabled={!isToday && !attendance}
+                          />
+                          <span className="text-[13px] font-bold text-stone-700">Giờ ra</span>
+                        </label>
+                        <Input
+                          type="time"
+                          className="h-10 text-[13px] border-stone-200/80 rounded-xl"
+                          {...register("checkOutTime")}
+                          disabled={!checkOutEnabled || (!isToday && !attendance)}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Note */}
+                  <div className="space-y-1.5">
+                    <Label className="text-[12px] font-bold text-stone-500 uppercase tracking-wider">
+                      Ghi chú
+                    </Label>
+                    <Textarea
+                      placeholder="Nhập ghi chú chấm công..."
+                      className="border-stone-200/80 rounded-xl min-h-[80px] text-[13px]"
+                      {...register("note")}
+                    />
+                  </div>
+                </>
+              )
             ) : (
               /* History Tab */
               <div className="space-y-3 py-2">
@@ -560,15 +652,17 @@ export function AttendanceDailyDialog({
             </div>
             
             {activeTab === "attendance" && (
-              <Button
-                type="submit"
-                variant="admin"
-                size="sm"
-                className="h-9 px-5 rounded-xl text-[13px]"
-                loading={isPending}
-              >
-                Lưu
-              </Button>
+              isAdminOrManager || (isToday && (!attendance || !attendance.checkOutAt)) ? (
+                <Button
+                  type="submit"
+                  variant="admin"
+                  size="sm"
+                  className="h-9 px-5 rounded-xl text-[13px]"
+                  loading={isPending}
+                >
+                  {isAdminOrManager ? "Lưu" : !attendance ? "Check-in" : "Check-out"}
+                </Button>
+              ) : null
             )}
           </DialogFooter>
         </form>

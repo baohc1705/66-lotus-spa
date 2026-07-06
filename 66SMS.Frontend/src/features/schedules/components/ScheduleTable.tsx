@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Check } from "lucide-react";
+import { Plus, Check, Trash2 } from "lucide-react";
 import type {
   ShiftDTO,
   ShiftPeriodDTO,
@@ -7,7 +7,11 @@ import type {
 import type { WorkScheduleDTO } from "../types/schedule.types";
 import type { StaffDto } from "@/features/staffs/types/staff.types";
 import { AddStaffDialog } from "./AddStaffDialog";
-import { useUpdateWorkSchedule } from "../hooks/useSchedules";
+import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
+import {
+  useUpdateWorkSchedule,
+  useDeleteWorkSchedule,
+} from "../hooks/useSchedules";
 import { toast } from "sonner";
 import { formatDate, DateUtil } from "@/shared/utils/date.utils";
 import { useAuthStore } from "@/features/auth/stores/authStore";
@@ -41,7 +45,14 @@ export function ScheduleTable({
     existingStaffIds: number[];
   } | null>(null);
 
+  const [deleteScheduleId, setDeleteScheduleId] = useState<number | null>(null);
+
   const { mutate: updateWorkSchedule } = useUpdateWorkSchedule();
+  const { mutate: deleteWorkSchedule, isPending: isDeleting } = useDeleteWorkSchedule();
+
+  const handleDelete = (id: number) => {
+    setDeleteScheduleId(id);
+  };
 
   const days = Array.from({ length: 7 }).map((_, i) => weekStart.add(i, "day"));
   const today = formatDate().startOf("day");
@@ -66,7 +77,7 @@ export function ScheduleTable({
 
   workSchedules.forEach((ws) => {
     const dateStr = formatDate(ws.workDate).format("YYYY-MM-DD");
-    
+
     if (ws.shiftPeriodId && ws.staffId) {
       const keyFull = `${ws.shiftPeriodId}_${ws.staffId}_${dateStr}`;
       fullMap.set(keyFull, ws);
@@ -132,6 +143,9 @@ export function ScheduleTable({
       return;
     }
 
+    const originalWs = workSchedules.find((w) => w.id === wsId);
+    const staff = staffList.find((s) => s.id === staffId);
+
     updateWorkSchedule(
       {
         id: wsId,
@@ -139,7 +153,8 @@ export function ScheduleTable({
           shiftPeriodId: targetPeriodId,
           staffId: staffId,
           workDate: targetDateStr,
-          salonId: salonId || undefined,
+          salonId:
+            salonId || originalWs?.salonId || staff?.salonId || undefined,
         },
       },
       {
@@ -148,7 +163,7 @@ export function ScheduleTable({
             toast.success("Cập nhật lịch thành công");
           }
         },
-      }
+      },
     );
   };
 
@@ -159,7 +174,10 @@ export function ScheduleTable({
       <tbody className="divide-y divide-stone-200/50">
         {activeShiftPeriods.length === 0 ? (
           <tr>
-            <td colSpan={8} className="py-12 text-center text-lotus-stone font-medium">
+            <td
+              colSpan={8}
+              className="py-12 text-center text-lotus-stone font-medium"
+            >
               Không có ca làm việc nào trong tuần này.
             </td>
           </tr>
@@ -214,11 +232,32 @@ export function ScheduleTable({
                         {cellSchedules.map((ws) => (
                           <div
                             key={ws.id}
-                            draggable
-                            onDragStart={(e) => handleDragStart(e, ws)}
-                            className="px-2.5 py-1.5 bg-white text-lotus-deep rounded-md text-[12px] font-medium border border-stone-200 shadow-sm truncate cursor-grab active:cursor-grabbing hover:border-lotus-gold transition-colors flex items-center justify-between group/item"
+                            draggable={canEdit}
+                            onDragStart={(e) =>
+                              canEdit
+                                ? handleDragStart(e, ws)
+                                : e.preventDefault()
+                            }
+                            className={`px-2.5 py-1.5 bg-white text-lotus-deep rounded-md text-[12px] font-medium border border-stone-200 shadow-sm truncate transition-colors flex items-center justify-between group/item ${
+                              canEdit
+                                ? "cursor-grab active:cursor-grabbing hover:border-lotus-gold"
+                                : ""
+                            }`}
                           >
                             <span className="truncate">{ws.staffName}</span>
+                            {canEdit && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDelete(ws.id!);
+                                }}
+                                className="opacity-0 group-hover/item:opacity-100 transition-opacity p-0.5 hover:text-red-500 rounded text-stone-400 flex items-center justify-center shrink-0"
+                                title="Xóa lịch làm việc"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -231,7 +270,9 @@ export function ScheduleTable({
                                 shift,
                                 shiftPeriod: period,
                                 date: dateStr,
-                                existingStaffIds: cellSchedules.map(ws => ws.staffId).filter((id): id is number => id != null),
+                                existingStaffIds: cellSchedules
+                                  .map((ws) => ws.staffId)
+                                  .filter((id): id is number => id != null),
                               })
                             }
                             className="flex items-center gap-1 text-[12px] font-semibold text-lotus-leaf hover:text-lotus-deep bg-lotus-cream hover:bg-lotus-cream/80 px-3 py-1.5 rounded-full transition-colors w-full justify-center border border-lotus-leaf/20"
@@ -256,7 +297,10 @@ export function ScheduleTable({
       <tbody className="divide-y divide-stone-200/50">
         {staffList.length === 0 ? (
           <tr>
-            <td colSpan={8} className="py-12 text-center text-lotus-stone font-medium">
+            <td
+              colSpan={8}
+              className="py-12 text-center text-lotus-stone font-medium"
+            >
               Không có nhân viên nào.
             </td>
           </tr>
@@ -264,7 +308,9 @@ export function ScheduleTable({
           staffList.map((staff) => (
             <tr key={staff.id}>
               <td className="py-3 px-4 border-r border-stone-200/50 align-top bg-stone-50/30">
-                <div className="font-bold text-lotus-deep">{staff.fullName}</div>
+                <div className="font-bold text-lotus-deep">
+                  {staff.fullName}
+                </div>
                 <div className="text-[12px] text-lotus-stone mt-1">
                   {staff.code || "Nhân viên"}
                 </div>
@@ -307,7 +353,10 @@ export function ScheduleTable({
       return (
         <tbody>
           <tr>
-            <td colSpan={8} className="py-12 text-center text-lotus-stone font-medium">
+            <td
+              colSpan={8}
+              className="py-12 text-center text-lotus-stone font-medium"
+            >
               Vui lòng chọn nhân viên để xem lịch cá nhân.
             </td>
           </tr>
@@ -333,7 +382,7 @@ export function ScheduleTable({
             </td>
             {days.map((day, i) => {
               const dateStr = day.format("YYYY-MM-DD");
-              
+
               const isPeriodActiveThisDay =
                 period.effectiveFrom &&
                 period.effectiveFrom <= dateStr &&
@@ -363,16 +412,37 @@ export function ScheduleTable({
                   }`}
                 >
                   {isWorking ? (
-                    <div className="inline-flex flex-col items-center gap-1 text-lotus-leaf animate-in fade-in zoom-in duration-300">
-                      <div className="p-1.5 bg-lotus-leaf/10 rounded-full text-lotus-leaf">
-                        <Check size={18} className="stroke-[3px]" />
+                    <div className="relative h-full flex flex-col items-center justify-center">
+                      <div className="inline-flex flex-col items-center gap-1 text-lotus-leaf animate-in fade-in zoom-in duration-300">
+                        <div className="p-1.5 bg-lotus-leaf/10 rounded-full text-lotus-leaf">
+                          <Check size={18} className="stroke-[3px]" />
+                        </div>
+                        <span className="text-[11px] font-semibold">
+                          Ca làm việc
+                        </span>
                       </div>
-                      <span className="text-[11px] font-semibold">Ca làm việc</span>
+
+                      {canEdit && !day.isBefore(today) && (
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute inset-0 flex items-center justify-center bg-white/90">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const ws = fullMap.get(keyFull);
+                              if (ws?.id) handleDelete(ws.id);
+                            }}
+                            className="flex items-center gap-1 text-xs font-semibold text-red-650 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-full transition-colors border border-red-200"
+                          >
+                            <Trash2 size={12} /> Hủy ca
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="flex flex-col gap-1.5 h-full justify-center">
-                      <span className="text-xs text-stone-300 font-medium">Nghỉ</span>
-                      
+                      <span className="text-xs text-stone-300 font-medium">
+                        Nghỉ
+                      </span>
+
                       {canEdit && !day.isBefore(today) && (
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute inset-0 flex items-center justify-center bg-white/90">
                           <button
@@ -449,6 +519,30 @@ export function ScheduleTable({
           onClose={() => setAddingShift(null)}
         />
       )}
+
+      <ConfirmDialog
+        open={deleteScheduleId !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteScheduleId(null);
+        }}
+        onConfirm={() => {
+          if (deleteScheduleId !== null) {
+            deleteWorkSchedule(deleteScheduleId, {
+              onSuccess: (res) => {
+                if (res.isSuccess) {
+                  setDeleteScheduleId(null);
+                }
+              },
+            });
+          }
+        }}
+        title="Xóa lịch làm việc"
+        description="Bạn có chắc chắn muốn xóa lịch làm việc này? Hành động này không thể hoàn tác."
+        confirmLabel="Xóa"
+        cancelLabel="Hủy"
+        loading={isDeleting}
+        variant="danger"
+      />
     </>
   );
 }

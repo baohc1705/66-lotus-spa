@@ -15,6 +15,9 @@ import { AttendanceDailyDialog } from "../components/AttendanceDailyDialog";
 
 export function AttendanceListPage() {
   const salonId = useAuthStore((s) => s.getEffectiveSalonId());
+  const { user, hasRole } = useAuthStore();
+  const isAdminOrManager = hasRole("Admin") || hasRole("Manager");
+  const currentStaffId = user?.staffInfo?.id;
 
   // Week selection state
   const [currentDate, setCurrentDate] = useState<DateUtil>(
@@ -59,6 +62,7 @@ export function AttendanceListPage() {
     pageIndex: 1,
     pageSize: 1000,
     salonId: salonId ?? undefined,
+    staffId: isAdminOrManager ? undefined : (currentStaffId ?? -1),
   });
 
   // Fetch attendances for this week
@@ -72,6 +76,7 @@ export function AttendanceListPage() {
     pageIndex: 1,
     pageSize: 1000,
     salonId: salonId ?? undefined,
+    staffId: isAdminOrManager ? undefined : (currentStaffId ?? -1),
   });
 
   const handleRefresh = () => {
@@ -400,19 +405,21 @@ export function AttendanceListPage() {
       {/* Search & Navigation header */}
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-2 rounded border border-stone-200/30 shadow-sm">
         <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto">
-          <div className="relative w-full sm:w-64">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400"
-              size={16}
-            />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Tìm kiếm nhân viên..."
-              className="pl-9 pr-4 py-2 bg-white border border-stone-200/50 rounded-xl text-[13px] focus:outline-none focus:ring-1 focus:ring-lotus-leaf w-full transition-all placeholder:text-stone-400"
-            />
-          </div>
+          {isAdminOrManager && (
+            <div className="relative w-full sm:w-64">
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400"
+                size={16}
+              />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Tìm kiếm nhân viên..."
+                className="pl-9 pr-4 py-2 bg-white border border-stone-200/50 rounded-xl text-[13px] focus:outline-none focus:ring-1 focus:ring-lotus-leaf w-full transition-all placeholder:text-stone-400"
+              />
+            </div>
+          )}
 
           {/* Simple Checkbox filters */}
           <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-stone-600">

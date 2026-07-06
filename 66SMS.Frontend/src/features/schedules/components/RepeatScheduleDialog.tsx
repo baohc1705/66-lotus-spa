@@ -114,7 +114,7 @@ export function RepeatScheduleDialog({
           staffId: ws.staffId,
           shiftPeriodId: ws.shiftPeriodId,
           workDate: newDate.format("YYYY-MM-DD"),
-          salonId: salonId || undefined,
+          salonId: salonId || ws.salonId || undefined,
         });
       }
       w = w.add(1, "week");

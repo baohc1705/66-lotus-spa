@@ -112,12 +112,15 @@ export function AddStaffDialog({
       return;
     }
 
-    const schedules = selectedIds.map((staffId) => ({
-      staffId,
-      shiftPeriodId: shiftPeriod.id,
-      workDate: date,
-      salonId: salonId || undefined,
-    }));
+    const schedules = selectedIds.map((staffId) => {
+      const staff = staffsData?.data?.items?.find((s) => s.id === staffId);
+      return {
+        staffId,
+        shiftPeriodId: shiftPeriod.id,
+        workDate: date,
+        salonId: salonId || staff?.salonId || undefined,
+      };
+    });
 
     bulkCreate(
       { schedules },

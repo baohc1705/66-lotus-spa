@@ -1,12 +1,10 @@
-import { useState, useMemo } from "react";
-import {
-  useReactTable,
-  getCoreRowModel,
-  type ColumnDef,
-} from "@tanstack/react-table";
-import { Calculator, CheckCircle2, Wallet } from "lucide-react";
+import { useAuthStore } from "@/features/auth/stores/authStore";
+import { useSalons } from "@/features/salons/hooks/useSalons";
+import { useAdminStaffs } from "@/features/staffs/hooks/useStaffs";
+import type { StaffDto } from "@/features/staffs/types/staff.types";
 import { DataTable } from "@/shared/components/DataTable/DataTable";
 import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
+import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { Button } from "@/shared/components/ui/button";
 import {
   Select,
@@ -15,13 +13,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
-import { usePayrolls, useConfirmPayroll } from "../hooks/usePayrolls";
+import {
+  getCoreRowModel,
+  useReactTable,
+  type ColumnDef,
+} from "@tanstack/react-table";
+import { Calculator, CheckCircle2, Pencil, Wallet } from "lucide-react";
+import { useMemo, useState } from "react";
+import { EditPayrollDialog } from "../components/EditPayrollDialog";
 import { GeneratePayrollDialog } from "../components/GeneratePayrollDialog";
-import { useAdminStaffs } from "@/features/staffs/hooks/useStaffs";
-import { useAuthStore } from "@/features/auth/stores/authStore";
+import { useConfirmPayroll, usePayrolls } from "../hooks/usePayrolls";
 import type { PayrollDto } from "../types/payroll.types";
-import type { StaffDto } from "@/features/staffs/types/staff.types";
 
 const PAYROLL_STATUS_MAP: StatusMap = {
   "1": { label: "Nháp", variant: "warning" },
@@ -35,25 +37,44 @@ const SALARY_TYPE_LABEL: Record<string, string> = {
 
 const now = new Date();
 const formatVnd = (v?: number | null) =>
-  v !== null && v !== undefined ? new Intl.NumberFormat("vi-VN").format(v) : "—";
+  v !== null && v !== undefined
+    ? new Intl.NumberFormat("vi-VN").format(v)
+    : "—";
 
 export function PayrollListPage() {
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [staffId, setStaffId] = useState<number | null>(null);
+  const [localSalonId, setLocalSalonId] = useState<number | null>(null);
   const [month, setMonth] = useState<number | null>(null);
   const [year, setYear] = useState<number | null>(now.getFullYear());
   const [generateOpen, setGenerateOpen] = useState(false);
+  const [editingPayroll, setEditingPayroll] = useState<PayrollDto | null>(null);
 
-  const salonId = useAuthStore((s) => s.getEffectiveSalonId());
-  const { data: staffsResult } = useAdminStaffs({ pageIndex: 1, pageSize: 200, salonId });
-  const staffs = useMemo(() => staffsResult?.data?.items ?? [], [staffsResult?.data?.items]);
+  const headerSalonId = useAuthStore((s) => s.getEffectiveSalonId());
+  const effectiveSalonId = headerSalonId ?? localSalonId;
+
+  const { data: staffsResult } = useAdminStaffs({
+    pageIndex: 1,
+    pageSize: 200,
+    salonId: effectiveSalonId ?? undefined,
+  });
+  const staffs = useMemo(
+    () => staffsResult?.data?.items ?? [],
+    [staffsResult?.data?.items],
+  );
+
+  const { data: salonsResult } = useSalons(
+    { pageIndex: 1, pageSize: 100 },
+    !headerSalonId,
+  );
+  const salons = useMemo(() => salonsResult?.data?.items ?? [], [salonsResult]);
 
   const { data: result, isLoading } = usePayrolls({
     pageIndex,
     pageSize,
     staffId: staffId ?? undefined,
-    salonId,
+    salonId: effectiveSalonId ?? undefined,
     month: month ?? undefined,
     year: year ?? undefined,
   });
@@ -153,7 +174,10 @@ export function PayrollListPage() {
         accessorKey: "status",
         header: "Trạng thái",
         cell: ({ row }) => (
-          <StatusBadge status={row.original.status?.toString() ?? null} statusMap={PAYROLL_STATUS_MAP} />
+          <StatusBadge
+            status={row.original.status?.toString() ?? null}
+            statusMap={PAYROLL_STATUS_MAP}
+          />
         ),
       },
       {
@@ -161,23 +185,33 @@ export function PayrollListPage() {
         header: "",
         cell: ({ row }) => {
           const p = row.original;
-          if (p.status === 2 || !p.id) return null;
+          if (!p.id) return null;
           return (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-1 text-[12px]"
-              onClick={() => confirmMutation.mutate(p.id!)}
-              loading={confirmMutation.isPending}
-            >
-              <CheckCircle2 className="w-3.5 h-3.5" /> Chốt
-            </Button>
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1 text-[12px] h-8 px-2 text-lotus-deep hover:text-lotus-deep hover:bg-lotus-stone/10"
+                onClick={() => setEditingPayroll(p)}
+              >
+                <Pencil className="w-3.5 h-3.5" /> Sửa
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1 text-[12px] h-8 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+                onClick={() => confirmMutation.mutate(p.id!)}
+                loading={confirmMutation.isPending}
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" /> Chốt
+              </Button>
+            </div>
           );
         },
-        size: 80,
+        size: 150,
       },
     ],
-    [pageIndex, pageSize, confirmMutation],
+    [pageIndex, pageSize, confirmMutation, setEditingPayroll],
   );
 
   const table = useReactTable({
@@ -201,8 +235,37 @@ export function PayrollListPage() {
           </Button>
 
           <div className="ml-auto flex items-end gap-3">
+            {!headerSalonId && (
+              <div className="space-y-1">
+                <label className="text-[12px] font-semibold text-lotus-deep/80">
+                  Chi nhánh
+                </label>
+                <Select
+                  value={localSalonId ? String(localSalonId) : "all"}
+                  onValueChange={(v) => {
+                    setLocalSalonId(v === "all" ? null : Number(v));
+                    setStaffId(null); // Reset selected staff when switching salons
+                    setPageIndex(1);
+                  }}
+                >
+                  <SelectTrigger className="h-9 text-[13px] w-[180px]">
+                    <SelectValue placeholder="Tất cả" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tất cả chi nhánh</SelectItem>
+                    {salons.map((s) => (
+                      <SelectItem key={s.id} value={String(s.id)}>
+                        {s.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="space-y-1">
-              <label className="text-[12px] font-semibold text-lotus-deep/80">Nhân viên</label>
+              <label className="text-[12px] font-semibold text-lotus-deep/80">
+                Nhân viên
+              </label>
               <Select
                 value={staffId ? String(staffId) : "all"}
                 onValueChange={(v) => {
@@ -224,7 +287,9 @@ export function PayrollListPage() {
               </Select>
             </div>
             <div className="space-y-1">
-              <label className="text-[12px] font-semibold text-lotus-deep/80">Tháng</label>
+              <label className="text-[12px] font-semibold text-lotus-deep/80">
+                Tháng
+              </label>
               <Select
                 value={month ? String(month) : "all"}
                 onValueChange={(v) => {
@@ -246,7 +311,9 @@ export function PayrollListPage() {
               </Select>
             </div>
             <div className="space-y-1">
-              <label className="text-[12px] font-semibold text-lotus-deep/80">Năm</label>
+              <label className="text-[12px] font-semibold text-lotus-deep/80">
+                Năm
+              </label>
               <Select
                 value={year ? String(year) : "all"}
                 onValueChange={(v) => {
@@ -279,7 +346,9 @@ export function PayrollListPage() {
               <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
                 <Wallet className="w-7 h-7 text-lotus-stone" />
               </div>
-              <p className="text-sm font-semibold text-lotus-deep">Chưa có bảng lương</p>
+              <p className="text-sm font-semibold text-lotus-deep">
+                Chưa có bảng lương
+              </p>
             </div>
           }
           pagination={
@@ -302,7 +371,17 @@ export function PayrollListPage() {
         />
       </div>
 
-      <GeneratePayrollDialog open={generateOpen} onOpenChange={setGenerateOpen} />
+      <GeneratePayrollDialog
+        open={generateOpen}
+        onOpenChange={setGenerateOpen}
+      />
+      <EditPayrollDialog
+        open={editingPayroll !== null}
+        onOpenChange={(open) => {
+          if (!open) setEditingPayroll(null);
+        }}
+        payroll={editingPayroll}
+      />
     </div>
   );
 }
