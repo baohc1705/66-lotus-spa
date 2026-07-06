@@ -1,53 +1,27 @@
-import { useCallback, useMemo } from "react";
-import { useOutletContext } from "react-router-dom";
-import {
-  useReactTable,
-  getCoreRowModel,
-  getExpandedRowModel,
-} from "@tanstack/react-table";
-import { Plus, Users, ArrowLeft, Trash2 } from "lucide-react";
-import { motion } from "motion/react";
-
-import { containerVariants } from "@/shared/motion/pageVariants";
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { TableEmptyState } from "@/shared/components/DataTable/TableEmptyState";
-import { Button } from "@/shared/components/ui/button";
-import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
-import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
-import { TABLE_STYLES } from "@/shared/styles/table.styles";
-import { useRowSelection } from "@/shared/hooks/useRowSelection";
 import { StatusActive } from "@/shared/constants/status.enum";
+import { useCallback, useMemo, useState } from "react";
 
 import { CustomerFormDialog } from "../components/CustomerFormDialog";
-import { CustomerDetailExpanded } from "../components/CustomerDetailExpanded";
 import { CustomerStatCards } from "../components/CustomerStatCards";
-import { CustomerFilterSidebar } from "../components/CustomerFilterSidebar";
-import {
-  useActiveCustomerColumns,
-  CUSTOMER_COLUMN_LABELS,
-} from "../components/useActiveCustomerColumns";
-import { useDeletedCustomerColumns } from "../components/useDeletedCustomerColumns";
-import { CUSTOMER_PERM } from "../constants/customer.permissions";
+import { useCustomerListState } from "../hooks/useCustomerListState";
 import {
   useCustomers,
   useDeleteCustomer,
   useRestoreCustomer,
 } from "../hooks/useCustomers";
-import { useCustomerListState } from "../hooks/useCustomerListState";
 import type { CustomerDto } from "../types/customer.types";
+
+import { CustomerCrmActivity } from "../components/CustomerCrmActivity";
+import { CustomerCrmDetail } from "../components/CustomerCrmDetail";
+import { CustomerCrmList } from "../components/CustomerCrmList";
 
 const ENTITY = "khách hàng";
 const ENTITY_SUBJECT = "Khách hàng";
 
 export function CustomerListPage() {
-  const perm = CUSTOMER_PERM;
-
   const listState = useCustomerListState();
   const {
     queryParams,
@@ -63,28 +37,40 @@ export function CustomerListPage() {
     handleToggleView,
     pageIndex,
     setPageIndex,
-    pageSize,
-    columnVisibility,
-    setColumnVisibility,
-    orderBy,
-    isDescending,
-    handleSort,
-    handlePageSizeChange,
-    handleSearchChange,
     filter,
     selectedGender,
     setSelectedGender,
     selectedSource,
     setSelectedSource,
+    handleSearchChange,
   } = listState;
 
-  const { data: customersResult, isLoading, isFetching } = useCustomers(queryParams);
+  const { data: customersResult, isLoading } = useCustomers(queryParams);
   const deleteMutation = useDeleteCustomer();
   const restoreMutation = useRestoreCustomer();
 
   const paged = customersResult?.data;
   const customers = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = paged?.totalPages ?? 1;
+  const pageSize = paged?.pageSize ?? 10;
+
+  // Selected customer for CRM view
+  const [selectedCustomerIdState, setSelectedCustomerId] = useState<
+    number | null
+  >(null);
+
+  // Derive the active selected customer ID. Fall back to the first customer if none is selected
+  // or if the selected customer is not in the current list (e.g. due to pagination or filtering).
+  const selectedCustomerId = useMemo(() => {
+    if (
+      selectedCustomerIdState !== null &&
+      customers.some((c: CustomerDto) => c.id === selectedCustomerIdState)
+    ) {
+      return selectedCustomerIdState;
+    }
+    return customers[0]?.id ?? null;
+  }, [customers, selectedCustomerIdState]);
 
   // Stat card calculations
   const activeCustomerCount = useMemo(
@@ -112,68 +98,20 @@ export function CustomerListPage() {
     [customers],
   );
 
-  const pageIds = useMemo(
-    () =>
-      customers
-        .map((c: CustomerDto) => c.id)
-        .filter((id): id is number => id != null),
-    [customers],
-  );
-
-  const {
-    selectedRowIds,
-    clearSelection,
-    headerChecked,
-    toggleAll,
-    toggleOne,
-    selectedCount,
-  } = useRowSelection(pageIds);
-
-  const activeColumns = useActiveCustomerColumns({
-    pageIndex,
-    pageSize,
-    orderBy,
-    isDescending,
-    onSort: handleSort,
-    headerChecked,
-    selectedRowIds,
-    onToggleAll: toggleAll,
-    onToggleOne: toggleOne,
-    onEdit: setEditTarget,
-    onDelete: setDeleteTarget,
-  });
-
-  const deletedColumns = useDeletedCustomerColumns({
-    pageIndex,
-    pageSize,
-    onRestore: setRestoreTarget,
-  });
-
-  const columns = showDeleted ? deletedColumns : activeColumns;
-
-  // eslint-disable-next-line react-hooks/incompatible-library
-  const table = useReactTable({
-    data: customers,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    ...(!showDeleted && {
-      getExpandedRowModel: getExpandedRowModel(),
-      getRowCanExpand: () => true,
-    }),
-    enableMultiRowSelection: false,
-    columnResizeMode: "onChange",
-    state: { columnVisibility },
-    onColumnVisibilityChange: setColumnVisibility,
-  });
-
   const handleDelete = useCallback(() => {
     if (!deleteTarget?.id) return;
     deleteMutation.mutate(deleteTarget.id, {
       onSuccess: (result) => {
-        if (result.isSuccess) setDeleteTarget(null);
+        if (result.isSuccess) {
+          setDeleteTarget(null);
+          // If we deleted the currently selected customer, reset selection
+          if (selectedCustomerId === deleteTarget.id) {
+            setSelectedCustomerId(null);
+          }
+        }
       },
     });
-  }, [deleteTarget, deleteMutation, setDeleteTarget]);
+  }, [deleteTarget, deleteMutation, selectedCustomerId, setDeleteTarget]);
 
   const handleRestore = useCallback(() => {
     if (!restoreTarget?.id) return;
@@ -184,190 +122,58 @@ export function CustomerListPage() {
     });
   }, [restoreTarget, restoreMutation, setRestoreTarget]);
 
-  const columnLabels = useMemo(() => ({ ...CUSTOMER_COLUMN_LABELS }), []);
-
-  const { layoutMode } = useOutletContext<{
-    layoutMode: "top-nav" | "sidebar";
-  }>();
-  const isSidebarMode = layoutMode === "sidebar";
-
   return (
-    <div className="flex h-full overflow-hidden gap-2">
-      {/* Sidebar bộ lọc */}
-      {!isSidebarMode && (
-        <CustomerFilterSidebar
-          selectedGender={selectedGender}
-          onSelectGender={setSelectedGender}
-          selectedSource={selectedSource}
-          onSelectSource={setSelectedSource}
+    <div className="flex flex-col h-full overflow-hidden gap-2">
+      {/* Stats row */}
+      <div className="shrink-0">
+        <CustomerStatCards
+          totalCustomers={totalCount}
+          activeCustomers={activeCustomerCount}
+          totalPoints={totalPoints}
+          walkInCustomers={walkInCustomerCount}
+          isLoading={isLoading}
         />
-      )}
+      </div>
 
-      {/* Main container: Stats + Table */}
-      <div className="flex-1 min-w-0 flex flex-col gap-2 overflow-hidden">
-        {/* Stats row */}
-        <div className="shrink-0">
-          <CustomerStatCards
-            totalCustomers={totalCount}
-            activeCustomers={activeCustomerCount}
-            totalPoints={totalPoints}
-            walkInCustomers={walkInCustomerCount}
+      {/* CRM 3-Column Grid */}
+      <div className="grid grid-cols-12 gap-2 flex-1 min-h-0 overflow-hidden">
+        {/* Column 1: Customer List */}
+        <div className="col-span-3 h-full overflow-hidden">
+          <CustomerCrmList
+            customers={customers}
+            selectedId={selectedCustomerId}
+            onSelect={setSelectedCustomerId}
             isLoading={isLoading}
+            totalCustomers={totalCount}
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            totalPages={totalPages}
+            onPageChange={setPageIndex}
+            filter={filter}
+            onFilterChange={handleSearchChange}
+            selectedGender={selectedGender}
+            onSelectGender={setSelectedGender}
+            selectedSource={selectedSource}
+            onSelectSource={setSelectedSource}
+            onAdd={() => setCreateOpen(true)}
+            showDeleted={showDeleted}
+            onToggleDeleted={() => handleToggleView(() => {})}
           />
         </div>
 
-        {/* Table card */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={containerVariants}
-          className={`${TABLE_STYLES.pageCard} flex-1 min-h-0 flex flex-col overflow-hidden relative`}
-        >
-          {/* Fetching bar */}
-          {isFetching && !isLoading && (
-            <div className={TABLE_STYLES.fetchBar}>
-              <div className={TABLE_STYLES.fetchBarInner} />
-            </div>
-          )}
-
-          {/* Toolbar */}
-          <div className="px-4 pt-3 shrink-0">
-            <DataTableToolbar
-              searchValue={filter}
-              onSearchChange={handleSearchChange}
-              searchPlaceholder="Tìm theo tên, SĐT, email..."
-            >
-              {selectedCount > 0 && !showDeleted && (
-                <div className="flex items-center gap-2 mr-auto text-[13px] text-lotus-deep font-medium bg-lotus-cream/50 px-3 py-1.5 rounded-lg border border-stone-200/50">
-                  <span>Đã chọn {selectedCount}</span>
-                  <button
-                    onClick={clearSelection}
-                    className="text-lotus-stone hover:text-lotus-deep ml-1 transition-colors"
-                    title="Bỏ chọn tất cả"
-                  >
-                    Bỏ chọn
-                  </button>
-                </div>
-              )}
-
-              {!showDeleted && (
-                <DataTableViewOptions
-                  table={table}
-                  columnLabels={columnLabels}
-                />
-              )}
-
-              <PermissionGate
-                resource={perm.resource}
-                action={perm.create}
-                role={perm.role}
-              >
-                <Button
-                  variant="admin"
-                  size="sm"
-                  onClick={() => setCreateOpen(true)}
-                  className={TABLE_STYLES.toolbarBtn}
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Thêm KH
-                </Button>
-              </PermissionGate>
-
-              <PermissionGate
-                resource={perm.resource}
-                action={perm.read}
-                role={perm.role}
-              >
-                <Button
-                  variant="admin"
-                  size="sm"
-                  className={TABLE_STYLES.toolbarBtn}
-                  onClick={() => handleToggleView(clearSelection)}
-                  title={showDeleted ? "Quay lại danh sách" : "Khách hàng đã xóa"}
-                >
-                  {showDeleted ? (
-                    <>
-                      <ArrowLeft className="w-4 h-4" />
-                      {COMMON_MSG.back}
-                    </>
-                  ) : (
-                    <>
-                      <Trash2 className="w-4 h-4" />
-                      {COMMON_MSG.restore}
-                    </>
-                  )}
-                </Button>
-              </PermissionGate>
-            </DataTableToolbar>
-          </div>
-
-          {/* Table */}
-          <DataTable
-            table={table}
-            isLoading={isLoading}
-            loadingRows={
-              pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
-            }
-            onRowClick={showDeleted ? undefined : (row) => row.toggleExpanded()}
-            renderSubComponent={
-              showDeleted
-                ? undefined
-                : ({ row }) =>
-                    row.original.id ? (
-                      <CustomerDetailExpanded
-                        customerId={row.original.id}
-                        onEdit={(cust) => setEditTarget(cust)}
-                      />
-                    ) : null
-            }
-            emptyState={
-              showDeleted ? (
-                <TableEmptyState
-                  icon={Trash2}
-                  title="Không có khách hàng đã xóa"
-                  hint="Các khách hàng bị xóa sẽ hiển thị tại đây."
-                />
-              ) : (
-                <TableEmptyState
-                  icon={Users}
-                  title="Chưa có khách hàng"
-                  hint="Thêm khách hàng mới để bắt đầu quản lý."
-                  action={
-                    <PermissionGate
-                      resource={perm.resource}
-                      action={perm.create}
-                      role={perm.role}
-                    >
-                      <Button
-                        variant="admin"
-                        size="sm"
-                        onClick={() => setCreateOpen(true)}
-                        className="mt-1 text-[12px]"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        Thêm khách hàng
-                      </Button>
-                    </PermissionGate>
-                  }
-                />
-              )
-            }
-            pagination={
-              paged && totalCount > 0 ? (
-                <DataTablePagination
-                  pageIndex={paged.pageIndex}
-                  pageSize={paged.pageSize}
-                  totalCount={paged.totalCount}
-                  totalPages={paged.totalPages}
-                  hasPreviousPage={paged.hasPreviousPage}
-                  hasNextPage={paged.hasNextPage}
-                  onPageChange={setPageIndex}
-                  onPageSizeChange={handlePageSizeChange}
-                />
-              ) : null
-            }
+        {/* Column 2: Customer Detail */}
+        <div className="col-span-6 h-full overflow-hidden">
+          <CustomerCrmDetail
+            customerId={selectedCustomerId}
+            onEdit={setEditTarget}
+            onDelete={setDeleteTarget}
           />
-        </motion.div>
+        </div>
+
+        {/* Column 3: CRM Activities / History */}
+        <div className="col-span-3 h-full overflow-hidden">
+          <CustomerCrmActivity customerId={selectedCustomerId} />
+        </div>
       </div>
 
       {/* Dialogs */}
