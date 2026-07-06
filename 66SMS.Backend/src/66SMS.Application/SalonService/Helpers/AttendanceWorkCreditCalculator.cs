@@ -43,7 +43,11 @@ namespace _66SMS.Application.SalonService.Helpers
                 return 0m;
 
             if (!checkInAt.HasValue || !checkOutAt.HasValue)
+            {
+                if (status == AttendanceConst.STATUS_CHECKED_OUT)
+                    return 1.0m;
                 return 0m;
+            }
 
             var hoursBasedCredit = ConvertHoursToWorkCredit(workedHours);
             var scheduledStart = GetScheduledStart(checkInAt.Value, shiftStart);

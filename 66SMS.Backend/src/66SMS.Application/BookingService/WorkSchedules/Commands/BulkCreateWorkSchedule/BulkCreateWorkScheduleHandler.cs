@@ -37,7 +37,8 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Commands.BulkCreateWor
             var shiftPeriodIds = request.Schedules.Select(x => x.ShiftPeriodId).Distinct().ToList();
 
             var existingSchedules = workScheduleSqlRepository.AsQueryable()
-                .Where(x => staffIds.Contains(x.StaffId) 
+                .Where(x => x.Status != _66SMS.Domain.Constants.WorkScheduleConst.STATUS_DELETED
+                         && staffIds.Contains(x.StaffId) 
                          && shiftPeriodIds.Contains(x.ShiftPeriodId) 
                          && workDates.Contains(x.WorkDate))
                 .ToList();

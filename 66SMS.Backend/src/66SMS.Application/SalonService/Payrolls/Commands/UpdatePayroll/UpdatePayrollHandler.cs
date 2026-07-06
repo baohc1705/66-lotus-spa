@@ -25,8 +25,20 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.UpdatePayroll
             if (payroll == null)
                 return Result<int>.NotFound(PayrollConst.MSG_NOT_FOUND, ErrorCodes.ERR_PAYROLL_NOT_FOUND);
 
+            if (request.BaseAmount.HasValue)
+                payroll.BaseAmount = request.BaseAmount.Value;
+            if (request.CommissionAmount.HasValue)
+                payroll.CommissionAmount = request.CommissionAmount.Value;
+
+            payroll.TotalAmount = payroll.BaseAmount + payroll.CommissionAmount;
+
             if (request.Note != null)
                 payroll.Note = request.Note;
+
+            if (request.Status.HasValue)
+            {
+                payroll.Status = request.Status.Value;
+            }
 
             payroll.UpdatedAt = DateTime.UtcNow;
             payroll.UpdatedBy = request.UpdatedBy;

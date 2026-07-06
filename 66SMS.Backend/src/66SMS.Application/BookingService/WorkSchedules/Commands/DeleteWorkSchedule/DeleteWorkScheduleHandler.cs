@@ -23,9 +23,7 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Commands.DeleteWorkSch
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                workSchedule.Status = _66SMS.Domain.Constants.WorkScheduleConst.STATUS_DELETED;
-                workSchedule.UpdatedAt = DateTime.UtcNow;
-                workScheduleSqlRepository.Update(workSchedule);
+                workScheduleSqlRepository.Remove(workSchedule);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
                 return Result<object>.Ok();

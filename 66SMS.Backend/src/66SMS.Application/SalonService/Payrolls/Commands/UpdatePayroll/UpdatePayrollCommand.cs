@@ -8,7 +8,10 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.UpdatePayroll
     {
         [JsonIgnore]
         public int Id { get; set; }
+        public decimal? BaseAmount { get; set; }
+        public decimal? CommissionAmount { get; set; }
         public string? Note { get; set; }
+        public int? Status { get; set; }
 
         [JsonIgnore]
         public int? UpdatedBy { get; set; }

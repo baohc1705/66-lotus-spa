@@ -35,7 +35,9 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
 
         public async Task<Result<int>> Handle(GeneratePayrollCommand request, CancellationToken cancellationToken)
         {
-            var staff = await staffRepository.FindByIdAsync(request.StaffId, asNoTracking: true, cancellationToken);
+            var staff = await staffRepository.AsQueryable(asNoTracking: true)
+                .Include(s => s.StaffSalons)
+                .FirstOrDefaultAsync(x => x.Id == request.StaffId, cancellationToken);
             if (staff == null)
                 return Result<int>.NotFound(StaffConst.MSG_STAFF_NOT_FOUND, ErrorCodes.ERR_STAFF_NOT_FOUND);
 
@@ -54,6 +56,7 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
 
             var relevantAttendances = attendances
                 .Where(a => AttendanceWorkCreditCalculator.IsManualStatus(a.Status)
+                    || a.Status == AttendanceConst.STATUS_CHECKED_OUT
                     || (a.CheckInAt.HasValue && a.CheckOutAt.HasValue))
                 .ToList();
 
@@ -124,6 +127,10 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
                 }
                 else
                 {
+                    if (payroll.SalonId == null && staff.StaffSalons != null && staff.StaffSalons.Count > 0)
+                    {
+                        payroll.SalonId = staff.StaffSalons[0].SalonId;
+                    }
                     payroll.SalaryType = salaryType;
                     payroll.Rate = rate;
                     payroll.TotalHours = totalHours;
