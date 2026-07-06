@@ -3,6 +3,7 @@ using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
+using _66SMS.Domain.Enums;
 using MediatR;
 
 namespace _66SMS.Application.CatalogService.CertificateTypes.Queries.GetAllCertificateTypes
@@ -18,8 +19,16 @@ namespace _66SMS.Application.CatalogService.CertificateTypes.Queries.GetAllCerti
 
         public async Task<Result<PagedResult<CertificateTypeDTO>>> Handle(GetAllCertificateTypesQuery request, CancellationToken cancellationToken)
         {
-            var query = certificateTypeRepository.AsQueryable()
-                .Where(x => x.Status != CertificateTypeConst.STATUS_DELETED);
+            var query = certificateTypeRepository.AsQueryable();
+
+            if (request.IsDeleted)
+            {
+                query = query.Where(x => x.Status == (int)StatusActiveEnum.DELETED);
+            }
+            else
+            {
+                query = query.Where(x => x.Status != (int)StatusActiveEnum.DELETED);
+            }
 
             if (!string.IsNullOrEmpty(request.Filter))
             {
@@ -29,11 +38,6 @@ namespace _66SMS.Application.CatalogService.CertificateTypes.Queries.GetAllCerti
             if (request.Status.HasValue)
             {
                 query = query.Where(x => x.Status == request.Status);
-            }
-
-            if (!request.IsDeleted)
-            {
-                query = query.Where(x => x.Status != CertificateTypeConst.STATUS_DELETED);
             }
 
             query = request.OrderBy?.ToLower() switch

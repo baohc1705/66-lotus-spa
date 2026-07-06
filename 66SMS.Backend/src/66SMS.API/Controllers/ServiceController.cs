@@ -1,6 +1,7 @@
 using _66SMS.API.Abstractions;
 using _66SMS.Application.CatalogService.Services.Commands.CreateServices;
 using _66SMS.Application.CatalogService.Services.Commands.DeleteServices;
+using _66SMS.Application.CatalogService.Services.Commands.DeleteServiceMultiples;
 using _66SMS.Application.CatalogService.Services.Commands.UpdateServices;
 using _66SMS.Application.CatalogService.Services.Queries.GetAllServices;
 using _66SMS.Application.CatalogService.Services.Queries.GetDetailService;
@@ -30,6 +31,15 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("services", "read")]
         public async Task<IActionResult> AdminGetAll([FromQuery] GetAllServicesQuery query)
         {
+            var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        [HttpGet("deleted")]
+        [PermissionAuthorize("services", "read")]
+        public async Task<IActionResult> AdminGetAllDeleted([FromQuery] GetAllServicesQuery query)
+        {
+            query.IsDeleted = true;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
@@ -88,6 +98,15 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var command = new DeleteServiceCommand { Id = id };
+            command.UpdatedBy = jwtService.GetUserId();
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpDelete("bulk")]
+        [PermissionAuthorize("services", "delete")]
+        public async Task<IActionResult> DeleteMultiples([FromBody] DeleteServiceMultiplesCommand command)
+        {
             command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);

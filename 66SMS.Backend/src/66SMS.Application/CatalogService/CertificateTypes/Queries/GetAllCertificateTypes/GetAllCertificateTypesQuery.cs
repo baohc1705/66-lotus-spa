@@ -7,6 +7,6 @@ namespace _66SMS.Application.CatalogService.CertificateTypes.Queries.GetAllCerti
     public class GetAllCertificateTypesQuery : PageRequest, IRequest<Result<PagedResult<CertificateTypeDTO>>>
     {
         public int? Status { get; set; }
-        public bool IsDeleted { get; set; } = true;
+        public bool IsDeleted { get; set; } = false;
     }
 }

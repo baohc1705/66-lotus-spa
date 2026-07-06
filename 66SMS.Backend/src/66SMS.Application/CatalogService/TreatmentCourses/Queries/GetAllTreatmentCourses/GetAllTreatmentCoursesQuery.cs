@@ -7,7 +7,7 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Queries.GetAllTreat
     public class GetAllTreatmentCoursesQuery : PageRequest, IRequest<Result<PagedResult<TreatmentCourseDTO>>>
     {
         public int? Status { get; set; }
-        public bool IsDeleted { get; set; } = true;
+        public bool IsDeleted { get; set; } = false;
         public int? CategoryId { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
+using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,10 +20,18 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Queries.GetAllStaf
 
         public async Task<Result<PagedResult<StaffCertificateDTO>>> Handle(GetAllStaffCertificatesQuery request, CancellationToken cancellationToken)
         {
-            var query = staffCertificateRepository.AsQueryable()
+            IQueryable<StaffCertificate> query = staffCertificateRepository.AsQueryable()
                 .Include(x => x.Staff)
-                .Include(x => x.CertificateType)
-                .Where(x => x.Status != StaffCertificateConst.STATUS_DELETED);
+                .Include(x => x.CertificateType);
+
+            if (request.IsDeleted)
+            {
+                query = query.Where(x => x.Status == StaffCertificateConst.STATUS_DELETED);
+            }
+            else
+            {
+                query = query.Where(x => x.Status != StaffCertificateConst.STATUS_DELETED);
+            }
 
             if (request.StaffId.HasValue)
             {

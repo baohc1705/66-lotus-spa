@@ -1,6 +1,7 @@
 using _66SMS.API.Abstractions;
 using _66SMS.Application.CatalogService.CertificateTypes.Commands.CreateCertificateType;
 using _66SMS.Application.CatalogService.CertificateTypes.Commands.DeleteCertificateType;
+using _66SMS.Application.CatalogService.CertificateTypes.Commands.DeleteCertificateTypeMultiples;
 using _66SMS.Application.CatalogService.CertificateTypes.Commands.UpdateCertificateType;
 using _66SMS.Application.CatalogService.CertificateTypes.Queries.GetAllCertificateTypes;
 using _66SMS.Application.CatalogService.CertificateTypes.Queries.GetDetailCertificateType;
@@ -55,10 +56,28 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
+        [HttpDelete("bulk")]
+        [PermissionAuthorize("certificate", "delete")]
+        public async Task<IActionResult> DeleteMultiples([FromBody] DeleteCertificateTypeMultiplesCommand command)
+        {
+            command.UpdatedBy = jwtService.GetUserId();
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
         [HttpGet("admin")]
         [PermissionAuthorize("certificate", "read")]
         public async Task<IActionResult> AdminGetAll([FromQuery] GetAllCertificateTypesQuery query)
         {
+            var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        [HttpGet("deleted")]
+        [PermissionAuthorize("certificate", "read")]
+        public async Task<IActionResult> GetAllDeleted([FromQuery] GetAllCertificateTypesQuery query)
+        {
+            query.IsDeleted = true;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

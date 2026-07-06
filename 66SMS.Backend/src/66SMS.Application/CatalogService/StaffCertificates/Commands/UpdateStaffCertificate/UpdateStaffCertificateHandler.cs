@@ -28,13 +28,13 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.UpdateSta
         {
             var entity = await staffCertificateRepository.FindByIdAsync((int)request.Id!, false, cancellationToken);
 
-            if (entity == null || entity.Status == StaffCertificateConst.STATUS_DELETED)
+            if (entity == null)
                 return Result<object>.NotFound(StaffCertificateConst.MSG_NOT_FOUND, ErrorCodes.ERR_STAFF_CERTIFICATE_NOT_FOUND);
 
             if (request.CertificateTypeId.HasValue && request.CertificateTypeId != entity.CertificateTypeId)
             {
                 var certType = await certificateTypeRepository.FindByIdAsync(request.CertificateTypeId.Value, true, cancellationToken);
-                if (certType == null || certType.Status == CertificateTypeConst.STATUS_DELETED)
+                if (certType == null || certType.Status == (int)_66SMS.Domain.Enums.StatusActiveEnum.DELETED)
                     return Result<object>.NotFound(CertificateTypeConst.MSG_NOT_FOUND, ErrorCodes.ERR_CERTIFICATE_TYPE_NOT_FOUND);
                 entity.CertificateTypeId = request.CertificateTypeId.Value;
             }

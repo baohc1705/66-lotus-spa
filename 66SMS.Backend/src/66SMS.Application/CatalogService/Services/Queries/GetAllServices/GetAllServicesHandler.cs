@@ -3,6 +3,7 @@ using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
+using _66SMS.Domain.Enums;
 using AutoMapper;
 using MediatR;
 
@@ -33,15 +34,20 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
                 query = query.Where(x => x.Name.StartsWith(request.Keyword) || x.Code == request.Keyword);
             }
 
-            if (!request.IsDeleted)
+            if (request.IsDeleted)
             {
-                query = query.Where(x => x.Status != ServiceConst.STATUS_DELETED);
+                query = query.Where(x => x.Status == (int)StatusActiveEnum.DELETED);
+            }
+            else
+            {
+                query = query.Where(x => x.Status != (int)StatusActiveEnum.DELETED);
             }
 
             if (request.Status != null)
             {
                 query = query.Where(x => x.Status == request.Status);
             }
+
 
             if (request.MinPrice.HasValue)
             {

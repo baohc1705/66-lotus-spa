@@ -1,6 +1,7 @@
 using _66SMS.API.Abstractions;
 using _66SMS.Application.CatalogService.TreatmentCourses.Commands.CreateTreatmentCourse;
 using _66SMS.Application.CatalogService.TreatmentCourses.Commands.DeleteTreatmentCourse;
+using _66SMS.Application.CatalogService.TreatmentCourses.Commands.DeleteTreatmentCourseMultiples;
 using _66SMS.Application.CatalogService.TreatmentCourses.Commands.UpdateTreatmentCourse;
 using _66SMS.Application.CatalogService.TreatmentCourses.Queries.GetAllTreatmentCourses;
 using _66SMS.Application.CatalogService.TreatmentCourses.Queries.GetDetailTreatmentCourse;
@@ -55,10 +56,28 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
+        [HttpDelete("bulk")]
+        [PermissionAuthorize("treatment-courses", "delete")]
+        public async Task<IActionResult> DeleteMultiples([FromBody] DeleteTreatmentCourseMultiplesCommand command)
+        {
+            command.UpdatedBy = jwtService.GetUserId();
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
         [HttpGet("admin")]
         [PermissionAuthorize("treatment-courses", "read")]
         public async Task<IActionResult> AdminGetAll([FromQuery] GetAllTreatmentCoursesQuery query)
         {
+            var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        [HttpGet("deleted")]
+        [PermissionAuthorize("treatment-courses", "read")]
+        public async Task<IActionResult> AdminGetAllDeleted([FromQuery] GetAllTreatmentCoursesQuery query)
+        {
+            query.IsDeleted = true;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

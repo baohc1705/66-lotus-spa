@@ -2,6 +2,7 @@ using _66SMS.API.Abstractions;
 using _66SMS.Application.BookingService.Appointments.Queries.GetDetailAppointment;
 using _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateServiceCategories;
 using _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteServiceCategories;
+using _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteServiceCategoryMultiples;
 using _66SMS.Application.CatalogService.ServiceCategories.Commands.UpdateServiceCategories;
 using _66SMS.Application.CatalogService.ServiceCategories.Queries.GetAllServiceCategories;
 using _66SMS.Contracts.Abstractions;
@@ -59,6 +60,15 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
+        [HttpGet("deleted")]
+        [PermissionAuthorize("services", "read")]
+        public async Task<IActionResult> AdminGetAllDeleted([FromQuery] GetAllServiceCategoriesQuery query)
+        {
+            query.IsDeleted = true;
+            var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
         [HttpPost]
         [PermissionAuthorize("services", "create")]
         public async Task<IActionResult> Create([FromBody] CreateServiceCategoriesCommand command)
@@ -83,6 +93,15 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var command = new DeleteServiceCategoriesCommand { Id = id };
+            command.UpdatedBy = jwtService.GetUserId();
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpDelete("bulk")]
+        [PermissionAuthorize("services", "delete")]
+        public async Task<IActionResult> DeleteMultiples([FromBody] DeleteServiceCategoryMultiplesCommand command)
+        {
             command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);

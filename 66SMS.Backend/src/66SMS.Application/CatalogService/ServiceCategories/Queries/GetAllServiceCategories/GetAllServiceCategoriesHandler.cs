@@ -2,6 +2,7 @@ using _66SMS.Application.DTOs.ServiceCategories;
 using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Enums;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
@@ -30,6 +31,15 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetAllServ
             if (!string.IsNullOrEmpty(request.Keyword))
             {
                 query = query.Where(x => x.Name.StartsWith(request.Keyword));
+            }
+
+            if (request.IsDeleted)
+            {
+                query = query.Where(x => x.Status == (int)StatusActiveEnum.DELETED);
+            }
+            else
+            {
+                query = query.Where(x => x.Status != (int)StatusActiveEnum.DELETED);
             }
 
             if (request.Status != null)

@@ -11,5 +11,6 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetAllServ
     {
         public string? Keyword { get; set; }
         public int? Status { get; set; }
+        public bool IsDeleted { get; set; } = false;
     }
 }

@@ -3,6 +3,7 @@ using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
+using _66SMS.Domain.Enums;
 using MediatR;
 using System.Data;
 
@@ -23,11 +24,11 @@ namespace _66SMS.Application.CatalogService.CertificateTypes.Commands.UpdateCert
         {
             var entity = await certificateTypeRepository.FindByIdAsync((int)request.Id!, false, cancellationToken);
 
-            if (entity == null || entity.Status == CertificateTypeConst.STATUS_DELETED)
+            if (entity == null)
                 return Result<object>.NotFound(CertificateTypeConst.MSG_NOT_FOUND, ErrorCodes.ERR_CERTIFICATE_TYPE_NOT_FOUND);
 
             var codeExists = certificateTypeRepository.AsQueryable()
-                .Any(x => x.Code == request.Code && x.Id != request.Id && x.Status != CertificateTypeConst.STATUS_DELETED);
+                .Any(x => x.Code == request.Code && x.Id != request.Id && x.Status != (int)StatusActiveEnum.DELETED);
 
             if (codeExists)
                 return Result<object>.Conflict(CertificateTypeConst.MSG_CODE_EXISTED, ErrorCodes.ERR_CERTIFICATE_TYPE_CODE_EXISTED);

@@ -3,6 +3,7 @@ using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
+using _66SMS.Domain.Enums;
 using MediatR;
 
 namespace _66SMS.Application.CatalogService.TreatmentCourses.Queries.GetAllTreatmentCourses
@@ -18,8 +19,16 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Queries.GetAllTreat
 
         public async Task<Result<PagedResult<TreatmentCourseDTO>>> Handle(GetAllTreatmentCoursesQuery request, CancellationToken cancellationToken)
         {
-            var query = treatmentCourseRepository.AsQueryable()
-                .Where(x => x.Status != TreatmentCourseConst.STATUS_DELETED);
+            var query = treatmentCourseRepository.AsQueryable();
+
+            if (request.IsDeleted)
+            {
+                query = query.Where(x => x.Status == (int)StatusActiveEnum.DELETED);
+            }
+            else
+            {
+                query = query.Where(x => x.Status != (int)StatusActiveEnum.DELETED);
+            }
 
             if (!string.IsNullOrEmpty(request.Filter))
             {
@@ -29,11 +38,6 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Queries.GetAllTreat
             if (request.Status.HasValue)
             {
                 query = query.Where(x => x.Status == request.Status);
-            }
-
-            if (!request.IsDeleted)
-            {
-                query = query.Where(x => x.Status != TreatmentCourseConst.STATUS_DELETED);
             }
 
             query = request.OrderBy?.ToLower() switch

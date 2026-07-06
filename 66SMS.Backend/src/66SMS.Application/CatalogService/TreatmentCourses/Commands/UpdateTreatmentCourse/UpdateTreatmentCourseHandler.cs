@@ -30,7 +30,7 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.UpdateTrea
             var course = await treatmentCourseRepository
                 .AsQueryable(false)
                 .Include(x => x.Items)
-                .FirstOrDefaultAsync(x => x.Id == request.Id && x.Status != TreatmentCourseConst.STATUS_DELETED, cancellationToken);
+                .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
             if (course == null)
                 return Result<object>.NotFound(TreatmentCourseConst.MSG_NOT_FOUND, ErrorCodes.ERR_TREATMENT_COURSE_NOT_FOUND);
