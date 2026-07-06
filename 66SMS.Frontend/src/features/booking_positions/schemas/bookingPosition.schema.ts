@@ -1,15 +1,16 @@
 import { z } from "zod";
+import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
 const bookingPositionBaseSchema = z.object({
-  roomId: z.coerce.number().min(1, "Vui lòng chọn phòng dịch vụ"),
+  roomId: z.coerce.number().min(1, VALIDATION_MSG.selectRequired("phòng dịch vụ")),
   name: z
     .string()
-    .nonempty("Tên vị trí không được để trống")
-    .max(100, "Tối đa 100 ký tự"),
-  sortOrder: z.coerce.number().min(0, "Thứ tự phải lớn hơn 0").optional(),
+    .nonempty(VALIDATION_MSG.required("Tên vị trí"))
+    .max(100, VALIDATION_MSG.max(100)),
+  sortOrder: z.coerce.number().min(0, VALIDATION_MSG.min(0)).optional(),
   note: z
     .string()
-    .max(500, "Tối đa 500 ký tự")
+    .max(500, VALIDATION_MSG.max(500))
     .optional()
     .or(z.literal("")),
   status: z.coerce.number().optional(),

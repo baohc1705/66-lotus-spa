@@ -13,6 +13,7 @@ import {
 } from "../schemas/timeSlot.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 import {
   Dialog,
@@ -149,7 +150,7 @@ export function TimeSlotFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Hủy
+              {COMMON_MSG.cancel}
             </Button>
             <Button type="submit" variant="admin" size="sm" loading={isPending}>
               {isEdit ? "Cập nhật" : "Tạo khung giờ"}

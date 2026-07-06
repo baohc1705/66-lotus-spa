@@ -28,6 +28,7 @@ import type { StaffDto } from '@/features/staffs/types/staff.types'
 import { useSalons } from '@/features/salons/hooks/useSalons'
 import type { SalonDTO } from '@/features/salons/types/salon.types'
 import { useAuthStore } from '@/features/auth/stores/authStore'
+import { COMMON_MSG } from '@/shared/constants/common.messages'
 import {
   INVOICE_ITEM_TYPE, PAYMENT_METHOD, POINT_VALUE_VND,
   type CreateInvoicePayload,
@@ -323,7 +324,7 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
           </FormSection>
 
           <DialogFooter>
-            <Button type="button" variant="outline" size="sm" onClick={() => onOpenChange(false)} disabled={isPending}>Hủy</Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => onOpenChange(false)} disabled={isPending}>{COMMON_MSG.cancel}</Button>
             <Button type="submit" variant="admin" size="sm" loading={isPending}>Lập hóa đơn</Button>
           </DialogFooter>
         </form>

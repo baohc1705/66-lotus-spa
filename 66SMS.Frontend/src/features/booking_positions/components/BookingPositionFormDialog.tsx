@@ -31,6 +31,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { Switch } from "@/shared/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 interface BookingPositionFormDialogProps {
   open: boolean;
@@ -261,7 +262,7 @@ export function BookingPositionFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Hủy
+              {COMMON_MSG.cancel}
             </Button>
             <Button type="submit" variant="admin" size="sm" loading={isPending}>
               {isEdit ? "Cập nhật" : "Tạo vị trí"}

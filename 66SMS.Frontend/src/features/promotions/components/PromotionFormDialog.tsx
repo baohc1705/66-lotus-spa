@@ -21,6 +21,7 @@ import {
 import { useCreatePromotion, useUpdatePromotion } from '../hooks/usePromotions'
 import { promotionSchema, type PromotionFormValues } from '../schemas/promotion.schema'
 import { DISCOUNT_TYPE_OPTIONS, STATUS_OPTIONS, type PromotionDto } from '../types/promotion.types'
+import { COMMON_MSG } from '@/shared/constants/common.messages'
 
 interface PromotionFormDialogProps {
   open: boolean
@@ -295,7 +296,7 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Hủy
+              {COMMON_MSG.cancel}
             </Button>
             <Button type="submit" variant="admin" size="sm" disabled={isPending}>
               {isPending ? 'Đang lưu...' : isEdit ? 'Cập nhật' : 'Tạo khuyến mãi'}

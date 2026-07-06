@@ -1,27 +1,3 @@
-export interface ShiftPeriodDTO {
-  id?: number;
-  shiftStart?: string;
-  shiftEnd?: string;
-  effectiveFrom?: string;
-  effectiveTo?: string;
-  createdAt?: string;
-  createdBy?: number;
-  updatedAt?: string;
-  updatedBy?: number;
-  status?: boolean; // Tương đương "Ca đang hoạt động" trong lịch sử
-}
-
-export interface ShiftDTO {
-  id?: number;
-  name?: string;
-  description?: string;
-  shiftPeriodDTOs?: ShiftPeriodDTO[];
-  createdAt?: string;
-  createdBy?: number;
-  updatedAt?: string;
-  updatedBy?: number;
-}
-
 export interface CreateShiftPeriodPayload {
   shiftStart?: string;
   shiftEnd?: string;
@@ -48,4 +24,28 @@ export interface UpdateShiftPayload {
   name?: string;
   description?: string;
   shiftPeriod?: UpdateShiftPeriodPayload;
+}
+
+export interface ShiftPeriodDTO {
+  id?: number;
+  shiftStart?: string;
+  shiftEnd?: string;
+  effectiveFrom?: string;
+  effectiveTo?: string;
+  createdAt?: string;
+  createdBy?: number;
+  updatedAt?: string;
+  updatedBy?: number;
+  status?: boolean;
+}
+
+export interface ShiftDTO {
+  id?: number;
+  name?: string;
+  description?: string;
+  shiftPeriodDTOs?: ShiftPeriodDTO[];
+  createdAt?: string;
+  createdBy?: number;
+  updatedAt?: string;
+  updatedBy?: number;
 }

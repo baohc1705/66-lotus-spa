@@ -1,13 +1,13 @@
+import { useAuthStore } from "@/features/auth/stores/authStore";
+import { cn } from "@/lib/utils";
+import { BranchSelector } from "@/shared/components/BranchSelector";
+import { Logo } from "@/shared/components/Logo";
+import { Bell, LogOut, Menu, PanelLeft, PanelTop, Settings, ShoppingCart, User } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "motion/react";
-import { Menu, ShoppingCart, Bell, Settings, User, LogOut, PanelLeft, PanelTop } from "lucide-react";
 import { MENU_ITEMS } from "../constants/menu";
-import { useAuthStore } from "@/features/auth/stores/authStore";
-import { BranchSelector } from "@/shared/components/BranchSelector";
 import { AdminTopNavbar } from "./AdminTopNavbar";
-import { Logo } from "@/shared/components/Logo";
-import { cn } from "@/lib/utils";
 
 interface AdminHeaderProps {
   toggleSidebar: () => void;
@@ -17,7 +17,6 @@ interface AdminHeaderProps {
 }
 
 export function AdminHeader({
-  toggleSidebar,
   toggleMobileSidebar,
   layoutMode,
   toggleLayoutMode,

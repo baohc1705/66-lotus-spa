@@ -2,10 +2,14 @@ import { bookingRoomApi } from "@/features/booking_rooms/api/bookingRoom.api";
 import type { PageRequest } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { TOAST_MSG } from "@/shared/constants/toast.messages";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type {
   CreateBookingRoomPayload,
   UpdateBookingRoomPayload,
 } from "../types/booking_room.types";
+
+const ENTITY = "phòng dịch vụ";
 
 const BOOKING_ROOM_KEYS = {
   all: ["booking-rooms"] as const,
@@ -19,6 +23,14 @@ export function useBookingRooms(params: PageRequest) {
   return useQuery({
     queryKey: BOOKING_ROOM_KEYS.list(params),
     queryFn: () => bookingRoomApi.getAll(params),
+  });
+}
+
+export function useAdminBookingRooms(params: PageRequest, enabled = true) {
+  return useQuery({
+    queryKey: BOOKING_ROOM_KEYS.list(params),
+    queryFn: () => bookingRoomApi.getAll(params),
+    enabled,
   });
 }
 
@@ -38,13 +50,13 @@ export function useCreateBookingRoom() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: BOOKING_ROOM_KEYS.lists() });
-        toast.success("Tạo thành công");
+        toast.success(TOAST_MSG.createSuccess(ENTITY));
       } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+        toast.error(result.message || COMMON_MSG.error);
       }
     },
     onError: () => {
-      toast.error("Có lỗi xảy ra khi tạo phòng dịch vụ");
+      toast.error(TOAST_MSG.actionError("tạo", ENTITY));
     },
   });
 }
@@ -62,13 +74,13 @@ export function useUpdateBookingRoom() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: BOOKING_ROOM_KEYS.all });
-        toast.success("Cập nhật thành công");
+        toast.success(TOAST_MSG.updateSuccess(ENTITY));
       } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+        toast.error(result.message || COMMON_MSG.error);
       }
     },
     onError: () => {
-      toast.error("Có lỗi xảy ra khi cập nhật phòng dịch vụ");
+      toast.error(TOAST_MSG.actionError("cập nhật", ENTITY));
     },
   });
 }
@@ -80,13 +92,13 @@ export function useDeleteBookingRoom() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: BOOKING_ROOM_KEYS.all });
-        toast.success("Xóa thành công");
+        toast.success(TOAST_MSG.deleteSuccess(ENTITY));
       } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+        toast.error(result.message || COMMON_MSG.error);
       }
     },
     onError: () => {
-      toast.error("Có lỗi xảy ra khi xóa phòng dịch vụ");
+      toast.error(TOAST_MSG.actionError("xóa", ENTITY));
     },
   });
 }

@@ -1,3 +1,13 @@
+import type {
+  CreateBookingPositionPayload as CreatePayload,
+  UpdateBookingPositionPayload as UpdatePayload,
+  BookingPositionFormValues as FormValues,
+} from "../schemas/bookingPosition.schema";
+
+export type CreateBookingPositionPayload = CreatePayload;
+export type UpdateBookingPositionPayload = UpdatePayload;
+export type BookingPositionFormValues = FormValues;
+
 export interface BookingPositionDTO {
   id?: number;
   roomId?: number;
@@ -10,21 +20,4 @@ export interface BookingPositionDTO {
   updatedAt?: string;
   updatedBy?: number;
   roomName?: string;
-}
-
-export interface CreateBookingPositionPayload {
-  roomId: number;
-  name: string;
-  sortOrder?: number;
-  note?: string;
-  status?: number;
-}
-
-export interface UpdateBookingPositionPayload {
-  id?: number;
-  roomId?: number;
-  name?: string;
-  sortOrder?: number;
-  note?: string;
-  status?: number;
 }

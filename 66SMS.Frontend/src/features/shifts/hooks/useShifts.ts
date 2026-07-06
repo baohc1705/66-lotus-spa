@@ -1,13 +1,15 @@
 import { shiftApi } from "@/features/shifts/api/shift.api";
-import type { PageRequest, Result } from "@/shared/types/common.types";
+import type { PageRequest } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { AxiosError } from "axios";
-import { getErrorMessage } from "@/shared/utils/errorUtils";
+import { TOAST_MSG } from "@/shared/constants/toast.messages";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type {
   CreateShiftPayload,
   UpdateShiftPayload,
 } from "../types/shift.types";
+
+const ENTITY = "ca làm việc";
 
 const SHIFT_KEYS = {
   all: ["shifts"] as const,
@@ -21,6 +23,14 @@ export function useShifts(params: PageRequest) {
   return useQuery({
     queryKey: SHIFT_KEYS.list(params),
     queryFn: () => shiftApi.getAll(params),
+  });
+}
+
+export function useAdminShifts(params: PageRequest, enabled = true) {
+  return useQuery({
+    queryKey: SHIFT_KEYS.list(params),
+    queryFn: () => shiftApi.getAll(params),
+    enabled,
   });
 }
 
@@ -39,12 +49,14 @@ export function useCreateShift() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: SHIFT_KEYS.lists() });
-        toast.success("Tạo ca làm việc thành công");
+        toast.success(TOAST_MSG.createSuccess(ENTITY));
       } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+        toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
+    onError: () => {
+      toast.error(TOAST_MSG.actionError("tạo", ENTITY));
+    },
   });
 }
 
@@ -61,12 +73,14 @@ export function useUpdateShift() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: SHIFT_KEYS.all });
-        toast.success("Cập nhật ca làm việc thành công");
+        toast.success(TOAST_MSG.updateSuccess(ENTITY));
       } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+        toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
+    onError: () => {
+      toast.error(TOAST_MSG.actionError("cập nhật", ENTITY));
+    },
   });
 }
 
@@ -77,11 +91,13 @@ export function useDeleteShift() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: SHIFT_KEYS.all });
-        toast.success("Xóa ca làm việc thành công");
+        toast.success(TOAST_MSG.deleteSuccess(ENTITY));
       } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+        toast.error(result.message || COMMON_MSG.error);
       }
     },
-    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
+    onError: () => {
+      toast.error(TOAST_MSG.actionError("xóa", ENTITY));
+    },
   });
 }

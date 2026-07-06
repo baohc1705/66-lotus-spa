@@ -1,6 +1,6 @@
 export const TABLE_STYLES = {
   pageCard:
-    "relative bg-white/70 rounded-admin border border-stone-200/30 overflow-hidden",
+    "relative bg-white rounded-admin border border-stone-200/30 overflow-hidden",
   cellMuted: "text-lotus-deep/80",
   cellMutedSmall: "text-lotus-deep/80 text-[12px]",
   cellIndex: "text-lotus-stone",

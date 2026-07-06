@@ -10,6 +10,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { formatDate } from "@/shared/utils/date.utils";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 import {
   Dialog,
@@ -234,7 +235,7 @@ export function ShiftFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Hủy
+              {COMMON_MSG.cancel}
             </Button>
             <Button type="submit" variant="admin" size="sm" loading={isPending}>
               {isEdit ? "Cập nhật" : "Tạo ca làm việc"}

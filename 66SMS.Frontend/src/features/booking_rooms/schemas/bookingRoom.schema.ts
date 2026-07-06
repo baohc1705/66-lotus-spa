@@ -1,17 +1,18 @@
 import { z } from "zod";
+import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
 const bookingRoomBaseSchema = z.object({
   name: z
     .string()
-    .nonempty("Tên phòng không được để trống")
-    .max(100, "Tối đa 100 ký tự"),
+    .nonempty(VALIDATION_MSG.required("Tên phòng"))
+    .max(100, VALIDATION_MSG.max(100)),
   imageUrl: z
     .string()
     .optional()
     .or(z.literal("")),
   note: z
     .string()
-    .max(500, "Tối đa 500 ký tự")
+    .max(500, VALIDATION_MSG.max(500))
     .optional()
     .or(z.literal("")),
   status: z.coerce.number().optional(),

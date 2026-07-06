@@ -31,6 +31,7 @@ import { Textarea } from "@/shared/components/ui/textarea";
 import { Switch } from "@/shared/components/ui/switch";
 import { ImageUpload } from "@/shared/components/ImageUpload";
 import { uploadApi } from "@/shared/api/upload.api";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 interface BookingRoomFormDialogProps {
   open: boolean;
@@ -173,7 +174,7 @@ export function BookingRoomFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Hủy
+              {COMMON_MSG.cancel}
             </Button>
             <Button type="submit" variant="admin" size="sm" loading={isPending || isUploading}>
               {isEdit ? "Cập nhật" : "Tạo phòng"}

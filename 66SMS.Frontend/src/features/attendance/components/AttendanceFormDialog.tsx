@@ -1,18 +1,14 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/shared/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
-import { Checkbox } from "@/shared/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -20,6 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { useUpdateAttendance } from "../hooks/useAttendances";
 import {
   attendanceEditSchema,
@@ -72,7 +71,11 @@ export function AttendanceFormDialog({
   } = form;
 
   const selectedStatus = watch("status");
-  const isManualStatus = selectedStatus === "3" || selectedStatus === "4" || selectedStatus === "5" || selectedStatus === "6";
+  const isManualStatus =
+    selectedStatus === "3" ||
+    selectedStatus === "4" ||
+    selectedStatus === "5" ||
+    selectedStatus === "6";
   // showKpiOverride removed
 
   useEffect(() => {
@@ -183,7 +186,12 @@ export function AttendanceFormDialog({
             >
               Hủy
             </Button>
-            <Button type="submit" variant="admin" size="sm" loading={updateMutation.isPending}>
+            <Button
+              type="submit"
+              variant="admin"
+              size="sm"
+              loading={updateMutation.isPending}
+            >
               Lưu
             </Button>
           </DialogFooter>
@@ -206,7 +214,9 @@ function FormField({
 }) {
   return (
     <div className={`space-y-1 ${className ?? ""}`}>
-      <Label className="text-[12px] font-semibold text-lotus-deep/80">{label}</Label>
+      <Label className="text-[12px] font-semibold text-lotus-deep/80">
+        {label}
+      </Label>
       {children}
       {error && <p className="text-[11px] text-red-500 font-medium">{error}</p>}
     </div>
