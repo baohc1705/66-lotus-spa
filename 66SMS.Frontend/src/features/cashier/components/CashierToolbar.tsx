@@ -1,5 +1,5 @@
 import { Search, Filter, ChevronLeft, ChevronRight, Calendar, Plus, Rows3, Columns3 } from 'lucide-react'
-import type { CashierViewMode } from '../types'
+import type { CashierViewMode, CashierTimeRange } from '../types'
 
 interface CashierToolbarProps {
   currentDate: Date
@@ -7,23 +7,47 @@ interface CashierToolbarProps {
   onAddBooking: () => void
   viewMode: CashierViewMode
   onViewModeChange: (mode: CashierViewMode) => void
+  timeRange: CashierTimeRange
+  onTimeRangeChange: (range: CashierTimeRange) => void
 }
 
-export function CashierToolbar({ currentDate, onDateChange, onAddBooking, viewMode, onViewModeChange }: CashierToolbarProps) {
+export function CashierToolbar({ currentDate, onDateChange, onAddBooking, viewMode, onViewModeChange, timeRange, onTimeRangeChange }: CashierToolbarProps) {
   const handlePrevDay = () => {
     const prev = new Date(currentDate)
-    prev.setDate(prev.getDate() - 1)
+    if (timeRange === 'weekly') {
+      prev.setDate(prev.getDate() - 7)
+    } else {
+      prev.setDate(prev.getDate() - 1)
+    }
     onDateChange(prev)
   }
 
   const handleNextDay = () => {
     const next = new Date(currentDate)
-    next.setDate(next.getDate() + 1)
+    if (timeRange === 'weekly') {
+      next.setDate(next.getDate() + 7)
+    } else {
+      next.setDate(next.getDate() + 1)
+    }
     onDateChange(next)
   }
 
   const handleToday = () => {
     onDateChange(new Date())
+  }
+
+  const getDisplayDate = () => {
+    if (timeRange === 'daily') return currentDate.toLocaleDateString('vi-VN');
+    
+    const start = new Date(currentDate);
+    const day = start.getDay();
+    const diff = start.getDate() - day + (day === 0 ? -6 : 1);
+    start.setDate(diff);
+    
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    
+    return `${start.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })} - ${end.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
   }
 
   return (
@@ -45,33 +69,59 @@ export function CashierToolbar({ currentDate, onDateChange, onAddBooking, viewMo
 
       {/* Right: Date Nav & Action */}
       <div className="flex items-center gap-3">
-        {/* View Toggle: Timeline (hàng ngang) / Cột (cũ) */}
+        {/* Time Range Toggle */}
         <div className="flex items-center bg-white p-0.5 rounded-[3px] border border-stone-200">
           <button
-            onClick={() => onViewModeChange('timeline')}
-            title="Nhân viên theo hàng, thời gian chạy ngang"
-            className={`flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-[2px] transition-all whitespace-nowrap ${
-              viewMode === 'timeline'
+            onClick={() => onTimeRangeChange('daily')}
+            className={`px-2.5 py-0.5 text-xs font-semibold rounded-[2px] transition-all whitespace-nowrap ${
+              timeRange === 'daily'
                 ? 'bg-lotus-primary/10 text-lotus-primary'
                 : 'text-lotus-deep/70 hover:text-lotus-deep'
             }`}
           >
-            <Rows3 className="w-3.5 h-3.5" />
-            Timeline
+            Ngày
           </button>
           <button
-            onClick={() => onViewModeChange('grid')}
-            title="Nhân viên theo cột, thời gian chạy dọc"
-            className={`flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-[2px] transition-all whitespace-nowrap ${
-              viewMode === 'grid'
+            onClick={() => onTimeRangeChange('weekly')}
+            className={`px-2.5 py-0.5 text-xs font-semibold rounded-[2px] transition-all whitespace-nowrap ${
+              timeRange === 'weekly'
                 ? 'bg-lotus-primary/10 text-lotus-primary'
                 : 'text-lotus-deep/70 hover:text-lotus-deep'
             }`}
           >
-            <Columns3 className="w-3.5 h-3.5" />
-            Cột
+            Tuần
           </button>
         </div>
+
+        {/* View Toggle: Timeline / Cột (Only show if daily) */}
+        {timeRange === 'daily' && (
+          <div className="flex items-center bg-white p-0.5 rounded-[3px] border border-stone-200">
+            <button
+              onClick={() => onViewModeChange('timeline')}
+              title="Nhân viên theo hàng, thời gian chạy ngang"
+              className={`flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-[2px] transition-all whitespace-nowrap ${
+                viewMode === 'timeline'
+                  ? 'bg-lotus-primary/10 text-lotus-primary'
+                  : 'text-lotus-deep/70 hover:text-lotus-deep'
+              }`}
+            >
+              <Rows3 className="w-3.5 h-3.5" />
+              Timeline
+            </button>
+            <button
+              onClick={() => onViewModeChange('grid')}
+              title="Nhân viên theo cột, thời gian chạy dọc"
+              className={`flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-[2px] transition-all whitespace-nowrap ${
+                viewMode === 'grid'
+                  ? 'bg-lotus-primary/10 text-lotus-primary'
+                  : 'text-lotus-deep/70 hover:text-lotus-deep'
+              }`}
+            >
+              <Columns3 className="w-3.5 h-3.5" />
+              Cột
+            </button>
+          </div>
+        )}
 
         <div className="flex items-center bg-white p-0.5 rounded-[3px] border border-stone-200">
           <button 
@@ -86,7 +136,7 @@ export function CashierToolbar({ currentDate, onDateChange, onAddBooking, viewMo
           </button>
           <div className="flex items-center gap-1 px-2 text-xs font-semibold text-lotus-deep min-w-[90px] justify-center whitespace-nowrap">
             <Calendar className="w-3.5 h-3.5 text-lotus-stone" />
-            {currentDate.toLocaleDateString('vi-VN')}
+            {getDisplayDate()}
           </div>
           <button onClick={handleNextDay} className="p-0.5 text-lotus-stone hover:text-lotus-deep hover:bg-lotus-cream/40 rounded-[2px] transition-all">
             <ChevronRight className="w-3.5 h-3.5" />

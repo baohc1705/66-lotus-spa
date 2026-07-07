@@ -35,10 +35,6 @@ export const router = createBrowserRouter([
     element: <HomePage />,
   },
   {
-    path: "/dat-lich",
-    element: <BookingPage />,
-  },
-  {
     path: "/login",
     element: <LoginPage />,
   },
@@ -53,6 +49,10 @@ export const router = createBrowserRouter([
   {
     element: <ProtectedRoute />,
     children: [
+      {
+        path: "/dat-lich",
+        element: <BookingPage />,
+      },
       {
         path: "/dashboard",
         element: <div className="p-6">Dashboard</div>,

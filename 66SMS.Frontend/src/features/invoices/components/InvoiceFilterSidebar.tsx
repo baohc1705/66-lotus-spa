@@ -36,7 +36,7 @@ export function InvoiceFilterSidebar({
   const hasFilter = selectedStatus !== null || selectedPaymentMethod !== null;
 
   return (
-    <aside className="w-56 shrink-0 flex flex-col h-full bg-white rounded border border-stone-200/60 overflow-hidden">
+    <aside className="w-56 shrink-0 flex flex-col h-full bg-white rounded overflow-hidden">
       {/* Title */}
       <div className="px-4 py-3 border-b border-stone-100 shrink-0 flex items-center justify-between">
         <div className="flex items-center gap-2">

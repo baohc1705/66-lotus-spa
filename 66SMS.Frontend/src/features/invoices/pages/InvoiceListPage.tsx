@@ -4,6 +4,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { Plus, Receipt } from "lucide-react";
+import { motion } from "motion/react";
 import { useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 
@@ -13,10 +14,10 @@ import { DataTable } from "@/shared/components/DataTable/DataTable";
 import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
 import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
 import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Button } from "@/shared/components/ui/button";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
+import { containerVariants } from "@/shared/motion/pageVariants";
 
 import { InvoiceDetailExpanded } from "../components/InvoiceDetailExpanded";
 import { InvoiceFilterSidebar } from "../components/InvoiceFilterSidebar";
@@ -144,21 +145,21 @@ export function InvoiceListPage() {
   const isSidebarMode = layoutMode === "sidebar";
 
   return (
-    <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-      <div className="flex h-full overflow-hidden gap-6 items-start">
-        {/* Sidebar bá»™ lá»c */}
-        {!isSidebarMode && (
-          <InvoiceFilterSidebar
-            selectedStatus={selectedStatus}
-            onSelectStatus={handleSelectStatus}
-            selectedPaymentMethod={selectedPaymentMethod}
-            onSelectPaymentMethod={handleSelectPaymentMethod}
-            onReset={handleResetFilters}
-          />
-        )}
+    <div className="flex h-full overflow-hidden gap-2">
+      {/* Sidebar bộ lọc */}
+      {!isSidebarMode && (
+        <InvoiceFilterSidebar
+          selectedStatus={selectedStatus}
+          onSelectStatus={handleSelectStatus}
+          selectedPaymentMethod={selectedPaymentMethod}
+          onSelectPaymentMethod={handleSelectPaymentMethod}
+          onReset={handleResetFilters}
+        />
+      )}
 
-        {/* Right: Stats + Table */}
-        <div className="flex-1 min-w-0 flex flex-col gap-4 overflow-hidden w-full">
+      {/* Right: Stats + Table */}
+      <div className="flex-1 min-w-0 flex flex-col gap-2 overflow-hidden">
+        <div className="shrink-0">
           <InvoiceStatCards
             paidRevenue={paidRevenue}
             paidCount={paidCount}
@@ -166,79 +167,95 @@ export function InvoiceListPage() {
             cancelledCount={cancelledCount}
             isLoading={isLoading}
           />
+        </div>
 
-          <DataTableToolbar
-            searchPlaceholder="Tìm theo mã, tên khách hàng..."
-            searchValue={filter}
-            onSearchChange={handleSearchChange}
-          >
-            <DataTableViewOptions table={table} columnLabels={columnLabels} />
-            <div className="flex items-center gap-2 ml-auto">
-              <PermissionGate resource={perm.resource} action={perm.create}>
-                <Button
-                  variant="admin"
-                  size="sm"
-                  onClick={() => setCreateOpen(true)}
-                  className="lotus-admin-table-toolbar-btn"
-                >
-                  <Plus className="w-4 h-4" /> Lập hóa đơn
-                </Button>
-              </PermissionGate>
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+          className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative"
+        >
+          {isFetching && !isLoading && (
+            <div className="lotus-admin-table-fetch-bar">
+              <div className="lotus-admin-table-fetch-bar-inner" />
             </div>
-          </DataTableToolbar>
+          )}
 
-          <div className="lotus-admin-table-page-card">
-            <DataTable
-              table={table}
-              isLoading={isLoading}
-              loadingRows={DEFAULT_LOADING_ROWS}
-              renderSubComponent={({ row }) =>
-                row.original.id ? (
-                  <InvoiceDetailExpanded
-                    invoiceId={row.original.id}
-                    onCancel={(id) => setCancelTarget(id)}
-                  />
-                ) : null
-              }
-              emptyState={
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
-                    <Receipt className="w-7 h-7 text-lotus-stone" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-lotus-deep">
-                      Chưa có hóa đơn
-                    </p>
-                    <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
-                      Lập hóa đơn mới để bắt đầu.
-                    </p>
-                  </div>
-                  <PermissionGate resource={perm.resource} action="create">
-                    <Button
-                      variant="admin"
-                      size="sm"
-                      onClick={() => setCreateOpen(true)}
-                      className="mt-1 text-lotus-admin-md"
-                    >
-                      <Plus className="w-3.5 h-3.5" /> Lập hóa đơn
-                    </Button>
-                  </PermissionGate>
-                </div>
-              }
-            />
+          <div className="px-4 pt-3 shrink-0">
+            <DataTableToolbar
+              searchPlaceholder="Tìm theo mã, tên khách hàng..."
+              searchValue={filter}
+              onSearchChange={handleSearchChange}
+            >
+              <DataTableViewOptions table={table} columnLabels={columnLabels} />
+              <div className="flex items-center gap-2 ml-auto">
+                <PermissionGate resource={perm.resource} action={perm.create}>
+                  <Button
+                    variant="admin"
+                    size="sm"
+                    onClick={() => setCreateOpen(true)}
+                    className="lotus-admin-table-toolbar-btn"
+                  >
+                    <Plus className="w-4 h-4" /> Lập hóa đơn
+                  </Button>
+                </PermissionGate>
+              </div>
+            </DataTableToolbar>
           </div>
 
-          <DataTablePagination
-            pageIndex={pageIndex}
-            pageSize={pageSize}
-            totalCount={totalCount}
-            totalPages={paged?.totalPages ?? 0}
-            hasPreviousPage={paged?.hasPreviousPage ?? false}
-            hasNextPage={paged?.hasNextPage ?? false}
-            onPageChange={listState.setPageIndex}
-            onPageSizeChange={handlePageSizeChange}
+          <DataTable
+            table={table}
+            isLoading={isLoading}
+            loadingRows={pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize}
+            renderSubComponent={({ row }) =>
+              row.original.id ? (
+                <InvoiceDetailExpanded
+                  invoiceId={row.original.id}
+                  onCancel={(id) => setCancelTarget(id)}
+                />
+              ) : null
+            }
+            emptyState={
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
+                  <Receipt className="w-7 h-7 text-lotus-stone" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-lotus-deep">
+                    Chưa có hóa đơn
+                  </p>
+                  <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
+                    Lập hóa đơn mới để bắt đầu.
+                  </p>
+                </div>
+                <PermissionGate resource={perm.resource} action="create">
+                  <Button
+                    variant="admin"
+                    size="sm"
+                    onClick={() => setCreateOpen(true)}
+                    className="mt-1 text-lotus-admin-md"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Lập hóa đơn
+                  </Button>
+                </PermissionGate>
+              </div>
+            }
+            pagination={
+              paged && totalCount > 0 ? (
+                <DataTablePagination
+                  pageIndex={pageIndex}
+                  pageSize={pageSize}
+                  totalCount={totalCount}
+                  totalPages={paged?.totalPages ?? 0}
+                  hasPreviousPage={paged?.hasPreviousPage ?? false}
+                  hasNextPage={paged?.hasNextPage ?? false}
+                  onPageChange={listState.setPageIndex}
+                  onPageSizeChange={handlePageSizeChange}
+                />
+              ) : null
+            }
           />
-        </div>
+        </motion.div>
       </div>
 
       <InvoiceFormDialog open={createOpen} onOpenChange={setCreateOpen} />
@@ -257,7 +274,7 @@ export function InvoiceListPage() {
           variant="danger"
         />
       )}
-    </TablePageShell>
+    </div>
   );
 }
 

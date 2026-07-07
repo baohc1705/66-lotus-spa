@@ -1,178 +1,30 @@
-import {
-  Calendar,
-  Clock,
-  Heart,
-  Users,
-} from "lucide-react";
-import { Logo } from "@/shared/components/Logo";
+import loginBgUrl from "@/assets/backgrounds/login-bg.webp";
+import logoHomeUrl from "@/assets/logo-home.png";
 import { RegisterForm } from "@/features/auth/components/RegisterForm";
-import { Link } from "react-router-dom";
-
-const features = [
-  {
-    icon: Calendar,
-    title: "Đặt Lịch Trực Tuyến",
-    desc: "Khách hàng tự chọn dịch vụ, kỹ thuật viên & thời gian mong muốn.",
-  },
-  {
-    icon: Clock,
-    title: "Tiết Kiệm Thời Gian",
-    desc: "Hệ thống tự động điều phối giường, phòng và kỹ thuật viên.",
-  },
-  {
-    icon: Heart,
-    title: "Chăm Sóc Tận Tâm",
-    desc: "Lưu trữ hồ sơ liệu trình sức khỏe, sở thích và ghi chú dịch vụ.",
-  },
-  {
-    icon: Users,
-    title: "Quản Lý Nhân Sự",
-    desc: "Xếp lịch làm việc, tính lương và hoa hồng chuyên nghiệp.",
-  },
-];
-
-const stats = [
-  { value: "500+", label: "Lượt khách/ngày" },
-  { value: "20+", label: "Liệu trình làm đẹp" },
-  { value: "98%", label: "Hài lòng" },
-];
 
 export const RegisterPage = () => (
-  <div className="min-h-screen flex">
-    <div
-      className="hidden lg:flex lg:w-[52%] flex-col justify-between p-12 relative overflow-hidden"
-      style={{
-        background:
-          "linear-gradient(135deg, #1c0a1a 0%, #3e1b38 50%, #E91E8C 100%)",
-      }}
-    >
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute -top-32 -right-32 w-96 h-96 rounded-full opacity-10"
-          style={{
-            background: "radial-gradient(circle, #E8D5B0, transparent)",
-          }}
-        />
-        <div
-          className="absolute -bottom-40 -left-20 w-[500px] h-[500px] rounded-full opacity-10"
-          style={{
-            background: "radial-gradient(circle, #C9A86C, transparent)",
-          }}
-        />
-        <svg
-          className="absolute inset-0 w-full h-full opacity-5"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden
-        >
-          <defs>
-            <pattern
-              id="login-dots"
-              x="0"
-              y="0"
-              width="24"
-              height="24"
-              patternUnits="userSpaceOnUse"
-            >
-              <circle cx="2" cy="2" r="1.5" fill="white" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#login-dots)" />
-        </svg>
-      </div>
-
-      <div className="relative z-10">
-        <Logo
-          size="md"
-          variant="light"
-          showTagline
-          taglineText="Beauty & Wellness"
-        />
-      </div>
-
-      <div className="relative z-10 flex-1 flex flex-col justify-center py-12">
-        <h1
-          className="text-4xl xl:text-5xl font-bold text-white leading-tight mb-6 font-sans"
-        >
-          Trải nghiệm{" "}
-          <span
-            className="inline-block"
-            style={{
-              background: "linear-gradient(90deg, #E8D5B0, #F06DAA)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            vận hành hoàn hảo
-          </span>
-        </h1>
-        <p className="text-pink-100 text-base leading-relaxed mb-10 max-w-md">
-          Hệ thống chuyên nghiệp dành riêng cho Lotus Spa — hỗ trợ đặt lịch
-          trực tuyến, chăm sóc liệu trình khách hàng và quản lý cơ sở tối ưu.
-        </p>
-
-        <div className="grid grid-cols-2 gap-4">
-          {features.map(({ icon: Icon, title, desc }) => (
-            <div
-              key={title}
-              className="rounded-2xl p-4 border border-white/10 backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:bg-white/5"
-              style={{ background: "rgba(255,255,255,0.03)" }}
-            >
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center mb-3"
-                style={{ background: "rgba(233, 30, 140, 0.15)" }}
-              >
-                <Icon className="w-4 h-4 text-pink-300" />
-              </div>
-              <p className="text-white text-sm font-semibold mb-1">{title}</p>
-              <p className="text-pink-200 text-xs leading-relaxed">{desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="relative z-10 flex gap-8">
-        {stats.map(({ value, label }) => (
-          <div key={label}>
-            <p className="text-2xl font-bold text-white">{value}</p>
-            <p className="text-pink-200 text-xs mt-0.5">{label}</p>
-          </div>
-        ))}
-      </div>
+  <div
+    className="min-h-screen flex flex-col items-center justify-center p-6 relative bg-cover bg-center bg-no-repeat"
+    style={{
+      backgroundImage: `url(${loginBgUrl})`,
+    }}
+  >
+    {/* Logo */}
+    <div className="flex flex-col items-center select-none mb-6">
+      <img
+        src={logoHomeUrl}
+        alt="Hoa Sen Spa Logo"
+        className="h-16 w-auto object-contain mb-2"
+      />
+      <h2 className="font-display text-[22px] font-semibold tracking-[0.1em] text-[#be7a87] uppercase">HOA SEN SPA</h2>
+      <span className="text-[11px] tracking-[0.3em] text-[#be7a87]/80 font-sans uppercase mt-1">ĐÔNG THÁP</span>
     </div>
 
-    <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-10 bg-[var(--spa-page-bg)]">
-      <div className="lg:hidden mb-8">
-        <Logo size="sm" variant="rose" showTagline taglineText="Lotus Spa" />
-      </div>
-
-      <div className="w-full max-w-md">
-        <div className="mb-6">
-          <h2
-            className="text-3xl font-bold text-[var(--spa-ui-text)] mb-2 font-sans"
-          >
-            Tạo tài khoản mới
-          </h2>
-          <p className="text-[var(--spa-ui-text-muted)] text-sm">
-            Đăng ký để trải nghiệm dịch vụ tại Lotus Spa
-          </p>
-        </div>
-
-        <RegisterForm />
-
-        <div className="mt-6 text-center text-sm">
-          <span className="text-[var(--spa-ui-text-muted)]">Đã có tài khoản? </span>
-          <Link
-            to="/login"
-            className="font-semibold text-[var(--spa-rose)] hover:text-[var(--spa-rose-hover)] transition-colors"
-          >
-            Đăng nhập ngay
-          </Link>
-        </div>
-      </div>
-
-      <div className="mt-8 text-center text-xs text-[var(--spa-ui-text-muted)]">
-        <p>© 2026 Lotus Spa. Bảo lưu mọi quyền.</p>
-      </div>
+    {/* Form Card */}
+    <div className="w-full max-w-[440px] bg-white rounded-[24px] p-8 sm:p-10 shadow-[0_15px_50px_-15px_rgba(184,151,106,0.15)] animate-fade-in">
+      <RegisterForm />
     </div>
   </div>
 );
+
+

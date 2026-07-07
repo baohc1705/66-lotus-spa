@@ -55,17 +55,17 @@ export function StaffScheduleToolbar({
       : (weekLabel ?? "");
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 px-4 py-3 bg-white border border-[var(--color-border)] rounded-xl shadow-sm">
+    <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-4 rounded-admin border border-stone-200/30 shadow-sm">
       <div className="flex items-center gap-2">
-        <div className="flex p-1 bg-gray-100 rounded-lg border border-gray-200">
+        <div className="flex bg-stone-100 p-0.5 rounded-lg border border-stone-200/50 h-9">
           <button
             type="button"
             onClick={() => onViewModeChange("day")}
             className={cn(
-              "px-3 py-1.5 text-sm font-medium rounded-md transition-all",
+              "px-3 py-1.5 text-lotus-admin-lg font-semibold rounded-md transition-colors",
               viewMode === "day"
-                ? "bg-white text-blue-600 shadow-sm"
-                : "text-gray-600 hover:text-gray-900",
+                ? "bg-white text-primary shadow-sm"
+                : "text-lotus-stone hover:text-lotus-deep",
             )}
           >
             Ngày
@@ -74,17 +74,17 @@ export function StaffScheduleToolbar({
             type="button"
             onClick={() => onViewModeChange("week")}
             className={cn(
-              "px-3 py-1.5 text-sm font-medium rounded-md transition-all",
+              "px-3 py-1.5 text-lotus-admin-lg font-semibold rounded-md transition-colors",
               viewMode === "week"
-                ? "bg-white text-blue-600 shadow-sm"
-                : "text-gray-600 hover:text-gray-900",
+                ? "bg-white text-primary shadow-sm"
+                : "text-lotus-stone hover:text-lotus-deep",
             )}
           >
             Tuần
           </button>
         </div>
-
-        <div className="hidden sm:flex items-center gap-3 text-xs font-medium text-gray-600 ml-2">
+ 
+        <div className="hidden lg:flex items-center gap-3 text-lotus-admin-md font-medium text-lotus-stone ml-2 select-none">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-status-pending" />
             Chờ xác nhận
@@ -107,37 +107,37 @@ export function StaffScheduleToolbar({
           </span>
         </div>
       </div>
-
-      <div className="flex items-center gap-2">
+ 
+      <div className="flex items-center gap-2 justify-end">
         <button
           type="button"
           onClick={handleToday}
           className={cn(
-            "px-3 py-1.5 text-sm font-medium rounded-lg border transition-all",
+            "px-4 h-9 text-lotus-admin-lg font-semibold rounded-lg border transition-all flex items-center justify-center",
             isToday
-              ? "bg-blue-600 text-white border-blue-600"
-              : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-white",
+              ? "bg-primary text-white border-primary"
+              : "bg-white text-lotus-deep border-stone-200/50 hover:bg-stone-50",
           )}
         >
           Hôm nay
         </button>
-
-        <div className="flex items-center bg-gray-50 p-1 rounded-lg border border-gray-200">
+ 
+        <div className="flex items-center bg-stone-50 p-0.5 rounded-lg border border-stone-200/50 h-9">
           <button
             type="button"
             onClick={handlePrev}
-            className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-white rounded-md transition-all"
+            className="p-1.5 text-lotus-stone hover:text-lotus-deep hover:bg-white rounded-md transition-all h-full flex items-center justify-center"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <div className="flex items-center gap-2 px-3 text-sm font-medium text-gray-900 min-w-[200px] justify-center">
-            <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
+          <div className="flex items-center gap-2 px-3 text-lotus-admin-lg font-semibold text-lotus-deep min-w-[200px] justify-center select-none">
+            <Calendar className="w-4 h-4 text-lotus-stone shrink-0" />
             <span className="truncate">{dateLabel}</span>
           </div>
           <button
             type="button"
             onClick={handleNext}
-            className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-white rounded-md transition-all"
+            className="p-1.5 text-lotus-stone hover:text-lotus-deep hover:bg-white rounded-md transition-all h-full flex items-center justify-center"
           >
             <ChevronRight className="w-4 h-4" />
           </button>

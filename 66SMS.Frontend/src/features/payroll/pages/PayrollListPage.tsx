@@ -7,6 +7,8 @@ import { DataTable } from "@/shared/components/DataTable/DataTable";
 import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { Button } from "@/shared/components/ui/button";
+import { DEFAULT_LOADING_ROWS } from '@/shared/constants/display.const';
+import { containerVariants } from '@/shared/motion/pageVariants';
 import {
   Select,
   SelectContent,
@@ -19,6 +21,7 @@ import {
   type ColumnDef,
 } from "@tanstack/react-table";
 import { Calculator, CheckCircle2, Pencil, Wallet } from "lucide-react";
+import { motion } from 'motion/react';
 import { useMemo, useState } from "react";
 import { EditPayrollDialog } from "../components/EditPayrollDialog";
 import { GeneratePayrollDialog } from "../components/GeneratePayrollDialog";
@@ -221,10 +224,15 @@ export function PayrollListPage() {
   });
 
   return (
-    <div className="space-y-4 w-full max-w-full overflow-hidden">
-      <div className="bg-white/70 backdrop-blur-md rounded-admin border border-stone-200/30 overflow-hidden w-full">
+    <div className="flex flex-col gap-2 h-full overflow-hidden w-full">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative"
+      >
         {/* Toolbar */}
-        <div className="p-4 flex flex-wrap items-end gap-3 border-b border-stone-100">
+        <div className="p-4 flex flex-wrap items-end gap-3 border-b border-stone-100 shrink-0">
           <Button
             variant="admin"
             size="sm"
@@ -340,7 +348,7 @@ export function PayrollListPage() {
         <DataTable
           table={table}
           isLoading={isLoading}
-          loadingRows={pageSize > 5 ? 5 : pageSize}
+          loadingRows={pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize}
           emptyState={
             <div className="flex flex-col items-center gap-3">
               <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
@@ -369,7 +377,7 @@ export function PayrollListPage() {
             ) : null
           }
         />
-      </div>
+      </motion.div>
 
       <GeneratePayrollDialog
         open={generateOpen}

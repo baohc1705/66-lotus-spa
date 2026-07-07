@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import { Loader2, CalendarDays } from "lucide-react";
 import { CashierGrid } from "@/features/cashier/components/CashierGrid";
 import type { CashierBooking } from "@/features/cashier/types";
 import { useAuthStore } from "@/features/auth/stores/authStore";
@@ -142,20 +141,7 @@ export function StaffAppointmentsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4 h-[calc(100vh-8rem)] min-h-[500px]">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-          <CalendarDays className="w-5 h-5 text-blue-600" />
-        </div>
-        <div>
-          <h1 className="text-xl font-bold text-lotus-deep">Lịch hẹn của tôi</h1>
-          <p className="text-sm text-gray-500">
-            Xem lịch hẹn khách theo ngày hoặc tuần — nhấn &quot;Hôm nay&quot; để
-            về ngày hiện tại
-          </p>
-        </div>
-      </div>
-
+    <div className="space-y-4">
       <StaffScheduleToolbar
         viewMode={viewMode}
         onViewModeChange={setViewMode}
@@ -164,24 +150,31 @@ export function StaffAppointmentsPage() {
         weekLabel={weekLabel}
       />
 
-      <div className="flex-1 flex flex-col min-h-0 bg-blue-50 rounded-xl overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-[500px] bg-white/70 backdrop-blur-md rounded-admin border border-stone-200/30 overflow-hidden">
         {isLoadingStaff || schedule.isLoading ? (
-          <div className="flex-1 flex items-center justify-center bg-white rounded-xl border border-[var(--color-border)]">
-            <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+          <div className="flex-1 flex items-center justify-center py-20 min-h-[400px]">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-8 h-8 animate-spin rounded-full border-4 border-stone-200 border-t-primary" />
+              <p className="text-sm text-lotus-stone font-medium">
+                Đang tải lịch hẹn...
+              </p>
+            </div>
           </div>
         ) : schedule.isError ? (
-          <div className="flex-1 flex items-center justify-center bg-white rounded-xl border text-red-500 text-sm gap-2">
-            <span>{schedule.error}</span>
+          <div className="flex-1 flex flex-col items-center justify-center p-8 min-h-[400px] text-center gap-3 bg-white">
+            <p className="text-red-500 font-semibold text-lotus-admin-lg">
+              {schedule.error}
+            </p>
             <button
               type="button"
               onClick={() => schedule.refetch()}
-              className="underline text-blue-600"
+              className="px-4 py-1.5 rounded-lg border border-stone-200 text-lotus-admin-md text-primary font-bold hover:bg-stone-50 transition-colors"
             >
               Thử lại
             </button>
           </div>
         ) : viewMode === "day" ? (
-          <div className="flex-1 min-h-0 flex flex-col rounded-xl overflow-hidden border border-[var(--color-border)]">
+          <div className="flex-1 min-h-[400px] flex flex-col overflow-hidden">
             <CashierGrid
               date={anchorDate}
               columns={[{ id: STAFF_COLUMN_ID, name: staffName }]}
@@ -202,7 +195,7 @@ export function StaffAppointmentsPage() {
             onBookingClick={handleBookingClick}
           />
         ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-500 bg-white rounded-xl border">
+          <div className="flex-1 flex items-center justify-center text-lotus-stone font-medium min-h-[400px] bg-white">
             Không có dữ liệu lịch tuần
           </div>
         )}

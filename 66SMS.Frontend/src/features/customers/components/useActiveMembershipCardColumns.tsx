@@ -17,18 +17,23 @@ import { CUSTOMER_PERM } from "../constants/customer.permissions";
 import type { MembershipCardDto } from "../types/membershipCard.types";
 
 export const MEMBERSHIP_CARD_COLUMN_LABELS = {
+  id: "Mã hệ thống",
+  customerId: "Mã KH",
   cardCode: "Mã thẻ",
   customerName: "Khách hàng",
-  tierName: "Loại thẻ",
+  membershipTierId: "Mã loại thẻ",
+  tierName: "Hạng thẻ",
   issuedAt: "Ngày cấp",
   expiresAt: "Ngày hết hạn",
   status: "Trạng thái",
+  createdAt: "Ngày tạo",
+  updatedAt: "Ngày cập nhật",
 } as const;
 
 export const CARD_STATUS_MAP: StatusMap = {
-  "0": { label: "Ngưng hoạt động", variant: "error" },
   "1": { label: "Hoạt động", variant: "success", dot: true },
-  "2": { label: "Tạm khóa", variant: "warning" },
+  "2": { label: "Hết hạn", variant: "warning" },
+  "3": { label: "Đã thu hồi", variant: "error" },
 };
 
 interface UseActiveMembershipCardColumnsParams {
@@ -67,6 +72,26 @@ export function useActiveMembershipCardColumns({
         enableResizing: false,
       },
       {
+        accessorKey: "id",
+        header: cols.id,
+        cell: ({ row }) => (
+          <span className="text-lotus-admin-xs font-mono font-bold text-stone-500">
+            #{row.original.id}
+          </span>
+        ),
+        size: 80,
+      },
+      {
+        accessorKey: "customerId",
+        header: cols.customerId,
+        cell: ({ row }) => (
+          <span className="text-lotus-admin-xs font-mono text-stone-500">
+            #{row.original.customerId}
+          </span>
+        ),
+        size: 80,
+      },
+      {
         accessorKey: "cardCode",
         header: () => (
           <SortableColumnHeader
@@ -96,6 +121,16 @@ export function useActiveMembershipCardColumns({
           </span>
         ),
         size: 180,
+      },
+      {
+        accessorKey: "membershipTierId",
+        header: cols.membershipTierId,
+        cell: ({ row }) => (
+          <span className="text-lotus-admin-xs font-mono text-stone-500">
+            #{row.original.membershipTierId}
+          </span>
+        ),
+        size: 80,
       },
       {
         accessorKey: "tierName",
@@ -141,6 +176,30 @@ export function useActiveMembershipCardColumns({
           />
         ),
         size: 120,
+      },
+      {
+        accessorKey: "createdAt",
+        header: cols.createdAt,
+        cell: ({ row }) => (
+          <span className="text-lotus-deep/80 text-lotus-admin-lg">
+            {row.original.createdAt
+              ? new Date(row.original.createdAt).toLocaleDateString("vi-VN")
+              : "—"}
+          </span>
+        ),
+        size: 110,
+      },
+      {
+        accessorKey: "updatedAt",
+        header: cols.updatedAt,
+        cell: ({ row }) => (
+          <span className="text-lotus-deep/80 text-lotus-admin-lg">
+            {row.original.updatedAt
+              ? new Date(row.original.updatedAt).toLocaleDateString("vi-VN")
+              : "—"}
+          </span>
+        ),
+        size: 110,
       },
       {
         id: "actions",

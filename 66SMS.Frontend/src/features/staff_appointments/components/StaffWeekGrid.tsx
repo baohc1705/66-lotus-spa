@@ -19,23 +19,23 @@ function timeToMins(t: string) {
 function statusStyles(status: string) {
   switch (status) {
     case "in-progress":
-      return "bg-sky-50 border-sky-300 text-sky-600";
+      return "bg-sky-50/80 border-sky-200 text-sky-700 font-medium";
     case "not-arrived":
-      return "bg-red-50 border-red-300 text-red-600";
+      return "bg-red-50/80 border-red-200 text-red-700 font-medium";
     case "waiting":
-      return "bg-yellow-50 border-yellow-300 text-yellow-600";
+      return "bg-amber-50/80 border-amber-200 text-amber-700 font-medium";
     case "completed":
     case "paid":
-      return "bg-emerald-50 border-emerald-300 text-emerald-600";
+      return "bg-emerald-50/80 border-emerald-200 text-emerald-700 font-medium";
     case "unpaid":
-      return "bg-rose-50 border-rose-300 text-rose-600";
+      return "bg-rose-50/80 border-rose-200 text-rose-700 font-medium";
     case "cancelled":
-      return "bg-slate-50 border-slate-300 text-slate-600";
+      return "bg-stone-50/80 border-stone-200 text-stone-600 font-medium";
     case "confirmed":
-      return "bg-blue-50 border-blue-300 text-blue-600";
+      return "bg-blue-50/80 border-blue-200 text-blue-700 font-medium";
     case "pending":
     default:
-      return "bg-amber-50 border-amber-300 text-amber-600";
+      return "bg-yellow-50/80 border-yellow-200 text-yellow-700 font-medium";
   }
 }
 
@@ -89,14 +89,14 @@ export function StaffWeekGrid({
   const currentTimeY = (currentH - 8) * 120 + (currentM / 60) * 120;
 
   return (
-    <div className="flex-1 overflow-auto scrollbar-thin bg-white border border-[var(--color-border)] rounded-xl">
+    <div className="flex-1 overflow-auto scrollbar-thin bg-white border border-stone-200/50 rounded-admin">
       <div className="flex min-w-max">
-        <div className="w-16 flex-shrink-0 border-r border-[var(--color-border)] bg-gray-50/50 sticky left-0 z-20">
-          <div className="h-14 border-b border-[var(--color-border)] sticky top-0 bg-gray-50/50 z-30" />
+        <div className="w-16 flex-shrink-0 border-r border-stone-200/50 bg-stone-50/50 sticky left-0 z-20">
+          <div className="h-14 border-b border-stone-200/50 sticky top-0 bg-stone-50/50 z-30" />
           <div className="relative">
             {HOURS.map((hour) => (
               <div key={hour} className="h-[120px] relative">
-                <span className="absolute -top-2.5 right-2 text-xs font-medium text-gray-400">
+                <span className="absolute -top-2.5 right-2 text-lotus-admin-xs font-semibold text-lotus-stone/80">
                   {hour.toString().padStart(2, "0")}:00
                 </span>
               </div>
@@ -125,28 +125,28 @@ export function StaffWeekGrid({
               <div
                 key={day.date}
                 className={cn(
-                  "flex-1 min-w-[140px] border-r border-[var(--color-border)] border-dashed",
-                  (header.isToday || isHighlighted) && "bg-blue-50/30",
+                  "flex-1 min-w-[140px] border-r border-stone-200/50 border-dashed",
+                  (header.isToday || isHighlighted) && "bg-primary/5",
                 )}
               >
                 <div
                   className={cn(
-                    "h-14 border-b border-[var(--color-border)] sticky top-0 z-10 flex flex-col items-center justify-center px-1",
-                    header.isToday ? "bg-blue-50" : "bg-white",
+                    "h-14 border-b border-stone-200/50 sticky top-0 z-10 flex flex-col items-center justify-center px-1",
+                    header.isToday ? "bg-lotus-cream" : "bg-white",
                   )}
                 >
                   <span
                     className={cn(
-                      "text-xs font-semibold uppercase",
-                      header.isToday ? "text-blue-600" : "text-gray-500",
+                      "text-lotus-admin-xs font-bold uppercase",
+                      header.isToday ? "text-primary" : "text-lotus-stone",
                     )}
                   >
                     {header.weekday}
                   </span>
                   <span
                     className={cn(
-                      "text-sm font-medium",
-                      header.isToday ? "text-blue-600" : "text-gray-900",
+                      "text-lotus-admin-md font-semibold",
+                      header.isToday ? "text-primary" : "text-lotus-deep",
                     )}
                   >
                     {header.label}
@@ -161,12 +161,12 @@ export function StaffWeekGrid({
                     {HOURS.map((hour) => (
                       <div
                         key={hour}
-                        className="h-[120px] w-full flex flex-col border-b border-[var(--color-border)]"
+                        className="h-[120px] w-full flex flex-col border-b border-stone-100"
                       >
                         {[0, 15, 30, 45].map((min) => (
                           <div
                             key={min}
-                            className="flex-1 border-b border-[var(--color-border)] border-dashed border-opacity-40 last:border-0"
+                            className="flex-1 border-b border-stone-100/50 border-dashed last:border-0"
                           />
                         ))}
                       </div>
@@ -185,7 +185,7 @@ export function StaffWeekGrid({
                         type="button"
                         onClick={() => onBookingClick(booking, day.date)}
                         className={cn(
-                          "absolute left-1 right-1 rounded-lg border p-1.5 text-left transition-all hover:shadow-md overflow-hidden z-10",
+                          "absolute left-1 right-1 rounded-lotus-admin-sm border p-1.5 text-left transition-all hover:shadow-md overflow-hidden z-10",
                           statusStyles(booking.status),
                         )}
                         style={{

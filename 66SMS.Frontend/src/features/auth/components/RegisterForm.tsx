@@ -2,20 +2,20 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
-  ArrowRight,
   Eye,
-  EyeOff,
   Loader2,
   Mail,
   RotateCcw,
+  User,
+  Lock,
+  Phone,
 } from "lucide-react";
 import {
   registerSchema,
   type RegisterFormData,
 } from "@/features/auth/schemas/registerSchema";
-import { Label } from "@/shared/components/ui/label";
 import { Input } from "@/shared/components/ui/input";
 import { toast } from "sonner";
 import { useRegister } from "@/features/auth/hooks/useRegister";
@@ -115,65 +115,91 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="fullName">Họ và tên</Label>
+      {/* Header inside Form card */}
+      <div className="text-center mb-6">
+        <h3 className="text-[26px] font-bold text-[#2a1f1a] font-sans">Đăng ký</h3>
+        <div className="w-12 h-[2px] bg-[#be7a87] mx-auto mt-2" />
+      </div>
+
+      {/* Họ và tên */}
+      <div className="space-y-1.5">
+        <div className="relative">
+          <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-[#a3a3a3] pointer-events-none w-5 h-5">
+            <User className="w-5 h-5" />
+          </span>
           <Input
             id="fullName"
             type="text"
-            placeholder="Nhập họ và tên"
+            placeholder="Họ và tên"
+            className="w-full h-11 pl-11 pr-4 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm outline-none transition-all duration-200 focus:border-[#be7a87] focus:ring-1 focus:ring-[#be7a87]"
             aria-invalid={!!errors.fullName}
             {...register("fullName")}
           />
-          {errors.fullName && <FieldError message={errors.fullName.message} />}
         </div>
+        {errors.fullName && <FieldError message={errors.fullName.message} />}
+      </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="phone">Số điện thoại</Label>
+      {/* Số điện thoại */}
+      <div className="space-y-1.5">
+        <div className="relative">
+          <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-[#a3a3a3] pointer-events-none w-5 h-5">
+            <Phone className="w-5 h-5" />
+          </span>
           <Input
             id="phone"
             type="tel"
-            placeholder="Nhập số điện thoại"
+            placeholder="Số điện thoại"
+            className="w-full h-11 pl-11 pr-4 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm outline-none transition-all duration-200 focus:border-[#be7a87] focus:ring-1 focus:ring-[#be7a87]"
             aria-invalid={!!errors.phone}
             {...register("phone")}
           />
-          {errors.phone && <FieldError message={errors.phone.message} />}
         </div>
+        {errors.phone && <FieldError message={errors.phone.message} />}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="userName">Tên đăng nhập</Label>
+      {/* Tên đăng nhập */}
+      <div className="space-y-1.5">
+        <div className="relative">
+          <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-[#a3a3a3] pointer-events-none w-5 h-5">
+            <User className="w-5 h-5" />
+          </span>
           <Input
             id="userName"
             type="text"
             placeholder="Tên đăng nhập"
             autoComplete="username"
+            className="w-full h-11 pl-11 pr-4 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm outline-none transition-all duration-200 focus:border-[#be7a87] focus:ring-1 focus:ring-[#be7a87]"
             aria-invalid={!!errors.userName}
             {...register("userName")}
           />
-          {errors.userName && <FieldError message={errors.userName.message} />}
         </div>
+        {errors.userName && <FieldError message={errors.userName.message} />}
+      </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
+      {/* Email */}
+      <div className="space-y-1.5">
+        <div className="relative">
+          <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-[#a3a3a3] pointer-events-none w-5 h-5">
+            <Mail className="w-5 h-5" />
+          </span>
           <Input
             id="email"
             type="email"
-            placeholder="Nhập email"
+            placeholder="Email"
             autoComplete="email"
+            className="w-full h-11 pl-11 pr-4 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm outline-none transition-all duration-200 focus:border-[#be7a87] focus:ring-1 focus:ring-[#be7a87]"
             aria-invalid={!!errors.email}
             {...register("email")}
           />
-          {errors.email && <FieldError message={errors.email.message} />}
         </div>
+        {errors.email && <FieldError message={errors.email.message} />}
       </div>
 
+      {/* Mật khẩu */}
       <div className="space-y-1.5">
-        <Label htmlFor="password">Mật khẩu</Label>
         <PasswordField
           id="password"
-          placeholder="Nhập mật khẩu"
+          placeholder="Mật khẩu"
           autoComplete="new-password"
           show={showPassword}
           onToggle={() => setShowPassword((v) => !v)}
@@ -183,11 +209,11 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
         {errors.password && <FieldError message={errors.password.message} />}
       </div>
 
+      {/* Xác nhận mật khẩu */}
       <div className="space-y-1.5">
-        <Label htmlFor="confirmPassword">Xác nhận mật khẩu</Label>
         <PasswordField
           id="confirmPassword"
-          placeholder="Nhập lại mật khẩu"
+          placeholder="Xác nhận mật khẩu"
           autoComplete="new-password"
           show={showConfirmPassword}
           onToggle={() => setShowConfirmPassword((v) => !v)}
@@ -204,9 +230,28 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
         label="Đăng ký"
         pendingLabel="Đang xử lý..."
       />
+
+      {/* Divider */}
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-200" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-white px-3 text-gray-400">hoặc</span>
+        </div>
+      </div>
+
+      {/* Login Link */}
+      <div className="text-center text-xs text-gray-500">
+        Đã có tài khoản?{" "}
+        <Link to="/login" className="font-semibold text-[#be7a87] hover:text-[#ac6a77] hover:underline transition-colors">
+          Đăng nhập ngay
+        </Link>
+      </div>
     </form>
   );
 };
+
 
 // ─── Step 2: OTP verification ─────────────────────────────────────────────────
 
@@ -313,30 +358,24 @@ const OtpStep = ({ email }: OtpStepProps) => {
   const otpComplete = otp.every((d) => d !== "");
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-      {/* Header */}
-      <div className="flex flex-col items-center text-center gap-3">
-        <div
-          className="w-14 h-14 rounded-2xl flex items-center justify-center"
-          style={{ background: "linear-gradient(135deg, #fce7f3, #fbcfe8)" }}
-        >
-          <Mail className="w-7 h-7 text-pink-500" />
-        </div>
-        <div>
-          <h3 className="text-lg font-bold text-[var(--spa-ui-text)]">
-            Xác minh địa chỉ email
-          </h3>
-          <p className="text-sm text-[var(--spa-ui-text-muted)] mt-1">
-            Chúng tôi đã gửi mã OTP 6 chữ số đến
-          </p>
-          <p className="text-sm font-semibold text-[var(--spa-rose)]">
-            {maskedEmail}
-          </p>
-        </div>
+    <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in" noValidate>
+      {/* Header inside Form card */}
+      <div className="text-center mb-6">
+        <h3 className="text-[26px] font-bold text-[#2a1f1a] font-sans">Xác thực OTP</h3>
+        <div className="w-12 h-[2px] bg-[#be7a87] mx-auto mt-2" />
+      </div>
+
+      <div className="text-center">
+        <p className="text-sm text-gray-500">
+          Chúng tôi đã gửi mã OTP 6 chữ số đến email
+        </p>
+        <p className="text-sm font-semibold text-[#be7a87] mt-1">
+          {maskedEmail}
+        </p>
       </div>
 
       {/* OTP boxes */}
-      <div className="flex justify-center gap-3" onPaste={handlePaste}>
+      <div className="flex justify-center gap-2.5" onPaste={handlePaste}>
         {otp.map((digit, i) => (
           <input
             key={i}
@@ -349,10 +388,10 @@ const OtpStep = ({ email }: OtpStepProps) => {
             value={digit}
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
-            className="w-12 h-14 text-center text-xl font-bold rounded-xl border-2 transition-all duration-150 outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 bg-white"
+            className="w-11 h-12 text-center text-lg font-bold rounded-xl border transition-all duration-150 outline-none focus:border-[#be7a87] focus:ring-1 focus:ring-[#be7a87] bg-white"
             style={{
-              borderColor: digit ? "#E91E8C" : "#e5e7eb",
-              color: "#1f2937",
+              borderColor: digit ? "#be7a87" : "#e5e7eb",
+              color: "#374151",
             }}
             aria-label={`Ký tự OTP thứ ${i + 1}`}
           />
@@ -367,11 +406,11 @@ const OtpStep = ({ email }: OtpStepProps) => {
       />
 
       {/* Resend */}
-      <div className="text-center text-sm text-[var(--spa-ui-text-muted)]">
+      <div className="text-center text-xs text-gray-500">
         {countdown > 0 ? (
           <span>
             Gửi lại sau{" "}
-            <span className="font-semibold text-[var(--spa-rose)]">
+            <span className="font-semibold text-[#be7a87]">
               {countdown}s
             </span>
           </span>
@@ -380,7 +419,7 @@ const OtpStep = ({ email }: OtpStepProps) => {
             type="button"
             onClick={handleResend}
             disabled={sendOtpMutation.isPending}
-            className="inline-flex items-center gap-1.5 font-semibold text-[var(--spa-rose)] hover:text-[var(--spa-rose-hover)] transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-1 font-semibold text-[#be7a87] hover:text-[#ac6a77] hover:underline transition-colors disabled:opacity-50"
           >
             {sendOtpMutation.isPending ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -397,42 +436,46 @@ const OtpStep = ({ email }: OtpStepProps) => {
 
 // ─── Shared sub-components ───────────────────────────────────────────────────
 
-const FieldError = ({ message }: { message?: string }) => {
+function FieldError({ message }: { message?: string }) {
   if (!message) return null;
   return (
-    <p className="text-xs text-[var(--spa-error)] flex items-center gap-1">
-      <span className="inline-block w-1 h-1 rounded-full bg-[var(--spa-error)]" />
+    <p className="text-xs text-red-500 font-medium pl-1 mt-1">
       {message}
     </p>
   );
-};
+}
 
 interface PasswordFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   show: boolean;
   onToggle: () => void;
 }
 
-const PasswordField = ({
+function PasswordField({
   show,
   onToggle,
   ...inputProps
-}: PasswordFieldProps) => (
-  <div className="relative">
-    <Input
-      {...inputProps}
-      type={show ? "text" : "password"}
-      className={`pr-12 ${inputProps.className ?? ""}`}
-    />
-    <button
-      type="button"
-      onClick={onToggle}
-      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 transition-colors"
-      aria-label={show ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
-    >
-      {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-    </button>
-  </div>
-);
+}: PasswordFieldProps) {
+  return (
+    <div className="relative">
+      <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-[#a3a3a3] pointer-events-none w-5 h-5">
+        <Lock className="w-5 h-5" />
+      </span>
+      <Input
+        {...inputProps}
+        type={show ? "text" : "password"}
+        className={`w-full h-11 pl-11 pr-12 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm outline-none transition-all duration-200 focus:border-[#be7a87] focus:ring-1 focus:ring-[#be7a87] ${inputProps.className ?? ""}`}
+      />
+      <button
+        type="button"
+        onClick={onToggle}
+        className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 transition-colors"
+        aria-label={show ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+      >
+        <Eye className="w-5 h-5" />
+      </button>
+    </div>
+  );
+}
 
 interface SubmitButtonProps {
   pending: boolean;
@@ -441,27 +484,18 @@ interface SubmitButtonProps {
   pendingLabel: string;
 }
 
-const SubmitButton = ({
+function SubmitButton({
   pending,
   disabled = false,
   label,
   pendingLabel,
-}: SubmitButtonProps) => {
+}: SubmitButtonProps) {
   const isDisabled = pending || disabled;
   return (
     <button
       type="submit"
       disabled={isDisabled}
-      className={`w-full flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-white font-semibold text-sm transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-pink-200 mt-2 ${
-        isDisabled
-          ? "opacity-60 cursor-not-allowed"
-          : "hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
-      }`}
-      style={{
-        background: isDisabled
-          ? "#9ca3af"
-          : "linear-gradient(135deg, #E91E8C, #C4177A)",
-      }}
+      className="w-full h-11 flex items-center justify-center gap-2 rounded-xl text-white bg-[#be7a87] font-semibold text-sm transition-all duration-200 outline-none hover:bg-[#ac6a77] hover:shadow-lg active:bg-[#995f6a] disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-[#9ca3af] mt-2"
     >
       {pending ? (
         <>
@@ -469,11 +503,9 @@ const SubmitButton = ({
           <span>{pendingLabel}</span>
         </>
       ) : (
-        <>
-          <span>{label}</span>
-          <ArrowRight className="w-4 h-4" />
-        </>
+        <span>{label}</span>
       )}
     </button>
   );
-};
+}
+

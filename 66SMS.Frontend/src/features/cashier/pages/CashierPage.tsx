@@ -1,31 +1,40 @@
-import { useState, useEffect } from "react";
-import { toast } from "sonner";
-import { CashierHeader } from "../components/CashierHeader";
-import { CashierToolbar } from "../components/CashierToolbar";
-import { CashierGrid } from "../components/CashierGrid";
-import { CashierTimeline } from "../components/CashierTimeline";
-import { CashierInvoiceSidebar } from "../components/CashierInvoiceSidebar";
-import type { CashierBooking, CashierViewMode } from "../types";
-import { useCashierData } from "../hooks/useCashier";
-import { CashierBookingModal } from "../components/CashierBookingModal";
-import { cashierApi } from "../api/cashier.api";
-import { invoiceApi } from "@/features/invoices/api/invoice.api";
-import { Loader2 } from "lucide-react";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { APPOINTMENT_STATUS } from "@/features/booking/constants/appointment.constants";
-import { CashierPOS } from "../components/CashierPOS";
+import { invoiceApi } from "@/features/invoices/api/invoice.api";
 import type { InvoiceDto } from "@/features/invoices/types/invoice.types";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { cashierApi } from "../api/cashier.api";
+import { CashierBookingModal } from "../components/CashierBookingModal";
+import { CashierGrid } from "../components/CashierGrid";
+import { CashierHeader } from "../components/CashierHeader";
+import { CashierInvoiceSidebar } from "../components/CashierInvoiceSidebar";
+import { CashierPOS } from "../components/CashierPOS";
+import { CashierTimeline } from "../components/CashierTimeline";
+import { CashierToolbar } from "../components/CashierToolbar";
+import { CashierWeeklyView } from "../components/CashierWeeklyView";
+import { useCashierData, useCashierWeekly } from "../hooks/useCashier";
+import type {
+  CashierBooking,
+  CashierTimeRange,
+  CashierViewMode,
+} from "../types";
 
 export function CashierPage() {
-  const [activeTab, setActiveTab] = useState<"calendar" | "invoices">("calendar");
+  const [activeTab, setActiveTab] = useState<"calendar" | "invoices">(
+    "calendar",
+  );
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [timeRange, setTimeRange] = useState<CashierTimeRange>("daily");
   const [selectedBooking, setSelectedBooking] = useState<CashierBooking | null>(
     null,
   );
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
-  const [pendingCheckoutInvoice, setPendingCheckoutInvoice] = useState<InvoiceDto | null>(null);
+  const [pendingCheckoutInvoice, setPendingCheckoutInvoice] =
+    useState<InvoiceDto | null>(null);
   const [viewMode, setViewMode] = useState<CashierViewMode>(
     () =>
       (localStorage.getItem("cashier-view-mode") as CashierViewMode) ||
@@ -41,8 +50,21 @@ export function CashierPage() {
   const isReceptionist = hasRole("Receptionist");
 
   const salonId = getEffectiveSalonId();
-  const { data, isLoading, isError, error, refetch, moveBooking } =
-    useCashierData(currentDate, salonId);
+
+  // Calculate week range
+  const weekStart = new Date(currentDate);
+  const day = weekStart.getDay();
+  const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
+  weekStart.setDate(diff);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+
+  const dailyQuery = useCashierData(currentDate, salonId);
+  const weeklyQuery = useCashierWeekly(weekStart, weekEnd, salonId);
+
+  const { data, isLoading, isError, error, refetch } =
+    timeRange === "daily" ? dailyQuery : weeklyQuery;
+  const moveBooking = timeRange === "daily" ? dailyQuery.moveBooking : () => {}; // Weekly view might not support D&D initially
 
   useEffect(() => {
     // Only admin and receptionist can access cashier page
@@ -66,14 +88,6 @@ export function CashierPage() {
 
   const handleEmptySlotClick = () => {
     setIsBookingModalOpen(true);
-  };
-
-  const handleBookingMove = (
-    bookingId: string,
-    newStaffId: number,
-    newStartTime: string,
-  ) => {
-    moveBooking(bookingId, newStaffId, newStartTime);
   };
 
   const handlePay = async (bookingId: string, paymentMethod: string) => {
@@ -216,6 +230,8 @@ export function CashierPage() {
             onAddBooking={handleAddBooking}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
+            timeRange={timeRange}
+            onTimeRangeChange={setTimeRange}
           />
 
           {/* Main Content Area */}
@@ -239,6 +255,14 @@ export function CashierPage() {
               <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-sm text-lotus-stone">
                 Không thể tải dữ liệu lưới lịch
               </div>
+            ) : timeRange === "weekly" ? (
+              <CashierWeeklyView
+                startDate={weekStart}
+                endDate={weekEnd}
+                bookings={data.bookings}
+                onBookingClick={handleBookingClick}
+                onEmptySlotClick={handleEmptySlotClick}
+              />
             ) : viewMode === "grid" ? (
               <CashierGrid
                 date={currentDate}
@@ -246,7 +270,7 @@ export function CashierPage() {
                 bookings={data.bookings}
                 onBookingClick={handleBookingClick}
                 onEmptySlotClick={handleEmptySlotClick}
-                onBookingMove={handleBookingMove}
+                onBookingMove={moveBooking}
               />
             ) : (
               <CashierTimeline
@@ -255,7 +279,7 @@ export function CashierPage() {
                 bookings={data.bookings}
                 onBookingClick={handleBookingClick}
                 onEmptySlotClick={handleEmptySlotClick}
-                onBookingMove={handleBookingMove}
+                onBookingMove={moveBooking}
               />
             )}
           </div>

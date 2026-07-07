@@ -70,3 +70,30 @@ export function useCashierData(date: Date, salonId?: number | null) {
     moveBooking,
   };
 }
+
+export function useCashierWeekly(startDate: Date, endDate: Date, salonId?: number | null) {
+
+  const query = useQuery({
+    queryKey: ["cashier-weekly", startDate.toDateString(), endDate.toDateString(), salonId],
+    queryFn: async () => {
+      const res = await cashierApi.getWeekly(startDate, endDate, salonId);
+      if (!res.isSuccess || !res.data) {
+        throw new Error(res.message || "Lỗi tải dữ liệu tuần");
+      }
+      return res.data;
+    },
+    staleTime: 30_000,
+  });
+
+  return {
+    data: query.data
+      ? { columns: query.data.columns, bookings: query.data.bookings }
+      : null,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    error: query.error
+      ? getApiError(query.error, "Không tải được lịch hẹn tuần")
+      : null,
+    refetch: query.refetch,
+  };
+}

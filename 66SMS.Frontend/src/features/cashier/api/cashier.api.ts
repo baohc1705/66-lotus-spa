@@ -21,6 +21,17 @@ export const cashierApi = {
       })
       .then((r) => r.data),
 
+  getWeekly: (startDate: Date, endDate: Date, salonId?: number | null) =>
+    axiosInstance
+      .get<Result<CashierDailyDto>>('/cashier/weekly', { // Will add to endpoints.ts
+        params: { 
+          startDate: formatDate(startDate),
+          endDate: formatDate(endDate),
+          ...(salonId !== undefined && salonId !== null ? { salonId } : {})
+        },
+      })
+      .then((r) => r.data),
+
   getOnlineBookings: (salonId?: number | null) =>
     axiosInstance
       .get<Result<CashierBooking[]>>(API.cashier.onlineAppointments, {
