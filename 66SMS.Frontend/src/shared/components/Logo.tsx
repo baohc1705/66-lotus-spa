@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
 import logoHomeUrl from "@/assets/logo-home.png";
+import { Link } from "react-router-dom";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg";

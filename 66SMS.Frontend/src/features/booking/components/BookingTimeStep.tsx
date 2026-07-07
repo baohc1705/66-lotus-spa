@@ -1,20 +1,21 @@
-import React, { useEffect, useState } from "react";
 import {
-  Calendar as CalendarIcon,
-  User,
-  Check,
   ArrowLeft,
+  Calendar as CalendarIcon,
+  Check,
   ChevronRight,
   MapPin,
+  Sofa,
+  User,
 } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useBookingStore } from "../stores/bookingStore";
 import {
-  useTechnicians,
-  useTimeSlots,
   useBookingPositions,
   useCreateSlotLock,
+  useTechnicians,
+  useTimeSlots,
 } from "../hooks/useBookingData";
+import { useBookingStore } from "../stores/bookingStore";
 
 export const BookingTimeStep: React.FC = () => {
   const store = useBookingStore();
@@ -50,7 +51,6 @@ export const BookingTimeStep: React.FC = () => {
   });
 
   useEffect(() => {
-    // Mặc định chọn ngày hôm nay nếu chưa có
     if (!selectedDate) {
       selectDate(days[0].fullDate);
     }
@@ -76,13 +76,12 @@ export const BookingTimeStep: React.FC = () => {
     useBookingPositions();
 
   const hasWorkingTechnicians = technicians.length > 0;
-  const isStep2Valid = !!selectedDate && !!selectedTimeSlot; // Technician và Position là tuỳ chọn
+  const isStep2Valid = !!selectedDate && !!selectedTimeSlot;
 
   const { mutateAsync: createSlotLock } = useCreateSlotLock();
   const [isLocking, setIsLocking] = useState(false);
 
   const handleNextStep = async () => {
-    // Collect slots that are fully selected
     const validGuests = store.guests.filter(
       (g) => g.selectedService && g.selectedDate && g.selectedTimeSlot
     );
@@ -92,10 +91,8 @@ export const BookingTimeStep: React.FC = () => {
       return;
     }
 
-    // Filter guests that actually need a NEW lock
     const guestsToLock = validGuests.filter((g) => !g.lockId);
 
-    // If all valid guests are already locked, just go to next step
     if (guestsToLock.length === 0) {
       nextStep();
       return;
@@ -113,9 +110,10 @@ export const BookingTimeStep: React.FC = () => {
 
       const res = await createSlotLock(payload);
       if (res.success && res.lockIds) {
-        // Set lockId only for the guests we just locked
         guestsToLock.forEach((g, idx) => {
-          const originalIndex = store.guests.findIndex((storeG) => storeG.id === g.id);
+          const originalIndex = store.guests.findIndex(
+            (storeG) => storeG.id === g.id
+          );
           if (originalIndex !== -1 && res.lockIds[idx]) {
             store.setGuestLockId(originalIndex, res.lockIds[idx]);
           }
@@ -133,25 +131,28 @@ export const BookingTimeStep: React.FC = () => {
   };
 
   return (
-    <div className="bg-lotus-surface rounded-3xl p-6 sm:p-8 border border-lotus-muted/20 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h3 className="text-xl font-bold text-lotus-deep font-display mb-1 flex items-center gap-2">
-        <CalendarIcon className="w-5 h-5 text-lotus-rose" />
-        <span>Bước 3: Chọn ngày lành, giờ đẹp & chuyên viên</span>
-      </h3>
-      {selectedSalon && (
-        <p className="text-xs text-lotus-stone mb-4 flex items-center gap-1.5 border-b border-lotus-muted/20 pb-3">
-          <MapPin className="w-3.5 h-3.5 text-lotus-rose-light" />
-          Kỹ thuật viên tại: <span className="font-semibold text-lotus-deep">{selectedSalon.name}</span>
-        </p>
-      )}
-      {!selectedSalon && <div className="border-b border-lotus-muted/20 mb-5" />}
+    <div className="bg-white rounded-sm shadow-sm p-4 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col gap-1">
+        <h3 className="text-lg font-bold text-lotus-deep font-display flex items-center gap-2">
+          <CalendarIcon className="w-5 h-5 text-lotus-rose" />
+          <span>Chọn thời gian</span>
+        </h3>
+        {selectedSalon && (
+          <p className="text-xs text-lotus-stone flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-lotus-rose" />
+            <span className="font-semibold text-lotus-deep">
+              {selectedSalon.name}
+            </span>
+          </p>
+        )}
+      </div>
 
-      {/* 1. Chọn ngày */}
-      <div className="mb-6">
-        <p className="text-xs text-lotus-stone font-bold uppercase tracking-wider mb-2.5">
-          1. Chọn ngày phục vụ:
+      {/* Chọn ngày */}
+      <div className="flex flex-col gap-2">
+        <p className="text-xs text-lotus-stone  tracking-wider">
+          1. Chọn ngày phục vụ
         </p>
-        <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
           {days.map((d) => {
             const isSelected =
               selectedDate?.toDateString() === d.fullDate.toDateString();
@@ -161,25 +162,24 @@ export const BookingTimeStep: React.FC = () => {
                 disabled={d.isBookedOut}
                 onClick={() => {
                   selectDate(d.fullDate);
-                  selectTimeSlot(null); // Reset timeslot
+                  selectTimeSlot(null);
                 }}
-                className={`flex flex-col items-center justify-center p-3 rounded-2xl w-14 shrink-0 transition-all border relative ${
+                className={`flex flex-col items-center justify-center p-3 rounded-sm w-14 shrink-0 transition-all relative ${
                   isSelected
-                    ? "bg-lotus-rose text-white border-lotus-rose shadow-sm"
+                    ? "bg-lotus-rose text-white shadow-md"
                     : d.isBookedOut
-                      ? "bg-gray-50 border-gray-200 text-gray-300 cursor-not-allowed line-through"
-                      : "bg-lotus-surface text-lotus-deep border-lotus-muted/20 hover:bg-lotus-rose/5"
+                      ? "bg-gray-50 text-gray-300 cursor-not-allowed line-through shadow-sm"
+                      : "bg-lotus-cream/50 text-lotus-deep shadow-sm hover:shadow-md"
                 }`}
               >
-                <span className="text-lotus-admin-xs font-semibold opacity-80">
+                <span className="text-[10px] font-semibold opacity-80">
                   {d.dayName}
                 </span>
                 <span className="text-base font-extrabold mt-0.5">
                   {d.dayNum}
                 </span>
-
                 {d.isBookedOut && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-red-100 text-red-600 border border-red-200 text-lotus-admin-xs font-bold rounded px-1 scale-90 whitespace-nowrap">
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-red-100 text-red-600 text-[9px] font-bold rounded-sm px-1 scale-90 whitespace-nowrap">
                     Hết chỗ
                   </span>
                 )}
@@ -189,12 +189,12 @@ export const BookingTimeStep: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Chọn Vị trí (Phòng) */}
-      <div className="mb-6">
-        <p className="text-xs text-lotus-stone font-bold uppercase tracking-wider mb-2.5">
-          2. Chọn vị trí / phòng (Tùy chọn):
+      {/* Chọn vị trí */}
+      <div className="flex flex-col gap-2">
+        <p className="text-xs text-lotus-stone tracking-wider">
+          2. Chọn vị trí
         </p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {loadingPositions ? (
             <div className="col-span-full py-4 text-center text-xs text-lotus-stone">
               Đang tải danh sách vị trí...
@@ -203,10 +203,10 @@ export const BookingTimeStep: React.FC = () => {
             <>
               <div
                 onClick={() => selectPosition(null)}
-                className={`border rounded-2xl p-3 flex items-center justify-center gap-2 transition-all relative cursor-pointer ${
+                className={`rounded-sm p-3 flex items-center justify-center gap-2 transition-all relative cursor-pointer ${
                   !selectedPosition
-                    ? "border-lotus-rose bg-lotus-rose/5 shadow-sm"
-                    : "border-lotus-muted/20 hover:border-lotus-rose-light hover:bg-lotus-cream"
+                    ? "bg-lotus-rose shadow-md"
+                    : "shadow-sm hover:shadow-md bg-lotus-cream"
                 }`}
               >
                 <span className="text-xs font-bold text-lotus-deep">
@@ -219,22 +219,22 @@ export const BookingTimeStep: React.FC = () => {
                   <div
                     key={pos.id}
                     onClick={() => selectPosition(pos)}
-                    className={`border rounded-2xl p-3 flex flex-col items-start gap-1 transition-all relative overflow-hidden cursor-pointer ${
+                    className={`rounded-sm p-3 flex flex-col items-start gap-1 transition-all relative overflow-hidden cursor-pointer ${
                       isSelected
-                        ? "border-lotus-rose bg-lotus-rose/5 shadow-sm"
-                        : "border-lotus-muted/20 hover:border-lotus-rose-light hover:bg-lotus-cream"
+                        ? "shadow-md"
+                        : "shadow-sm hover:shadow-md"
                     }`}
                   >
                     {isSelected && (
-                      <div className="absolute top-0 right-0 w-6 h-6 bg-lotus-rose rounded-bl-xl flex items-center justify-center">
+                      <div className="absolute top-0 right-0 w-6 h-6 bg-lotus-rose rounded-bl-sm flex items-center justify-center">
                         <Check className="w-3.5 h-3.5 text-white" />
                       </div>
                     )}
                     <div className="flex items-center gap-1.5 text-lotus-deep">
-                      <MapPin className="w-3.5 h-3.5 text-lotus-rose-light" />
+                      <Sofa className="w-3.5 h-3.5 text-lotus-rose" />
                       <h4 className="font-bold text-xs truncate">{pos.name}</h4>
                     </div>
-                    <p className="text-lotus-admin-xs text-lotus-stone truncate ml-5">
+                    <p className="text-[11px] text-lotus-stone truncate ml-5">
                       {pos.roomName}
                     </p>
                   </div>
@@ -245,103 +245,102 @@ export const BookingTimeStep: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Chọn KTV */}
-      <div className="mb-6">
-        <p className="text-xs text-lotus-stone font-bold uppercase tracking-wider mb-2.5">
-          3. Chọn Kỹ thuật viên (Tùy chọn):
+      {/* Chọn KTV */}
+      <div className="flex flex-col gap-2">
+        <p className="text-xs text-lotus-stone tracking-wider">
+          3. Chọn kỹ thuật viên
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {!serviceId ? (
             <div className="col-span-full py-4 text-center text-xs text-lotus-stone">
-              Vui lòng chọn dịch vụ ở bước 1
+              Vui lòng chọn dịch vụ ở bước trước
             </div>
           ) : loadingTechs ? (
             <div className="col-span-full py-4 text-center text-xs text-lotus-stone">
               Đang tải danh sách KTV...
             </div>
           ) : !hasWorkingTechnicians ? (
-            <div className="col-span-full py-6 text-center text-sm text-lotus-stone bg-lotus-cream rounded-2xl border border-dashed border-lotus-muted/20">
+            <div className="col-span-full py-6 text-center text-sm text-lotus-stone bg-lotus-cream rounded-sm shadow-sm">
               Không có kỹ thuật viên nào làm việc trong ngày này. Vui lòng chọn
               ngày khác.
             </div>
           ) : (
-            <>
-              {technicians.map((tech) => {
-                // Determine if this technician is selected.
-                // If the selected technician has no ID (like 'Bất kỳ kỹ thuật viên'), we match by isAny flag if present.
-                const isSelected = selectedTechnician?.id === tech.id && (!tech.isAny || selectedTechnician?.isAny === tech.isAny);
-                
-                return (
-                  <div
-                    key={tech.id ?? "any"}
-                    onClick={() => selectTechnician(tech)}
-                    className={`border rounded-2xl p-3.5 flex items-center gap-3.5 transition-all relative overflow-hidden cursor-pointer ${
-                      isSelected
-                        ? "border-lotus-rose bg-lotus-rose/5 shadow-sm"
-                        : "border-lotus-muted/20 hover:border-lotus-rose-light hover:bg-lotus-cream"
-                    }`}
-                  >
-                    {isSelected && (
-                      <div className="absolute top-0 right-0 w-6 h-6 bg-lotus-rose rounded-bl-xl flex items-center justify-center">
-                        <Check className="w-3.5 h-3.5 text-white" />
-                      </div>
-                    )}
+            technicians.map((tech) => {
+              const isSelected =
+                selectedTechnician?.id === tech.id &&
+                (!tech.isAny || selectedTechnician?.isAny === tech.isAny);
 
-                    {tech.avatar ? (
-                      <img
-                        src={tech.avatar}
-                        alt={tech.name}
-                        className="w-10 h-10 rounded-full object-cover border border-lotus-muted/20"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-lotus-rose/10 text-lotus-rose flex items-center justify-center shrink-0">
-                        <User className="w-5 h-5" />
-                      </div>
-                    )}
-
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-lotus-deep text-xs truncate">
-                        {tech.name || "Kỹ thuật viên"}
-                      </h4>
-                      <p className="text-lotus-admin-xs text-lotus-stone truncate mt-0.5">
-                        {tech.role || "Nhân viên"}
-                      </p>
-
-                      <span className="inline-block text-lotus-admin-xs font-bold px-1.5 py-0.5 rounded mt-1.5 border bg-emerald-50 text-emerald-600 border-emerald-200">
-                        {tech.slotsLeft !== undefined ? `Còn ${tech.slotsLeft} slot` : "Sẵn sàng"}
-                      </span>
+              return (
+                <div
+                  key={tech.id ?? "any"}
+                  onClick={() => selectTechnician(tech)}
+                  className={`rounded-sm p-3 flex items-center gap-3 transition-all relative overflow-hidden cursor-pointer ${
+                    isSelected
+                      ? "shadow-md"
+                      : "shadow-sm hover:shadow-md"
+                  }`}
+                >
+                  {isSelected && (
+                    <div className="absolute top-0 right-0 w-6 h-6 bg-lotus-rose rounded-bl-sm flex items-center justify-center">
+                      <Check className="w-3.5 h-3.5 text-white" />
                     </div>
+                  )}
+
+                  {tech.avatar ? (
+                    <img
+                      src={tech.avatar}
+                      alt={tech.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-lotus-rose-light text-lotus-rose flex items-center justify-center shrink-0">
+                      <User className="w-5 h-5" />
+                    </div>
+                  )}
+
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-lotus-deep text-xs truncate">
+                      {tech.name || "Kỹ thuật viên"}
+                    </h4>
+                    <p className="text-[11px] text-lotus-stone truncate mt-0.5">
+                      {tech.role || "Nhân viên"}
+                    </p>
+                    <span className="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-sm mt-1.5 bg-lotus-leaf-light text-lotus-leaf">
+                      {tech.slotsLeft !== undefined
+                        ? `Còn ${tech.slotsLeft} slot`
+                        : "Sẵn sàng"}
+                    </span>
                   </div>
-                );
-              })}
-            </>
+                </div>
+              );
+            })
           )}
         </div>
       </div>
 
-      {/* 4. Khung giờ */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-xs text-lotus-stone font-bold uppercase tracking-wider">
-            4. Chọn khung giờ phục vụ:
+      {/* Khung giờ */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-lotus-stone tracking-wider">
+            4. Chọn khung giờ phục vụ
           </p>
-          <div className="flex items-center gap-3 text-lotus-admin-xs text-lotus-stone">
+          <div className="flex items-center gap-3 text-[10px] text-lotus-stone">
             <div className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-lotus-surface border border-lotus-muted/30 inline-block"></span>
+              <span className="w-2.5 h-2.5 rounded-full bg-white shadow-sm inline-block" />
               Trống
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-50 border border-red-200 inline-block"></span>
+              <span className="w-2.5 h-2.5 rounded-full bg-red-300 inline-block" />
               Đã đặt
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-gray-100 border border-gray-300 inline-block"></span>
-              Ngoài giờ / Nghỉ
+              <span className="w-2.5 h-2.5 rounded-full bg-gray-200 inline-block" />
+              Ngoài giờ
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin">
+        <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-[220px] overflow-y-auto scrollbar-thin">
           {!dateInput ? (
             <div className="col-span-full py-4 text-center text-xs text-lotus-stone">
               Vui lòng chọn ngày trước
@@ -353,25 +352,31 @@ export const BookingTimeStep: React.FC = () => {
           ) : (
             timeSlots.map((slot) => {
               const isSelected = selectedTimeSlot?.slotId === slot.slotId;
-              
+
               const s = slot.status?.toLowerCase() || "";
               let label = "Không khả dụng";
               let isAvailable = false;
-              let classes = "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-50";
+              let classes =
+                "bg-gray-100 text-gray-400 cursor-not-allowed opacity-50 shadow-sm";
 
               if (s === "available" || s === "trống") {
                 label = "Còn trống";
                 isAvailable = true;
-                classes = isSelected ? "bg-lotus-rose text-white border-lotus-rose shadow-sm" : "bg-lotus-surface text-lotus-deep border-lotus-muted/20 hover:bg-lotus-rose/5";
+                classes = isSelected
+                  ? "bg-lotus-rose text-white shadow-md"
+                  : "bg-white text-lotus-deep shadow-sm hover:shadow-md";
               } else if (s === "booked" || s === "đầy") {
                 label = "Đã đặt";
-                classes = "bg-red-50 text-red-400 border-red-100 cursor-not-allowed line-through opacity-60";
+                classes =
+                  "bg-red-50 text-red-400 cursor-not-allowed line-through opacity-60 shadow-sm";
               } else if (s === "outside") {
                 label = "Ngoài giờ";
-                classes = "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-50";
+                classes =
+                  "bg-gray-100 text-gray-400 cursor-not-allowed opacity-50 shadow-sm";
               } else if (s === "break" || s === "nghỉ") {
                 label = "Nghỉ";
-                classes = "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-50";
+                classes =
+                  "bg-gray-100 text-gray-400 cursor-not-allowed opacity-50 shadow-sm";
               }
 
               return (
@@ -380,10 +385,10 @@ export const BookingTimeStep: React.FC = () => {
                   type="button"
                   disabled={!isAvailable}
                   onClick={() => selectTimeSlot(slot)}
-                  className={`py-2 px-1 text-center text-xs font-bold rounded-xl transition-all border flex flex-col items-center justify-center gap-0.5 ${classes}`}
+                  className={`py-2 px-1 text-center text-xs font-bold rounded-sm transition-all flex flex-col items-center justify-center gap-0.5 ${classes}`}
                 >
                   <span>{slot.time}</span>
-                  <span className="text-lotus-admin-xs uppercase font-bold tracking-wider opacity-90 scale-90">
+                  <span className="text-xs tracking-wider opacity-90 scale-90">
                     {label}
                   </span>
                 </button>
@@ -393,10 +398,10 @@ export const BookingTimeStep: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 border-t border-lotus-muted/20 pt-5">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-2">
         <button
           onClick={prevStep}
-          className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl font-bold transition-all bg-lotus-surface text-lotus-deep border border-lotus-muted/20 hover:bg-lotus-cream"
+          className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-full font-bold transition-all bg-lotus-cream text-lotus-deep shadow-sm hover:shadow-md"
         >
           <ArrowLeft className="w-5 h-5" />
           Quay lại
@@ -404,9 +409,9 @@ export const BookingTimeStep: React.FC = () => {
         <button
           onClick={handleNextStep}
           disabled={!isStep2Valid || isLocking}
-          className={`flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl font-bold transition-all ${
+          className={`flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-full font-bold transition-all ${
             isStep2Valid
-              ? "bg-lotus-rose text-white hover:bg-lotus-rose/90 shadow-md"
+              ? "bg-lotus-rose text-white hover:bg-lotus-rose/90 shadow-sm"
               : "bg-gray-100 text-gray-400 cursor-not-allowed"
           }`}
         >

@@ -1,14 +1,14 @@
-import React, { useMemo, useState } from "react";
 import {
-  Search,
-  Heart,
-  Check,
-  HelpCircle,
-  ChevronRight,
   ArrowLeft,
+  Check,
+  ChevronRight,
+  HelpCircle,
+  Leaf,
+  Search,
 } from "lucide-react";
-import { useBookingStore } from "../stores/bookingStore";
+import React, { useMemo, useState } from "react";
 import { useServices } from "../../services/hooks/useServices";
+import { useBookingStore } from "../stores/bookingStore";
 
 export const BookingServiceStep: React.FC = () => {
   const store = useBookingStore();
@@ -57,26 +57,24 @@ export const BookingServiceStep: React.FC = () => {
   };
 
   return (
-    <div className="bg-lotus-surface rounded-3xl p-6 sm:p-8 border border-lotus-muted/20 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h3 className="text-xl font-bold text-lotus-deep font-display mb-5 flex items-center gap-2 border-b border-lotus-muted/20 pb-3">
-        <Heart className="w-5 h-5 text-lotus-rose" />
-        <span>Bước 2: Chọn dịch vụ làm đẹp & chăm sóc</span>
+    <div className="bg-white rounded-sm shadow-sm p-4 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <h3 className="text-lg font-bold text-lotus-deep font-display flex items-center gap-2">
+        <Leaf className="w-5 h-5 text-lotus-rose" />
+        <span>Chọn dịch vụ</span>
       </h3>
 
-      {/* Search Row */}
-      <div className="relative mb-6">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         <input
           type="text"
           placeholder="Tìm tên dịch vụ, mô tả..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 border border-lotus-muted/20 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-lotus-rose-light bg-lotus-cream/50 text-lotus-deep"
+          className="w-full pl-9 pr-4 py-2.5 rounded-sm shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-lotus-rose-light bg-lotus-cream text-lotus-deep"
         />
       </div>
 
-      {/* Services list grouped by category */}
-      <div className="flex flex-col gap-6 max-h-[500px] overflow-y-auto pr-1 scrollbar-thin">
+      <div className="flex flex-col gap-4 max-h-[500px] overflow-y-auto scrollbar-thin">
         {isLoading ? (
           <div className="text-center py-12 text-lotus-stone">
             Đang tải danh sách dịch vụ...
@@ -88,20 +86,20 @@ export const BookingServiceStep: React.FC = () => {
         ) : Object.keys(groupedServices).length > 0 ? (
           Object.entries(groupedServices).map(([categoryName, items]) => (
             <div key={categoryName} className="flex flex-col gap-2">
-              <h4 className="text-sm font-bold text-lotus-rose uppercase tracking-wider mb-2 border-b border-lotus-muted/10 pb-1">
+              <h4 className="text-xs font-bold text-lotus-rose tracking-wider">
                 {categoryName}
               </h4>
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-2">
                 {items.map((s) => {
                   const isSelected = selectedService?.id === s.id;
                   return (
                     <div
                       key={s.id}
                       onClick={() => selectService(s)}
-                      className={`flex items-center justify-between p-3.5 rounded-2xl cursor-pointer transition-all ${
+                      className={`flex items-center justify-between p-3 rounded-sm cursor-pointer transition-all ${
                         isSelected
-                          ? "bg-lotus-rose/5 border border-lotus-rose shadow-sm"
-                          : "border border-transparent hover:bg-lotus-cream"
+                          ? "shadow-md hover:shadow-md"
+                          : "shadow-sm hover:shadow-md bg-white"
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -109,10 +107,10 @@ export const BookingServiceStep: React.FC = () => {
                           <img
                             src={s.imageUrl}
                             alt={s.name}
-                            className="w-12 h-12 rounded-full object-cover shrink-0"
+                            className="w-12 h-12 rounded-sm object-cover shrink-0"
                           />
                         ) : (
-                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-lotus-rose/10 to-lotus-gold/10 flex items-center justify-center shrink-0 text-lg">
+                          <div className="w-12 h-12 rounded-sm bg-gradient-to-br from-lotus-rose to-lotus-gold flex items-center justify-center shrink-0 text-lg">
                             🌸
                           </div>
                         )}
@@ -121,7 +119,9 @@ export const BookingServiceStep: React.FC = () => {
                             {s.name}
                           </h5>
                           <div className="flex items-center gap-2 mt-0.5 text-xs text-lotus-stone">
-                            <span>Thời lượng: {formatDuration(s.durationMins)}</span>
+                            <span>
+                              Thời lượng: {formatDuration(s.durationMins)}
+                            </span>
                             <span>·</span>
                             <span className="font-semibold text-lotus-rose">
                               Giá: {(s.sellingPrice || 0).toLocaleString("vi-VN")}đ
@@ -130,7 +130,7 @@ export const BookingServiceStep: React.FC = () => {
                         </div>
                       </div>
                       {isSelected && (
-                        <div className="w-6 h-6 bg-lotus-rose rounded-full flex items-center justify-center text-white shrink-0 shadow-sm animate-in zoom-in-50 duration-200">
+                        <div className="w-6 h-6 bg-lotus-rose rounded-full flex items-center justify-center text-white shrink-0 shadow-sm">
                           <Check className="w-4 h-4" />
                         </div>
                       )}
@@ -141,8 +141,8 @@ export const BookingServiceStep: React.FC = () => {
             </div>
           ))
         ) : (
-          <div className="text-center py-12 border border-dashed border-lotus-muted/20 rounded-2xl">
-            <HelpCircle className="w-8 h-8 text-lotus-stone/50 mx-auto mb-2" />
+          <div className="text-center py-12 rounded-sm shadow-sm bg-lotus-cream">
+            <HelpCircle className="w-8 h-8 text-lotus-stone mx-auto mb-2" />
             <p className="text-lotus-stone text-sm">
               Không tìm thấy dịch vụ làm đẹp nào tương thích.
             </p>
@@ -150,10 +150,10 @@ export const BookingServiceStep: React.FC = () => {
         )}
       </div>
 
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-lotus-muted/20 pt-5 mt-8">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-2">
         <button
           onClick={store.prevStep}
-          className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl font-bold transition-all bg-lotus-surface text-lotus-deep border border-lotus-muted/20 hover:bg-lotus-cream"
+          className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-full font-bold transition-all bg-lotus-cream text-lotus-deep shadow-sm hover:shadow-md"
         >
           <ArrowLeft className="w-5 h-5" />
           Quay lại
@@ -161,9 +161,9 @@ export const BookingServiceStep: React.FC = () => {
         <button
           disabled={!selectedService}
           onClick={() => nextStep()}
-          className={`flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl font-bold transition-all ${
+          className={`flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-full font-bold transition-all ${
             selectedService
-              ? "bg-lotus-rose text-white hover:bg-lotus-rose/90 shadow-md"
+              ? "bg-lotus-rose text-white hover:bg-lotus-rose/90 shadow-sm"
               : "bg-gray-100 text-gray-400 cursor-not-allowed"
           }`}
         >

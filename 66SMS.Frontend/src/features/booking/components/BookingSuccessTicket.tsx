@@ -25,7 +25,7 @@ export const BookingSuccessTicket: React.FC = () => {
     <div className="relative w-full flex flex-col items-center justify-center">
       {/* Decorative Grid is now in BookingPage.tsx */}
 
-      <div className="max-w-md w-full bg-lotus-surface rounded-3xl p-8 border border-lotus-muted/20 shadow-2xl relative z-10 text-center animate-in fade-in zoom-in duration-500">
+      <div className="max-w-md w-full bg-lotus-surface rounded-3xl p-8 border border-lotus-muted shadow-2xl relative z-10 text-center animate-in fade-in zoom-in duration-500">
         <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-200">
           <CheckCircle2 className="w-10 h-10 text-emerald-500" />
         </div>
@@ -39,10 +39,10 @@ export const BookingSuccessTicket: React.FC = () => {
         </p>
 
         {/* Ticket Information */}
-        <div className="bg-lotus-rose/5 rounded-2xl p-5 border border-lotus-muted/20 text-left mb-6 flex flex-col gap-3.5 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-lotus-gold/20 rounded-full blur-xl"></div>
+        <div className="bg-lotus-rose-light rounded-2xl p-5 border border-lotus-muted text-left mb-6 flex flex-col gap-3.5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-lotus-gold rounded-full blur-xl"></div>
 
-          <div className="flex justify-between items-center border-b border-lotus-muted/20 pb-2.5">
+          <div className="flex justify-between items-center border-b border-lotus-muted pb-2.5">
             <span className="text-xs text-lotus-stone font-medium uppercase tracking-wider">
               Mã đặt lịch:
             </span>
@@ -53,7 +53,7 @@ export const BookingSuccessTicket: React.FC = () => {
 
           <div className="flex flex-col gap-1.5 text-sm">
             {selectedSalon && (
-              <div className="flex justify-between pb-2 mb-1 border-b border-lotus-muted/10">
+              <div className="flex justify-between pb-2 mb-1 border-b border-lotus-muted">
                 <span className="text-lotus-stone">Chi nhánh:</span>
                 <span className="font-semibold text-lotus-deep text-right max-w-[200px]">
                   {selectedSalon.name}
@@ -79,7 +79,7 @@ export const BookingSuccessTicket: React.FC = () => {
               </span>
             </div>
             {selectedPosition && (
-              <div className="flex justify-between mt-1 pt-1 border-t border-lotus-muted/10">
+              <div className="flex justify-between mt-1 pt-1 border-t border-lotus-muted">
                 <span className="text-lotus-stone">Phòng / Vị trí:</span>
                 <span className="font-semibold text-lotus-deep text-right">
                   {selectedPosition?.name} ({selectedPosition?.roomName})
@@ -104,7 +104,7 @@ export const BookingSuccessTicket: React.FC = () => {
               resetBooking();
               window.location.href = "/";
             }}
-            className="w-full bg-lotus-rose text-white font-medium px-6 py-3.5 rounded-xl transition-all hover:bg-lotus-rose/90 shadow-md"
+            className="w-full bg-lotus-rose text-white font-medium px-6 py-3.5 rounded-xl transition-all hover:bg-lotus-rose shadow-md"
           >
             Về trang chủ
           </button>

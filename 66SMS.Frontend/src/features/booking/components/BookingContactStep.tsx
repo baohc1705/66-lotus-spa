@@ -42,7 +42,6 @@ export const BookingContactStep: React.FC = () => {
   });
 
   const onSubmit = async (data: BookingContactFormValues) => {
-    // Validate that all guests have required fields
     const invalidGuests = guests.filter(
       (g) => !g.selectedService || !g.selectedDate || !g.selectedTimeSlot
     );
@@ -61,10 +60,10 @@ export const BookingContactStep: React.FC = () => {
       const payload: GuestAppointmentDto[] = guests.map((guest, index) => {
         const isFirstGuest = index === 0;
         const notePrefix = `[Đại diện: ${data.fullName} - SĐT: ${data.phoneNumber}]`;
-        // Append form note only to the first guest to avoid duplication
-        const finalNote = isFirstGuest && data.note 
-          ? `${notePrefix} - Ghi chú: ${data.note}` 
-          : notePrefix;
+        const finalNote =
+          isFirstGuest && data.note
+            ? `${notePrefix} - Ghi chú: ${data.note}`
+            : notePrefix;
 
         return {
           lockId: guest.lockId,
@@ -74,18 +73,20 @@ export const BookingContactStep: React.FC = () => {
           positionId: guest.selectedPosition?.id || 0,
           salonId: selectedSalon?.id ?? null,
           note: finalNote,
-          services: [{ serviceId: guest.selectedService!.id ?? 0, quantity: 1 }],
+          services: [
+            { serviceId: guest.selectedService!.id ?? 0, quantity: 1 },
+          ],
         };
       });
 
       const result = await createBooking({
         promotionCode: appliedPromotion ? promotionCode : undefined,
-        guests: payload
+        guests: payload,
       });
 
       if (result.success) {
         toast.success("Đặt lịch thành công! Cảm ơn bạn đã tin tưởng.");
-        nextStep(); // Chuyển sang bước vé
+        nextStep();
       }
     } catch (error) {
       toast.error("Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.");
@@ -95,37 +96,46 @@ export const BookingContactStep: React.FC = () => {
     }
   };
 
-  const total = guests.reduce((sum, g) => sum + (g.selectedService?.sellingPrice || 0), 0);
+  const total = guests.reduce(
+    (sum, g) => sum + (g.selectedService?.sellingPrice || 0),
+    0
+  );
   const discount = appliedPromotion ? appliedPromotion.discountAmount : 0;
   const depositPreview = Math.round(Math.max(0, total - discount) * 0.3);
 
+  const inputClass = (hasError: boolean) =>
+    `w-full px-4 py-3 rounded-sm shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-lotus-rose-light bg-lotus-cream/50 transition-colors ${
+      hasError ? "ring-2 ring-red-400" : ""
+    }`;
+
   return (
-    <div className="bg-lotus-surface rounded-3xl p-6 sm:p-8 border border-lotus-muted/20 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h3 className="text-xl font-bold text-lotus-deep font-display mb-5 flex items-center gap-2 border-b border-lotus-muted/20 pb-3">
+    <div className="bg-white rounded-sm shadow-sm p-4 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <h3 className="text-lg font-bold text-lotus-deep font-display flex items-center gap-2">
         <Phone className="w-5 h-5 text-lotus-rose" />
-        <span>Bước 4: Nhập thông tin liên hệ & đặt cọc</span>
+        <span>Thông tin liên hệ</span>
       </h3>
 
-      <div className="mb-5 p-4 rounded-2xl border border-blue-500/20 bg-blue-500/5 flex gap-3">
+      <div className="p-4 rounded-sm shadow-sm bg-blue-50 flex gap-3">
         <Wallet className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
         <div className="text-sm text-gray-700">
           <p className="font-semibold text-gray-900">Đặt cọc 30% để giữ lịch</p>
           <p className="mt-1 text-gray-600">
             Sau khi xác nhận, bạn sẽ cần thanh toán cọc{" "}
-            <strong>{depositPreview.toLocaleString("vi-VN")}đ</strong> cho tổng cộng {guests.length} khách. Phần còn
-            lại thu sau khi sử dụng dịch vụ tại spa.
+            <strong>{depositPreview.toLocaleString("vi-VN")}đ</strong> cho tổng
+            cộng {guests.length} khách. Phần còn lại thu sau khi sử dụng dịch vụ
+            tại spa.
           </p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex flex-col relative">
             <label className="text-xs font-bold text-lotus-deep mb-2 flex items-center gap-1.5">
               Họ và tên người đặt *
               <span className="group relative cursor-pointer text-gray-400 hover:text-gray-600">
                 <Info className="w-3.5 h-3.5" />
-                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:block bg-gray-800 text-white text-lotus-admin-xs py-1 px-2.5 rounded whitespace-nowrap z-50">
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:block bg-gray-800 text-white text-[10px] py-1 px-2.5 rounded-sm whitespace-nowrap z-50">
                   Người đại diện đặt lịch
                 </span>
               </span>
@@ -134,9 +144,7 @@ export const BookingContactStep: React.FC = () => {
               {...register("fullName")}
               type="text"
               placeholder="Nhập họ và tên..."
-              className={`w-full px-4 py-3 border rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-lotus-rose-light bg-lotus-cream/50 transition-colors ${
-                errors.fullName ? "border-red-500" : "border-lotus-muted/20"
-              }`}
+              className={inputClass(!!errors.fullName)}
             />
             {errors.fullName && (
               <span className="text-xs text-red-500 mt-1">
@@ -150,7 +158,7 @@ export const BookingContactStep: React.FC = () => {
               Số điện thoại người đặt *
               <span className="group relative cursor-pointer text-gray-400 hover:text-gray-600">
                 <Info className="w-3.5 h-3.5" />
-                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:block bg-gray-800 text-white text-lotus-admin-xs py-1 px-2.5 rounded whitespace-nowrap z-50">
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:block bg-gray-800 text-white text-[10px] py-1 px-2.5 rounded-sm whitespace-nowrap z-50">
                   Để hệ thống gửi SMS xác nhận lập tức
                 </span>
               </span>
@@ -159,9 +167,7 @@ export const BookingContactStep: React.FC = () => {
               {...register("phoneNumber")}
               type="tel"
               placeholder="Ví dụ: 0901234567"
-              className={`w-full px-4 py-3 border rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-lotus-rose-light bg-lotus-cream/50 transition-colors ${
-                errors.phoneNumber ? "border-red-500" : "border-lotus-muted/20"
-              }`}
+              className={inputClass(!!errors.phoneNumber)}
             />
             {errors.phoneNumber && (
               <span className="text-xs text-red-500 mt-1">
@@ -171,16 +177,14 @@ export const BookingContactStep: React.FC = () => {
           </div>
 
           <div className="col-span-full flex flex-col relative">
-            <label className="text-xs font-bold text-lotus-deep mb-2 flex items-center gap-1.5">
+            <label className="text-xs font-bold text-lotus-deep mb-2">
               Email (Tùy chọn)
             </label>
             <input
               {...register("email")}
               type="email"
               placeholder="example@gmail.com"
-              className={`w-full px-4 py-3 border rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-lotus-rose-light bg-lotus-cream/50 transition-colors ${
-                errors.email ? "border-red-500" : "border-lotus-muted/20"
-              }`}
+              className={inputClass(!!errors.email)}
             />
             {errors.email && (
               <span className="text-xs text-red-500 mt-1">
@@ -190,7 +194,7 @@ export const BookingContactStep: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-col mb-5">
+        <div className="flex flex-col">
           <label className="text-xs font-bold text-lotus-deep mb-2">
             Ghi chú yêu cầu chung (Nếu có)
           </label>
@@ -198,16 +202,16 @@ export const BookingContactStep: React.FC = () => {
             {...register("note")}
             rows={3}
             placeholder="Yêu cầu chung cho đoàn khách..."
-            className="w-full px-4 py-3 border border-lotus-muted/20 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-lotus-rose-light bg-lotus-cream/50 resize-none"
+            className="w-full px-4 py-3 rounded-sm shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-lotus-rose-light bg-lotus-cream/50 resize-none"
           />
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 border-t border-lotus-muted/20 pt-5">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-2">
           <button
             type="button"
             onClick={prevStep}
             disabled={isSubmitting}
-            className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl font-bold transition-all bg-lotus-surface text-lotus-deep border border-lotus-muted/20 hover:bg-lotus-cream disabled:opacity-50"
+            className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-full font-bold transition-all bg-lotus-cream text-lotus-deep shadow-sm hover:shadow-md disabled:opacity-50"
           >
             <ArrowLeft className="w-5 h-5" />
             Quay lại
@@ -215,7 +219,7 @@ export const BookingContactStep: React.FC = () => {
           <button
             type="submit"
             disabled={!isValid || isSubmitting}
-            className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3 rounded-xl font-bold transition-all bg-lotus-rose text-white hover:bg-lotus-rose/90 shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3 rounded-full font-bold transition-all bg-lotus-rose text-white hover:bg-lotus-rose/90 shadow-sm disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>
