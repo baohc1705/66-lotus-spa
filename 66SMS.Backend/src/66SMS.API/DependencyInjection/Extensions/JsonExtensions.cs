@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace _66SMS.API.DependencyInjection.Extensions
@@ -13,6 +14,7 @@ namespace _66SMS.API.DependencyInjection.Extensions
         {
             builder.AddJsonOptions(options =>
             {
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 // Cài đặt nếu field nào null không hiển thị trong api
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 // Cài đặt convert enum

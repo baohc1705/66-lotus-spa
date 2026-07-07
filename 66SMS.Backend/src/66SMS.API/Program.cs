@@ -3,14 +3,20 @@ using _66SMS.API.Middleware;
 using _66SMS.Application.DependencyInjection;
 using _66SMS.Infrastructure.DependencyInjection.Extensions;
 using _66SMS.Persistence.DependencyInjection;
-using _66SMS.API.Abstractions;
 using _66SMS.API.Commons;
 using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Routing: lowercase + kebab-case controller segments (ProductCategory → product-category)
+builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+
 // Controllers
-builder.Services.AddControllers().AddJsonConfig();
+builder.Services.AddControllers(options =>
+{
+    options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
+}).AddJsonConfig();
 builder.Services.AddEndpointsApiExplorer();
 
 // API Versioning

@@ -193,7 +193,7 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-        [HttpPost("role/assign-permisison")]
+        [HttpPost("role/assign-permission")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> AssignPermission([FromBody] AssignPermissionsCommand command)
         {

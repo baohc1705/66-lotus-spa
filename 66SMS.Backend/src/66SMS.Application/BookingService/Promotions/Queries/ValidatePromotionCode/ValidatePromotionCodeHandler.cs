@@ -19,10 +19,10 @@ namespace _66SMS.Application.BookingService.Promotions.Queries.ValidatePromotion
 
         public async Task<Result<PromotionValidationDto>> Handle(ValidatePromotionCodeQuery request, CancellationToken cancellationToken)
         {
-            var code = request.Code.Trim();
+            var code = request.Code.Trim().ToLowerInvariant();
 
             var promo = await promotionSqlRepository.AsQueryable(asNoTracking: true)
-                .Where(x => x.Code == code && x.Status != PromotionConst.STATUS_DELETED)
+                .Where(x => x.Code.ToLowerInvariant() == code && x.Status != PromotionConst.STATUS_DELETED)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (promo == null)

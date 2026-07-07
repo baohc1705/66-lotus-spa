@@ -55,7 +55,7 @@ namespace _66SMS.API.Controllers
         /// <param name="serviceId">ID của dịch vụ.</param>
         /// <param name="technicianId">ID của nhân viên (tùy chọn). Nếu không truyền sẽ lấy khung giờ trống của tất cả nhân viên.</param>
         /// <returns>Danh sách khung giờ trống.</returns>
-        [HttpGet("timeslots")]
+        [HttpGet("time-slots")]
         [AllowAnonymous]
         public async Task<IActionResult> GetTimeSlots([FromQuery] DateOnly date, [FromQuery] int serviceId, [FromQuery] int? technicianId, [FromQuery] int? salonId = null)
         {
