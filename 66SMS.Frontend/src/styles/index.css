@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
 
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -10,15 +10,30 @@
 @tailwind utilities;
 
 /* ── Global scrollbar ── */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: var(--lotus-background); }
-::-webkit-scrollbar-thumb { background: var(--lotus-muted); border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: var(--lotus-primary); }
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: var(--lotus-background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--lotus-muted);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--lotus-primary);
+}
 
 .hide-scrollbar::-webkit-scrollbar,
-.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
 .hide-scrollbar,
-.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 /* ── Shared decorative utilities ── */
 .hero-top-vignette {
@@ -44,21 +59,24 @@
   overflow: hidden;
 }
 .lotus-bg-pattern::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background-image: none;
   pointer-events: none;
   z-index: 0;
 }
-.lotus-bg-pattern > * { position: relative; z-index: 1; }
+.lotus-bg-pattern > * {
+  position: relative;
+  z-index: 1;
+}
 
 .crane-bg-mark {
   position: relative;
   overflow: hidden;
 }
 .crane-bg-mark::after {
-  content: '';
+  content: "";
   position: absolute;
   right: -4%;
   bottom: -4%;
@@ -70,28 +88,56 @@
   pointer-events: none;
   z-index: 0;
 }
-.crane-bg-mark > * { position: relative; z-index: 1; }
+.crane-bg-mark > * {
+  position: relative;
+  z-index: 1;
+}
 
 @keyframes slide-in {
-  from { transform: translateY(-16px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(-16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes float-y {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-12px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
 }
 @keyframes shimmer {
-  from { background-position: -200% center; }
-  to { background-position: 200% center; }
+  from {
+    background-position: -200% center;
+  }
+  to {
+    background-position: 200% center;
+  }
 }
 
-.animate-slide-in { animation: slide-in 0.22s ease-out; }
-.animate-fade-in { animation: fade-in 0.20s ease-out; }
-.animate-float { animation: float-y 4s ease-in-out infinite; }
+.animate-slide-in {
+  animation: slide-in 0.22s ease-out;
+}
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+.animate-float {
+  animation: float-y 4s ease-in-out infinite;
+}
 
 /* Hide native password reveal button in MS Edge and Chromium browsers on Windows */
 input[type="password"]::-ms-reveal,
@@ -99,4 +145,15 @@ input[type="password"]::-ms-clear {
   display: none;
 }
 
-
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-delay: -1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    background-attachment: initial !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+    transform: none !important;
+  }
+}

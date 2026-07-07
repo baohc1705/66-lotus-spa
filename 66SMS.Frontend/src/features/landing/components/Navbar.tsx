@@ -21,7 +21,7 @@ interface NavbarProps {
 export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  
+
   const accessToken = useAuthStore((s) => s.accessToken);
   const isLoggedIn = !!accessToken;
   const { data: me } = useGetMe();
@@ -40,7 +40,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
         id="main-nav"
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "nav--scrolled h-[68px]" : alwaysDark ? "nav--scrolled h-[68px]" : "bg-transparent h-[80px]"}`}
       >
-        <div className="max-w-7xl mx-auto h-full px-6 lg:px-10 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto h-full flex items-center justify-between">
           {/* Logo */}
           <a
             href="#"
@@ -58,12 +58,12 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
               <span
                 className={`font-display font-semibold text-lg tracking-wide transition-colors duration-500 ${isDark ? "text-lotus-rose" : "text-white"}`}
               >
-                HOA SEN SPA
+                HOA SEN
               </span>
               <span
                 className={`text-[8px] tracking-[0.28em] uppercase font-sans mt-0.5 transition-colors duration-500 ${isDark ? "text-lotus-gold" : "text-white/60"}`}
               >
-                Đồng Tháp
+                Spa & Wellness
               </span>
             </div>
           </a>
@@ -74,7 +74,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
               <a
                 key={item.href}
                 href={item.href}
-                className={`relative font-sans text-[13px] font-medium tracking-wide transition-colors duration-300 group ${isDark ? "text-lotus-deep hover:text-lotus-rose" : "text-white/80 hover:text-white"}`}
+                className={`relative font-sans text-[13px] font-medium uppercase tracking-wide transition-colors duration-300 group ${isDark ? "text-lotus-deep hover:text-lotus-rose" : "text-white/80 hover:text-white"}`}
               >
                 {item.label}
                 <span
@@ -94,7 +94,9 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
               0907 95 93 95
             </a>
 
-            <div className={`w-px h-4 mx-1 ${isDark ? 'bg-lotus-stone/30' : 'bg-white/20'}`} />
+            <div
+              className={`w-px h-4 mx-1 ${isDark ? "bg-lotus-stone/30" : "bg-white/20"}`}
+            />
 
             {isLoggedIn ? (
               <a
@@ -103,12 +105,18 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
               >
                 <div className="w-7 h-7 rounded-full border border-lotus-rose/30 bg-lotus-cream flex items-center justify-center text-lotus-rose overflow-hidden">
                   {me?.avatarUrl ? (
-                    <img src={me.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                    <img
+                      src={me.avatarUrl}
+                      alt="Avatar"
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <UserIcon className="w-3.5 h-3.5" />
                   )}
                 </div>
-                <span className="max-w-[100px] truncate">{me?.fullName ?? me?.username ?? "Tài khoản"}</span>
+                <span className="max-w-[100px] truncate">
+                  {me?.fullName ?? me?.username ?? "Tài khoản"}
+                </span>
               </a>
             ) : (
               <a
@@ -178,7 +186,11 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
                   >
                     <div className="w-6 h-6 rounded-full overflow-hidden bg-lotus-cream border border-lotus-rose/30 flex items-center justify-center text-lotus-rose">
                       {me?.avatarUrl ? (
-                        <img src={me.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                        <img
+                          src={me.avatarUrl}
+                          alt="Avatar"
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
                         <UserIcon className="w-4 h-4" />
                       )}

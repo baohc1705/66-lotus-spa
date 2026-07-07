@@ -1,10 +1,16 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { motion, AnimatePresence, useScroll, useTransform, type Variants } from 'motion/react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useState, useEffect, useCallback, useRef } from "react";
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useTransform,
+  type Variants,
+} from "motion/react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import spaHero from '@/assets/spa_hero.png'
-import spaMassage from '@/assets/spa_massage.png'
-import spaFacial from '@/assets/spa_facial.png'
+import spaHero from "@/assets/spa_hero.png";
+import spaMassage from "@/assets/spa_massage.png";
+import spaFacial from "@/assets/spa_facial.png";
 
 /* ── Lotus petal SVG — nhỏ, đơn sắc hồng sen ── */
 const LotusPetal = ({ style }: { style: React.CSSProperties }) => (
@@ -17,7 +23,7 @@ const LotusPetal = ({ style }: { style: React.CSSProperties }) => (
       />
     </svg>
   </div>
-)
+);
 
 /* ── Petal configs — 10 cánh rơi ── */
 const PETALS = Array.from({ length: 10 }, (_, i) => ({
@@ -25,62 +31,71 @@ const PETALS = Array.from({ length: 10 }, (_, i) => ({
   animationDuration: `${8 + Math.random() * 7}s`,
   animationDelay: `${Math.random() * 8}s`,
   fontSize: `${14 + Math.random() * 10}px`,
-}))
+}));
 
 /* ── Slides Data ── */
 const SLIDES = [
   {
-    id: 'slide-1',
+    id: "slide-1",
     image: spaHero,
-    brand: 'Hoa Sen Spa · Đồng Tháp',
+    brand: "Hoa Sen Spa · Đồng Tháp",
     title: (
       <>
-        Nơi cơ thể<br />
-        tìm về<br />
+        Nơi cơ thể
+        <br />
+        tìm về
+        <br />
         sự tĩnh lặng
       </>
     ),
-    subtitle: 'Không gian chăm sóc sức khỏe và sắc đẹp giữa lòng thành phố, nơi mỗi liệu trình là một hành trình phục hồi.',
-    ctaPrimary: 'Đặt lịch ngay',
-    ctaPrimaryHref: '#booking',
-    ctaSecondary: 'Khám phá',
-    ctaSecondaryHref: '#about'
+    subtitle:
+      "Không gian chăm sóc sức khỏe và sắc đẹp giữa lòng thành phố, nơi mỗi liệu trình là một hành trình phục hồi.",
+    ctaPrimary: "Đặt lịch ngay",
+    ctaPrimaryHref: "#booking",
+    ctaSecondary: "Khám phá",
+    ctaSecondaryHref: "#about",
   },
   {
-    id: 'slide-2',
+    id: "slide-2",
     image: spaMassage,
-    brand: 'Trị Liệu Chuyên Sâu',
+    brand: "Trị Liệu Chuyên Sâu",
     title: (
       <>
-        Phục hồi<br />
-        năng lượng<br />
+        Phục hồi
+        <br />
+        năng lượng
+        <br />
         từ bên trong
       </>
     ),
-    subtitle: 'Các liệu pháp massage ấn huyệt kết hợp thảo dược phương Đông giúp xua tan mệt mỏi, tái tạo sinh khí.',
-    ctaPrimary: 'Xem dịch vụ',
-    ctaPrimaryHref: '#services',
-    ctaSecondary: 'Tư vấn ngay',
-    ctaSecondaryHref: '#contact'
+    subtitle:
+      "Các liệu pháp massage ấn huyệt kết hợp thảo dược phương Đông giúp xua tan mệt mỏi, tái tạo sinh khí.",
+    ctaPrimary: "Xem dịch vụ",
+    ctaPrimaryHref: "#services",
+    ctaSecondary: "Tư vấn ngay",
+    ctaSecondaryHref: "#contact",
   },
   {
-    id: 'slide-3',
+    id: "slide-3",
     image: spaFacial,
-    brand: 'Chăm Sóc Làn Da',
+    brand: "Chăm Sóc Làn Da",
     title: (
       <>
-        Đánh thức<br />
-        vẻ đẹp<br />
+        Đánh thức
+        <br />
+        vẻ đẹp
+        <br />
         rạng ngời
       </>
     ),
-    subtitle: 'Phác đồ chăm sóc da chuẩn y khoa kết hợp mỹ phẩm hữu cơ, mang lại làn da tươi trẻ và khỏe mạnh tự nhiên.',
-    ctaPrimary: 'Khám phá facial',
-    ctaPrimaryHref: '#services',
-    ctaSecondary: 'Nhận ưu đãi',
-    ctaSecondaryHref: '#booking'
-  }
-]
+    subtitle:
+      "Phác đồ chăm sóc da chuẩn y khoa kết hợp mỹ phẩm hữu cơ, mang lại làn da tươi trẻ và khỏe mạnh tự nhiên.",
+    ctaPrimary: "Khám phá facial",
+    ctaPrimaryHref: "#services",
+    ctaSecondary: "Nhận ưu đãi",
+    ctaSecondaryHref: "#booking",
+  },
+];
 
 /* ── Text Animation Variants ── */
 const containerVariants: Variants = {
@@ -89,17 +104,17 @@ const containerVariants: Variants = {
     opacity: 1,
     transition: {
       staggerChildren: 0.15,
-      delayChildren: 0.2
-    }
+      delayChildren: 0.2,
+    },
   },
   exit: {
     opacity: 0,
     transition: {
       staggerChildren: 0.1,
-      staggerDirection: -1
-    }
-  }
-}
+      staggerDirection: -1,
+    },
+  },
+};
 
 const textVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
@@ -108,44 +123,44 @@ const textVariants: Variants = {
     y: 0,
     transition: {
       duration: 0.8,
-      ease: [0.16, 1, 0.3, 1]
-    }
+      ease: [0.16, 1, 0.3, 1],
+    },
   },
   exit: {
     opacity: 0,
     y: -20,
     transition: {
       duration: 0.4,
-      ease: "easeIn"
-    }
-  }
-}
+      ease: "easeIn",
+    },
+  },
+};
 
 export const HeroSection = () => {
-  const sectionRef = useRef<HTMLElement>(null)
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const sectionRef = useRef<HTMLElement>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ['start start', 'end start'],
-  })
+    offset: ["start start", "end start"],
+  });
 
   // Parallax: background moves slower than scroll
-  const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
 
   const nextSlide = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % SLIDES.length)
-  }, [])
+    setCurrentIndex((prev) => (prev + 1) % SLIDES.length);
+  }, []);
 
   const prevSlide = useCallback(() => {
-    setCurrentIndex((prev) => (prev - 1 + SLIDES.length) % SLIDES.length)
-  }, [])
+    setCurrentIndex((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
+  }, []);
 
   // Auto-play interval
   useEffect(() => {
-    const timer = setInterval(nextSlide, 6000)
-    return () => clearInterval(timer)
-  }, [nextSlide])
+    const timer = setInterval(nextSlide, 6000);
+    return () => clearInterval(timer);
+  }, [nextSlide]);
 
   return (
     <section
@@ -166,7 +181,7 @@ export const HeroSection = () => {
               initial={{ opacity: 0, scale: 1.05 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 1.2, ease: 'easeInOut' }}
+              transition={{ duration: 1.2, ease: "easeInOut" }}
               className="absolute inset-0 w-full h-full object-cover"
             />
           </AnimatePresence>
@@ -265,8 +280,6 @@ export const HeroSection = () => {
         </AnimatePresence>
       </div>
 
-
-
       {/* Stats Bar */}
       <div className="absolute bottom-0 left-0 right-0 z-20 border-t border-white/10 bg-lotus-deep/40 backdrop-blur-sm py-5 px-[5%]">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center gap-6 md:gap-0">
@@ -275,9 +288,7 @@ export const HeroSection = () => {
             <span className="text-xl md:text-2xl font-display font-semibold text-lotus-gold">
               1.200+
             </span>
-            <span className="text-sm text-white/70 font-sans">
-              Khách hàng
-            </span>
+            <span className="text-sm text-white/70 font-sans">Khách hàng</span>
           </div>
           <div className="hidden md:block w-px h-8 bg-white/20" />
 
@@ -297,12 +308,10 @@ export const HeroSection = () => {
             <span className="text-xl md:text-2xl font-display font-semibold text-lotus-gold">
               4.9★
             </span>
-            <span className="text-sm text-white/70 font-sans">
-              Đánh giá
-            </span>
+            <span className="text-sm text-white/70 font-sans">Đánh giá</span>
           </div>
         </div>
       </div>
     </section>
-  )
-}
+  );
+};

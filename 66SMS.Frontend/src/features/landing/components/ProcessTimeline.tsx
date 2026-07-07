@@ -1,31 +1,31 @@
 import { motion } from 'motion/react'
-import { Phone, ClipboardList, Sparkles, Heart, Star } from 'lucide-react'
+import { ClipboardList, Sparkles, Heart, Star, UserCheck } from 'lucide-react'
 
 const STEPS = [
   {
-    icon: Phone,
-    title: 'Đặt lịch',
-    description: 'Liên hệ hoặc đặt lịch online. Chúng tôi sẽ xác nhận ngay.',
+    icon: UserCheck,
+    title: 'Đón tiếp (Arrival)',
+    description: 'Chào mừng bạn đến với Hoa Sen Spa bằng trà thảo mộc thơm lành và khăn ấm mát lạnh để rũ bỏ cát bụi.',
   },
   {
     icon: ClipboardList,
-    title: 'Tư vấn',
-    description: 'Kỹ thuật viên tư vấn liệu trình phù hợp với nhu cầu của bạn.',
+    title: 'Tham vấn (Consultation)',
+    description: 'Chuyên viên lắng nghe trạng thái sức khỏe, mong muốn và kiểm tra cơ thể để tư vấn liệu trình phù hợp nhất.',
   },
   {
     icon: Sparkles,
-    title: 'Trải nghiệm',
-    description: 'Thư giãn và tận hưởng liệu trình trong không gian yên bình.',
+    title: 'Trị liệu (Treatment)',
+    description: 'Tận hưởng kỹ thuật massage điêu luyện kết hợp dược thảo tự nhiên trong phòng riêng ấm cúng, riêng tư.',
   },
   {
     icon: Heart,
-    title: 'Chăm sóc sau',
-    description: 'Hướng dẫn chăm sóc tại nhà và theo dõi kết quả.',
+    title: 'Thư giãn (Relaxation)',
+    description: 'Thưởng trà, dùng cháo sen bổ dưỡng và nghỉ ngơi sâu tại không gian sảnh chờ tràn ngập hương thơm dịu nhẹ.',
   },
   {
     icon: Star,
-    title: 'Trở lại',
-    description: 'Đặt lịch hẹn tiếp theo để duy trì sức khỏe và sắc đẹp.',
+    title: 'Chăm sóc sau (Aftercare)',
+    description: 'Hướng dẫn các bài tập thở, chế độ sinh hoạt và theo dõi sát sao tiến trình phục hồi cơ thể sau liệu trình.',
   },
 ]
 
@@ -37,31 +37,36 @@ const containerVariants = {
 }
 
 const stepVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.3 } },
 }
 
 export const ProcessTimeline = () => {
   return (
     <section
       id="process"
-      className="py-20 md:py-28 bg-lotus-cream"
+      className="py-16 md:py-24 bg-lotus-cream"
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         {/* Heading */}
         <motion.div
-          className="text-center mb-14 md:mb-20"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 md:mb-12 text-left"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.3 }}
         >
-          <span className="block text-[13px] tracking-[0.2em] uppercase font-sans font-light text-lotus-gold mb-4">
-            Quy trình
-          </span>
-          <h2 className="font-display italic font-normal text-3xl md:text-4xl lg:text-5xl text-lotus-deep">
-            5 bước trải nghiệm
-          </h2>
+          <div className="max-w-md">
+            <span className="block text-[0.75rem] tracking-[0.2em] uppercase font-sans font-medium text-lotus-gold mb-3">
+              Trải nghiệm
+            </span>
+            <h2 className="font-display italic font-normal text-[clamp(2rem,3vw,2.8rem)] text-lotus-deep leading-[1.15]">
+              Hành trình phục hồi
+            </h2>
+          </div>
+          <p className="font-sans text-[1rem] text-lotus-stone max-w-md md:mb-1 leading-[1.6]">
+            Một chu trình khép kín tinh tế được thiết kế để chăm sóc trọn vẹn cả thân - tâm - trí của bạn từ lúc đặt chân đến.
+          </p>
         </motion.div>
 
         {/* Desktop: Horizontal Timeline */}

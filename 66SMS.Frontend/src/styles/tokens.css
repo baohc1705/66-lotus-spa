@@ -7,90 +7,107 @@
   /* ── Brand Colors (logo-home.png) ──
      Chỉ 3 gam chính: hồng sen, vàng gold, xanh lá sen
      + cream/deep cho background/text                    */
-  --lotus-rose:        #D4547E;
-  --lotus-rose-light:  #FAF0F4;
-  --lotus-gold:        #B8976A;
-  --lotus-leaf:        #3E7A3E;
-  --lotus-leaf-light:  rgba(62, 122, 62, 0.1);
-  --lotus-cream:       #FBF7F2;
-  --lotus-deep:        #2A1F1A;
-  --lotus-stone:       #8A7E76;
-  --lotus-surface:     #FFFFFF;
-  --lotus-error:       #EF4444;
+  --lotus-rose: #d4547e;
+  --lotus-rose-light: #faf0f4;
+  --lotus-gold: #b8976a;
+  --lotus-leaf: #3e7a3e;
+  --lotus-leaf-light: rgba(62, 122, 62, 0.1);
+  --lotus-cream: #fbf7f2;
+  --lotus-deep: #2a1f1a;
+  --lotus-stone: #8a7e76;
+  --lotus-surface: #ffffff;
+  --lotus-error: #ef4444;
 
   /* ── Cashier / VNPay (dùng token, không hardcode hex trong component) ── */
-  --lotus-vnpay:              #005BAA;
-  --lotus-vnpay-red:          #ED1B24;
-  --lotus-rose-dark:          #B64269;
-  --lotus-cashier-header-from: #200A1C;
-  --lotus-cashier-header-via:  #35152B;
-  --lotus-cashier-header-to:   #911F43;
+  --lotus-vnpay: #005baa;
+  --lotus-vnpay-red: #ed1b24;
+  --lotus-rose-dark: #b64269;
+  --lotus-cashier-header-from: #200a1c;
+  --lotus-cashier-header-via: #35152b;
+  --lotus-cashier-header-to: #911f43;
 
   /* ── Membership tier cards (profile) ── */
-  --membership-bronze-bg:      #FFFBF5;
-  --membership-bronze-bg-end:  #E5BE90;
-  --membership-bronze-border:  #8B5A2B;
-  --membership-bronze-accent:  #C8863C;
-  --membership-bronze-text:    #2C1A0A;
-  --membership-silver-bg:      #F8FAFC;
-  --membership-silver-bg-end:  #CBD5E1;
-  --membership-silver-border:  #9E9E9E;
-  --membership-silver-accent:  #C8C8C8;
-  --membership-silver-text:    #1C1C1E;
-  --membership-gold-bg:        #FFFDF0;
-  --membership-gold-bg-end:    #E3C567;
-  --membership-gold-border:    #C9960C;
-  --membership-gold-accent:    #E8BB3A;
-  --membership-gold-text:      #1A1200;
-  --membership-platinum-bg:    #F8FAFC;
-  --membership-platinum-bg-end:#C8CBD4;
-  --membership-platinum-border:#C8CBD4;
-  --membership-platinum-accent:#DDE0EA;
-  --membership-platinum-text:  #111215;
-  --membership-diamond-bg:     #F0F9FF;
-  --membership-diamond-bg-end: #A3E0F8;
-  --membership-diamond-border: #6DCEF5;
-  --membership-diamond-accent: #A3E0F8;
-  --membership-diamond-text:   #0A1626;
-  --membership-default-bg:     #FAF5FF;
-  --membership-default-bg-end: #E9D5FF;
-  --membership-default-border: #A78BFA;
-  --membership-default-accent: #C4B5FD;
-  --membership-default-text:   #4C1D95;
+  --membership-bronze-bg: #fffbf5;
+  --membership-bronze-bg-end: #e5be90;
+  --membership-bronze-border: #8b5a2b;
+  --membership-bronze-accent: #c8863c;
+  --membership-bronze-text: #2c1a0a;
+  --membership-silver-bg: #f8fafc;
+  --membership-silver-bg-end: #cbd5e1;
+  --membership-silver-border: #9e9e9e;
+  --membership-silver-accent: #c8c8c8;
+  --membership-silver-text: #1c1c1e;
+  --membership-gold-bg: #fffdf0;
+  --membership-gold-bg-end: #e3c567;
+  --membership-gold-border: #c9960c;
+  --membership-gold-accent: #e8bb3a;
+  --membership-gold-text: #1a1200;
+  --membership-platinum-bg: #f8fafc;
+  --membership-platinum-bg-end: #c8cbd4;
+  --membership-platinum-border: #c8cbd4;
+  --membership-platinum-accent: #dde0ea;
+  --membership-platinum-text: #111215;
+  --membership-diamond-bg: #f0f9ff;
+  --membership-diamond-bg-end: #a3e0f8;
+  --membership-diamond-border: #6dcef5;
+  --membership-diamond-accent: #a3e0f8;
+  --membership-diamond-text: #0a1626;
+  --membership-default-bg: #faf5ff;
+  --membership-default-bg-end: #e9d5ff;
+  --membership-default-border: #a78bfa;
+  --membership-default-accent: #c4b5fd;
+  --membership-default-text: #4c1d95;
 
   /* ── Typography ── */
-  --font-display: 'Playfair Display', Georgia, serif;
-  --font-body:    'Be Vietnam Pro', system-ui, sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Be Vietnam Pro", system-ui, sans-serif;
 
   /* ── Transitions ── */
-  --transition-base:   300ms ease;
-  --transition-panel:  500ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 300ms ease;
+  --transition-panel: 500ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ═══ Scroll Reveal (IntersectionObserver fallback) ═══ */
 
 .reveal {
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 500ms ease-out, transform 500ms ease-out;
+  transition:
+    opacity 300ms ease-out;
 }
 .reveal.is-visible {
   opacity: 1;
-  transform: translateY(0);
 }
 
 /* Stagger cho list items */
 .reveal-stagger > * {
   opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 400ms ease-out, transform 400ms ease-out;
+  transition:
+    opacity 300ms ease-out;
 }
-.reveal-stagger.is-visible > *:nth-child(1) { transition-delay:   0ms; opacity: 1; transform: none; }
-.reveal-stagger.is-visible > *:nth-child(2) { transition-delay:  80ms; opacity: 1; transform: none; }
-.reveal-stagger.is-visible > *:nth-child(3) { transition-delay: 160ms; opacity: 1; transform: none; }
-.reveal-stagger.is-visible > *:nth-child(4) { transition-delay: 240ms; opacity: 1; transform: none; }
-.reveal-stagger.is-visible > *:nth-child(5) { transition-delay: 320ms; opacity: 1; transform: none; }
-.reveal-stagger.is-visible > *:nth-child(6) { transition-delay: 400ms; opacity: 1; transform: none; }
+.reveal-stagger.is-visible > *:nth-child(1) {
+  transition-delay: 0ms;
+  opacity: 1;
+}
+.reveal-stagger.is-visible > *:nth-child(2) {
+  transition-delay: 60ms;
+  opacity: 1;
+}
+.reveal-stagger.is-visible > *:nth-child(3) {
+  transition-delay: 120ms;
+  opacity: 1;
+}
+.reveal-stagger.is-visible > *:nth-child(4) {
+  transition-delay: 180ms;
+  opacity: 1;
+}
+.reveal-stagger.is-visible > *:nth-child(5) {
+  transition-delay: 240ms;
+  opacity: 1;
+}
+.reveal-stagger.is-visible > *:nth-child(6) {
+  transition-delay: 300ms;
+  opacity: 1;
+}
 
 /* ═══ Services Hover Panel (desktop) ═══ */
 
@@ -129,7 +146,9 @@
 .service-panel__detail {
   opacity: 0;
   transform: translateY(8px);
-  transition: opacity 300ms ease 100ms, transform 300ms ease 100ms;
+  transition:
+    opacity 300ms ease 100ms,
+    transform 300ms ease 100ms;
   max-height: 0;
   overflow: hidden;
 }
@@ -174,8 +193,12 @@
   animation: marquee 20s linear infinite;
 }
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* ═══ Navbar Scrolled ═══ */
@@ -207,9 +230,16 @@
 }
 
 @keyframes petal-sway {
-  0%, 100% { transform: translateX(0); }
-  25%      { transform: translateX(15px); }
-  75%      { transform: translateX(-15px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(15px);
+  }
+  75% {
+    transform: translateX(-15px);
+  }
 }
 
 .petal {
@@ -228,7 +258,9 @@
 /* ═══ Golden Glow Hover (Cards) ═══ */
 
 .card-glow {
-  transition: transform 350ms ease, box-shadow 350ms ease;
+  transition:
+    transform 350ms ease,
+    box-shadow 350ms ease;
 }
 .card-glow:hover {
   transform: translateY(-6px);

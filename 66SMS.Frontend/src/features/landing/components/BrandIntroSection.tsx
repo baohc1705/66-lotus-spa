@@ -2,10 +2,7 @@ import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'motion/react'
 import { Flower2 } from 'lucide-react'
 import aboutBgCrane from '@/assets/about_bg_crane.png'
-import spaAbout from '@/assets/spa_about.png'
 import spaMassage from '@/assets/spa_massage.png'
-
-const MARQUEE_ITEMS = 'Facial · Massage · Body Treatment · Skincare · Detox · '
 
 export const BrandIntroSection = () => {
   const sectionRef = useRef<HTMLElement>(null)
@@ -17,20 +14,96 @@ export const BrandIntroSection = () => {
 
   return (
     <>
-      {/* Marquee Divider */}
-      <div className="py-4 bg-lotus-cream border-y border-lotus-gold/20">
-        <div className="marquee">
-          <span className="marquee__inner text-[13px] tracking-[0.15em] uppercase font-sans font-light text-lotus-gold">
-            {MARQUEE_ITEMS}{MARQUEE_ITEMS}
-          </span>
+      {/* Trust KPI Section */}
+      <section className="bg-lotus-cream pt-16 pb-8">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            
+            {/* KPI 1 */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4 }}
+              className="bg-white/40 backdrop-blur-sm border border-lotus-rose/10 rounded-2xl p-6 text-center shadow-sm hover:bg-white/60 transition-colors"
+            >
+              <span className="block font-display text-[clamp(1.8rem,3vw,2.4rem)] text-lotus-rose leading-none mb-2">
+                1.200+
+              </span>
+              <span className="block font-sans text-xs font-semibold text-lotus-deep uppercase tracking-wider mb-1">
+                Khách Hàng
+              </span>
+              <span className="block font-sans text-xs text-lotus-stone">
+                Tin tưởng & đồng hành trị liệu
+              </span>
+            </motion.div>
+
+            {/* KPI 2 */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="bg-white/40 backdrop-blur-sm border border-lotus-rose/10 rounded-2xl p-6 text-center shadow-sm hover:bg-white/60 transition-colors"
+            >
+              <span className="block font-display text-[clamp(1.8rem,3vw,2.4rem)] text-lotus-rose leading-none mb-2">
+                15+
+              </span>
+              <span className="block font-sans text-xs font-semibold text-lotus-deep uppercase tracking-wider mb-1">
+                Kỹ Thuật Viên
+              </span>
+              <span className="block font-sans text-xs text-lotus-stone">
+                Chứng chỉ chuyên môn quốc tế
+              </span>
+            </motion.div>
+
+            {/* KPI 3 */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              className="bg-white/40 backdrop-blur-sm border border-lotus-rose/10 rounded-2xl p-6 text-center shadow-sm hover:bg-white/60 transition-colors"
+            >
+              <span className="block font-display text-[clamp(1.8rem,3vw,2.4rem)] text-lotus-rose leading-none mb-2">
+                5+
+              </span>
+              <span className="block font-sans text-xs font-semibold text-lotus-deep uppercase tracking-wider mb-1">
+                Năm Kinh Nghiệm
+              </span>
+              <span className="block font-sans text-xs text-lotus-stone">
+                Trong ngành chăm sóc sức khỏe
+              </span>
+            </motion.div>
+
+            {/* KPI 4 */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+              className="bg-white/40 backdrop-blur-sm border border-lotus-rose/10 rounded-2xl p-6 text-center shadow-sm hover:bg-white/60 transition-colors"
+            >
+              <span className="block font-display text-[clamp(1.8rem,3vw,2.4rem)] text-lotus-rose leading-none mb-2">
+                4.9★
+              </span>
+              <span className="block font-sans text-xs font-semibold text-lotus-deep uppercase tracking-wider mb-1">
+                Đánh Giá
+              </span>
+              <span className="block font-sans text-xs text-lotus-stone">
+                Hài lòng tuyệt đối từ khách hàng
+              </span>
+            </motion.div>
+
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* Brand Intro Content */}
       <section
         id="about"
         ref={sectionRef}
-        className="relative pt-20 md:pt-28 pb-10 md:pb-12 bg-lotus-cream overflow-hidden"
+        className="relative py-16 md:py-24 bg-lotus-cream overflow-hidden"
       >
         {/* Parallax Crane Background */}
         <motion.div
@@ -45,22 +118,21 @@ export const BrandIntroSection = () => {
               backgroundSize: 'contain',
               backgroundPosition: 'left bottom',
               backgroundRepeat: 'no-repeat',
-              WebkitMaskImage: 'radial-gradient(ellipse at 0% 100%, black 50%, transparent 85%)',
-              maskImage: 'radial-gradient(ellipse at 0% 100%, black 50%, transparent 85%)',
+              opacity: 0.15,
             }}
           />
         </motion.div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 flex flex-col md:flex-row items-center gap-12 lg:gap-16">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 flex flex-col md:flex-row items-center gap-12 md:gap-16">
           {/* Text Block */}
           <motion.div
-            className="w-full md:w-[50%] md:pl-8 lg:pl-12"
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            className="w-full md:w-[50%] md:pl-8 lg:pl-12 text-left"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.4 }}
           >
-            <h2 className="font-display font-medium text-3xl md:text-4xl lg:text-[40px] text-lotus-rose leading-snug mb-4">
+            <h2 className="font-display font-normal text-[clamp(1.8rem,3vw,2.4rem)] text-lotus-deep leading-[1.15] mb-6">
               Hoa Sen Spa – Chạm đến bình yên giữa lòng phố thị
             </h2>
 
@@ -70,78 +142,43 @@ export const BrandIntroSection = () => {
               <div className="h-[1px] w-8 bg-lotus-rose/30" />
             </div>
 
-            <p className="font-sans text-[15px] text-lotus-deep/80 leading-relaxed mb-4">
-              Nằm giữa vùng đất sen hồng Đồng Tháp — nơi những cánh đồng sen
-              bạt ngàn trải dài dưới nắng trời phương Nam, Hoa Sen Spa ra đời
-              với khát vọng mang tinh hoa thiên nhiên vào từng liệu trình
-              chăm sóc sức khỏe và sắc đẹp.
+            <p className="font-sans text-[1rem] text-lotus-stone leading-[1.6] max-w-[70ch] mb-4">
+              Nằm giữa vùng đất sen hồng Đồng Tháp, Hoa Sen Spa ra đời với khát vọng mang tinh hoa thiên nhiên của xứ sở sen vào từng liệu trình phục hồi cơ thể và tinh thần chuyên sâu.
             </p>
 
-            <p className="font-sans text-[15px] text-lotus-deep/80 leading-relaxed mb-4">
-              Từ mùi hương dịu nhẹ của tinh dầu, âm thanh êm đềm của thiên nhiên
-              đến đôi bàn tay điêu luyện của các kỹ thuật viên — tất cả tạo nên
-              một trải nghiệm thư giãn trọn vẹn, đưa bạn thoát khỏi áp lực
-              thường ngày, trở về với chính mình.
-            </p>
-
-            <p className="font-sans text-[15px] text-lotus-deep/80 leading-relaxed mb-8">
-              Tại Hoa Sen Spa, mỗi kỹ thuật viên không những được đào tạo bài bản
-              về chuyên môn mà còn luôn làm việc với trái tim đầy nhiệt huyết,
-              giúp bạn phục hồi năng lượng trong từng phút giây.
+            <p className="font-sans text-[1rem] text-lotus-stone leading-[1.6] max-w-[70ch] mb-8">
+              Từ mùi hương thảo mộc dịu nhẹ, không gian yên bình đến đôi bàn tay điêu luyện của các kỹ thuật viên tâm huyết, chúng tôi cam kết đem lại trải nghiệm thư giãn trọn vẹn nhất cho hành trình tìm lại sự cân bằng trong bạn.
             </p>
 
             <a
               href="#services"
-              className="inline-flex items-center justify-center px-8 py-2.5 rounded-full border border-lotus-rose text-lotus-rose font-sans text-sm font-medium hover:bg-lotus-rose hover:text-white transition-colors duration-300"
+              className="inline-flex items-center justify-center h-11 px-6 rounded-lg border border-lotus-rose text-lotus-rose font-sans font-medium text-[0.875rem] hover:bg-lotus-rose hover:text-white transition-all duration-300"
             >
               Xem thêm →
             </a>
           </motion.div>
 
-          {/* Creative Image Gallery */}
+          {/* Arched Architectural Frame */}
           <motion.div
-            className="w-full md:w-[50%] relative h-[500px] md:h-[650px] mt-12 md:mt-0"
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            className="w-full md:w-[50%] flex justify-center mt-12 md:mt-0"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
           >
-            {/* Main image — Vertical Pill */}
-            <div className="absolute right-0 top-0 w-[70%] h-[85%] rounded-[100px] overflow-hidden shadow-2xl">
-              <img
-                src={spaMassage}
-                alt="Thư giãn"
-                loading="lazy"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Overlapping secondary — Circle */}
-            <div className="absolute left-0 bottom-[5%] w-[55%] aspect-square rounded-full overflow-hidden border-[8px] border-lotus-cream shadow-2xl z-10">
-              <img
-                src={spaAbout}
-                alt="Không gian spa"
-                loading="lazy"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Floating Stats Card — Glassmorphism */}
-            <motion.div
-              className="absolute top-[15%] left-0 md:-left-8 z-20 bg-white/80 backdrop-blur-md border border-white/50 px-6 py-5 rounded-[2rem] shadow-xl flex items-center gap-4"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <div className="w-12 h-12 rounded-full bg-lotus-gold flex items-center justify-center text-white shadow-inner">
-                <Flower2 size={24} strokeWidth={1.5} />
+            <div className="relative w-full max-w-[360px] aspect-[3/4] md:h-[550px] md:aspect-auto">
+              {/* Offset border frame */}
+              <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-t-[180px] border border-lotus-gold/25" />
+              {/* Main arched image */}
+              <div className="absolute inset-0 rounded-t-[180px] overflow-hidden border border-lotus-gold/15 bg-lotus-cream shadow-none">
+                <img
+                  src={spaMassage}
+                  alt="Không gian trị liệu và thư giãn tại Hoa Sen Spa"
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                />
               </div>
-              <div className="flex flex-col">
-                <span className="font-display font-bold text-2xl text-lotus-deep leading-none">10+ Năm</span>
-                <span className="font-sans text-[13px] text-lotus-stone mt-1">Kinh nghiệm spa</span>
-              </div>
-            </motion.div>
+            </div>
           </motion.div>
         </div>
       </section>

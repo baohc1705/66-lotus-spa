@@ -20,6 +20,7 @@ export default {
         '3xl': '1.5rem',
         '4xl': '2rem',
       },
+
       colors: {
         background:  'rgb(var(--background) / <alpha-value>)',
         foreground:  'rgb(var(--foreground) / <alpha-value>)',

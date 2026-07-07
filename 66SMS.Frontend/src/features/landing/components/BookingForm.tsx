@@ -21,7 +21,7 @@ const SERVICE_OPTIONS = [
   'Sản phẩm & Gói',
 ]
 
-const inputClass = `w-full px-4 py-3 rounded-lg border border-lotus-stone/20 bg-lotus-cream font-sans text-sm text-lotus-deep placeholder:text-lotus-stone/50 focus:outline-none focus:ring-2 focus:ring-lotus-rose/30 focus:border-lotus-rose transition-all duration-300`
+const inputClass = `w-full h-11 px-4 rounded-lg border border-lotus-stone/20 bg-lotus-cream font-sans text-sm text-lotus-deep placeholder:text-lotus-stone/50 focus:outline-none focus:ring-2 focus:ring-lotus-rose/30 focus:border-lotus-rose transition-all duration-300`
 
 export const BookingForm = () => {
   const [isSuccess, setIsSuccess] = useState(false)
@@ -175,7 +175,7 @@ export const BookingForm = () => {
             rows={3}
             placeholder="Yêu cầu đặc biệt, thời gian mong muốn..."
             {...register('note')}
-            className={`${inputClass} resize-none`}
+            className="w-full min-h-[80px] px-4 py-3 rounded-lg border border-lotus-stone/20 bg-lotus-cream font-sans text-sm text-lotus-deep placeholder:text-lotus-stone/50 focus:outline-none focus:ring-2 focus:ring-lotus-rose/30 focus:border-lotus-rose transition-all duration-300 resize-none"
           />
         </div>
       </div>
@@ -185,7 +185,7 @@ export const BookingForm = () => {
         type="submit"
         disabled={isSubmitting}
         id="booking-submit"
-        className={`mt-8 w-full md:w-auto inline-flex items-center justify-center gap-2 px-10 py-3.5 rounded-full bg-lotus-rose text-white font-sans font-medium text-sm transition-all duration-300 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100`}
+        className="mt-8 w-full md:w-auto inline-flex items-center justify-center gap-2 h-11 px-10 rounded-lg bg-lotus-rose text-white font-sans font-medium text-sm transition-all duration-300 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
       >
         {isSubmitting ? (
           <>
