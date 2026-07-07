@@ -28,11 +28,22 @@ namespace _66SMS.API.Controllers
 
         [HttpGet("daily")]
         [Authorize]
-        public async Task<IActionResult> GetDaily([FromQuery] DateOnly date, [FromQuery] int? salonId)
+        public async Task<IActionResult> GetDaily([FromQuery] DateOnly date, [FromQuery] DateOnly? endDate, [FromQuery] int? salonId)
         {
             var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
             var finalSalonId = tokenSalonId ?? salonId;
-            var query = new GetCashierDailyQuery { Date = date, SalonId = finalSalonId };
+            var query = new GetCashierDailyQuery { Date = date, EndDate = endDate, SalonId = finalSalonId };
+            var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        [HttpGet("weekly")]
+        [Authorize]
+        public async Task<IActionResult> GetWeekly([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate, [FromQuery] int? salonId)
+        {
+            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var finalSalonId = tokenSalonId ?? salonId;
+            var query = new GetCashierDailyQuery { Date = startDate, EndDate = endDate, SalonId = finalSalonId };
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

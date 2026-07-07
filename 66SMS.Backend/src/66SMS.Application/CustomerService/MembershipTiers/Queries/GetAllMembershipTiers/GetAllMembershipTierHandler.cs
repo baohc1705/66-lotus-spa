@@ -21,7 +21,8 @@ namespace _66SMS.Application.CustomerService.MembershipTiers.Queries.GetAllMembe
 
         public async Task<Result<PagedResult<MembershipTierDto>>> Handle(GetAllMembershipTierQuery request, CancellationToken cancellationToken)
         {
-            var query = membershipTierSqlRepository.AsQueryable();
+            var query = membershipTierSqlRepository.AsQueryable()
+                .Where(x => x.Status != _66SMS.Domain.Constants.MembershipTierConst.STATUS_DELETED);
 
             if (!string.IsNullOrEmpty(request.Keyword))
             {

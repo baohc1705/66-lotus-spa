@@ -23,7 +23,8 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Queries.GetAllMembe
 
         public async Task<Result<PagedResult<MembershipCardDto>>> Handle(GetAllMembershipCardQuery request, CancellationToken cancellationToken)
         {
-            IQueryable<MembershipCard> query = membershipCardSqlRepository.AsQueryable();
+            IQueryable<MembershipCard> query = membershipCardSqlRepository.AsQueryable()
+                .Where(x => x.Status != _66SMS.Domain.Constants.MembershipCardConst.STATUS_REVOKED);
 
             if (request.CustomerId.HasValue)
             {

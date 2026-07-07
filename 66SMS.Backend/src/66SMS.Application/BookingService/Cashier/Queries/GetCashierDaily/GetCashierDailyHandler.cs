@@ -66,7 +66,9 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
                 .Include(a => a.TimeSlot)
                 .Include(a => a.Services)
                     .ThenInclude(s => s.Service)
-                .Where(a => a.AppointmentDate == request.Date);
+                .Where(a => request.EndDate.HasValue 
+                    ? a.AppointmentDate >= request.Date && a.AppointmentDate <= request.EndDate.Value
+                    : a.AppointmentDate == request.Date);
 
             if (request.SalonId.HasValue)
             {

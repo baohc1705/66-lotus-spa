@@ -30,11 +30,15 @@ namespace _66SMS.Application.CustomerService.Wallets.Queries.GetWalletTransactio
 
             // Fetch creators (staffs/admins who created the transaction)
             var userIds = transactions.Where(t => t.CreatedBy.HasValue).Select(t => t.CreatedBy).Distinct().ToList();
-            var users = await userRepository.AsQueryable(asNoTracking: true)
+            var usersList = await userRepository.AsQueryable(asNoTracking: true)
                 .Include(u => u.Staff)
                 .Include(u => u.Customer)
                 .Where(u => userIds.Contains(u.Id))
-                .ToDictionaryAsync(u => u.Id, cancellationToken);
+                .ToListAsync(cancellationToken);
+
+            var users = usersList
+                .GroupBy(u => u.Id)
+                .ToDictionary(g => g.Key, g => g.First());
 
             var dtos = transactions.Select(t => {
                 string createdByName = "Hệ thống";
