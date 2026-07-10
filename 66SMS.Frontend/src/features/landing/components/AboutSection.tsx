@@ -1,144 +1,133 @@
-import { motion } from 'motion/react'
-import { Sparkles } from 'lucide-react'
-import spaMassage from '@/assets/spa_massage.png'
-import spaAbout from '@/assets/spa_about.png'
+import { useState } from "react";
+import { motion } from "motion/react";
+import aboutBg from "@/assets/backgrounds/about.webp";
+import spaAbout from "@/assets/spa_about.png";
+import { LotusDivider } from "./LotusDivider";
+
+const SLIDES = [
+  {
+    subtitle: "Đơn vị tiên phong về dịch vụ Spa",
+    description:
+      "Hoa Sen Spa mang đến không gian thư giãn chuẩn 5 sao với liệu trình chăm sóc từ thiên nhiên. Đội ngũ kỹ thuật viên giàu kinh nghiệm, sản phẩm cao cấp và dịch vụ tận tâm giúp bạn tái tạo năng lượng mỗi ngày.",
+  },
+  {
+    subtitle: "Liệu trình từ sen Đồng Tháp",
+    description:
+      "Chúng tôi chọn nguyên liệu sen tự nhiên, kết hợp kỹ thuật trị liệu nhẹ nhàng để mang lại cảm giác thư thái sâu — từ làn da đến tinh thần.",
+  },
+  {
+    subtitle: "Không gian chuẩn thư giãn",
+    description:
+      "Mỗi phòng được thiết kế ấm áp, riêng tư với hương thơm dịu và ánh sáng mềm, giúp bạn tạm gác lại nhịp sống hối hả và trở về với chính mình.",
+  },
+  {
+    subtitle: "Đội ngũ kỹ thuật viên tâm huyết",
+    description:
+      "Kỹ thuật viên được đào tạo bài bản, lắng nghe nhu cầu của bạn để cá nhân hóa liệu trình — chăm sóc đúng chỗ, đúng lúc, đúng người.",
+  },
+];
+
+const ease = [0.22, 1, 0.36, 1] as const;
 
 export const AboutSection = () => {
+  const [activeSlide, setActiveSlide] = useState(0);
+  const slide = SLIDES[activeSlide];
+
   return (
     <section
-      id="why-choose-us"
-      className="py-16 md:py-24 bg-lotus-cream overflow-hidden"
+      id="about"
+      className="relative w-full overflow-hidden"
+      aria-labelledby="about-heading"
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        
-        {/* Section Heading */}
+      <div className="grid w-full lg:grid-cols-2">
+        {/* Trái: nội dung */}
         <motion.div
-          className="max-w-2xl text-left mb-16"
-          initial={{ opacity: 0, y: 15 }}
+          className="relative flex min-h-[420px] flex-col justify-center bg-lotus-rose px-8 py-12 sm:px-12 sm:py-14 lg:min-h-[560px] lg:px-16 lg:py-20 xl:px-24"
+          initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.55, ease }}
         >
-          <span className="block text-[0.75rem] tracking-[0.2em] uppercase font-sans font-medium text-lotus-gold mb-3">
-            <Sparkles className="w-4 h-4 inline-block mr-1 -mt-0.5" strokeWidth={1.5} />
-            Giá trị cốt lõi
-          </span>
-          <h2 className="font-display italic font-normal text-[clamp(2rem,3vw,2.8rem)] text-lotus-deep leading-[1.15] mb-6">
-            Nghệ thuật trong từng điểm chạm
-          </h2>
-          <p className="font-sans text-[1.1rem] leading-[1.6] text-lotus-stone max-w-xl">
-            Tại Hoa Sen Spa, sự chữa lành bắt đầu từ những điểm chạm chân thành nhất. Không chỉ là massage, đó là kỹ nghệ phục hồi kết hợp giữa đôi tay điêu luyện của trị liệu viên và sinh khí của dược thảo Việt Nam.
-          </p>
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.12]"
+            aria-hidden="true"
+            style={{
+              backgroundImage: `url(${aboutBg})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+
+          <div className="relative z-10 mx-auto w-full max-w-xl text-center lg:mx-0 lg:text-left">
+            <h2
+              id="about-heading"
+              className="font-display text-[clamp(1.75rem,3.2vw,2.5rem)] font-semibold leading-[1.15] tracking-[0.02em] text-white"
+            >
+              Tại sao chọn Sen Spa
+            </h2>
+
+            <LotusDivider
+              dark
+              className="mt-4 justify-center lg:justify-start"
+            />
+
+            <h3 className="mt-6 font-geist text-lg font-semibold text-white sm:text-xl">
+              {slide.subtitle}
+            </h3>
+
+            <p className="mt-4 font-geist text-base leading-[1.75] text-white/90">
+              {slide.description}
+            </p>
+
+            <div
+              className="mt-10 flex items-center justify-center gap-3 lg:justify-start"
+              role="tablist"
+              aria-label="Các lý do chọn Sen Spa"
+            >
+              {SLIDES.map((item, index) => {
+                const isActive = index === activeSlide;
+                return (
+                  <button
+                    key={item.subtitle}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    aria-label={`Slide ${index + 1}`}
+                    onClick={() => setActiveSlide(index)}
+                    className={`landing-focus-ring flex h-5 w-5 items-center justify-center rounded-full border transition-colors duration-300 ${
+                      isActive
+                        ? "border-white"
+                        : "border-transparent hover:border-white/40"
+                    }`}
+                  >
+                    <span
+                      className={`rounded-full bg-white transition-all duration-300 ${
+                        isActive ? "h-1.5 w-1.5" : "h-1.5 w-1.5 opacity-55"
+                      }`}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </motion.div>
 
-        {/* Asymmetric Storytelling Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          
-          {/* Left Column (takes 5 cols) */}
-          <div className="lg:col-span-5 space-y-12">
-            
-            {/* Story Block 1 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4 }}
-              className="text-left"
-            >
-              <span className="block font-sans text-xs font-semibold text-lotus-rose uppercase tracking-wider mb-2">
-                01 / Tay Nghề Trị Liệu
-              </span>
-              <h3 className="font-display italic text-xl md:text-2xl text-lotus-deep mb-3">
-                Kỹ nghệ chạm chữa lành
-              </h3>
-              <p className="font-sans text-[1rem] leading-[1.6] text-lotus-stone">
-                Đội ngũ trị liệu viên của chúng tôi được đào tạo chuyên sâu và sở hữu chứng chỉ chuyên môn Đông Y cổ truyền. Mỗi động tác ấn huyệt, miết cơ đều mang sự thấu hiểu sâu sắc đối với cơ thể bạn để xoa dịu các điểm nghẽn đau nhức một cách chính xác.
-              </p>
-            </motion.div>
-
-            {/* Asymmetric Image Left */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="relative aspect-[3/4] w-full rounded-t-[140px] overflow-hidden border border-lotus-rose/10 shadow-sm"
-            >
-              <img
-                src={spaMassage}
-                alt="Massage trị liệu thảo mộc tại Hoa Sen Spa"
-                loading="lazy"
-                className="w-full h-full object-cover"
-              />
-            </motion.div>
-
-          </div>
-
-          {/* Middle Spacer for Desktop */}
-          <div className="hidden lg:block lg:col-span-1" />
-
-          {/* Right Column (takes 6 cols) */}
-          <div className="lg:col-span-6 space-y-12 lg:pt-16">
-            
-            {/* Asymmetric Image Right */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="relative aspect-[4/3] w-full rounded-b-[140px] overflow-hidden border border-lotus-rose/10 shadow-sm"
-            >
-              <img
-                src={spaAbout}
-                alt="Không gian an tĩnh tại Hoa Sen Spa"
-                loading="lazy"
-                className="w-full h-full object-cover"
-              />
-            </motion.div>
-
-            {/* Story Block 2 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: 0.15 }}
-              className="text-left"
-            >
-              <span className="block font-sans text-xs font-semibold text-lotus-rose uppercase tracking-wider mb-2">
-                02 / Thảo Dược Bản Địa
-              </span>
-              <h3 className="font-display italic text-xl md:text-2xl text-lotus-deep mb-3">
-                Tinh túy từ sen hồng Đồng Tháp
-              </h3>
-              <p className="font-sans text-[1rem] leading-[1.6] text-lotus-stone">
-                Chúng tôi sử dụng nguồn dược chất hữu cơ tự nhiên được chưng cất từ sen Đồng Tháp và các loại thảo mộc Việt Nam. Không chứa chất hóa học, tinh khiết nuôi dưỡng làn da và khơi dậy các giác quan thông qua mùi hương nhẹ nhàng, thanh tao.
-              </p>
-            </motion.div>
-
-            {/* Story Block 3 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-              className="text-left"
-            >
-              <span className="block font-sans text-xs font-semibold text-lotus-rose uppercase tracking-wider mb-2">
-                03 / Không Gian & Giác Quan
-              </span>
-              <h3 className="font-display italic text-xl md:text-2xl text-lotus-deep mb-3">
-                Ngắt kết nối, chạm bình yên
-              </h3>
-              <p className="font-sans text-[1rem] leading-[1.6] text-lotus-stone">
-                Tại Hoa Sen Spa, âm thanh êm dịu, ánh sáng vàng ấm và mùi gỗ trầm lan tỏa được thiết kế tỉ mỉ để tạo ra một ốc đảo an tĩnh. Giúp bạn hoàn toàn rũ bỏ mọi ồn ào lo toan từ thế giới bên ngoài ngay khi vừa bước chân qua cửa sổ mái vòm.
-              </p>
-            </motion.div>
-
-          </div>
-
-        </div>
-
+        {/* Phải: ảnh — chỉ motion khi load */}
+        <motion.div
+          className="relative min-h-[320px] lg:min-h-[560px]"
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.55, delay: 0.08, ease }}
+        >
+          <img
+            src={spaAbout}
+            alt="Không gian và liệu trình thư giãn tại Hoa Sen Spa"
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </motion.div>
       </div>
     </section>
-  )
-}
+  );
+};

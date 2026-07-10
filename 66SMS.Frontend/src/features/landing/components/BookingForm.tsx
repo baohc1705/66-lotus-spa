@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Loader2, CheckCircle } from 'lucide-react'
+import { Button } from './Button'
 
 const bookingSchema = z.object({
   name:    z.string().min(2, 'Vui lòng nhập họ tên'),
@@ -21,7 +22,7 @@ const SERVICE_OPTIONS = [
   'Sản phẩm & Gói',
 ]
 
-const inputClass = `w-full h-11 px-4 rounded-lg border border-lotus-stone/20 bg-lotus-cream font-sans text-sm text-lotus-deep placeholder:text-lotus-stone/50 focus:outline-none focus:ring-2 focus:ring-lotus-rose/30 focus:border-lotus-rose transition-all duration-300`
+const inputClass = `landing-focus-ring w-full h-11 px-4 border border-lotus-stone/20 bg-lotus-cream font-geist text-sm text-lotus-deep placeholder:text-lotus-stone/50 focus:border-lotus-rose focus:ring-2 focus:ring-lotus-rose/20 transition-all duration-200`
 
 export const BookingForm = () => {
   const [isSuccess, setIsSuccess] = useState(false)
@@ -44,18 +45,18 @@ export const BookingForm = () => {
 
   if (isSuccess) {
     return (
-      <div className={`text-center py-12 px-6 bg-lotus-surface rounded-2xl border border-lotus-leaf/20`}>
+      <div className={`text-center py-12 px-6 bg-lotus-surface border border-lotus-leaf/20`}>
         <CheckCircle className={`w-16 h-16 text-lotus-leaf mx-auto mb-4`} />
-        <h3 className={`font-display text-2xl font-semibold text-lotus-deep mb-2`}>
-          Cảm ơn bạn!
+        <h3 className={`font-geist text-2xl font-semibold text-lotus-deep mb-2`}>
+          Cảm ơn bạn
         </h3>
-        <p className={`font-sans text-base text-lotus-stone mb-6 max-w-sm mx-auto`}>
+        <p className={`font-geist text-base text-lotus-stone mb-6 max-w-sm mx-auto`}>
           Chúng tôi đã nhận được yêu cầu đặt lịch và sẽ liên hệ
           xác nhận trong thời gian sớm nhất.
         </p>
         <button
           onClick={() => setIsSuccess(false)}
-          className={`font-sans text-sm font-medium text-lotus-rose hover:text-lotus-deep transition-colors duration-300 border-b border-lotus-rose/30 hover:border-lotus-deep/30 pb-0.5`}
+          className={`landing-focus-ring font-geist text-sm font-medium text-lotus-rose hover:text-lotus-deep transition-colors duration-200 border-b border-lotus-rose/30 hover:border-lotus-deep/30 pb-0.5`}
         >
           Đặt lịch thêm
         </button>
@@ -66,14 +67,14 @@ export const BookingForm = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className={`bg-lotus-surface rounded-2xl p-6 md:p-10 shadow-lotus`}
+      className={`landing-surface p-6 md:p-10`}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Họ tên */}
         <div>
           <label
             htmlFor="booking-name"
-            className={`block font-sans text-sm font-medium text-lotus-deep mb-2`}
+            className={`block font-geist text-sm font-medium text-lotus-deep mb-2`}
           >
             Họ và tên
           </label>
@@ -85,7 +86,7 @@ export const BookingForm = () => {
             className={inputClass}
           />
           {errors.name && (
-            <span className={`block mt-1 font-sans text-xs text-lotus-error`}>
+            <span className={`block mt-1 font-geist text-xs text-lotus-error`}>
               {errors.name.message}
             </span>
           )}
@@ -95,7 +96,7 @@ export const BookingForm = () => {
         <div>
           <label
             htmlFor="booking-phone"
-            className={`block font-sans text-sm font-medium text-lotus-deep mb-2`}
+            className={`block font-geist text-sm font-medium text-lotus-deep mb-2`}
           >
             Số điện thoại
           </label>
@@ -107,7 +108,7 @@ export const BookingForm = () => {
             className={inputClass}
           />
           {errors.phone && (
-            <span className={`block mt-1 font-sans text-xs text-lotus-error`}>
+            <span className={`block mt-1 font-geist text-xs text-lotus-error`}>
               {errors.phone.message}
             </span>
           )}
@@ -117,7 +118,7 @@ export const BookingForm = () => {
         <div>
           <label
             htmlFor="booking-service"
-            className={`block font-sans text-sm font-medium text-lotus-deep mb-2`}
+            className={`block font-geist text-sm font-medium text-lotus-deep mb-2`}
           >
             Dịch vụ
           </label>
@@ -132,7 +133,7 @@ export const BookingForm = () => {
             ))}
           </select>
           {errors.service && (
-            <span className={`block mt-1 font-sans text-xs text-lotus-error`}>
+            <span className={`block mt-1 font-geist text-xs text-lotus-error`}>
               {errors.service.message}
             </span>
           )}
@@ -142,7 +143,7 @@ export const BookingForm = () => {
         <div>
           <label
             htmlFor="booking-date"
-            className={`block font-sans text-sm font-medium text-lotus-deep mb-2`}
+            className={`block font-geist text-sm font-medium text-lotus-deep mb-2`}
           >
             Ngày mong muốn
           </label>
@@ -153,7 +154,7 @@ export const BookingForm = () => {
             className={inputClass}
           />
           {errors.date && (
-            <span className={`block mt-1 font-sans text-xs text-lotus-error`}>
+            <span className={`block mt-1 font-geist text-xs text-lotus-error`}>
               {errors.date.message}
             </span>
           )}
@@ -163,7 +164,7 @@ export const BookingForm = () => {
         <div className="md:col-span-2">
           <label
             htmlFor="booking-note"
-            className={`block font-sans text-sm font-medium text-lotus-deep mb-2`}
+            className={`block font-geist text-sm font-medium text-lotus-deep mb-2`}
           >
             Ghi chú{' '}
             <span className="text-lotus-stone font-light">
@@ -175,17 +176,18 @@ export const BookingForm = () => {
             rows={3}
             placeholder="Yêu cầu đặc biệt, thời gian mong muốn..."
             {...register('note')}
-            className="w-full min-h-[80px] px-4 py-3 rounded-lg border border-lotus-stone/20 bg-lotus-cream font-sans text-sm text-lotus-deep placeholder:text-lotus-stone/50 focus:outline-none focus:ring-2 focus:ring-lotus-rose/30 focus:border-lotus-rose transition-all duration-300 resize-none"
+            className="landing-focus-ring w-full min-h-[80px] px-4 py-3 border border-lotus-stone/20 bg-lotus-cream font-geist text-sm text-lotus-deep placeholder:text-lotus-stone/50 focus:border-lotus-rose focus:ring-2 focus:ring-lotus-rose/20 transition-all duration-200 resize-none"
           />
         </div>
       </div>
 
       {/* Submit Button */}
-      <button
+      <Button
         type="submit"
         disabled={isSubmitting}
         id="booking-submit"
-        className="mt-8 w-full md:w-auto inline-flex items-center justify-center gap-2 h-11 px-10 rounded-lg bg-lotus-rose text-white font-sans font-medium text-sm transition-all duration-300 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+        variant="primary"
+        className="mt-8 w-full md:w-auto h-11 px-10"
       >
         {isSubmitting ? (
           <>
@@ -195,7 +197,7 @@ export const BookingForm = () => {
         ) : (
           'Xác nhận đặt lịch'
         )}
-      </button>
+      </Button>
     </form>
   )
 }

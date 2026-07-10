@@ -41,11 +41,7 @@ const SLIDES = [
     brand: "Hoa Sen Spa · Đồng Tháp",
     title: (
       <>
-        Nơi cơ thể
-        <br />
-        tìm về
-        <br />
-        sự tĩnh lặng
+        Tĩnh lặng
       </>
     ),
     subtitle:
@@ -62,10 +58,6 @@ const SLIDES = [
     title: (
       <>
         Phục hồi
-        <br />
-        năng lượng
-        <br />
-        từ bên trong
       </>
     ),
     subtitle:
@@ -84,8 +76,6 @@ const SLIDES = [
         Đánh thức
         <br />
         vẻ đẹp
-        <br />
-        rạng ngời
       </>
     ),
     subtitle:
@@ -205,26 +195,28 @@ export const HeroSection = () => {
         ))}
       </div>
 
-      {/* Navigation Controls (Arrows) */}
-      <div className="absolute inset-0 z-20 flex items-center justify-between px-4 md:px-8 pointer-events-none">
+      {/* Navigation arrows — desktop only */}
+      <div className="pointer-events-none absolute inset-0 z-20 hidden items-center justify-between px-4 md:flex md:px-8">
         <button
+          type="button"
           onClick={prevSlide}
-          className="pointer-events-auto w-12 h-12 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 text-white/70 hover:text-white backdrop-blur-sm border border-white/10 transition-all"
+          className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-black/20 text-white/70 backdrop-blur-sm transition-all hover:bg-black/40 hover:text-white"
           aria-label="Previous slide"
         >
-          <ChevronLeft className="w-6 h-6" />
+          <ChevronLeft className="h-6 w-6" />
         </button>
         <button
+          type="button"
           onClick={nextSlide}
-          className="pointer-events-auto w-12 h-12 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 text-white/70 hover:text-white backdrop-blur-sm border border-white/10 transition-all"
+          className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-black/20 text-white/70 backdrop-blur-sm transition-all hover:bg-black/40 hover:text-white"
           aria-label="Next slide"
         >
-          <ChevronRight className="w-6 h-6" />
+          <ChevronRight className="h-6 w-6" />
         </button>
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-[5%] pb-36 md:pb-40 pt-32">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pb-28 pt-28 md:px-8 md:pb-40 md:pt-32">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
@@ -234,81 +226,103 @@ export const HeroSection = () => {
             exit="exit"
             className="max-w-2xl"
           >
-            {/* Brand Label */}
             <motion.span
               variants={textVariants}
-              className="block text-[13px] tracking-[0.2em] uppercase font-sans font-light mb-5 text-lotus-gold"
+              className="mb-3 block font-sans text-xs font-light uppercase tracking-[0.2em] text-lotus-gold md:mb-5 md:text-sm"
             >
               {SLIDES[currentIndex].brand}
             </motion.span>
 
-            {/* Heading */}
             <motion.h1
               variants={textVariants}
-              className="font-display italic font-normal text-[48px] md:text-[64px] lg:text-[80px] text-white leading-[1.08] mb-6"
+              className="mb-4 font-display text-[clamp(2rem,9vw,2.75rem)] font-normal leading-[1.08] text-white md:mb-6 md:text-[68px] lg:text-[84px]"
             >
               {SLIDES[currentIndex].title}
             </motion.h1>
 
-            {/* Subtitle */}
             <motion.p
               variants={textVariants}
-              className="font-sans text-base md:text-lg text-white/80 leading-relaxed max-w-lg mb-8"
+              className="mb-6 max-w-lg font-sans text-base leading-relaxed text-white/80 md:mb-8 md:text-lg lg:text-xl"
             >
               {SLIDES[currentIndex].subtitle}
             </motion.p>
 
-            {/* CTA Row */}
             <motion.div
               variants={textVariants}
-              className="flex flex-wrap items-center gap-4"
+              className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4"
             >
               <a
                 href={SLIDES[currentIndex].ctaPrimaryHref}
-                className="inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-lotus-rose text-white font-sans font-medium text-sm transition-all duration-300 hover:shadow-[0_4px_20px_rgba(212,84,126,0.35)] hover:-translate-y-0.5 active:translate-y-0"
+                className="inline-flex items-center justify-center rounded-full bg-lotus-rose px-6 py-3 font-sans text-sm font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(212,84,126,0.35)] active:translate-y-0 md:px-8 md:py-3.5 md:text-base"
               >
                 {SLIDES[currentIndex].ctaPrimary}
               </a>
               <a
                 href={SLIDES[currentIndex].ctaSecondaryHref}
-                className="inline-flex items-center justify-center px-8 py-3.5 rounded-full border border-white/40 text-white font-sans font-medium text-sm transition-all duration-300 hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-white/40 px-6 py-3 font-sans text-sm font-medium text-white transition-all duration-300 hover:bg-white/10 md:px-8 md:py-3.5 md:text-base"
               >
                 {SLIDES[currentIndex].ctaSecondary}
               </a>
+            </motion.div>
+
+            {/* Dots — mobile only */}
+            <motion.div
+              variants={textVariants}
+              className="mt-6 flex items-center gap-2 md:hidden"
+              role="tablist"
+              aria-label="Chọn slide"
+            >
+              {SLIDES.map((slide, i) => (
+                <button
+                  key={slide.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === currentIndex}
+                  aria-label={`Slide ${i + 1}`}
+                  onClick={() => setCurrentIndex(i)}
+                  className={`landing-focus-ring h-2 rounded-full transition-all duration-300 ${
+                    i === currentIndex
+                      ? "w-6 bg-lotus-rose"
+                      : "w-2 bg-white/40"
+                  }`}
+                />
+              ))}
             </motion.div>
           </motion.div>
         </AnimatePresence>
       </div>
 
       {/* Stats Bar */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 border-t border-white/10 bg-lotus-deep/40 backdrop-blur-sm py-5 px-[5%]">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center gap-6 md:gap-0">
-          {/* Stat 1 */}
-          <div className="flex items-baseline gap-2 md:pr-10">
-            <span className="text-xl md:text-2xl font-display font-semibold text-lotus-gold">
+      <div className="absolute bottom-0 left-0 right-0 z-20 border-t border-white/10 bg-lotus-deep/40 px-4 py-3 backdrop-blur-sm md:px-[5%] md:py-5">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 md:justify-start md:gap-0">
+          <div className="flex min-w-0 flex-1 items-baseline gap-1 md:flex-none md:gap-2 md:pr-10">
+            <span className="font-display text-base font-semibold text-lotus-gold md:text-xl lg:text-2xl">
               1.200+
             </span>
-            <span className="text-sm text-white/70 font-sans">Khách hàng</span>
+            <span className="truncate font-sans text-[0.6875rem] text-white/70 md:text-sm">
+              Khách hàng
+            </span>
           </div>
-          <div className="hidden md:block w-px h-8 bg-white/20" />
+          <div className="hidden h-8 w-px bg-white/20 md:block" />
 
-          {/* Stat 2 */}
-          <div className="flex items-baseline gap-2 md:px-10">
-            <span className="text-xl md:text-2xl font-display font-semibold text-lotus-gold">
+          <div className="flex min-w-0 flex-1 items-baseline justify-center gap-1 md:flex-none md:justify-start md:gap-2 md:px-10">
+            <span className="font-display text-base font-semibold text-lotus-gold md:text-xl lg:text-2xl">
               5
             </span>
-            <span className="text-sm text-white/70 font-sans">
-              Năm kinh nghiệm
+            <span className="truncate font-sans text-[0.6875rem] text-white/70 md:text-sm">
+              <span className="md:hidden">Năm KN</span>
+              <span className="hidden md:inline">Năm kinh nghiệm</span>
             </span>
           </div>
-          <div className="hidden md:block w-px h-8 bg-white/20" />
+          <div className="hidden h-8 w-px bg-white/20 md:block" />
 
-          {/* Stat 3 */}
-          <div className="flex items-baseline gap-2 md:pl-10">
-            <span className="text-xl md:text-2xl font-display font-semibold text-lotus-gold">
+          <div className="flex min-w-0 flex-1 items-baseline justify-end gap-1 md:flex-none md:justify-start md:gap-2 md:pl-10">
+            <span className="font-display text-base font-semibold text-lotus-gold md:text-xl lg:text-2xl">
               4.9★
             </span>
-            <span className="text-sm text-white/70 font-sans">Đánh giá</span>
+            <span className="truncate font-sans text-[0.6875rem] text-white/70 md:text-sm">
+              Đánh giá
+            </span>
           </div>
         </div>
       </div>

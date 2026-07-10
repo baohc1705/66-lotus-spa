@@ -4,14 +4,15 @@ import { motion, AnimatePresence } from "motion/react";
 import logoUrl from "@/assets/logo-home.png";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useGetMe } from "@/features/users";
+import { Button } from "./Button";
 
 const NAV_ITEMS = [
-  { label: "Giới Thiệu", href: "#about" },
-  { label: "Dịch Vụ", href: "#services" },
-  { label: "Không Gian", href: "#space" },
-  { label: "Quy Trình", href: "#process" },
-  { label: "Đánh Giá", href: "#testimonials" },
-  { label: "Vị Trí", href: "#location" },
+  { label: "Giới thiệu", href: "#about" },
+  { label: "Dịch vụ", href: "#services" },
+  { label: "Sản phẩm", href: "#products" },
+  { label: "Phòng riêng", href: "#space" },
+  { label: "Đánh giá", href: "#testimonials" },
+  { label: "Câu hỏi", href: "#faq" },
 ];
 
 interface NavbarProps {
@@ -61,7 +62,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
                 HOA SEN
               </span>
               <span
-                className={`text-[8px] tracking-[0.28em] uppercase font-sans mt-0.5 transition-colors duration-500 ${isDark ? "text-lotus-gold" : "text-white/60"}`}
+                className={`text-[10px] tracking-[0.28em] uppercase font-sans mt-0.5 transition-colors duration-500 ${isDark ? "text-lotus-gold" : "text-white/60"}`}
               >
                 Spa & Wellness
               </span>
@@ -74,7 +75,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
               <a
                 key={item.href}
                 href={item.href}
-                className={`relative font-sans text-[13px] font-medium uppercase tracking-wide transition-colors duration-300 group ${isDark ? "text-lotus-deep hover:text-lotus-rose" : "text-white/80 hover:text-white"}`}
+                className={`relative font-sans text-sm font-medium uppercase tracking-wide transition-colors duration-300 group ${isDark ? "text-lotus-deep hover:text-lotus-rose" : "text-white/80 hover:text-white"}`}
               >
                 {item.label}
                 <span
@@ -88,7 +89,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
           <div className="hidden lg:flex items-center gap-3">
             <a
               href="tel:09079593951"
-              className={`flex items-center gap-1.5 font-sans text-[13px] font-medium transition-colors duration-300 ${isDark ? "text-lotus-stone hover:text-lotus-rose" : "text-white/70 hover:text-white"}`}
+              className={`flex items-center gap-1.5 font-sans text-sm font-medium transition-colors duration-300 ${isDark ? "text-lotus-stone hover:text-lotus-rose" : "text-white/70 hover:text-white"}`}
             >
               <Phone className="w-3.5 h-3.5" />
               0907 95 93 95
@@ -101,7 +102,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
             {isLoggedIn ? (
               <a
                 href="/profile"
-                className={`flex items-center gap-2 text-[13px] font-medium transition-colors duration-300 ${isDark ? "text-lotus-deep hover:text-lotus-rose" : "text-white/90 hover:text-white"}`}
+                className={`flex items-center gap-2 text-sm font-medium transition-colors duration-300 ${isDark ? "text-lotus-deep hover:text-lotus-rose" : "text-white/90 hover:text-white"}`}
               >
                 <div className="w-7 h-7 rounded-full border border-lotus-rose/30 bg-lotus-cream flex items-center justify-center text-lotus-rose overflow-hidden">
                   {me?.avatarUrl ? (
@@ -121,27 +122,28 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
             ) : (
               <a
                 href="/login"
-                className={`flex items-center gap-1.5 font-sans text-[13px] font-medium transition-colors duration-300 ${isDark ? "text-lotus-deep hover:text-lotus-rose" : "text-white/90 hover:text-white"}`}
+                className={`flex items-center gap-1.5 font-sans text-sm font-medium transition-colors duration-300 ${isDark ? "text-lotus-deep hover:text-lotus-rose" : "text-white/90 hover:text-white"}`}
               >
                 <UserIcon className="w-3.5 h-3.5" />
                 Đăng nhập
               </a>
             )}
 
-            <a
+            <Button
               href="/dat-lich"
               id="nav-cta-booking"
-              className="flex items-center gap-2 bg-lotus-rose hover:bg-lotus-deep text-white text-[13px] font-medium px-5 py-2.5 rounded-full transition-all duration-300 shadow-lotus hover:shadow-jade-lg hover:-translate-y-px active:translate-y-0"
+              variant="primary"
+              className="px-5 py-2.5 text-sm"
             >
               <Calendar className="w-3.5 h-3.5" />
               Đặt Lịch
-            </a>
+            </Button>
           </div>
 
           {/* Mobile Hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className={`lg:hidden p-2 rounded-lg transition-colors ${isDark ? "text-lotus-deep" : "text-white"}`}
+            className={`lg:hidden p-2 transition-colors ${isDark ? "text-lotus-deep" : "text-white"}`}
             aria-label="Mở menu"
           >
             {menuOpen ? (
@@ -207,14 +209,15 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
                     Đăng nhập
                   </a>
                 )}
-                <a
+                <Button
                   href="/dat-lich"
                   onClick={() => setMenuOpen(false)}
-                  className="mt-2 flex items-center justify-center gap-2 bg-lotus-rose text-white text-sm font-medium px-6 py-3.5 rounded-full"
+                  variant="primary"
+                  className="mt-2 w-full py-3.5 text-sm"
                 >
                   <Calendar className="w-4 h-4" />
                   Đặt Lịch Ngay
-                </a>
+                </Button>
               </div>
             </div>
           </motion.div>

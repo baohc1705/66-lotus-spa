@@ -1,131 +1,132 @@
-import { motion } from 'motion/react'
-import { ShoppingBag } from 'lucide-react'
+import { motion } from "motion/react";
+import { Eye, ShoppingBag } from "lucide-react";
+import { SectionHeader } from "./SectionHeader";
 
-import spaProducts from '@/assets/spa_products.png'
-import spaFacial from '@/assets/spa_facial.png'
-import spaTreatment from '@/assets/spa_treatment_1780310830592.png'
+import spaProducts from "@/assets/spa_products.png";
+import spaFacial from "@/assets/spa_facial.png";
+import spaTreatment from "@/assets/spa_treatment_1780310830592.png";
+import spaAbout from "@/assets/spa_about.png";
 
 const PRODUCTS = [
   {
-    name: 'Tinh dầu Hoa Sen',
-    description: 'Tinh dầu massage thiên nhiên chiết xuất từ hoa sen Đồng Tháp, giúp thư giãn và nuôi dưỡng làn da.',
-    price: '350.000đ',
+    name: "Tinh dầu Hoa Sen",
+    price: "350.000đ",
+    tag: "Bán chạy",
+    description:
+      "Chiết xuất 100% từ hoa sen tự nhiên, thư giãn và cân bằng tinh thần.",
     imageSrc: spaProducts,
-    imageAlt: 'Tinh dầu hoa sen tự nhiên',
+    imageAlt: "Tinh dầu hoa sen tự nhiên",
   },
   {
-    name: 'Kem dưỡng da sen',
-    description: 'Kem dưỡng ẩm chiết xuất từ nhụy sen, cung cấp độ ẩm sâu và giúp da luôn mềm mịn.',
-    price: '280.000đ',
+    name: "Kem dưỡng da sen",
+    price: "280.000đ",
+    tag: "Dưỡng ẩm",
+    description:
+      "Dưỡng ẩm sâu với chiết xuất sen, giúp da mềm mịn và sáng khỏe mỗi ngày.",
     imageSrc: spaFacial,
-    imageAlt: 'Kem dưỡng da chiết xuất sen',
+    imageAlt: "Kem dưỡng da chiết xuất sen",
   },
   {
-    name: 'Bộ chăm sóc toàn diện',
-    description: 'Bộ sản phẩm chăm sóc da hoàn chỉnh với các bước từ làm sạch đến dưỡng ẩm chuyên sâu.',
-    price: '680.000đ',
+    name: "Bộ chăm sóc da",
+    price: "680.000đ",
+    tag: "Combo tiết kiệm",
+    description:
+      "Combo đầy đủ bước chăm sóc da, tiết kiệm hơn khi mua lẻ từng sản phẩm.",
     imageSrc: spaTreatment,
-    imageAlt: 'Bộ sản phẩm chăm sóc da toàn diện',
+    imageAlt: "Bộ sản phẩm chăm sóc da",
   },
-]
-
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.12 },
+  {
+    name: "Serum sen hồng",
+    price: "420.000đ",
+    tag: "Mới",
+    description:
+      "Serum sen hồng Đồng Tháp, phục hồi và làm dịu làn da nhạy cảm.",
+    imageSrc: spaAbout,
+    imageAlt: "Serum sen hồng Đồng Tháp",
   },
-}
-
-const itemVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.3 } },
-}
+];
 
 export const ProductsSection = () => {
   return (
     <section
       id="products"
-      className="py-8 md:py-12 bg-lotus-cream"
+      className="landing-section bg-lotus-cream"
+      aria-labelledby="products-heading"
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        {/* Heading */}
-        <motion.div
-          className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 md:mb-12 text-left"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.3 }}
-        >
-          <div className="max-w-md">
-            <span className="block text-[0.75rem] tracking-[0.2em] uppercase font-sans font-medium text-lotus-gold mb-3">
-              Sản phẩm
-            </span>
-            <h2 className="font-display italic font-normal text-[clamp(1.8rem,3vw,2.4rem)] text-lotus-deep leading-[1.15]">
-              Tinh hoa từ thiên nhiên
-            </h2>
-          </div>
-          <p className="font-sans text-[1rem] text-lotus-stone max-w-md md:mb-1 leading-[1.6]">
-            Các dòng sản phẩm chăm sóc da và trị liệu organic được chọn lọc kỹ lưỡng, mang trọn vẹn dưỡng chất tinh túy từ sen hồng Đồng Tháp.
-          </p>
-        </motion.div>
+      <div className="landing-container">
+        <SectionHeader
+          title="Sản phẩm"
+          titleId="products-heading"
+          variant="lotus"
+          className="mb-10"
+        />
 
-        {/* Product Grid */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          {PRODUCTS.map((product) => (
-            <motion.div
+        <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
+          {PRODUCTS.map((product, i) => (
+            <motion.article
               key={product.name}
-              variants={itemVariants}
-              className="card-glow bg-white rounded-2xl overflow-hidden border border-lotus-rose/10 flex flex-col justify-between h-full"
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.35, delay: i * 0.04 }}
+              className="group flex flex-col overflow-hidden bg-white shadow-[0_2px_14px_rgba(42,31,26,0.06)] transition-shadow duration-300 hover:shadow-[0_10px_28px_rgba(212,84,126,0.22)]"
             >
-              {/* Top part */}
-              <div>
-                {/* Image — NO zoom on hover */}
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img
-                    src={product.imageSrc}
-                    alt={product.imageAlt}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+              {/* Ảnh */}
+              <div className="relative aspect-[5/4] overflow-hidden bg-lotus-rose-light/40">
+                <img
+                  src={product.imageSrc}
+                  alt={product.imageAlt}
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                />
 
-                {/* Info */}
-                <div className="p-6">
-                  <h3 className="font-display font-semibold text-[1.125rem] text-lotus-deep mb-2">
-                    {product.name}
-                  </h3>
-                  <p className="font-sans text-[0.875rem] text-lotus-stone leading-[1.6]">
-                    {product.description}
-                  </p>
-                </div>
-              </div>
+                <span className="absolute left-2.5 top-2.5 bg-white px-2 py-1 font-geist text-xs font-medium text-lotus-rose shadow-sm">
+                  {product.tag}
+                </span>
 
-              {/* Price & Action Row */}
-              <div className="p-6 pt-0 border-t border-lotus-rose/5 mt-4">
-                <div className="flex items-center justify-between pt-4">
-                  <span className="font-display font-semibold text-lg text-lotus-rose">
-                    {product.price}
+                {/* Overlay hover: xem chi tiết */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[rgba(42,31,26,0.45)] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-md">
+                    <Eye className="h-5 w-5 text-lotus-deep" aria-hidden="true" />
                   </span>
-                  <a
-                    href="#booking"
-                    className="inline-flex items-center gap-2 font-sans text-sm font-medium text-lotus-gold hover:text-lotus-rose border-b border-lotus-gold/25 hover:border-lotus-rose/40 pb-0.5 transition-all duration-300"
-                  >
-                    <ShoppingBag className="w-4 h-4" />
-                    Mua ngay
-                  </a>
+                  <span className="font-geist text-sm font-medium text-white">
+                    Xem chi tiết
+                  </span>
                 </div>
               </div>
-            </motion.div>
+
+              {/* Nội dung */}
+              <div className="flex flex-1 flex-col p-3.5 sm:p-4">
+                <h3 className="mb-1.5 font-geist text-base font-semibold leading-snug text-lotus-deep sm:text-base">
+                  {product.name}
+                </h3>
+
+                <p className="mb-3 line-clamp-2 font-geist text-sm leading-[1.5] text-lotus-stone">
+                  {product.description}
+                </p>
+
+                <p className="mb-3 font-geist text-base font-bold tabular-nums text-lotus-rose">
+                  {product.price}
+                </p>
+
+                <div
+                  className="mb-3 h-px w-full bg-lotus-deep/10"
+                  aria-hidden="true"
+                />
+
+                {/* Mua ngay: text → nút hồng khi hover */}
+                <a
+                  href="/dat-lich"
+                  className="landing-focus-ring mt-auto inline-flex w-full items-center justify-center gap-1.5 rounded-full py-2 font-geist text-sm font-medium text-lotus-rose transition-all duration-300 group-hover:bg-lotus-rose group-hover:text-white group-hover:hover:bg-lotus-rose-dark"
+                >
+                  <ShoppingBag className="h-3.5 w-3.5" aria-hidden="true" />
+                  Mua ngay
+                </a>
+              </div>
+            </motion.article>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
-  )
-}
+  );
+};

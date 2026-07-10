@@ -1,171 +1,256 @@
-import { useAutoRotate } from '../hooks/useAutoRotate'
-import { motion, AnimatePresence } from 'motion/react'
-import { Star, Quote } from 'lucide-react'
-import spaAbout from '@/assets/spa_about.png'
-import spaMassage from '@/assets/spa_massage.png'
-import spaFacial from '@/assets/spa_facial.png'
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
+import { SectionHeader } from "./SectionHeader";
+import lotusIcon from "@/assets/icons/lotus.webp";
 
-const TESTIMONIALS = [
+const REVIEWS = [
   {
-    name: 'Chị Minh Tâm',
-    role: 'Khách hàng thân thiết',
-    text: 'Mỗi lần đến Hoa Sen Spa, tôi cảm nhận được sự chăm sóc tận tâm từ từng chi tiết nhỏ. Không gian yên tĩnh, nhân viên chu đáo — đó là lý do tôi quay lại suốt 3 năm qua.',
+    name: "Chị Minh Tâm",
+    role: "Khách thân thiết · 3 năm",
+    text: "Không gian yên tĩnh, nhân viên chu đáo — tôi quay lại suốt 3 năm qua vì cảm giác được chăm sóc thật sự.",
     rating: 5,
-    image: spaAbout,
+    initials: "MT",
   },
   {
-    name: 'Chị Thanh Hà',
-    role: 'Khách hàng',
-    text: 'Liệu trình massage ở đây thật sự giúp tôi giảm đau lưng rất nhiều. Kỹ thuật viên rất chuyên nghiệp và luôn lắng nghe yêu cầu của khách.',
+    name: "Chị Thanh Hà",
+    role: "Khách hàng",
+    text: "Massage giúp giảm đau lưng rõ rệt. Kỹ thuật viên lắng nghe và rất nhẹ tay.",
     rating: 5,
-    image: spaMassage,
+    initials: "TH",
   },
   {
-    name: 'Chị Bích Ngọc',
-    role: 'Khách hàng từ 2022',
-    text: 'Tôi đã thử nhiều spa nhưng không nơi nào cho cảm giác thư giãn như Hoa Sen. Đặc biệt là liệu trình chăm sóc da mặt — da tôi cải thiện rõ rệt sau 3 buổi.',
+    name: "Chị Bích Ngọc",
+    role: "Khách từ 2022",
+    text: "Da tôi sáng mịn hơn sau 3 buổi facial. Mùi sen rất dễ chịu, không gian cũng rất sạch sẽ.",
     rating: 5,
-    image: spaFacial,
+    initials: "BN",
   },
   {
-    name: 'Chị Phương Trinh',
-    role: 'Khách hàng VIP',
-    text: 'Không gian cực kỳ sạch sẽ và thơm tho. Mỗi lần vào đây là tôi quên hết mệt mỏi. Đặc biệt liệu trình body treatment rất đáng trải nghiệm.',
+    name: "Chị Phương Trinh",
+    role: "Khách VIP",
+    text: "Phòng riêng sạch sẽ, thơm tho. Body treatment đáng trải nghiệm, sẽ giới thiệu bạn bè.",
     rating: 5,
-    image: spaMassage,
+    initials: "PT",
   },
-  {
-    name: 'Chị Kim Anh',
-    role: 'Khách hàng từ 2023',
-    text: 'Lần đầu tiên tôi đến đây là vì bạn bè giới thiệu. Giờ thì tôi đã thành khách quen rồi. Dịch vụ chuyên nghiệp, giá cả hợp lý. Rất hài lòng!',
-    rating: 5,
-    image: spaFacial,
-  },
-]
+];
+
+const Stars = ({ count }: { count: number }) => (
+  <div className="flex gap-0.5" aria-label={`${count} sao`}>
+    {Array.from({ length: count }).map((_, i) => (
+      <Star
+        key={i}
+        className="h-3.5 w-3.5 fill-lotus-gold text-lotus-gold"
+        aria-hidden="true"
+      />
+    ))}
+  </div>
+);
 
 export const TestimonialsSection = () => {
-  const {
-    current,
-    setCurrent,
-    pause,
-    resume,
-  } = useAutoRotate(TESTIMONIALS.length, 5000)
+  const [activeIndex, setActiveIndex] = useState(0);
+  const total = REVIEWS.length;
+
+  const goPrev = () => {
+    setActiveIndex((prev) => (prev - 1 + total) % total);
+  };
+
+  const goNext = () => {
+    setActiveIndex((prev) => (prev + 1) % total);
+  };
+
+  // Desktop: 4 cards. Mobile/tablet: carousel 1 card
+  const orderedReviews = [
+    ...REVIEWS.slice(activeIndex),
+    ...REVIEWS.slice(0, activeIndex),
+  ];
 
   return (
     <section
       id="testimonials"
-      className="py-16 md:py-24 bg-lotus-deep"
+      className="landing-section relative overflow-hidden bg-[#FAF7F5]"
+      aria-labelledby="testimonials-heading"
     >
-      <div className="max-w-6xl mx-auto px-6 lg:px-10">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16 items-center">
-          
-          {/* Left Column: Large Customer Photo (Dynamic) */}
-          <div className="hidden md:block md:col-span-5">
-            <div className="relative w-full aspect-[3/4] max-h-[480px]">
-              {/* Offset border frame */}
-              <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-t-[140px] border border-lotus-gold/20" />
-              {/* Main arched image */}
-              <div className="absolute inset-0 rounded-t-[140px] overflow-hidden border border-white/10 bg-lotus-deep">
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={current}
-                    src={TESTIMONIALS[current].image}
-                    alt={TESTIMONIALS[current].name}
-                    loading="lazy"
-                    initial={{ opacity: 0, scale: 1.02 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.4 }}
-                    className="w-full h-full object-cover"
-                  />
-                </AnimatePresence>
+      {/* Watermark sen */}
+      <div
+        className="pointer-events-none absolute -right-8 top-8 h-56 w-56 opacity-[0.06] sm:h-72 sm:w-72"
+        aria-hidden="true"
+        style={{
+          backgroundColor: "var(--lotus-rose)",
+          WebkitMaskImage: `url(${lotusIcon})`,
+          maskImage: `url(${lotusIcon})`,
+          WebkitMaskSize: "contain",
+          maskSize: "contain",
+          WebkitMaskRepeat: "no-repeat",
+          maskRepeat: "no-repeat",
+          WebkitMaskPosition: "center",
+          maskPosition: "center",
+        }}
+      />
+
+      <div className="landing-container relative z-10">
+        {/* Badge FEEDBACK */}
+        <div className="mb-5 flex justify-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-lotus-rose/10 px-3.5 py-1.5 font-geist text-xs font-semibold uppercase tracking-[0.14em] text-lotus-rose">
+            <span
+              className="h-3.5 w-3.5 bg-lotus-rose"
+              style={{
+                WebkitMaskImage: `url(${lotusIcon})`,
+                maskImage: `url(${lotusIcon})`,
+                WebkitMaskSize: "contain",
+                maskSize: "contain",
+                WebkitMaskRepeat: "no-repeat",
+                maskRepeat: "no-repeat",
+                WebkitMaskPosition: "center",
+                maskPosition: "center",
+              }}
+              aria-hidden="true"
+            />
+            Feedback
+          </span>
+        </div>
+
+        <SectionHeader
+          title="Khách hàng nói gì"
+          titleId="testimonials-heading"
+          variant="lotus"
+          description="Những trải nghiệm thực tế từ khách hàng đã sử dụng dịch vụ của chúng tôi."
+          className="mb-10"
+        />
+
+        {/* Desktop: 4 cards */}
+        <div className="hidden gap-5 lg:grid lg:grid-cols-4">
+          {REVIEWS.map((item, i) => (
+            <motion.blockquote
+              key={item.name}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.35, delay: i * 0.05 }}
+              className={`flex flex-col bg-white p-5 shadow-[0_8px_28px_rgba(212,84,126,0.08)] transition-shadow duration-300 ${
+                i === activeIndex
+                  ? "shadow-[0_10px_32px_rgba(212,84,126,0.16)]"
+                  : ""
+              }`}
+            >
+              <div className="mb-4 flex items-start justify-between">
+                <Quote
+                  className="h-7 w-7 text-lotus-rose/80"
+                  fill="currentColor"
+                  aria-hidden="true"
+                />
+                <Stars count={item.rating} />
               </div>
-            </div>
+
+              <p className="mb-5 flex-1 font-geist text-sm leading-[1.7] text-lotus-stone">
+                {item.text}
+              </p>
+
+              <div className="mb-4 h-px w-full bg-lotus-rose/15" aria-hidden="true" />
+
+              <footer className="flex items-center gap-3">
+                <span
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-lotus-rose/15 font-geist text-xs font-semibold text-lotus-rose"
+                  aria-hidden="true"
+                >
+                  {item.initials}
+                </span>
+                <cite className="not-italic">
+                  <span className="block font-geist text-sm font-semibold text-lotus-deep">
+                    {item.name}
+                  </span>
+                  <span className="font-geist text-xs text-lotus-stone">
+                    {item.role}
+                  </span>
+                </cite>
+              </footer>
+            </motion.blockquote>
+          ))}
+        </div>
+
+        {/* Mobile / tablet: carousel */}
+        <div className="lg:hidden">
+          <AnimatePresence mode="wait">
+            <motion.blockquote
+              key={orderedReviews[0].name}
+              initial={{ opacity: 0, x: 16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -16 }}
+              transition={{ duration: 0.28 }}
+              className="flex flex-col bg-white p-5 shadow-[0_8px_28px_rgba(212,84,126,0.08)] sm:mx-auto sm:max-w-md"
+            >
+              <div className="mb-4 flex items-start justify-between">
+                <Quote
+                  className="h-7 w-7 text-lotus-rose/80"
+                  fill="currentColor"
+                  aria-hidden="true"
+                />
+                <Stars count={orderedReviews[0].rating} />
+              </div>
+
+              <p className="mb-5 flex-1 font-geist text-sm leading-[1.7] text-lotus-stone">
+                {orderedReviews[0].text}
+              </p>
+
+              <div className="mb-4 h-px w-full bg-lotus-rose/15" aria-hidden="true" />
+
+              <footer className="flex items-center gap-3">
+                <span
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-lotus-rose/15 font-geist text-xs font-semibold text-lotus-rose"
+                  aria-hidden="true"
+                >
+                  {orderedReviews[0].initials}
+                </span>
+                <cite className="not-italic">
+                  <span className="block font-geist text-sm font-semibold text-lotus-deep">
+                    {orderedReviews[0].name}
+                  </span>
+                  <span className="font-geist text-xs text-lotus-stone">
+                    {orderedReviews[0].role}
+                  </span>
+                </cite>
+              </footer>
+            </motion.blockquote>
+          </AnimatePresence>
+        </div>
+
+        {/* Nav: arrows + dots */}
+        <div className="mt-8 flex items-center justify-center gap-4">
+          <button
+            type="button"
+            onClick={goPrev}
+            aria-label="Đánh giá trước"
+            className="landing-focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-lotus-rose/30 text-lotus-rose transition-colors hover:bg-lotus-rose hover:text-white"
+          >
+            <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+          </button>
+
+          <div className="flex items-center gap-2" role="tablist" aria-label="Chọn đánh giá">
+            {REVIEWS.map((item, i) => (
+              <button
+                key={item.name}
+                type="button"
+                role="tab"
+                aria-selected={i === activeIndex}
+                aria-label={`Đánh giá ${i + 1}`}
+                onClick={() => setActiveIndex(i)}
+                className={`landing-focus-ring h-2 w-2 rounded-full transition-colors ${
+                  i === activeIndex ? "bg-lotus-rose" : "bg-lotus-rose/25"
+                }`}
+              />
+            ))}
           </div>
 
-          {/* Right Column: Heading + Testimonial Card */}
-          <div className="md:col-span-7 flex flex-col justify-center">
-            {/* Section Heading */}
-            <motion.div
-              className="mb-8 text-left"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, amount: 0.5 }}
-              transition={{ duration: 0.3 }}
-            >
-              <span className="block text-[0.75rem] tracking-[0.2em] uppercase font-sans font-medium text-lotus-gold mb-3">
-                Đánh giá
-              </span>
-              <h2 className="font-display italic font-normal text-[clamp(2rem,3vw,2.8rem)] text-white leading-[1.15]">
-                Khách hàng nói gì
-              </h2>
-            </motion.div>
-
-            {/* Testimonial Card container */}
-            <div
-              onMouseEnter={pause}
-              onMouseLeave={resume}
-              className="w-full"
-            >
-              <div className="relative min-h-[220px]">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={current}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -12 }}
-                    transition={{ duration: 0.4, ease: 'easeOut' }}
-                    className="bg-transparent border-0 rounded-none shadow-none text-left p-0"
-                  >
-                    <Quote className="w-8 h-8 text-lotus-gold/20 mb-4" strokeWidth={1.5} />
-
-                    <p className="font-sans italic text-[clamp(1.1rem,1.8vw,1.3rem)] text-white/90 leading-[1.6] mb-6">
-                      "{TESTIMONIALS[current].text}"
-                    </p>
-
-                    {/* Star Rating */}
-                    <div className="flex items-center gap-1 mb-3">
-                      {Array.from({ length: TESTIMONIALS[current].rating }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className="w-3.5 h-3.5 fill-current text-lotus-gold"
-                        />
-                      ))}
-                    </div>
-
-                    {/* Author */}
-                    <div>
-                      <span className="block font-display text-[1.125rem] font-medium text-white mb-1">
-                        {TESTIMONIALS[current].name}
-                      </span>
-                      <span className="font-sans text-xs text-white/50">
-                        {TESTIMONIALS[current].role}
-                      </span>
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-
-              {/* Dots Indicator */}
-              <div className="flex items-center justify-start gap-2 mt-6">
-                {TESTIMONIALS.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrent(i)}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      i === current
-                        ? 'w-8 bg-lotus-gold'
-                        : 'w-3 bg-white/20 hover:bg-white/40'
-                    }`}
-                    aria-label={`Xem đánh giá ${i + 1}`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-
+          <button
+            type="button"
+            onClick={goNext}
+            aria-label="Đánh giá tiếp"
+            className="landing-focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-lotus-rose/30 text-lotus-rose transition-colors hover:bg-lotus-rose hover:text-white"
+          >
+            <ChevronRight className="h-5 w-5" aria-hidden="true" />
+          </button>
         </div>
       </div>
     </section>
-  )
-}
+  );
+};

@@ -18,6 +18,17 @@ import { useAuthStore } from "@/features/auth/stores/authStore";
 import { uploadApi } from "@/shared/api/upload.api";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import { FormField } from "@/shared/components/forms/FormField";
+import { AdminInput } from "@/shared/components/forms/AdminInput";
+import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/shared/components/ui/select";
+import { containerVariants, itemVariants } from "@/shared/motion/pageVariants";
 
 export function AdminProfilePage() {
   const [activeTab, setActiveTab] = useState<"profile" | "security">("profile");
@@ -25,12 +36,12 @@ export function AdminProfilePage() {
   const { data: profile, isLoading, isError } = useProfile();
   const isStaff = profile?.profileType === "Staff";
 
-
   const updateProfileMutation = useUpdateProfile();
   const updateStaffMutation = useUpdateStaffMutation();
   const changePasswordMutation = useChangePassword();
 
-  const isProfilePending = updateProfileMutation.isPending || updateStaffMutation.isPending;
+  const isProfilePending =
+    updateProfileMutation.isPending || updateStaffMutation.isPending;
   const isSecurityPending = changePasswordMutation.isPending;
 
   const { mySalon } = useAuthStore();
@@ -59,7 +70,10 @@ export function AdminProfilePage() {
       fullName: profile?.fullName ?? "",
       phoneNumber: profile?.phone ?? "",
       profilePhotoUrl: profile?.avatarUrl ?? "",
-      gender: profile?.gender !== null && profile?.gender !== undefined ? Number(profile.gender) : null,
+      gender:
+        profile?.gender !== null && profile?.gender !== undefined
+          ? Number(profile.gender)
+          : null,
       dateOfBirth: parseToDateInput(profile?.dateOfBirth) ?? "",
     };
   }, [profile]);
@@ -90,7 +104,10 @@ export function AdminProfilePage() {
       fullName: data.fullName,
       phone: data.phoneNumber,
       avatarUrl: data.profilePhotoUrl ?? undefined,
-      gender: data.gender !== null && data.gender !== undefined ? Number(data.gender) : undefined,
+      gender:
+        data.gender !== null && data.gender !== undefined
+          ? Number(data.gender)
+          : undefined,
       dateOfBirth: data.dateOfBirth ? data.dateOfBirth : undefined,
     };
 
@@ -103,7 +120,7 @@ export function AdminProfilePage() {
               qc.invalidateQueries({ queryKey: ["profile"] });
             }
           },
-        }
+        },
       );
     } else {
       updateProfileMutation.mutate({
@@ -138,7 +155,7 @@ export function AdminProfilePage() {
       if (result.isSuccess && result.data) {
         setValueProfile("profilePhotoUrl", result.data);
         toast.success(
-          "Tải ảnh đại diện lên thành công. Đừng quên bấm Lưu thông tin!"
+          "Tải ảnh đại diện lên thành công. Đừng quên bấm Lưu thông tin!",
         );
       } else {
         toast.error(result.message || "Tải ảnh đại diện thất bại");
@@ -164,29 +181,32 @@ export function AdminProfilePage() {
         <p className="text-red-500 font-medium mb-4">
           Không thể tải thông tin tài khoản
         </p>
-        <button
-          type="button"
+        <Button
+          variant="link"
           onClick={() => window.location.reload()}
-          className="text-lotus-leaf font-semibold hover:underline"
+          className="text-lotus-leaf font-semibold"
         >
           Thử lại
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto font-sans antialiased text-lotus-deep">
+    <div className="w-full font-sans antialiased text-lotus-deep">
       <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="flex flex-col lg:flex-row gap-6"
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="flex flex-col lg:flex-row gap-2"
       >
         {/* Left Column: Avatar Card & Menu Card */}
-        <div className="w-full lg:w-[260px] shrink-0 flex flex-col gap-6">
+        <motion.div
+          variants={itemVariants}
+          className="w-full lg:w-[260px] shrink-0 flex flex-col gap-2"
+        >
           {/* Avatar Card */}
-          <div className="bg-white/70 backdrop-blur-md rounded-admin border-0 shadow-sm p-6 flex flex-col items-center">
+          <div className="bg-white rounded-admin border border-stone-200/30 shadow-sm p-6 flex flex-col items-center">
             <input
               id="admin-avatar-upload-input"
               type="file"
@@ -222,168 +242,201 @@ export function AdminProfilePage() {
           </div>
 
           {/* Menu Card */}
-          <div className="bg-white/70 backdrop-blur-md rounded-admin border-0 shadow-sm overflow-hidden">
-            <div className="px-4 py-2.5 border-b border-stone-200/30 bg-white/30">
-              <span className="text-lotus-admin-base font-bold text-lotus-stone uppercase tracking-wider block">Menu</span>
+          <div className="bg-white rounded-admin border border-stone-200/30 shadow-sm overflow-hidden">
+            <div className="px-4 py-2.5 border-b border-stone-200/30 bg-stone-50/50">
+              <span className="text-lotus-admin-base font-bold text-lotus-stone uppercase tracking-wider block">
+                Menu
+              </span>
             </div>
-            <nav className="flex flex-col">
+            <nav className="flex flex-col p-1.5 space-y-0.5">
               <button
                 type="button"
                 onClick={() => setActiveTab("profile")}
-                className={`w-full flex items-center gap-2.5 px-4 py-3 text-sm font-medium text-left transition-all ${
+                className={`lotus-admin-sidebar-item ${
                   activeTab === "profile"
-                    ? "bg-lotus-leaf/10 text-lotus-leaf font-bold"
-                    : "text-lotus-stone bg-white/10 hover:bg-white/50 hover:text-lotus-deep"
+                    ? "bg-lotus-leaf/10 text-lotus-leaf font-semibold border-l-[3px] border-lotus-leaf"
+                    : "text-lotus-deep/70 hover:bg-lotus-leaf/5 hover:text-lotus-leaf border-l-[3px] border-transparent"
                 }`}
               >
-                <User className="w-4 h-4" />
-                Thông tin tài khoản
+                <div className="flex items-center gap-2 min-w-0">
+                  <User className="w-4 h-4 shrink-0 text-stone-400" />
+                  <span>Thông tin tài khoản</span>
+                </div>
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab("security")}
-                className={`w-full flex items-center gap-2.5 px-4 py-3 text-sm font-medium text-left transition-all ${
+                className={`lotus-admin-sidebar-item ${
                   activeTab === "security"
-                    ? "bg-lotus-leaf/10 text-lotus-leaf font-bold"
-                    : "text-lotus-stone bg-white/10 hover:bg-white/50 hover:text-lotus-deep"
+                    ? "bg-lotus-leaf/10 text-lotus-leaf font-semibold border-l-[3px] border-lotus-leaf"
+                    : "text-lotus-deep/70 hover:bg-lotus-leaf/5 hover:text-lotus-leaf border-l-[3px] border-transparent"
                 }`}
               >
-                <Lock className="w-4 h-4" />
-                Đổi mật khẩu
+                <div className="flex items-center gap-2 min-w-0">
+                  <Lock className="w-4 h-4 shrink-0 text-stone-400" />
+                  <span>Đổi mật khẩu</span>
+                </div>
               </button>
             </nav>
           </div>
-        </div>
+        </motion.div>
 
         {/* Right Column: Tab Content */}
-        <div className="flex-grow">
+        <motion.div variants={itemVariants} className="flex-grow">
           {activeTab === "profile" ? (
-            <div className="bg-white/70 backdrop-blur-md rounded-admin border-0 shadow-sm overflow-hidden min-h-[500px]">
+            <div className="bg-white rounded-admin border border-stone-200/30 shadow-sm overflow-hidden min-h-[500px]">
               {/* Card Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200/30 bg-white/30">
-                <span className="font-bold text-sm md:text-base text-lotus-deep">Thông tin tài khoản</span>
-                <button
+              <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200/30 bg-stone-50/50">
+                <span className="font-bold text-sm md:text-base text-lotus-deep">
+                  Thông tin tài khoản
+                </span>
+                <Button
                   type="submit"
                   form="profile-form"
                   disabled={isProfilePending}
-                  className="bg-lotus-leaf hover:bg-lotus-leaf/90 text-white text-xs font-semibold px-4 py-2 rounded-md flex items-center gap-1.5 transition-all shadow-sm disabled:opacity-50"
+                  variant="admin"
+                  size="sm"
+                  loading={isProfilePending}
+                  className="flex items-center gap-1.5"
                 >
-                  {isProfilePending ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Save className="w-3.5 h-3.5" />
-                  )}
+                  {!isProfilePending && <Save className="w-3.5 h-3.5" />}
                   Lưu thông tin
-                </button>
+                </Button>
               </div>
 
               {/* Card Body */}
               <div className="p-6 md:p-8">
                 {/* Profile Form fields */}
-                <form id="profile-form" onSubmit={handleSubmitProfile(onSubmitProfile)} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <form
+                  id="profile-form"
+                  onSubmit={handleSubmitProfile(onSubmitProfile)}
+                  className="space-y-6"
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                     {/* Email đăng nhập */}
-                    <div className="space-y-2 text-left">
-                      <label className="text-sm font-semibold text-lotus-deep block">Email đăng nhập</label>
-                      <input
+                    <FormField label="Email đăng nhập">
+                      <AdminInput
                         type="text"
                         value={profile?.email || ""}
                         readOnly
                         disabled
-                        className="w-full px-4 py-3 rounded-md border border-stone-200/30 bg-stone-100/60 text-stone-400 text-sm shadow-inner cursor-not-allowed outline-none"
                       />
-                    </div>
+                    </FormField>
 
                     {/* Họ tên */}
-                    <div className="space-y-2 text-left">
-                      <label className="text-sm font-semibold text-lotus-deep block">Họ tên</label>
-                      <input
+                    <FormField
+                      label="Họ tên *"
+                      error={errorsProfile.fullName?.message}
+                    >
+                      <AdminInput
                         type="text"
                         {...registerProfile("fullName")}
-                        className="w-full px-4 py-3 rounded-md border border-stone-200/50 bg-white/80 text-lotus-deep text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-lotus-leaf/10 focus:border-lotus-leaf transition-all"
                       />
-                      {errorsProfile.fullName && (
-                        <p className="text-xs text-red-500 mt-1">{errorsProfile.fullName.message}</p>
-                      )}
-                    </div>
+                    </FormField>
 
                     {/* Email liên lạc */}
-                    <div className="space-y-2 text-left">
-                      <label className="text-sm font-semibold text-lotus-deep block">Email liên lạc</label>
-                      <input
+                    <FormField label="Email liên lạc">
+                      <AdminInput
                         type="text"
                         value={profile?.email || ""}
                         readOnly
                         disabled
-                        className="w-full px-4 py-3 rounded-md border border-stone-200/30 bg-stone-100/60 text-stone-400 text-sm shadow-inner cursor-not-allowed outline-none"
                       />
-                    </div>
+                    </FormField>
 
                     {/* Điện thoại */}
-                    <div className="space-y-2 text-left">
-                      <label className="text-sm font-semibold text-lotus-deep block">Điện thoại</label>
-                      <input
+                    <FormField
+                      label="Điện thoại *"
+                      error={errorsProfile.phoneNumber?.message}
+                    >
+                      <AdminInput
                         type="text"
                         {...registerProfile("phoneNumber")}
-                        className="w-full px-4 py-3 rounded-md border border-stone-200/50 bg-white/80 text-lotus-deep text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-lotus-leaf/10 focus:border-lotus-leaf transition-all"
                       />
-                      {errorsProfile.phoneNumber && (
-                        <p className="text-xs text-red-500 mt-1">{errorsProfile.phoneNumber.message}</p>
-                      )}
-                    </div>
+                    </FormField>
 
                     {/* Giới tính */}
-                    <div className="space-y-2 text-left">
-                      <label className="text-sm font-semibold text-lotus-deep block">Giới tính</label>
-                      <select
-                        value={watchProfile("gender") ?? ""}
-                        onChange={(e) =>
+                    <FormField
+                      label="Giới tính"
+                      error={errorsProfile.gender?.message}
+                    >
+                      <Select
+                        value={
+                          watchProfile("gender") !== null &&
+                          watchProfile("gender") !== undefined
+                            ? watchProfile("gender")!.toString()
+                            : ""
+                        }
+                        onValueChange={(val) =>
                           setValueProfile(
                             "gender",
-                            e.target.value === "" ? null : Number(e.target.value)
+                            val === "" ? null : Number(val),
+                            { shouldValidate: true, shouldDirty: true },
                           )
                         }
-                        className="w-full px-4 py-3 rounded-md border border-stone-200/50 bg-white/80 text-lotus-deep text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-lotus-leaf/10 focus:border-lotus-leaf transition-all"
                       >
-                        <option value="">Chọn giới tính</option>
-                        <option value="0">Nam</option>
-                        <option value="1">Nữ</option>
-                        <option value="2">Khác</option>
-                      </select>
-                    </div>
+                        <AdminSelectTrigger>
+                          <SelectValue placeholder="Chọn giới tính" />
+                        </AdminSelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="0">Nam</SelectItem>
+                          <SelectItem value="1">Nữ</SelectItem>
+                          <SelectItem value="2">Khác</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormField>
 
                     {/* Ngày sinh */}
-                    <div className="space-y-2 text-left">
-                      <label className="text-sm font-semibold text-lotus-deep block">Ngày sinh</label>
-                      <input
+                    <FormField
+                      label="Ngày sinh"
+                      error={errorsProfile.dateOfBirth?.message}
+                    >
+                      <AdminInput
                         type="date"
                         {...registerProfile("dateOfBirth")}
-                        className="w-full px-4 py-3 rounded-md border border-stone-200/50 bg-white/80 text-lotus-deep text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-lotus-leaf/10 focus:border-lotus-leaf transition-all"
                       />
-                    </div>
+                    </FormField>
                   </div>
                 </form>
 
                 {/* Additional metadata row (Chi nhánh / Quyền hạn / Staff metadata) */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 mt-8 border-t border-stone-200/30 text-left">
                   <div>
-                    <span className="text-xs font-semibold text-lotus-stone uppercase tracking-wider block mb-1">Chi nhánh</span>
-                    <span className="text-sm font-bold text-lotus-deep block">{mySalon?.salonName || "HoaSenSpa TPHCM"}</span>
-                    <span className="text-xs text-lotus-stone block mt-0.5">Đồng Tháp</span>
+                    <span className="text-lotus-admin-xs font-semibold text-lotus-stone uppercase tracking-wider block mb-1">
+                      Chi nhánh
+                    </span>
+                    <span className="text-lotus-admin-lg font-bold text-lotus-deep block">
+                      {mySalon?.salonName || "HoaSenSpa TPHCM"}
+                    </span>
+                    <span className="text-lotus-admin-xs text-lotus-stone block mt-0.5">
+                      Đồng Tháp
+                    </span>
                   </div>
                   <div>
-                    <span className="text-xs font-semibold text-lotus-stone uppercase tracking-wider block mb-1">Quyền hạn</span>
-                    <span className="text-sm font-bold text-lotus-deep block">{profile?.roles?.[0] || "Admin"}</span>
+                    <span className="text-lotus-admin-xs font-semibold text-lotus-stone uppercase tracking-wider block mb-1">
+                      Quyền hạn
+                    </span>
+                    <span className="text-lotus-admin-lg font-bold text-lotus-deep block">
+                      {profile?.roles?.[0] || "Admin"}
+                    </span>
                   </div>
                   {profile?.staffInfo && (
                     <>
                       <div>
-                        <span className="text-xs font-semibold text-lotus-stone uppercase tracking-wider block mb-1">Mã nhân viên</span>
-                        <span className="text-sm font-bold text-lotus-deep block">{profile.staffInfo.code || "---"}</span>
+                        <span className="text-lotus-admin-xs font-semibold text-lotus-stone uppercase tracking-wider block mb-1">
+                          Mã nhân viên
+                        </span>
+                        <span className="text-lotus-admin-lg font-bold text-lotus-deep block">
+                          {profile.staffInfo.code || "---"}
+                        </span>
                       </div>
                       <div>
-                        <span className="text-xs font-semibold text-lotus-stone uppercase tracking-wider block mb-1">Ngày vào làm</span>
-                        <span className="text-sm font-bold text-lotus-deep block">{formatDisplayDate(profile.staffInfo.hireDate)}</span>
+                        <span className="text-lotus-admin-xs font-semibold text-lotus-stone uppercase tracking-wider block mb-1">
+                          Ngày vào làm
+                        </span>
+                        <span className="text-lotus-admin-lg font-bold text-lotus-deep block">
+                          {formatDisplayDate(profile.staffInfo.hireDate)}
+                        </span>
                       </div>
                     </>
                   )}
@@ -391,76 +444,73 @@ export function AdminProfilePage() {
               </div>
             </div>
           ) : (
-            <div className="bg-white/70 backdrop-blur-md rounded-admin border-0 shadow-sm overflow-hidden min-h-[500px]">
+            <div className="bg-white rounded-admin border border-stone-200/30 shadow-sm overflow-hidden min-h-[500px]">
               {/* Card Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200/30 bg-white/30">
-                <span className="font-bold text-sm md:text-base text-lotus-deep">Đổi mật khẩu</span>
-                <button
+              <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200/30 bg-stone-50/50">
+                <span className="font-bold text-sm md:text-base text-lotus-deep">
+                  Đổi mật khẩu
+                </span>
+                <Button
                   type="submit"
                   form="security-form"
                   disabled={isSecurityPending}
-                  className="bg-lotus-leaf hover:bg-lotus-leaf/90 text-white text-xs font-semibold px-4 py-2 rounded-md flex items-center gap-1.5 transition-all shadow-sm disabled:opacity-50"
+                  variant="admin"
+                  size="sm"
+                  loading={isSecurityPending}
+                  className="flex items-center gap-1.5"
                 >
-                  {isSecurityPending ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Save className="w-3.5 h-3.5" />
-                  )}
+                  {!isSecurityPending && <Save className="w-3.5 h-3.5" />}
                   Cập nhật mật khẩu
-                </button>
+                </Button>
               </div>
 
               {/* Card Body */}
               <div className="p-6 md:p-8 text-left">
-                <form id="security-form" onSubmit={handleSubmitSecurity(onSubmitSecurity)} className="space-y-5 max-w-xl">
+                <form
+                  id="security-form"
+                  onSubmit={handleSubmitSecurity(onSubmitSecurity)}
+                  className="space-y-5 max-w-xl"
+                >
                   {/* Mật khẩu hiện tại */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-lotus-deep block">Mật khẩu hiện tại</label>
-                    <input
+                  <FormField
+                    label="Mật khẩu hiện tại *"
+                    error={errorsSecurity.currentPassword?.message}
+                  >
+                    <AdminInput
                       type="password"
                       {...registerSecurity("currentPassword")}
-                      className="w-full px-4 py-3 rounded-md border border-stone-200/50 bg-white/80 text-lotus-deep text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-lotus-leaf/10 focus:border-lotus-leaf transition-all"
                     />
-                    {errorsSecurity.currentPassword && (
-                      <p className="text-xs text-red-500 mt-1">{errorsSecurity.currentPassword.message}</p>
-                    )}
-                  </div>
+                  </FormField>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {/* Mật khẩu mới */}
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-lotus-deep block">Mật khẩu mới</label>
-                      <input
+                    <FormField
+                      label="Mật khẩu mới *"
+                      error={errorsSecurity.newPassword?.message}
+                    >
+                      <AdminInput
                         type="password"
                         {...registerSecurity("newPassword")}
-                        className="w-full px-4 py-3 rounded-md border border-stone-200/50 bg-white/80 text-lotus-deep text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-lotus-leaf/10 focus:border-lotus-leaf transition-all"
                       />
-                      {errorsSecurity.newPassword && (
-                        <p className="text-xs text-red-500 mt-1">{errorsSecurity.newPassword.message}</p>
-                      )}
-                    </div>
+                    </FormField>
 
                     {/* Xác nhận mật khẩu */}
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-lotus-deep block">Xác nhận mật khẩu</label>
-                      <input
+                    <FormField
+                      label="Xác nhận mật khẩu *"
+                      error={errorsSecurity.confirmPassword?.message}
+                    >
+                      <AdminInput
                         type="password"
                         {...registerSecurity("confirmPassword")}
-                        className="w-full px-4 py-3 rounded-md border border-stone-200/50 bg-white/80 text-lotus-deep text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-lotus-leaf/10 focus:border-lotus-leaf transition-all"
                       />
-                      {errorsSecurity.confirmPassword && (
-                        <p className="text-xs text-red-500 mt-1">{errorsSecurity.confirmPassword.message}</p>
-                      )}
-                    </div>
+                    </FormField>
                   </div>
                 </form>
               </div>
             </div>
           )}
-        </div>
+        </motion.div>
       </motion.div>
     </div>
   );
 }
-
-

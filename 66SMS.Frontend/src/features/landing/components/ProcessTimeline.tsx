@@ -1,162 +1,134 @@
-import { motion } from 'motion/react'
-import { ClipboardList, Sparkles, Heart, Star, UserCheck } from 'lucide-react'
+import { useState } from "react";
+import { motion } from "motion/react";
+import { SectionHeader } from "./SectionHeader";
 
 const STEPS = [
   {
-    icon: UserCheck,
-    title: 'Đón tiếp (Arrival)',
-    description: 'Chào mừng bạn đến với Hoa Sen Spa bằng trà thảo mộc thơm lành và khăn ấm mát lạnh để rũ bỏ cát bụi.',
+    title: "Đón tiếp",
+    subtitle: "Arrival",
+    description:
+      "Trà thảo mộc thơm lành và khăn ấm mát lạnh chào đón bạn — bước đầu để rũ bỏ cát bụi và lo toan.",
   },
   {
-    icon: ClipboardList,
-    title: 'Tham vấn (Consultation)',
-    description: 'Chuyên viên lắng nghe trạng thái sức khỏe, mong muốn và kiểm tra cơ thể để tư vấn liệu trình phù hợp nhất.',
+    title: "Tham vấn",
+    subtitle: "Consultation",
+    description:
+      "Chuyên viên lắng nghe trạng thái sức khỏe, mong muốn và kiểm tra cơ thể để tư vấn liệu trình phù hợp.",
   },
   {
-    icon: Sparkles,
-    title: 'Trị liệu (Treatment)',
-    description: 'Tận hưởng kỹ thuật massage điêu luyện kết hợp dược thảo tự nhiên trong phòng riêng ấm cúng, riêng tư.',
+    title: "Trị liệu",
+    subtitle: "Treatment",
+    description:
+      "Kỹ thuật massage điêu luyện kết hợp dược thảo tự nhiên trong phòng riêng ấm cúng, riêng tư.",
   },
   {
-    icon: Heart,
-    title: 'Thư giãn (Relaxation)',
-    description: 'Thưởng trà, dùng cháo sen bổ dưỡng và nghỉ ngơi sâu tại không gian sảnh chờ tràn ngập hương thơm dịu nhẹ.',
+    title: "Thư giãn",
+    subtitle: "Relaxation",
+    description:
+      "Thưởng trà, dùng cháo sen bổ dưỡng và nghỉ ngơi sâu tại sảnh chờ tràn hương thơm dịu nhẹ.",
   },
   {
-    icon: Star,
-    title: 'Chăm sóc sau (Aftercare)',
-    description: 'Hướng dẫn các bài tập thở, chế độ sinh hoạt và theo dõi sát sao tiến trình phục hồi cơ thể sau liệu trình.',
+    title: "Chăm sóc sau",
+    subtitle: "Aftercare",
+    description:
+      "Hướng dẫn bài tập thở, chế độ sinh hoạt và theo dõi tiến trình phục hồi sau liệu trình.",
   },
-]
-
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.15 },
-  },
-}
-
-const stepVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.3 } },
-}
+];
 
 export const ProcessTimeline = () => {
+  const [active, setActive] = useState(0);
+
   return (
     <section
       id="process"
-      className="py-16 md:py-24 bg-lotus-cream"
+      className="landing-section bg-lotus-cream"
+      aria-labelledby="process-heading"
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        {/* Heading */}
-        <motion.div
-          className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 md:mb-12 text-left"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.3 }}
-        >
-          <div className="max-w-md">
-            <span className="block text-[0.75rem] tracking-[0.2em] uppercase font-sans font-medium text-lotus-gold mb-3">
-              Trải nghiệm
+      <div className="landing-container">
+        <SectionHeader
+          label="Trải nghiệm"
+          title="Hành trình phục hồi"
+          titleId="process-heading"
+          description="Chu trình khép kín được thiết kế để chăm sóc trọn vẹn thân — tâm — trí từ lúc bạn đặt chân đến."
+          align="split"
+          className="mb-16"
+        />
+
+        <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
+          <nav
+            className="lg:col-span-5"
+            aria-label="Các bước trải nghiệm spa"
+          >
+            <ol className="space-y-2">
+              {STEPS.map((step, i) => {
+                const isActive = active === i;
+                return (
+                  <li key={step.title}>
+                    <button
+                      type="button"
+                      onClick={() => setActive(i)}
+                      aria-current={isActive ? "step" : undefined}
+                      className={`landing-focus-ring w-full border px-5 py-4 text-left transition-all duration-200 ${
+                        isActive
+                          ? "border-lotus-rose/20 bg-white shadow-[0_4px_20px_rgba(42,31,26,0.06)]"
+                          : "border-transparent bg-transparent hover:border-lotus-rose/10 hover:bg-white/60"
+                      }`}
+                    >
+                      <div className="flex items-baseline gap-3">
+                        <span
+                          className={`font-geist text-xs font-medium tabular-nums ${
+                            isActive ? "text-lotus-rose" : "text-lotus-stone"
+                          }`}
+                        >
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <div>
+                          <span className="block font-geist text-base font-semibold text-lotus-deep">
+                            {step.title}
+                          </span>
+                          <span className="font-geist text-xs text-lotus-stone">
+                            {step.subtitle}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+          </nav>
+
+          <motion.div
+            key={active}
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="landing-surface flex flex-col justify-center p-8 md:p-10 lg:col-span-7"
+            aria-live="polite"
+          >
+            <span className="mb-4 font-geist text-xs font-semibold uppercase tracking-[0.14em] text-lotus-rose">
+              Bước {String(active + 1).padStart(2, "0")}
             </span>
-            <h2 className="font-display italic font-normal text-[clamp(2rem,3vw,2.8rem)] text-lotus-deep leading-[1.15]">
-              Hành trình phục hồi
-            </h2>
-          </div>
-          <p className="font-sans text-[1rem] text-lotus-stone max-w-md md:mb-1 leading-[1.6]">
-            Một chu trình khép kín tinh tế được thiết kế để chăm sóc trọn vẹn cả thân - tâm - trí của bạn từ lúc đặt chân đến.
-          </p>
-        </motion.div>
+            <h3 className="mb-3 font-geist text-[clamp(1.5rem,2.5vw,2rem)] font-semibold tracking-[-0.02em] text-lotus-deep">
+              {STEPS[active].title}
+            </h3>
+            <p className="max-w-prose font-geist text-base leading-[1.7] text-lotus-stone">
+              {STEPS[active].description}
+            </p>
 
-        {/* Desktop: Horizontal Timeline */}
-        <motion.div
-          className="hidden md:block relative"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-        >
-          {/* Line */}
-          <div className="timeline-line" />
-
-          <div className="grid grid-cols-5 gap-4">
-            {STEPS.map((step, i) => {
-              const Icon = step.icon
-              return (
-                <motion.div
-                  key={step.title}
-                  variants={stepVariants}
-                  className="timeline-step"
-                >
-                  {/* Icon Circle */}
-                  <div className="timeline-icon">
-                    <Icon className="w-6 h-6" strokeWidth={1.5} />
-                  </div>
-
-                  {/* Step Number */}
-                  <span className="font-display font-bold text-sm text-lotus-gold">
-                    0{i + 1}
-                  </span>
-
-                  {/* Title */}
-                  <h3 className="font-display font-semibold text-base text-lotus-deep text-center">
-                    {step.title}
-                  </h3>
-
-                  {/* Description */}
-                  <p className="font-sans text-xs text-lotus-stone text-center leading-relaxed max-w-[180px]">
-                    {step.description}
-                  </p>
-                </motion.div>
-              )
-            })}
-          </div>
-        </motion.div>
-
-        {/* Mobile: Vertical Timeline */}
-        <motion.div
-          className="md:hidden space-y-8"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-        >
-          {STEPS.map((step, i) => {
-            const Icon = step.icon
-            return (
-              <motion.div
-                key={step.title}
-                variants={stepVariants}
-                className="flex items-start gap-4"
-              >
-                {/* Left: Icon + Line */}
-                <div className="flex flex-col items-center">
-                  <div className="timeline-icon shrink-0">
-                    <Icon className="w-5 h-5" strokeWidth={1.5} />
-                  </div>
-                  {i < STEPS.length - 1 && (
-                    <div className="w-px h-10 bg-gradient-to-b from-lotus-gold to-lotus-rose/30 mt-2" />
-                  )}
-                </div>
-
-                {/* Right: Text */}
-                <div className="pt-2">
-                  <span className="font-display font-bold text-xs text-lotus-gold">
-                    Bước 0{i + 1}
-                  </span>
-                  <h3 className="font-display font-semibold text-base text-lotus-deep mt-0.5">
-                    {step.title}
-                  </h3>
-                  <p className="font-sans text-sm text-lotus-stone leading-relaxed mt-1">
-                    {step.description}
-                  </p>
-                </div>
-              </motion.div>
-            )
-          })}
-        </motion.div>
+            <div className="mt-8 flex gap-1.5" aria-hidden="true">
+              {STEPS.map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-1 rounded-full transition-all duration-300 ${
+                    i <= active ? "w-8 bg-lotus-rose" : "w-3 bg-lotus-rose/15"
+                  }`}
+                />
+              ))}
+            </div>
+          </motion.div>
+        </div>
       </div>
     </section>
-  )
-}
+  );
+};

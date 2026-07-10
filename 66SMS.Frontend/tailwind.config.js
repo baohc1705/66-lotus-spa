@@ -8,6 +8,7 @@ export default {
     extend: {
       fontFamily: {
         sans:    ['"Be Vietnam Pro"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        geist:   ['"Geist Variable"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         display: ['"Playfair Display"', 'Georgia', 'serif'],
         mono:    ['"DM Mono"',        'ui-monospace',  'SFMono-Regular', 'monospace'],
       },
