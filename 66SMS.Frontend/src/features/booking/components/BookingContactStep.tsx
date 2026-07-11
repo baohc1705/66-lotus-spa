@@ -104,24 +104,24 @@ export const BookingContactStep: React.FC = () => {
   const depositPreview = Math.round(Math.max(0, total - discount) * 0.3);
 
   const inputClass = (hasError: boolean) =>
-    `w-full px-4 py-3 rounded-sm shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-lotus-rose-light bg-lotus-cream/50 transition-colors ${
-      hasError ? "ring-2 ring-red-400" : ""
+    `w-full rounded-sm border bg-surface px-4 py-3 text-sm text-ink transition-colors placeholder:text-warm-600 hover:border-warm-300 focus:outline-none focus:border-rose-600 ${
+      hasError ? "border-error-text" : "border-warm-100"
     }`;
 
   return (
-    <div className="bg-white rounded-sm shadow-sm p-4 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h3 className="text-lg font-bold text-lotus-deep font-display flex items-center gap-2">
-        <Phone className="w-5 h-5 text-lotus-rose" />
+    <div className="lotus-panel flex flex-col gap-5 p-5 sm:p-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <h3 className="flex items-center gap-2 font-display text-lg font-semibold text-ink">
+        <Phone className="h-5 w-5 text-rose-600" />
         <span>Thông tin liên hệ</span>
       </h3>
 
-      <div className="p-4 rounded-sm shadow-sm bg-blue-50 flex gap-3">
-        <Wallet className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-        <div className="text-sm text-gray-700">
-          <p className="font-semibold text-gray-900">Đặt cọc 30% để giữ lịch</p>
-          <p className="mt-1 text-gray-600">
+      <div className="p-4 rounded-sm border border-warning-bg bg-warning-bg flex gap-3">
+        <Wallet className="w-5 h-5 text-warning-text shrink-0 mt-0.5" />
+        <div className="text-sm text-ink">
+          <p className="font-semibold text-ink">Đặt cọc 30% để giữ lịch</p>
+          <p className="mt-1 text-warm-600">
             Sau khi xác nhận, bạn sẽ cần thanh toán cọc{" "}
-            <strong>{depositPreview.toLocaleString("vi-VN")}đ</strong> cho tổng
+            <strong className="text-rose-600">{depositPreview.toLocaleString("vi-VN")}đ</strong> cho tổng
             cộng {guests.length} khách. Phần còn lại thu sau khi sử dụng dịch vụ
             tại spa.
           </p>
@@ -131,11 +131,11 @@ export const BookingContactStep: React.FC = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex flex-col relative">
-            <label className="text-xs font-bold text-lotus-deep mb-2 flex items-center gap-1.5">
+            <label className="text-xs font-bold text-ink mb-2 flex items-center gap-1.5">
               Họ và tên người đặt *
-              <span className="group relative cursor-pointer text-gray-400 hover:text-gray-600">
+              <span className="group relative cursor-pointer text-warm-400 hover:text-warm-600">
                 <Info className="w-3.5 h-3.5" />
-                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:block bg-gray-800 text-white text-[10px] py-1 px-2.5 rounded-sm whitespace-nowrap z-50">
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:block bg-ink text-white text-[10px] py-1 px-2.5 rounded-sm whitespace-nowrap z-50">
                   Người đại diện đặt lịch
                 </span>
               </span>
@@ -147,18 +147,18 @@ export const BookingContactStep: React.FC = () => {
               className={inputClass(!!errors.fullName)}
             />
             {errors.fullName && (
-              <span className="text-xs text-red-500 mt-1">
+              <span className="text-xs text-error-text mt-1">
                 {errors.fullName.message}
               </span>
             )}
           </div>
 
           <div className="flex flex-col relative">
-            <label className="text-xs font-bold text-lotus-deep mb-2 flex items-center gap-1.5">
+            <label className="text-xs font-bold text-ink mb-2 flex items-center gap-1.5">
               Số điện thoại người đặt *
-              <span className="group relative cursor-pointer text-gray-400 hover:text-gray-600">
+              <span className="group relative cursor-pointer text-warm-400 hover:text-warm-600">
                 <Info className="w-3.5 h-3.5" />
-                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:block bg-gray-800 text-white text-[10px] py-1 px-2.5 rounded-sm whitespace-nowrap z-50">
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:block bg-ink text-white text-[10px] py-1 px-2.5 rounded-sm whitespace-nowrap z-50">
                   Để hệ thống gửi SMS xác nhận lập tức
                 </span>
               </span>
@@ -170,14 +170,14 @@ export const BookingContactStep: React.FC = () => {
               className={inputClass(!!errors.phoneNumber)}
             />
             {errors.phoneNumber && (
-              <span className="text-xs text-red-500 mt-1">
+              <span className="text-xs text-error-text mt-1">
                 {errors.phoneNumber.message}
               </span>
             )}
           </div>
 
           <div className="col-span-full flex flex-col relative">
-            <label className="text-xs font-bold text-lotus-deep mb-2">
+            <label className="text-xs font-bold text-ink mb-2">
               Email (Tùy chọn)
             </label>
             <input
@@ -187,7 +187,7 @@ export const BookingContactStep: React.FC = () => {
               className={inputClass(!!errors.email)}
             />
             {errors.email && (
-              <span className="text-xs text-red-500 mt-1">
+              <span className="text-xs text-error-text mt-1">
                 {errors.email.message}
               </span>
             )}
@@ -195,14 +195,14 @@ export const BookingContactStep: React.FC = () => {
         </div>
 
         <div className="flex flex-col">
-          <label className="text-xs font-bold text-lotus-deep mb-2">
+          <label className="text-xs font-bold text-ink mb-2">
             Ghi chú yêu cầu chung (Nếu có)
           </label>
           <textarea
             {...register("note")}
             rows={3}
             placeholder="Yêu cầu chung cho đoàn khách..."
-            className="w-full px-4 py-3 rounded-sm shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-lotus-rose-light bg-lotus-cream/50 resize-none"
+            className="w-full resize-none rounded-sm border border-warm-100 bg-surface px-4 py-3 text-sm text-ink placeholder:text-warm-600 hover:border-warm-300 focus:outline-none focus:border-rose-600"
           />
         </div>
 
@@ -211,7 +211,7 @@ export const BookingContactStep: React.FC = () => {
             type="button"
             onClick={prevStep}
             disabled={isSubmitting}
-            className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-full font-bold transition-all bg-lotus-cream text-lotus-deep shadow-sm hover:shadow-md disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-full border border-warm-300 bg-surface px-6 py-3 font-bold text-ink transition-all hover:border-rose-400 hover:text-rose-600 disabled:border-warm-100 disabled:text-warm-300 sm:w-auto"
           >
             <ArrowLeft className="w-5 h-5" />
             Quay lại
@@ -219,7 +219,7 @@ export const BookingContactStep: React.FC = () => {
           <button
             type="submit"
             disabled={!isValid || isSubmitting}
-            className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3 rounded-full font-bold transition-all bg-lotus-rose text-white hover:bg-lotus-rose/90 shadow-sm disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3 rounded-full font-bold transition-all bg-rose-600 text-white hover:bg-rose-500 disabled:bg-warm-50 disabled:text-warm-300 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>

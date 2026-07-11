@@ -67,7 +67,7 @@ const FaqRow = ({
   const Icon = item.Icon;
 
   return (
-    <div className="border-b border-lotus-deep/8 last:border-b-0">
+    <div className="border-b border-warm-100 last:border-b-0">
       <button
         id={buttonId}
         type="button"
@@ -78,19 +78,19 @@ const FaqRow = ({
       >
         {/* Icon tròn trái */}
         <span
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-lotus-rose/12 text-lotus-rose sm:h-11 sm:w-11"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-600/12 text-rose-600 sm:h-11 sm:w-11"
           aria-hidden="true"
         >
           <Icon className="h-4 w-4 sm:h-[1.125rem] sm:w-[1.125rem]" strokeWidth={1.75} />
         </span>
 
-        <span className="min-w-0 flex-1 font-geist text-base font-medium leading-snug text-lotus-deep">
+        <span className="min-w-0 flex-1 font-geist text-base font-medium leading-snug text-ink">
           {item.question}
         </span>
 
         {/* Nút +/- tròn phải */}
         <span
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-lotus-rose text-lotus-rose"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-rose-600 text-rose-600"
           aria-hidden="true"
         >
           {isOpen ? (
@@ -113,8 +113,8 @@ const FaqRow = ({
             transition={{ duration: 0.22 }}
             className="overflow-hidden"
           >
-            <div className="bg-lotus-rose/8 px-4 py-4 sm:px-6 sm:py-5">
-              <p className="pl-[3.25rem] font-geist text-sm leading-[1.7] text-lotus-stone sm:pl-[3.75rem]">
+            <div className="bg-rose-600/8 px-4 py-4 sm:px-6 sm:py-5">
+              <p className="pl-[3.25rem] font-geist text-sm leading-[1.7] text-warm-600 sm:pl-[3.75rem]">
                 {item.answer}
               </p>
             </div>
@@ -131,7 +131,7 @@ export const FaqSection = () => {
   return (
     <section
       id="faq"
-      className="landing-section bg-lotus-cream"
+      className="landing-section bg-page"
       aria-labelledby="faq-heading"
     >
       <div className="landing-container">
@@ -142,7 +142,7 @@ export const FaqSection = () => {
           className="mb-10"
         />
 
-        <div className="w-full overflow-hidden bg-white shadow-[0_8px_32px_rgba(212,84,126,0.08)]">
+        <div className="w-full overflow-hidden border border-card-border bg-surface">
           {FAQ_ITEMS.map((item, i) => (
             <FaqRow
               key={item.question}

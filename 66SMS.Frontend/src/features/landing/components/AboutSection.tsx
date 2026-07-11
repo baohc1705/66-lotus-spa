@@ -42,7 +42,7 @@ export const AboutSection = () => {
       <div className="grid w-full lg:grid-cols-2">
         {/* Trái: nội dung */}
         <motion.div
-          className="relative flex min-h-[420px] flex-col justify-center bg-lotus-rose px-8 py-12 sm:px-12 sm:py-14 lg:min-h-[560px] lg:px-16 lg:py-20 xl:px-24"
+          className="relative flex min-h-[420px] flex-col justify-center bg-rose-600 px-8 py-12 sm:px-12 sm:py-14 lg:min-h-[560px] lg:px-16 lg:py-20 xl:px-24"
           initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.25 }}

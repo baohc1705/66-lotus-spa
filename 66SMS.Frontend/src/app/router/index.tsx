@@ -47,12 +47,16 @@ export const router = createBrowserRouter([
     element: <VnPayReturnPage />,
   },
   {
+    path: "/dat-lich",
+    element: <BookingPage />,
+  },
+  {
     element: <ProtectedRoute />,
     children: [
-      {
-        path: "/dat-lich",
-        element: <BookingPage />,
-      },
+      // {
+      //   path: "/dat-lich",
+      //   element: <BookingPage />,
+      // },
       {
         path: "/dashboard",
         element: <div className="p-6">Dashboard</div>,

@@ -4,27 +4,36 @@
    ═══════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Brand Colors (logo-home.png) ──
-     Chỉ 3 gam chính: hồng sen, vàng gold, xanh lá sen
-     + cream/deep cho background/text                    */
-  --lotus-rose: #d4547e;
-  --lotus-rose-light: #faf0f4;
-  --lotus-gold: #b8976a;
-  --lotus-leaf: #3e7a3e;
-  --lotus-leaf-light: rgba(62, 122, 62, 0.1);
-  --lotus-cream: #fbf7f2;
-  --lotus-deep: #2a1f1a;
-  --lotus-stone: #8a7e76;
+  /* ── Hoa Sen Spa — alias landing (map sang bảng màu color.md) ──
+     Canonical vars: --rose-*, --gold-*, --ink, --warm-*, --bg-* (index.css) */
+
+  --lotus-cream: #fafaf9;
   --lotus-surface: #ffffff;
-  --lotus-error: #ef4444;
+  --lotus-inset: #f3eff0;
+
+  --lotus-rose: #9d174d;
+  --lotus-rose-dark: #b32e64;
+  --lotus-rose-light: #fceef3;
+
+  --lotus-gold: #b8860b;
+
+  --lotus-leaf: #3b7a4e;
+  --lotus-leaf-light: #dcefe1;
+
+  --lotus-deep: #2b2226;
+  --lotus-stone: #7a6a6e;
+
+  --lotus-error: #b23a3a;
+  --lotus-muted: #e9e2e4;
 
   /* ── Cashier / VNPay (dùng token, không hardcode hex trong component) ── */
   --lotus-vnpay: #005baa;
   --lotus-vnpay-red: #ed1b24;
-  --lotus-rose-dark: #b64269;
-  --lotus-cashier-header-from: #200a1c;
-  --lotus-cashier-header-via: #35152b;
-  --lotus-cashier-header-to: #911f43;
+  --lotus-cashier-header-from: #2b2226;
+  --lotus-cashier-header-via: #5c0b2b;
+  --lotus-cashier-header-to: #9d174d;
+
+
 
   /* ── Membership tier cards (profile) ── */
   --membership-bronze-bg: #fffbf5;
@@ -139,7 +148,7 @@
   padding: 24px;
   background: linear-gradient(
     to top,
-    rgba(42, 31, 26, 0.9) 0%,
+    rgba(43, 34, 38, 0.9) 0%,
     transparent 100%
   );
   color: white;
@@ -166,10 +175,10 @@
 .hero-overlay {
   background: linear-gradient(
     to bottom,
-    rgba(42, 31, 26, 0.6) 0%,
-    rgba(42, 31, 26, 0.1) 15%,
-    rgba(42, 31, 26, 0.2) 60%,
-    rgba(42, 31, 26, 0.8) 100%
+    rgba(43, 34, 38, 0.55) 0%,
+    rgba(43, 34, 38, 0.12) 18%,
+    rgba(43, 34, 38, 0.28) 55%,
+    rgba(43, 34, 38, 0.82) 100%
   );
 }
 
@@ -206,10 +215,10 @@
 /* ═══ Navbar Scrolled ═══ */
 
 .nav--scrolled {
-  background: rgba(251, 247, 242, 0.95);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 1px 0 rgba(42, 31, 26, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 1px 0 var(--border-card, #efefee);
 }
 
 /* ═══ Falling Lotus Petals ═══ */
@@ -266,7 +275,7 @@
 }
 .card-glow:hover {
   transform: translateY(-6px);
-  box-shadow: 0 8px 32px 0 rgba(184, 151, 106, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(157, 23, 77, 0.12);
 }
 
 /* ═══ Process Timeline ═══ */
@@ -279,8 +288,8 @@
   height: 2px;
   background: linear-gradient(
     to right,
-    var(--lotus-gold) 0%,
-    var(--lotus-rose) 100%
+    var(--gold-600, var(--lotus-gold)) 0%,
+    var(--rose-600, var(--lotus-rose)) 100%
   );
   transform: translateY(-50%);
 }
@@ -298,33 +307,34 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: var(--lotus-cream);
-  border: 2px solid var(--lotus-gold);
+  background: var(--bg-surface, #fff);
+  border: 1px solid var(--warm-100, #e9e2e4);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--lotus-gold);
+  color: var(--gold-600, var(--lotus-gold));
   transition: all 350ms ease;
 }
 
 .timeline-step:hover .timeline-icon {
-  background: var(--lotus-gold);
+  background: var(--rose-600, var(--lotus-rose));
+  border-color: var(--rose-600, var(--lotus-rose));
   color: white;
-  box-shadow: 0 4px 20px rgba(184, 151, 106, 0.35);
+  box-shadow: 0 4px 20px rgba(157, 23, 77, 0.25);
 }
 
 /* ═══ Quiz Progress Bar ═══ */
 
 .quiz-progress {
   height: 4px;
-  background: var(--lotus-rose-light);
+  background: var(--rose-100, var(--lotus-rose-light));
   border-radius: 0;
   overflow: hidden;
 }
 
 .quiz-progress__bar {
   height: 100%;
-  background: var(--lotus-rose);
+  background: var(--rose-600, var(--lotus-rose));
   border-radius: 0;
   transition: width 400ms ease;
 }
@@ -376,21 +386,29 @@
 }
 
 .landing-surface {
-  background: var(--lotus-surface);
+  background: var(--bg-surface, var(--lotus-surface));
+  border: 1px solid var(--border-card, #efefee);
   border-radius: var(--landing-radius);
-  box-shadow: 0 2px 14px rgba(42, 31, 26, 0.05);
 }
 
 .landing-card {
-  background: var(--lotus-surface);
+  background: var(--bg-surface, var(--lotus-surface));
+  border: 1px solid var(--border-card, #efefee);
   border-radius: var(--landing-radius);
-  box-shadow: 0 2px 14px rgba(42, 31, 26, 0.05);
-  transition: box-shadow 0.35s ease;
+  transition: border-color 0.3s ease, box-shadow 0.35s ease;
   overflow: hidden;
 }
 
+/* Panel booking — surface + viền card theo color.md */
+.lotus-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-card);
+  box-shadow: 0 8px 32px rgba(43, 34, 38, 0.05);
+}
+
 .landing-card:hover {
-  box-shadow: 0 10px 28px rgba(42, 31, 26, 0.09);
+  border-color: var(--rose-200, #efa9c1);
+  box-shadow: 0 10px 28px rgba(43, 34, 38, 0.07);
 }
 
 .landing-card__media {
@@ -402,13 +420,13 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(42, 31, 26, 0);
+  background: rgba(43, 34, 38, 0);
   transition: background 0.35s ease;
   pointer-events: none;
 }
 
 .landing-card:hover .landing-card__media::after {
-  background: rgba(42, 31, 26, 0.12);
+  background: rgba(43, 34, 38, 0.1);
 }
 
 .landing-card__link {
@@ -418,7 +436,7 @@
   gap: 0.375rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--lotus-rose);
+  color: var(--rose-600, var(--lotus-rose));
   transition: color 0.25s ease;
 }
 
@@ -428,8 +446,8 @@
   left: 0;
   bottom: -2px;
   width: 0;
-  height: 1px;
-  background: var(--lotus-rose);
+  height: 2px;
+  background: var(--rose-600, var(--lotus-rose));
   transition: width 0.3s ease;
 }
 
@@ -438,8 +456,8 @@
 }
 
 .landing-muted-band {
-  background: rgba(42, 31, 26, 0.03);
-  border-block: 1px solid rgba(42, 31, 26, 0.06);
+  background: var(--warm-50, #f3eff0);
+  border-block: 1px solid var(--warm-100, #e9e2e4);
 }
 
 .landing-grain::before {
@@ -453,7 +471,7 @@
 }
 
 .landing-focus-ring:focus-visible {
-  outline: 2px solid var(--lotus-rose);
+  outline: 2px solid var(--rose-600, var(--lotus-rose));
   outline-offset: 2px;
 }
 

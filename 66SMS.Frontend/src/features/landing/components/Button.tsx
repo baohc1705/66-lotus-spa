@@ -26,15 +26,15 @@ export const Button = ({
   rel,
 }: ButtonProps) => {
   const baseStyle =
-    "landing-focus-ring inline-flex items-center justify-center gap-2 font-geist text-sm font-medium transition-colors duration-300 disabled:pointer-events-none disabled:opacity-50 select-none";
+    "landing-focus-ring inline-flex items-center justify-center gap-2 font-geist text-sm font-medium transition-colors duration-300 disabled:pointer-events-none disabled:bg-warm-50 disabled:text-warm-300 select-none";
 
   const variants = {
     primary:
-      "rounded-full bg-lotus-rose text-white hover:bg-lotus-rose-dark px-6 py-2.5",
+      "rounded-full bg-rose-600 text-white hover:bg-rose-500 px-6 py-2.5",
     secondary:
-      "rounded-full border border-lotus-rose/30 bg-transparent text-lotus-rose hover:bg-lotus-rose hover:text-white px-6 py-2.5",
+      "rounded-full border border-warm-300 bg-transparent text-ink hover:border-rose-400 hover:text-rose-600 px-6 py-2.5",
     ghost:
-      "rounded-full text-lotus-rose hover:bg-lotus-rose/8 px-3 py-1.5",
+      "rounded-full text-rose-600 hover:bg-rose-50 px-3 py-1.5",
   };
 
   const combinedClasses = `${baseStyle} ${variants[variant]} ${className}`.trim();

@@ -42,7 +42,7 @@ export const SpaceGallerySection = () => {
   return (
     <section
       id="space"
-      className="landing-section bg-lotus-deep"
+      className="landing-section bg-ink"
       aria-labelledby="space-heading"
     >
       <div className="landing-container">

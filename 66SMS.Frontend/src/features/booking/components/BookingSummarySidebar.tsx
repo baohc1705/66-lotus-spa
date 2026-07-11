@@ -27,7 +27,7 @@ function TicketPunchRow({ edge }: { edge: "top" | "bottom" }) {
       {Array.from({ length: holeCount }).map((_, i) => (
         <div
           key={`${edge}-${i}`}
-          className="w-4 h-4 rounded-full bg-lotus-cream shadow-sm shrink-0"
+          className="w-4 h-4 rounded-full bg-page shadow-sm shrink-0"
         />
       ))}
     </div>
@@ -36,7 +36,7 @@ function TicketPunchRow({ edge }: { edge: "top" | "bottom" }) {
 
 
 function TicketDivider() {
-  return <div className="h-px bg-lotus-muted/15" />;
+  return <div className="h-px bg-warm-100" />;
 }
 
 export const BookingSummarySidebar: React.FC = () => {
@@ -65,12 +65,12 @@ export const BookingSummarySidebar: React.FC = () => {
   return (
     <div className="relative">
       {/* Thân vé */}
-      <div className="bg-white shadow-sm relative overflow-visible">
+      <div className="lotus-panel relative overflow-visible">
         <TicketPunchRow edge="top" />
-        <div className="p-4 pt-5 flex flex-col gap-4">
+        <div className="flex flex-col gap-4 p-5 pt-6">
           {/* Tiêu đề */}
-          <div className="text-center pt-1">
-            <h3 className="text-sm font-bold text-lotus-rose font-display flex items-center justify-center gap-2 uppercase tracking-wide">
+          <div className="pt-1 text-center">
+            <h3 className="flex items-center justify-center gap-2 font-display text-sm font-semibold uppercase tracking-[0.14em] text-rose-600">
               Chi tiết đặt chỗ
             </h3>
           </div>
@@ -80,13 +80,13 @@ export const BookingSummarySidebar: React.FC = () => {
           {/* Khách hàng */}
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-bold uppercase tracking-wider text-lotus-deep flex items-center gap-1.5">
+              <p className="text-xs font-bold uppercase tracking-wider text-ink flex items-center gap-1.5">
                 
                 Khách hàng
               </p>
               <button
                 onClick={addGuest}
-                className="flex items-center gap-1 text-[11px] font-bold text-lotus-rose hover:text-lotus-rose/80 transition-colors"
+                className="flex items-center gap-1 text-[11px] font-bold text-rose-600 hover:text-rose-400 transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Thêm
@@ -100,22 +100,22 @@ export const BookingSummarySidebar: React.FC = () => {
               return (
                 <div key={guest.id} className="flex flex-col gap-2">
                   <div
-                    className={`flex items-center justify-between px-4 py-2.5 rounded-full cursor-pointer border-2 border-lotus-rose transition-all ${
+                    className={`flex items-center justify-between px-4 py-2.5 rounded-full cursor-pointer border-2 transition-all ${
                       isGuestActive
-                        ? "bg-lotus-rose/10 shadow-sm"
-                        : "bg-lotus-rose/5 shadow-sm hover:shadow-md"
+                        ? "border-rose-600 bg-rose-50"
+                        : "border-rose-200 bg-rose-50/50 hover:border-rose-400"
                     }`}
                     onClick={() => setActiveGuest(index)}
                   >
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-full bg-lotus-rose/15 flex items-center justify-center">
-                        <User className="w-4 h-4 text-lotus-rose" />
+                      <div className="w-7 h-7 rounded-full bg-rose-100 flex items-center justify-center">
+                        <User className="w-4 h-4 text-rose-600" />
                       </div>
-                      <span className="text-sm font-bold text-lotus-rose">
+                      <span className="text-sm font-bold text-rose-600">
                         Khách {index + 1}
                       </span>
                       {sellingPrice > 0 && (
-                        <span className="text-xs font-semibold text-lotus-deep">
+                        <span className="text-xs font-semibold text-ink">
                           · {sellingPrice.toLocaleString("vi-VN")}đ
                         </span>
                       )}
@@ -128,14 +128,14 @@ export const BookingSummarySidebar: React.FC = () => {
                             e.stopPropagation();
                             removeGuest(index);
                           }}
-                          className="text-lotus-stone hover:text-red-500 transition-colors p-1"
+                          className="text-warm-400 hover:text-error-text transition-colors p-1"
                           title="Xóa khách này"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       )}
                       <ChevronRight
-                        className={`w-4 h-4 text-lotus-rose transition-transform ${
+                        className={`w-4 h-4 text-rose-600 transition-transform ${
                           isGuestActive ? "rotate-90" : ""
                         }`}
                       />
@@ -143,10 +143,10 @@ export const BookingSummarySidebar: React.FC = () => {
                   </div>
 
                   {isGuestActive && (
-                    <div className="px-2 flex flex-col gap-3 text-xs text-lotus-deep">
+                    <div className="px-2 flex flex-col gap-3 text-xs text-ink">
                       {/* Chi nhánh */}
                       {selectedSalon ? (
-                        <div className="flex items-center gap-3 bg-lotus-cream/50 rounded-sm p-3 shadow-sm">
+                        <div className="flex items-center gap-3 rounded-sm border border-warm-100 bg-warm-50 p-3">
                           {selectedSalon.imageUrl ? (
                             <img
                               src={selectedSalon.imageUrl}
@@ -154,19 +154,19 @@ export const BookingSummarySidebar: React.FC = () => {
                               className="w-10 h-10 rounded-full object-cover shrink-0"
                             />
                           ) : (
-                            <div className="w-10 h-10 rounded-full bg-lotus-rose/10 flex items-center justify-center shrink-0 text-base">
+                            <div className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center shrink-0 text-base">
                               🌸
                             </div>
                           )}
                           <div className="min-w-0">
-                            <p className="text-[10px] font-bold uppercase tracking-wider text-lotus-stone mb-0.5">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-gold-600 mb-0.5">
                               Chi nhánh
                             </p>
-                            <div className="font-bold text-lotus-deep truncate">
+                            <div className="font-bold text-ink truncate">
                               {selectedSalon.name}
                             </div>
                             {selectedSalon.fullAddress && (
-                              <div className="text-lotus-stone line-clamp-2 mt-0.5 flex items-start gap-1">
+                              <div className="text-warm-600 line-clamp-2 mt-0.5 flex items-start gap-1">
                                 <MapPin className="w-3 h-3 shrink-0 mt-0.5" />
                                 {selectedSalon.fullAddress}
                               </div>
@@ -174,7 +174,7 @@ export const BookingSummarySidebar: React.FC = () => {
                           </div>
                         </div>
                       ) : (
-                        <div className="text-lotus-stone italic px-2">
+                        <div className="text-warm-600 italic px-2">
                           Chưa chọn chi nhánh
                         </div>
                       )}
@@ -182,24 +182,24 @@ export const BookingSummarySidebar: React.FC = () => {
                       {/* Dịch vụ */}
                       {guest.selectedService ? (
                         <div className="px-2">
-                          <p className="text-[10px] font-bold tracking-wider text-lotus-stone mb-1">
+                          <p className="text-[10px] font-bold tracking-wider text-gold-600 uppercase mb-1">
                             Dịch vụ
                           </p>
                           <div className="font-bold line-clamp-1">
                             {guest.selectedService.name}
                           </div>
-                          <div className="flex justify-between items-center text-lotus-deep mt-1">
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3.5 h-3.5 text-lotus-rose" />
+                          <div className="flex justify-between items-center text-ink mt-1">
+                            <span className="flex items-center gap-1 text-warm-600">
+                              <Clock className="w-3.5 h-3.5 text-rose-400" />
                               {guest.selectedService.durationMins} phút
                             </span>
-                            <span className="bg-lotus-rose/10 px-2 py-0.5 rounded-full text-[10px] uppercase">
+                            <span className="bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full text-[10px] uppercase">
                               {guest.selectedService.categoryName || "Dịch vụ"}
                             </span>
                           </div>
                         </div>
                       ) : (
-                        <div className="text-lotus-stone italic px-2">
+                        <div className="text-warm-600 italic px-2">
                           Chưa chọn dịch vụ
                         </div>
                       )}
@@ -212,8 +212,8 @@ export const BookingSummarySidebar: React.FC = () => {
                         <div className="px-2 flex flex-col gap-1.5">
                           {guest.selectedDate && guest.selectedTimeSlot && (
                             <div className="flex justify-between items-center">
-                              <span className="text-lotus-stone">Thời gian:</span>
-                              <span className="font-bold text-lotus-rose">
+                              <span className="text-warm-600">Thời gian:</span>
+                              <span className="font-bold text-rose-600">
                                 {guest.selectedTimeSlot.time} ·{" "}
                                 {formatDateString(guest.selectedDate)}
                               </span>
@@ -221,7 +221,7 @@ export const BookingSummarySidebar: React.FC = () => {
                           )}
                           {guest.selectedTechnician && (
                             <div className="flex justify-between items-center">
-                              <span className="text-lotus-stone">Kỹ thuật viên:</span>
+                              <span className="text-warm-600">Kỹ thuật viên:</span>
                               <span className="font-semibold">
                                 {guest.selectedTechnician.name}
                               </span>
@@ -229,7 +229,7 @@ export const BookingSummarySidebar: React.FC = () => {
                           )}
                           {guest.selectedPosition && (
                             <div className="flex justify-between items-center">
-                              <span className="text-lotus-stone">Phòng:</span>
+                              <span className="text-warm-600">Phòng:</span>
                               <span className="font-semibold">
                                 {guest.selectedPosition.name}
                               </span>
@@ -253,39 +253,39 @@ export const BookingSummarySidebar: React.FC = () => {
 
           {/* Tổng tiền */}
           <div className="flex flex-col gap-2">
-            <div className="flex justify-between text-xs text-lotus-stone">
+            <div className="flex justify-between text-xs text-warm-600">
               <span>Số lượng khách:</span>
-              <span className="font-bold text-lotus-deep">
+              <span className="font-bold text-ink">
                 {guests.length} khách
               </span>
             </div>
 
-            <div className="flex justify-between text-xs text-lotus-stone">
+            <div className="flex justify-between text-xs text-warm-600">
               <span>Tổng tiền dịch vụ:</span>
-              <span className="font-bold text-lotus-deep">
+              <span className="font-bold text-ink">
                 {total.toLocaleString("vi-VN")}đ
               </span>
             </div>
 
             {discount > 0 && (
-              <div className="flex justify-between text-xs text-emerald-600 font-semibold">
+              <div className="flex justify-between text-xs text-success-text font-semibold">
                 <span>Khuyến mãi:</span>
                 <span>-{discount.toLocaleString("vi-VN")}đ</span>
               </div>
             )}
 
             <div className="flex justify-between items-end pt-1">
-              <span className="text-sm font-bold text-lotus-deep uppercase">
+              <span className="text-sm font-bold text-ink uppercase">
                 Tổng cộng
               </span>
-              <span className="text-2xl font-black text-lotus-rose">
+              <span className="text-2xl font-black text-rose-600">
                 {finalTotal.toLocaleString("vi-VN")}đ
               </span>
             </div>
 
-            <div className="flex justify-between items-center text-xs text-lotus-stone">
+            <div className="flex justify-between items-center text-xs text-warm-600">
               <span>Thanh toán cọc (30%):</span>
-              <span className="font-bold text-lotus-deep">
+              <span className="font-bold text-ink">
                 {deposit.toLocaleString("vi-VN")}đ
               </span>
             </div>
@@ -298,19 +298,19 @@ export const BookingSummarySidebar: React.FC = () => {
             {[
               {
                 icon: CalendarCheck,
-                color: "text-lotus-rose",
+                color: "text-rose-600",
                 title: "Xác nhận ngay",
                 subtitle: "Đặt lịch nhanh chóng",
               },
               {
                 icon: RotateCcw,
-                color: "text-orange-400",
+                color: "text-gold-600",
                 title: "Miễn phí hủy",
                 subtitle: "Trước 2 giờ",
               },
               {
                 icon: ShieldCheck,
-                color: "text-lotus-rose",
+                color: "text-rose-600",
                 title: "Bảo mật tuyệt đối",
                 subtitle: "Thông tin của bạn",
               },
@@ -320,10 +320,10 @@ export const BookingSummarySidebar: React.FC = () => {
                 className="flex flex-col items-center gap-1 text-center"
               >
                 <Icon className={`w-5 h-5 ${color}`} />
-                <span className="text-[10px] font-bold text-lotus-deep leading-tight">
+                <span className="text-[10px] font-bold text-ink leading-tight">
                   {title}
                 </span>
-                <span className="text-[9px] text-lotus-stone leading-tight">
+                <span className="text-[9px] text-warm-600 leading-tight">
                   {subtitle}
                 </span>
               </div>
@@ -333,7 +333,7 @@ export const BookingSummarySidebar: React.FC = () => {
 
         <TicketPunchRow edge="bottom" />
 
-        <div className="px-4 pb-5 pt-2 text-[10px] text-lotus-stone leading-relaxed text-center flex flex-col gap-0.5">
+        <div className="px-4 pb-5 pt-2 text-[10px] text-warm-600 leading-relaxed text-center flex flex-col gap-0.5">
           <span>Miễn phí hủy lịch trước 2 giờ</span>
           <span>Bảo mật thông tin tuyệt đối</span>
         </div>

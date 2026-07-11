@@ -40,7 +40,7 @@ const Stars = ({ count }: { count: number }) => (
     {Array.from({ length: count }).map((_, i) => (
       <Star
         key={i}
-        className="h-3.5 w-3.5 fill-lotus-gold text-lotus-gold"
+        className="h-3.5 w-3.5 fill-gold-600 text-gold-600"
         aria-hidden="true"
       />
     ))}
@@ -68,7 +68,7 @@ export const TestimonialsSection = () => {
   return (
     <section
       id="testimonials"
-      className="landing-section relative overflow-hidden bg-[#FAF7F5]"
+      className="landing-section relative overflow-hidden bg-page"
       aria-labelledby="testimonials-heading"
     >
       {/* Watermark sen */}
@@ -76,7 +76,7 @@ export const TestimonialsSection = () => {
         className="pointer-events-none absolute -right-8 top-8 h-56 w-56 opacity-[0.06] sm:h-72 sm:w-72"
         aria-hidden="true"
         style={{
-          backgroundColor: "var(--lotus-rose)",
+          backgroundColor: "var(--rose-600)",
           WebkitMaskImage: `url(${lotusIcon})`,
           maskImage: `url(${lotusIcon})`,
           WebkitMaskSize: "contain",
@@ -91,9 +91,9 @@ export const TestimonialsSection = () => {
       <div className="landing-container relative z-10">
         {/* Badge FEEDBACK */}
         <div className="mb-5 flex justify-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-lotus-rose/10 px-3.5 py-1.5 font-geist text-xs font-semibold uppercase tracking-[0.14em] text-lotus-rose">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-600/10 px-3.5 py-1.5 font-geist text-xs font-semibold uppercase tracking-[0.14em] text-rose-600">
             <span
-              className="h-3.5 w-3.5 bg-lotus-rose"
+              className="h-3.5 w-3.5 bg-rose-600"
               style={{
                 WebkitMaskImage: `url(${lotusIcon})`,
                 maskImage: `url(${lotusIcon})`,
@@ -135,31 +135,31 @@ export const TestimonialsSection = () => {
             >
               <div className="mb-4 flex items-start justify-between">
                 <Quote
-                  className="h-7 w-7 text-lotus-rose/80"
+                  className="h-7 w-7 text-rose-600/80"
                   fill="currentColor"
                   aria-hidden="true"
                 />
                 <Stars count={item.rating} />
               </div>
 
-              <p className="mb-5 flex-1 font-geist text-sm leading-[1.7] text-lotus-stone">
+              <p className="mb-5 flex-1 font-geist text-sm leading-[1.7] text-warm-600">
                 {item.text}
               </p>
 
-              <div className="mb-4 h-px w-full bg-lotus-rose/15" aria-hidden="true" />
+              <div className="mb-4 h-px w-full bg-rose-600/15" aria-hidden="true" />
 
               <footer className="flex items-center gap-3">
                 <span
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-lotus-rose/15 font-geist text-xs font-semibold text-lotus-rose"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-600/15 font-geist text-xs font-semibold text-rose-600"
                   aria-hidden="true"
                 >
                   {item.initials}
                 </span>
                 <cite className="not-italic">
-                  <span className="block font-geist text-sm font-semibold text-lotus-deep">
+                  <span className="block font-geist text-sm font-semibold text-ink">
                     {item.name}
                   </span>
-                  <span className="font-geist text-xs text-lotus-stone">
+                  <span className="font-geist text-xs text-warm-600">
                     {item.role}
                   </span>
                 </cite>
@@ -181,31 +181,31 @@ export const TestimonialsSection = () => {
             >
               <div className="mb-4 flex items-start justify-between">
                 <Quote
-                  className="h-7 w-7 text-lotus-rose/80"
+                  className="h-7 w-7 text-rose-600/80"
                   fill="currentColor"
                   aria-hidden="true"
                 />
                 <Stars count={orderedReviews[0].rating} />
               </div>
 
-              <p className="mb-5 flex-1 font-geist text-sm leading-[1.7] text-lotus-stone">
+              <p className="mb-5 flex-1 font-geist text-sm leading-[1.7] text-warm-600">
                 {orderedReviews[0].text}
               </p>
 
-              <div className="mb-4 h-px w-full bg-lotus-rose/15" aria-hidden="true" />
+              <div className="mb-4 h-px w-full bg-rose-600/15" aria-hidden="true" />
 
               <footer className="flex items-center gap-3">
                 <span
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-lotus-rose/15 font-geist text-xs font-semibold text-lotus-rose"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-600/15 font-geist text-xs font-semibold text-rose-600"
                   aria-hidden="true"
                 >
                   {orderedReviews[0].initials}
                 </span>
                 <cite className="not-italic">
-                  <span className="block font-geist text-sm font-semibold text-lotus-deep">
+                  <span className="block font-geist text-sm font-semibold text-ink">
                     {orderedReviews[0].name}
                   </span>
-                  <span className="font-geist text-xs text-lotus-stone">
+                  <span className="font-geist text-xs text-warm-600">
                     {orderedReviews[0].role}
                   </span>
                 </cite>
@@ -220,7 +220,7 @@ export const TestimonialsSection = () => {
             type="button"
             onClick={goPrev}
             aria-label="Đánh giá trước"
-            className="landing-focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-lotus-rose/30 text-lotus-rose transition-colors hover:bg-lotus-rose hover:text-white"
+            className="landing-focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-rose-600/30 text-rose-600 transition-colors hover:bg-rose-600 hover:text-white"
           >
             <ChevronLeft className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -235,7 +235,7 @@ export const TestimonialsSection = () => {
                 aria-label={`Đánh giá ${i + 1}`}
                 onClick={() => setActiveIndex(i)}
                 className={`landing-focus-ring h-2 w-2 rounded-full transition-colors ${
-                  i === activeIndex ? "bg-lotus-rose" : "bg-lotus-rose/25"
+                  i === activeIndex ? "bg-rose-600" : "bg-rose-600/25"
                 }`}
               />
             ))}
@@ -245,7 +245,7 @@ export const TestimonialsSection = () => {
             type="button"
             onClick={goNext}
             aria-label="Đánh giá tiếp"
-            className="landing-focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-lotus-rose/30 text-lotus-rose transition-colors hover:bg-lotus-rose hover:text-white"
+            className="landing-focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-rose-600/30 text-rose-600 transition-colors hover:bg-rose-600 hover:text-white"
           >
             <ChevronRight className="h-5 w-5" aria-hidden="true" />
           </button>

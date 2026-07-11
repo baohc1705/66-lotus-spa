@@ -41,10 +41,10 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
         id="main-nav"
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "nav--scrolled h-[68px]" : alwaysDark ? "nav--scrolled h-[68px]" : "bg-transparent h-[80px]"}`}
       >
-        <div className="max-w-7xl mx-auto h-full flex items-center justify-between">
+        <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-4 sm:px-6">
           {/* Logo */}
           <a
-            href="#"
+            href="/"
             className="flex items-center gap-3 select-none group cursor-pointer"
           >
             <img
@@ -57,29 +57,29 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
             />
             <div className="flex flex-col leading-none justify-center">
               <span
-                className={`font-display font-semibold text-lg tracking-wide transition-colors duration-500 ${isDark ? "text-lotus-rose" : "text-white"}`}
+                className={`font-display font-semibold text-lg tracking-wide transition-colors duration-500 ${isDark ? "text-rose-800" : "text-white"}`}
               >
                 HOA SEN
               </span>
               <span
-                className={`text-[10px] tracking-[0.28em] uppercase font-sans mt-0.5 transition-colors duration-500 ${isDark ? "text-lotus-gold" : "text-white/60"}`}
+                className={`text-[10px] tracking-[0.28em] uppercase font-sans mt-0.5 transition-colors duration-500 ${isDark ? "text-gold-600" : "text-white/60"}`}
               >
                 Spa & Wellness
               </span>
             </div>
           </a>
 
-          {/* Desktop Nav */}
+          {/* Desktop Nav — tab style per color.md */}
           <div className="hidden lg:flex items-center gap-8">
             {NAV_ITEMS.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className={`relative font-sans text-sm font-medium uppercase tracking-wide transition-colors duration-300 group ${isDark ? "text-lotus-deep hover:text-lotus-rose" : "text-white/80 hover:text-white"}`}
+                className={`relative font-sans text-xs font-medium uppercase tracking-wide transition-colors duration-300 group ${isDark ? "text-ink hover:text-rose-400" : "text-white/80 hover:text-white"}`}
               >
                 {item.label}
                 <span
-                  className={`absolute -bottom-0.5 left-0 h-[1.5px] w-0 group-hover:w-full transition-all duration-300 rounded-full ${isDark ? "bg-lotus-rose" : "bg-white"}`}
+                  className={`absolute -bottom-0.5 left-0 h-0.5 w-0 group-hover:w-full transition-all duration-300 ${isDark ? "bg-rose-600" : "bg-white"}`}
                 />
               </a>
             ))}
@@ -88,23 +88,23 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3">
             <a
-              href="tel:09079593951"
-              className={`flex items-center gap-1.5 font-sans text-sm font-medium transition-colors duration-300 ${isDark ? "text-lotus-stone hover:text-lotus-rose" : "text-white/70 hover:text-white"}`}
+              href="tel:0337779999"
+              className={`flex items-center gap-1.5 font-sans text-xs font-medium transition-colors duration-300 ${isDark ? "text-warm-600 hover:text-rose-600" : "text-white/70 hover:text-white"}`}
             >
               <Phone className="w-3.5 h-3.5" />
-              0907 95 93 95
+              0337 779 999
             </a>
 
             <div
-              className={`w-px h-4 mx-1 ${isDark ? "bg-lotus-stone/30" : "bg-white/20"}`}
+              className={`w-px h-4 mx-1 ${isDark ? "bg-warm-100" : "bg-white/20"}`}
             />
 
             {isLoggedIn ? (
               <a
                 href="/profile"
-                className={`flex items-center gap-2 text-sm font-medium transition-colors duration-300 ${isDark ? "text-lotus-deep hover:text-lotus-rose" : "text-white/90 hover:text-white"}`}
+                className={`flex items-center gap-2 text-xs font-medium transition-colors duration-300 ${isDark ? "text-ink hover:text-rose-600" : "text-white/90 hover:text-white"}`}
               >
-                <div className="w-7 h-7 rounded-full border border-lotus-rose/30 bg-lotus-cream flex items-center justify-center text-lotus-rose overflow-hidden">
+                <div className="w-7 h-7 rounded-full border border-rose-200 bg-rose-50 flex items-center justify-center text-rose-600 overflow-hidden">
                   {me?.avatarUrl ? (
                     <img
                       src={me.avatarUrl}
@@ -122,7 +122,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
             ) : (
               <a
                 href="/login"
-                className={`flex items-center gap-1.5 font-sans text-sm font-medium transition-colors duration-300 ${isDark ? "text-lotus-deep hover:text-lotus-rose" : "text-white/90 hover:text-white"}`}
+                className={`flex items-center gap-1.5 font-sans text-xs font-medium transition-colors duration-300 ${isDark ? "text-ink hover:text-rose-600" : "text-white/90 hover:text-white"}`}
               >
                 <UserIcon className="w-3.5 h-3.5" />
                 Đăng nhập
@@ -133,7 +133,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
               href="/dat-lich"
               id="nav-cta-booking"
               variant="primary"
-              className="px-5 py-2.5 text-sm"
+              className="px-5 py-2.5 text-xs"
             >
               <Calendar className="w-3.5 h-3.5" />
               Đặt Lịch
@@ -143,7 +143,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
           {/* Mobile Hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className={`lg:hidden p-2 transition-colors ${isDark ? "text-lotus-deep" : "text-white"}`}
+            className={`lg:hidden p-2 transition-colors ${isDark ? "text-ink" : "text-white"}`}
             aria-label="Mở menu"
           >
             {menuOpen ? (
@@ -163,7 +163,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-x-0 top-[68px] z-40 bg-lotus-cream border-b border-lotus-rose/10 shadow-jade-lg lg:hidden"
+            className="fixed inset-x-0 top-[68px] z-40 bg-surface border-b border-card-border shadow-jade-lg lg:hidden"
           >
             <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-1">
               {NAV_ITEMS.map((item, i) => (
@@ -174,19 +174,19 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.05 }}
                   onClick={() => setMenuOpen(false)}
-                  className="font-sans text-base font-medium text-lotus-deep hover:text-lotus-rose py-3 border-b border-lotus-stone/20 last:border-0 transition-colors"
+                  className="font-sans text-base font-medium text-ink hover:text-rose-600 py-3 border-b border-warm-100 last:border-0 transition-colors"
                 >
                   {item.label}
                 </motion.a>
               ))}
-              <div className="pt-4 border-t border-lotus-stone/20 flex flex-col gap-2 mt-2">
+              <div className="pt-4 border-t border-warm-100 flex flex-col gap-2 mt-2">
                 {isLoggedIn ? (
                   <a
                     href="/profile"
                     onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-2 font-sans text-base font-medium text-lotus-deep hover:text-lotus-rose py-2 transition-colors"
+                    className="flex items-center gap-2 font-sans text-base font-medium text-ink hover:text-rose-600 py-2 transition-colors"
                   >
-                    <div className="w-6 h-6 rounded-full overflow-hidden bg-lotus-cream border border-lotus-rose/30 flex items-center justify-center text-lotus-rose">
+                    <div className="w-6 h-6 rounded-full overflow-hidden bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600">
                       {me?.avatarUrl ? (
                         <img
                           src={me.avatarUrl}
@@ -203,7 +203,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
                   <a
                     href="/login"
                     onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-2 font-sans text-base font-medium text-lotus-deep hover:text-lotus-rose py-2 transition-colors"
+                    className="flex items-center gap-2 font-sans text-base font-medium text-ink hover:text-rose-600 py-2 transition-colors"
                   >
                     <UserIcon className="w-5 h-5" />
                     Đăng nhập
@@ -213,7 +213,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
                   href="/dat-lich"
                   onClick={() => setMenuOpen(false)}
                   variant="primary"
-                  className="mt-2 w-full py-3.5 text-sm"
+                  className="mt-2 w-full py-3.5 text-xs"
                 >
                   <Calendar className="w-4 h-4" />
                   Đặt Lịch Ngay

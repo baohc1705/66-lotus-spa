@@ -10,6 +10,48 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════
+   Hoa Sen Spa — bảng màu chuẩn (color.md)
+   Dùng cho booking + landing brand
+   ═══════════════════════════════════════════════════════ */
+:root {
+  /* Rose — primary */
+  --rose-900: #5c0b2b;
+  --rose-800: #7a0f3b;
+  --rose-600: #9d174d;
+  --rose-500: #b32e64;
+  --rose-400: #c8477b;
+  --rose-200: #efa9c1;
+  --rose-100: #f6d9e3;
+  --rose-50: #fceef3;
+
+  /* Gold — accent */
+  --gold-700: #8c6608;
+  --gold-600: #b8860b;
+  --gold-100: #f3e4be;
+
+  /* Neutral */
+  --ink: #2b2226;
+  --warm-600: #7a6a6e;
+  --warm-400: #a79a9d;
+  --warm-300: #c9bfc2;
+  --warm-100: #e9e2e4;
+  --warm-50: #f3eff0;
+
+  /* Base */
+  --bg-page: #fafaf9;
+  --bg-surface: #ffffff;
+  --border-card: #efefee;
+
+  /* Semantic */
+  --success-bg: #dcefe1;
+  --success-text: #3b7a4e;
+  --error-bg: #f7dede;
+  --error-text: #b23a3a;
+  --warning-bg: #f6e9ce;
+  --warning-text: #8c6608;
+}
+
 /* ── Global scrollbar ── */
 ::-webkit-scrollbar {
   width: 5px;

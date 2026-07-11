@@ -131,16 +131,16 @@ export const BookingTimeStep: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-sm shadow-sm p-4 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="lotus-panel flex flex-col gap-5 p-5 sm:p-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col gap-1">
-        <h3 className="text-lg font-bold text-lotus-deep font-display flex items-center gap-2">
-          <CalendarIcon className="w-5 h-5 text-lotus-rose" />
+        <h3 className="flex items-center gap-2 font-display text-lg font-semibold text-ink">
+          <CalendarIcon className="h-5 w-5 text-rose-600" />
           <span>Chọn thời gian</span>
         </h3>
         {selectedSalon && (
-          <p className="text-xs text-lotus-stone flex items-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5 text-lotus-rose" />
-            <span className="font-semibold text-lotus-deep">
+          <p className="text-xs text-warm-600 flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-rose-400" />
+            <span className="font-semibold text-ink">
               {selectedSalon.name}
             </span>
           </p>
@@ -149,7 +149,7 @@ export const BookingTimeStep: React.FC = () => {
 
       {/* Chọn ngày */}
       <div className="flex flex-col gap-2">
-        <p className="text-xs text-lotus-stone  tracking-wider">
+        <p className="text-xs text-gold-600 uppercase tracking-wider font-semibold">
           1. Chọn ngày phục vụ
         </p>
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
@@ -164,12 +164,12 @@ export const BookingTimeStep: React.FC = () => {
                   selectDate(d.fullDate);
                   selectTimeSlot(null);
                 }}
-                className={`flex flex-col items-center justify-center p-3 rounded-sm w-14 shrink-0 transition-all relative ${
+                className={`flex flex-col items-center justify-center p-3 rounded-sm w-14 shrink-0 transition-all relative border ${
                   isSelected
-                    ? "bg-lotus-rose text-white shadow-md"
+                    ? "border-rose-600 bg-rose-600 text-white"
                     : d.isBookedOut
-                      ? "bg-gray-50 text-gray-300 cursor-not-allowed line-through shadow-sm"
-                      : "bg-lotus-cream/50 text-lotus-deep shadow-sm hover:shadow-md"
+                      ? "border-warm-100 bg-warm-50 text-warm-300 cursor-not-allowed line-through"
+                      : "border-warm-100 bg-surface text-ink hover:border-rose-200"
                 }`}
               >
                 <span className="text-[10px] font-semibold opacity-80">
@@ -179,7 +179,7 @@ export const BookingTimeStep: React.FC = () => {
                   {d.dayNum}
                 </span>
                 {d.isBookedOut && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-red-100 text-red-600 text-[9px] font-bold rounded-sm px-1 scale-90 whitespace-nowrap">
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-error-bg text-error-text text-[9px] font-bold rounded-sm px-1 scale-90 whitespace-nowrap">
                     Hết chỗ
                   </span>
                 )}
@@ -191,25 +191,25 @@ export const BookingTimeStep: React.FC = () => {
 
       {/* Chọn vị trí */}
       <div className="flex flex-col gap-2">
-        <p className="text-xs text-lotus-stone tracking-wider">
+        <p className="text-xs text-gold-600 uppercase tracking-wider font-semibold">
           2. Chọn vị trí
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {loadingPositions ? (
-            <div className="col-span-full py-4 text-center text-xs text-lotus-stone">
+            <div className="col-span-full py-4 text-center text-xs text-warm-600">
               Đang tải danh sách vị trí...
             </div>
           ) : (
             <>
               <div
                 onClick={() => selectPosition(null)}
-                className={`rounded-sm p-3 flex items-center justify-center gap-2 transition-all relative cursor-pointer ${
+                className={`relative flex cursor-pointer items-center justify-center gap-2 rounded-sm p-3 transition-all border ${
                   !selectedPosition
-                    ? "bg-lotus-rose shadow-md"
-                    : "shadow-sm hover:shadow-md bg-lotus-cream"
+                    ? "border-rose-600 bg-rose-600 text-white"
+                    : "border-warm-100 bg-surface text-ink hover:border-rose-200"
                 }`}
               >
-                <span className="text-xs font-bold text-lotus-deep">
+                <span className="text-xs font-bold">
                   Không yêu cầu
                 </span>
               </div>
@@ -219,22 +219,22 @@ export const BookingTimeStep: React.FC = () => {
                   <div
                     key={pos.id}
                     onClick={() => selectPosition(pos)}
-                    className={`rounded-sm p-3 flex flex-col items-start gap-1 transition-all relative overflow-hidden cursor-pointer ${
+                    className={`relative flex cursor-pointer flex-col items-start gap-1 overflow-hidden rounded-sm p-3 transition-all border ${
                       isSelected
-                        ? "shadow-md"
-                        : "shadow-sm hover:shadow-md"
+                        ? "border-2 border-rose-600 bg-rose-50"
+                        : "border-warm-100 bg-surface hover:border-rose-200"
                     }`}
                   >
                     {isSelected && (
-                      <div className="absolute top-0 right-0 w-6 h-6 bg-lotus-rose rounded-bl-sm flex items-center justify-center">
+                      <div className="absolute top-0 right-0 w-6 h-6 bg-rose-600 rounded-bl-sm flex items-center justify-center">
                         <Check className="w-3.5 h-3.5 text-white" />
                       </div>
                     )}
-                    <div className="flex items-center gap-1.5 text-lotus-deep">
-                      <Sofa className="w-3.5 h-3.5 text-lotus-rose" />
+                    <div className="flex items-center gap-1.5 text-ink">
+                      <Sofa className="w-3.5 h-3.5 text-rose-400" />
                       <h4 className="font-bold text-xs truncate">{pos.name}</h4>
                     </div>
-                    <p className="text-[11px] text-lotus-stone truncate ml-5">
+                    <p className="text-[11px] text-warm-600 truncate ml-5">
                       {pos.roomName}
                     </p>
                   </div>
@@ -247,20 +247,20 @@ export const BookingTimeStep: React.FC = () => {
 
       {/* Chọn KTV */}
       <div className="flex flex-col gap-2">
-        <p className="text-xs text-lotus-stone tracking-wider">
+        <p className="text-xs text-gold-600 uppercase tracking-wider font-semibold">
           3. Chọn kỹ thuật viên
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {!serviceId ? (
-            <div className="col-span-full py-4 text-center text-xs text-lotus-stone">
+            <div className="col-span-full py-4 text-center text-xs text-warm-600">
               Vui lòng chọn dịch vụ ở bước trước
             </div>
           ) : loadingTechs ? (
-            <div className="col-span-full py-4 text-center text-xs text-lotus-stone">
+            <div className="col-span-full py-4 text-center text-xs text-warm-600">
               Đang tải danh sách KTV...
             </div>
           ) : !hasWorkingTechnicians ? (
-            <div className="col-span-full py-6 text-center text-sm text-lotus-stone bg-lotus-cream rounded-sm shadow-sm">
+            <div className="col-span-full rounded-sm border border-warm-100 bg-warm-50 py-6 text-center text-sm text-warm-600">
               Không có kỹ thuật viên nào làm việc trong ngày này. Vui lòng chọn
               ngày khác.
             </div>
@@ -274,14 +274,14 @@ export const BookingTimeStep: React.FC = () => {
                 <div
                   key={tech.id ?? "any"}
                   onClick={() => selectTechnician(tech)}
-                  className={`rounded-sm p-3 flex items-center gap-3 transition-all relative overflow-hidden cursor-pointer ${
+                  className={`relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-sm p-3 transition-all border ${
                     isSelected
-                      ? "shadow-md"
-                      : "shadow-sm hover:shadow-md"
+                      ? "border-2 border-rose-600 bg-rose-50"
+                      : "border-warm-100 bg-surface hover:border-rose-200"
                   }`}
                 >
                   {isSelected && (
-                    <div className="absolute top-0 right-0 w-6 h-6 bg-lotus-rose rounded-bl-sm flex items-center justify-center">
+                    <div className="absolute top-0 right-0 w-6 h-6 bg-rose-600 rounded-bl-sm flex items-center justify-center">
                       <Check className="w-3.5 h-3.5 text-white" />
                     </div>
                   )}
@@ -293,19 +293,19 @@ export const BookingTimeStep: React.FC = () => {
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-lotus-rose-light text-lotus-rose flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
                       <User className="w-5 h-5" />
                     </div>
                   )}
 
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-lotus-deep text-xs truncate">
+                    <h4 className="font-bold text-ink text-xs truncate">
                       {tech.name || "Kỹ thuật viên"}
                     </h4>
-                    <p className="text-[11px] text-lotus-stone truncate mt-0.5">
+                    <p className="text-[11px] text-warm-600 truncate mt-0.5">
                       {tech.role || "Nhân viên"}
                     </p>
-                    <span className="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-sm mt-1.5 bg-lotus-leaf-light text-lotus-leaf">
+                    <span className="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-sm mt-1.5 bg-success-bg text-success-text">
                       {tech.slotsLeft !== undefined
                         ? `Còn ${tech.slotsLeft} slot`
                         : "Sẵn sàng"}
@@ -321,20 +321,20 @@ export const BookingTimeStep: React.FC = () => {
       {/* Khung giờ */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <p className="text-xs text-lotus-stone tracking-wider">
+          <p className="text-xs text-gold-600 uppercase tracking-wider font-semibold">
             4. Chọn khung giờ phục vụ
           </p>
-          <div className="flex items-center gap-3 text-[10px] text-lotus-stone">
+          <div className="flex items-center gap-3 text-[10px] text-warm-600">
             <div className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-white shadow-sm inline-block" />
+              <span className="w-2.5 h-2.5 rounded-full bg-surface border border-warm-100 inline-block" />
               Trống
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-300 inline-block" />
+              <span className="w-2.5 h-2.5 rounded-full bg-error-text/40 inline-block" />
               Đã đặt
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-gray-200 inline-block" />
+              <span className="w-2.5 h-2.5 rounded-full bg-warm-100 inline-block" />
               Ngoài giờ
             </div>
           </div>
@@ -342,11 +342,11 @@ export const BookingTimeStep: React.FC = () => {
 
         <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-[220px] overflow-y-auto scrollbar-thin">
           {!dateInput ? (
-            <div className="col-span-full py-4 text-center text-xs text-lotus-stone">
+            <div className="col-span-full py-4 text-center text-xs text-warm-600">
               Vui lòng chọn ngày trước
             </div>
           ) : loadingSlots ? (
-            <div className="col-span-full py-4 text-center text-xs text-lotus-stone">
+            <div className="col-span-full py-4 text-center text-xs text-warm-600">
               Đang tải khung giờ...
             </div>
           ) : (
@@ -357,26 +357,26 @@ export const BookingTimeStep: React.FC = () => {
               let label = "Không khả dụng";
               let isAvailable = false;
               let classes =
-                "bg-gray-100 text-gray-400 cursor-not-allowed opacity-50 shadow-sm";
+                "border-warm-100 bg-warm-50 text-warm-300 cursor-not-allowed opacity-50";
 
               if (s === "available" || s === "trống") {
                 label = "Còn trống";
                 isAvailable = true;
                 classes = isSelected
-                  ? "bg-lotus-rose text-white shadow-md"
-                  : "bg-white text-lotus-deep shadow-sm hover:shadow-md";
+                  ? "border-rose-600 bg-rose-600 text-white"
+                  : "border-warm-100 bg-surface text-ink hover:border-rose-200";
               } else if (s === "booked" || s === "đầy") {
                 label = "Đã đặt";
                 classes =
-                  "bg-red-50 text-red-400 cursor-not-allowed line-through opacity-60 shadow-sm";
+                  "border-error-bg bg-error-bg text-error-text cursor-not-allowed line-through opacity-60";
               } else if (s === "outside") {
                 label = "Ngoài giờ";
                 classes =
-                  "bg-gray-100 text-gray-400 cursor-not-allowed opacity-50 shadow-sm";
+                  "border-warm-100 bg-warm-50 text-warm-300 cursor-not-allowed opacity-50";
               } else if (s === "break" || s === "nghỉ") {
                 label = "Nghỉ";
                 classes =
-                  "bg-gray-100 text-gray-400 cursor-not-allowed opacity-50 shadow-sm";
+                  "border-warm-100 bg-warm-50 text-warm-300 cursor-not-allowed opacity-50";
               }
 
               return (
@@ -385,7 +385,7 @@ export const BookingTimeStep: React.FC = () => {
                   type="button"
                   disabled={!isAvailable}
                   onClick={() => selectTimeSlot(slot)}
-                  className={`py-2 px-1 text-center text-xs font-bold rounded-sm transition-all flex flex-col items-center justify-center gap-0.5 ${classes}`}
+                  className={`py-2 px-1 text-center text-xs font-bold rounded-sm transition-all flex flex-col items-center justify-center gap-0.5 border ${classes}`}
                 >
                   <span>{slot.time}</span>
                   <span className="text-xs tracking-wider opacity-90 scale-90">
@@ -401,7 +401,7 @@ export const BookingTimeStep: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-2">
         <button
           onClick={prevStep}
-          className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-full font-bold transition-all bg-lotus-cream text-lotus-deep shadow-sm hover:shadow-md"
+          className="flex w-full items-center justify-center gap-2 rounded-full border border-warm-300 bg-surface px-6 py-3 font-bold text-ink transition-all hover:border-rose-400 hover:text-rose-600 sm:w-auto"
         >
           <ArrowLeft className="w-5 h-5" />
           Quay lại
@@ -411,8 +411,8 @@ export const BookingTimeStep: React.FC = () => {
           disabled={!isStep2Valid || isLocking}
           className={`flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-full font-bold transition-all ${
             isStep2Valid
-              ? "bg-lotus-rose text-white hover:bg-lotus-rose/90 shadow-sm"
-              : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              ? "bg-rose-600 text-white hover:bg-rose-500"
+              : "bg-warm-50 text-warm-300 cursor-not-allowed"
           }`}
         >
           Tiếp tục: Nhập thông tin

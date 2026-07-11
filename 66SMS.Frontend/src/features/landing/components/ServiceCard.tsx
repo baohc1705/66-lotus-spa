@@ -31,7 +31,7 @@ export const ServiceCard = ({
           <p className={`font-sans text-sm text-white/80 leading-relaxed mb-3`}>
             {description}
           </p>
-          <span className={`block font-sans text-sm font-medium text-lotus-gold mb-3`}>
+          <span className={`block font-sans text-sm font-medium text-gold-600 mb-3`}>
             Từ {price}
           </span>
           <a

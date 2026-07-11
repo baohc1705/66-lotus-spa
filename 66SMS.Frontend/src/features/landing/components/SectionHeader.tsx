@@ -27,9 +27,9 @@ export const SectionHeader = ({
   className = "",
   titleId,
 }: SectionHeaderProps) => {
-  const labelColor = dark ? "text-lotus-gold" : "text-lotus-rose";
-  const titleColor = dark ? "text-white" : "text-lotus-deep";
-  const descColor = dark ? "text-white/65" : "text-lotus-stone";
+  const labelColor = dark ? "text-gold-100" : "text-gold-600";
+  const titleColor = dark ? "text-white" : "text-ink";
+  const descColor = dark ? "text-white/65" : "text-warm-600";
 
   if (variant === "lotus") {
     const isLeft = align === "left";
@@ -45,11 +45,11 @@ export const SectionHeader = ({
       >
         <h2 id={titleId} className="leading-[1.1]">
           {scriptLabel && (
-            <span className="block font-display text-[clamp(1.25rem,2.2vw,1.6rem)] font-normal tracking-[0.04em] text-lotus-rose">
+            <span className="block font-display text-[clamp(1.25rem,2.2vw,1.6rem)] font-normal tracking-[0.04em] text-rose-800">
               {scriptLabel}
             </span>
           )}
-          <span className="block font-display text-[clamp(1.75rem,3.5vw,2.5rem)] font-semibold leading-[1.15] tracking-[0.02em] text-lotus-rose">
+          <span className="block font-display text-[clamp(1.75rem,3.5vw,2.5rem)] font-semibold leading-[1.15] tracking-[0.02em] text-rose-800">
             {title}
           </span>
         </h2>

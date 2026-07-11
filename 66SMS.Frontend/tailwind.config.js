@@ -81,16 +81,61 @@ export default {
         'lotus-deep':       'var(--lotus-deep)',
         'lotus-stone':      'var(--lotus-stone)',
         'lotus-rose-light': 'var(--lotus-rose-light)',
+        'lotus-inset':      'var(--lotus-inset)',
         'lotus-error':      'var(--lotus-error)',
         'lotus-vnpay':      'var(--lotus-vnpay)',
         'lotus-vnpay-red':  'var(--lotus-vnpay-red)',
         'lotus-rose-dark':  'var(--lotus-rose-dark)',
+
+        /* ── Hoa Sen Spa palette (color.md) ── */
+        rose: {
+          900: 'var(--rose-900)',
+          800: 'var(--rose-800)',
+          600: 'var(--rose-600)',
+          500: 'var(--rose-500)',
+          400: 'var(--rose-400)',
+          200: 'var(--rose-200)',
+          100: 'var(--rose-100)',
+          50:  'var(--rose-50)',
+        },
+        gold: {
+          700: 'var(--gold-700)',
+          600: 'var(--gold-600)',
+          100: 'var(--gold-100)',
+        },
+        ink: 'var(--ink)',
+        warm: {
+          600: 'var(--warm-600)',
+          400: 'var(--warm-400)',
+          300: 'var(--warm-300)',
+          100: 'var(--warm-100)',
+          50:  'var(--warm-50)',
+        },
+        page:    'var(--bg-page)',
+        surface: 'var(--bg-surface)',
+        'card-border': 'var(--border-card)',
+        success: {
+          DEFAULT: 'var(--success-text)',
+          bg:      'var(--success-bg)',
+          text:    'var(--success-text)',
+        },
+        error: {
+          DEFAULT: 'var(--error-text)',
+          bg:      'var(--error-bg)',
+          text:    'var(--error-text)',
+        },
+        warning: {
+          DEFAULT: 'var(--warning-text)',
+          bg:      'var(--warning-bg)',
+          text:    'var(--warning-text)',
+        },
       },
       boxShadow: {
-        jade:      '0 4px 24px 0 rgba(210, 91, 124, 0.12)', /* shadow hồng sen nhạt */
-        'jade-lg': '0 8px 40px 0 rgba(210, 91, 124, 0.16)', /* shadow hồng sen đậm */
-        lotus:     '0 4px 20px 0 rgba(210, 91, 124, 0.15)',
-        gold:      '0 4px 20px 0 rgba(176, 141, 87, 0.20)',
+        jade:      '0 4px 24px 0 rgba(157, 23, 77, 0.14)',
+        'jade-lg': '0 8px 40px 0 rgba(157, 23, 77, 0.16)',
+        lotus:     '0 4px 20px 0 rgba(157, 23, 77, 0.14)',
+        gold:      '0 4px 20px 0 rgba(184, 134, 11, 0.2)',
+        panel:     '0 8px 32px 0 rgba(43, 34, 38, 0.06)',
       },
       keyframes: {
         'slide-in': {

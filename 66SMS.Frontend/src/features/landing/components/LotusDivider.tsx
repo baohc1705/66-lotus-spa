@@ -16,8 +16,8 @@ export const LotusDivider = ({
   const lineStyle = dark
     ? { backgroundColor: "rgba(255,255,255,0.45)" }
     : isGold
-      ? { backgroundColor: "rgba(215,167,109,0.7)" }
-      : { backgroundColor: "var(--lotus-rose)" };
+      ? { backgroundColor: "var(--gold-600)" }
+      : { backgroundColor: "var(--rose-600)" };
 
   return (
     <div
@@ -36,7 +36,7 @@ export const LotusDivider = ({
         <span
           className="h-5 w-5 shrink-0 sm:h-6 sm:w-6"
           style={{
-            backgroundColor: isGold ? "#D7A76D" : "var(--lotus-rose)",
+            backgroundColor: isGold ? "var(--gold-600)" : "var(--rose-600)",
             WebkitMaskImage: `url(${lotusIcon})`,
             maskImage: `url(${lotusIcon})`,
             WebkitMaskSize: "contain",

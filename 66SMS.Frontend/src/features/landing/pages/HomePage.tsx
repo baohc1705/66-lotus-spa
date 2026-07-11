@@ -13,10 +13,10 @@ import { MotionConfig } from "motion/react";
 
 export const HomePage = () => (
   <MotionConfig reducedMotion="user">
-    <main className="landing-page bg-lotus-cream font-geist">
+    <main className="landing-page bg-page font-geist">
       <a
         href="#about"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:focus:bg-lotus-deep focus:px-4 focus:py-2 focus:text-white"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-ink focus:px-4 focus:py-2 focus:text-white"
       >
         Bỏ qua đến nội dung chính
       </a>

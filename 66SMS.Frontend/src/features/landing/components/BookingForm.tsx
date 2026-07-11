@@ -22,7 +22,7 @@ const SERVICE_OPTIONS = [
   'Sản phẩm & Gói',
 ]
 
-const inputClass = `landing-focus-ring w-full h-11 px-4 border border-lotus-stone/20 bg-lotus-cream font-geist text-sm text-lotus-deep placeholder:text-lotus-stone/50 focus:border-lotus-rose focus:ring-2 focus:ring-lotus-rose/20 transition-all duration-200`
+const inputClass = `landing-focus-ring w-full h-11 px-4 border border-warm-100 bg-surface font-geist text-sm text-ink placeholder:text-warm-600 hover:border-warm-300 focus:border-rose-600 focus:outline-none transition-all duration-200`
 
 export const BookingForm = () => {
   const [isSuccess, setIsSuccess] = useState(false)
@@ -45,18 +45,18 @@ export const BookingForm = () => {
 
   if (isSuccess) {
     return (
-      <div className={`text-center py-12 px-6 bg-lotus-surface border border-lotus-leaf/20`}>
-        <CheckCircle className={`w-16 h-16 text-lotus-leaf mx-auto mb-4`} />
-        <h3 className={`font-geist text-2xl font-semibold text-lotus-deep mb-2`}>
+      <div className={`text-center py-12 px-6 bg-surface border border-success-text/20`}>
+        <CheckCircle className={`w-16 h-16 text-success-text mx-auto mb-4`} />
+        <h3 className={`font-geist text-2xl font-semibold text-ink mb-2`}>
           Cảm ơn bạn
         </h3>
-        <p className={`font-geist text-base text-lotus-stone mb-6 max-w-sm mx-auto`}>
+        <p className={`font-geist text-base text-warm-600 mb-6 max-w-sm mx-auto`}>
           Chúng tôi đã nhận được yêu cầu đặt lịch và sẽ liên hệ
           xác nhận trong thời gian sớm nhất.
         </p>
         <button
           onClick={() => setIsSuccess(false)}
-          className={`landing-focus-ring font-geist text-sm font-medium text-lotus-rose hover:text-lotus-deep transition-colors duration-200 border-b border-lotus-rose/30 hover:border-lotus-deep/30 pb-0.5`}
+          className={`landing-focus-ring font-geist text-sm font-medium text-rose-600 hover:text-ink transition-colors duration-200 border-b border-rose-600/30 hover:border-ink/30 pb-0.5`}
         >
           Đặt lịch thêm
         </button>
@@ -74,7 +74,7 @@ export const BookingForm = () => {
         <div>
           <label
             htmlFor="booking-name"
-            className={`block font-geist text-sm font-medium text-lotus-deep mb-2`}
+            className={`block font-geist text-sm font-medium text-ink mb-2`}
           >
             Họ và tên
           </label>
@@ -86,7 +86,7 @@ export const BookingForm = () => {
             className={inputClass}
           />
           {errors.name && (
-            <span className={`block mt-1 font-geist text-xs text-lotus-error`}>
+            <span className={`block mt-1 font-geist text-xs text-error-text`}>
               {errors.name.message}
             </span>
           )}
@@ -96,7 +96,7 @@ export const BookingForm = () => {
         <div>
           <label
             htmlFor="booking-phone"
-            className={`block font-geist text-sm font-medium text-lotus-deep mb-2`}
+            className={`block font-geist text-sm font-medium text-ink mb-2`}
           >
             Số điện thoại
           </label>
@@ -108,7 +108,7 @@ export const BookingForm = () => {
             className={inputClass}
           />
           {errors.phone && (
-            <span className={`block mt-1 font-geist text-xs text-lotus-error`}>
+            <span className={`block mt-1 font-geist text-xs text-error-text`}>
               {errors.phone.message}
             </span>
           )}
@@ -118,7 +118,7 @@ export const BookingForm = () => {
         <div>
           <label
             htmlFor="booking-service"
-            className={`block font-geist text-sm font-medium text-lotus-deep mb-2`}
+            className={`block font-geist text-sm font-medium text-ink mb-2`}
           >
             Dịch vụ
           </label>
@@ -133,7 +133,7 @@ export const BookingForm = () => {
             ))}
           </select>
           {errors.service && (
-            <span className={`block mt-1 font-geist text-xs text-lotus-error`}>
+            <span className={`block mt-1 font-geist text-xs text-error-text`}>
               {errors.service.message}
             </span>
           )}
@@ -143,7 +143,7 @@ export const BookingForm = () => {
         <div>
           <label
             htmlFor="booking-date"
-            className={`block font-geist text-sm font-medium text-lotus-deep mb-2`}
+            className={`block font-geist text-sm font-medium text-ink mb-2`}
           >
             Ngày mong muốn
           </label>
@@ -154,7 +154,7 @@ export const BookingForm = () => {
             className={inputClass}
           />
           {errors.date && (
-            <span className={`block mt-1 font-geist text-xs text-lotus-error`}>
+            <span className={`block mt-1 font-geist text-xs text-error-text`}>
               {errors.date.message}
             </span>
           )}
@@ -164,10 +164,10 @@ export const BookingForm = () => {
         <div className="md:col-span-2">
           <label
             htmlFor="booking-note"
-            className={`block font-geist text-sm font-medium text-lotus-deep mb-2`}
+            className={`block font-geist text-sm font-medium text-ink mb-2`}
           >
             Ghi chú{' '}
-            <span className="text-lotus-stone font-light">
+            <span className="text-warm-600 font-light">
               (không bắt buộc)
             </span>
           </label>
@@ -176,7 +176,7 @@ export const BookingForm = () => {
             rows={3}
             placeholder="Yêu cầu đặc biệt, thời gian mong muốn..."
             {...register('note')}
-            className="landing-focus-ring w-full min-h-[80px] px-4 py-3 border border-lotus-stone/20 bg-lotus-cream font-geist text-sm text-lotus-deep placeholder:text-lotus-stone/50 focus:border-lotus-rose focus:ring-2 focus:ring-lotus-rose/20 transition-all duration-200 resize-none"
+            className="landing-focus-ring w-full min-h-[80px] px-4 py-3 border border-warm-100/20 bg-page font-geist text-sm text-ink placeholder:text-warm-600/50 focus:border-rose-600 focus:ring-2 focus:ring-rose-600/20 transition-all duration-200 resize-none"
           />
         </div>
       </div>

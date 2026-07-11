@@ -143,14 +143,14 @@ export function MyBookingsPanel() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 text-lotus-rose animate-spin" />
+        <Loader2 className="w-8 h-8 text-rose-600 animate-spin" />
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="text-center py-20 text-red-500">
+      <div className="text-center py-20 text-error-text">
         Không thể tải danh sách lịch hẹn. Vui lòng thử lại sau.
       </div>
     );
@@ -159,11 +159,11 @@ export function MyBookingsPanel() {
   if (!bookings || bookings.length === 0) {
     return (
       <div className="text-center py-20">
-        <div className="bg-lotus-cream w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Calendar className="w-10 h-10 text-lotus-gold" />
+        <div className="bg-page w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Calendar className="w-10 h-10 text-gold-600" />
         </div>
-        <p className="text-lotus-stone text-lg">Bạn chưa có lịch hẹn nào.</p>
-        <p className="text-sm text-gray-500 mt-2">
+        <p className="text-warm-600 text-lg">Bạn chưa có lịch hẹn nào.</p>
+        <p className="text-sm text-warm-600 mt-2">
           Các lịch hẹn đã đặt sẽ hiển thị tại đây.
         </p>
       </div>
@@ -216,7 +216,7 @@ export function MyBookingsPanel() {
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200 whitespace-nowrap">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-warm-50 text-ink border border-warm-100 whitespace-nowrap">
             Không xác định
           </span>
         );
@@ -225,14 +225,14 @@ export function MyBookingsPanel() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+      <div className="flex items-center justify-between border-b border-warm-100 pb-4">
         <h2
-          className="text-2xl font-semibold text-lotus-deep"
+          className="text-2xl font-semibold text-ink"
           style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
         >
           Lịch hẹn của tôi
         </h2>
-        <span className="bg-lotus-cream text-lotus-rose px-3 py-1 rounded-full text-sm font-medium">
+        <span className="bg-page text-rose-600 px-3 py-1 rounded-full text-sm font-medium">
           {bookings.length} lịch hẹn
         </span>
       </div>
@@ -243,8 +243,8 @@ export function MyBookingsPanel() {
             key={booking.id}
             className={`border rounded-lg overflow-hidden transition-all duration-300 ${
               expandedId === booking.id
-                ? "border-lotus-rose ring-1 ring-lotus-rose/20 bg-white"
-                : "border-gray-200 bg-gray-50/50 hover:border-lotus-gold/50 hover:bg-white shadow-sm"
+                ? "border-rose-600 ring-1 ring-rose-600/20 bg-white"
+                : "border-warm-100 bg-warm-50/50 hover:border-gold-600/50 hover:bg-white shadow-sm"
             }`}
           >
             {/* Header (Always visible) */}
@@ -254,9 +254,9 @@ export function MyBookingsPanel() {
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-2">
-                  <span className="font-semibold text-gray-900 truncate">
+                  <span className="font-semibold text-ink truncate">
                     Mã lịch hẹn:{" "}
-                    <span className="text-lotus-rose">
+                    <span className="text-rose-600">
                       {booking.appointmentCode || `#${booking.id}`}
                     </span>
                   </span>
@@ -265,13 +265,13 @@ export function MyBookingsPanel() {
                   </div>
                 </div>
                 
-                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-600">
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-warm-600">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-gray-400">Ngày đặt:</span> 
+                    <span className="text-warm-400">Ngày đặt:</span> 
                     <span>{booking.createdAt}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <Calendar className="w-4 h-4 text-lotus-gold" />
+                    <Calendar className="w-4 h-4 text-gold-600" />
                     <span>
                       {booking.appointmentDate
                         ? new Intl.DateTimeFormat("vi-VN").format(
@@ -281,7 +281,7 @@ export function MyBookingsPanel() {
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-lotus-gold" />
+                    <Clock className="w-4 h-4 text-gold-600" />
                     <span>
                       {booking.timeSlotStartTime
                         ? `${booking.timeSlotStartTime.substring(0, 5)} - ${booking.timeSlotEndTime?.substring(0, 5)}`
@@ -290,10 +290,10 @@ export function MyBookingsPanel() {
                   </div>
                   {canPayDeposit(booking) && (
                     <div className="flex items-center gap-1.5">
-                      <DollarSign className="w-4 h-4 text-lotus-gold" />
-                      <span className="text-gray-900 font-medium">
-                        Cần cọc: <span className="text-lotus-rose">{formatCurrency(((booking.totalAmount || 0) * (booking.depositPercent || 0)) / 100)}</span>
-                        <span className="text-gray-500 font-normal ml-1">({booking.depositPercent}%)</span>
+                      <DollarSign className="w-4 h-4 text-gold-600" />
+                      <span className="text-ink font-medium">
+                        Cần cọc: <span className="text-rose-600">{formatCurrency(((booking.totalAmount || 0) * (booking.depositPercent || 0)) / 100)}</span>
+                        <span className="text-warm-600 font-normal ml-1">({booking.depositPercent}%)</span>
                       </span>
                     </div>
                   )}
@@ -328,7 +328,7 @@ export function MyBookingsPanel() {
                             isPayingWalletId === booking.id ||
                             isPayingId === booking.id
                           }
-                          className="px-3 py-1.5 bg-lotus-gold text-white text-xs font-medium rounded-md hover:bg-lotus-gold/90 transition flex items-center gap-1.5 shadow-sm whitespace-nowrap"
+                          className="px-3 py-1.5 bg-gold-600 text-white text-xs font-medium rounded-md hover:bg-gold-600/90 transition flex items-center gap-1.5 shadow-sm whitespace-nowrap"
                         >
                           {isPayingWalletId === booking.id ? (
                             <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -344,7 +344,7 @@ export function MyBookingsPanel() {
                           isPayingId === booking.id ||
                           isPayingWalletId === booking.id
                         }
-                        className="px-3 py-1.5 bg-lotus-leaf text-white text-xs font-medium rounded-md hover:bg-lotus-leaf/90 transition flex items-center gap-1.5 shadow-sm whitespace-nowrap"
+                        className="px-3 py-1.5 bg-success-text text-white text-xs font-medium rounded-md hover:bg-success-text/90 transition flex items-center gap-1.5 shadow-sm whitespace-nowrap"
                       >
                         {isPayingId === booking.id ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -361,7 +361,7 @@ export function MyBookingsPanel() {
                         handlePostpone(e, booking.id!, booking.paidAmount)
                       }
                       disabled={isPostponingId === booking.id}
-                      className="px-3 py-1.5 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-medium rounded-md transition flex items-center gap-1.5 shadow-sm whitespace-nowrap"
+                      className="px-3 py-1.5 border border-error-bg text-error-text hover:bg-error-bg text-xs font-medium rounded-md transition flex items-center gap-1.5 shadow-sm whitespace-nowrap"
                     >
                       {isPostponingId === booking.id ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -373,7 +373,7 @@ export function MyBookingsPanel() {
                   )}
                 </div>
                 
-                <button className="p-1.5 hover:bg-gray-100 rounded-md transition-colors text-gray-400 ml-1">
+                <button className="p-1.5 hover:bg-warm-100 rounded-md transition-colors text-warm-400 ml-1">
                   {expandedId === booking.id ? (
                     <ChevronUp className="w-5 h-5" />
                   ) : (
@@ -392,19 +392,19 @@ export function MyBookingsPanel() {
               }`}
             >
               <div className="overflow-hidden">
-                <div className="p-5 border-t border-gray-100 bg-white space-y-6">
+                <div className="p-5 border-t border-warm-100 bg-white space-y-6">
                   {/* Grid info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
-                      <h4 className="font-medium text-gray-900 border-b border-gray-50 pb-2">
+                      <h4 className="font-medium text-ink border-b border-warm-50 pb-2">
                         Thông tin dịch vụ
                       </h4>
 
                       <div className="space-y-3">
                         <div className="flex items-start gap-3 text-sm">
-                          <Tag className="w-4 h-4 text-lotus-stone mt-0.5" />
+                          <Tag className="w-4 h-4 text-warm-600 mt-0.5" />
                           <div>
-                            <span className="text-gray-500 block mb-1">
+                            <span className="text-warm-600 block mb-1">
                               Dịch vụ đã chọn:
                             </span>
                             {booking.serviceNames &&
@@ -413,14 +413,14 @@ export function MyBookingsPanel() {
                                 {booking.serviceNames.map((srv, idx) => (
                                   <li
                                     key={idx}
-                                    className="text-gray-900 font-medium before:content-['•'] before:mr-2 before:text-lotus-gold"
+                                    className="text-ink font-medium before:content-['•'] before:mr-2 before:text-gold-600"
                                   >
                                     {srv}
                                   </li>
                                 ))}
                               </ul>
                             ) : (
-                              <span className="text-gray-900">
+                              <span className="text-ink">
                                 Không có thông tin
                               </span>
                             )}
@@ -428,22 +428,22 @@ export function MyBookingsPanel() {
                         </div>
 
                         <div className="flex items-center gap-3 text-sm">
-                          <DollarSign className="w-4 h-4 text-lotus-stone" />
+                          <DollarSign className="w-4 h-4 text-warm-600" />
                           <div>
-                            <span className="text-gray-500 mr-2">
+                            <span className="text-warm-600 mr-2">
                               Tổng tiền:
                             </span>
-                            <span className="text-lotus-rose font-semibold">
+                            <span className="text-rose-600 font-semibold">
                               {formatCurrency(booking.totalAmount)}
                             </span>
                           </div>
                         </div>
 
                         <div className="flex items-center gap-3 text-sm pl-7">
-                          <span className="text-gray-500 mr-2">
+                          <span className="text-warm-600 mr-2">
                             Cọc yêu cầu ({booking.depositPercent}%):
                           </span>
-                          <span className="text-lotus-gold font-medium">
+                          <span className="text-gold-600 font-medium">
                             {formatCurrency(
                               ((booking.totalAmount || 0) *
                                 (booking.depositPercent || 0)) /
@@ -455,10 +455,10 @@ export function MyBookingsPanel() {
                         {booking.depositDeadlineAt &&
                           booking.status === APPOINTMENT_STATUS.CONFIRMED && (
                             <div className="flex items-center gap-3 text-sm pl-7">
-                              <span className="text-gray-500 mr-2">
+                              <span className="text-warm-600 mr-2">
                                 Hạn chót cọc:
                               </span>
-                              <span className="text-red-600 font-medium">
+                              <span className="text-error-text font-medium">
                                 {new Intl.DateTimeFormat("vi-VN", {
                                   dateStyle: "short",
                                   timeStyle: "short",
@@ -470,30 +470,30 @@ export function MyBookingsPanel() {
                     </div>
 
                     <div className="space-y-4">
-                      <h4 className="font-medium text-gray-900 border-b border-gray-50 pb-2">
+                      <h4 className="font-medium text-ink border-b border-warm-50 pb-2">
                         Nhân viên & Địa điểm
                       </h4>
 
                       <div className="space-y-3">
                         <div className="flex items-center gap-3 text-sm">
-                          <User className="w-4 h-4 text-lotus-stone" />
+                          <User className="w-4 h-4 text-warm-600" />
                           <div>
-                            <span className="text-gray-500 mr-2">
+                            <span className="text-warm-600 mr-2">
                               Nhân viên:
                             </span>
-                            <span className="text-gray-900 font-medium">
+                            <span className="text-ink font-medium">
                               {booking.staffFullName || "Chưa xếp nhân viên"}
                             </span>
                           </div>
                         </div>
 
                         <div className="flex items-center gap-3 text-sm">
-                          <MapPin className="w-4 h-4 text-lotus-stone" />
+                          <MapPin className="w-4 h-4 text-warm-600" />
                           <div>
-                            <span className="text-gray-500 mr-2">
+                            <span className="text-warm-600 mr-2">
                               Phòng/Giường:
                             </span>
-                            <span className="text-gray-900 font-medium">
+                            <span className="text-ink font-medium">
                               {booking.positionRoomName
                                 ? `${booking.positionRoomName} - ${booking.positionName}`
                                 : "Chưa xếp phòng"}
@@ -503,12 +503,12 @@ export function MyBookingsPanel() {
 
                         {booking.note && (
                           <div className="flex items-start gap-3 text-sm">
-                            <StickyNote className="w-4 h-4 text-lotus-stone mt-0.5" />
+                            <StickyNote className="w-4 h-4 text-warm-600 mt-0.5" />
                             <div>
-                              <span className="text-gray-500 block mb-1">
+                              <span className="text-warm-600 block mb-1">
                                 Ghi chú:
                               </span>
-                              <p className="text-gray-900 bg-gray-50 p-2 rounded-lg text-xs italic">
+                              <p className="text-ink bg-warm-50 p-2 rounded-lg text-xs italic">
                                 {booking.note}
                               </p>
                             </div>
@@ -532,17 +532,17 @@ export function MyBookingsPanel() {
         description={
           <div className="space-y-3 mt-2">
             <p>Bạn có muốn thanh toán cọc bằng Ví cho lịch hẹn này không?</p>
-            <div className="bg-gray-50 p-3 rounded-md space-y-2 text-sm border border-gray-100">
+            <div className="bg-warm-50 p-3 rounded-md space-y-2 text-sm border border-warm-100">
               <div className="flex justify-between">
-                <span className="text-gray-500">Số tiền cọc:</span>
-                <span className="font-medium text-lotus-rose">{formatCurrency(walletConfirm.depositAmount)}</span>
+                <span className="text-warm-600">Số tiền cọc:</span>
+                <span className="font-medium text-rose-600">{formatCurrency(walletConfirm.depositAmount)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Số dư hiện tại:</span>
-                <span className="font-medium text-gray-900">{formatCurrency(walletBalance)}</span>
+                <span className="text-warm-600">Số dư hiện tại:</span>
+                <span className="font-medium text-ink">{formatCurrency(walletBalance)}</span>
               </div>
             </div>
-            <p className="text-xs text-gray-500 italic">Số dư ví của bạn sẽ bị trừ tương ứng sau khi xác nhận.</p>
+            <p className="text-xs text-warm-600 italic">Số dư ví của bạn sẽ bị trừ tương ứng sau khi xác nhận.</p>
           </div>
         }
         loading={isPayingWalletId !== null}

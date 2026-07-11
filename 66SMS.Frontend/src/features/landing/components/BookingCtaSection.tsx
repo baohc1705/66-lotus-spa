@@ -6,7 +6,7 @@ export const BookingCtaSection = () => {
   return (
     <section
       id="booking"
-      className="landing-section bg-lotus-cream"
+      className="landing-section bg-page"
       aria-labelledby="booking-cta-heading"
     >
       <div className="landing-container">
@@ -15,9 +15,8 @@ export const BookingCtaSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.45 }}
-          className="relative min-h-[360px] overflow-hidden shadow-[0_8px_32px_rgba(42,31,26,0.12)] lg:min-h-[400px]"
+          className="relative min-h-[360px] overflow-hidden border border-card-border lg:min-h-[400px]"
         >
-          {/* Ảnh full background */}
           <img
             src={spaFacial}
             alt=""
@@ -26,19 +25,20 @@ export const BookingCtaSection = () => {
             className="absolute inset-0 h-full w-full object-cover"
           />
 
-          {/* Overlay mờ dần: đậm bên trái (chữ) → trong suốt bên phải (ảnh) */}
           <div
-            className="absolute inset-0 bg-gradient-to-r from-[#2a1f1a] via-[#2a1f1a]/88 to-[#2a1f1a]/15 sm:via-[#2a1f1a]/75 sm:to-transparent"
+            className="absolute inset-0 bg-gradient-to-r from-ink via-ink/85 to-ink/20 sm:via-ink/70 sm:to-transparent"
             aria-hidden="true"
           />
           <div
-            className="absolute inset-0 bg-gradient-to-t from-[#2a1f1a]/50 via-transparent to-[#2a1f1a]/20 lg:hidden"
+            className="absolute inset-0 bg-gradient-to-t from-ink/50 via-transparent to-ink/20 lg:hidden"
             aria-hidden="true"
           />
 
-          {/* Content nổi trên nền */}
           <div className="relative z-10 flex min-h-[360px] items-center px-8 py-12 sm:px-10 sm:py-14 lg:min-h-[400px] lg:w-[58%] lg:px-12 xl:px-14">
             <div className="max-w-lg">
+              <p className="mb-3 font-geist text-xs font-semibold uppercase tracking-[0.18em] text-gold-100">
+                Đặt lịch
+              </p>
               <h2
                 id="booking-cta-heading"
                 className="font-display text-[clamp(1.75rem,3.5vw,2.5rem)] font-medium leading-[1.15] tracking-[0.01em] text-white"
@@ -56,7 +56,7 @@ export const BookingCtaSection = () => {
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <a
                   href="/dat-lich"
-                  className="landing-focus-ring inline-flex items-center gap-2 rounded-full bg-white px-6 py-2.5 font-geist text-sm font-medium text-lotus-deep transition-colors duration-300 hover:bg-white/90"
+                  className="landing-focus-ring inline-flex items-center gap-2 rounded-full bg-rose-600 px-6 py-2.5 font-geist text-sm font-medium text-white transition-colors duration-300 hover:bg-rose-500"
                 >
                   Xác nhận đặt lịch
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />

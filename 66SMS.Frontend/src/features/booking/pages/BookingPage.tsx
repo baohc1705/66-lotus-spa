@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Check, ChevronRight } from "lucide-react";
+import { Check } from "lucide-react";
 import { useBookingStore } from "../stores/bookingStore";
 
 import { Navbar } from "@/features/landing/components/Navbar";
@@ -28,9 +28,9 @@ export const BookingPage: React.FC = () => {
 
   if (currentStep === 4) {
     return (
-      <div className="min-h-screen bg-lotus-cream flex flex-col justify-between">
+      <div className="landing-page min-h-screen bg-page flex flex-col">
         <Navbar alwaysDark />
-        <main className="flex-1 w-full pt-28 pb-16 flex items-center justify-center p-4">
+        <main className="flex-1 landing-container flex items-center justify-center py-28">
           <BookingSuccessTicket />
         </main>
         <FooterSection />
@@ -39,54 +39,86 @@ export const BookingPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-lotus-cream flex flex-col justify-between">
+    <div className="landing-page min-h-screen bg-page flex flex-col">
       <Navbar alwaysDark />
 
-      <main className="flex-1 max-w-7xl mx-auto w-full p-4 pt-24 pb-12">
-        {/* Header + Stepper */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-lotus-deep font-display leading-tight">
-            Đặt lịch hẹn
-          </h1>
-
-          <div className="flex items-center gap-4 bg-white rounded-full shadow-lg shadow-lotus-rose-light p-4 self-start lg:self-auto">
-            {STEP_CONFIG.map((item, idx) => (
-              <div key={item.s} className="flex items-center gap-2">
+      <main className="flex-1 landing-container pt-28 pb-16">
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:gap-8">
+          <div className="flex flex-col gap-6 lg:col-span-8">
+            {/* Stepper — cùng độ rộng + padding với section trái */}
+            <nav aria-label="Các bước đặt lịch" className="w-full px-5 sm:px-6">
+              <div className="relative">
+                {/* Đường nền (inactive) luôn hiện */}
                 <div
-                  className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                    currentStep === item.s
-                      ? "bg-lotus-rose text-white shadow-sm"
-                      : currentStep > item.s
-                        ? "bg-lotus-leaf text-white"
-                        : "bg-gray-100 text-gray-400"
-                  }`}
-                >
-                  {currentStep > item.s ? (
-                    <Check className="w-3.5 h-3.5" />
-                  ) : (
-                    item.s + 1
-                  )}
-                </div>
-                <span
-                  className={`text-xs hidden sm:inline ${
-                    currentStep === item.s
-                      ? "text-lotus-deep font-bold"
-                      : "text-gray-400"
-                  }`}
-                >
-                  {item.label}
-                </span>
-                {idx < 3 && (
-                  <ChevronRight className="w-3.5 h-3.5 text-gray-300 hidden sm:block" />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+                  className="absolute left-4 right-4 top-4 h-[2px] -translate-y-1/2 bg-warm-300"
+                  aria-hidden
+                />
+                {/* Đường tiến độ (active/done) */}
+                <div
+                  className="absolute left-4 top-4 h-[2px] -translate-y-1/2 bg-rose-600 transition-all duration-300"
+                  style={{
+                    width: `calc((100% - 2rem) * ${currentStep / (STEP_CONFIG.length - 1)})`,
+                  }}
+                  aria-hidden
+                />
 
-        {/* Main layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-          <div className="lg:col-span-8 flex flex-col gap-4">
+                <ol className="relative z-10 flex w-full justify-between">
+                  {STEP_CONFIG.map((item, idx) => {
+                    const isActive = currentStep === item.s;
+                    const isDone = currentStep > item.s;
+                    const isFirst = idx === 0;
+                    const isLast = idx === STEP_CONFIG.length - 1;
+
+                    return (
+                      <li
+                        key={item.s}
+                        className={`flex w-8 flex-col ${
+                          isFirst
+                            ? "items-start"
+                            : isLast
+                              ? "items-end"
+                              : "items-center"
+                        }`}
+                      >
+                        <div
+                          className={`flex h-8 w-8 items-center justify-center rounded-full font-geist text-sm font-bold transition-colors ${
+                            isDone
+                              ? "bg-rose-800 text-white"
+                              : isActive
+                                ? "bg-rose-600 text-white"
+                                : "border border-warm-300 bg-surface text-warm-600"
+                          }`}
+                        >
+                          {isDone ? (
+                            <Check className="h-4 w-4" strokeWidth={2.5} />
+                          ) : (
+                            item.s + 1
+                          )}
+                        </div>
+                        <span
+                          className={`mt-2 whitespace-nowrap font-geist text-[11px] leading-tight sm:text-xs ${
+                            isFirst
+                              ? "text-left"
+                              : isLast
+                                ? "text-right"
+                                : "text-center"
+                          } ${
+                            isActive
+                              ? "font-semibold text-rose-600"
+                              : isDone
+                                ? "font-medium text-ink"
+                                : "text-warm-600"
+                          }`}
+                        >
+                          {item.label}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </div>
+            </nav>
+
             {currentStep === 0 && <BookingSalonStep />}
             {currentStep === 1 && <BookingServiceStep />}
             {currentStep === 2 && <BookingTimeStep />}

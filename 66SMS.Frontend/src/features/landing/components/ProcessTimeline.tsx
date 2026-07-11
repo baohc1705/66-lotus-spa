@@ -41,7 +41,7 @@ export const ProcessTimeline = () => {
   return (
     <section
       id="process"
-      className="landing-section bg-lotus-cream"
+      className="landing-section bg-page"
       aria-labelledby="process-heading"
     >
       <div className="landing-container">
@@ -70,23 +70,23 @@ export const ProcessTimeline = () => {
                       aria-current={isActive ? "step" : undefined}
                       className={`landing-focus-ring w-full border px-5 py-4 text-left transition-all duration-200 ${
                         isActive
-                          ? "border-lotus-rose/20 bg-white shadow-[0_4px_20px_rgba(42,31,26,0.06)]"
-                          : "border-transparent bg-transparent hover:border-lotus-rose/10 hover:bg-white/60"
+                          ? "border-rose-600/20 bg-white shadow-[0_4px_20px_rgba(42,31,26,0.06)]"
+                          : "border-transparent bg-transparent hover:border-rose-600/10 hover:bg-white/60"
                       }`}
                     >
                       <div className="flex items-baseline gap-3">
                         <span
                           className={`font-geist text-xs font-medium tabular-nums ${
-                            isActive ? "text-lotus-rose" : "text-lotus-stone"
+                            isActive ? "text-rose-600" : "text-warm-600"
                           }`}
                         >
                           {String(i + 1).padStart(2, "0")}
                         </span>
                         <div>
-                          <span className="block font-geist text-base font-semibold text-lotus-deep">
+                          <span className="block font-geist text-base font-semibold text-ink">
                             {step.title}
                           </span>
-                          <span className="font-geist text-xs text-lotus-stone">
+                          <span className="font-geist text-xs text-warm-600">
                             {step.subtitle}
                           </span>
                         </div>
@@ -106,13 +106,13 @@ export const ProcessTimeline = () => {
             className="landing-surface flex flex-col justify-center p-8 md:p-10 lg:col-span-7"
             aria-live="polite"
           >
-            <span className="mb-4 font-geist text-xs font-semibold uppercase tracking-[0.14em] text-lotus-rose">
+            <span className="mb-4 font-geist text-xs font-semibold uppercase tracking-[0.14em] text-rose-600">
               Bước {String(active + 1).padStart(2, "0")}
             </span>
-            <h3 className="mb-3 font-geist text-[clamp(1.5rem,2.5vw,2rem)] font-semibold tracking-[-0.02em] text-lotus-deep">
+            <h3 className="mb-3 font-geist text-[clamp(1.5rem,2.5vw,2rem)] font-semibold tracking-[-0.02em] text-ink">
               {STEPS[active].title}
             </h3>
-            <p className="max-w-prose font-geist text-base leading-[1.7] text-lotus-stone">
+            <p className="max-w-prose font-geist text-base leading-[1.7] text-warm-600">
               {STEPS[active].description}
             </p>
 
@@ -121,7 +121,7 @@ export const ProcessTimeline = () => {
                 <div
                   key={i}
                   className={`h-1 rounded-full transition-all duration-300 ${
-                    i <= active ? "w-8 bg-lotus-rose" : "w-3 bg-lotus-rose/15"
+                    i <= active ? "w-8 bg-rose-600" : "w-3 bg-rose-600/15"
                   }`}
                 />
               ))}

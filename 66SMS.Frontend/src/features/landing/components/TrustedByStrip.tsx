@@ -15,15 +15,15 @@ export const TrustedByStrip = () => {
   return (
     <section
       id="trusted"
-      className="border-b border-lotus-rose/8 bg-lotus-rose-light/50 py-7 sm:py-8"
+      className="border-b border-warm-100 bg-rose-50/80 py-7 sm:py-8"
       aria-label="Đối tác tin tưởng"
     >
       <div className="landing-container">
         <div className="mb-5 flex items-center gap-3">
-          <span className="shrink-0 font-geist text-sm font-semibold uppercase tracking-[0.16em] text-lotus-rose">
+          <span className="shrink-0 font-geist text-sm font-semibold uppercase tracking-[0.16em] text-gold-600">
             Được tin tưởng bởi
           </span>
-          <div className="h-px flex-1 bg-lotus-rose/20" aria-hidden="true" />
+          <div className="h-px flex-1 bg-warm-100" aria-hidden="true" />
         </div>
 
         <div className="trusted-marquee">
@@ -31,7 +31,7 @@ export const TrustedByStrip = () => {
             {items.map((name, i) => (
               <span
                 key={`${name}-${i}`}
-                className="shrink-0 font-display text-lg font-semibold tracking-[0.02em] text-lotus-deep sm:text-xl"
+                className="shrink-0 font-display text-lg font-semibold tracking-[0.02em] text-ink sm:text-xl"
               >
                 {name}
               </span>
