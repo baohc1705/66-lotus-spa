@@ -23,9 +23,6 @@ export interface StaffDto {
   username: string | null;
   email: string | null;
   createdAt?: string | null;
-  createdBy?: number | null;
-  updatedAt?: string | null;
-  updatedBy?: number | null;
 }
 
 // Payload tạo nhân viên (match CreateStaffCommand, bỏ [JsonIgnore] fields)

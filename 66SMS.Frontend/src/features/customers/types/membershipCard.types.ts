@@ -11,7 +11,6 @@ export interface MembershipCardDto {
   expiresAt: string | null;
   status: number;
   createdAt?: string | null;
-  updatedAt?: string | null;
 }
 
 export interface MembershipCardQueryParams extends PageRequest {

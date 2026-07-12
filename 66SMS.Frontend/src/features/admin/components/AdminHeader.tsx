@@ -1,11 +1,12 @@
 import { useAuthStore } from "@/features/auth/stores/authStore";
+import { useLogout } from "@/features/auth/hooks/useLogout";
 import { cn } from "@/lib/utils";
 import { BranchSelector } from "@/shared/components/BranchSelector";
 import { Logo } from "@/shared/components/Logo";
 import { Bell, LogOut, Menu, PanelLeft, PanelTop, Settings, ShoppingCart, User } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { MENU_ITEMS } from "../constants/menu";
 import { AdminTopNavbar } from "./AdminTopNavbar";
 
@@ -23,14 +24,13 @@ export function AdminHeader({
 }: AdminHeaderProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  const { user, hasRole, clearAuth } = useAuthStore();
+  const { user, hasRole } = useAuthStore();
   const isAdmin = hasRole("Admin");
   const isReceptionist = hasRole("Receptionist");
-  const navigate = useNavigate();
+  const logoutMutation = useLogout();
 
   const handleLogout = () => {
-    clearAuth();
-    navigate("/auth/login");
+    logoutMutation.mutate();
   };
 
   const location = useLocation();

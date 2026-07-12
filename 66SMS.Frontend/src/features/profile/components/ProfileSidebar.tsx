@@ -1,6 +1,5 @@
 import { User, Wallet, Bell, LogOut, Calendar, Award, ShieldCheck, Lock } from 'lucide-react'
-import { useAuthStore } from '@/features/auth/stores/authStore'
-import { useNavigate } from 'react-router-dom'
+import { useLogout } from '@/features/auth/hooks/useLogout'
 
 interface ProfileSidebarProps {
   activeTab: string
@@ -9,12 +8,10 @@ interface ProfileSidebarProps {
 }
 
 export function ProfileSidebar({ activeTab, onTabChange, isCustomer = false }: ProfileSidebarProps) {
-  const clearAuth = useAuthStore((state) => state.clearAuth)
-  const navigate = useNavigate()
+  const logoutMutation = useLogout()
 
   const handleLogout = () => {
-    clearAuth()
-    navigate('/')
+    logoutMutation.mutate()
   }
 
   const menuItems = [

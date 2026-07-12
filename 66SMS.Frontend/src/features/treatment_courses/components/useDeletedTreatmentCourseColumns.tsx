@@ -94,9 +94,9 @@ export function useDeletedTreatmentCourseColumns({
         size: 120,
       },
       {
-        accessorKey: "updatedAt",
-        header: "Ngày xóa",
-        cell: ({ row }) => <DateTimeCell value={row.original.updatedAt} />,
+        accessorKey: "createdAt",
+        header: "Ngày tạo",
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
         size: 140,
       },
       {

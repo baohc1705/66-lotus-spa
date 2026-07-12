@@ -3,7 +3,7 @@ import { HomePage } from "@/features/landing/pages/HomePage";
 import { ProfilePage } from "@/features/profile";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AdminLayout, AdminDashboard, AdminProfilePage } from "@/features/admin";
-import { LoginPage, RegisterPage } from "@/features/auth";
+import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage } from "@/features/auth";
 import RolePermissionPage from "@/features/auth/pages/RolePermissionPage";
 import { BookingPage } from "@/features/booking";
 import { CashierPage, VnPayReturnPage } from "@/features/cashier";
@@ -41,6 +41,14 @@ export const router = createBrowserRouter([
   {
     path: "/register",
     element: <RegisterPage />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPasswordPage />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPasswordPage />,
   },
   {
     path: "/thanh-toan/vnpay-return",

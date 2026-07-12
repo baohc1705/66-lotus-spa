@@ -24,9 +24,6 @@ export interface TreatmentCourseDto {
   sortOrder: number | null;
   status: number | null;
   createdAt: string | null;
-  createdBy: number | null;
-  updatedAt: string | null;
-  updatedBy: number | null;
   items: TreatmentCourseItemDto[] | null;
 }
 

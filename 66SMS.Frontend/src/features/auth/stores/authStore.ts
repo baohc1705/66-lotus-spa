@@ -1,8 +1,9 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import { type UserDto } from '@/features/users/types/user.types';
-import { parseJwt } from '@/features/auth/utils/jwt';
 import type { StaffSalonDTO } from '@/features/staff_salons/types/staff-salon.types';
+import type { TokenResponseDTO } from '@/features/auth/types/auth.types';
+import { applyTokenResponse } from '@/features/auth/utils/mapTokenProfile';
 
 interface AuthState {
   accessToken: string | null;
@@ -10,8 +11,10 @@ interface AuthState {
   managedSalonId: number | null;
   selectedSalonId: number | null;
   mySalon: StaffSalonDTO | null;
-  // Actions
-  setAccessToken: (token: string) => void;
+  /** false cho đến khi bootstrap xong */
+  isAuthReady: boolean;
+  setAuthReady: (ready: boolean) => void;
+  setSession: (data: TokenResponseDTO) => void;
   setUser: (user: UserDto) => void;
   setMySalon: (salon: StaffSalonDTO | null) => void;
   clearAuth: () => void;
@@ -28,32 +31,47 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       managedSalonId: null,
       selectedSalonId: null,
-
       mySalon: null,
+      isAuthReady: false,
 
-      setAccessToken: (token) => {
-        set({ accessToken: token });
-        const decoded = parseJwt(token);
-        if (decoded) {
-          const roleClaim = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded.role;
-          const roles = roleClaim ? (Array.isArray(roleClaim) ? roleClaim : [roleClaim]) : [];
+      setAuthReady: (ready) => set({ isAuthReady: ready }),
 
-          const permClaim = decoded.permission;
-          const permissions = permClaim ? (Array.isArray(permClaim) ? permClaim : [permClaim]) : [];
-
-          const salonIdClaim = decoded['salon_id'];
-          const managedSalonId = salonIdClaim ? parseInt(salonIdClaim, 10) : null;
-
-          const currentUser = get().user || ({} as UserDto);
-          set({ user: { ...currentUser, roles, permissions }, managedSalonId });
-        }
+      setSession: (data) => {
+        const session = applyTokenResponse(data);
+        const salonId = session.managedSalonId;
+        set({
+          accessToken: session.accessToken,
+          user: session.user,
+          managedSalonId: salonId,
+          mySalon: salonId
+            ? {
+                staffId: data.userProfile.staffProfile?.staffId,
+                salonId,
+              }
+            : null,
+        });
       },
 
       setUser: (user) => set({ user }),
 
       setMySalon: (salon) => set({ mySalon: salon }),
 
-      clearAuth: () => set({ accessToken: null, user: null, managedSalonId: null, selectedSalonId: null, mySalon: null }),
+      clearAuth: () => {
+        set({
+          accessToken: null,
+          user: null,
+          managedSalonId: null,
+          selectedSalonId: null,
+          mySalon: null,
+        });
+        // Đảm bảo xóa sạch persist (tránh F5 còn profile)
+        try {
+          sessionStorage.removeItem('auth-session');
+          localStorage.removeItem('auth-storage'); // key cũ nếu còn
+        } catch {
+          /* ignore */
+        }
+      },
 
       setSelectedSalonId: (id) => set({ selectedSalonId: id }),
 
@@ -64,41 +82,32 @@ export const useAuthStore = create<AuthState>()(
         return state.selectedSalonId;
       },
 
-      // Kiểm tra permission theo format "resource:action" giống backend
       hasPermission: (resource, action) => {
         const user = get().user;
-        console.log(`[PermissionCheck] Resource: ${resource}, Action: ${action}`, { user });
         if (!user) return false;
-        
-        // Kiểm tra case-insensitive cho role admin
-        const hasAdmin = user.roles?.some(r => r.toLowerCase() === 'admin');
-        if (hasAdmin) {
-           console.log(`[PermissionCheck] Granted via admin role bypass`);
-           return true;
-        }
+
+        const hasAdmin = user.roles?.some((r) => r.toLowerCase() === 'admin');
+        if (hasAdmin) return true;
 
         const permissions = user.permissions ?? [];
-        const hasPerm = permissions.includes(`${resource}:${action}`);
-        console.log(`[PermissionCheck] Exact permission match: ${hasPerm}`);
-        return hasPerm;
+        return permissions.includes(`${resource}:${action}`);
       },
 
       hasRole: (role) => {
         const roles = get().user?.roles ?? [];
-        const has = roles.some(r => r.toLowerCase() === role.toLowerCase());
-        console.log(`[RoleCheck] Role requested: ${role}, User roles:`, roles, `=> ${has}`);
-        return has;
+        return roles.some((r) => r.toLowerCase() === role.toLowerCase());
       },
     }),
     {
-      name: 'auth-storage',
-      // Persist cả accessToken và user để giữ phiên đăng nhập (bao gồm permissions) sau khi F5
-      partialize: (state) => ({ 
-        accessToken: state.accessToken, 
-        user: state.user, 
+      name: 'auth-session',
+      // sessionStorage: sống qua F5, mất khi đóng tab — giảm gọi refresh mỗi F5
+      storage: createJSONStorage(() => sessionStorage),
+      partialize: (state) => ({
+        accessToken: state.accessToken,
+        user: state.user,
         managedSalonId: state.managedSalonId,
+        mySalon: state.mySalon,
         selectedSalonId: state.selectedSalonId,
-        mySalon: state.mySalon
       }),
     },
   ),

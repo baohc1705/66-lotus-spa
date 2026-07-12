@@ -7,10 +7,38 @@ export interface PermissionDTO {
   permissionKey: string;
 }
 
+/** Profile gọn trả từ login/refresh (đồng bộ JWT claim profile). */
+export interface TokenUserProfileDto {
+  userId: number;
+  username: string;
+  email: string;
+  fullName?: string;
+  avatarUrl?: string;
+  phone?: string;
+  roles: string[];
+  permissions: string[];
+  /** customer | staff | none */
+  profileType: string;
+  customerProfile?: TokenCustomerProfileDto | null;
+  staffProfile?: TokenStaffProfileDto | null;
+}
+
+export interface TokenCustomerProfileDto {
+  customerId: number;
+  loyaltyPoint?: number | null;
+}
+
+export interface TokenStaffProfileDto {
+  staffId: number;
+  code?: string | null;
+  salonId?: number | null;
+}
+
 export interface TokenResponseDTO {
   userId: number;
   accessToken: string;
   refreshToken: string;
+  userProfile: TokenUserProfileDto;
 }
 
 export interface RoleDTO {
@@ -93,11 +121,6 @@ export interface RegisterPayload {
   password: string;
   confirmPassword: string;
   status: number;
-}
-
-export interface RegisterResponseDto {
-  userId: number;
-  customerId: number;
 }
 
 export interface SendOtpRequest {

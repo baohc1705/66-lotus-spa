@@ -21,15 +21,12 @@ import { toast } from "sonner";
 import { useRegister } from "@/features/auth/hooks/useRegister";
 import { useSendOtp } from "@/features/auth/hooks/useSendOtp";
 import { useVerifyOtp } from "@/features/auth/hooks/useVerifyOtp";
-import axiosInstance from "@/shared/api/axiosInstance";
-import { API } from "@/shared/api/endpoints";
 
 const RESEND_COOLDOWN = 60;
 const OTP_LENGTH = 6;
 
 type Step = "register" | "verify";
 
-// ─── Root shell — owns the step state ────────────────────────────────────────
 export const RegisterForm = () => {
   const [step, setStep] = useState<Step>("register");
   const [registeredEmail, setRegisteredEmail] = useState("");
@@ -48,16 +45,12 @@ export const RegisterForm = () => {
   return <OtpStep email={registeredEmail} />;
 };
 
-// ─── Step 1: registration form ───────────────────────────────────────────────
-
 interface RegisterStepProps {
   onSuccess: (email: string) => void;
 }
 
 const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
-  // Named `registerMutation` to avoid collision with RHF's `register` below
   const registerMutation = useRegister();
-  const sendOtpMutation = useSendOtp();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -78,40 +71,20 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
   });
 
   const onSubmit = (data: RegisterFormData) => {
-    registerMutation.mutate({ ...data, status: 1 }, {
-      onSuccess: (response) => {
-        const customerId = response.data?.customerId ?? 0;
-
-        // Gọi song song sendOtp và tạo membership card để tránh gọi tuần tự không cần thiết.
-        // Hai thao tác độc lập nhau — OTP dùng email, membership card dùng customerId từ register response.
-        // Nếu tạo membership card thất bại thì vẫn chuyển bước OTP bình thường (best-effort).
-        Promise.allSettled([
-          sendOtpMutation.mutateAsync({ email: data.email }),
-          customerId > 0
-            ? axiosInstance.post(API.membershipCards, {
-                customerId,
-                membershipTierName: "common",
-                issuedAt: new Date().toISOString(),
-                status: 1,
-              })
-            : Promise.resolve(),
-        ]).then(([otpResult]) => {
-          if (otpResult.status === "fulfilled") {
-            toast.success(
-              "Đăng ký thành công! Mã OTP đã được gửi đến email của bạn.",
-            );
-          } else {
-            toast.warning(
-              "Đăng ký thành công nhưng không gửi được OTP. Vui lòng thử gửi lại.",
-            );
-          }
+    registerMutation.mutate(
+      { ...data, status: 1 },
+      {
+        onSuccess: () => {
+          toast.success(
+            "Đăng ký thành công! Mã OTP đang được gửi đến email của bạn.",
+          );
           onSuccess(data.email);
-        });
+        },
       },
-    });
+    );
   };
 
-  const isPending = registerMutation.isPending || sendOtpMutation.isPending;
+  const isPending = registerMutation.isPending;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>

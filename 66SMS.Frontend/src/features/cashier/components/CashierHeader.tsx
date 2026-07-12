@@ -10,10 +10,11 @@ import {
   Settings,
   Home,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/shared/components/Logo";
 import { useAuthStore } from "@/features/auth/stores/authStore";
+import { useLogout } from "@/features/auth/hooks/useLogout";
 import { useOnlineBookings } from "../hooks/useOnlineBookings";
 import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
 import { BranchSelector } from "@/shared/components/BranchSelector";
@@ -27,11 +28,11 @@ interface CashierHeaderProps {
 export function CashierHeader({ activeTab = "calendar", onTabChange }: CashierHeaderProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [, setIsDrawerOpen] = useState(false);
-  const { user, hasRole, clearAuth, getEffectiveSalonId } = useAuthStore();
+  const { user, hasRole, getEffectiveSalonId } = useAuthStore();
   const isAdmin = hasRole("Admin");
   const isEmployee = hasRole("Staff");
   const isReceptionist = hasRole("Receptionist");
-  const navigate = useNavigate();
+  const logoutMutation = useLogout();
 
   const salonId = getEffectiveSalonId();
   const { data: salons = [] } = useActiveSalons();
@@ -46,9 +47,8 @@ export function CashierHeader({ activeTab = "calendar", onTabChange }: CashierHe
   const hasPendingBookings = onlineBookings.length > 0;
 
   const handleLogoutClick = () => {
-    clearAuth();
     setIsProfileOpen(false);
-    navigate("/login");
+    logoutMutation.mutate();
   };
 
   const cashierName = user?.username || "Thu ngân";

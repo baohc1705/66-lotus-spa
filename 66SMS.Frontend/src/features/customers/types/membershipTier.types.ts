@@ -9,7 +9,6 @@ export interface MembershipTierDto {
   benefits: string | null;
   status: number;
   createdAt?: string | null;
-  updatedAt?: string | null;
 }
 
 export interface MembershipTierQueryParams extends PageRequest {

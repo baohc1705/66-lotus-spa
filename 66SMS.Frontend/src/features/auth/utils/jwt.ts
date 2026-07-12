@@ -1,8 +1,8 @@
-export function parseJwt(token: string) {
+export function parseJwt(token: string): Record<string, unknown> | null {
   try {
     const base64Url = token.split('.')[1];
     if (!base64Url) return null;
-    
+
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const jsonPayload = decodeURIComponent(
       window
@@ -11,7 +11,7 @@ export function parseJwt(token: string) {
         .map(function (c) {
           return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         })
-        .join('')
+        .join(''),
     );
 
     return JSON.parse(jsonPayload);
@@ -19,4 +19,12 @@ export function parseJwt(token: string) {
     console.error('Failed to parse JWT payload', error);
     return null;
   }
+}
+
+/** Token còn hạn không (trừ buffer giây để tránh edge case sắp hết hạn). */
+export function isAccessTokenValid(token: string, bufferSeconds = 60): boolean {
+  const decoded = parseJwt(token);
+  if (!decoded || typeof decoded.exp !== 'number') return false;
+  const nowSec = Math.floor(Date.now() / 1000);
+  return decoded.exp > nowSec + bufferSeconds;
 }

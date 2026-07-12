@@ -17,7 +17,6 @@ import type {
   SendOtpRequest,
   VerifyOtpRequest,
   RegisterPayload,
-  RegisterResponseDto,
 } from '@/features/auth/types/auth.types';
 
 export const authApi = {
@@ -29,10 +28,9 @@ export const authApi = {
 
   refreshToken: (token: string) =>
     axiosInstance.post<Result<TokenResponseDTO>>(API.auth.refreshToken, { token }).then(r => r.data),
-
-  // Public registration — AllowAnonymous on POST /auth/register, NOT POST /customer
+  
   register: (body: RegisterPayload) =>
-    axiosInstance.post<Result<RegisterResponseDto>>(API.auth.register, body).then(r => r.data),
+    axiosInstance.post<Result<number>>(API.auth.register, body).then(r => r.data),
 
   forgotPassword: (body: ForgotPasswordRequest) =>
     axiosInstance.post<Result<object>>(API.auth.forgotPassword, body).then(r => r.data),

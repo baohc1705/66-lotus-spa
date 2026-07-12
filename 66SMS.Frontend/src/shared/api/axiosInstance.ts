@@ -1,18 +1,19 @@
 // Axios instance dùng chung cho toàn bộ app.
 // Tự động gắn Bearer token vào header mỗi request.
 // Tự động refresh token khi nhận lỗi 401 và retry lại request gốc.
-import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
-import { useAuthStore } from "@/features/auth/stores/authStore";
+import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import { useAuthStore } from '@/features/auth/stores/authStore';
+import type { Result } from '@/shared/types/common.types';
+import type { TokenResponseDTO } from '@/features/auth/types/auth.types';
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:7777/api/v1",
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:7777/api/v1',
   withCredentials: true, // gửi HttpOnly cookie (refreshToken)
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
 });
 
-// Gắn token vào mỗi request trước khi gửi đi
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = useAuthStore.getState().accessToken;
@@ -24,9 +25,6 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// Token hết hạn — thử refresh.
-// Nếu refresh thành công: retry tất cả request đang chờ.
-// Nếu refresh thất bại: xoá auth và chuyển về trang đăng nhập.
 let isRefreshing = false;
 let failedQueue: Array<{
   resolve: (token: string) => void;
@@ -47,43 +45,53 @@ axiosInstance.interceptors.response.use(
       _retry?: boolean;
     };
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      if (isRefreshing) {
-        // Xếp hàng chờ token mới
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return axiosInstance(originalRequest);
-        });
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      try {
-        // Cookie HttpOnly tự động gửi kèm nhờ withCredentials: true
-        const { data } = await axiosInstance.post("/auth/refresh-token", {
-          token: "", // backend lấy từ cookie
-        });
-
-        const newToken: string = data.data.accessToken;
-        useAuthStore.getState().setAccessToken(newToken);
-        processQueue(null, newToken);
-
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        return axiosInstance(originalRequest);
-      } catch (refreshError) {
-        processQueue(refreshError, null);
-        useAuthStore.getState().clearAuth();
-        window.location.href = "/login";
-        return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
-      }
+    if (!originalRequest || error.response?.status !== 401 || originalRequest._retry) {
+      return Promise.reject(error);
     }
 
-    return Promise.reject(error);
+    // Không retry chính endpoint refresh / login
+    const url = originalRequest.url ?? '';
+    if (url.includes('/auth/refresh-token') || url.includes('/auth/login')) {
+      return Promise.reject(error);
+    }
+
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+      }).then((token) => {
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+        return axiosInstance(originalRequest);
+      });
+    }
+
+    originalRequest._retry = true;
+    isRefreshing = true;
+
+    try {
+      const { data } = await axiosInstance.post<Result<TokenResponseDTO>>(
+        '/auth/refresh-token',
+        { token: '' },
+      );
+
+      if (!data.isSuccess || !data.data?.accessToken) {
+        throw new Error(data.message || 'Refresh token failed');
+      }
+
+      useAuthStore.getState().setSession(data.data);
+      processQueue(null, data.data.accessToken);
+
+      originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;
+      return axiosInstance(originalRequest);
+    } catch (refreshError) {
+      processQueue(refreshError, null);
+      useAuthStore.getState().clearAuth();
+      if (!window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login';
+      }
+      return Promise.reject(refreshError);
+    } finally {
+      isRefreshing = false;
+    }
   },
 );
 
