@@ -24,6 +24,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.UpdatedBy).HasColumnName(UserConst.FIELD_UPDATED_BY);
             builder.Property(x => x.PasswordResetToken).HasColumnName(UserConst.FIELD_PASSWORD_RESET_TOKEN);
             builder.Property(x => x.PasswordResetTokenExpiry).HasColumnName(UserConst.FIELD_PASSWORD_RESET_TOKEN_EXPIRY);
+            builder.Property(x => x.OtpCode).HasColumnName(UserConst.FIELD_OTP_CODE);
             builder.ToTable(UserConst.TABLE_NAME);
         }
     }

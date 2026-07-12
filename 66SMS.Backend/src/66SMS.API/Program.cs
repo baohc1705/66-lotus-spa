@@ -6,6 +6,7 @@ using _66SMS.Persistence.DependencyInjection;
 using _66SMS.API.Commons;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using _66SMS.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -40,8 +40,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.DeleteStaff
             try
             {
                 staff.Status = StaffConst.STATUS_DELETED;
-                staff.UpdatedAt = DateTime.UtcNow;
-                staff.UpdatedBy = request.UpdatedBy;
                 staffSqlRepository.Update(staff);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 

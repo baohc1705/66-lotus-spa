@@ -70,7 +70,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
                 RoleId = role.Id,
                 AssignedAt = DateTimeHelper.UtcNow(),
                 AssignedBy = request.CreatedBy ?? 1,
-                CreatedAt = DateTimeHelper.UtcNow(),
             };
             user.UserRoles = new List<UserRole> { userRole };
 

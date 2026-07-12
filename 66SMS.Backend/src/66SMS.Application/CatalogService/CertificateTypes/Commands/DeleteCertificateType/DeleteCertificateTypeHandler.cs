@@ -30,8 +30,6 @@ namespace _66SMS.Application.CatalogService.CertificateTypes.Commands.DeleteCert
             try
             {
                 entity.Status = CertificateTypeConst.STATUS_DELETED;
-                entity.UpdatedAt = DateTime.UtcNow;
-                entity.UpdatedBy = request.UpdatedBy;
                 certificateTypeRepository.Update(entity);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();

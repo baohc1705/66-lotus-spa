@@ -17,12 +17,8 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.PointMultiplier).HasColumnName(MembershipTierConst.FIELD_POINT_MULTIPLIER).HasColumnType("decimal(5, 2)");
             builder.Property(x => x.Benefits).HasColumnName(MembershipTierConst.FIELD_BENEFITS).HasMaxLength(MembershipTierConst.BENEFITS_MAX_LENGTH);
             builder.Property(x => x.Status).HasColumnName(MembershipTierConst.FIELD_STATUS);
-            builder.Property(x => x.CreatedAt).HasColumnName(MembershipTierConst.FIELD_CREATED_AT);
-            builder.Property(x => x.CreatedBy).HasColumnName(MembershipTierConst.FIELD_CREATED_BY);
-            builder.Property(x => x.UpdatedAt).HasColumnName(MembershipTierConst.FIELD_UPDATED_AT);
-            builder.Property(x => x.UpdatedBy).HasColumnName(MembershipTierConst.FIELD_UPDATED_BY);
-
             builder.ToTable(MembershipTierConst.TABLE_NAME);
+           
         }
     }
 }

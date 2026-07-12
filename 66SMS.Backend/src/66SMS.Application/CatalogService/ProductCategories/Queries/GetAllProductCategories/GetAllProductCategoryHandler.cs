@@ -32,7 +32,7 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Queries.GetAllProd
                 {
                     "name" => request.IsDescending ? query.OrderByDescending(x => x.Name) : query.OrderBy(x => x.Name),
                     "sortorder" => request.IsDescending ? query.OrderByDescending(x => x.SortOrder) : query.OrderBy(x => x.SortOrder),
-                    _ => request.IsDescending ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt)
+                    _ => request.IsDescending ? query.OrderByDescending(x => x.Id) : query.OrderBy(x => x.Id)
                 };
             }
 
@@ -59,8 +59,8 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Queries.GetAllProd
                     Description = x.Description,
                     SortOrder = x.SortOrder,
                     Status = x.Status,
-                    CreatedAt = x.CreatedAt.ToString(),
-                    UpdatedAt = x.UpdatedAt.HasValue ? x.UpdatedAt.Value.ToString() : null,
+                    CreatedAt = null,
+                    UpdatedAt = null,
                    
                 })
                 .ToPagedAsync(request, cancellationToken);

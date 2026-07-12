@@ -55,8 +55,6 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CancelInvoice
                             if (product != null)
                             {
                                 product.StockQuantity += item.Quantity;
-                                product.UpdatedAt = DateTime.UtcNow;
-                                product.UpdatedBy = request.UpdatedBy;
                                 productRepository.Update(product);
                             }
                         }
@@ -73,7 +71,6 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CancelInvoice
                         customer.LoyaltyPoint = (customer.LoyaltyPoint ?? 0) + invoice.LoyaltyPointsUsed - invoice.LoyaltyPointsEarned;
                         if (customer.LoyaltyPoint < 0) customer.LoyaltyPoint = 0;
                         customer.UpdatedAt = DateTime.UtcNow;
-                        customer.UpdatedBy = request.UpdatedBy;
                         customerRepository.Update(customer);
                     }
                 }

@@ -14,8 +14,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.RoleId).HasColumnName(UserRoleConst.FIELD_ROLE_ID);
             builder.Property(x => x.AssignedAt).HasColumnName(UserRoleConst.FIELD_ASSIGNED_AT);
             builder.Property(x => x.AssignedBy).HasColumnName(UserRoleConst.FIELD_ASSIGNED_BY);
-            builder.Property(x => x.CreatedAt).HasColumnName(UserRoleConst.FIELD_CREATED_AT);
-            builder.Property(x => x.UpdatedAt).HasColumnName(UserRoleConst.FIELD_UPDATED_AT);
 
             builder.ToTable(UserRoleConst.TABLE_NAME);
 

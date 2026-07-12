@@ -28,8 +28,6 @@ namespace _66SMS.Application.CustomerService.MembershipTiers.Commands.CreateMemb
             try
             {
                 MembershipTier membershipTier = mapper.Map<MembershipTier>(request);
-                membershipTier.CreatedAt = DateTime.UtcNow;
-                membershipTier.CreatedBy = request.CreatedBy ?? 1;
 
                 membershipTierSqlRepository.Add(membershipTier);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

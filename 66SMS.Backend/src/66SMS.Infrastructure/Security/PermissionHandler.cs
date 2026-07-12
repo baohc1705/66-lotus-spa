@@ -1,6 +1,7 @@
-using _66SMS.Domain.Abstractions.Repositories.Sql;
-using _66SMS.Domain.Entities;
+using _66SMS.Contracts.Constants;
+using _66SMS.Contracts.Shared;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
 using System.Security.Claims;
 
 namespace _66SMS.Infrastructure.Security
@@ -13,18 +14,31 @@ namespace _66SMS.Infrastructure.Security
 
     public class PermissionHandler : AuthorizationHandler<RequirePermissionAttribute>
     {
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, RequirePermissionAttribute requirement)
+        protected override Task HandleRequirementAsync(
+            AuthorizationHandlerContext context,
+            RequirePermissionAttribute requirement)
         {
-            // Kiểm tra xem trong JWT payload có chứa permission (có phân biệt hoa/thường)
-            if (context.User.HasClaim(c => c.Type == "permission" && c.Value == requirement.Permission))
+            // Admin bypass theo role claim
+            if (context.User.IsInRole("admin"))
             {
                 context.Succeed(requirement);
+                return Task.CompletedTask;
             }
-            else
+
+            // Permissions nằm trong claim "profile" (JSON TokenUserProfileDto)
+            var profileJson = context.User.FindFirstValue(JwtClaimConst.Profile);
+            if (!string.IsNullOrEmpty(profileJson))
             {
-                context.Fail();
+                var profile = JsonConvert.DeserializeObject<TokenUserProfileDto>(profileJson);
+                if (profile?.Permissions != null
+                    && profile.Permissions.Contains(requirement.Permission))
+                {
+                    context.Succeed(requirement);
+                    return Task.CompletedTask;
+                }
             }
-            
+
+            context.Fail();
             return Task.CompletedTask;
         }
     }

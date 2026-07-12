@@ -1,3 +1,5 @@
+using _66SMS.Contracts.Shared;
+
 namespace _66SMS.Application.DTOs.Auth
 {
     public class TokenResponseDTO
@@ -5,6 +7,7 @@ namespace _66SMS.Application.DTOs.Auth
         public int UserId { get; set; }
         public string AccessToken { get; set; } = null!;
         public string RefreshToken { get; set; } = null!;
-        public int? ManagedSalonId { get; set; }
+        // public int? ManagedSalonId { get; set; } Lấy từ UserProfile
+        public TokenUserProfileDto? UserProfile { get; set; } = null!;
     }
 }

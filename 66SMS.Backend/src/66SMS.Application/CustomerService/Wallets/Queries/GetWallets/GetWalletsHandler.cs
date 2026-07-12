@@ -19,7 +19,7 @@ namespace _66SMS.Application.CustomerService.Wallets.Queries.GetWallets
         {
             var wallets = await walletRepository.AsQueryable(asNoTracking: true)
                 .Include(w => w.Customer)
-                .OrderByDescending(w => w.UpdatedAt ?? w.CreatedAt)
+                .OrderByDescending(w => w.CreatedAt)
                 .Select(w => new AdminWalletDto
                 {
                     Id = w.Id,
@@ -30,7 +30,7 @@ namespace _66SMS.Application.CustomerService.Wallets.Queries.GetWallets
                     Balance = w.Balance,
                     Status = w.Status,
                     CreatedAt = w.CreatedAt,
-                    UpdatedAt = w.UpdatedAt
+                    UpdatedAt = null
                 })
                 .ToListAsync(cancellationToken);
 

@@ -44,7 +44,7 @@ namespace _66SMS.Application.CatalogService.CertificateTypes.Queries.GetAllCerti
             {
                 "name" => request.IsDescending ? query.OrderByDescending(x => x.Name) : query.OrderBy(x => x.Name),
                 "code" => request.IsDescending ? query.OrderByDescending(x => x.Code) : query.OrderBy(x => x.Code),
-                _ => request.IsDescending ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt)
+                _ => request.IsDescending ? query.OrderByDescending(x => x.Id) : query.OrderBy(x => x.Id)
             };
 
             var result = await query
@@ -56,10 +56,10 @@ namespace _66SMS.Application.CatalogService.CertificateTypes.Queries.GetAllCerti
                     Description = x.Description,
                     SortOrder = x.SortOrder,
                     Status = x.Status,
-                    CreatedAt = x.CreatedAt.ToString(),
-                    CreatedBy = x.CreatedBy,
-                    UpdatedAt = x.UpdatedAt.ToString(),
-                    UpdatedBy = x.UpdatedBy,
+                    CreatedAt = null,
+                    CreatedBy = null,
+                    UpdatedAt = null,
+                    UpdatedBy = null,
                 })
                 .ToPagedAsync(request, cancellationToken);
 

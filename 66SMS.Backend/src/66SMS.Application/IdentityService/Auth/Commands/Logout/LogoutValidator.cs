@@ -3,13 +3,12 @@ using FluentValidation;
 namespace _66SMS.Application.IdentityService.Auth.Commands.Logout
 {
     /// <summary>
-    /// Validator for <see cref="LogoutCommand"/>
+    /// Token lấy từ cookie ở AuthController; có thể rỗng nếu cookie đã mất.
     /// </summary>
     public class LogoutValidator : AbstractValidator<LogoutCommand>
     {
         public LogoutValidator()
         {
-            RuleFor(x => x.Token).NotNull().NotEmpty();
         }
     }
 }

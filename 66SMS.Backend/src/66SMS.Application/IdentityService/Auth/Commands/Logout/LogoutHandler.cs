@@ -21,21 +21,21 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Logout
 
         public async Task<Result<object>> Handle(LogoutCommand request, CancellationToken cancellationToken)
         {
-            // Find refreshtoken 
+            if (string.IsNullOrWhiteSpace(request.Token))
+                return Result<object>.Ok(); // Không có cookie → coi như đã logout
+
             var stored = await refreshTokenSqlRepository.AsQueryable(asNoTracking: false)
                 .Where(x => x.Token.Equals(request.Token))
                 .FirstOrDefaultAsync(cancellationToken);
-            // Check token
+
             if (stored == null || !stored.IsActive)
-                return Result<object>.BadRequest(UserConst.MSG_USER_INVALID_TOKEN, ErrorCodes.ERR_AUTH_TOKEN_INVALID);
-            // Revoke token
+                return Result<object>.Ok(); // Token đã hết / revoke — vẫn logout OK phía client
+
             stored.IsRevoked = true;
             stored.RevokedAt = DateTime.UtcNow;
             stored.RevokedByIp = request.IpAddress;
-            // Update and persist token to database
             refreshTokenSqlRepository.Update(stored);
             await refreshTokenSqlRepository.SaveChangeAsync(cancellationToken);
-            // return ok status
             return Result<object>.Ok();
         }
     }

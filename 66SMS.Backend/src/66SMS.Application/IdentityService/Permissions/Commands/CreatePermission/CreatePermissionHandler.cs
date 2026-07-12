@@ -35,7 +35,6 @@ namespace _66SMS.Application.IdentityService.Permissions.Commands.CreatePermissi
 
             // Map request to domain entity
             Permission? permission = mapper.Map<Permission>(request);
-            permission.CreatedBy = request.CreatedBy ?? 1;
 
             // Save and persist to database
             permissionSqlRepository.Add(permission);

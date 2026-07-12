@@ -1,6 +1,6 @@
 ﻿using _66SMS.Application.DTOs.Auth;
 using _66SMS.Contracts.Shared;
-using _66SMS.Domain.Constants;
+using _66SMS.Domain.Enums;
 using MediatR;
 using System.Text.Json.Serialization;
 
@@ -9,7 +9,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
     /// <summary>
     /// Regiter new customer or user request
     /// </summary>
-    public class RegisterCommand : IRequest<Result<RegisterResponseDto>>
+    public class RegisterCommand : IRequest<Result<int>>
     {
         public string? FullName { get; set; }
         public string? Phone { get; set; }
@@ -20,6 +20,6 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
         [JsonIgnore]
         public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
         
-        public int? Status { get; set; } = UserConst.STATUS_ACTIVED;
+        public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
     }
 }

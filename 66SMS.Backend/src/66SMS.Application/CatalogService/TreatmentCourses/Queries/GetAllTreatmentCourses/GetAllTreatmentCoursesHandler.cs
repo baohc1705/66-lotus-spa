@@ -62,10 +62,7 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Queries.GetAllTreat
                     ImageUrl = x.ImageUrl,
                     SortOrder = x.SortOrder,
                     Status = x.Status,
-                    CreatedAt = x.CreatedAt.ToString(),
-                    CreatedBy = x.CreatedBy,
-                    UpdatedAt = x.UpdatedAt.ToString(),
-                    UpdatedBy = x.UpdatedBy,
+                    CreatedAt = x.CreatedAt.ToString()
                 })
                 .ToPagedAsync(request, cancellationToken);
 

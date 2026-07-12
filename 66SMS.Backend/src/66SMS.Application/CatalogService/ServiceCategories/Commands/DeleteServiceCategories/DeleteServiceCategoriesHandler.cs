@@ -40,8 +40,6 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteSer
 
                 // Update status is deleted
                 entity.Status = ServiceCategoryConst.STATUS_DELETED;
-                entity.UpdatedAt = DateTime.UtcNow;
-                entity.UpdatedBy = request.UpdatedBy;
 
                 // Update and persist to database
                 serviceCategorySqlRepository.Update(entity);

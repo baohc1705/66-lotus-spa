@@ -65,8 +65,7 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Queries.GetDetailMe
                     IssuedAt = x.IssuedAt.ToString(),
                     ExpiresAt = x.ExpiresAt.ToString(),
                     Status = x.Status,
-                    CreatedAt = x.CreatedAt.ToString(),
-                    UpdatedAt = x.UpdatedAt.ToString()
+                    CreatedAt = x.IssuedAt.ToString()
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

@@ -45,8 +45,6 @@ namespace _66SMS.Application.CatalogService.Products.Commands.DeleteProducts
 
                 // update status is deleted soft deleted
                 product.Status = (int)StatusActiveEnum.DELETED;
-                product.UpdatedAt = DateTime.UtcNow;
-                product.UpdatedBy = request.UpdatedBy;
 
                 // Update and persist to database
                 productSqlRepository.Update(product);

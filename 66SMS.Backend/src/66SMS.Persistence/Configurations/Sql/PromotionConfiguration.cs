@@ -26,9 +26,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.EndDate).HasColumnName(PromotionConst.FIELD_END_DATE);
             builder.Property(x => x.Status).HasColumnName(PromotionConst.FIELD_STATUS);
             builder.Property(x => x.CreatedAt).HasColumnName(PromotionConst.FIELD_CREATED_AT);
-            builder.Property(x => x.CreatedBy).HasColumnName(PromotionConst.FIELD_CREATED_BY);
-            builder.Property(x => x.UpdatedAt).HasColumnName(PromotionConst.FIELD_UPDATED_AT);
-            builder.Property(x => x.UpdatedBy).HasColumnName(PromotionConst.FIELD_UPDATED_BY);
 
             builder.HasIndex(x => x.Code).IsUnique();
             builder.ToTable(PromotionConst.TABLE_NAME);

@@ -218,7 +218,6 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                     customer.LastPurchaseAt = DateTime.UtcNow;
                     customer.FirstPurchaseAt ??= DateTime.UtcNow;
                     customer.UpdatedAt = DateTime.UtcNow;
-                    customer.UpdatedBy = request.CashierId;
                     customerRepository.Update(customer);
                 }
 

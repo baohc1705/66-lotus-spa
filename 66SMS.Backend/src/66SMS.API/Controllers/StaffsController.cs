@@ -15,7 +15,6 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using _66SMS.Domain.Constants;
 
 namespace _66SMS.API.Controllers
 {
@@ -36,7 +35,7 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> CreateStaff([FromBody] CreateStaffCommand command)
         {
             command.CreatedBy = jwtService.GetUserId();
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue)
             {
                 // Manager: ghi đè salon_id từ token
@@ -55,7 +54,7 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("staffs", "delete", Roles = "admin")]
         public async Task<IActionResult> DeleteStaff(int id)
         {
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue)
             {
                 var check = await mediator.Send(new GetDetailStaffQuery { Id = id, SalonId = tokenSalonId });
@@ -73,7 +72,7 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("staffs", "update")]
         public async Task<IActionResult> UpdateStaff(int id, [FromBody] UpdateStaffCommand command)
         {
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue)
             {
                 var check = await mediator.Send(new GetDetailStaffQuery { Id = id, SalonId = tokenSalonId });
@@ -102,7 +101,7 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("staffs", "read")]
         public async Task<IActionResult> GetAll([FromQuery] GetAllStaffQuery query)
         {
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue)
                 query.SalonId = tokenSalonId.Value;
             var result = await mediator.Send(query);
@@ -113,7 +112,7 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("staffs", "read")]
         public async Task<IActionResult> AdminGetAll([FromQuery] GetAllStaffQuery query)
         {
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue)
                 query.SalonId = tokenSalonId.Value;
             var result = await mediator.Send(query);
@@ -124,7 +123,7 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("staffs", "read")]
         public async Task<IActionResult> GetDetail(int id)
         {
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             var result = await mediator.Send(new GetDetailStaffQuery { Id = id, SalonId = tokenSalonId });
             return HandleResult(result);
         }

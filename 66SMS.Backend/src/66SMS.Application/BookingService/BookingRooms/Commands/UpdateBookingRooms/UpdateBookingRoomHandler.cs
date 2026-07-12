@@ -39,7 +39,6 @@ namespace _66SMS.Application.BookingService.BookingRooms.Commands.UpdateBookingR
                 }
 
                 mapper.Map(request, bookingRoom);
-                bookingRoom.UpdatedAt = DateTimeHelper.UtcNow();
 
                 bookingRoomSqlRepository.Update(bookingRoom);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

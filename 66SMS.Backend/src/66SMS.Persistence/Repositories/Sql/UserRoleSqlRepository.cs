@@ -17,8 +17,9 @@ namespace _66SMS.Persistence.Repositories.Sql
             return await Entities
                 .AsNoTracking()
                 .Where(ur => ur.UserId == userId && ur.Role!.Status == RoleConst.STATUS_ACTIVED)
-                .SelectMany(ur => ur.Role!.RolePermissions)
-                .Select(rp => rp.Permission!.PermissionKey)
+                .SelectMany(ur => ur.Role!.RolePermissions!)
+                .Where(rp => rp.Permission != null)
+                .Select(rp => rp.Permission!.Resource + ":" + rp.Permission.Action)
                 .Distinct()
                 .ToListAsync(cancellationToken);
         }
@@ -31,28 +32,28 @@ namespace _66SMS.Persistence.Repositories.Sql
                     ur.UserId == userId &&
                     ur.RoleId == roleId &&
                     ur.Role!.Status == RoleConst.STATUS_ACTIVED)
-                .SelectMany(ur => ur.Role!.RolePermissions)
-                .Select(rp => rp.Permission!.PermissionKey)
+                .SelectMany(ur => ur.Role!.RolePermissions!)
+                .Where(rp => rp.Permission != null)
+                .Select(rp => rp.Permission!.Resource + ":" + rp.Permission.Action)
                 .Distinct()
                 .ToListAsync(cancellationToken);
         }
 
         public void Add(UserRole entity)
         {
-            entity.CreatedAt = DateTimeHelper.UtcNow();
+            if (entity.AssignedAt == default)
+                entity.AssignedAt = DateTimeHelper.UtcNow();
             base.Add(entity);
         }
 
         public void AddRange(List<UserRole> entities)
         {
             foreach (var entity in entities)
-                entity.CreatedAt = DateTimeHelper.UtcNow();
+            {
+                if (entity.AssignedAt == default)
+                    entity.AssignedAt = DateTimeHelper.UtcNow();
+            }
             base.AddRange(entities);
-        }
-        public void Update(UserRole entity)
-        {
-            entity.UpdatedAt = DateTimeHelper.UtcNow();
-            base.Update(entity);
         }
 
         public async Task<Role?> GetRoleByUserIdAsync(int id, CancellationToken cancellationToken)

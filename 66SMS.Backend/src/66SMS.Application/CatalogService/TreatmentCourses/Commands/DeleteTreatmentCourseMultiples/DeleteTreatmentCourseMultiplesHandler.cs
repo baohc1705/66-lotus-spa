@@ -39,8 +39,6 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.DeleteTrea
             foreach (var course in existingCourses)
             {
                 course.Status = (int)StatusActiveEnum.DELETED;
-                course.UpdatedAt = now;
-                course.UpdatedBy = request.UpdatedBy;
                 treatmentCourseSqlRepository.Update(course);
             }
 

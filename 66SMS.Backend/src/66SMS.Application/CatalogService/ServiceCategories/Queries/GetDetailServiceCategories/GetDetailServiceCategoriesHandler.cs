@@ -32,8 +32,8 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetDetailS
                     Description = x.Description,
                     SortOrder = x.SortOrder,
                     Status = x.Status,
-                    CreatedAt = x.CreatedAt.ToString(),
-                    UpdatedAt = x.UpdatedAt.ToString()
+                    CreatedAt = null,
+                    UpdatedAt = null
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

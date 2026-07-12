@@ -36,12 +36,9 @@ namespace _66SMS.Application.CatalogService.Products.Commands.DeleteProductMulti
                 return Result<object>.NotFound(ProductConst.MSG_PRODUCT_ID_NOT_FOUND, ErrorCodes.ERR_PRODUCT_NOT_FOUND);
             }
 
-            var now = DateTime.UtcNow;
             foreach (var product in existingProducts)
             {
                 product.Status = (int)StatusActiveEnum.DELETED;
-                product.UpdatedAt = now;
-                product.UpdatedBy = request.UpdatedBy ?? 0;
                 productSqlRepository.Update(product);
             }
 

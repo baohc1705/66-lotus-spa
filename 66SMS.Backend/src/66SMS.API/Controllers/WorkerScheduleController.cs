@@ -31,7 +31,7 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Create([FromBody] CreateWorkScheduleCommand command)
         {
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue && !command.SalonId.HasValue)
                 command.SalonId = tokenSalonId.Value;
 
@@ -44,7 +44,7 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> BulkCreate([FromBody] _66SMS.Application.BookingService.WorkSchedules.Commands.BulkCreateWorkSchedule.BulkCreateWorkScheduleCommand command)
         {
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue && command.Schedules != null)
             {
                 foreach (var s in command.Schedules)
@@ -65,7 +65,7 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] UpdateWorkScheduleCommand command)
         {
             command.Id = id;
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue && !command.SalonId.HasValue)
                 command.SalonId = tokenSalonId.Value;
 
@@ -89,7 +89,7 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAll([FromQuery] GetAllWorkScheduleQuery query)
         {
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue)
                 query.SalonId = tokenSalonId.Value;
             var result = await mediator.Send(query);

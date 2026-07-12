@@ -39,8 +39,7 @@ namespace _66SMS.Application.BookingService.Helpers
                     FullName = user.Staff?.FullName ?? user.Username ?? "User",
                     Phone = user.Staff?.Phone,
                     Status = CustomerConst.STATUS_ACTIVED,
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = userId
+                    CreatedAt = DateTime.UtcNow
                 };
             }
             else
@@ -64,8 +63,7 @@ namespace _66SMS.Application.BookingService.Helpers
                     Customer = customer,
                     Balance = 0,
                     Status = WalletConst.STATUS_ACTIVE,
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = userId
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 // Gán CustomerId trực tiếp nếu Customer đã có Id (tránh trùng khi EF track navigation)

@@ -38,8 +38,6 @@ namespace _66SMS.Application.CatalogService.CertificateTypes.Commands.UpdateCert
             entity.Description = request.Description;
             if (request.SortOrder.HasValue) entity.SortOrder = request.SortOrder;
             if (request.Status.HasValue) entity.Status = request.Status.Value;
-            entity.UpdatedAt = DateTime.UtcNow;
-            entity.UpdatedBy = request.UpdatedBy;
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try

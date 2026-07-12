@@ -29,9 +29,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.WardCode).HasColumnName(CustomerConst.FIELD_WARD_CODE).HasMaxLength(CustomerConst.WARD_CODE_MAX_LENGTH);
             builder.Property(x => x.FullAddress).HasColumnName(CustomerConst.FIELD_FULL_ADDRESS).HasMaxLength(CustomerConst.FULL_ADDRESS_MAX_LENGTH);
             builder.Property(x => x.CreatedAt).HasColumnName(CustomerConst.FIELD_CREATED_AT);
-            builder.Property(x => x.CreatedBy).HasColumnName(CustomerConst.FIELD_CREATED_BY);
             builder.Property(x => x.UpdatedAt).HasColumnName(CustomerConst.FIELD_UPDATED_AT);
-            builder.Property(x => x.UpdatedBy).HasColumnName(CustomerConst.FIELD_UPDATED_BY);
             builder.HasOne(x => x.User).WithOne(x => x.Customer).HasForeignKey<Customer>(x => x.UserId).IsRequired(false);
             builder.ToTable(CustomerConst.TABLE_NAME);
         }

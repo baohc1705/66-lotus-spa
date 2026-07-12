@@ -35,8 +35,6 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.DeleteMemb
 
             // update status is  deleted
             membershipCard.Status = MembershipCardConst.STATUS_REVOKED;
-            membershipCard.UpdatedAt = DateTime.UtcNow;
-            membershipCard.UpdatedBy = request.UpdatedBy;
 
             // update and persist to database
             membershipCardSqlRepository.Update(membershipCard);

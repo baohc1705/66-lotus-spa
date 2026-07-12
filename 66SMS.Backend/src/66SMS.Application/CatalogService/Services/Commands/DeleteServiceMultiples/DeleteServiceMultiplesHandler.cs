@@ -35,12 +35,9 @@ namespace _66SMS.Application.CatalogService.Services.Commands.DeleteServiceMulti
                 return Result<object>.NotFound(ServiceConst.MSG_SERVICE_NOT_FOUND, ErrorCodes.ERR_SERVICE_NOT_FOUND);
             }
 
-            var now = DateTime.UtcNow;
             foreach (var service in existingServices)
             {
                 service.Status = (int)StatusActiveEnum.DELETED;
-                service.UpdatedAt = now;
-                service.UpdatedBy = request.UpdatedBy ?? 0;
                 serviceSqlRepository.Update(service);
             }
 

@@ -34,9 +34,6 @@ namespace _66SMS.Application.CustomerService.MembershipTiers.Commands.UpdateMemb
             }
 
             mapper.Map(request, membershipTier);
-            membershipTier.UpdatedAt = DateTime.UtcNow;
-
-            membershipTierSqlRepository.Update(membershipTier);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
             return Result<object>.Ok();

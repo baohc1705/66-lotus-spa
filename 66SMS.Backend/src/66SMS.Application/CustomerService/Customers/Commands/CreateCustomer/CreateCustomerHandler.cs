@@ -39,8 +39,7 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
                     CustomerId = customer.Id,
                     Balance = 0,
                     Status = WalletConst.STATUS_ACTIVE,
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = request.CreatedBy ?? 1
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 // add and persist to database

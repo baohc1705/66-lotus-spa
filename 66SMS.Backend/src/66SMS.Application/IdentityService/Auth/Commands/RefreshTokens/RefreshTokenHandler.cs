@@ -1,59 +1,68 @@
 using _66SMS.Application.DTOs.Auth;
 using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Constants;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Settings;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
+using _66SMS.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
 {
-    /// <summary>
-    /// Handler for <see cref="RefreshTokenCommand"/>
-    /// </summary>
     public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, Result<TokenResponseDTO>>
     {
         private readonly IRefreshTokenSqlRepository refreshTokenSqlRepository;
         private readonly IUserSqlRepository userSqlRepository;
+        private readonly IUserRoleSqlRepository userRoleSqlRepository;
+        private readonly ICustomerSqlRepository customerSqlRepository;
+        private readonly IStaffSqlRepository staffSqlRepository;
         private readonly IJwtService jwtService;
         private readonly IOptions<JwtSettings> jwtOptions;
-        private readonly IStaffSqlRepository staffSqlRepository;
-        private readonly IStaffSalonSqlRepository staffSalonSqlRepository;
 
         public RefreshTokenHandler(
             IRefreshTokenSqlRepository refreshTokenSqlRepository,
             IUserSqlRepository userSqlRepository,
-            IJwtService jwtService,
-            IOptions<JwtSettings> jwtOptions,
+            IUserRoleSqlRepository userRoleSqlRepository,
+            ICustomerSqlRepository customerSqlRepository,
             IStaffSqlRepository staffSqlRepository,
-            IStaffSalonSqlRepository staffSalonSqlRepository)
+            IJwtService jwtService,
+            IOptions<JwtSettings> jwtOptions)
         {
             this.refreshTokenSqlRepository = refreshTokenSqlRepository;
             this.userSqlRepository = userSqlRepository;
+            this.userRoleSqlRepository = userRoleSqlRepository;
+            this.customerSqlRepository = customerSqlRepository;
+            this.staffSqlRepository = staffSqlRepository;
             this.jwtService = jwtService;
             this.jwtOptions = jwtOptions;
-            this.staffSqlRepository = staffSqlRepository;
-            this.staffSalonSqlRepository = staffSalonSqlRepository;
         }
 
         public async Task<Result<TokenResponseDTO>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
-            // Tim token trong refresh token db
-            RefreshToken? stored = await refreshTokenSqlRepository.AsQueryable(asNoTracking: false)
+            // Token lấy từ body hoặc cookie (controller merge). Rỗng = chưa đăng nhập / cookie mất.
+            if (string.IsNullOrWhiteSpace(request.Token))
+                return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_INVALID_TOKEN, ErrorCodes.ERR_AUTH_TOKEN_INVALID);
+
+            var stored = await refreshTokenSqlRepository
+                .AsQueryable(asNoTracking: false)
                 .Where(x => x.Token.Equals(request.Token))
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (stored == null)
                 return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_INVALID_TOKEN, ErrorCodes.ERR_AUTH_TOKEN_INVALID);
 
-            // Phat hien reuse attack
             if (stored.IsRevoked)
             {
-                IReadOnlyList<RefreshToken>? allToken = await refreshTokenSqlRepository.AsQueryable(asNoTracking: false).Where(x => x.UserId.Equals(stored.Id)).ToListAsync(cancellationToken);
+                var allToken = await refreshTokenSqlRepository
+                    .AsQueryable(asNoTracking: false)
+                    .Where(x => x.UserId == stored.UserId)
+                    .ToListAsync(cancellationToken);
+
                 foreach (var token in allToken.Where(x => x.IsActive))
                 {
                     token.IsRevoked = true;
@@ -66,85 +75,155 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
                 return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_TOKEN_REVOKED, ErrorCodes.ERR_AUTH_TOKEN_REVOKED);
             }
 
-            // kiem tra neu token con han khong
             if (stored.IsExpired)
                 return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_REFRESH_TOKEN_EXPIRED, ErrorCodes.ERR_AUTH_REFRESH_TOKEN_EXPIRED);
 
-            // Kiem tra user co hop le
-            User? user = await userSqlRepository.AsQueryable(asNoTracking: false)
-               .AsQueryable()
-               .Where(x => x.Id == stored.UserId!)
-               .Include(x => x.UserRoles!)
-                   .ThenInclude(ur => ur.Role!)
-                       .ThenInclude(r => r.RolePermissions!)
-                           .ThenInclude(rp => rp.Permission!)
-               .FirstOrDefaultAsync(cancellationToken);
+            var user = await userSqlRepository
+                .AsQueryable(true)
+                .Where(x => x.Id == stored.UserId)
+                .Select(x => new User
+                {
+                    Id = x.Id,
+                    Username = x.Username,
+                    Email = x.Email,
+                    Status = x.Status,
+                })
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (user == null || user.Status == UserConst.STATUS_LOCKED)
                 return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_NOT_FOUND, ErrorCodes.ERR_USER_NOT_FOUND);
 
-            // Rotate token
             stored.IsRevoked = true;
             stored.RevokedAt = DateTime.UtcNow;
             stored.RevokedByIp = request.IpAddress;
             refreshTokenSqlRepository.Update(stored);
 
-            string newRawToken = jwtService.GenerateRefreshToken();
-            // create new token
-            RefreshToken newRefreshToken = new RefreshToken
+            var newRawToken = jwtService.GenerateRefreshToken();
+            refreshTokenSqlRepository.Add(new RefreshToken
             {
                 UserId = user.Id,
                 Token = newRawToken,
                 ExpiresAt = DateTime.UtcNow.AddDays(jwtOptions.Value.RefreshTokenExpiryDays),
                 CreatedByIp = request.IpAddress ?? "",
-            };
+                CreatedAt = DateTime.UtcNow,
+            });
 
-            // Tracking insert state
-            refreshTokenSqlRepository.Add(newRefreshToken);
-
-            // Check user role 
-            if (user.UserRoles == null || !user.UserRoles.Any())
-                return Result<TokenResponseDTO>.NotFound(UserConst.MSG_USER_NO_ROLE, ErrorCodes.ERR_AUTH_NO_ROLE);
-            
-            // Set role and permission to jwt
-            var roleEntity = user.UserRoles.First().Role!;
-            string role = roleEntity.Name;
-            List<string> permissions = roleEntity.RolePermissions?
-                .Where(rp => rp.Permission != null)
-                .Select(rp => rp.Permission!.PermissionKey)
-                .Distinct()
-                .ToList() ?? new List<string>();
-            
-            // Get their salon_id from staff_salons
-            int? managedSalonId = null;
-            var staff = await staffSqlRepository.AsQueryable()
-                .Where(x => x.UserId == user.Id)
+            string? role = await userRoleSqlRepository
+                .AsQueryable(false)
+                .Where(x => x.UserId == user.Id && x.Role!.Status == (int)StatusActiveEnum.ACTIVED)
+                .Select(x => x.Role!.Code)
                 .FirstOrDefaultAsync(cancellationToken);
-            Console.WriteLine($"[RefreshTokenHandler] UserId: {user.Id}, Staff found: {staff != null}");
-            if (staff != null)
-            {
-                var staffSalon = await staffSalonSqlRepository.AsQueryable()
-                    .Where(x => x.StaffId == staff.Id && x.Status == StaffSalonConst.STATUS_ACTIVE)
-                    .FirstOrDefaultAsync(cancellationToken);
-                Console.WriteLine($"[RefreshTokenHandler] StaffId: {staff.Id}, StaffSalon found: {staffSalon != null}, SalonId: {staffSalon?.SalonId}, Status: {staffSalon?.Status}");
-                if (staffSalon != null)
-                    managedSalonId = staffSalon.SalonId;
-            }
 
-            // Generate jwt with role and permission
-            string accessToken = jwtService.GenerateAccessToken(user, role, permissions, managedSalonId);
+            if (role == null)
+                return Result<TokenResponseDTO>.NotFound(UserConst.MSG_USER_NO_ROLE, ErrorCodes.ERR_AUTH_NO_ROLE);
 
-            // Persist to database
+            var permissions = await userRoleSqlRepository
+                .AsQueryable(true)
+                .Where(x => x.UserId == user.Id && x.Role!.Status == (int)StatusActiveEnum.ACTIVED)
+                .SelectMany(x => x.Role!.RolePermissions!
+                    .Where(y => y.Permission != null)
+                    .Select(y => y.Permission!.Resource + ":" + y.Permission.Action))
+                .Distinct()
+                .ToListAsync(cancellationToken);
+
+            var profile = await BuildProfileAsync(user, role, permissions, cancellationToken);
+            var accessToken = jwtService.GenerateAccessToken(profile);
+
             await refreshTokenSqlRepository.SaveChangeAsync(cancellationToken);
 
-            // Return to token response dto
-            return Result<TokenResponseDTO>.Success(new TokenResponseDTO 
-            { 
-                AccessToken = accessToken , 
-                RefreshToken = newRawToken, 
+            return Result<TokenResponseDTO>.Success(new TokenResponseDTO
+            {
                 UserId = user.Id,
-                ManagedSalonId = managedSalonId
+                AccessToken = accessToken,
+                RefreshToken = newRawToken,
+                UserProfile = profile,
             });
+        }
+
+        private async Task<TokenUserProfileDto> BuildProfileAsync(
+            User user,
+            string role,
+            List<string> permissions,
+            CancellationToken cancellationToken)
+        {
+            var profile = new TokenUserProfileDto
+            {
+                UserId = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                Roles = new List<string> { role },
+                Permissions = permissions,
+                ProfileType = role == RoleConst.CODE_CUSTOMER
+                    ? JwtClaimConst.ProfileTypeCustomer
+                    : JwtClaimConst.ProfileTypeStaff,
+            };
+
+            if (role == RoleConst.CODE_CUSTOMER)
+            {
+                var customer = await customerSqlRepository
+                    .AsQueryable(true)
+                    .Where(x => x.UserId == user.Id)
+                    .Select(x => new Customer
+                    {
+                        Id = x.Id,
+                        FullName = x.FullName,
+                        Phone = x.Phone,
+                        AvatarUrl = x.AvatarUrl,
+                        LoyaltyPoint = x.LoyaltyPoint,
+                    })
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                profile.FullName = customer?.FullName;
+                profile.Phone = customer?.Phone;
+                profile.AvatarUrl = customer?.AvatarUrl;
+                profile.CustomerProfile = customer != null
+                    ? new TokenCustomerProfileDto
+                    {
+                        CustomerId = customer.Id,
+                        LoyaltyPoint = customer.LoyaltyPoint,
+                    }
+                    : null;
+            }
+            else
+            {
+                var staff = await staffSqlRepository
+                    .AsQueryable(true)
+                    .Where(x => x.UserId == user.Id)
+                    .Select(x => new Staff
+                    {
+                        Id = x.Id,
+                        Code = x.Code,
+                        FullName = x.FullName,
+                        Phone = x.Phone,
+                        AvatarUrl = x.AvatarUrl,
+                        StaffSalons = x.StaffSalons!
+                            .Where(y => y.Status == StaffSalonConst.STATUS_ACTIVE)
+                            .Select(y => new StaffSalon { SalonId = y.SalonId })
+                            .ToList(),
+                    })
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (staff != null)
+                {
+                    profile.FullName = staff.FullName;
+                    profile.Phone = staff.Phone;
+                    profile.AvatarUrl = staff.AvatarUrl;
+                    profile.StaffProfile = new TokenStaffProfileDto
+                    {
+                        StaffId = staff.Id,
+                        Code = staff.Code,
+                        SalonId = staff.StaffSalons!
+                            .Select(x => (int?)x.SalonId)
+                            .FirstOrDefault(),
+                    };
+                }
+                else if (role == RoleConst.CODE_ADMIN)
+                {
+                    profile.ProfileType = JwtClaimConst.ProfileTypeNone;
+                }
+            }
+
+            return profile;
         }
     }
 }

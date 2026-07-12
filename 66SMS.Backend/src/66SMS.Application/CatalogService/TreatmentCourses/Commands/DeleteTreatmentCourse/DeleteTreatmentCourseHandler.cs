@@ -30,8 +30,6 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.DeleteTrea
             try
             {
                 course.Status = TreatmentCourseConst.STATUS_DELETED;
-                course.UpdatedAt = DateTime.UtcNow;
-                course.UpdatedBy = request.UpdatedBy;
                 foreach(var item in course.Items!)
                 {
                     item.Status = TreatmentCourseItemConst.STATUS_DELETED;

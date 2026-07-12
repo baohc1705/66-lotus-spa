@@ -1,7 +1,7 @@
+using System.Text.Json.Serialization;
 using _66SMS.Application.DTOs.Auth;
 using _66SMS.Contracts.Shared;
 using MediatR;
-using System.Text.Json.Serialization;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
 {
@@ -14,5 +14,6 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
 
         [JsonIgnore]
         public string? IpAddress { get; set; }
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

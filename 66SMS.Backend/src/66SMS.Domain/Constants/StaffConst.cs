@@ -23,9 +23,6 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_WARD_CODE = "ward_code";
         public const string FIELD_FULL_ADDRESS = "full_address";
         public const string FIELD_CREATED_AT = "created_at";
-        public const string FIELD_CREATED_BY = "created_by";
-        public const string FIELD_UPDATED_AT = "updated_at";
-        public const string FIELD_UPDATED_BY = "updated_by";
         #endregion
 
         #region Constraint

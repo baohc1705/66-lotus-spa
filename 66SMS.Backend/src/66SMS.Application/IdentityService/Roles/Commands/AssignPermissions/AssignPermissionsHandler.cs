@@ -69,7 +69,6 @@ namespace _66SMS.Application.IdentityService.Roles.Commands.AssignPermissions
                         RoleId = (int)request.RoleId!,
                         PermissionId = permissionId,
                         AssignedAt = DateTime.UtcNow,
-                        CreatedAt = DateTime.UtcNow,
                     });
                 }
 

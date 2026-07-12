@@ -1,11 +1,12 @@
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Settings;
+using _66SMS.Infrastructure.DependencyInjection.Extensions;
 using _66SMS.Infrastructure.Mails;
 using _66SMS.Infrastructure.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace _66SMS.Infrastructure.DependencyInjection.Extensions
+namespace _66SMS.Infrastructure.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
@@ -30,6 +31,13 @@ namespace _66SMS.Infrastructure.DependencyInjection.Extensions
 
             // Cloudinary (lưu trữ file/ảnh)
             services.AddCloudinaryStorage(configuration);
+
+            // MassTransit
+            services.AddMassTransitExtensions(configuration);
+
+            // Background jobs (Quartz)
+            services.AddBackgroundJobs(configuration);
+
             return services;
         }
     }

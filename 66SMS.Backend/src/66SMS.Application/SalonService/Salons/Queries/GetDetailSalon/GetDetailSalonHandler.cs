@@ -44,7 +44,7 @@ namespace _66SMS.Application.SalonService.Salons.Queries.GetDetailSalon
                     SortOrder = x.SortOrder,
                     Status = x.Status,
                     CreatedAt = x.CreatedAt.ToString(),
-                    UpdatedAt = x.UpdatedAt.ToString()
+                    UpdatedAt = null
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

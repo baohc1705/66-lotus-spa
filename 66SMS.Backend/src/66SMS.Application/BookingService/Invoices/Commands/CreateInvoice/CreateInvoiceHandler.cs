@@ -78,8 +78,6 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
                         itemName = product.Name;
                         unitPrice = product.SellingPrice ?? 0;
                         product.StockQuantity -= quantity;
-                        product.UpdatedAt = request.IssuedAt;
-                        product.UpdatedBy = request.CreatedBy;
                         productRepository.Update(product);
                     }
                     else
@@ -202,7 +200,6 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
                     customer.LastPurchaseAt = request.IssuedAt;
                     customer.FirstPurchaseAt ??= request.IssuedAt;
                     customer.UpdatedAt = request.IssuedAt;
-                    customer.UpdatedBy = request.CreatedBy;
                     customerRepository.Update(customer);
                 }
 

@@ -35,12 +35,9 @@ namespace _66SMS.Application.CatalogService.CertificateTypes.Commands.DeleteCert
                 return Result<object>.NotFound(CertificateTypeConst.MSG_NOT_FOUND, ErrorCodes.ERR_CERTIFICATE_TYPE_NOT_FOUND);
             }
 
-            var now = DateTime.UtcNow;
             foreach (var type in existingTypes)
             {
                 type.Status = (int)StatusActiveEnum.DELETED;
-                type.UpdatedAt = now;
-                type.UpdatedBy = request.UpdatedBy;
                 certificateTypeSqlRepository.Update(type);
             }
 

@@ -29,13 +29,8 @@ namespace _66SMS.Application.CustomerService.MembershipTiers.Commands.DeleteMemb
                 return Result<object>.NotFound(MembershipTierConst.MSG_MEMBERSHIP_TIER_NOT_FOUND, ErrorCodes.ERR_MEMBERSHIP_TIER_NOT_FOUND);
             }
 
-            membershipTier.Status = MembershipTierConst.STATUS_DELETED;
-            membershipTier.UpdatedAt = DateTime.UtcNow;
-            membershipTier.UpdatedBy = request.UpdatedBy;
-
             membershipTierSqlRepository.Update(membershipTier);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-
             return Result<object>.Ok();
         }
     }

@@ -38,7 +38,6 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.DeleteCustomer
                 // update status is deleted
                 customer.Status = CustomerConst.STATUS_DELETED;
                 customer.UpdatedAt = DateTime.UtcNow;
-                customer.UpdatedBy = request.UpdatedBy;
 
                 // update and persist to database
                 customerSqlRepository.Update(customer);

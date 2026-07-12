@@ -44,7 +44,7 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetDetailService
                     SortOrder = x.SortOrder,
                     Status = x.Status,
                     CreatedAt = x.CreatedAt.ToString(),
-                    UpdatedAt = x.UpdatedAt.ToString(),
+                    UpdatedAt = null,
                     ImageUrl = x.Images!.Where(x => x.IsPrimary).Select(x => x.Url).FirstOrDefault(),
                     Images = x.Images!.Select(x => new ServiceImageResponse
                     {

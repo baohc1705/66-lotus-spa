@@ -9,8 +9,6 @@ namespace _66SMS.Domain.Entities
         public string? ImageUrl { get; set; }
         public string? Note { get; set; }
         public int Status { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
 
         public List<BookingPosition>? Positions { get; set; }
         public Salon? Salon { get; set; }

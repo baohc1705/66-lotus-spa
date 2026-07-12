@@ -122,7 +122,7 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetAllAppointment([FromQuery] GetAllAppointmentQuery query)
         {
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue)
                 query.SalonId = tokenSalonId.Value;
             var result = await mediator.Send(query);

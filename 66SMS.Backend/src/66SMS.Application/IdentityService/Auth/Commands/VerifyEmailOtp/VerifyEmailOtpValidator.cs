@@ -1,4 +1,6 @@
+using System.Text.RegularExpressions;
 using FluentValidation;
+using _66SMS.Contracts.Constants;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.VerifyEmailOtp
 {
@@ -6,7 +8,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.VerifyEmailOtp
     {
         public VerifyEmailOtpValidator()
         {
-            RuleFor(x => x.Email).NotNull().NotEmpty();
+            RuleFor(x => x.Email).NotNull().Matches(RegexConst.EMAIL_REGEX).NotEmpty();
             RuleFor(x => x.OtpCode).NotNull().NotEmpty().Length(6);
         }
     }

@@ -64,7 +64,7 @@ namespace _66SMS.Application.Mappers
                 .IgnoreNullValueTypes();
             CreateMap<Salon, SalonDto>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt != null ? src.UpdatedAt.Value.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss") : null))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => (string?)null))
                 .IgnoreNullValueTypes();
         }
     }

@@ -26,8 +26,6 @@ namespace _66SMS.Application.BookingService.Promotions.Commands.DeletePromotion
                 return Result<object>.NotFound(PromotionConst.MSG_PROMOTION_NOT_FOUND, ErrorCodes.ERR_PROMOTION_NOT_FOUND);
 
             promotion.Status = PromotionConst.STATUS_DELETED;
-            promotion.UpdatedAt = DateTime.UtcNow;
-            promotion.UpdatedBy = request.UpdatedBy;
 
             promotionSqlRepository.Update(promotion);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

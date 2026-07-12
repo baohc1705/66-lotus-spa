@@ -19,12 +19,15 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_CREATED_BY = "created_by";
         public const string FIELD_UPDATED_AT = "updated_at";
         public const string FIELD_UPDATED_BY = "updated_by";
+        public const string FIELD_OTP_CODE = "otp_code";
         #endregion
 
         #region Constraint
         public const int USERNAME_MAX_LENGTH = 100;
         public const int EMAIL_MAX_LENGTH = 100;
         public const int PASSWORD_HASH_MAX_LENGTH = 256;
+        public const int OTP_CODE_MAX_LENGTH = 10;
+        public const int OTP_CODE_EXPIRY_MINUTES = 5;
         #endregion
 
         #region Status
@@ -49,6 +52,7 @@ namespace _66SMS.Domain.Constants
         public const string MSG_USER_TOKEN_REVOKED = "Token has been revoked.";
         public const string MSG_USER_REFRESH_TOKEN_EXPIRED = "Refresh token has expired.";
         public const string MSG_USER_LOCKOUT_TIMEOUT = "Account is locked. Try again after {0}";
+        public const string MSG_USER_OTP_CODE_INVALID = "Otp code is invalid.";
         #endregion
     }
 }

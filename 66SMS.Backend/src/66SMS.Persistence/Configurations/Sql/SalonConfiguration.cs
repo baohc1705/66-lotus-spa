@@ -28,9 +28,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.SortOrder).HasColumnName(SalonConst.FIELD_SORT_ORDER);
             builder.Property(x => x.Status).HasColumnName(SalonConst.FIELD_STATUS);
             builder.Property(x => x.CreatedAt).HasColumnName(SalonConst.FIELD_CREATED_AT);
-            builder.Property(x => x.CreatedBy).HasColumnName(SalonConst.FIELD_CREATED_BY);
-            builder.Property(x => x.UpdatedAt).HasColumnName(SalonConst.FIELD_UPDATED_AT);
-            builder.Property(x => x.UpdatedBy).HasColumnName(SalonConst.FIELD_UPDATED_BY);
             builder.ToTable(SalonConst.TABLE_NAME);
         }
     }

@@ -38,9 +38,6 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Queries.GetDetailTr
                     SortOrder = x.SortOrder,
                     Status = x.Status,
                     CreatedAt = x.CreatedAt.ToString(),
-                    CreatedBy = x.CreatedBy,
-                    UpdatedAt = x.UpdatedAt.ToString(),
-                    UpdatedBy = x.UpdatedBy,
                     Items = x.Items != null ? x.Items.Select(i => new TreatmentCourseItemDTO
                     {
                         Id = i.Id,

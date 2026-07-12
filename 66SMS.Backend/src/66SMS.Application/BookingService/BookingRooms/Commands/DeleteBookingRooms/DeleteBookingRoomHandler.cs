@@ -35,7 +35,6 @@ namespace _66SMS.Application.BookingService.BookingRooms.Commands.DeleteBookingR
                 }
 
                 bookingRoom.Status = BookingRoomConst.STATUS_DELETED;
-                bookingRoom.UpdatedAt = DateTimeHelper.UtcNow();
                 bookingRoomSqlRepository.Update(bookingRoom);
 
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

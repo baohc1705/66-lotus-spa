@@ -41,8 +41,6 @@ namespace _66SMS.Application.CatalogService.Services.Commands.DeleteServices
 
                 // Update status is deleted
                 service.Status = ServiceConst.STATUS_DELETED;
-                service.UpdatedAt = DateTimeHelper.UtcNow();
-                service.UpdatedBy = request.UpdatedBy;
 
                 // Update and persist to database
                 serviceSqlRepository.Update(service);

@@ -35,7 +35,7 @@ namespace _66SMS.API.Controllers
             command.CreatedBy = userId;
 
             // Manager/thu ngân: ghi đè salon_id từ token. Admin: dùng salonId trong body (nếu có).
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue)
             {
                 command.SalonId = tokenSalonId.Value;

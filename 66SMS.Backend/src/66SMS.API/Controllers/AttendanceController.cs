@@ -31,7 +31,7 @@ namespace _66SMS.API.Controllers
         {
             command.CreatedBy = jwtService.GetUserId();
 
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue)
                 command.SalonId = tokenSalonId.Value;
 
@@ -54,7 +54,7 @@ namespace _66SMS.API.Controllers
         {
             command.CreatedBy = jwtService.GetUserId();
 
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue)
                 command.SalonId = tokenSalonId.Value;
 

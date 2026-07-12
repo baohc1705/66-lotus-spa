@@ -50,7 +50,7 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetAllServ
             query = request.OrderBy?.Trim().ToLower() switch
             {
                 "name" => request.IsDescending ? query.OrderByDescending(x => x.Name) : query.OrderBy(x => x.Name),
-                _ => request.IsDescending ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt)
+                _ => request.IsDescending ? query.OrderByDescending(x => x.Id) : query.OrderBy(x => x.Id)
             };
 
             PagedResult<ServiceCategoryDto> result = await query
@@ -61,10 +61,9 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetAllServ
                     Description = x.Description,
                     SortOrder = x.SortOrder,
                     Status = x.Status,
-                    CreatedAt = x.CreatedAt.ToString(),
-                    UpdatedAt = x.UpdatedAt.ToString()
+                    CreatedAt = null,
+                    UpdatedAt = null
                 })
-                .OrderByDescending(x => x.CreatedAt)
                 .ToPagedAsync(request, cancellationToken);
 
             return Result<PagedResult<ServiceCategoryDto>>.Success(result);

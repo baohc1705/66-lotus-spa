@@ -35,12 +35,9 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteSer
                 return Result<object>.NotFound(ServiceCategoryConst.MSG_SERVICE_CATEGORY_NOT_FOUND, ErrorCodes.ERR_SERVICE_CATEGORY_NOT_FOUND);
             }
 
-            var now = DateTime.UtcNow;
             foreach (var category in existingCategories)
             {
                 category.Status = (int)StatusActiveEnum.DELETED;
-                category.UpdatedAt = now;
-                category.UpdatedBy = request.UpdatedBy;
                 serviceCategorySqlRepository.Update(category);
             }
 

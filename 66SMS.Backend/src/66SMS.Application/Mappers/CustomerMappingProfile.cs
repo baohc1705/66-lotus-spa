@@ -28,8 +28,7 @@ namespace _66SMS.Application.Mappers
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .IgnoreNullValueTypes();
             CreateMap<MembershipTier, MembershipTierDto>()
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => (string?)null))
                 .IgnoreNullValueTypes();
 
             // MembershipCard mappings
@@ -43,8 +42,7 @@ namespace _66SMS.Application.Mappers
                 .ForMember(dest => dest.TierName, opt => opt.MapFrom(src => src.Tier != null ? src.Tier.Name : null))
                 .ForMember(dest => dest.IssuedAt, opt => opt.MapFrom(src => src.IssuedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
                 .ForMember(dest => dest.ExpiresAt, opt => opt.MapFrom(src => src.ExpiresAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.IssuedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
                 .IgnoreNullValueTypes();
         }
     }

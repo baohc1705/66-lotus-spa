@@ -34,8 +34,6 @@ namespace _66SMS.Application.SalonService.Salons.Commands.UpdateSalon
                     return Result<object>.NotFound(SalonConst.MSG_SALON_NOT_FOUND, ErrorCodes.ERR_SALON_NOT_FOUND);
 
                 mapper.Map(request, salon);
-                salon.UpdatedAt = DateTimeHelper.UtcNow();
-                salon.UpdatedBy = request.UpdatedBy;
 
                 salonSqlRepository.Update(salon);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

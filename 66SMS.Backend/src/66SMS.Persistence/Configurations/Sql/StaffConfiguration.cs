@@ -29,9 +29,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.WardCode).HasColumnName(StaffConst.FIELD_WARD_CODE).HasMaxLength(StaffConst.WARD_CODE_MAX_LENGTH);
             builder.Property(x => x.FullAddress).HasColumnName(StaffConst.FIELD_FULL_ADDRESS).HasMaxLength(StaffConst.FULL_ADDRESS_MAX_LENGTH);
             builder.Property(x => x.CreatedAt).HasColumnName(StaffConst.FIELD_CREATED_AT);
-            builder.Property(x => x.CreatedBy).HasColumnName(StaffConst.FIELD_CREATED_BY);
-            builder.Property(x => x.UpdatedAt).HasColumnName(StaffConst.FIELD_UPDATED_AT);
-            builder.Property(x => x.UpdatedBy).HasColumnName(StaffConst.FIELD_UPDATED_BY);
 
             builder.HasOne(x => x.User).WithOne(x => x.Staff).HasForeignKey<Staff>(x => x.UserId).IsRequired(false);
             builder.ToTable(StaffConst.TABLE_NAME);

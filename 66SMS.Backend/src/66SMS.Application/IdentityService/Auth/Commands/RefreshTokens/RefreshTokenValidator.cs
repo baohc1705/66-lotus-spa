@@ -3,13 +3,14 @@ using FluentValidation;
 namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
 {
     /// <summary>
-    /// Validator for <see cref="RefreshTokenCommand"/>
+    /// Token có thể rỗng ở body — AuthController sẽ lấy từ cookie HttpOnly.
+    /// Handler tự kiểm tra sau khi merge cookie.
     /// </summary>
     public class RefreshTokenValidator : AbstractValidator<RefreshTokenCommand>
     {
         public RefreshTokenValidator()
         {
-            RuleFor(x => x.Token).NotNull().NotEmpty();
+            // Không bắt NotEmpty ở đây: FE silent-refresh gửi { token: "" } + cookie.
         }
     }
 }

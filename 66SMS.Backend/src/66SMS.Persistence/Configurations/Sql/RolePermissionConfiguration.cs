@@ -13,8 +13,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.RoleId).HasColumnName(RolePermissionConst.FIELD_ROLE_ID);
             builder.Property(x => x.PermissionId).HasColumnName(RolePermissionConst.FIELD_PERMISSION_ID);
             builder.Property(x => x.AssignedAt).HasColumnName(RolePermissionConst.FIELD_ASSIGNED_AT);
-            builder.Property(x => x.CreatedAt).HasColumnName(RolePermissionConst.FIELD_CREATED_AT);
-            builder.Property(x => x.UpdatedAt).HasColumnName(RolePermissionConst.FIELD_UPDATED_AT);
 
             builder.ToTable(RolePermissionConst.TABLE_NAME);
 

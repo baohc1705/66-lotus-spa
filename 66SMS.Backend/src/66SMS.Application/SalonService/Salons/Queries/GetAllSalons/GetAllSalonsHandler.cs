@@ -62,7 +62,7 @@ namespace _66SMS.Application.SalonService.Salons.Queries.GetAllSalons
                     SortOrder = x.SortOrder,
                     Status = x.Status,
                     CreatedAt = x.CreatedAt.ToString(),
-                    UpdatedAt = x.UpdatedAt.ToString()
+                    UpdatedAt = null
                 })
                 .ToPagedAsync(request, cancellationToken);
 

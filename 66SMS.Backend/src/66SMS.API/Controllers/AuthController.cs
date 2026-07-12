@@ -85,7 +85,7 @@ namespace _66SMS.API.Controllers
                 command.Token = refreshToken;
             var result = await mediator.Send(command);
             if (result != null)
-                Response.Cookies.Delete("refreshToken");
+                DeleteRefreshTokenCookies();
             return HandleResult(result!);
         }
 
@@ -209,16 +209,28 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
+        private static CookieOptions RefreshTokenCookieOptions(DateTimeOffset? expires = null) => new()
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Path = "/",
+            Expires = expires
+        };
+
         private void SetRefreshTokenCookies(string token)
         {
-            Response.Cookies.Append("refreshToken", token, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddDays(7)
-            });
+            Response.Cookies.Append(
+                "refreshToken",
+                token,
+                RefreshTokenCookieOptions(DateTimeOffset.UtcNow.AddDays(7)));
         }
+
+        private void DeleteRefreshTokenCookies()
+        {
+            Response.Cookies.Delete("refreshToken", RefreshTokenCookieOptions());
+        }
+
         private string GetIpAddress() => Request.Headers.TryGetValue("X-Forwarded-For", out var ip)
             ? ip.ToString()
             : HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";

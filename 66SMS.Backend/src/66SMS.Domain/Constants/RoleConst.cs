@@ -5,16 +5,15 @@ namespace _66SMS.Domain.Constants
         #region Database
         public const string TABLE_NAME = "roles";
         public const string FIELD_ID = "id";
+        public const string FIELD_CODE = "code";
         public const string FIELD_NAME = "name";
         public const string FIELD_DESCRIPTION = "description";
         public const string FIELD_STATUS = "status";
         public const string FIELD_CREATED_AT = "created_at";
-        public const string FIELD_CREATED_BY = "created_by";
-        public const string FIELD_UPDATED_AT = "updated_at";
-        public const string FIELD_UPDATED_BY = "updated_by";
         #endregion
 
         #region Constraint
+        public const int CODE_MAX_LENGTH = 100;
         public const int NAME_MAX_LENGTH = 100;
         public const int DESCRIPTION_MAX_LENGTH = 500;
         #endregion
@@ -23,6 +22,13 @@ namespace _66SMS.Domain.Constants
         public const int STATUS_INACTIVED = 0;
         public const int STATUS_ACTIVED = 1;
         public const int STATUS_DELETED = 2;
+        #endregion
+
+        #region Codes
+        public const string CODE_CUSTOMER = "customer";
+        public const string CODE_ADMIN = "admin";
+        public const string CODE_MANAGER = "manager";
+        public const string CODE_STAFF = "staff";
         #endregion
 
         #region Message

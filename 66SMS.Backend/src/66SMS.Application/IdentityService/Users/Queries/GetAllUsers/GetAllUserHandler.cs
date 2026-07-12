@@ -47,7 +47,9 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetAllUsers
                 LastLoginAt = x.LastLoginAt.HasValue ? x.LastLoginAt.Value.ToString("HH:mm:ss dd/MM/yyyy") : null,
                 Roles = x.UserRoles!.Select(ur => ur.Role!.Name).ToList(),
                 Permissions = x.UserRoles!
-                    .SelectMany(ur => ur.Role!.RolePermissions!.Select(rp => rp.Permission!.PermissionKey))
+                    .SelectMany(ur => ur.Role!.RolePermissions!
+                        .Where(rp => rp.Permission != null)
+                        .Select(rp => rp.Permission!.Resource + ":" + rp.Permission.Action))
                     .Distinct()
                     .ToList(),
             });

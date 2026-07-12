@@ -78,8 +78,8 @@ namespace _66SMS.Application.Mappers
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .IgnoreNullValueTypes();
             CreateMap<BookingRoom, BookingRoomDto>()
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt != null ? src.UpdatedAt.Value.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss") : null))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => (string?)null))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => (string?)null))
                 .IgnoreNullValueTypes();
 
             // BookingPosition

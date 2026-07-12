@@ -1,57 +1,55 @@
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Helpers;
-using _66SMS.Contracts.Settings;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Constants;
+using _66SMS.Contracts.Helpers;
+using _66SMS.Contracts.Settings;
+using _66SMS.Contracts.Shared;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace _66SMS.Infrastructure.Security
 {
     public class JwtService(IOptions<JwtSettings> options, IHttpContextAccessor httpContextAccessor) : IJwtService
     {
-        public string GenerateAccessToken<TEntity>(TEntity entity, string role, List<string> permissions, int? salonId = null)
+        private static readonly JsonSerializerSettings ProfileJsonSettings = new()
         {
-            // Create claim
-            var claims = new List<Claim>();
-            // Get user id
-            var type = typeof(TEntity);
-            var idProp = type.GetProperty("Id");
-            if (idProp != null)
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, idProp.GetValue(entity)?.ToString() ?? ""));
-            // Add role
-            claims.Add(new Claim(ClaimTypes.Role, role));
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            NullValueHandling = NullValueHandling.Ignore
+        };
 
-            // Add permissions
-            foreach (var permission in permissions)
+        public string GenerateAccessToken(TokenUserProfileDto profile)
+        {
+            var roleCode = profile.Roles.FirstOrDefault() ?? string.Empty;
+
+            var claims = new List<Claim>
             {
-                claims.Add(new Claim("permission", permission));
-            }
+                new Claim(ClaimTypes.NameIdentifier, profile.UserId.ToString()),
+                new Claim(ClaimTypes.Role, roleCode),
+                new Claim(JwtClaimConst.ProfileType, profile.ProfileType),
+            };
 
-            // Add salon_id for managers
-            if (salonId.HasValue)
-                claims.Add(new Claim("salon_id", salonId.Value.ToString()));
+            var profileJson = JsonConvert.SerializeObject(profile, ProfileJsonSettings);
+            claims.Add(new Claim(JwtClaimConst.Profile, profileJson));
 
-            // Create key and cred
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.Value.SecretKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            // create token
+
             var token = new JwtSecurityToken(
                 issuer: options.Value.Issuer,
                 audience: options.Value.Audience,
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(options.Value.AccessTokenExpiryMinutes),
                 signingCredentials: credentials);
-            // Tra ve token
+
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public string GenerateRefreshToken()
-        {
-            return GenerateTokenHelper.Generate();
-        }
+        public string GenerateRefreshToken() => GenerateTokenHelper.Generate();
 
         public TEntity? GetClaim<TEntity>(string claimType)
         {
@@ -66,7 +64,21 @@ namespace _66SMS.Infrastructure.Security
                 return default;
             }
         }
+
+        public TokenUserProfileDto? GetProfile()
+        {
+            var profileJson = httpContextAccessor.HttpContext?.User?.FindFirstValue(JwtClaimConst.Profile);
+            if (string.IsNullOrEmpty(profileJson)) return null;
+            return JsonConvert.DeserializeObject<TokenUserProfileDto>(profileJson, ProfileJsonSettings);
+        }
+
         public int GetUserId() => GetClaim<int>(ClaimTypes.NameIdentifier);
+
+        public int? GetSalonId()
+        {
+            var salonId = GetProfile()?.StaffProfile?.SalonId;
+            return salonId is > 0 ? salonId : null;
+        }
 
         public ClaimsPrincipal? ValidateToken(string token)
         {

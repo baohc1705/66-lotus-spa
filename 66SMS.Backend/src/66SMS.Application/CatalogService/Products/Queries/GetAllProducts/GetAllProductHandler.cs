@@ -85,7 +85,7 @@ namespace _66SMS.Application.CatalogService.Products.Queries.GetAllProducts
                     MinStock = x.MinStock,
                     Status = x.Status,
                     CreatedAt = x.CreatedAt.ToString(),
-                    UpdatedAt = x.UpdatedAt.ToString(),
+                    UpdatedAt = null,
                     Images = x.Images!.Select(x => new ProductImageDto
                     {
                         Id = x.Id,

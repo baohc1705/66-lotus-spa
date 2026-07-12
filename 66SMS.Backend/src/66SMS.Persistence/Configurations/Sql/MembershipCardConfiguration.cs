@@ -17,10 +17,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.IssuedAt).HasColumnName(MembershipCardConst.FIELD_ISSUED_AT);
             builder.Property(x => x.ExpiresAt).HasColumnName(MembershipCardConst.FIELD_EXPIRES_AT);
             builder.Property(x => x.Status).HasColumnName(MembershipCardConst.FIELD_STATUS);
-            builder.Property(x => x.CreatedAt).HasColumnName(MembershipCardConst.FIELD_CREATED_AT);
-            builder.Property(x => x.CreatedBy).HasColumnName(MembershipCardConst.FIELD_CREATED_BY);
-            builder.Property(x => x.UpdatedAt).HasColumnName(MembershipCardConst.FIELD_UPDATED_AT);
-            builder.Property(x => x.UpdatedBy).HasColumnName(MembershipCardConst.FIELD_UPDATED_BY);
 
             builder.HasOne(x => x.Customer).WithOne(c => c.MembershipCard).HasForeignKey<MembershipCard>(x => x.CustomerId).IsRequired(false);
             builder.HasOne(x => x.Tier).WithMany(x => x.Cards).HasForeignKey(x => x.MembershipTierId).IsRequired(false);

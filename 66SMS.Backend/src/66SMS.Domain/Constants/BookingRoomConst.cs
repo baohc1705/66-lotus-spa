@@ -10,8 +10,6 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_IMAGE_URL = "image_url";
         public const string FIELD_NOTE = "note";
         public const string FIELD_STATUS = "status";
-        public const string FIELD_CREATED_AT = "created_at";
-        public const string FIELD_UPDATED_AT = "updated_at";
         #endregion
 
         #region Constraint

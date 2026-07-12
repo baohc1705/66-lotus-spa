@@ -15,9 +15,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.Balance).HasColumnName(WalletConst.FIELD_BALANCE).HasColumnType("decimal(18, 0)");
             builder.Property(x => x.Status).HasColumnName(WalletConst.FIELD_STATUS);
             builder.Property(x => x.CreatedAt).HasColumnName(WalletConst.FIELD_CREATED_AT);
-            builder.Property(x => x.CreatedBy).HasColumnName(WalletConst.FIELD_CREATED_BY);
-            builder.Property(x => x.UpdatedAt).HasColumnName(WalletConst.FIELD_UPDATED_AT);
-            builder.Property(x => x.UpdatedBy).HasColumnName(WalletConst.FIELD_UPDATED_BY);
 
             builder.HasOne(x => x.Customer).WithOne(c => c.Wallet).HasForeignKey<Wallet>(x => x.CustomerId).IsRequired(false);
 

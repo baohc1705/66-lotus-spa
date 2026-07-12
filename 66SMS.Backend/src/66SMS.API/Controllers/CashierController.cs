@@ -30,7 +30,7 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetDaily([FromQuery] DateOnly date, [FromQuery] DateOnly? endDate, [FromQuery] int? salonId)
         {
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             var finalSalonId = tokenSalonId ?? salonId;
             var query = new GetCashierDailyQuery { Date = date, EndDate = endDate, SalonId = finalSalonId };
             var result = await mediator.Send(query);
@@ -41,7 +41,7 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetWeekly([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate, [FromQuery] int? salonId)
         {
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             var finalSalonId = tokenSalonId ?? salonId;
             var query = new GetCashierDailyQuery { Date = startDate, EndDate = endDate, SalonId = finalSalonId };
             var result = await mediator.Send(query);
@@ -52,7 +52,7 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetOnlineAppointments([FromQuery] int? salonId)
         {
-            var tokenSalonId = jwtService.GetClaim<int?>("salon_id");
+            var tokenSalonId = jwtService.GetSalonId();
             var finalSalonId = tokenSalonId ?? salonId;
             var query = new GetOnlineAppointmentsQuery { SalonId = finalSalonId };
             var result = await mediator.Send(query);

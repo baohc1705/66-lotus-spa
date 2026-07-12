@@ -52,8 +52,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
                     return Result<object>.NotFound();
 
                 mapper.Map(request, staff);
-                staff.UpdatedAt = DateTime.UtcNow;
-                staff.UpdatedBy = request.UpdatedBy;
                 staffSqlRepository.Update(staff);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
@@ -135,7 +133,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
                             RoleId = role.Id,
                             AssignedAt = DateTime.UtcNow,
                             AssignedBy = request.UpdatedBy ?? 1,
-                            CreatedAt = DateTime.UtcNow,
                         };
                         userRoleSqlRepository.Add(userRole);
                         await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

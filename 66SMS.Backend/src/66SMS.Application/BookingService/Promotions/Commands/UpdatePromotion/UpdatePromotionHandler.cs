@@ -39,8 +39,6 @@ namespace _66SMS.Application.BookingService.Promotions.Commands.UpdatePromotion
             }
 
             mapper.Map(request, promotion);
-            promotion.UpdatedAt = DateTime.UtcNow;
-            promotion.UpdatedBy = request.UpdatedBy;
 
             promotionSqlRepository.Update(promotion);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

@@ -16,9 +16,6 @@ namespace _66SMS.Application.DTOs.TreatmentCourses
         public int? SortOrder { get; set; }
         public int? Status { get; set; }
         public string? CreatedAt { get; set; }
-        public int? CreatedBy { get; set; }
-        public string? UpdatedAt { get; set; }
-        public int? UpdatedBy { get; set; }
         public List<TreatmentCourseItemDTO>? Items { get; set; }
     }
 }

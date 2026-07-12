@@ -41,12 +41,9 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Commands.DeletePro
                     ErrorCodes.ERR_PRODUCT_CATEGORY_NOT_FOUND);
             }
 
-            var now = DateTime.UtcNow;
             foreach (var category in existingCategories)
             {
                 category.Status = (int)StatusActiveEnum.DELETED;
-                category.UpdatedAt = now;
-                category.UpdatedBy = request.UpdatedBy;
                 productCategorySqlRepository.Update(category);
             }
 

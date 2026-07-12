@@ -39,8 +39,6 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Commands.DeletePro
 
             // Soft delete
             productCategory.Status = (int)StatusActiveEnum.DELETED;
-            productCategory.UpdatedAt = DateTime.UtcNow;
-            productCategory.UpdatedBy = request.UpdatedBy;
 
             // Begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);

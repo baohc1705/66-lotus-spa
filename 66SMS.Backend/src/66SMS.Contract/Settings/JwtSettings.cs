@@ -1,5 +1,8 @@
 ﻿namespace _66SMS.Contracts.Settings
 {
+    /// <summary>
+    /// Cấu hình JWT
+    /// </summary>
     public class JwtSettings
     {
         public string SecretKey { get; set; } = null!;

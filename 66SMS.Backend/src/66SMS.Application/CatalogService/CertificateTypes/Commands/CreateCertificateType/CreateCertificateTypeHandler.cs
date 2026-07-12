@@ -35,8 +35,6 @@ namespace _66SMS.Application.CatalogService.CertificateTypes.Commands.CreateCert
                 Description = request.Description,
                 SortOrder = request.SortOrder,
                 Status = request.Status ?? CertificateTypeConst.STATUS_ACTIVED,
-                CreatedAt = request.CreatedAt ?? DateTime.UtcNow,
-                CreatedBy = request.CreatedBy,
             };
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);

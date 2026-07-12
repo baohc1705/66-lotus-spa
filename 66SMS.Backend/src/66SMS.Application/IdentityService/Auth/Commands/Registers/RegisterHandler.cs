@@ -1,4 +1,6 @@
 using _66SMS.Application.DTOs.Auth;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Messages;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
@@ -6,6 +8,8 @@ using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
+using _66SMS.Domain.Enums;
+using _66SMS.Domain.Messages;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -16,100 +20,115 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
     /// <summary>
     /// Handler for  <see cref="RegisterCommand"/>
     /// </summary>
-    public class RegisterHandler : IRequestHandler<RegisterCommand, Result<RegisterResponseDto>>
+    public class RegisterHandler : IRequestHandler<RegisterCommand, Result<int>>
     {
         private readonly IUserSqlRepository userSqlRepository;
         private readonly IRoleSqlRepository roleSqlRepository;
         private readonly IMapper mapper;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IPasswordHash passwordHash;
+        private readonly IDomainEventPublisher domainEventPublisher;
+        private readonly IEmailTemplateFactory emailTemplateFactory;
 
-        public RegisterHandler(IUserSqlRepository userSqlRepository, IRoleSqlRepository roleSqlRepository, IMapper mapper, ISqlUnitOfWork sqlUnitOfWork, IPasswordHash passwordHash)
+        public RegisterHandler(IUserSqlRepository userSqlRepository,
+                                IRoleSqlRepository roleSqlRepository,
+                                IMapper mapper,
+                                ISqlUnitOfWork sqlUnitOfWork,
+                                IPasswordHash passwordHash,
+                                IDomainEventPublisher domainEventPublisher,
+                                IEmailTemplateFactory emailTemplateFactory)
         {
             this.userSqlRepository = userSqlRepository;
             this.roleSqlRepository = roleSqlRepository;
             this.mapper = mapper;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.passwordHash = passwordHash;
+            this.domainEventPublisher = domainEventPublisher;
+            this.emailTemplateFactory = emailTemplateFactory;
         }
 
-        public async Task<Result<RegisterResponseDto>> Handle(RegisterCommand request, CancellationToken cancellationToken)
+        public async Task<Result<int>> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
-            // Check email and username if existed
+            // Kiểm tra email và username đã tồn tại chưa
             bool emailOrUsernameExisted = await userSqlRepository
-                .AsQueryable()
+                .AsQueryable(true)
                 .Where(x => x.Username == request.UserName || x.Email == request.Email)
                 .AnyAsync(cancellationToken);
 
+            // Nếu email hoặc username đã tồn tại, trả về lỗi
             if (emailOrUsernameExisted)
             {
-                return Result<RegisterResponseDto>.Conflict(UserConst.MSG_USER_ALREADY_EXISTS, ErrorCodes.ERR_USER_ALREADY_EXISTS);
+                return Result<int>.Conflict(UserConst.MSG_USER_ALREADY_EXISTS, ErrorCodes.ERR_USER_ALREADY_EXISTS);
             }
 
-            // Fetch customer role
-            var role = await roleSqlRepository
-                .AsQueryable()
-                .Where(x => x.Name.Equals("customer"))
+            // Lấy role customer theo code (schema: roles.code)
+            int roleId = await roleSqlRepository
+                .AsQueryable(true)
+                .Where(x => x.Code == RoleConst.CODE_CUSTOMER && x.Status == RoleConst.STATUS_ACTIVED)
+                .Select(x => x.Id)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (role == null)
+            if (roleId == 0)
             {
-                return Result<RegisterResponseDto>.NotFound(RoleConst.MSG_ROLE_NOT_FOUND, ErrorCodes.ERR_ROLE_NOT_FOUND);
+                return Result<int>.NotFound(RoleConst.MSG_ROLE_NOT_FOUND, ErrorCodes.ERR_ROLE_NOT_FOUND);
             }
+            User user = mapper.Map<User>(request);
+            user.PasswordHash = passwordHash.Hash(request.Password!);
+            user.OtpCode = Random.Shared.Next(100000, 999999).ToString();
 
-            // Begin transaction
+            // Bắt đầu transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // 1. Create user entity
-                User user = mapper.Map<User>(request);
-                user.PasswordHash = passwordHash.Hash(request.Password!);
-
-                // Thêm User vào CSDL trước để lấy Id (An toàn với Transaction)
+                // Thêm vào repository
                 userSqlRepository.Add(user);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // 2. Create and link customer
+                // Tạo và liên kết user role
+                var userRole = new UserRole
+                {
+                    UserId = user.Id,
+                    RoleId = roleId
+                };
+                user.UserRoles = new List<UserRole> { userRole };
+
+                // Tạo và liên kết customer
                 var customer = new Customer
                 {
                     UserId = user.Id, // Gán cứng UserId vừa sinh ra
                     FullName = request.FullName!,
                     Phone = request.Phone!,
-                    Source =  "Online",
-                    CreatedBy = user.Id,
-                    Status = request.Status ?? CustomerConst.STATUS_ACTIVED // Tự set active nếu không có status
+                    Source = SourceEnum.ONLINE.ToString(),
+                    CreatedAt = DateTime.UtcNow,
+                    Status = request.Status ?? (int)StatusActiveEnum.ACTIVED
                 };
                 user.Customer = customer;
 
-                // 3. Create and link wallet to customer
-                var wallet = new Wallet
-                {
-                    Balance = 0,
-                    Status = WalletConst.STATUS_ACTIVE,
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = user.Id
-                };
-                customer.Wallet = wallet;
-
-                // 4. Create and link user role
-                var userRole = new UserRole
-                {
-                    UserId = user.Id,
-                    RoleId = role.Id
-                };
-                user.UserRoles = new List<UserRole> { userRole };
-
-                // 5. Persist relations
+                // Lưu thay đổi vào database
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-
                 transaction.Commit();
 
-                // Trả về cả userId và customerId để frontend có thể tạo membership card ngay sau đăng ký
-                return Result<RegisterResponseDto>.Created(new RegisterResponseDto
+                // Gửi email OTP qua queue
+                var otpMail = emailTemplateFactory.CreateOtpEmail(
+                    user.Email,
+                    user.Username,
+                    user.OtpCode,
+                    UserConst.OTP_CODE_EXPIRY_MINUTES);
+                await domainEventPublisher.PublishAsync(new SendEmailEvent
+                {
+                    ToEmail = otpMail.ToEmail,
+                    Subject = otpMail.Subject,
+                    HtmlBody = otpMail.HtmlBody,
+                }, cancellationToken);
+
+                // Gửi event để tạo wallet và membership card khi customer được tạo
+                await domainEventPublisher.PublishAsync(new CreatedUserEvent
                 {
                     UserId = user.Id,
                     CustomerId = customer.Id
-                });
+                }, cancellationToken);
+
+                return Result<int>.Created(user.Id);
             }
             catch
             {
