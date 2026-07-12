@@ -120,41 +120,41 @@ function getClusters(laneBookings: CashierBooking[]): Cluster[] {
 }
 
 function getStatusStyle(status: CashierBooking["status"]) {
-  let statusColor = "bg-stone-50 border-stone-200 text-stone-700";
-  let statusBadge = "bg-stone-400";
+  let statusColor = "bg-adminGray-50 border-adminGray-100 text-adminInk";
+  let statusBadge = "bg-adminGray-400";
 
   switch (status) {
     case "in-progress":
-      statusColor = "bg-sky-50 border-sky-200 text-sky-700";
+      statusColor = "bg-state-info-bg border-state-info-border text-state-info-text";
       statusBadge = "bg-status-in-progress";
       break;
     case "not-arrived":
-      statusColor = "bg-red-50 border-red-200 text-red-700";
+      statusColor = "bg-state-danger-bg border-state-danger-border text-state-danger-text";
       statusBadge = "bg-status-cancelled";
       break;
     case "waiting":
-      statusColor = "bg-yellow-50 border-yellow-200 text-yellow-700";
+      statusColor = "bg-state-warning-bg border-state-warning-border text-state-warning-text";
       statusBadge = "bg-status-waiting";
       break;
     case "pending":
-      statusColor = "bg-amber-50 border-amber-200 text-amber-700";
+      statusColor = "bg-state-warning-bg border-state-warning-border text-state-warning-text";
       statusBadge = "bg-status-pending";
       break;
     case "confirmed":
-      statusColor = "bg-blue-50 border-blue-200 text-blue-700";
+      statusColor = "bg-state-info-bg border-state-info-border text-state-info-text";
       statusBadge = "bg-status-confirmed";
       break;
     case "unpaid":
-      statusColor = "bg-rose-50 border-rose-200 text-rose-700";
-      statusBadge = "bg-lotus-rose animate-pulse";
+      statusColor = "bg-state-danger-bg border-state-danger-border text-state-danger-text";
+      statusBadge = "bg-adminGreen-600 animate-pulse";
       break;
     case "paid":
     case "completed":
-      statusColor = "bg-emerald-50 border-emerald-200 text-emerald-700";
+      statusColor = "bg-state-success-bg border-state-success-border text-state-success-text";
       statusBadge = "bg-status-completed";
       break;
     case "cancelled":
-      statusColor = "bg-slate-50 border-slate-200 text-slate-700";
+      statusColor = "bg-adminGray-50 border-adminGray-100 text-adminInk";
       statusBadge = "bg-status-cancelled";
       break;
   }
@@ -266,24 +266,24 @@ export function CashierTimeline({
         {/* Header: thước thời gian (trục X) */}
         <div className="flex sticky top-0 z-40 bg-white">
           <div
-            className="flex-shrink-0 h-10 border-b border-r border-stone-300/80 bg-lotus-rose-light/50 sticky left-0 z-50 flex items-center px-4"
+            className="flex-shrink-0 h-10 border-b border-r border-adminGray-300/80 bg-adminGreen-600-light/50 sticky left-0 z-50 flex items-center px-4"
             style={{ width: `${STAFF_COL_WIDTH}px` }}
           >
-            <span className="text-lotus-admin-base font-bold text-lotus-stone">
+            <span className="text-xs font-bold text-adminGray-600">
               Nhân viên
             </span>
           </div>
           <div
-            className="relative h-10 border-b border-stone-300/80 bg-lotus-rose-light/20"
+            className="relative h-10 border-b border-adminGray-300/80 bg-adminGreen-600-light/20"
             style={{ width: `${laneWidth}px` }}
           >
             {HOURS.map((hour, i) => (
               <div
                 key={hour}
-                className="absolute top-0 h-full border-l border-stone-300/60 flex items-center"
+                className="absolute top-0 h-full border-l border-adminGray-300/60 flex items-center"
                 style={{ left: `${i * HOUR_WIDTH}px`, width: `${HOUR_WIDTH}px` }}
               >
-                <span className="text-lotus-admin-xs font-bold text-lotus-stone/80 pl-2">
+                <span className="text-2xs font-bold text-adminGray-600/80 pl-2">
                   {hour.toString().padStart(2, "0")}:00
                 </span>
               </div>
@@ -293,7 +293,7 @@ export function CashierTimeline({
                 className="absolute top-0 z-40 -translate-x-1/2 pointer-events-none"
                 style={{ left: `${currentTimeX}px` }}
               >
-                <div className="bg-rose-600 text-white text-lotus-admin-xs px-1 rounded-[2px] shadow-sm font-bold mt-2 border border-rose-600">
+                <div className="bg-state-danger-solid text-white text-2xs px-1 rounded-[2px] shadow-sm font-bold mt-2 border border-state-danger-solid">
                   {currentH.toString().padStart(2, "0")}:
                   {currentM.toString().padStart(2, "0")}
                 </div>
@@ -312,12 +312,12 @@ export function CashierTimeline({
           return (
             <div
               key={col.id}
-              className="flex border-b border-stone-300/60"
+              className="flex border-b border-adminGray-300/60"
               style={{ height: `${ROW_HEIGHT}px` }}
             >
               {/* Cột nhân viên cố định bên trái */}
               <div
-                className="flex-shrink-0 border-r border-stone-300/80 bg-lotus-rose-light/20 sticky left-0 z-30 flex items-center gap-2 px-4"
+                className="flex-shrink-0 border-r border-adminGray-300/80 bg-adminGreen-600-light/20 sticky left-0 z-30 flex items-center gap-2 px-4"
                 style={{ width: `${STAFF_COL_WIDTH}px` }}
               >
                 {col.avatar ? (
@@ -327,15 +327,15 @@ export function CashierTimeline({
                     className="w-6 h-6 rounded-[3px] flex-shrink-0"
                   />
                 ) : (
-                  <div className="w-6 h-6 rounded-[3px] bg-lotus-gold/10 flex items-center justify-center text-lotus-gold font-bold text-xs flex-shrink-0">
+                  <div className="w-6 h-6 rounded-[3px] bg-adminGold-600/10 flex items-center justify-center text-adminGold-600 font-bold text-xs flex-shrink-0">
                     {col.name.charAt(0)}
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="font-bold text-xs text-lotus-deep truncate whitespace-nowrap">
+                  <p className="font-bold text-xs text-adminInk truncate whitespace-nowrap">
                     {col.name}
                   </p>
-                  <p className="text-lotus-admin-xs text-lotus-stone">KTV</p>
+                  <p className="text-2xs text-adminGray-600">KTV</p>
                 </div>
               </div>
 
@@ -351,13 +351,13 @@ export function CashierTimeline({
                   {HOURS.map((hour) => (
                     <div
                       key={hour}
-                      className="border-l border-stone-300/60 h-full flex"
+                      className="border-l border-adminGray-300/60 h-full flex"
                       style={{ width: `${HOUR_WIDTH}px` }}
                     >
                       {[0, 15, 30, 45].map((min) => (
                         <div
                           key={min}
-                          className="flex-1 h-full border-l border-stone-300/30 border-dashed first:border-0 hover:bg-lotus-primary/5 transition-colors cursor-pointer"
+                          className="flex-1 h-full border-l border-adminGray-300/30 border-dashed first:border-0 hover:bg-adminGreen-50 transition-colors cursor-pointer"
                           onClick={() =>
                             handleSlotClick(
                               Number(col.id),
@@ -414,7 +414,7 @@ export function CashierTimeline({
                         }}
                       >
                         <div className="flex items-center justify-between gap-1 leading-none">
-                          <span className="font-bold text-lotus-admin-xs truncate whitespace-nowrap text-lotus-deep">
+                          <span className="font-bold text-2xs truncate whitespace-nowrap text-adminInk">
                             {booking.customerName}
                           </span>
                           <span
@@ -424,10 +424,10 @@ export function CashierTimeline({
                             )}
                           />
                         </div>
-                        <div className="text-lotus-admin-xs opacity-90 truncate whitespace-nowrap mt-0.5">
+                        <div className="text-2xs opacity-90 truncate whitespace-nowrap mt-0.5">
                           {booking.serviceName}
                         </div>
-                        <div className="text-lotus-admin-xs opacity-75 flex items-center gap-0.5 truncate whitespace-nowrap mt-0.5">
+                        <div className="text-2xs opacity-75 flex items-center gap-0.5 truncate whitespace-nowrap mt-0.5">
                           <Clock className="w-2 h-2 flex-shrink-0" />
                           {booking.startTime} - {booking.endTime}
                         </div>
@@ -441,7 +441,7 @@ export function CashierTimeline({
         })}
 
         {columns.length === 0 && (
-          <div className="flex items-center justify-center py-12 text-xs text-lotus-stone">
+          <div className="flex items-center justify-center py-12 text-xs text-adminGray-600">
             Không có nhân viên nào trong ngày này
           </div>
         )}

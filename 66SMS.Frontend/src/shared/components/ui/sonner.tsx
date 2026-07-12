@@ -26,8 +26,8 @@ function Toaster({ ...props }: ToasterProps) {
             "rounded-lg px-3 py-1.5",
           ].join(" "),
           success: "border-l-4 border-l-[var(--spa-rose)]",
-          error: "border-l-4 border-l-red-500",
-          warning: "border-l-4 border-l-yellow-500",
+          error: "border-l-4 border-l-state-danger-solid",
+          warning: "border-l-4 border-l-state-warning-solid",
           info: "border-l-4 border-l-[var(--spa-admin-primary)]",
         },
       }}

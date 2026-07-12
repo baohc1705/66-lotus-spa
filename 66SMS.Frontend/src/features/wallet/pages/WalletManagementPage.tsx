@@ -14,9 +14,9 @@ import { containerVariants } from '@/shared/motion/pageVariants';
 import { DEFAULT_LOADING_ROWS } from '@/shared/constants/display.const';
 
 const WALLET_STATUS_MAP: Record<number, { label: string; className: string }> = {
-  1: { label: "Hoạt động", className: "bg-emerald-50 text-emerald-700 border-emerald-200/50" },
-  2: { label: "Đang khóa", className: "bg-rose-50 text-rose-700 border-rose-200/50" },
-  3: { label: "Đã đóng", className: "bg-stone-50 text-stone-700 border-stone-200/50" },
+  1: { label: "Hoạt động", className: "bg-state-success-bg text-state-success-text border-state-success-border" },
+  2: { label: "Đang khóa", className: "bg-state-danger-bg text-state-danger-text border-state-danger-border" },
+  3: { label: "Đã đóng", className: "bg-state-neutral-bg text-state-neutral-text border-state-neutral-border" },
 };
 
 export function WalletManagementPage() {
@@ -43,7 +43,7 @@ export function WalletManagementPage() {
         id: "index",
         header: "#",
         cell: ({ row }) => (
-          <span className="text-lotus-stone text-lotus-admin-md font-medium">
+          <span className="text-adminGray-600 text-xs font-medium">
             {row.index + 1}
           </span>
         ),
@@ -53,7 +53,7 @@ export function WalletManagementPage() {
         accessorKey: "id",
         header: "Mã ví",
         cell: ({ row }) => (
-          <span className="text-lotus-admin-xs font-mono font-bold text-stone-500">
+          <span className="text-2xs font-mono font-bold text-adminGray-600">
             #{row.original.id}
           </span>
         ),
@@ -63,7 +63,7 @@ export function WalletManagementPage() {
         accessorKey: "customerId",
         header: "Mã KH",
         cell: ({ row }) => (
-          <span className="text-lotus-admin-xs font-mono text-stone-500">
+          <span className="text-2xs font-mono text-adminGray-600">
             #{row.original.customerId}
           </span>
         ),
@@ -74,10 +74,10 @@ export function WalletManagementPage() {
         header: "Khách hàng",
         cell: ({ row }) => (
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-full bg-lotus-rose-light/35 flex items-center justify-center text-lotus-rose font-bold shrink-0 text-lotus-admin-base uppercase">
+            <div className="w-7 h-7 rounded-full bg-adminGreen-600-light/35 flex items-center justify-center text-adminGreen-600 font-bold shrink-0 text-xs uppercase">
               {(row.original.customerName || 'K').charAt(0)}
             </div>
-            <span className="text-lotus-admin-lg font-semibold text-lotus-deep">
+            <span className="text-sm font-semibold text-adminInk">
               {row.original.customerName}
             </span>
           </div>
@@ -87,7 +87,7 @@ export function WalletManagementPage() {
         accessorKey: "customerPhone",
         header: "Số điện thoại",
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80 text-lotus-admin-md">
+          <span className="text-adminInk/80 text-xs">
             {row.original.customerPhone}
           </span>
         ),
@@ -96,7 +96,7 @@ export function WalletManagementPage() {
         accessorKey: "balance",
         header: "Số dư ví",
         cell: ({ row }) => (
-          <span className="font-bold text-lotus-rose text-lotus-admin-lg">
+          <span className="font-bold text-adminGreen-600 text-sm">
             {formatCurrency(row.original.balance)}
           </span>
         ),
@@ -106,9 +106,9 @@ export function WalletManagementPage() {
         header: "Trạng thái",
         cell: ({ row }) => {
           const statusVal = row.original.status;
-          const statusInfo = WALLET_STATUS_MAP[statusVal] || { label: "Không rõ", className: "bg-stone-50 text-stone-700 border-stone-200/50" };
+          const statusInfo = WALLET_STATUS_MAP[statusVal] || { label: "Không rõ", className: "bg-adminGray-50 text-adminInk border-adminGray-100/50" };
           return (
-            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${statusInfo.className}`}>
+            <span className={`text-2xs font-bold px-1.5 py-0.5 rounded border ${statusInfo.className}`}>
               {statusInfo.label}
             </span>
           );
@@ -118,7 +118,7 @@ export function WalletManagementPage() {
         accessorKey: "createdAt",
         header: "Ngày tạo ví",
         cell: ({ row }) => (
-          <span className="text-lotus-stone text-lotus-admin-xs">
+          <span className="text-adminGray-600 text-2xs">
             {new Date(row.original.createdAt).toLocaleDateString('vi-VN')}
           </span>
         ),
@@ -127,7 +127,7 @@ export function WalletManagementPage() {
         id: "updatedAt",
         header: "Cập nhật lần cuối",
         cell: ({ row }) => (
-          <span className="text-lotus-stone text-lotus-admin-xs">
+          <span className="text-adminGray-600 text-2xs">
             {new Date(row.original.updatedAt || row.original.createdAt).toLocaleString('vi-VN')}
           </span>
         ),
@@ -140,7 +140,7 @@ export function WalletManagementPage() {
             <Button
               variant="ghost"
               size="sm"
-              className="text-lotus-leaf hover:text-lotus-leaf/80 font-bold text-lotus-admin-md h-8 hover:bg-lotus-leaf/5"
+              className="text-adminGreen-600 hover:text-adminGreen-600/80 font-bold text-xs h-8 hover:bg-adminGreen-50"
               onClick={() => setSelectedWallet({ id: row.original.id, name: row.original.customerName })}
             >
               Chi tiết
@@ -162,16 +162,16 @@ export function WalletManagementPage() {
   return (
     <div className="flex flex-col gap-2 h-full overflow-hidden w-full">
       {/* Header section */}
-      <div className="shrink-0 bg-white p-4 rounded border border-stone-200/30 shadow-sm flex items-center justify-between">
+      <div className="shrink-0 bg-white p-4 rounded border border-adminGray-100/30 shadow-sm flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-lotus-rose-light/20 text-lotus-rose rounded-xl">
+          <div className="p-2 bg-adminGreen-600-light/20 text-adminGreen-600 rounded-xl">
             <Wallet className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-lotus-deep leading-tight">
+            <h1 className="text-lg font-bold text-adminInk leading-tight">
               Quản lý Ví Khách Hàng
             </h1>
-            <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
+            <p className="text-xs text-adminGray-600 mt-0.5">
               Xem danh sách ví của khách hàng và quản lý các giao dịch nạp / trừ tiền thủ công.
             </p>
           </div>
@@ -201,14 +201,14 @@ export function WalletManagementPage() {
           loadingRows={DEFAULT_LOADING_ROWS}
           emptyState={
             <div className="flex flex-col items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
-                <Wallet className="w-7 h-7 text-lotus-stone" />
+              <div className="w-14 h-14 rounded-2xl bg-adminGray-50 flex items-center justify-center">
+                <Wallet className="w-7 h-7 text-adminGray-600" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-lotus-deep">
+                <p className="text-sm font-semibold text-adminInk">
                   Không tìm thấy dữ liệu ví
                 </p>
-                <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
+                <p className="text-xs text-adminGray-600 mt-0.5">
                   Hãy thử thay đổi từ khóa tìm kiếm khác.
                 </p>
               </div>

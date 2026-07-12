@@ -12,7 +12,7 @@ export function RoleList({ roles, activeRoleId, onSelectRole, onCreateRole, onEd
   return (
     <aside className="w-[260px] shrink-0 flex flex-col gap-2">
       <button
-        className="w-full py-2.5 rounded-lg bg-lotus-leaf text-white font-semibold text-sm cursor-pointer border-0 hover:opacity-90"
+        className="w-full py-2.5 rounded-lg bg-adminGreen-600 text-white font-semibold text-sm cursor-pointer border-0 hover:opacity-90"
         onClick={onCreateRole}
       >
         + Tạo vai trò
@@ -28,8 +28,8 @@ export function RoleList({ roles, activeRoleId, onSelectRole, onCreateRole, onEd
               className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl cursor-pointer transition-all"
               style={{
                 border: isSelected ? `1.5px solid ${color.bg}` : '1.5px solid var(--border)',
-                background: isSelected ? color.light : '#fff',
-                boxShadow: isSelected ? `0 2px 8px ${color.bg}33` : '0 1px 3px rgba(42,31,26,.04)',
+                background: isSelected ? color.light : 'var(--admin-bg-surface)',
+                boxShadow: isSelected ? '0 2px 8px color-mix(in srgb, var(--admin-green-600) 20%, transparent)' : '0 1px 3px color-mix(in srgb, var(--admin-ink) 4%, transparent)',
               }}
             >
               <div
@@ -40,8 +40,8 @@ export function RoleList({ roles, activeRoleId, onSelectRole, onCreateRole, onEd
               </div>
 
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-bold text-lotus-deep truncate">{role.name}</div>
-                <div className="text-lotus-admin-base text-lotus-stone mt-0.5">
+                <div className="text-sm font-bold text-adminInk truncate">{role.name}</div>
+                <div className="text-xs text-adminGray-600 mt-0.5">
                   {role.roleUsers?.length ?? 0} thành viên · {role.rolePermissions?.length ?? 0} quyền
                 </div>
               </div>
@@ -50,14 +50,14 @@ export function RoleList({ roles, activeRoleId, onSelectRole, onCreateRole, onEd
                 <button
                   title="Sửa vai trò"
                   onClick={() => onEditRole(role)}
-                  className="bg-transparent border-0 cursor-pointer text-sm text-lotus-leaf px-1 py-0.5 rounded hover:bg-[rgba(62,122,62,0.1)] leading-none"
+                  className="bg-transparent border-0 cursor-pointer text-sm text-adminGreen-600 px-1 py-0.5 rounded hover:bg-adminGreen-50 leading-none"
                 >
                   ✎
                 </button>
                 <button
                   title="Xóa vai trò"
                   onClick={() => onDeleteRole(role)}
-                  className="bg-transparent border-0 cursor-pointer text-sm text-lotus-error px-1 py-0.5 rounded hover:bg-red-50 leading-none"
+                  className="bg-transparent border-0 cursor-pointer text-sm text-lotus-error px-1 py-0.5 rounded hover:bg-state-danger-bg leading-none"
                 >
                   ✕
                 </button>
@@ -69,19 +69,19 @@ export function RoleList({ roles, activeRoleId, onSelectRole, onCreateRole, onEd
 
       {/* Legend */}
       <div className="mt-1 bg-white border border-border rounded-xl p-3">
-        <div className="text-lotus-admin-xs font-bold uppercase tracking-widest text-lotus-stone mb-2">Chú thích</div>
+        <div className="text-2xs font-bold uppercase tracking-widest text-adminGray-600 mb-2">Chú thích</div>
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-lotus-leaf shrink-0" />
-            <span className="text-xs text-lotus-stone">Quyền được cấp</span>
+            <div className="w-4 h-4 rounded bg-adminGreen-600 shrink-0" />
+            <span className="text-xs text-adminGray-600">Quyền được cấp</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded border border-border bg-white shrink-0" />
-            <span className="text-xs text-lotus-stone">Chưa cấp quyền</span>
+            <span className="text-xs text-adminGray-600">Chưa cấp quyền</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-amber-500 shrink-0" />
-            <span className="text-xs text-lotus-stone">Một phần</span>
+            <div className="w-4 h-4 rounded bg-adminGold-600 shrink-0" />
+            <span className="text-xs text-adminGray-600">Một phần</span>
           </div>
         </div>
       </div>

@@ -10,7 +10,7 @@ export function SalonScopeIndicator() {
   if (!managedSalonId) return null;
 
   return (
-    <div className="flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300">
+    <div className="flex items-center gap-2 rounded-md border border-state-info-border bg-state-info-bg px-3 py-2 text-sm text-state-info-text">
       <MapPin className="h-4 w-4 shrink-0" />
       <span>
         Đang xem dữ liệu chi nhánh:{" "}

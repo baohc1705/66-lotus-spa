@@ -48,6 +48,8 @@ export function AdminHeader({
   for (const link of allLinks) {
     if (location.pathname.startsWith(link.path)) {
       currentTitle = link.label;
+      if (currentTitle === "Danh sách nhân viên")
+        currentTitle = "Quản lý nhân viên";
       if (currentTitle === "Nhân viên") currentTitle = "Quản lý nhân viên";
       if (currentTitle === "Khách hàng") currentTitle = "Quản lý khách hàng";
       if (currentTitle === "Sản phẩm") currentTitle = "Quản lý sản phẩm";
@@ -60,24 +62,21 @@ export function AdminHeader({
   }
 
   return (
-    <header className="h-12 bg-lotus-leaf border-b border-white/10 shadow-md flex items-center justify-between px-2 sm:px-4 sticky top-0 z-30 transition-all duration-300">
+    <header className="admin-header h-12 shadow-md flex items-center justify-between px-2 sm:px-4 sticky top-0 z-30 transition-all duration-300">
       <div className="flex items-center gap-2 sm:gap-4 h-full">
-        {/* Mobile menu trigger */}
         <button
           onClick={toggleMobileSidebar}
-          className="lg:hidden w-8 h-8 rounded-[4px] bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all duration-300"
+          className="lg:hidden w-8 h-8 rounded-[4px] bg-white/10 text-white flex items-center justify-center hover:bg-adminGreen-700 transition-all duration-300"
         >
           <Menu className="w-4 h-4" />
         </button>
 
-        {/* Logo (shown on desktop if layout is top-nav, hidden if layout is sidebar because sidebar has its own logo) */}
         {layoutMode === "top-nav" && (
           <div className="hidden lg:flex items-center shrink-0 mr-1.5">
             <Logo variant="light" size="sm" showTagline={false} />
           </div>
         )}
 
-        {/* Page Title (shown on mobile, or on desktop if layout is sidebar) */}
         <h1 className={cn(
           "text-sm sm:text-base font-bold text-white ml-1 tracking-tight",
           layoutMode === "sidebar" ? "block" : "lg:hidden"
@@ -85,7 +84,6 @@ export function AdminHeader({
           {currentTitle}
         </h1>
 
-        {/* Desktop Top Navigation Bar (Mega Menus) */}
         {layoutMode === "top-nav" && (
           <div className="hidden lg:block h-full">
             <AdminTopNavbar />
@@ -101,9 +99,9 @@ export function AdminHeader({
         {(isAdmin || isReceptionist) && (
           <Link
             to="/thu-ngan"
-            className="flex items-center gap-1.5 px-3 h-8 rounded-[4px] bg-white/10 text-white border border-white/10 hover:border-white/25 hover:bg-white/15 transition-all duration-300 font-medium text-xs tracking-wide whitespace-nowrap"
+            className="flex items-center gap-1.5 px-3 h-8 rounded-[4px] bg-white/10 text-white border border-white/10 hover:border-white/25 hover:bg-adminGreen-700 transition-all duration-300 font-medium text-xs tracking-wide whitespace-nowrap"
           >
-            <ShoppingCart className="w-3.5 h-3.5 text-lotus-secondary" />
+            <ShoppingCart className="w-3.5 h-3.5 text-adminGold-100" />
             <span className="hidden sm:inline">Thu ngân</span>
           </Link>
         )}
@@ -112,7 +110,7 @@ export function AdminHeader({
           <button
             onClick={toggleLayoutMode}
             title={layoutMode === "top-nav" ? "Chuyển sang giao diện Sidebar" : "Chuyển sang giao diện Top-Nav"}
-            className="w-8 h-8 rounded-[4px] bg-white/10 text-white border border-white/10 flex items-center justify-center hover:border-white/25 hover:bg-white/15 transition-all duration-300 relative group"
+            className="w-8 h-8 rounded-[4px] bg-white/10 text-white border border-white/10 flex items-center justify-center hover:border-white/25 hover:bg-adminGreen-700 transition-all duration-300 relative group"
           >
             {layoutMode === "top-nav" ? (
               <PanelLeft className="w-4 h-4 text-white" />
@@ -121,15 +119,15 @@ export function AdminHeader({
             )}
           </button>
 
-          <button className="w-8 h-8 rounded-[4px] bg-white/10 text-white border border-white/10 flex items-center justify-center hover:border-white/25 hover:bg-white/15 transition-all duration-300 relative group">
+          <button className="w-8 h-8 rounded-[4px] bg-white/10 text-white border border-white/10 flex items-center justify-center hover:border-white/25 hover:bg-adminGreen-700 transition-all duration-300 relative group">
             <Bell className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-            <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-lotus-primary border border-lotus-deep" />
+            <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-adminGold-600 border border-adminGreen-800" />
           </button>
 
           <div className="relative">
             <button
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="w-8 h-8 rounded-[4px] bg-white/10 text-white flex items-center justify-center hover:bg-white/15 hover:shadow-md transition-all duration-300 ml-0.5 border border-white/10 overflow-hidden"
+              className="w-8 h-8 rounded-[4px] bg-white/10 text-white flex items-center justify-center hover:bg-adminGreen-700 hover:shadow-md transition-all duration-300 ml-0.5 border border-white/10 overflow-hidden"
             >
               {user?.avatarUrl ? (
                 <img
@@ -154,41 +152,41 @@ export function AdminHeader({
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.96 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-2 w-52 bg-white rounded-[4px] shadow-[0_12px_30px_rgba(0,0,0,0.12)] p-2 z-50 flex flex-col gap-0.5"
+                    className="absolute right-0 mt-2 w-52 bg-white rounded-[4px] shadow-[0_12px_30px_rgba(0,0,0,0.12)] border border-adminGray-100 p-2 z-50 flex flex-col gap-0.5"
                   >
-                    <div className="px-3 py-2 border-b border-lotus-surface/20 mb-1.5">
-                      <p className="text-lotus-admin-lg font-semibold text-lotus-deep leading-tight">
+                    <div className="px-3 py-2 border-b border-adminGray-100 mb-1.5">
+                      <p className="text-sm font-semibold text-adminInk leading-tight">
                         {user?.username || "Tài khoản"}
                       </p>
-                      <p className="text-lotus-admin-base text-lotus-stone truncate mt-0.5 leading-none">
+                      <p className="text-xs text-adminGray-600 truncate mt-0.5 leading-none">
                         {user?.email || ""}
                       </p>
                     </div>
                     <Link
                       to="/admin/profile"
                       onClick={() => setIsProfileOpen(false)}
-                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-lotus-admin-md text-lotus-deep/85 hover:text-lotus-primary hover:bg-lotus-cream transition-all duration-300 font-normal"
+                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-xs text-adminInk/85 hover:text-adminGreen-600 hover:bg-adminGreen-50 transition-all duration-300 font-normal"
                     >
-                      <User className="w-3.5 h-3.5 text-lotus-deep/45 group-hover:text-lotus-primary group-hover:scale-110 transition-all duration-300" />
+                      <User className="w-3.5 h-3.5 text-adminGray-400 group-hover:text-adminGreen-600 group-hover:scale-110 transition-all duration-300" />
                       <span>Hồ sơ cá nhân</span>
                     </Link>
                     <Link
                       to="/admin/profile"
                       onClick={() => setIsProfileOpen(false)}
-                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-lotus-admin-md text-lotus-deep/85 hover:text-lotus-primary hover:bg-lotus-cream transition-all duration-300 font-normal"
+                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-xs text-adminInk/85 hover:text-adminGreen-600 hover:bg-adminGreen-50 transition-all duration-300 font-normal"
                     >
-                      <Settings className="w-3.5 h-3.5 text-lotus-deep/45 group-hover:text-lotus-primary group-hover:scale-110 transition-all duration-300" />
+                      <Settings className="w-3.5 h-3.5 text-adminGray-400 group-hover:text-adminGreen-600 group-hover:scale-110 transition-all duration-300" />
                       <span>Cài đặt tài khoản</span>
                     </Link>
-                    <div className="h-px bg-lotus-surface/20 my-1" />
+                    <div className="h-px bg-adminGray-100 my-1" />
                     <button
                       onClick={() => {
                         setIsProfileOpen(false);
                         handleLogout();
                       }}
-                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-lotus-admin-md text-lotus-rose hover:bg-lotus-rose/5 transition-all duration-300 font-normal w-full text-left"
+                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-xs text-state-danger-text hover:bg-state-danger-bg transition-all duration-300 font-normal w-full text-left"
                     >
-                      <LogOut className="w-3.5 h-3.5 text-lotus-rose/60 group-hover:scale-110 transition-all duration-300" />
+                      <LogOut className="w-3.5 h-3.5 text-state-danger-text/60 group-hover:scale-110 transition-all duration-300" />
                       <span>Đăng xuất</span>
                     </button>
                   </motion.div>

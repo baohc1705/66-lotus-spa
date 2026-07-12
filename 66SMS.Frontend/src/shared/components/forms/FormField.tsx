@@ -26,7 +26,7 @@ export function FormField({
           (tooltip ? (
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-red-500 cursor-help hover:text-red-600 focus:outline-none select-none">
+                <span className="text-state-danger-text cursor-help hover:text-state-danger-text focus:outline-none select-none">
                   *
                 </span>
               </TooltipTrigger>
@@ -35,7 +35,7 @@ export function FormField({
               </TooltipContent>
             </Tooltip>
           ) : (
-            <span className="text-red-500">*</span>
+            <span className="text-state-danger-text">*</span>
           ))}
       </Label>
       {children}

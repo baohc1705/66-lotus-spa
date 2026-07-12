@@ -40,7 +40,7 @@ export function CustomerCrmDetail({
 
   if (isLoading) {
     return (
-      <div className="flex flex-col h-full bg-white border border-stone-200 rounded overflow-hidden p-6 space-y-4 shadow-sm">
+      <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden p-6 space-y-4 shadow-sm">
         <div className="flex items-center justify-between">
           <Skeleton className="h-6 w-48" />
           <div className="flex gap-2">
@@ -63,8 +63,8 @@ export function CustomerCrmDetail({
 
   if (!customerId || !customer) {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-white border border-stone-200 rounded shadow-sm p-6 text-center text-stone-400">
-        <User className="w-12 h-12 text-stone-300 mb-2 stroke-[1.5]" />
+      <div className="flex flex-col items-center justify-center h-full bg-white border border-adminGray-100 rounded shadow-sm p-6 text-center text-adminGray-400">
+        <User className="w-12 h-12 text-adminGray-300 mb-2 stroke-[1.5]" />
         <p className="text-sm font-medium">
           Chọn một khách hàng để xem chi tiết
         </p>
@@ -78,18 +78,18 @@ export function CustomerCrmDetail({
     : "—";
 
   return (
-    <div className="flex flex-col h-full bg-white border border-stone-200 rounded overflow-hidden shadow-sm">
+    <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-sm">
       {/* Detail Header & Main Title */}
-      <div className="p-4 border-b border-stone-100 flex items-center justify-between shrink-0">
-        <h3 className="text-sm font-bold text-stone-900 truncate">
+      <div className="p-4 border-b border-adminGray-100 flex items-center justify-between shrink-0">
+        <h3 className="text-sm font-bold text-adminInk truncate">
           Thông tin khách hàng -{" "}
-          <span className="font-mono text-stone-600">{code}</span>
+          <span className="font-mono text-adminGray-600">{code}</span>
         </h3>
         <div className="flex items-center gap-1.5 shrink-0">
           <Button
             size="sm"
             variant="outline"
-            className="h-8 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+            className="h-8 text-xs text-state-danger-text hover:text-state-danger-text hover:bg-state-danger-bg border-state-danger-border"
             onClick={() => onDelete(customer)}
           >
             <Trash2 className="w-3.5 h-3.5 mr-1" />
@@ -111,7 +111,7 @@ export function CustomerCrmDetail({
       <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
         {/* Profile Card & Big Badge */}
         <div className="flex items-start gap-4">
-          <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center shrink-0 overflow-hidden shadow-inner border border-stone-200">
+          <div className="w-16 h-16 rounded-full bg-adminGray-100 flex items-center justify-center shrink-0 overflow-hidden shadow-inner border border-adminGray-100">
             {customer.avatarUrl ? (
               <img
                 src={customer.avatarUrl}
@@ -119,16 +119,16 @@ export function CustomerCrmDetail({
                 className="w-16 h-16 object-cover"
               />
             ) : (
-              <span className="text-xl font-bold text-stone-500">
+              <span className="text-xl font-bold text-adminGray-600">
                 {(customer.fullName || "?").charAt(0).toUpperCase()}
               </span>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <h4 className="text-lg font-bold text-stone-900 truncate">
+            <h4 className="text-lg font-bold text-adminInk truncate">
               {customer.fullName || "—"}
             </h4>
-            <div className="text-xs text-stone-500 mt-1 space-y-0.5">
+            <div className="text-xs text-adminGray-600 mt-1 space-y-0.5">
               <p>Khởi tạo lúc: {createdDate}</p>
               <p>
                 Ghé thăm lần cuối:{" "}
@@ -138,10 +138,10 @@ export function CustomerCrmDetail({
               </p>
             </div>
             <div className="flex flex-wrap gap-1.5 mt-2">
-              <span className="text-lotus-admin-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/50 px-2 py-0.5 rounded">
+              <span className="text-2xs font-semibold bg-state-success-bg text-state-success-text border border-state-success-border/50 px-2 py-0.5 rounded">
                 Hạng Thường
               </span>
-              <button className="text-lotus-admin-base text-lotus-leaf hover:underline font-medium">
+              <button className="text-xs text-adminGreen-600 hover:underline font-medium">
                 + Thêm nhóm khách hàng
               </button>
             </div>
@@ -151,33 +151,33 @@ export function CustomerCrmDetail({
             <span className="text-base font-black leading-none">
               {customer.loyaltyPoint ?? 0}
             </span>
-            <span className="text-lotus-admin-xs mt-0.5 uppercase tracking-wider font-semibold">
+            <span className="text-2xs mt-0.5 uppercase tracking-wider font-semibold">
               Điểm
             </span>
           </div>
         </div>
 
         {/* Short Summary Stats */}
-        <div className="bg-stone-50 border border-stone-100 rounded-lg p-3 text-xs space-y-1.5 text-stone-600">
+        <div className="bg-adminGray-50 border border-adminGray-100 rounded-lg p-3 text-xs space-y-1.5 text-adminGray-600">
           <div className="flex justify-between">
             <span>Tổng số lần đặt trước:</span>
-            <span className="font-bold text-stone-900">0 (lần)</span>
+            <span className="font-bold text-adminInk">0 (lần)</span>
           </div>
           <div className="flex justify-between">
             <span>Tổng số lần đặt từ app:</span>
-            <span className="font-bold text-stone-900">0 (lần)</span>
+            <span className="font-bold text-adminInk">0 (lần)</span>
           </div>
           <div className="flex justify-between">
             <span>Tổng số lần đến trực tiếp:</span>
-            <span className="font-bold text-stone-900">0 (lần)</span>
+            <span className="font-bold text-adminInk">0 (lần)</span>
           </div>
           <div className="flex justify-between">
             <span>Tổng số lần hủy đặt / không đến:</span>
-            <span className="font-bold text-stone-900">0 (lần)</span>
+            <span className="font-bold text-adminInk">0 (lần)</span>
           </div>
-          <div className="flex justify-between border-t border-stone-200/60 pt-1.5">
+          <div className="flex justify-between border-t border-adminGray-100/60 pt-1.5">
             <span>Nguồn giới thiệu:</span>
-            <span className="font-medium text-stone-800">
+            <span className="font-medium text-adminInk">
               {customer.source || "—"}
             </span>
           </div>
@@ -185,22 +185,22 @@ export function CustomerCrmDetail({
 
         {/* Tabbed Info */}
         <Tabs defaultValue="personal" className="w-full flex flex-col">
-          <TabsList className="w-full justify-start rounded-none border-b border-stone-200 bg-transparent p-0 h-9">
+          <TabsList className="w-full justify-start rounded-none border-b border-adminGray-100 bg-transparent p-0 h-9">
             <TabsTrigger
               value="personal"
-              className="rounded-none border-b-2 border-transparent bg-transparent px-4 pb-2 pt-2 text-xs font-semibold text-stone-500 hover:text-stone-900 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:shadow-none"
+              className="rounded-none border-b-2 border-transparent bg-transparent px-4 pb-2 pt-2 text-xs font-semibold text-adminGray-600 hover:text-adminInk data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:shadow-none"
             >
               Thông tin cá nhân
             </TabsTrigger>
             <TabsTrigger
               value="note"
-              className="rounded-none border-b-2 border-transparent bg-transparent px-4 pb-2 pt-2 text-xs font-semibold text-stone-500 hover:text-stone-900 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:shadow-none"
+              className="rounded-none border-b-2 border-transparent bg-transparent px-4 pb-2 pt-2 text-xs font-semibold text-adminGray-600 hover:text-adminInk data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:shadow-none"
             >
               Ghi chú
             </TabsTrigger>
             <TabsTrigger
               value="relatives"
-              className="rounded-none border-b-2 border-transparent bg-transparent px-4 pb-2 pt-2 text-xs font-semibold text-stone-500 hover:text-stone-900 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:shadow-none"
+              className="rounded-none border-b-2 border-transparent bg-transparent px-4 pb-2 pt-2 text-xs font-semibold text-adminGray-600 hover:text-adminInk data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:shadow-none"
             >
               Người thân
             </TabsTrigger>
@@ -246,15 +246,15 @@ export function CustomerCrmDetail({
 
           <TabsContent
             value="note"
-            className="pt-3 m-0 outline-none text-xs text-stone-500"
+            className="pt-3 m-0 outline-none text-xs text-adminGray-600"
           >
-            <div className="bg-stone-50 rounded p-3 min-h-24 border border-stone-100 flex items-start gap-2">
-              <FileText className="w-4 h-4 text-stone-400 shrink-0 mt-0.5" />
+            <div className="bg-adminGray-50 rounded p-3 min-h-24 border border-adminGray-100 flex items-start gap-2">
+              <FileText className="w-4 h-4 text-adminGray-400 shrink-0 mt-0.5" />
               <div className="flex-1">
-                <span className="font-bold text-stone-700 block mb-1">
+                <span className="font-bold text-adminInk block mb-1">
                   Ghi chú:
                 </span>
-                <p className="text-stone-600 italic">
+                <p className="text-adminGray-600 italic">
                   {customer.note || "Không có ghi chú nào"}
                 </p>
               </div>
@@ -263,20 +263,20 @@ export function CustomerCrmDetail({
 
           <TabsContent
             value="relatives"
-            className="pt-3 m-0 outline-none text-xs text-stone-500 text-center py-6"
+            className="pt-3 m-0 outline-none text-xs text-adminGray-600 text-center py-6"
           >
-            <Users className="w-8 h-8 text-stone-300 mx-auto mb-1 stroke-[1.5]" />
+            <Users className="w-8 h-8 text-adminGray-300 mx-auto mb-1 stroke-[1.5]" />
             <p>Chưa khai báo thông tin người thân</p>
           </TabsContent>
         </Tabs>
       </div>
 
       {/* Footer fixed action buttons */}
-      <div className="p-3 border-t border-stone-100 bg-stone-50/50 flex gap-2 shrink-0">
+      <div className="p-3 border-t border-adminGray-100 bg-adminGray-50/50 flex gap-2 shrink-0">
         <Button
           variant="outline"
           size="sm"
-          className="flex-1 text-xs border-stone-300 text-stone-700 h-9 font-semibold"
+          className="flex-1 text-xs border-adminGray-300 text-adminInk h-9 font-semibold"
         >
           <Printer className="w-3.5 h-3.5 mr-1" />
           In phiếu
@@ -284,7 +284,7 @@ export function CustomerCrmDetail({
         <Button
           variant="admin"
           size="sm"
-          className="flex-[1.5] text-xs bg-orange-500 hover:bg-orange-600 text-white h-9 font-semibold"
+          className="flex-[1.5] text-xs bg-state-warning-solid hover:bg-state-warning-solid text-white h-9 font-semibold"
         >
           <ShoppingCart className="w-3.5 h-3.5 mr-1" />
           Tạo Đơn Hàng
@@ -292,7 +292,7 @@ export function CustomerCrmDetail({
         <Button
           variant="outline"
           size="sm"
-          className="flex-1 text-xs border-stone-300 text-stone-700 h-9 font-semibold"
+          className="flex-1 text-xs border-adminGray-300 text-adminInk h-9 font-semibold"
         >
           <CalendarRange className="w-3.5 h-3.5 mr-1" />
           Đặt lịch
@@ -300,7 +300,7 @@ export function CustomerCrmDetail({
         <Button
           variant="outline"
           size="sm"
-          className="flex-1 text-xs border-stone-300 text-stone-700 h-9 font-semibold"
+          className="flex-1 text-xs border-adminGray-300 text-adminInk h-9 font-semibold"
         >
           <Award className="w-3.5 h-3.5 mr-1" />
           Điểm
@@ -323,17 +323,17 @@ function DetailFieldItem({
 }) {
   return (
     <div
-      className={`space-y-0.5 border-b border-stone-100/60 pb-1.5 last:border-b-0 ${className}`}
+      className={`space-y-0.5 border-b border-adminGray-100/60 pb-1.5 last:border-b-0 ${className}`}
     >
-      <span className="text-lotus-admin-xs text-stone-400 font-bold uppercase tracking-wider block">
+      <span className="text-2xs text-adminGray-400 font-bold uppercase tracking-wider block">
         {label}
       </span>
       <div className="flex items-center gap-1.5 justify-between">
-        <span className="font-semibold text-stone-800 truncate">
+        <span className="font-semibold text-adminInk truncate">
           {value || "—"}
         </span>
         {canPrint && value && value !== "—" && (
-          <button className="text-lotus-admin-xs bg-stone-100 text-stone-600 hover:bg-stone-200 px-1.5 py-0.5 rounded font-bold shrink-0">
+          <button className="text-2xs bg-adminGray-100 text-adminGray-600 hover:bg-adminGray-100 px-1.5 py-0.5 rounded font-bold shrink-0">
             In mã
           </button>
         )}

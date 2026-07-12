@@ -278,7 +278,7 @@ export function ServiceFormDialog({
                     {...register("sellingPrice", { valueAsNumber: true })}
                     type="number"
                     disabled
-                    className="bg-stone-50"
+                    className="bg-adminGray-50"
                   />
                 </FormField>
 
@@ -355,7 +355,7 @@ export function ServiceFormDialog({
                   return (
                     <div
                       key={field.id}
-                      className="grid grid-cols-12 gap-3 items-start border p-3 rounded-lg bg-stone-50/50"
+                      className="grid grid-cols-12 gap-3 items-start border p-3 rounded-lg bg-adminGray-50/50"
                     >
                       <div className="col-span-4">
                         <Select
@@ -382,7 +382,7 @@ export function ServiceFormDialog({
                           </SelectContent>
                         </Select>
                         {errorObj?.productId && (
-                          <span className="text-red-500 text-xs mt-1 block">
+                          <span className="text-state-danger-text text-xs mt-1 block">
                             {errorObj.productId.message}
                           </span>
                         )}
@@ -398,14 +398,14 @@ export function ServiceFormDialog({
                           placeholder="SL"
                         />
                         {errorObj?.quantityUsed && (
-                          <span className="text-red-500 text-xs mt-1 block">
+                          <span className="text-state-danger-text text-xs mt-1 block">
                             {errorObj.quantityUsed.message}
                           </span>
                         )}
                       </div>
 
                       <div className="col-span-3">
-                         <div className="lotus-admin-select-trigger flex items-center justify-end bg-stone-100 border border-transparent text-lotus-admin-md text-stone-700 font-medium">
+                         <div className="lotus-admin-select-trigger flex items-center justify-end bg-adminGray-100 border border-transparent text-xs text-adminInk font-medium">
                            {formatCurrency(total > 0 ? total : 0)}
                          </div>
                       </div>
@@ -422,7 +422,7 @@ export function ServiceFormDialog({
                           type="button"
                           variant="ghost"
                           size="icon-sm"
-                          className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                          className="text-state-danger-text hover:text-state-danger-text hover:bg-state-danger-bg"
                           onClick={() => removeProduct(index)}
                         >
                           <Trash2 className="w-4 h-4" />
@@ -460,8 +460,8 @@ export function ServiceFormDialog({
                           className={[
                             'h-[88px] w-full rounded-lg overflow-hidden transition-all',
                             preview
-                              ? 'border border-stone-200 hover:border-lotus-leaf/60'
-                              : 'border-2 border-dashed border-stone-300 bg-stone-50 hover:border-lotus-leaf hover:bg-lotus-leaf/5',
+                              ? 'border border-adminGray-100 hover:border-adminGreen-600/60'
+                              : 'border-2 border-dashed border-adminGray-300 bg-adminGray-50 hover:border-adminGreen-600 hover:bg-adminGreen-50',
                           ].join(' ')}
                         >
                           {preview ? (
@@ -472,21 +472,21 @@ export function ServiceFormDialog({
                               </div>
                             </>
                           ) : (
-                            <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-stone-400 group-hover/card:text-lotus-leaf transition-colors">
+                            <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-adminGray-400 group-hover/card:text-adminGreen-600 transition-colors">
                               <ImageIcon className="h-6 w-6" />
-                              <span className="text-lotus-admin-xs font-medium">Chọn ảnh</span>
+                              <span className="text-2xs font-medium">Chọn ảnh</span>
                             </div>
                           )}
                         </button>
                         <button
                           type="button"
                           onClick={() => removeImage(index)}
-                          className="absolute -top-1.5 -right-1.5 z-10 h-5 w-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity hover:bg-red-600 shadow-sm"
+                          className="absolute -top-1.5 -right-1.5 z-10 h-5 w-5 rounded-full bg-state-danger-solid text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity hover:bg-state-danger-solid shadow-sm"
                         >
                           <X className="h-3 w-3" />
                         </button>
                         {isPrimary && (
-                          <div className="absolute bottom-1.5 left-1.5 bg-lotus-leaf text-white text-lotus-admin-xs font-bold px-1.5 py-0.5 rounded-full leading-none pointer-events-none">
+                          <div className="absolute bottom-1.5 left-1.5 bg-adminGreen-600 text-white text-2xs font-bold px-1.5 py-0.5 rounded-full leading-none pointer-events-none">
                             Chính
                           </div>
                         )}
@@ -510,8 +510,8 @@ export function ServiceFormDialog({
                           setValue(`images.${index}.isPrimary`, !isPrimary);
                         }}
                         className={[
-                          'flex items-center gap-1 text-lotus-admin-base font-medium transition-colors self-start',
-                          isPrimary ? 'text-lotus-leaf' : 'text-stone-400 hover:text-stone-600',
+                          'flex items-center gap-1 text-xs font-medium transition-colors self-start',
+                          isPrimary ? 'text-adminGreen-600' : 'text-adminGray-400 hover:text-adminGray-600',
                         ].join(' ')}
                       >
                         <Star className={`h-3 w-3 ${isPrimary ? 'fill-lotus-leaf' : ''}`} />
@@ -524,10 +524,10 @@ export function ServiceFormDialog({
                 <button
                   type="button"
                   onClick={() => appendImage({ url: '', isPrimary: imageFields.length === 0, sortOrder: 0 })}
-                  className="flex h-[88px] w-[110px] flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-stone-300 text-stone-400 transition-all hover:border-lotus-leaf hover:bg-lotus-leaf/5 hover:text-lotus-leaf self-start"
+                  className="flex h-[88px] w-[110px] flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-adminGray-300 text-adminGray-400 transition-all hover:border-adminGreen-600 hover:bg-adminGreen-50 hover:text-adminGreen-600 self-start"
                 >
                   <Plus className="h-5 w-5" />
-                  <span className="text-lotus-admin-xs font-medium">Thêm ảnh</span>
+                  <span className="text-2xs font-medium">Thêm ảnh</span>
                 </button>
               </div>
             </FormSection>

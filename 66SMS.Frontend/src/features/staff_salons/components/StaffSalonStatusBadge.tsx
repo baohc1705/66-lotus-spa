@@ -4,9 +4,9 @@ interface StaffSalonStatusBadgeProps {
 }
 
 const STATUS_MAP: Record<number, { label: string; className: string }> = {
-  0: { label: 'Không hoạt động', className: 'bg-amber-100 text-amber-700 border-amber-200' },
-  1: { label: 'Đang làm việc', className: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
-  2: { label: 'Đã xóa', className: 'bg-red-100 text-red-700 border-red-200' },
+  0: { label: 'Không hoạt động', className: 'bg-state-warning-bg text-state-warning-text border-state-warning-border' },
+  1: { label: 'Đang làm việc', className: 'bg-state-success-bg text-state-success-text border-state-success-border' },
+  2: { label: 'Đã xóa', className: 'bg-state-danger-bg text-state-danger-text border-state-danger-border' },
 }
 
 export function StaffSalonStatusBadge({ status, isManager }: StaffSalonStatusBadgeProps) {
@@ -14,18 +14,18 @@ export function StaffSalonStatusBadge({ status, isManager }: StaffSalonStatusBad
   return (
     <div className="flex items-center gap-1.5">
       {isManager && (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-lotus-admin-base font-medium border bg-violet-100 text-violet-700 border-violet-200">
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border bg-adminGold-100 text-adminGold-700 border-adminGold-600/30">
           Quản lý
         </span>
       )}
       {config ? (
         <span
-          className={`inline-flex items-center px-2 py-0.5 rounded-full text-lotus-admin-base font-medium border ${config.className}`}
+          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${config.className}`}
         >
           {config.label}
         </span>
       ) : (
-        <span className="text-stone-400 text-xs">—</span>
+        <span className="text-adminGray-400 text-xs">—</span>
       )}
     </div>
   )

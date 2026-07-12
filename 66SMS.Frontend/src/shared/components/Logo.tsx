@@ -10,9 +10,9 @@ interface LogoProps {
 }
 
 const sizeConfig = {
-  sm: { img: "h-8 w-auto", text: "text-base", tagline: "text-[8px] tracking-widest" },
-  md: { img: "h-10 w-auto", text: "text-lg", tagline: "text-[9px] tracking-widest" },
-  lg: { img: "h-14 w-auto", text: "text-xl", tagline: "text-[10px] tracking-widest" },
+  sm: { img: "h-8 w-auto", text: "text-base", tagline: "text-3xs tracking-widest" },
+  md: { img: "h-10 w-auto", text: "text-lg", tagline: "text-3xs tracking-widest" },
+  lg: { img: "h-14 w-auto", text: "text-xl", tagline: "text-2xs tracking-widest" },
 };
 
 const colorConfig = {
@@ -30,7 +30,7 @@ export function Logo({
 }: LogoProps) {
   const s = sizeConfig[size];
   const c = colorConfig[variant];
-  const isWhite = variant === "light";
+  const isOnDark = variant === "light";
 
   return (
     <Link
@@ -40,17 +40,19 @@ export function Logo({
       <img
         src={logoHomeUrl}
         alt="Hoa Sen Spa Logo"
-        className={`object-contain shrink-0 filter drop-shadow-sm transition-transform duration-500 ease-out group-hover:scale-105 ${
-          isWhite ? "brightness-0 invert opacity-90 h-8 w-auto" : s.img
+        className={`object-contain shrink-0 drop-shadow-sm transition-transform duration-500 ease-out group-hover:scale-105 ${
+          isOnDark
+            ? "logo-icon-gold h-8 w-auto opacity-95"
+            : s.img
         }`.trim()}
       />
-      
-      {isWhite ? (
+
+      {isOnDark ? (
         <div className="flex flex-col leading-none justify-center">
           <span className="font-semibold text-xs tracking-wide text-white font-sans uppercase">
             HOA SEN SPA
           </span>
-          <span className="text-[7.5px] tracking-[0.24em] uppercase font-sans mt-0.5 text-white/60">
+          <span className="text-3xs tracking-[0.24em] uppercase font-sans mt-0.5 text-white/60">
             Đồng Tháp
           </span>
         </div>

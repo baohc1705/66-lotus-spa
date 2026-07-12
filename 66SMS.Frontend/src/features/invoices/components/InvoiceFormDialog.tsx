@@ -194,10 +194,10 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
           {/* Danh sách mặt hàng */}
           <FormSection icon={ShoppingCart} title="Mặt hàng">
             {typeof errors.items?.message === 'string' && (
-              <p className="text-lotus-admin-base text-red-500 font-medium mb-2">{errors.items.message}</p>
+              <p className="text-xs text-state-danger-text font-medium mb-2">{errors.items.message}</p>
             )}
             {errors.items?.root?.message && (
-              <p className="text-lotus-admin-base text-red-500 font-medium mb-2">{errors.items.root.message}</p>
+              <p className="text-xs text-state-danger-text font-medium mb-2">{errors.items.root.message}</p>
             )}
             <div className="space-y-3">
               {fields.map((field, index) => {
@@ -208,9 +208,9 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
                 const unit = getUnitPrice(itemType, refId)
                 const lineTotal = Math.max(unit * qty - lineDiscount, 0)
                 return (
-                  <div key={field.id} className="grid grid-cols-12 gap-2 items-start p-3 bg-stone-50 rounded-lg border border-stone-200">
+                  <div key={field.id} className="grid grid-cols-12 gap-2 items-start p-3 bg-adminGray-50 rounded-lg border border-adminGray-100">
                     <div className="col-span-2">
-                      <Label className="text-lotus-admin-base text-lotus-deep/70 mb-1 block">Loại *</Label>
+                      <Label className="text-xs text-adminInk/70 mb-1 block">Loại *</Label>
                       <Select
                         value={watch(`items.${index}.itemType`)?.toString() ?? '1'}
                         onValueChange={(v) => { setValue(`items.${index}.itemType`, Number(v)); setValue(`items.${index}.refId`, 0) }}
@@ -222,7 +222,7 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
                       </Select>
                     </div>
                     <div className="col-span-4">
-                      <Label className="text-lotus-admin-base text-lotus-deep/70 mb-1 block">Mặt hàng *</Label>
+                      <Label className="text-xs text-adminInk/70 mb-1 block">Mặt hàng *</Label>
                       <SearchableSelect
                         value={refId ? String(refId) : ''}
                         onValueChange={(v) => setValue(`items.${index}.refId`, v ? Number(v) : 0)}
@@ -232,19 +232,19 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
                         className="h-9"
                       />
                       {errors.items?.[index]?.refId && (
-                        <p className="text-lotus-admin-base text-red-500 mt-0.5">{errors.items[index]?.refId?.message}</p>
+                        <p className="text-xs text-state-danger-text mt-0.5">{errors.items[index]?.refId?.message}</p>
                       )}
                     </div>
                     <div className="col-span-1">
-                      <Label className="text-lotus-admin-base text-lotus-deep/70 mb-1 block">SL *</Label>
+                      <Label className="text-xs text-adminInk/70 mb-1 block">SL *</Label>
                       <AdminInput {...register(`items.${index}.quantity`)} type="number" min={1} />
                     </div>
                     <div className="col-span-2">
-                      <Label className="text-lotus-admin-base text-lotus-deep/70 mb-1 block">Giảm dòng</Label>
+                      <Label className="text-xs text-adminInk/70 mb-1 block">Giảm dòng</Label>
                       <AdminInput {...register(`items.${index}.discountAmount`)} type="number" min={0} />
                     </div>
                     <div className="col-span-2">
-                      <Label className="text-lotus-admin-base text-lotus-deep/70 mb-1 block">KTV</Label>
+                      <Label className="text-xs text-adminInk/70 mb-1 block">KTV</Label>
                       <SearchableSelect
                         value={watch(`items.${index}.staffId`)?.toString() ?? ''}
                         onValueChange={(v) => setValue(`items.${index}.staffId`, v ? Number(v) : undefined)}
@@ -256,12 +256,12 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
                     </div>
                     <div className="col-span-1 flex items-end justify-center h-9 mt-5">
                       <Button type="button" variant="ghost" size="icon-sm" onClick={() => remove(index)}
-                        className="text-red-400 hover:text-red-600 hover:bg-red-50">
+                        className="text-state-danger-text hover:text-state-danger-text hover:bg-state-danger-bg">
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
-                    <div className="col-span-12 text-right text-lotus-admin-base text-lotus-stone">
-                      Đơn giá: <strong>{formatCurrency(unit)}</strong> · Thành tiền: <strong className="text-lotus-deep">{formatCurrency(lineTotal)}</strong>
+                    <div className="col-span-12 text-right text-xs text-adminGray-600">
+                      Đơn giá: <strong>{formatCurrency(unit)}</strong> · Thành tiền: <strong className="text-adminInk">{formatCurrency(lineTotal)}</strong>
                     </div>
                   </div>
                 )
@@ -269,7 +269,7 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
             </div>
             <Button type="button" variant="outline" size="sm"
               onClick={() => append({ itemType: INVOICE_ITEM_TYPE.SERVICE, refId: 0, quantity: 1, discountAmount: 0, staffId: undefined, note: '' })}
-              className="mt-3 text-lotus-admin-md gap-1.5">
+              className="mt-3 text-xs gap-1.5">
               <Plus className="w-3.5 h-3.5" /> Thêm mặt hàng
             </Button>
           </FormSection>
@@ -305,21 +305,21 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
                 </Select>
               </FormField>
               <FormField label="Ghi chú" className="sm:col-span-3">
-                <AdminTextarea {...register('note')} placeholder="Ghi chú hóa đơn..." className="text-lotus-admin-lg min-h-[50px] resize-none" />
+                <AdminTextarea {...register('note')} placeholder="Ghi chú hóa đơn..." className="text-sm min-h-[50px] resize-none" />
               </FormField>
             </div>
 
             {/* Xem trước */}
-            <div className="mt-4 rounded-lg bg-lotus-cream/40 border border-stone-200 p-3 text-lotus-admin-lg space-y-1">
-              <div className="flex justify-between"><span className="text-lotus-stone">Tạm tính</span><strong>{formatCurrency(subTotal)}</strong></div>
-              {manualDiscount > 0 && <div className="flex justify-between"><span className="text-lotus-stone">Giảm giá</span><span>-{formatCurrency(manualDiscount)}</span></div>}
-              {pointsValue > 0 && <div className="flex justify-between"><span className="text-lotus-stone">Điểm quy đổi</span><span>-{formatCurrency(pointsValue)}</span></div>}
-              {tax > 0 && <div className="flex justify-between"><span className="text-lotus-stone">Thuế</span><span>+{formatCurrency(tax)}</span></div>}
-              <div className="flex justify-between border-t border-stone-200 pt-1 text-lotus-admin-lg">
-                <span className="font-semibold text-lotus-deep">Tổng (ước tính)</span>
-                <strong className="text-lotus-leaf">{formatCurrency(totalPreview)}</strong>
+            <div className="mt-4 rounded-lg bg-adminGray-50/40 border border-adminGray-100 p-3 text-sm space-y-1">
+              <div className="flex justify-between"><span className="text-adminGray-600">Tạm tính</span><strong>{formatCurrency(subTotal)}</strong></div>
+              {manualDiscount > 0 && <div className="flex justify-between"><span className="text-adminGray-600">Giảm giá</span><span>-{formatCurrency(manualDiscount)}</span></div>}
+              {pointsValue > 0 && <div className="flex justify-between"><span className="text-adminGray-600">Điểm quy đổi</span><span>-{formatCurrency(pointsValue)}</span></div>}
+              {tax > 0 && <div className="flex justify-between"><span className="text-adminGray-600">Thuế</span><span>+{formatCurrency(tax)}</span></div>}
+              <div className="flex justify-between border-t border-adminGray-100 pt-1 text-sm">
+                <span className="font-semibold text-adminInk">Tổng (ước tính)</span>
+                <strong className="text-adminGreen-600">{formatCurrency(totalPreview)}</strong>
               </div>
-              <p className="text-lotus-admin-base text-lotus-stone italic pt-1">* Chưa gồm giảm giá hạng thành viên — số chính xác do hệ thống tính khi lưu.</p>
+              <p className="text-xs text-adminGray-600 italic pt-1">* Chưa gồm giảm giá hạng thành viên — số chính xác do hệ thống tính khi lưu.</p>
             </div>
           </FormSection>
 
@@ -338,9 +338,9 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
 function FormSection({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-stone-100">
-        <Icon className="w-4 h-4 text-lotus-leaf" />
-        <h3 className="text-lotus-admin-lg font-semibold text-lotus-deep">{title}</h3>
+      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-adminGray-100">
+        <Icon className="w-4 h-4 text-adminGreen-600" />
+        <h3 className="text-sm font-semibold text-adminInk">{title}</h3>
       </div>
       {children}
     </div>
@@ -352,11 +352,11 @@ function FormField({ label, error, className, children }: { label: string; error
   const cleanLabel = label.replace('*', '').trim()
   return (
     <div className={`space-y-1 ${className ?? ''}`}>
-      <Label className="text-lotus-admin-md font-semibold text-lotus-deep/80">
-        {cleanLabel}{isRequired && <span className="text-red-500 ml-0.5">*</span>}
+      <Label className="text-xs font-semibold text-adminInk/80">
+        {cleanLabel}{isRequired && <span className="text-state-danger-text ml-0.5">*</span>}
       </Label>
       {children}
-      {error && <p className="text-lotus-admin-base text-red-500 font-medium">{error}</p>}
+      {error && <p className="text-xs text-state-danger-text font-medium">{error}</p>}
     </div>
   )
 }

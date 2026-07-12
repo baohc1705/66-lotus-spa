@@ -36,17 +36,17 @@ export function CustomerFilterSidebar({
   onSelectSource,
 }: CustomerFilterSidebarProps) {
   return (
-    <aside className="w-56 shrink-0 flex flex-col h-full bg-white rounded border border-stone-200/60 overflow-hidden">
+    <aside className="w-56 shrink-0 flex flex-col h-full bg-white rounded border border-adminGray-100/60 overflow-hidden">
       {/* Title */}
-      <div className="px-4 py-3 border-b border-stone-100 shrink-0 flex items-center gap-2">
-        <Filter className="w-4 h-4 text-lotus-leaf" />
-        <span className="text-lotus-admin-lg font-bold text-lotus-deep">Bộ lọc khách hàng</span>
+      <div className="px-4 py-3 border-b border-adminGray-100 shrink-0 flex items-center gap-2">
+        <Filter className="w-4 h-4 text-adminGold-600" />
+        <span className="text-sm font-bold text-adminInk">Bộ lọc khách hàng</span>
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-5">
         {/* Section 1: Giới tính */}
         <div className="space-y-1.5">
-          <p className="text-lotus-admin-base font-bold text-stone-400 tracking-wider uppercase px-2">
+          <p className="text-xs font-bold text-adminGray-400 tracking-wider uppercase px-2">
             Giới tính
           </p>
           <div className="space-y-0.5">
@@ -59,13 +59,13 @@ export function CustomerFilterSidebar({
                   onClick={() => onSelectGender(opt.value)}
                   className={`lotus-admin-sidebar-item ${
                     isActive
-                      ? "bg-lotus-leaf/10 text-lotus-leaf font-semibold border-l-[3px] border-lotus-leaf"
-                      : "text-lotus-deep/70 hover:bg-lotus-leaf/5 hover:text-lotus-leaf border-l-[3px] border-transparent"
+                      ? "bg-adminGreen-100 text-adminGreen-600 font-semibold border-l-[3px] border-adminGreen-600"
+                      : "text-adminInk/70 hover:bg-adminGreen-50 hover:text-adminGreen-600 border-l-[3px] border-transparent"
                   }`}
                 >
                   <Users
                     className={`w-4 h-4 shrink-0 ${
-                      isActive ? "text-lotus-leaf" : "text-stone-400"
+                      isActive ? "text-adminGreen-600" : "text-adminGray-400"
                     }`}
                   />
                   <span className="truncate">{opt.label}</span>
@@ -77,7 +77,7 @@ export function CustomerFilterSidebar({
 
         {/* Section 2: Nguồn khách */}
         <div className="space-y-1.5">
-          <p className="text-lotus-admin-base font-bold text-stone-400 tracking-wider uppercase px-2">
+          <p className="text-xs font-bold text-adminGray-400 tracking-wider uppercase px-2">
             Nguồn khách
           </p>
           <div className="space-y-0.5">
@@ -91,13 +91,13 @@ export function CustomerFilterSidebar({
                   onClick={() => onSelectSource(opt.value)}
                   className={`lotus-admin-sidebar-item ${
                     isActive
-                      ? "bg-lotus-leaf/10 text-lotus-leaf font-semibold border-l-[3px] border-lotus-leaf"
-                      : "text-lotus-deep/70 hover:bg-lotus-leaf/5 hover:text-lotus-leaf border-l-[3px] border-transparent"
+                      ? "bg-adminGreen-100 text-adminGreen-600 font-semibold border-l-[3px] border-adminGreen-600"
+                      : "text-adminInk/70 hover:bg-adminGreen-50 hover:text-adminGreen-600 border-l-[3px] border-transparent"
                   }`}
                 >
                   <Icon
                     className={`w-4 h-4 shrink-0 ${
-                      isActive ? "text-lotus-leaf" : "text-stone-400"
+                      isActive ? "text-adminGreen-600" : "text-adminGray-400"
                     }`}
                   />
                   <span className="truncate">{opt.label}</span>

@@ -82,7 +82,7 @@ export const PromotionCodeInput: React.FC<PromotionCodeInputProps> = ({
           <div className="text-xs">
             <div className="font-bold text-success-text flex items-center gap-1.5">
               <span>Mã: {promotionCode}</span>
-              <span className="bg-surface text-success-text px-1.5 py-0.5 rounded-sm text-[10px] font-medium">
+              <span className="bg-surface text-success-text px-1.5 py-0.5 rounded-sm text-2xs font-medium">
                 Đã áp dụng
               </span>
             </div>
@@ -139,7 +139,7 @@ export const PromotionCodeInput: React.FC<PromotionCodeInputProps> = ({
         </button>
       </div>
       {error && (
-        <span className="text-[11px] text-error-text font-bold ml-1">{error}</span>
+        <span className="text-xs text-error-text font-bold ml-1">{error}</span>
       )}
     </form>
   );

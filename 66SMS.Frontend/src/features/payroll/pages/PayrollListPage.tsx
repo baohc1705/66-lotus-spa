@@ -97,7 +97,7 @@ export function PayrollListPage() {
         id: "index",
         header: "#",
         cell: ({ row }) => (
-          <span className="text-lotus-stone">
+          <span className="text-adminGray-600">
             {(pageIndex - 1) * pageSize + row.index + 1}
           </span>
         ),
@@ -107,7 +107,7 @@ export function PayrollListPage() {
         accessorKey: "staffName",
         header: "Nhân viên",
         cell: ({ row }) => (
-          <span className="text-lotus-admin-lg font-semibold text-lotus-deep">
+          <span className="text-sm font-semibold text-adminInk">
             {row.original.staffName ?? "—"}
           </span>
         ),
@@ -116,7 +116,7 @@ export function PayrollListPage() {
         id: "period",
         header: "Kỳ lương",
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80">
+          <span className="text-adminInk/80">
             {row.original.periodMonth}/{row.original.periodYear}
           </span>
         ),
@@ -125,7 +125,7 @@ export function PayrollListPage() {
         accessorKey: "salaryType",
         header: "Loại lương",
         cell: ({ row }) => (
-          <span className="text-lotus-deep/70">
+          <span className="text-adminInk/70">
             {SALARY_TYPE_LABEL[String(row.original.salaryType ?? "")] ?? "—"}
           </span>
         ),
@@ -159,7 +159,7 @@ export function PayrollListPage() {
         accessorKey: "commissionAmount",
         header: "Hoa hồng dịch vụ",
         cell: ({ row }) => (
-          <span className="text-lotus-gold font-semibold">
+          <span className="text-adminGold-600 font-semibold">
             {formatVnd(row.original.commissionAmount)}
           </span>
         ),
@@ -168,7 +168,7 @@ export function PayrollListPage() {
         accessorKey: "totalAmount",
         header: "Tổng",
         cell: ({ row }) => (
-          <span className="font-semibold text-lotus-deep">
+          <span className="font-semibold text-adminInk">
             {formatVnd(row.original.totalAmount)}
           </span>
         ),
@@ -194,7 +194,7 @@ export function PayrollListPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="gap-1 text-lotus-admin-md h-8 px-2 text-lotus-deep hover:text-lotus-deep hover:bg-lotus-stone/10"
+                className="gap-1 text-xs h-8 px-2 text-adminInk hover:text-adminInk hover:bg-lotus-stone/10"
                 onClick={() => setEditingPayroll(p)}
               >
                 <Pencil className="w-3.5 h-3.5" /> Sửa
@@ -202,7 +202,7 @@ export function PayrollListPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="gap-1 text-lotus-admin-md h-8 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+                className="gap-1 text-xs h-8 px-2 text-adminGreen-600 hover:text-state-success-text hover:bg-adminGreen-50"
                 onClick={() => confirmMutation.mutate(p.id!)}
                 loading={confirmMutation.isPending}
               >
@@ -232,7 +232,7 @@ export function PayrollListPage() {
         className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative"
       >
         {/* Toolbar */}
-        <div className="p-4 flex flex-wrap items-end gap-3 border-b border-stone-100 shrink-0">
+        <div className="p-4 flex flex-wrap items-end gap-3 border-b border-adminGray-100 shrink-0">
           <Button
             variant="admin"
             size="sm"
@@ -245,7 +245,7 @@ export function PayrollListPage() {
           <div className="ml-auto flex items-end gap-3">
             {!headerSalonId && (
               <div className="space-y-1">
-                <label className="text-lotus-admin-md font-semibold text-lotus-deep/80">
+                <label className="text-xs font-semibold text-adminInk/80">
                   Chi nhánh
                 </label>
                 <Select
@@ -271,7 +271,7 @@ export function PayrollListPage() {
               </div>
             )}
             <div className="space-y-1">
-              <label className="text-lotus-admin-md font-semibold text-lotus-deep/80">
+              <label className="text-xs font-semibold text-adminInk/80">
                 Nhân viên
               </label>
               <Select
@@ -295,7 +295,7 @@ export function PayrollListPage() {
               </Select>
             </div>
             <div className="space-y-1">
-              <label className="text-lotus-admin-md font-semibold text-lotus-deep/80">
+              <label className="text-xs font-semibold text-adminInk/80">
                 Tháng
               </label>
               <Select
@@ -319,7 +319,7 @@ export function PayrollListPage() {
               </Select>
             </div>
             <div className="space-y-1">
-              <label className="text-lotus-admin-md font-semibold text-lotus-deep/80">
+              <label className="text-xs font-semibold text-adminInk/80">
                 Năm
               </label>
               <Select
@@ -351,10 +351,10 @@ export function PayrollListPage() {
           loadingRows={pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize}
           emptyState={
             <div className="flex flex-col items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
-                <Wallet className="w-7 h-7 text-lotus-stone" />
+              <div className="w-14 h-14 rounded-2xl bg-adminGray-50 flex items-center justify-center">
+                <Wallet className="w-7 h-7 text-adminGray-600" />
               </div>
-              <p className="text-sm font-semibold text-lotus-deep">
+              <p className="text-sm font-semibold text-adminInk">
                 Chưa có bảng lương
               </p>
             </div>

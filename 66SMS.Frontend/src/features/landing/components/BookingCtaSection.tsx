@@ -41,7 +41,7 @@ export const BookingCtaSection = () => {
               </p>
               <h2
                 id="booking-cta-heading"
-                className="font-display text-[clamp(1.75rem,3.5vw,2.5rem)] font-medium leading-[1.15] tracking-[0.01em] text-white"
+                className="font-display text-display-section font-medium leading-[1.15] tracking-[0.01em] text-white"
               >
                 Sẵn sàng bắt đầu
                 <br />

@@ -155,12 +155,12 @@ export function CashierWeeklyView({
     <div className="flex-1 min-h-0 min-w-0 w-full overflow-auto scrollbar-thin bg-white relative font-sans">
       <div className="flex min-w-max">
         {/* Time Column (Y-Axis) */}
-        <div className="w-16 flex-shrink-0 border-r border-stone-300/80 bg-lotus-rose-light/20 sticky left-0 z-30">
-          <div className="h-16 border-b border-stone-300/80 sticky top-0 left-0 bg-lotus-rose-light/50 z-50"></div>
+        <div className="w-16 flex-shrink-0 border-r border-adminGray-300/80 bg-adminGreen-600-light/20 sticky left-0 z-30">
+          <div className="h-16 border-b border-adminGray-300/80 sticky top-0 left-0 bg-adminGreen-600-light/50 z-50"></div>
           <div className="relative">
             {HOURS.map((hour) => (
               <div key={hour} className="h-[80px] relative">
-                <span className="absolute top-1 right-2 text-lotus-admin-xs font-bold text-lotus-stone/85">
+                <span className="absolute top-1 right-2 text-2xs font-bold text-adminGray-600/85">
                   {hour.toString().padStart(2, "0")}:00
                 </span>
               </div>
@@ -179,17 +179,17 @@ export function CashierWeeklyView({
           return (
             <div
               key={colIdx}
-              className="flex-1 min-w-[150px] border-r border-stone-200 relative"
+              className="flex-1 min-w-[150px] border-r border-adminGray-100 relative"
             >
               {/* Header */}
-              <div className="h-16 border-b border-stone-300/80 sticky top-0 bg-white/95 backdrop-blur-sm z-20 flex flex-col items-center justify-center gap-0.5">
+              <div className="h-16 border-b border-adminGray-300/80 sticky top-0 bg-white/95 backdrop-blur-sm z-20 flex flex-col items-center justify-center gap-0.5">
                 <div
                   className={`text-xs font-medium uppercase ${
                     isToday
-                      ? "text-lotus-primary font-bold"
+                      ? "text-adminGreen-600 font-bold"
                       : isWeekend
-                        ? "text-lotus-primary"
-                        : "text-stone-800"
+                        ? "text-adminGreen-600"
+                        : "text-adminInk"
                   }`}
                 >
                   {getDayName(day)}
@@ -197,10 +197,10 @@ export function CashierWeeklyView({
                 <div
                   className={`text-xs font-extrabold ${
                     isToday
-                      ? "text-lotus-primary"
+                      ? "text-adminGreen-600"
                       : isWeekend
-                        ? "text-lotus-primary"
-                        : "text-stone-800"
+                        ? "text-adminGreen-600"
+                        : "text-adminInk"
                   }`}
                 >
                   {`${String(day.getDate()).padStart(2, "0")}/${String(day.getMonth() + 1).padStart(2, "0")}`}
@@ -217,11 +217,11 @@ export function CashierWeeklyView({
                 {HOURS.map((hour) => (
                   <div
                     key={hour}
-                    className="h-[80px] border-b border-stone-100/60 relative"
+                    className="h-[80px] border-b border-adminGray-100/60 relative"
                   >
-                    <div className="absolute top-1/4 w-full border-t border-stone-100/30 border-dashed" />
-                    <div className="absolute top-2/4 w-full border-t border-stone-100/50 border-dashed" />
-                    <div className="absolute top-3/4 w-full border-t border-stone-100/30 border-dashed" />
+                    <div className="absolute top-1/4 w-full border-t border-adminGray-100/30 border-dashed" />
+                    <div className="absolute top-2/4 w-full border-t border-adminGray-100/50 border-dashed" />
+                    <div className="absolute top-3/4 w-full border-t border-adminGray-100/30 border-dashed" />
                   </div>
                 ))}
 
@@ -231,8 +231,8 @@ export function CashierWeeklyView({
                     className="absolute left-0 right-0 z-10 pointer-events-none"
                     style={{ top: currentTimeY }}
                   >
-                    <div className="absolute -left-1.5 -top-1.5 w-3 h-3 rounded-full bg-lotus-rose border-2 border-white shadow-sm z-10" />
-                    <div className="w-full border-t-2 border-lotus-rose/80 shadow-sm" />
+                    <div className="absolute -left-1.5 -top-1.5 w-3 h-3 rounded-full bg-adminGreen-600 border-2 border-white shadow-sm z-10" />
+                    <div className="w-full border-t-2 border-adminGreen-600/80 shadow-sm" />
                   </div>
                 )}
 
@@ -263,13 +263,13 @@ export function CashierWeeklyView({
                           onBookingClick(booking);
                         }}
                       >
-                        <div className="text-lotus-admin-xs font-bold text-black/70 mb-0.5 truncate leading-tight">
+                        <div className="text-2xs font-bold text-black/70 mb-0.5 truncate leading-tight">
                           {booking.startTime} - {booking.endTime}
                         </div>
-                        <div className="text-lotus-admin-base font-semibold text-black/90 truncate leading-tight">
+                        <div className="text-xs font-semibold text-black/90 truncate leading-tight">
                           {booking.customerName}
                         </div>
-                        <div className="text-lotus-admin-xs text-black/70 truncate flex items-center gap-1 mt-0.5">
+                        <div className="text-2xs text-black/70 truncate flex items-center gap-1 mt-0.5">
                           {booking.staffName}
                         </div>
                       </div>
@@ -288,24 +288,24 @@ export function CashierWeeklyView({
 function getBookingColor(status: string) {
   switch (status) {
     case "pending":
-      return "bg-amber-100 border-amber-400 text-amber-900";
+      return "bg-state-warning-bg border-state-warning-border text-state-warning-text";
     case "confirmed":
-      return "bg-sky-100 border-sky-400 text-sky-900";
+      return "bg-state-info-bg border-state-info-border text-state-info-text";
     case "waiting":
-      return "bg-indigo-100 border-indigo-400 text-indigo-900";
+      return "bg-state-info-bg border-state-info-border text-state-info-text";
     case "in-progress":
-      return "bg-violet-100 border-violet-400 text-violet-900";
+      return "bg-adminGold-100 border-adminGold-600 text-adminGold-700";
     case "completed":
-      return "bg-green-100 border-green-400 text-green-900";
+      return "bg-state-success-bg border-state-success-border text-state-success-text";
     case "unpaid":
-      return "bg-green-50 border-green-400 text-green-900";
+      return "bg-state-success-bg border-state-success-border text-state-success-text";
     case "paid":
-      return "bg-emerald-100 border-emerald-500 text-emerald-900";
+      return "bg-state-success-bg border-state-success-border text-state-success-text";
     case "cancelled":
-      return "bg-rose-100 border-rose-400 text-rose-900 opacity-70";
+      return "bg-state-danger-bg border-state-danger-border text-state-danger-text opacity-70";
     case "not-arrived":
-      return "bg-stone-100 border-stone-400 text-stone-900";
+      return "bg-adminGray-100 border-adminGray-400 text-adminInk";
     default:
-      return "bg-slate-100 border-slate-400 text-slate-900";
+      return "bg-adminGray-100 border-adminGray-400 text-adminInk";
   }
 }

@@ -79,7 +79,7 @@ export function AssignManagerDialog({ open, onOpenChange, salonId }: AssignManag
               </SelectContent>
             </Select>
             {errors.staffId && (
-              <p className="text-xs text-red-500">{errors.staffId.message}</p>
+              <p className="text-xs text-state-danger-text">{errors.staffId.message}</p>
             )}
           </div>
 

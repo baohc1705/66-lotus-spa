@@ -217,14 +217,14 @@ export function InvoiceListPage() {
             }
             emptyState={
               <div className="flex flex-col items-center gap-3">
-                <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
-                  <Receipt className="w-7 h-7 text-lotus-stone" />
+                <div className="w-14 h-14 rounded-2xl bg-adminGray-50 flex items-center justify-center">
+                  <Receipt className="w-7 h-7 text-adminGray-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-lotus-deep">
+                  <p className="text-sm font-semibold text-adminInk">
                     Chưa có hóa đơn
                   </p>
-                  <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
+                  <p className="text-xs text-adminGray-600 mt-0.5">
                     Lập hóa đơn mới để bắt đầu.
                   </p>
                 </div>
@@ -233,7 +233,7 @@ export function InvoiceListPage() {
                     variant="admin"
                     size="sm"
                     onClick={() => setCreateOpen(true)}
-                    className="mt-1 text-lotus-admin-md"
+                    className="mt-1 text-xs"
                   >
                     <Plus className="w-3.5 h-3.5" /> Lập hóa đơn
                   </Button>

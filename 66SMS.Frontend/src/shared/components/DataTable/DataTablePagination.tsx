@@ -40,17 +40,17 @@ export function DataTablePagination({
   return (
     <div className="flex items-center justify-between gap-4 py-3 px-1">
       {/* Left: Record count & page size */}
-      <div className="flex items-center gap-3 text-[12px] text-lotus-stone">
+      <div className="flex items-center gap-3 text-xs text-lotus-stone">
         <span className="hidden sm:inline">
           Hiển thị <strong className="text-lotus-deep">{startRecord}-{endRecord}</strong> / <strong className="text-lotus-deep">{totalCount}</strong>
         </span>
-        <span className="sm:hidden text-[11px]">
+        <span className="sm:hidden text-xs">
           <strong className="text-lotus-deep">{totalCount}</strong> kết quả
         </span>
         <select
           value={pageSize}
           onChange={(e) => onPageSizeChange(Number(e.target.value))}
-          className="h-7 rounded-lg border border-stone-200/50 bg-white text-[11px] text-lotus-deep px-1.5 outline-none focus:border-lotus-gold cursor-pointer"
+          className="h-7 rounded-lg border border-adminGray-100/50 bg-white text-xs text-lotus-deep px-1.5 outline-none focus:border-lotus-gold cursor-pointer"
         >
           {pageSizeOptions.map(size => (
             <option key={size} value={size}>{size} / trang</option>
@@ -60,7 +60,7 @@ export function DataTablePagination({
 
       {/* Right: Page controls */}
       <div className="flex items-center gap-1">
-        <span className="text-[11px] text-lotus-stone mr-2 hidden sm:inline">
+        <span className="text-xs text-lotus-stone mr-2 hidden sm:inline">
           Trang <strong className="text-lotus-deep">{pageIndex}</strong> / {totalPages}
         </span>
         <Button

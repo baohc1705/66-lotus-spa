@@ -57,7 +57,7 @@ export function DataTableToolbar({
           value={localValue}
           onChange={(e) => setLocalValue(e.target.value)}
           placeholder={searchPlaceholder}
-          className="pl-9 pr-8 py-2 text-[13px] h-9 rounded-lg border-stone-200/50 bg-white/60 focus:bg-white"
+          className="pl-9 pr-8 py-2 text-sm h-9 rounded-lg border-adminGray-100/50 bg-white/60 focus:bg-white"
         />
         {localValue && (
           <button

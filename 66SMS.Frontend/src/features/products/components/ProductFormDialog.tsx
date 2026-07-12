@@ -278,8 +278,8 @@ export function ProductFormDialog({
                         className={[
                           "h-[88px] w-full rounded-lg overflow-hidden transition-all",
                           preview
-                            ? "border border-stone-200 hover:border-lotus-leaf/60"
-                            : "border-2 border-dashed border-stone-300 bg-stone-50 hover:border-lotus-leaf hover:bg-lotus-leaf/5",
+                            ? "border border-adminGray-100 hover:border-adminGreen-600/60"
+                            : "border-2 border-dashed border-adminGray-300 bg-adminGray-50 hover:border-adminGreen-600 hover:bg-adminGreen-50",
                         ].join(" ")}
                       >
                         {preview ? (
@@ -294,9 +294,9 @@ export function ProductFormDialog({
                             </div>
                           </>
                         ) : (
-                          <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-stone-400 group-hover/card:text-lotus-leaf transition-colors">
+                          <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-adminGray-400 group-hover/card:text-adminGreen-600 transition-colors">
                             <ImageIcon className="h-6 w-6" />
-                            <span className="text-lotus-admin-xs font-medium">
+                            <span className="text-2xs font-medium">
                               Chọn ảnh
                             </span>
                           </div>
@@ -305,12 +305,12 @@ export function ProductFormDialog({
                       <button
                         type="button"
                         onClick={() => removeImage(index)}
-                        className="absolute -top-1.5 -right-1.5 z-10 h-5 w-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity hover:bg-red-600 shadow-sm"
+                        className="absolute -top-1.5 -right-1.5 z-10 h-5 w-5 rounded-full bg-state-danger-solid text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity hover:bg-state-danger-solid shadow-sm"
                       >
                         <X className="h-3 w-3" />
                       </button>
                       {isPrimary && (
-                        <div className="absolute bottom-1.5 left-1.5 bg-lotus-leaf text-white text-lotus-admin-xs font-bold px-1.5 py-0.5 rounded-full leading-none pointer-events-none">
+                        <div className="absolute bottom-1.5 left-1.5 bg-adminGreen-600 text-white text-2xs font-bold px-1.5 py-0.5 rounded-full leading-none pointer-events-none">
                           Chính
                         </div>
                       )}
@@ -341,10 +341,10 @@ export function ProductFormDialog({
                         setValue(`images.${index}.isPrimary`, !isPrimary);
                       }}
                       className={[
-                        "flex items-center gap-1 text-lotus-admin-base font-medium transition-colors self-start",
+                        "flex items-center gap-1 text-xs font-medium transition-colors self-start",
                         isPrimary
-                          ? "text-lotus-leaf"
-                          : "text-stone-400 hover:text-stone-600",
+                          ? "text-adminGreen-600"
+                          : "text-adminGray-400 hover:text-adminGray-600",
                       ].join(" ")}
                     >
                       <Star
@@ -361,10 +361,10 @@ export function ProductFormDialog({
                 onClick={() =>
                   appendImage({ url: "", isPrimary: imageFields.length === 0 })
                 }
-                className="flex h-[88px] w-[110px] flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-stone-300 text-stone-400 transition-all hover:border-lotus-leaf hover:bg-lotus-leaf/5 hover:text-lotus-leaf self-start"
+                className="flex h-[88px] w-[110px] flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-adminGray-300 text-adminGray-400 transition-all hover:border-adminGreen-600 hover:bg-adminGreen-50 hover:text-adminGreen-600 self-start"
               >
                 <Plus className="h-5 w-5" />
-                <span className="text-lotus-admin-xs font-medium">Thêm ảnh</span>
+                <span className="text-2xs font-medium">Thêm ảnh</span>
               </button>
             </div>
           </FormSection>

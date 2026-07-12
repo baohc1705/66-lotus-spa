@@ -45,11 +45,11 @@ export const SectionHeader = ({
       >
         <h2 id={titleId} className="leading-[1.1]">
           {scriptLabel && (
-            <span className="block font-display text-[clamp(1.25rem,2.2vw,1.6rem)] font-normal tracking-[0.04em] text-rose-800">
+            <span className="block font-display text-display-script font-normal tracking-[0.04em] text-rose-800">
               {scriptLabel}
             </span>
           )}
-          <span className="block font-display text-[clamp(1.75rem,3.5vw,2.5rem)] font-semibold leading-[1.15] tracking-[0.02em] text-rose-800">
+          <span className="block font-display text-display-section font-semibold leading-[1.15] tracking-[0.02em] text-rose-800">
             {title}
           </span>
         </h2>
@@ -59,7 +59,7 @@ export const SectionHeader = ({
         />
         {description && (
           <p
-            className={`mt-4 font-geist text-base leading-[1.65] sm:text-[1.0625rem] ${descColor}`}
+            className={`mt-4 font-geist text-base leading-[1.65] ${descColor}`}
           >
             {description}
           </p>
@@ -87,7 +87,7 @@ export const SectionHeader = ({
           )}
           <h2
             id={titleId}
-            className={`font-geist text-balance text-[clamp(1.5rem,2.6vw,2.15rem)] font-semibold leading-[1.15] tracking-[-0.02em] ${titleColor}`}
+            className={`font-geist text-balance text-display-script-lg font-semibold leading-[1.15] tracking-[-0.02em] ${titleColor}`}
           >
             {title}
           </h2>
@@ -117,7 +117,7 @@ export const SectionHeader = ({
         )}
         <h2
           id={titleId}
-          className={`font-geist text-balance text-[clamp(1.5rem,2.6vw,2.15rem)] font-semibold leading-[1.15] tracking-[-0.02em] ${titleColor}`}
+          className={`font-geist text-balance text-display-script-lg font-semibold leading-[1.15] tracking-[-0.02em] ${titleColor}`}
         >
           {title}
         </h2>
@@ -147,7 +147,7 @@ export const SectionHeader = ({
       )}
       <h2
         id={titleId}
-        className={`font-geist text-balance text-[clamp(1.5rem,2.6vw,2.15rem)] font-semibold leading-[1.15] tracking-[-0.02em] ${titleColor}`}
+        className={`font-geist text-balance text-display-script-lg font-semibold leading-[1.15] tracking-[-0.02em] ${titleColor}`}
       >
         {title}
       </h2>

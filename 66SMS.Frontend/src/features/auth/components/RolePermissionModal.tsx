@@ -13,10 +13,10 @@ export function RolePermissionModal({ title, onClose, children }: {
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-base font-bold text-lotus-deep">{title}</h3>
+          <h3 className="text-base font-bold text-adminInk">{title}</h3>
           <button
             onClick={onClose}
-            className="text-xl leading-none text-lotus-stone hover:text-lotus-deep bg-transparent border-0 cursor-pointer"
+            className="text-xl leading-none text-adminGray-600 hover:text-adminInk bg-transparent border-0 cursor-pointer"
           >
             ×
           </button>

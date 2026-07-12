@@ -10,7 +10,7 @@ const buttonVariants = cva(
     "font-semibold whitespace-nowrap select-none",
     "transition-all duration-200 ease-out",
     "outline-none",
-    "focus-visible:ring-2 focus-visible:ring-[var(--spa-rose)] focus-visible:ring-offset-2",
+    "focus-visible:ring-2 focus-visible:ring-adminGreen-600 focus-visible:ring-offset-2",
     "disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none",
     "hover:-translate-y-0.5 active:translate-y-0",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
@@ -19,52 +19,54 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: [
-          "bg-lotus-leaf text-white",
-          "hover:bg-lotus-leaf/90",
+          "bg-adminGreen-600 text-white",
+          "hover:bg-adminGreen-600/90",
           "shadow-sm",
         ].join(" "),
 
         secondary: [
-          "bg-lotus-cream text-lotus-deep",
-          "hover:bg-lotus-cream/80",
+          "bg-adminGray-50 text-adminInk",
+          "hover:bg-adminGray-50/80",
         ].join(" "),
 
         outline: [
-          "bg-transparent text-lotus-deep",
-          "hover:bg-lotus-cream hover:text-lotus-deep",
+          "bg-transparent text-adminInk border border-adminGray-300",
+          "hover:border-adminGreen-500 hover:text-adminGreen-600",
         ].join(" "),
 
         gold: [
-          "bg-yellow-500 text-white",
+          "bg-adminGold-600 text-white",
           "hover:opacity-90",
           "shadow-sm",
         ].join(" "),
 
         ghost: [
-          "bg-transparent text-lotus-stone",
-          "hover:bg-lotus-cream hover:text-lotus-deep",
+          "bg-transparent text-adminGray-600",
+          "hover:bg-adminGray-50 hover:text-adminInk",
           "shadow-none",
           "hover:translate-y-0",
         ].join(" "),
 
         dark: [
-          "bg-lotus-deep text-white",
+          "bg-adminInk text-white",
           "hover:opacity-90",
         ].join(" "),
 
         admin: [
-          "bg-lotus-leaf text-white",
-          "hover:bg-lotus-leaf/90",
+          "bg-adminGreen-600 text-white",
+          "hover:bg-adminGreen-500",
+          "disabled:bg-adminGray-100 disabled:text-adminGray-300",
           "shadow-sm",
+          "focus-visible:ring-adminGreen-600",
         ].join(" "),
 
         destructive: [
-          "bg-red-50 text-red-600",
-          "hover:bg-red-100",
+          "bg-state-danger-bg text-state-danger-text",
+          "hover:bg-state-danger-border/40",
         ].join(" "),
 
         link: [
-          "text-lotus-leaf underline-offset-4 hover:underline",
+          "text-adminGreen-600 underline-offset-4 hover:underline",
           "hover:translate-y-0 shadow-none",
         ].join(" "),
       },

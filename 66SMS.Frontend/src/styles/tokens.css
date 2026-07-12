@@ -1,41 +1,46 @@
 /* ═══════════════════════════════════════════════════════
-   LANDING PAGE ONLY — không dùng trong admin CRUD
-   Fonts đã khai báo tại index.css (Google Fonts CDN)
+   LANDING / BOOKING / PROFILE tokens
+   Canonical brand colors: --rose-*, --gold-*, --ink, --warm-* (index.css)
    ═══════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Hoa Sen Spa — alias landing (map sang bảng màu color.md) ──
-     Canonical vars: --rose-*, --gold-*, --ink, --warm-*, --bg-* (index.css) */
+  /* Alias → color.md (giữ tên lotus-* cho Tailwind / component cũ) */
+  --lotus-cream: var(--bg-page);
+  --lotus-surface: var(--bg-surface);
+  --lotus-inset: var(--warm-50);
 
-  --lotus-cream: #fafaf9;
-  --lotus-surface: #ffffff;
-  --lotus-inset: #f3eff0;
+  --lotus-rose: var(--rose-600);
+  --lotus-rose-dark: var(--rose-500);
+  --lotus-rose-light: var(--rose-50);
 
-  --lotus-rose: #9d174d;
-  --lotus-rose-dark: #b32e64;
-  --lotus-rose-light: #fceef3;
+  --lotus-gold: var(--gold-600);
 
-  --lotus-gold: #b8860b;
+  --lotus-leaf: var(--success-text);
+  --lotus-leaf-light: var(--success-bg);
 
-  --lotus-leaf: #3b7a4e;
-  --lotus-leaf-light: #dcefe1;
+  --lotus-deep: var(--ink);
+  --lotus-stone: var(--warm-600);
 
-  --lotus-deep: #2b2226;
-  --lotus-stone: #7a6a6e;
+  --lotus-error: var(--error-text);
+  --lotus-muted: var(--warm-100);
 
-  --lotus-error: #b23a3a;
-  --lotus-muted: #e9e2e4;
+  /* Brand aliases used by shared UI (text-[var(--spa-*)]) */
+  --spa-text: var(--ink);
+  --spa-text-muted: var(--warm-600);
+  --spa-rose: var(--rose-600);
+  --spa-rose-hover: var(--rose-500);
+  --spa-rose-light: var(--rose-50);
+  --spa-gold: var(--gold-600);
+  --spa-gold-light: var(--gold-100);
+  --spa-blush: var(--rose-50);
+  --spa-border: var(--warm-100);
+  --spa-admin-primary: var(--admin-green-600);
 
-  /* ── Cashier / VNPay (dùng token, không hardcode hex trong component) ── */
+  /* VNPay */
   --lotus-vnpay: #005baa;
   --lotus-vnpay-red: #ed1b24;
-  --lotus-cashier-header-from: #2b2226;
-  --lotus-cashier-header-via: #5c0b2b;
-  --lotus-cashier-header-to: #9d174d;
 
-
-
-  /* ── Membership tier cards (profile) ── */
+  /* Membership tier cards (profile) */
   --membership-bronze-bg: #fffbf5;
   --membership-bronze-bg-end: #e5be90;
   --membership-bronze-border: #8b5a2b;
@@ -67,66 +72,14 @@
   --membership-default-accent: #c4b5fd;
   --membership-default-text: #4c1d95;
 
-  /* ── Typography ── */
+  /* Typography / motion */
   --font-display: "Playfair Display", Georgia, serif;
-  --font-body: "Be Vietnam Pro", system-ui, sans-serif;
   --font-geist: "Geist Variable", system-ui, sans-serif;
   --landing-radius: 0;
-
-  /* ── Transitions ── */
-  --transition-base: 300ms ease;
   --transition-panel: 500ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ═══ Scroll Reveal (IntersectionObserver fallback) ═══ */
-
-.reveal {
-  opacity: 0;
-  transition:
-    opacity 300ms ease-out;
-}
-.reveal.is-visible {
-  opacity: 1;
-}
-
-/* Stagger cho list items */
-.reveal-stagger > * {
-  opacity: 0;
-  transition:
-    opacity 300ms ease-out;
-}
-.reveal-stagger.is-visible > *:nth-child(1) {
-  transition-delay: 0ms;
-  opacity: 1;
-}
-.reveal-stagger.is-visible > *:nth-child(2) {
-  transition-delay: 60ms;
-  opacity: 1;
-}
-.reveal-stagger.is-visible > *:nth-child(3) {
-  transition-delay: 120ms;
-  opacity: 1;
-}
-.reveal-stagger.is-visible > *:nth-child(4) {
-  transition-delay: 180ms;
-  opacity: 1;
-}
-.reveal-stagger.is-visible > *:nth-child(5) {
-  transition-delay: 240ms;
-  opacity: 1;
-}
-.reveal-stagger.is-visible > *:nth-child(6) {
-  transition-delay: 300ms;
-  opacity: 1;
-}
-
-/* ═══ Services Hover Panel (desktop) ═══ */
-
-.services-panel-container {
-  display: flex;
-  gap: 2px;
-  height: 520px;
-}
+/* ═══ Services hover panel ═══ */
 
 .service-panel {
   flex: 1;
@@ -182,37 +135,7 @@
   );
 }
 
-.hero-bg {
-  background-attachment: fixed;
-  background-size: cover;
-  background-position: center;
-}
-@supports (-webkit-touch-callout: none) {
-  .hero-bg {
-    background-attachment: scroll;
-  }
-}
-
-/* ═══ Marquee ═══ */
-
-.marquee {
-  overflow: hidden;
-  white-space: nowrap;
-}
-.marquee__inner {
-  display: inline-block;
-  animation: marquee 20s linear infinite;
-}
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-/* ═══ Navbar Scrolled ═══ */
+/* ═══ Navbar scrolled ═══ */
 
 .nav--scrolled {
   background: rgba(255, 255, 255, 0.94);
@@ -221,7 +144,7 @@
   box-shadow: 0 1px 0 var(--border-card, #efefee);
 }
 
-/* ═══ Falling Lotus Petals ═══ */
+/* ═══ Falling lotus petals ═══ */
 
 @keyframes petal-fall {
   0% {
@@ -266,7 +189,7 @@
   animation: petal-sway 3s ease-in-out infinite;
 }
 
-/* ═══ Golden Glow Hover (Cards) ═══ */
+/* ═══ Card glow ═══ */
 
 .card-glow {
   transition:
@@ -278,73 +201,12 @@
   box-shadow: 0 8px 32px 0 rgba(157, 23, 77, 0.12);
 }
 
-/* ═══ Process Timeline ═══ */
-
-.timeline-line {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(
-    to right,
-    var(--gold-600, var(--lotus-gold)) 0%,
-    var(--rose-600, var(--lotus-rose)) 100%
-  );
-  transform: translateY(-50%);
-}
-
-.timeline-step {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.timeline-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--bg-surface, #fff);
-  border: 1px solid var(--warm-100, #e9e2e4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--gold-600, var(--lotus-gold));
-  transition: all 350ms ease;
-}
-
-.timeline-step:hover .timeline-icon {
-  background: var(--rose-600, var(--lotus-rose));
-  border-color: var(--rose-600, var(--lotus-rose));
-  color: white;
-  box-shadow: 0 4px 20px rgba(157, 23, 77, 0.25);
-}
-
-/* ═══ Quiz Progress Bar ═══ */
-
-.quiz-progress {
-  height: 4px;
-  background: var(--rose-100, var(--lotus-rose-light));
-  border-radius: 0;
-  overflow: hidden;
-}
-
-.quiz-progress__bar {
-  height: 100%;
-  background: var(--rose-600, var(--lotus-rose));
-  border-radius: 0;
-  transition: width 400ms ease;
-}
-
-/* ═══ Landing Page — Premium Utilities ═══ */
+/* ═══ Landing page utilities ═══ */
 
 .landing-page {
   font-family: var(--font-geist);
   scroll-behavior: smooth;
-  font-size: 1.0625rem; /* 17px — chữ landing rõ hơn */
+  font-size: 1.0625rem;
 }
 
 .landing-page .text-xs {
@@ -391,83 +253,10 @@
   border-radius: var(--landing-radius);
 }
 
-.landing-card {
-  background: var(--bg-surface, var(--lotus-surface));
-  border: 1px solid var(--border-card, #efefee);
-  border-radius: var(--landing-radius);
-  transition: border-color 0.3s ease, box-shadow 0.35s ease;
-  overflow: hidden;
-}
-
-/* Panel booking — surface + viền card theo color.md */
 .lotus-panel {
   background: var(--bg-surface);
   border: 1px solid var(--border-card);
   box-shadow: 0 8px 32px rgba(43, 34, 38, 0.05);
-}
-
-.landing-card:hover {
-  border-color: var(--rose-200, #efa9c1);
-  box-shadow: 0 10px 28px rgba(43, 34, 38, 0.07);
-}
-
-.landing-card__media {
-  position: relative;
-  overflow: hidden;
-}
-
-.landing-card__media::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(43, 34, 38, 0);
-  transition: background 0.35s ease;
-  pointer-events: none;
-}
-
-.landing-card:hover .landing-card__media::after {
-  background: rgba(43, 34, 38, 0.1);
-}
-
-.landing-card__link {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--rose-600, var(--lotus-rose));
-  transition: color 0.25s ease;
-}
-
-.landing-card__link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -2px;
-  width: 0;
-  height: 2px;
-  background: var(--rose-600, var(--lotus-rose));
-  transition: width 0.3s ease;
-}
-
-.landing-card:hover .landing-card__link::after {
-  width: 100%;
-}
-
-.landing-muted-band {
-  background: var(--warm-50, #f3eff0);
-  border-block: 1px solid var(--warm-100, #e9e2e4);
-}
-
-.landing-grain::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.35;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  z-index: 0;
 }
 
 .landing-focus-ring:focus-visible {

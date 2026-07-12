@@ -139,20 +139,20 @@ export default function RolePermissionPage() {
   const deleting = deleteRoleMutation.isPending || deletePermMutation.isPending;
 
   return (
-    <div className="min-h-screen bg-lotus-cream px-6 py-6 font-sans">
+    <div className="min-h-screen bg-adminGray-50 px-6 py-6 font-sans">
       {/* decorative blobs */}
-      <div className="fixed top-[-15vw] left-[-10vw] w-[40vw] h-[40vw] rounded-full bg-lotus-leaf/5 blur-[100px] pointer-events-none z-0" />
-      <div className="fixed bottom-[-15vw] right-[-10vw] w-[36vw] h-[36vw] rounded-full bg-lotus-leaf/6 blur-[90px] pointer-events-none z-0" />
+      <div className="fixed top-[-15vw] left-[-10vw] w-[40vw] h-[40vw] rounded-full bg-adminGreen-50 blur-[100px] pointer-events-none z-0" />
+      <div className="fixed bottom-[-15vw] right-[-10vw] w-[36vw] h-[36vw] rounded-full bg-adminGreen-600/6 blur-[90px] pointer-events-none z-0" />
 
       <div className="relative z-10 max-w-[1400px] mx-auto">
         {/* Header */}
         <div className="mb-5">
-          <h1 className="text-xl font-bold text-lotus-deep m-0">Phân quyền theo vai trò</h1>
-          <p className="text-sm text-lotus-stone mt-1 mb-0">Quản lý vai trò, quyền hạn và gán quyền cho từng vai trò.</p>
+          <h1 className="text-xl font-bold text-adminInk m-0">Phân quyền theo vai trò</h1>
+          <p className="text-sm text-adminGray-600 mt-1 mb-0">Quản lý vai trò, quyền hạn và gán quyền cho từng vai trò.</p>
         </div>
 
         {isLoading ? (
-          <div className="text-center py-16 text-lotus-stone">Đang tải dữ liệu...</div>
+          <div className="text-center py-16 text-adminGray-600">Đang tải dữ liệu...</div>
         ) : (
           <div className="flex flex-col gap-4">
             <div className="flex gap-3 items-start">
@@ -184,7 +184,7 @@ export default function RolePermissionPage() {
                     onUndo={handleUndo}
                   />
                 ) : (
-                  <div className="bg-white border border-border rounded-xl p-12 text-center text-lotus-stone text-sm">
+                  <div className="bg-white border border-border rounded-xl p-12 text-center text-adminGray-600 text-sm">
                     Chọn một vai trò bên trái để xem và chỉnh sửa quyền
                   </div>
                 )}

@@ -30,7 +30,7 @@ export function HorizontalTabBar({
   ];
 
   return (
-    <div className="w-full bg-white border-x border-b border-gray-100 p-2 shadow-sm rounded-b-2xl mb-4 overflow-hidden">
+    <div className="w-full bg-white border-x border-b border-warm-100 p-2 shadow-sm rounded-b-2xl mb-4 overflow-hidden">
       <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-1 px-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;

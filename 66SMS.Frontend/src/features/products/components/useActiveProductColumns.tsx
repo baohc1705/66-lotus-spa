@@ -100,7 +100,7 @@ export function useActiveProductColumns({
         accessorKey: "code",
         header: cols.code,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80 font-medium">
+          <span className="text-adminInk/80 font-medium">
             {row.original.code ?? "—"}
           </span>
         ),
@@ -122,7 +122,7 @@ export function useActiveProductColumns({
           const primaryImage = prod.images?.find((img) => img.isPrimary)?.url;
           return (
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center shrink-0 overflow-hidden">
+              <div className="w-8 h-8 rounded-lg bg-adminGray-100 flex items-center justify-center shrink-0 overflow-hidden">
                 {primaryImage ? (
                   <img
                     src={primaryImage}
@@ -130,10 +130,10 @@ export function useActiveProductColumns({
                     className="w-8 h-8 object-cover"
                   />
                 ) : (
-                  <Package className="w-4 h-4 text-stone-400" />
+                  <Package className="w-4 h-4 text-adminGray-400" />
                 )}
               </div>
-              <span className="text-lotus-admin-lg font-semibold text-lotus-deep truncate max-w-[180px]">
+              <span className="text-sm font-semibold text-adminInk truncate max-w-[180px]">
                 {prod.name ?? "—"}
               </span>
             </div>
@@ -164,7 +164,7 @@ export function useActiveProductColumns({
           const isLowStock = stock <= minStock;
           return (
             <span
-              className={`font-semibold ${isLowStock ? "text-red-500" : "text-lotus-deep"}`}
+              className={`font-semibold ${isLowStock ? "text-state-danger-text" : "text-adminInk"}`}
             >
               {stock}
             </span>

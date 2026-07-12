@@ -107,7 +107,7 @@ export function EditPayrollDialog({
           <DialogTitle>Chỉnh sửa bảng lương</DialogTitle>
           <DialogDescription>
             Cập nhật chi tiết lương của nhân viên{" "}
-            <span className="font-semibold text-lotus-deep">
+            <span className="font-semibold text-adminInk">
               {payroll?.staffName}
             </span>{" "}
             trong kỳ {payroll?.periodMonth}/{payroll?.periodYear}.
@@ -131,18 +131,18 @@ export function EditPayrollDialog({
             />
           </FormField>
 
-          <div className="bg-lotus-cream/40 border border-stone-200/50 rounded-lg p-3 space-y-1">
-            <span className="text-lotus-admin-md font-semibold text-lotus-deep/70">
+          <div className="bg-adminGray-50/40 border border-adminGray-100/50 rounded-lg p-3 space-y-1">
+            <span className="text-xs font-semibold text-adminInk/70">
               Tổng thực nhận (Dự kiến):
             </span>
-            <div className="text-lg font-bold text-lotus-deep">
+            <div className="text-lg font-bold text-adminInk">
               {new Intl.NumberFormat("vi-VN").format(totalVal)}đ
             </div>
           </div>
 
           <FormField label="Ghi chú" error={errors.note?.message}>
             <AdminTextarea
-              className="text-lotus-admin-lg resize-none"
+              className="text-sm resize-none"
               rows={3}
               placeholder="Nhập ghi chú..."
               {...register("note")}
@@ -202,11 +202,11 @@ function FormField({
 }) {
   return (
     <div className={`space-y-1 ${className ?? ""}`}>
-      <Label className="text-lotus-admin-md font-semibold text-lotus-deep/80">
+      <Label className="text-xs font-semibold text-adminInk/80">
         {label}
       </Label>
       {children}
-      {error && <p className="text-lotus-admin-base text-red-500 font-medium">{error}</p>}
+      {error && <p className="text-xs text-state-danger-text font-medium">{error}</p>}
     </div>
   );
 }

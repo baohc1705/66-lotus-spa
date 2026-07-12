@@ -123,7 +123,7 @@ export function useActiveCustomerColumns({
           const cust = row.original;
           return (
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0 overflow-hidden">
+              <div className="w-8 h-8 rounded-lg bg-adminGold-600/10 flex items-center justify-center shrink-0 overflow-hidden">
                 {cust.avatarUrl ? (
                   <img
                     src={cust.avatarUrl}
@@ -131,12 +131,12 @@ export function useActiveCustomerColumns({
                     className="w-8 h-8 object-cover"
                   />
                 ) : (
-                  <span className="text-lotus-admin-base font-bold text-amber-600">
+                  <span className="text-xs font-bold text-state-warning-text">
                     {(cust.fullName ?? "?").charAt(0).toUpperCase()}
                   </span>
                 )}
               </div>
-              <span className="text-lotus-admin-lg font-semibold text-lotus-deep truncate max-w-[140px]">
+              <span className="text-sm font-semibold text-adminInk truncate max-w-[140px]">
                 {cust.fullName ?? "—"}
               </span>
             </div>
@@ -148,7 +148,7 @@ export function useActiveCustomerColumns({
         accessorKey: "phone",
         header: cols.phone,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80">{row.original.phone ?? "—"}</span>
+          <span className="text-adminInk/80">{row.original.phone ?? "—"}</span>
         ),
         size: 110,
       },
@@ -164,7 +164,7 @@ export function useActiveCustomerColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="text-lotus-deep/70">{row.original.email ?? "—"}</span>
+          <span className="text-adminInk/70">{row.original.email ?? "—"}</span>
         ),
         size: 180,
       },
@@ -172,7 +172,7 @@ export function useActiveCustomerColumns({
         accessorKey: "gender",
         header: cols.gender,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/70">
+          <span className="text-adminInk/70">
             {GENDER_MAP[row.original.gender ?? ""] ?? "—"}
           </span>
         ),
@@ -184,7 +184,7 @@ export function useActiveCustomerColumns({
         cell: ({ row }) => {
           const points = row.original.loyaltyPoint;
           return (
-            <span className="font-semibold text-lotus-deep">{points ?? 0}</span>
+            <span className="font-semibold text-adminInk">{points ?? 0}</span>
           );
         },
         size: 80,
@@ -193,7 +193,7 @@ export function useActiveCustomerColumns({
         accessorKey: "source",
         header: cols.source,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/70">{row.original.source ?? "—"}</span>
+          <span className="text-adminInk/70">{row.original.source ?? "—"}</span>
         ),
         size: 110,
       },

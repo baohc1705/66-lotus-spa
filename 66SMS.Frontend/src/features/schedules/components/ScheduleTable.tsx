@@ -171,12 +171,12 @@ export function ScheduleTable({
 
   const renderByShift = () => {
     return (
-      <tbody className="divide-y divide-stone-200/50">
+      <tbody className="divide-y divide-adminGray-100/50">
         {activeShiftPeriods.length === 0 ? (
           <tr>
             <td
               colSpan={8}
-              className="py-12 text-center text-lotus-stone font-medium"
+              className="py-12 text-center text-adminGray-600 font-medium"
             >
               Không có ca làm việc nào trong tuần này.
             </td>
@@ -184,14 +184,14 @@ export function ScheduleTable({
         ) : (
           activeShiftPeriods.map(({ shift, period }, index) => (
             <tr key={`${shift.id}_${period.id}_${index}`}>
-              <td className="py-3 px-4 border-r border-stone-200/50 align-top bg-stone-50/30">
-                <div className="font-bold text-lotus-deep">{shift.name}</div>
-                <div className="text-lotus-admin-md text-lotus-stone mt-1 flex items-center gap-1">
-                  <span className="px-1.5 py-0.5 bg-lotus-cream rounded font-medium text-lotus-deep">
+              <td className="py-3 px-4 border-r border-adminGray-100/50 align-top bg-adminGray-50/30">
+                <div className="font-bold text-adminInk">{shift.name}</div>
+                <div className="text-xs text-adminGray-600 mt-1 flex items-center gap-1">
+                  <span className="px-1.5 py-0.5 bg-adminGray-50 rounded font-medium text-adminInk">
                     {period.shiftStart?.substring(0, 5)}
                   </span>
                   <span>-</span>
-                  <span className="px-1.5 py-0.5 bg-lotus-cream rounded font-medium text-lotus-deep">
+                  <span className="px-1.5 py-0.5 bg-adminGray-50 rounded font-medium text-adminInk">
                     {period.shiftEnd?.substring(0, 5)}
                   </span>
                 </div>
@@ -208,9 +208,9 @@ export function ScheduleTable({
                   return (
                     <td
                       key={i}
-                      className="py-2 px-2 border-r border-stone-200/50 last:border-0 align-top bg-stone-100/50"
+                      className="py-2 px-2 border-r border-adminGray-100/50 last:border-0 align-top bg-adminGray-100/50"
                     >
-                      <div className="flex h-full items-center justify-center text-lotus-admin-base text-stone-400">
+                      <div className="flex h-full items-center justify-center text-xs text-adminGray-400">
                         Không áp dụng
                       </div>
                     </td>
@@ -223,7 +223,7 @@ export function ScheduleTable({
                 return (
                   <td
                     key={i}
-                    className="py-2 px-2 border-r border-stone-200/50 last:border-0 align-top relative group min-h-[120px] h-[140px] hover:bg-stone-50/50 transition-colors"
+                    className="py-2 px-2 border-r border-adminGray-100/50 last:border-0 align-top relative group min-h-[120px] h-[140px] hover:bg-adminGray-50/50 transition-colors"
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, period.id!, dateStr)}
                   >
@@ -238,9 +238,9 @@ export function ScheduleTable({
                                 ? handleDragStart(e, ws)
                                 : e.preventDefault()
                             }
-                            className={`px-2.5 py-1.5 bg-white text-lotus-deep rounded-md text-lotus-admin-md font-medium border border-stone-200 shadow-sm truncate transition-colors flex items-center justify-between group/item ${
+                            className={`px-2.5 py-1.5 bg-white text-adminInk rounded-md text-xs font-medium border border-adminGray-100 shadow-sm truncate transition-colors flex items-center justify-between group/item ${
                               canEdit
-                                ? "cursor-grab active:cursor-grabbing hover:border-lotus-gold"
+                                ? "cursor-grab active:cursor-grabbing hover:border-adminGold-600"
                                 : ""
                             }`}
                           >
@@ -252,7 +252,7 @@ export function ScheduleTable({
                                   e.stopPropagation();
                                   handleDelete(ws.id!);
                                 }}
-                                className="opacity-0 group-hover/item:opacity-100 transition-opacity p-0.5 hover:text-red-500 rounded text-stone-400 flex items-center justify-center shrink-0"
+                                className="opacity-0 group-hover/item:opacity-100 transition-opacity p-0.5 hover:text-state-danger-text rounded text-adminGray-400 flex items-center justify-center shrink-0"
                                 title="Xóa lịch làm việc"
                               >
                                 <Trash2 size={13} />
@@ -275,7 +275,7 @@ export function ScheduleTable({
                                   .filter((id): id is number => id != null),
                               })
                             }
-                            className="flex items-center gap-1 text-lotus-admin-md font-semibold text-lotus-leaf hover:text-lotus-deep bg-lotus-cream hover:bg-lotus-cream/80 px-3 py-1.5 rounded-full transition-colors w-full justify-center border border-lotus-leaf/20"
+                            className="flex items-center gap-1 text-xs font-semibold text-adminGreen-600 hover:text-adminInk bg-adminGray-50 hover:bg-adminGray-50/80 px-3 py-1.5 rounded-full transition-colors w-full justify-center border border-adminGreen-600/20"
                           >
                             <Plus size={12} /> Thêm nhân viên
                           </button>
@@ -294,12 +294,12 @@ export function ScheduleTable({
 
   const renderByStaff = () => {
     return (
-      <tbody className="divide-y divide-stone-200/50">
+      <tbody className="divide-y divide-adminGray-100/50">
         {staffList.length === 0 ? (
           <tr>
             <td
               colSpan={8}
-              className="py-12 text-center text-lotus-stone font-medium"
+              className="py-12 text-center text-adminGray-600 font-medium"
             >
               Không có nhân viên nào.
             </td>
@@ -307,11 +307,11 @@ export function ScheduleTable({
         ) : (
           staffList.map((staff) => (
             <tr key={staff.id}>
-              <td className="py-3 px-4 border-r border-stone-200/50 align-top bg-stone-50/30">
-                <div className="font-bold text-lotus-deep">
+              <td className="py-3 px-4 border-r border-adminGray-100/50 align-top bg-adminGray-50/30">
+                <div className="font-bold text-adminInk">
                   {staff.fullName}
                 </div>
-                <div className="text-lotus-admin-md text-lotus-stone mt-1">
+                <div className="text-xs text-adminGray-600 mt-1">
                   {staff.code || "Nhân viên"}
                 </div>
               </td>
@@ -323,14 +323,14 @@ export function ScheduleTable({
                 return (
                   <td
                     key={i}
-                    className="py-2 px-2 border-r border-stone-200/50 last:border-0 align-top relative group min-h-[120px] h-[140px] hover:bg-stone-50/50 transition-colors"
+                    className="py-2 px-2 border-r border-adminGray-100/50 last:border-0 align-top relative group min-h-[120px] h-[140px] hover:bg-adminGray-50/50 transition-colors"
                   >
                     <div className="flex flex-col gap-1.5 h-full">
                       <div className="flex-1 overflow-y-auto space-y-1.5 p-1">
                         {cellSchedules.map((ws) => (
                           <div
                             key={ws.id}
-                            className="px-2.5 py-1.5 bg-lotus-leaf/10 text-lotus-leaf rounded-md text-lotus-admin-md font-medium border border-lotus-leaf/20 shadow-sm truncate"
+                            className="px-2.5 py-1.5 bg-adminGreen-100 text-adminGreen-600 rounded-md text-xs font-medium border border-adminGreen-600/20 shadow-sm truncate"
                             title={ws.shift?.name}
                           >
                             {ws.shift?.name || "Ca làm việc"}
@@ -355,7 +355,7 @@ export function ScheduleTable({
           <tr>
             <td
               colSpan={8}
-              className="py-12 text-center text-lotus-stone font-medium"
+              className="py-12 text-center text-adminGray-600 font-medium"
             >
               Vui lòng chọn nhân viên để xem lịch cá nhân.
             </td>
@@ -365,17 +365,17 @@ export function ScheduleTable({
     }
 
     return (
-      <tbody className="divide-y divide-stone-200/50">
+      <tbody className="divide-y divide-adminGray-100/50">
         {activeShiftPeriods.map(({ shift, period }, index) => (
           <tr key={`${shift.id}_${period.id}_${index}`}>
-            <td className="py-3 px-4 border-r border-stone-200/50 align-top bg-stone-50/30">
-              <div className="font-bold text-lotus-deep">{shift.name}</div>
-              <div className="text-lotus-admin-md text-lotus-stone mt-1 flex items-center gap-1">
-                <span className="px-1.5 py-0.5 bg-lotus-cream rounded font-medium text-lotus-deep">
+            <td className="py-3 px-4 border-r border-adminGray-100/50 align-top bg-adminGray-50/30">
+              <div className="font-bold text-adminInk">{shift.name}</div>
+              <div className="text-xs text-adminGray-600 mt-1 flex items-center gap-1">
+                <span className="px-1.5 py-0.5 bg-adminGray-50 rounded font-medium text-adminInk">
                   {period.shiftStart?.substring(0, 5)}
                 </span>
                 <span>-</span>
-                <span className="px-1.5 py-0.5 bg-lotus-cream rounded font-medium text-lotus-deep">
+                <span className="px-1.5 py-0.5 bg-adminGray-50 rounded font-medium text-adminInk">
                   {period.shiftEnd?.substring(0, 5)}
                 </span>
               </div>
@@ -392,9 +392,9 @@ export function ScheduleTable({
                 return (
                   <td
                     key={i}
-                    className="py-2 px-2 border-r border-stone-200/50 last:border-0 align-top bg-stone-100/50"
+                    className="py-2 px-2 border-r border-adminGray-100/50 last:border-0 align-top bg-adminGray-100/50"
                   >
-                    <div className="flex h-full items-center justify-center text-lotus-admin-base text-stone-400">
+                    <div className="flex h-full items-center justify-center text-xs text-adminGray-400">
                       Không áp dụng
                     </div>
                   </td>
@@ -407,17 +407,17 @@ export function ScheduleTable({
               return (
                 <td
                   key={i}
-                  className={`py-2 px-2 border-r border-stone-200/50 last:border-0 align-middle text-center min-h-[100px] h-[100px] transition-colors relative group ${
-                    isWorking ? "bg-lotus-cream/20" : "hover:bg-stone-50/50"
+                  className={`py-2 px-2 border-r border-adminGray-100/50 last:border-0 align-middle text-center min-h-[100px] h-[100px] transition-colors relative group ${
+                    isWorking ? "bg-adminGray-50/20" : "hover:bg-adminGray-50/50"
                   }`}
                 >
                   {isWorking ? (
                     <div className="relative h-full flex flex-col items-center justify-center">
-                      <div className="inline-flex flex-col items-center gap-1 text-lotus-leaf animate-in fade-in zoom-in duration-300">
-                        <div className="p-1.5 bg-lotus-leaf/10 rounded-full text-lotus-leaf">
+                      <div className="inline-flex flex-col items-center gap-1 text-adminGreen-600 animate-in fade-in zoom-in duration-300">
+                        <div className="p-1.5 bg-adminGreen-100 rounded-full text-adminGreen-600">
                           <Check size={18} className="stroke-[3px]" />
                         </div>
-                        <span className="text-lotus-admin-base font-semibold">
+                        <span className="text-xs font-semibold">
                           Ca làm việc
                         </span>
                       </div>
@@ -430,7 +430,7 @@ export function ScheduleTable({
                               const ws = fullMap.get(keyFull);
                               if (ws?.id) handleDelete(ws.id);
                             }}
-                            className="flex items-center gap-1 text-xs font-semibold text-red-650 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-full transition-colors border border-red-200"
+                            className="flex items-center gap-1 text-xs font-semibold text-state-danger-text hover:text-state-danger-text bg-state-danger-bg hover:bg-state-danger-bg px-3 py-1.5 rounded-full transition-colors border border-state-danger-border"
                           >
                             <Trash2 size={12} /> Hủy ca
                           </button>
@@ -439,7 +439,7 @@ export function ScheduleTable({
                     </div>
                   ) : (
                     <div className="flex flex-col gap-1.5 h-full justify-center">
-                      <span className="text-xs text-stone-300 font-medium">
+                      <span className="text-xs text-adminGray-300 font-medium">
                         Nghỉ
                       </span>
 
@@ -455,7 +455,7 @@ export function ScheduleTable({
                                 existingStaffIds: [], // Not strictly needed for single view
                               })
                             }
-                            className="flex items-center gap-1 text-xs font-semibold text-lotus-leaf hover:text-lotus-deep bg-lotus-cream hover:bg-lotus-cream/80 px-3 py-1.5 rounded-full transition-colors"
+                            className="flex items-center gap-1 text-xs font-semibold text-adminGreen-600 hover:text-adminInk bg-adminGray-50 hover:bg-adminGray-50/80 px-3 py-1.5 rounded-full transition-colors"
                           >
                             <Plus size={12} /> Đăng ký ca
                           </button>
@@ -476,23 +476,23 @@ export function ScheduleTable({
 
   return (
     <>
-      <div className="overflow-x-auto border border-stone-200/50 rounded-sm bg-white/70 shadow-sm ">
-        <table className="w-full text-lotus-admin-lg text-left table-fixed">
-          <thead className="bg-lotus-cream/50 border-b border-stone-200/50">
+      <div className="overflow-x-auto border border-adminGray-100/50 rounded-sm bg-white/70 shadow-sm ">
+        <table className="w-full text-sm text-left table-fixed">
+          <thead className="bg-adminGray-50/50 border-b border-adminGray-100/50">
             <tr>
-              <th className="w-48 py-4 px-4 font-semibold text-lotus-deep border-r border-stone-200/50">
+              <th className="w-48 py-4 px-4 font-semibold text-adminInk border-r border-adminGray-100/50">
                 {rowHeaderTitle}
               </th>
               {days.map((day, i) => (
                 <th
                   key={i}
-                  className="py-4 px-2 font-medium text-center border-r border-stone-200/50 last:border-0"
+                  className="py-4 px-2 font-medium text-center border-r border-adminGray-100/50 last:border-0"
                 >
                   <div
                     className={`flex items-center justify-center gap-1 ${
                       day.day() === 0 || day.day() === 6
-                        ? "text-lotus-rose"
-                        : "text-lotus-deep"
+                        ? "text-adminGreen-600"
+                        : "text-adminInk"
                     }`}
                   >
                     <span>{getDayName(day)}</span>

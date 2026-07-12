@@ -208,10 +208,10 @@ export function CashierPage() {
   };
 
   return (
-    <div className="h-screen w-full flex flex-col bg-lotus-cream overflow-hidden font-sans text-lotus-deep relative">
+    <div className="admin-dashboard-container h-screen w-full flex flex-col bg-adminGray-50 overflow-hidden font-sans text-adminInk relative">
       {/* Decorative Background Elements for Luxury Feel */}
-      <div className="absolute top-0 left-0 w-[50vw] h-[50vw] rounded-full bg-lotus-rose/5 blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2 z-0" />
-      <div className="absolute bottom-0 right-0 w-[40vw] h-[40vw] rounded-full bg-lotus-gold/5 blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3 z-0" />
+      <div className="absolute top-0 left-0 w-[50vw] h-[50vw] rounded-full bg-adminGreen-600/5 blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2 z-0" />
+      <div className="absolute bottom-0 right-0 w-[40vw] h-[40vw] rounded-full bg-adminGold-600/5 blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3 z-0" />
 
       {/* Standalone POS Header */}
       <CashierHeader activeTab={activeTab} onTabChange={setActiveTab} />
@@ -235,24 +235,24 @@ export function CashierPage() {
           />
 
           {/* Main Content Area */}
-          <div className="flex-1 flex min-h-0 min-w-0 w-full overflow-hidden relative z-10 border-t border-stone-200">
+          <div className="flex-1 flex min-h-0 min-w-0 w-full overflow-hidden relative z-10 border-t border-adminGray-100">
             {isLoading ? (
               <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-sm">
-                <Loader2 className="w-8 h-8 text-lotus-primary animate-spin" />
+                <Loader2 className="w-8 h-8 text-adminGreen-600 animate-spin" />
               </div>
             ) : isError ? (
-              <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-sm text-lotus-rose text-sm gap-2">
+              <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-sm text-adminGreen-600 text-sm gap-2">
                 <span>{error ?? "Không tải được lịch hẹn"}</span>
                 <button
                   type="button"
                   onClick={() => refetch()}
-                  className="underline text-lotus-deep hover:text-lotus-primary transition-colors"
+                  className="underline text-adminInk hover:text-adminGreen-600 transition-colors"
                 >
                   Thử lại
                 </button>
               </div>
             ) : !data ? (
-              <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-sm text-lotus-stone">
+              <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-sm text-adminGray-600">
                 Không thể tải dữ liệu lưới lịch
               </div>
             ) : timeRange === "weekly" ? (

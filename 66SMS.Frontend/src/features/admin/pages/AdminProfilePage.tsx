@@ -170,7 +170,7 @@ export function AdminProfilePage() {
   if (isLoading) {
     return (
       <div className="h-[400px] flex items-center justify-center min-h-[500px]">
-        <Loader2 className="w-8 h-8 text-lotus-leaf animate-spin" />
+        <Loader2 className="w-8 h-8 text-adminGreen-600 animate-spin" />
       </div>
     );
   }
@@ -178,13 +178,13 @@ export function AdminProfilePage() {
   if (isError) {
     return (
       <div className="h-[400px] flex flex-col items-center justify-center text-center min-h-[500px]">
-        <p className="text-red-500 font-medium mb-4">
+        <p className="text-state-danger-text font-medium mb-4">
           Không thể tải thông tin tài khoản
         </p>
         <Button
           variant="link"
           onClick={() => window.location.reload()}
-          className="text-lotus-leaf font-semibold"
+          className="text-adminGreen-600 font-semibold"
         >
           Thử lại
         </Button>
@@ -193,7 +193,7 @@ export function AdminProfilePage() {
   }
 
   return (
-    <div className="w-full font-sans antialiased text-lotus-deep">
+    <div className="w-full font-sans antialiased text-adminInk">
       <motion.div
         initial="hidden"
         animate="visible"
@@ -206,7 +206,7 @@ export function AdminProfilePage() {
           className="w-full lg:w-[260px] shrink-0 flex flex-col gap-2"
         >
           {/* Avatar Card */}
-          <div className="bg-white rounded-admin border border-stone-200/30 shadow-sm p-6 flex flex-col items-center">
+          <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-sm p-6 flex flex-col items-center">
             <input
               id="admin-avatar-upload-input"
               type="file"
@@ -216,7 +216,7 @@ export function AdminProfilePage() {
             />
             <div
               onClick={handleAvatarClick}
-              className="relative w-36 h-36 rounded-full border border-stone-200/50 p-1 bg-white cursor-pointer group shrink-0 shadow-inner"
+              className="relative w-36 h-36 rounded-full border border-adminGray-100/50 p-1 bg-white cursor-pointer group shrink-0 shadow-inner"
             >
               <div className="w-full h-full rounded-full overflow-hidden bg-white relative flex items-center justify-center">
                 {avatarUrl ? (
@@ -226,7 +226,7 @@ export function AdminProfilePage() {
                     className="w-full h-full object-cover rounded-full"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-stone-50 rounded-full text-stone-300">
+                  <div className="w-full h-full flex items-center justify-center bg-adminGray-50 rounded-full text-adminGray-300">
                     <User className="w-16 h-16" />
                   </div>
                 )}
@@ -236,15 +236,15 @@ export function AdminProfilePage() {
                 </div>
               </div>
             </div>
-            <h3 className="mt-4 text-base font-bold text-lotus-deep font-sans text-center truncate w-full">
+            <h3 className="mt-4 text-base font-bold text-adminInk font-sans text-center truncate w-full">
               {profile?.fullName || profile?.username || "Người dùng"}
             </h3>
           </div>
 
           {/* Menu Card */}
-          <div className="bg-white rounded-admin border border-stone-200/30 shadow-sm overflow-hidden">
-            <div className="px-4 py-2.5 border-b border-stone-200/30 bg-stone-50/50">
-              <span className="text-lotus-admin-base font-bold text-lotus-stone uppercase tracking-wider block">
+          <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-sm overflow-hidden">
+            <div className="px-4 py-2.5 border-b border-adminGray-100/30 bg-adminGray-50/50">
+              <span className="text-xs font-bold text-adminGray-600 uppercase tracking-wider block">
                 Menu
               </span>
             </div>
@@ -254,12 +254,12 @@ export function AdminProfilePage() {
                 onClick={() => setActiveTab("profile")}
                 className={`lotus-admin-sidebar-item ${
                   activeTab === "profile"
-                    ? "bg-lotus-leaf/10 text-lotus-leaf font-semibold border-l-[3px] border-lotus-leaf"
-                    : "text-lotus-deep/70 hover:bg-lotus-leaf/5 hover:text-lotus-leaf border-l-[3px] border-transparent"
+                    ? "is-active font-semibold"
+                    : "hover:text-adminGreen-600 border-l-[3px] border-transparent"
                 }`}
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <User className="w-4 h-4 shrink-0 text-stone-400" />
+                  <User className="w-4 h-4 shrink-0 text-adminGray-400" />
                   <span>Thông tin tài khoản</span>
                 </div>
               </button>
@@ -268,12 +268,12 @@ export function AdminProfilePage() {
                 onClick={() => setActiveTab("security")}
                 className={`lotus-admin-sidebar-item ${
                   activeTab === "security"
-                    ? "bg-lotus-leaf/10 text-lotus-leaf font-semibold border-l-[3px] border-lotus-leaf"
-                    : "text-lotus-deep/70 hover:bg-lotus-leaf/5 hover:text-lotus-leaf border-l-[3px] border-transparent"
+                    ? "is-active font-semibold"
+                    : "hover:text-adminGreen-600 border-l-[3px] border-transparent"
                 }`}
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <Lock className="w-4 h-4 shrink-0 text-stone-400" />
+                  <Lock className="w-4 h-4 shrink-0 text-adminGray-400" />
                   <span>Đổi mật khẩu</span>
                 </div>
               </button>
@@ -284,10 +284,10 @@ export function AdminProfilePage() {
         {/* Right Column: Tab Content */}
         <motion.div variants={itemVariants} className="flex-grow">
           {activeTab === "profile" ? (
-            <div className="bg-white rounded-admin border border-stone-200/30 shadow-sm overflow-hidden min-h-[500px]">
+            <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-sm overflow-hidden min-h-[500px]">
               {/* Card Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200/30 bg-stone-50/50">
-                <span className="font-bold text-sm md:text-base text-lotus-deep">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-adminGray-100/30 bg-adminGray-50/50">
+                <span className="font-bold text-sm md:text-base text-adminInk">
                   Thông tin tài khoản
                 </span>
                 <Button
@@ -400,41 +400,41 @@ export function AdminProfilePage() {
                 </form>
 
                 {/* Additional metadata row (Chi nhánh / Quyền hạn / Staff metadata) */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 mt-8 border-t border-stone-200/30 text-left">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 mt-8 border-t border-adminGray-100/30 text-left">
                   <div>
-                    <span className="text-lotus-admin-xs font-semibold text-lotus-stone uppercase tracking-wider block mb-1">
+                    <span className="text-2xs font-semibold text-adminGray-600 uppercase tracking-wider block mb-1">
                       Chi nhánh
                     </span>
-                    <span className="text-lotus-admin-lg font-bold text-lotus-deep block">
+                    <span className="text-sm font-bold text-adminInk block">
                       {mySalon?.salonName || "HoaSenSpa TPHCM"}
                     </span>
-                    <span className="text-lotus-admin-xs text-lotus-stone block mt-0.5">
+                    <span className="text-2xs text-adminGray-600 block mt-0.5">
                       Đồng Tháp
                     </span>
                   </div>
                   <div>
-                    <span className="text-lotus-admin-xs font-semibold text-lotus-stone uppercase tracking-wider block mb-1">
+                    <span className="text-2xs font-semibold text-adminGray-600 uppercase tracking-wider block mb-1">
                       Quyền hạn
                     </span>
-                    <span className="text-lotus-admin-lg font-bold text-lotus-deep block">
+                    <span className="text-sm font-bold text-adminInk block">
                       {profile?.roles?.[0] || "Admin"}
                     </span>
                   </div>
                   {profile?.staffInfo && (
                     <>
                       <div>
-                        <span className="text-lotus-admin-xs font-semibold text-lotus-stone uppercase tracking-wider block mb-1">
+                        <span className="text-2xs font-semibold text-adminGray-600 uppercase tracking-wider block mb-1">
                           Mã nhân viên
                         </span>
-                        <span className="text-lotus-admin-lg font-bold text-lotus-deep block">
+                        <span className="text-sm font-bold text-adminInk block">
                           {profile.staffInfo.code || "---"}
                         </span>
                       </div>
                       <div>
-                        <span className="text-lotus-admin-xs font-semibold text-lotus-stone uppercase tracking-wider block mb-1">
+                        <span className="text-2xs font-semibold text-adminGray-600 uppercase tracking-wider block mb-1">
                           Ngày vào làm
                         </span>
-                        <span className="text-lotus-admin-lg font-bold text-lotus-deep block">
+                        <span className="text-sm font-bold text-adminInk block">
                           {formatDisplayDate(profile.staffInfo.hireDate)}
                         </span>
                       </div>
@@ -444,10 +444,10 @@ export function AdminProfilePage() {
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-admin border border-stone-200/30 shadow-sm overflow-hidden min-h-[500px]">
+            <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-sm overflow-hidden min-h-[500px]">
               {/* Card Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200/30 bg-stone-50/50">
-                <span className="font-bold text-sm md:text-base text-lotus-deep">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-adminGray-100/30 bg-adminGray-50/50">
+                <span className="font-bold text-sm md:text-base text-adminInk">
                   Đổi mật khẩu
                 </span>
                 <Button

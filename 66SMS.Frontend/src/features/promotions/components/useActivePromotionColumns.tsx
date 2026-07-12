@@ -32,9 +32,9 @@ const PROMOTION_STATUS_MAP: StatusMap = {
 };
 
 const DISCOUNT_TYPE_MAP: Record<string, { label: string; color: string }> = {
-  "1": { label: "Giảm %", color: "bg-blue-100 text-blue-700" },
-  "2": { label: "Giảm tiền", color: "bg-amber-100 text-amber-700" },
-  "3": { label: "Mua X tặng Y", color: "bg-purple-100 text-purple-700" },
+  "1": { label: "Giảm %", color: "bg-state-info-bg text-state-info-text" },
+  "2": { label: "Giảm tiền", color: "bg-state-warning-bg text-state-warning-text" },
+  "3": { label: "Mua X tặng Y", color: "bg-adminGold-100 text-adminGold-700" },
 };
 
 interface UseActivePromotionColumnsParams {
@@ -86,7 +86,7 @@ export function useActivePromotionColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="font-mono text-lotus-admin-md font-semibold text-lotus-deep">
+          <span className="font-mono text-xs font-semibold text-adminInk">
             {row.original.code ?? "—"}
           </span>
         ),
@@ -104,7 +104,7 @@ export function useActivePromotionColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="text-lotus-admin-lg font-semibold text-lotus-deep truncate max-w-[200px] block">
+          <span className="text-sm font-semibold text-adminInk truncate max-w-[200px] block">
             {row.original.name ?? "—"}
           </span>
         ),
@@ -116,10 +116,10 @@ export function useActivePromotionColumns({
         cell: ({ row }) => {
           const type = row.original.discountType?.toString() ?? "";
           const info = DISCOUNT_TYPE_MAP[type];
-          if (!info) return <span className="text-lotus-stone">—</span>;
+          if (!info) return <span className="text-adminGray-600">—</span>;
           return (
             <span
-              className={`px-2 py-0.5 rounded-full text-lotus-admin-base font-semibold ${info.color}`}
+              className={`px-2 py-0.5 rounded-full text-xs font-semibold ${info.color}`}
             >
               {info.label}
             </span>
@@ -133,12 +133,12 @@ export function useActivePromotionColumns({
         cell: ({ row }) => {
           const p = row.original;
           if (p.discountType === 1)
-            return <span className="text-lotus-deep">{p.discountValue ?? 0}%</span>;
+            return <span className="text-adminInk">{p.discountValue ?? 0}%</span>;
           if (p.discountType === 2)
             return <PriceCell value={p.discountValue} />;
           if (p.discountType === 3)
             return (
-              <span className="text-lotus-deep">
+              <span className="text-adminInk">
                 Mua {p.buyQuantity} tặng {p.getQuantity}
               </span>
             );
@@ -160,7 +160,7 @@ export function useActivePromotionColumns({
         cell: ({ row }) => {
           const p = row.original;
           return (
-            <div className="text-lotus-admin-md text-lotus-deep/70 leading-5">
+            <div className="text-xs text-adminInk/70 leading-5">
               <div>{p.startDate ?? "—"}</div>
               <div>→ {p.endDate ?? "—"}</div>
             </div>

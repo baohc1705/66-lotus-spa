@@ -56,7 +56,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-full max-w-[calc(100%-2rem)] sm:max-w-lg bg-white rounded-[5px] border border-gray-100 shadow-xl p-6 sm:p-8 duration-200 outline-none flex flex-col max-h-[calc(100vh-2rem)] overflow-y-auto data-open:animate-in data-open:fade-in-0 data-open:slide-in-from-top-12 data-closed:animate-out data-closed:fade-out-0 data-closed:slide-out-to-top-12",
+          "fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-full max-w-[calc(100%-2rem)] sm:max-w-lg bg-white rounded-[5px] border border-adminGray-100 shadow-xl p-6 sm:p-8 duration-200 outline-none flex flex-col max-h-[calc(100vh-2rem)] overflow-y-auto data-open:animate-in data-open:fade-in-0 data-open:slide-in-from-top-12 data-closed:animate-out data-closed:fade-out-0 data-closed:slide-out-to-top-12",
           className
         )}
         {...props}
@@ -98,7 +98,7 @@ function DialogFooter({
   return (
     <div
       data-slot="dialog-footer"
-      className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-4 mt-6 border-t border-gray-100", className)}
+      className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-4 mt-6 border-t border-adminGray-100", className)}
       {...props}
     >
       {children}

@@ -51,7 +51,7 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
       id: "index",
       header: "#",
       cell: ({ row }) => (
-        <span className="text-stone-400 text-sm">
+        <span className="text-adminGray-400 text-sm">
           {(pageIndex - 1) * pageSize + row.index + 1}
         </span>
       ),
@@ -61,7 +61,7 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
       accessorKey: "staffId",
       header: "Mã NV",
       cell: ({ getValue }) => (
-        <span className="font-mono text-xs bg-stone-100 px-1.5 py-0.5 rounded">
+        <span className="font-mono text-xs bg-adminGray-100 px-1.5 py-0.5 rounded">
           {String(getValue())}
         </span>
       ),
@@ -70,7 +70,7 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
       accessorKey: "staffName",
       header: "Họ tên",
       cell: ({ row }) => (
-        <span className="font-mono text-xs bg-stone-100 px-1.5 py-0.5 rounded">
+        <span className="font-mono text-xs bg-adminGray-100 px-1.5 py-0.5 rounded">
           {row.original.staffName}
         </span>
       ),
@@ -86,7 +86,7 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
       accessorKey: "endDate",
       header: "Ngày kết thúc",
       cell: ({ getValue }) => (
-        <span className="text-sm text-stone-500">
+        <span className="text-sm text-adminGray-600">
           {String(getValue() ?? "—")}
         </span>
       ),
@@ -116,7 +116,7 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
               <Pencil className="h-3.5 w-3.5 mr-2" /> Chỉnh sửa
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="text-red-600"
+              className="text-state-danger-text"
               onClick={() => setDeleteTarget(row.original)}
             >
               <Trash2 className="h-3.5 w-3.5 mr-2" /> Xóa
@@ -141,10 +141,10 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-stone-600">
+        <div className="flex items-center gap-2 text-adminGray-600">
           <Users className="h-4 w-4" />
           <span className="text-sm font-medium">Nhân viên chi nhánh</span>
-          <span className="text-xs text-stone-400">({totalCount})</span>
+          <span className="text-xs text-adminGray-400">({totalCount})</span>
         </div>
         <div className="flex items-center gap-2">
           <DataTableViewOptions table={table} />

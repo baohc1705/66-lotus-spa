@@ -73,12 +73,12 @@ export function RevenueDashboard() {
       {/* ─── Header ─────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div className="flex items-center gap-2 self-start sm:self-center">
-          <div className="flex items-center gap-1.5 bg-white border border-stone-100 rounded-admin h-9 px-3">
-            <CalendarRange className="w-3.5 h-3.5 text-stone-400" />
+          <div className="flex items-center gap-1.5 bg-white border border-adminGray-100 rounded-admin h-9 px-3">
+            <CalendarRange className="w-3.5 h-3.5 text-adminGray-400" />
             <select
               value={preset}
               onChange={(e) => setPreset(e.target.value as RevenuePreset)}
-              className="text-lotus-admin-md text-stone-700 font-semibold bg-transparent border-none outline-none cursor-pointer"
+              className="text-xs text-adminInk font-semibold bg-transparent border-none outline-none cursor-pointer"
             >
               <option value="today">Hôm nay</option>
               <option value="7days">7 ngày qua</option>
@@ -90,13 +90,13 @@ export function RevenueDashboard() {
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className={`w-9 h-9 bg-white border border-stone-100 rounded-admin flex items-center justify-center hover:bg-stone-50 transition-colors ${
+            className={`w-9 h-9 bg-white border border-adminGray-100 rounded-admin flex items-center justify-center hover:bg-adminGray-50 transition-colors ${
               isRefreshing ? "opacity-50" : ""
             }`}
             title="Làm mới báo cáo"
           >
             <RefreshCw
-              className={`w-3.5 h-3.5 text-stone-400 ${isRefreshing ? "animate-spin" : ""}`}
+              className={`w-3.5 h-3.5 text-adminGray-400 ${isRefreshing ? "animate-spin" : ""}`}
             />
           </button>
         </div>

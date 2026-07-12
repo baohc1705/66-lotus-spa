@@ -12,6 +12,11 @@ export default {
         display: ['"Playfair Display"', 'Georgia', 'serif'],
         mono:    ['"DM Mono"',        'ui-monospace',  'SFMono-Regular', 'monospace'],
       },
+      fontSize: {
+        /* Micro labels (badges, tags, captions) — defined in theme, not arbitrary */
+        '3xs': ['0.5625rem', { lineHeight: '0.75rem' }],  /* 9px */
+        '2xs': ['0.625rem',  { lineHeight: '0.875rem' }], /* 10px */
+      },
       borderRadius: {
         admin: 'var(--admin-radius, 10px)',
         lg:   'var(--radius)',
@@ -128,6 +133,63 @@ export default {
           DEFAULT: 'var(--warning-text)',
           bg:      'var(--warning-bg)',
           text:    'var(--warning-text)',
+        },
+
+        /* ── Admin palette (admin-color.md) ── */
+        adminGreen: {
+          900: 'var(--admin-green-900)',
+          800: 'var(--admin-green-800)',
+          700: 'var(--admin-green-700)',
+          600: 'var(--admin-green-600)',
+          500: 'var(--admin-green-500)',
+          200: 'var(--admin-green-200)',
+          100: 'var(--admin-green-100)',
+          50:  'var(--admin-green-50)',
+        },
+        adminGold: {
+          700: 'var(--admin-gold-700)',
+          600: 'var(--admin-gold-600)',
+          100: 'var(--admin-gold-100)',
+        },
+        adminInk: 'var(--admin-ink)',
+        adminGray: {
+          600: 'var(--admin-gray-600)',
+          400: 'var(--admin-gray-400)',
+          300: 'var(--admin-gray-300)',
+          100: 'var(--admin-gray-100)',
+          50:  'var(--admin-gray-50)',
+        },
+        state: {
+          success: {
+            bg:     'var(--state-success-bg)',
+            text:   'var(--state-success-text)',
+            border: 'var(--state-success-border)',
+            solid:  'var(--state-success-solid)',
+          },
+          danger: {
+            bg:     'var(--state-danger-bg)',
+            text:   'var(--state-danger-text)',
+            border: 'var(--state-danger-border)',
+            solid:  'var(--state-danger-solid)',
+          },
+          warning: {
+            bg:     'var(--state-warning-bg)',
+            text:   'var(--state-warning-text)',
+            border: 'var(--state-warning-border)',
+            solid:  'var(--state-warning-solid)',
+          },
+          info: {
+            bg:     'var(--state-info-bg)',
+            text:   'var(--state-info-text)',
+            border: 'var(--state-info-border)',
+            solid:  'var(--state-info-solid)',
+          },
+          neutral: {
+            bg:     'var(--state-neutral-bg)',
+            text:   'var(--state-neutral-text)',
+            border: 'var(--state-neutral-border)',
+            solid:  'var(--state-neutral-solid)',
+          },
         },
       },
       boxShadow: {

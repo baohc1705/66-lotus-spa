@@ -79,7 +79,7 @@ export function AccountPanel({ initialData }: AccountPanelProps) {
           <input
             {...register("username")}
             placeholder="Tên đăng nhập"
-            className="w-full px-4 py-3 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all bg-white text-lotus-deep"
+            className="w-full px-4 py-3 rounded-md border border-warm-100 focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all bg-white text-lotus-deep"
           />
           {errors.username && (
             <p className="text-xs text-lotus-error">
@@ -96,7 +96,7 @@ export function AccountPanel({ initialData }: AccountPanelProps) {
           <input
             {...register("email")}
             placeholder="Địa chỉ Email"
-            className="w-full px-4 py-3 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all bg-white text-lotus-deep"
+            className="w-full px-4 py-3 rounded-md border border-warm-100 focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all bg-white text-lotus-deep"
           />
           {errors.email && (
             <p className="text-xs text-lotus-error">
@@ -113,7 +113,7 @@ export function AccountPanel({ initialData }: AccountPanelProps) {
           <input
             value={formatDate(initialData?.lastLoginAt)}
             disabled
-            className="w-full px-4 py-3 rounded-md border border-gray-100 bg-lotus-cream text-lotus-stone cursor-not-allowed"
+            className="w-full px-4 py-3 rounded-md border border-warm-100 bg-lotus-cream text-lotus-stone cursor-not-allowed"
           />
         </div>
 

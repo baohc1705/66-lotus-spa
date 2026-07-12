@@ -155,7 +155,7 @@ export function RepeatScheduleDialog({
       <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Copy size={16} className="text-lotus-leaf" />
+            <Copy size={16} className="text-adminGreen-600" />
             Lặp lịch làm việc
           </DialogTitle>
           <DialogDescription>
@@ -165,11 +165,11 @@ export function RepeatScheduleDialog({
 
         <div className="space-y-5">
           {/* Thông tin tuần gốc */}
-          <div className="bg-lotus-cream/40 border border-lotus-leaf/20 rounded-lg px-4 py-3 flex items-start gap-3">
-            <CalendarDays size={16} className="text-lotus-leaf mt-0.5 flex-shrink-0" />
+          <div className="bg-adminGray-50/40 border border-adminGreen-600/20 rounded-lg px-4 py-3 flex items-start gap-3">
+            <CalendarDays size={16} className="text-adminGreen-600 mt-0.5 flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-lotus-admin-lg font-semibold text-lotus-deep">{weekLabel}</p>
-              <p className="text-lotus-admin-md text-stone-500 mt-0.5">
+              <p className="text-sm font-semibold text-adminInk">{weekLabel}</p>
+              <p className="text-xs text-adminGray-600 mt-0.5">
                 {currentWeekSchedules.length} ca làm việc sẽ được sao chép
               </p>
             </div>
@@ -193,8 +193,8 @@ export function RepeatScheduleDialog({
               </FormField>
 
               {endWeekLabel && (
-                <div className="text-lotus-admin-md text-stone-500 bg-stone-50 border border-stone-200 rounded-md px-3 py-2">
-                  Tuần kết thúc: <span className="font-semibold text-lotus-deep">{endWeekLabel}</span>
+                <div className="text-xs text-adminGray-600 bg-adminGray-50 border border-adminGray-100 rounded-md px-3 py-2">
+                  Tuần kết thúc: <span className="font-semibold text-adminInk">{endWeekLabel}</span>
                 </div>
               )}
 
@@ -207,7 +207,7 @@ export function RepeatScheduleDialog({
                     checked={skipHolidays}
                     onCheckedChange={setSkipHolidays}
                   />
-                  <span className="text-lotus-admin-md text-stone-500">
+                  <span className="text-xs text-adminGray-600">
                     Không tạo lịch vào ngày 1/1, 30/4, 1/5, 2/9
                   </span>
                 </div>
@@ -218,26 +218,26 @@ export function RepeatScheduleDialog({
           {/* Preview */}
           {preview !== null && (
             preview.weeks === 0 ? (
-              <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-                <AlertCircle size={15} className="text-amber-500 flex-shrink-0 mt-0.5" />
-                <p className="text-lotus-admin-lg text-amber-700">
+              <div className="flex items-start gap-2 bg-state-warning-bg border border-state-warning-border rounded-lg px-4 py-3">
+                <AlertCircle size={15} className="text-adminGold-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-state-warning-text">
                   Tuần kết thúc phải sau tuần hiện tại.
                 </p>
               </div>
             ) : (
-              <div className="bg-stone-50 border border-stone-200 rounded-lg px-4 py-3 space-y-1">
-                <p className="text-lotus-admin-lg font-semibold text-lotus-deep">Tổng quan</p>
+              <div className="bg-adminGray-50 border border-adminGray-100 rounded-lg px-4 py-3 space-y-1">
+                <p className="text-sm font-semibold text-adminInk">Tổng quan</p>
                 <div className="grid grid-cols-2 gap-3 mt-2">
-                  <div className="text-center p-2 bg-white rounded-md border border-stone-200">
-                    <p className="text-2xl font-bold text-lotus-leaf">{preview.weeks}</p>
-                    <p className="text-lotus-admin-base text-stone-500 mt-0.5">tuần sẽ lặp</p>
+                  <div className="text-center p-2 bg-white rounded-md border border-adminGray-100">
+                    <p className="text-2xl font-bold text-adminGreen-600">{preview.weeks}</p>
+                    <p className="text-xs text-adminGray-600 mt-0.5">tuần sẽ lặp</p>
                   </div>
-                  <div className="text-center p-2 bg-white rounded-md border border-stone-200">
-                    <p className="text-2xl font-bold text-lotus-deep">{preview.schedules}</p>
-                    <p className="text-lotus-admin-base text-stone-500 mt-0.5">ca làm việc tạo mới</p>
+                  <div className="text-center p-2 bg-white rounded-md border border-adminGray-100">
+                    <p className="text-2xl font-bold text-adminInk">{preview.schedules}</p>
+                    <p className="text-xs text-adminGray-600 mt-0.5">ca làm việc tạo mới</p>
                   </div>
                 </div>
-                <p className="text-lotus-admin-base text-stone-400 mt-2">
+                <p className="text-xs text-adminGray-400 mt-2">
                   * Lịch trùng lặp đã có sẽ tự động bỏ qua.
                 </p>
               </div>

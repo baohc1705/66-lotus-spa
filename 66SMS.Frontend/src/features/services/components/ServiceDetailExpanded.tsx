@@ -33,7 +33,7 @@ export function ServiceDetailExpanded({
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-4 bg-stone-50/30">
+      <div className="p-6 space-y-4 bg-adminGray-50/30">
         <div className="flex gap-4 mb-4">
           <Skeleton className="w-24 h-8" />
           <Skeleton className="w-24 h-8" />
@@ -49,7 +49,7 @@ export function ServiceDetailExpanded({
 
   if (!service) {
     return (
-      <div className="p-6 text-center text-lotus-stone text-sm bg-stone-50/30">
+      <div className="p-6 text-center text-adminGray-600 text-sm bg-adminGray-50/30">
         Không tìm thấy thông tin dịch vụ
       </div>
     );
@@ -62,20 +62,20 @@ export function ServiceDetailExpanded({
     service.images?.[0]?.url;
 
   return (
-    <div className="bg-stone-50/30 w-full overflow-hidden max-h-[400px] overflow-y-auto custom-scrollbar">
+    <div className="bg-adminGray-50/30 w-full overflow-hidden max-h-[400px] overflow-y-auto custom-scrollbar">
       <Tabs defaultValue="info" className="w-full flex-col">
         {/* Tab Headers */}
-        <div className="px-4 pt-2 sticky top-0 bg-stone-50/95 backdrop-blur-sm z-10">
-          <TabsList className="h-10 border-b border-stone-200/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
+        <div className="px-4 pt-2 sticky top-0 bg-adminGray-50/95 backdrop-blur-sm z-10">
+          <TabsList className="h-10 border-b border-adminGray-100/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
             <TabsTrigger
               value="info"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Thông tin chung
             </TabsTrigger>
             <TabsTrigger
               value="products"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Sản phẩm tiêu hao ({products.length})
             </TabsTrigger>
@@ -87,7 +87,7 @@ export function ServiceDetailExpanded({
           <div className="flex flex-col gap-4">
             {/* Header info */}
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-xl bg-lotus-cream/50 flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-stone-200/50">
+              <div className="w-14 h-14 rounded-xl bg-adminGray-50/50 flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-adminGray-100/50">
                 {primaryImage ? (
                   <img
                     src={primaryImage}
@@ -95,14 +95,14 @@ export function ServiceDetailExpanded({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <Activity className="w-7 h-7 text-lotus-stone" />
+                  <Activity className="w-7 h-7 text-adminGray-600" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-lotus-admin-lg font-bold text-lotus-deep truncate">
+                <h3 className="text-sm font-bold text-adminInk truncate">
                   {service.name ?? "—"}
                 </h3>
-                <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
+                <p className="text-xs text-adminGray-600 mt-0.5">
                   Mã: {service.code || "—"} · Thời gian:{" "}
                   {service.durationMins || 0} phút
                 </p>
@@ -140,13 +140,13 @@ export function ServiceDetailExpanded({
             </div>
 
             {/* Actions */}
-            <div className="flex items-end justify-end mt-2 pt-4 border-t border-stone-100/80">
+            <div className="flex items-end justify-end mt-2 pt-4 border-t border-adminGray-100/80">
               <PermissionGate resource={SERVICE_PERM.resource} action={SERVICE_PERM.update}>
                 <Button
                   variant="admin"
                   size="sm"
                   onClick={() => onEdit?.(service)}
-                  className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-lotus-admin-lg gap-1.5 rounded-md transition-opacity"
+                  className="bg-adminGreen-600 hover:opacity-90 text-white shadow-sm h-8 px-4 text-sm gap-1.5 rounded-md transition-opacity"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                   Cập nhật
@@ -162,13 +162,13 @@ export function ServiceDetailExpanded({
           className="p-4 m-0 border-none outline-none"
         >
           {products.length === 0 ? (
-            <div className="py-8 text-center text-lotus-stone text-sm">
+            <div className="py-8 text-center text-adminGray-600 text-sm">
               Chưa có sản phẩm tiêu hao nào được cấu hình cho dịch vụ này
             </div>
           ) : (
-            <div className="rounded-md border border-stone-200 overflow-x-auto w-full">
-              <table className="w-full text-left text-lotus-admin-lg min-w-[600px]">
-                <thead className="bg-stone-50 border-b border-stone-200 text-lotus-stone">
+            <div className="rounded-md border border-adminGray-100 overflow-x-auto w-full">
+              <table className="w-full text-left text-sm min-w-[600px]">
+                <thead className="bg-adminGray-50 border-b border-adminGray-100 text-adminGray-600">
                   <tr>
                     <th className="py-2.5 px-4 font-semibold">Tên sản phẩm</th>
                     <th className="py-2.5 px-4 font-semibold">Giá bán</th>
@@ -180,25 +180,25 @@ export function ServiceDetailExpanded({
                     <th className="py-2.5 px-4 font-semibold">Ghi chú</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-100 bg-white">
+                <tbody className="divide-y divide-adminGray-100 bg-white">
                   {products.map((prod: ServiceProductResponse) => (
                     <tr
                       key={prod.id || prod.productId}
-                      className="hover:bg-stone-50/50 transition-colors"
+                      className="hover:bg-adminGray-50/50 transition-colors"
                     >
-                      <td className="py-2.5 px-4 font-medium text-lotus-deep">
+                      <td className="py-2.5 px-4 font-medium text-adminInk">
                         <div className="flex items-center gap-2">
-                          <Box className="w-3.5 h-3.5 text-lotus-leaf/70" />
+                          <Box className="w-3.5 h-3.5 text-adminGreen-600/70" />
                           {prod.productName || "—"}
                         </div>
                       </td>
-                      <td className="py-2.5 px-4 font-semibold text-lotus-stone">
+                      <td className="py-2.5 px-4 font-semibold text-adminGray-600">
                         {formatCurrency(prod.sellingPrice)}
                       </td>
-                      <td className="py-2.5 px-4 font-semibold text-lotus-stone text-center">
+                      <td className="py-2.5 px-4 font-semibold text-adminGray-600 text-center">
                         {prod.quantityUsed ?? "-"}
                       </td>
-                      <td className="py-2.5 px-4 font-semibold text-lotus-stone">
+                      <td className="py-2.5 px-4 font-semibold text-adminGray-600">
                         {formatCurrency((prod.quantityUsed ?? 0) * (prod.sellingPrice ?? 0))}
                       </td>
 
@@ -209,7 +209,7 @@ export function ServiceDetailExpanded({
                         />
                       </td>
                       <td
-                        className="py-2.5 px-4 text-lotus-stone truncate max-w-[200px]"
+                        className="py-2.5 px-4 text-adminGray-600 truncate max-w-[200px]"
                         title={prod.note}
                       >
                         {prod.note || "—"}
@@ -234,9 +234,9 @@ function DetailField({
   value: string | null | undefined;
 }) {
   return (
-    <div className="py-3.5 border-b border-stone-100/80 last:border-b-0 group">
-      <p className="text-lotus-admin-md text-lotus-stone mb-1">{label}</p>
-      <p className="text-lotus-admin-lg font-medium text-lotus-deep truncate">
+    <div className="py-3.5 border-b border-adminGray-100/80 last:border-b-0 group">
+      <p className="text-xs text-adminGray-600 mb-1">{label}</p>
+      <p className="text-sm font-medium text-adminInk truncate">
         {value || "—"}
       </p>
     </div>

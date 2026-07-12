@@ -164,7 +164,7 @@ export function StaffSalonFormDialog({
                 </SelectContent>
               </Select>
               {createForm.formState.errors.staffId && (
-                <p className="text-xs text-red-500">{createForm.formState.errors.staffId.message}</p>
+                <p className="text-xs text-state-danger-text">{createForm.formState.errors.staffId.message}</p>
               )}
             </div>
             <div className="flex items-center gap-3">
@@ -179,7 +179,7 @@ export function StaffSalonFormDialog({
                 <Label htmlFor="c-startDate">Ngày bắt đầu *</Label>
                 <Input id="c-startDate" type="date" {...createForm.register('startDate')} />
                 {createForm.formState.errors.startDate && (
-                  <p className="text-xs text-red-500">{createForm.formState.errors.startDate.message}</p>
+                  <p className="text-xs text-state-danger-text">{createForm.formState.errors.startDate.message}</p>
                 )}
               </div>
               <div className="space-y-1.5">

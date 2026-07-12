@@ -82,8 +82,8 @@ export function useActiveMembershipTierColumns({
         ),
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
-            <Crown className="w-4 h-4 text-amber-500" />
-            <span className="font-bold text-lotus-deep">
+            <Crown className="w-4 h-4 text-adminGold-600" />
+            <span className="font-bold text-adminInk">
               {row.original.name}
             </span>
           </div>
@@ -102,7 +102,7 @@ export function useActiveMembershipTierColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="font-semibold text-lotus-deep/80">
+          <span className="font-semibold text-adminInk/80">
             {formatCurrency(row.original.minSpending)}
           </span>
         ),
@@ -112,7 +112,7 @@ export function useActiveMembershipTierColumns({
         accessorKey: "discountPercent",
         header: cols.discountPercent,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80 font-medium">
+          <span className="text-adminInk/80 font-medium">
             {row.original.discountPercent ?? 0}%
           </span>
         ),
@@ -122,7 +122,7 @@ export function useActiveMembershipTierColumns({
         accessorKey: "pointMultiplier",
         header: cols.pointMultiplier,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80 font-medium">
+          <span className="text-adminInk/80 font-medium">
             x{row.original.pointMultiplier}
           </span>
         ),

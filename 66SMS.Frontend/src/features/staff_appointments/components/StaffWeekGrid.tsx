@@ -19,23 +19,23 @@ function timeToMins(t: string) {
 function statusStyles(status: string) {
   switch (status) {
     case "in-progress":
-      return "bg-sky-50/80 border-sky-200 text-sky-700 font-medium";
+      return "bg-state-info-bg/80 border-state-info-border text-state-info-text font-medium";
     case "not-arrived":
-      return "bg-red-50/80 border-red-200 text-red-700 font-medium";
+      return "bg-state-danger-bg/80 border-state-danger-border text-state-danger-text font-medium";
     case "waiting":
-      return "bg-amber-50/80 border-amber-200 text-amber-700 font-medium";
+      return "bg-state-warning-bg border-state-warning-border text-state-warning-text font-medium";
     case "completed":
     case "paid":
-      return "bg-emerald-50/80 border-emerald-200 text-emerald-700 font-medium";
+      return "bg-state-success-bg border-state-success-border text-state-success-text font-medium";
     case "unpaid":
-      return "bg-rose-50/80 border-rose-200 text-rose-700 font-medium";
+      return "bg-state-danger-bg border-state-danger-border text-state-danger-text font-medium";
     case "cancelled":
-      return "bg-stone-50/80 border-stone-200 text-stone-600 font-medium";
+      return "bg-adminGray-50/80 border-adminGray-100 text-adminGray-600 font-medium";
     case "confirmed":
-      return "bg-blue-50/80 border-blue-200 text-blue-700 font-medium";
+      return "bg-state-info-bg/80 border-state-info-border text-state-info-text font-medium";
     case "pending":
     default:
-      return "bg-yellow-50/80 border-yellow-200 text-yellow-700 font-medium";
+      return "bg-state-warning-bg/80 border-state-warning-border text-state-warning-text font-medium";
   }
 }
 
@@ -51,7 +51,7 @@ function statusDot(status: string) {
     case "paid":
       return "bg-status-completed";
     case "unpaid":
-      return "bg-lotus-rose";
+      return "bg-adminGreen-600";
     case "cancelled":
       return "bg-status-cancelled";
     case "confirmed":
@@ -89,14 +89,14 @@ export function StaffWeekGrid({
   const currentTimeY = (currentH - 8) * 120 + (currentM / 60) * 120;
 
   return (
-    <div className="flex-1 overflow-auto scrollbar-thin bg-white border border-stone-200/50 rounded-admin">
+    <div className="flex-1 overflow-auto scrollbar-thin bg-white border border-adminGray-100/50 rounded-admin">
       <div className="flex min-w-max">
-        <div className="w-16 flex-shrink-0 border-r border-stone-200/50 bg-stone-50/50 sticky left-0 z-20">
-          <div className="h-14 border-b border-stone-200/50 sticky top-0 bg-stone-50/50 z-30" />
+        <div className="w-16 flex-shrink-0 border-r border-adminGray-100/50 bg-adminGray-50/50 sticky left-0 z-20">
+          <div className="h-14 border-b border-adminGray-100/50 sticky top-0 bg-adminGray-50/50 z-30" />
           <div className="relative">
             {HOURS.map((hour) => (
               <div key={hour} className="h-[120px] relative">
-                <span className="absolute -top-2.5 right-2 text-lotus-admin-xs font-semibold text-lotus-stone/80">
+                <span className="absolute -top-2.5 right-2 text-2xs font-semibold text-adminGray-600/80">
                   {hour.toString().padStart(2, "0")}:00
                 </span>
               </div>
@@ -107,10 +107,10 @@ export function StaffWeekGrid({
         <div className="flex-1 flex relative">
           {showCurrentTime && days.some((d) => d.date === todayStr) && (
             <div
-              className="absolute left-0 right-0 border-b border-emerald-500 border-dashed z-20 pointer-events-none"
+              className="absolute left-0 right-0 border-b border-adminGreen-500 border-dashed z-20 pointer-events-none"
               style={{ top: `${currentTimeY + 56}px` }}
             >
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 absolute -left-0.5" />
+              <div className="w-1.5 h-1.5 rounded-full bg-adminGreen-500 absolute -left-0.5" />
             </div>
           )}
 
@@ -125,28 +125,28 @@ export function StaffWeekGrid({
               <div
                 key={day.date}
                 className={cn(
-                  "flex-1 min-w-[140px] border-r border-stone-200/50 border-dashed",
+                  "flex-1 min-w-[140px] border-r border-adminGray-100/50 border-dashed",
                   (header.isToday || isHighlighted) && "bg-primary/5",
                 )}
               >
                 <div
                   className={cn(
-                    "h-14 border-b border-stone-200/50 sticky top-0 z-10 flex flex-col items-center justify-center px-1",
-                    header.isToday ? "bg-lotus-cream" : "bg-white",
+                    "h-14 border-b border-adminGray-100/50 sticky top-0 z-10 flex flex-col items-center justify-center px-1",
+                    header.isToday ? "bg-adminGray-50" : "bg-white",
                   )}
                 >
                   <span
                     className={cn(
-                      "text-lotus-admin-xs font-bold uppercase",
-                      header.isToday ? "text-primary" : "text-lotus-stone",
+                      "text-2xs font-bold uppercase",
+                      header.isToday ? "text-primary" : "text-adminGray-600",
                     )}
                   >
                     {header.weekday}
                   </span>
                   <span
                     className={cn(
-                      "text-lotus-admin-md font-semibold",
-                      header.isToday ? "text-primary" : "text-lotus-deep",
+                      "text-xs font-semibold",
+                      header.isToday ? "text-primary" : "text-adminInk",
                     )}
                   >
                     {header.label}
@@ -161,12 +161,12 @@ export function StaffWeekGrid({
                     {HOURS.map((hour) => (
                       <div
                         key={hour}
-                        className="h-[120px] w-full flex flex-col border-b border-stone-100"
+                        className="h-[120px] w-full flex flex-col border-b border-adminGray-100"
                       >
                         {[0, 15, 30, 45].map((min) => (
                           <div
                             key={min}
-                            className="flex-1 border-b border-stone-100/50 border-dashed last:border-0"
+                            className="flex-1 border-b border-adminGray-100/50 border-dashed last:border-0"
                           />
                         ))}
                       </div>
@@ -204,10 +204,10 @@ export function StaffWeekGrid({
                             )}
                           />
                         </div>
-                        <div className="text-lotus-admin-xs opacity-90 truncate">
+                        <div className="text-2xs opacity-90 truncate">
                           {booking.serviceName}
                         </div>
-                        <div className="text-lotus-admin-xs opacity-75 mt-0.5 flex items-center gap-0.5">
+                        <div className="text-2xs opacity-75 mt-0.5 flex items-center gap-0.5">
                           <Clock className="w-2.5 h-2.5" />
                           {booking.startTime}–{booking.endTime}
                         </div>

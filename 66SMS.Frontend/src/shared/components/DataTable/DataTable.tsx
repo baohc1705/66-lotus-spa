@@ -99,7 +99,7 @@ export function DataTable<TData>({
                     className={cn(
                       onRowClick ? "cursor-pointer group" : "",
                       row.getIsExpanded()
-                        ? "border-x-2 border-t-2 border-lotus-leaf relative z-10 bg-lotus-leaf-light/50"
+                        ? "border-x-2 border-t-2 border-adminGreen-600 relative z-10 bg-adminGreen-100/50"
                         : "",
                     )}
                     onClick={() => {
@@ -124,7 +124,7 @@ export function DataTable<TData>({
                     ))}
                   </TableRow>
                   {row.getIsExpanded() && renderSubComponent && (
-                    <TableRow className="bg-stone-50/30 hover:bg-stone-50/30 !border-x-2 !border-b-2 border-t-0 border-lotus-leaf relative z-10 shadow-sm">
+                    <TableRow className="bg-adminGray-50/30 hover:bg-adminGray-50/30 !border-x-2 !border-b-2 border-t-0 border-adminGreen-600 relative z-10 shadow-sm">
                       <TableCell
                         colSpan={row.getVisibleCells().length}
                         className="p-0 border-b-0"
@@ -149,7 +149,7 @@ export function DataTable<TData>({
         </Table>
       </div>
       {pagination && (
-        <div className="px-4 border-t border-stone-100 bg-white/50">
+        <div className="px-4 border-t border-adminGray-100 bg-white/50">
           {pagination}
         </div>
       )}

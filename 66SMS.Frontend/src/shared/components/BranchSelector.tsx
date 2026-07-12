@@ -111,14 +111,14 @@ export function BranchSelector() {
             </div>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all" className="text-xs font-medium focus:bg-lotus-cream/50">
+            <SelectItem value="all" className="text-xs font-medium focus:bg-adminGray-50/50">
               Tất cả chi nhánh
             </SelectItem>
             {allSalons.map((salon) => (
               <SelectItem
                 key={salon.id}
                 value={salon.id?.toString() ?? ""}
-                className="text-xs font-medium focus:bg-lotus-cream/50"
+                className="text-xs font-medium focus:bg-adminGray-50/50"
               >
                 {salon.name}
               </SelectItem>
@@ -168,7 +168,7 @@ export function BranchSelector() {
             <SelectItem
               key={salon.id}
               value={salon.id.toString()}
-              className="text-xs font-medium focus:bg-lotus-cream/50"
+              className="text-xs font-medium focus:bg-adminGray-50/50"
             >
               {salon.name}
             </SelectItem>

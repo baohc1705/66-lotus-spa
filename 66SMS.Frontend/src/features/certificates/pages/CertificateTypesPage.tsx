@@ -81,7 +81,7 @@ export function CertificateTypesPage() {
 
   return (
     <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-      <div className="bg-white/70 backdrop-blur-md rounded-admin border border-stone-200/30 overflow-hidden">
+      <div className="bg-white/70 backdrop-blur-md rounded-admin border border-adminGray-100/30 overflow-hidden">
         <div className="px-4 pt-4">
           <DataTableToolbar
             searchValue={filter}
@@ -108,7 +108,7 @@ export function CertificateTypesPage() {
               hint="Thêm loại chứng chỉ để quản lý bằng cấp nhân viên."
               action={
                 <PermissionGate resource={perm.resource} action={perm.create}>
-                  <Button variant="admin" size="sm" onClick={() => setCreateOpen(true)} className="mt-1 text-lotus-admin-md">
+                  <Button variant="admin" size="sm" onClick={() => setCreateOpen(true)} className="mt-1 text-xs">
                     <Plus className="w-3.5 h-3.5" />Thêm loại chứng chỉ
                   </Button>
                 </PermissionGate>

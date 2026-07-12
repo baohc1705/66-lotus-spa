@@ -163,7 +163,7 @@ export function UserListPage() {
                   <Button
                     variant="destructive"
                     size="sm"
-                    className="text-lotus-admin-md h-7 px-2"
+                    className="text-xs h-7 px-2"
                     onClick={() => setBulkDeleteOpen(true)}
                   >
                     <Trash2 className="w-3.5 h-3.5 animate-pulse" />
@@ -215,7 +215,7 @@ export function UserListPage() {
                   variant="admin"
                   size="sm"
                   onClick={() => setCreateOpen(true)}
-                  className="mt-1 text-lotus-admin-md"
+                  className="mt-1 text-xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Thêm người dùng

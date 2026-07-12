@@ -25,7 +25,7 @@ export function DataTableViewOptions<TData>({
         <Button
           variant="secondary"
           size="sm"
-          className="h-9 text-[12px] gap-1.5 bg-white border border-stone-200 flex"
+          className="h-9 text-xs gap-1.5 bg-white border border-adminGray-100 flex"
         >
           <SlidersHorizontal className="w-3.5 h-3.5" />
           Cột
@@ -42,7 +42,7 @@ export function DataTableViewOptions<TData>({
             return (
               <DropdownMenuCheckboxItem
                 key={column.id}
-                className="capitalize text-[13px]"
+                className="capitalize text-sm"
                 checked={column.getIsVisible()}
                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
               >

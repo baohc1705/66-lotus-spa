@@ -16,20 +16,18 @@ export const LoginPage = () => (
         alt="Hoa Sen Spa Logo"
         className="h-16 w-auto object-contain mb-2"
       />
-      <h2 className="font-display text-[22px] font-semibold tracking-[0.1em] text-[#be7a87] uppercase">HOA SEN SPA</h2>
-      <span className="text-[11px] tracking-[0.3em] text-[#be7a87]/80 font-sans uppercase mt-1">ĐÔNG THÁP</span>
+      <h2 className="font-display text-2xl font-semibold tracking-[0.1em] text-rose-400 uppercase">HOA SEN SPA</h2>
+      <span className="text-xs tracking-[0.3em] text-rose-400/80 font-sans uppercase mt-1">ĐÔNG THÁP</span>
     </div>
 
     {/* Form Card */}
-    <div className="w-full max-w-[440px] bg-white rounded-[24px] p-8 sm:p-10 shadow-[0_15px_50px_-15px_rgba(184,151,106,0.15)] animate-fade-in">
+    <div className="w-full max-w-[440px] bg-white rounded-[24px] p-8 sm:p-10 shadow-gold animate-fade-in">
       <div className="text-center mb-6">
-        <h3 className="text-[26px] font-bold text-[#2a1f1a] font-sans">Đăng nhập</h3>
-        <div className="w-12 h-[2px] bg-[#be7a87] mx-auto mt-2" />
+        <h3 className="text-2xl font-bold text-ink font-sans">Đăng nhập</h3>
+        <div className="w-12 h-[2px] bg-rose-400 mx-auto mt-2" />
       </div>
 
       <LoginForm />
     </div>
   </div>
 );
-
-

@@ -29,22 +29,22 @@ export function CashierBookingModal({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 sm:p-6 transition-opacity animate-in fade-in">
-      <div className="relative w-full max-w-6xl max-h-[90vh] bg-lotus-cream rounded-[24px] shadow-[0_32px_64px_rgba(42,31,26,0.15)] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 border border-lotus-gold/20">
+      <div className="relative w-full max-w-6xl max-h-[90vh] bg-adminGray-50 rounded-[24px] shadow-[0_32px_64px_rgba(42,31,26,0.15)] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 border border-adminGold-600/20">
         {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-lotus-gold/10 bg-lotus-cream/80 z-10">
-          <h2 className="text-xl font-bold text-lotus-deep">
+        <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-adminGold-600/10 bg-adminGray-50/80 z-10">
+          <h2 className="text-xl font-bold text-adminInk">
             Thêm Lịch Khách Hàng Mới
           </h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-lotus-gold/20 hover:bg-lotus-gold/10 text-lotus-stone hover:text-lotus-deep transition-all shadow-sm"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-adminGold-600/20 hover:bg-adminGold-600/10 text-adminGray-600 hover:text-adminInk transition-all shadow-sm"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar relative bg-lotus-cream">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar relative bg-adminGray-50">
           {/* Decorative Background */}
           <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-[0.03]">
             <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -65,26 +65,26 @@ export function CashierBookingModal({
           <div className="relative z-10 h-full">
             {currentStep === 4 ? (
               <div className="flex flex-col items-center justify-center py-20 h-full">
-                <div className="w-20 h-20 bg-lotus-primary/10 rounded-full flex items-center justify-center mb-6 border border-lotus-primary/20 shadow-sm">
-                  <CheckCircle2 className="w-10 h-10 text-lotus-primary" />
+                <div className="w-20 h-20 bg-adminGreen-100 rounded-full flex items-center justify-center mb-6 border border-adminGreen-200 shadow-sm">
+                  <CheckCircle2 className="w-10 h-10 text-adminGreen-600" />
                 </div>
-                <h3 className="text-2xl font-bold text-lotus-deep mb-2">
+                <h3 className="text-2xl font-bold text-adminInk mb-2">
                   Đặt Lịch Thành Công!
                 </h3>
-                <p className="text-lotus-stone text-sm mb-8">
+                <p className="text-adminGray-600 text-sm mb-8">
                   Hệ thống đã ghi nhận lịch hẹn mới.
                 </p>
                 <div className="flex gap-4 mt-4">
                   <Button
                     variant="outline"
                     onClick={resetBooking}
-                    className="border-lotus-gold text-lotus-deep hover:bg-lotus-cream"
+                    className="border-adminGold-600 text-adminInk hover:bg-adminGray-50"
                   >
                     Tạo thêm lịch mới
                   </Button>
                   <Button
                     onClick={onClose}
-                    className="bg-lotus-primary text-white hover:bg-lotus-primary/90 shadow-lotus-primary/20 shadow-md"
+                    className="bg-adminGreen-600 text-white hover:bg-adminGreen-600/90 shadow-sm shadow-md"
                   >
                     Đóng
                   </Button>

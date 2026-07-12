@@ -8,15 +8,15 @@ interface Props {
   isLoading: boolean;
 }
 
-const DONUT_COLORS = ["#3e7a3e", "#b08d57", "#eaa9ba"];
+const DONUT_COLORS = ["var(--admin-green-600)", "var(--admin-gold-600)", "var(--admin-green-200)"];
 
 export const TodayCustomersCard = memo(function TodayCustomersCard({ data, isLoading }: Props) {
   if (isLoading || !data) {
     return (
-      <div className="bg-white border border-stone-100 rounded-admin p-5 animate-pulse h-[160px]">
-        <div className="h-4 w-32 bg-stone-100 rounded mb-3" />
-        <div className="h-8 w-12 bg-stone-100 rounded mb-2" />
-        <div className="h-3 w-20 bg-stone-100 rounded" />
+      <div className="bg-white border border-adminGray-100 rounded-admin p-5 animate-pulse h-[160px]">
+        <div className="h-4 w-32 bg-adminGray-100 rounded mb-3" />
+        <div className="h-8 w-12 bg-adminGray-100 rounded mb-2" />
+        <div className="h-3 w-20 bg-adminGray-100 rounded" />
       </div>
     );
   }
@@ -34,21 +34,21 @@ export const TodayCustomersCard = memo(function TodayCustomersCard({ data, isLoa
   ];
 
   return (
-    <div className="bg-white border border-stone-100 rounded-admin p-5 flex flex-col gap-2">
-      <div className="flex items-center gap-1.5 text-lotus-admin-md text-stone-400 font-semibold">
+    <div className="bg-white border border-adminGray-100 rounded-admin p-5 flex flex-col gap-2">
+      <div className="flex items-center gap-1.5 text-xs text-adminGray-400 font-semibold">
         <Users className="w-3.5 h-3.5" />
         Khách hàng hôm nay
       </div>
 
       <div className="flex items-start justify-between gap-2">
         <div>
-          <div className="text-4xl font-bold text-stone-800 leading-none">{data.total}</div>
+          <div className="text-4xl font-bold text-adminInk leading-none">{data.total}</div>
           <div className="mt-2 space-y-1">
             {rows.map((r) => (
-              <div key={r.label} className="flex items-center gap-1.5 text-lotus-admin-xs">
+              <div key={r.label} className="flex items-center gap-1.5 text-2xs">
                 <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: r.color }} />
-                <span className="text-stone-500">{r.label}</span>
-                <span className="font-bold text-stone-700 ml-auto">{r.value}</span>
+                <span className="text-adminGray-600">{r.label}</span>
+                <span className="font-bold text-adminInk ml-auto">{r.value}</span>
               </div>
             ))}
           </div>

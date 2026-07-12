@@ -343,7 +343,7 @@ export function CustomerFormDialog({
                   <AdminTextarea
                     {...register("note")}
                     placeholder="Ghi chú thêm về khách hàng..."
-                    className="text-lotus-admin-lg min-h-[60px] resize-none"
+                    className="text-sm min-h-[60px] resize-none"
                   />
                 </FormField>
               </div>

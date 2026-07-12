@@ -78,74 +78,47 @@
   scrollbar-width: none;
 }
 
-/* ── Shared decorative utilities ── */
-.hero-top-vignette {
-  background: linear-gradient(
-    to bottom,
-    rgba(10, 22, 15, 0.72) 0%,
-    rgba(10, 22, 15, 0.35) 30%,
-    transparent 60%
-  );
+/* ── Display type (landing hero / section titles) ── */
+.text-display-hero {
+  font-size: clamp(2rem, 9vw, 2.75rem);
+  line-height: 1.08;
 }
-
-.hero-content-gradient {
-  background: linear-gradient(
-    to right,
-    rgba(10, 22, 15, 0.82) 0%,
-    rgba(10, 22, 15, 0.55) 55%,
-    transparent 90%
-  );
-}
-
-.lotus-bg-pattern {
-  position: relative;
-  overflow: hidden;
-}
-.lotus-bg-pattern::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: none;
-  pointer-events: none;
-  z-index: 0;
-}
-.lotus-bg-pattern > * {
-  position: relative;
-  z-index: 1;
-}
-
-.crane-bg-mark {
-  position: relative;
-  overflow: hidden;
-}
-.crane-bg-mark::after {
-  content: "";
-  position: absolute;
-  right: -4%;
-  bottom: -4%;
-  width: 45%;
-  aspect-ratio: 1;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300' fill='none'%3E%3Cpath d='M150 230 Q120 200 100 180 Q80 160 90 140 Q100 120 120 125 Q130 128 140 135 Q145 120 155 110 Q165 100 170 110 Q175 120 165 135 Q175 128 185 125 Q205 120 215 140 Q225 160 205 180 Q185 200 175 215 Z' fill='%23D25B7C' opacity='0.04'/%3E%3Ccircle cx='150' cy='82' r='14' fill='%23D25B7C' opacity='0.04'/%3E%3Cpath d='M148 96 L148 120' stroke='%23D25B7C' stroke-width='6' opacity='0.04' stroke-linecap='round'/%3E%3Cpath d='M142 220 L130 270 M158 220 L170 270' stroke='%23D25B7C' stroke-width='5' opacity='0.04' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-size: contain;
-  pointer-events: none;
-  z-index: 0;
-}
-.crane-bg-mark > * {
-  position: relative;
-  z-index: 1;
-}
-
-@keyframes slide-in {
-  from {
-    transform: translateY(-16px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
+@media (min-width: 768px) {
+  .text-display-hero {
+    font-size: 4.25rem; /* 68px */
   }
 }
+@media (min-width: 1024px) {
+  .text-display-hero {
+    font-size: 5.25rem; /* 84px */
+  }
+}
+
+.text-display-section {
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  line-height: 1.15;
+}
+
+.text-display-section-md {
+  font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+  line-height: 1.15;
+}
+
+.text-display-section-sm {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  line-height: 1.15;
+}
+
+.text-display-script {
+  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+  line-height: 1.1;
+}
+
+.text-display-script-lg {
+  font-size: clamp(1.5rem, 2.6vw, 2.15rem);
+  line-height: 1.1;
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -154,32 +127,9 @@
     opacity: 1;
   }
 }
-@keyframes float-y {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-12px);
-  }
-}
-@keyframes shimmer {
-  from {
-    background-position: -200% center;
-  }
-  to {
-    background-position: 200% center;
-  }
-}
 
-.animate-slide-in {
-  animation: slide-in 0.22s ease-out;
-}
 .animate-fade-in {
   animation: fade-in 0.2s ease-out;
-}
-.animate-float {
-  animation: float-y 4s ease-in-out infinite;
 }
 
 /* Hide native password reveal button in MS Edge and Chromium browsers on Windows */
@@ -189,7 +139,9 @@ input[type="password"]::-ms-clear {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
+  *,
+  ::before,
+  ::after {
     animation-delay: -1ms !important;
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;

@@ -20,11 +20,11 @@ export function getSortedActions(permissions: PermissionDTO[]): string[] {
   });
 }
 
-// dùng inline style vì class động sẽ bị Tailwind purge
+// dùng CSS var để inline style không bị Tailwind purge
 export const ROLE_COLORS = [
-  { bg: '#3E7A3E', light: 'rgba(62,122,62,0.10)' },
-  { bg: '#7A5C3E', light: 'rgba(122,92,62,0.10)' },
-  { bg: '#3E5C7A', light: 'rgba(62,92,122,0.10)' },
-  { bg: '#7A3E6B', light: 'rgba(122,62,107,0.10)' },
-  { bg: '#5C7A3E', light: 'rgba(92,122,62,0.10)' },
+  { bg: 'var(--admin-green-600)', light: 'var(--admin-green-50)' },
+  { bg: 'var(--admin-gold-700)', light: 'var(--admin-gold-100)' },
+  { bg: 'var(--state-info-solid)', light: 'var(--state-info-bg)' },
+  { bg: 'var(--state-warning-solid)', light: 'var(--state-warning-bg)' },
+  { bg: 'var(--admin-green-700)', light: 'var(--admin-green-100)' },
 ];

@@ -1,4 +1,5 @@
 import type { RoleDTO, PermissionDTO } from '@/features/auth/types/auth.types';
+import { cn } from '@/lib/utils';
 
 function CheckIcon() {
   return (
@@ -34,23 +35,23 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
     <div className="flex flex-col gap-3">
       {/* Role card */}
       <div className="bg-white border border-border rounded-xl overflow-hidden">
-        <div className="h-1.5 bg-lotus-leaf" />
+        <div className="h-1.5 bg-adminGreen-600" />
         <div className="px-4 py-3.5 flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl shrink-0 bg-lotus-leaf text-white font-bold text-lg flex items-center justify-center">
+          <div className="w-11 h-11 rounded-xl shrink-0 bg-adminGreen-600 text-white font-bold text-lg flex items-center justify-center">
             {selectedRole.name.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1">
-            <h2 className="text-base font-bold text-lotus-deep mb-0.5">{selectedRole.name}</h2>
-            <p className="text-xs text-lotus-stone">{selectedRole.desctiption || 'Không có mô tả'}</p>
+            <h2 className="text-base font-bold text-adminInk mb-0.5">{selectedRole.name}</h2>
+            <p className="text-xs text-adminGray-600">{selectedRole.desctiption || 'Không có mô tả'}</p>
           </div>
           <div className="flex gap-2.5 shrink-0">
-            <div className="text-center bg-lotus-cream border border-border rounded-lg px-3.5 py-1.5">
-              <div className="text-base font-bold text-lotus-deep leading-none">{selectedRole.roleUsers?.length ?? 0}</div>
-              <div className="text-lotus-admin-xs text-lotus-stone mt-0.5">thành viên</div>
+            <div className="text-center bg-adminGray-50 border border-border rounded-lg px-3.5 py-1.5">
+              <div className="text-base font-bold text-adminInk leading-none">{selectedRole.roleUsers?.length ?? 0}</div>
+              <div className="text-2xs text-adminGray-600 mt-0.5">thành viên</div>
             </div>
-            <div className="text-center bg-[rgba(62,122,62,0.06)] border border-lotus-leaf/30 rounded-lg px-3.5 py-1.5">
-              <div className="text-base font-bold text-lotus-leaf leading-none">{checkedIds.size}</div>
-              <div className="text-lotus-admin-xs text-lotus-stone mt-0.5">quyền</div>
+            <div className="text-center bg-adminGreen-50 border border-adminGreen-600/30 rounded-lg px-3.5 py-1.5">
+              <div className="text-base font-bold text-adminGreen-600 leading-none">{checkedIds.size}</div>
+              <div className="text-2xs text-adminGray-600 mt-0.5">quyền</div>
             </div>
           </div>
         </div>
@@ -59,24 +60,24 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
       {/* Matrix table */}
       <div className="bg-white border border-border rounded-xl overflow-hidden">
         <div className="px-4 py-3 border-b border-border">
-          <div className="text-sm font-bold text-lotus-deep">Ma trận quyền</div>
+          <div className="text-sm font-bold text-adminInk">Ma trận quyền</div>
         </div>
 
         {allPermissions.length === 0 ? (
-          <p className="p-6 text-center text-lotus-stone text-sm">Chưa có quyền nào — hãy tạo quyền ở bảng bên dưới</p>
+          <p className="p-6 text-center text-adminGray-600 text-sm">Chưa có quyền nào — hãy tạo quyền ở bảng bên dưới</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full border-collapse min-w-[400px]">
               <thead>
-                <tr className="bg-lotus-cream">
-                  <th className="px-3.5 py-2.5 text-left text-lotus-admin-base font-bold text-lotus-stone uppercase tracking-wide border-b border-border w-44">
+                <tr className="bg-adminGray-50">
+                  <th className="px-3.5 py-2.5 text-left text-xs font-bold text-adminGray-600 uppercase tracking-wide border-b border-border w-44">
                     Tài nguyên
                   </th>
-                  <th className="px-2 py-2.5 text-center text-lotus-admin-base font-bold text-lotus-stone uppercase tracking-wide border-b border-border min-w-[70px]">
+                  <th className="px-2 py-2.5 text-center text-xs font-bold text-adminGray-600 uppercase tracking-wide border-b border-border min-w-[70px]">
                     Tất cả
                   </th>
                   {actions.map(a => (
-                    <th key={a} className="px-2 py-2.5 text-center text-lotus-admin-base font-bold text-lotus-stone uppercase tracking-wide border-b border-border min-w-[76px]">
+                    <th key={a} className="px-2 py-2.5 text-center text-xs font-bold text-adminGray-600 uppercase tracking-wide border-b border-border min-w-[76px]">
                       {a}
                     </th>
                   ))}
@@ -89,8 +90,8 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
                   const someChecked = !allChecked && resourcePerms.some(p => checkedIds.has(p.id));
 
                   return (
-                    <tr key={resource} className={ri % 2 === 0 ? 'bg-white' : 'bg-lotus-cream/30'}>
-                      <td className="px-3.5 py-2.5 text-sm font-semibold text-lotus-deep border-b border-border">
+                    <tr key={resource} className={ri % 2 === 0 ? 'bg-white' : 'bg-adminGray-50/30'}>
+                      <td className="px-3.5 py-2.5 text-sm font-semibold text-adminInk border-b border-border">
                         {resource}
                       </td>
 
@@ -99,12 +100,12 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
                         <button
                           onClick={() => onToggleResource(resource)}
                           title={allChecked ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
-                          className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-[5px] cursor-pointer border-0 transition-all"
-                          style={{
-                            background: allChecked ? '#3E7A3E' : someChecked ? '#f59e0b' : '#fff',
-                            border: allChecked || someChecked ? 'none' : '1.5px solid rgb(var(--border))',
-                            boxShadow: allChecked ? '0 1px 4px rgba(62,122,62,.35)' : someChecked ? '0 1px 4px rgba(245,158,11,.35)' : 'none',
-                          }}
+                          className={cn(
+                            'inline-flex items-center justify-center w-[22px] h-[22px] rounded-[5px] cursor-pointer transition-all',
+                            allChecked && 'bg-adminGreen-600 border-0 shadow-sm',
+                            someChecked && 'bg-adminGold-600 border-0 shadow-sm',
+                            !allChecked && !someChecked && 'bg-white border-[1.5px] border-border',
+                          )}
                         >
                           {allChecked && <CheckIcon />}
                           {someChecked && <DashIcon />}
@@ -115,7 +116,7 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
                         const perm = grouped[resource]?.find(p => p.action.toLowerCase() === act);
                         if (!perm) return (
                           <td key={act} className="px-2 py-2.5 text-center border-b border-border">
-                            <span className="inline-block w-5 h-5 rounded-[5px] bg-lotus-cream" />
+                            <span className="inline-block w-5 h-5 rounded-[5px] bg-adminGray-50" />
                           </td>
                         );
                         const checked = checkedIds.has(perm.id);
@@ -124,12 +125,12 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
                             <button
                               onClick={() => onTogglePermission(perm.id)}
                               title={perm.name}
-                              className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-[5px] cursor-pointer border-0 transition-all"
-                              style={{
-                                background: checked ? '#3E7A3E' : '#fff',
-                                border: checked ? 'none' : '1.5px solid rgb(var(--border))',
-                                boxShadow: checked ? '0 1px 4px rgba(62,122,62,.35)' : 'none',
-                              }}
+                              className={cn(
+                                'inline-flex items-center justify-center w-[22px] h-[22px] rounded-[5px] cursor-pointer transition-all',
+                                checked
+                                  ? 'bg-adminGreen-600 border-0 shadow-sm'
+                                  : 'bg-white border-[1.5px] border-border',
+                              )}
                             >
                               {checked && <CheckIcon />}
                             </button>
@@ -149,7 +150,7 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
       <div className="flex justify-end gap-2.5">
         {isDirty && (
           <button
-            className="px-4 py-2 rounded-lg border border-border bg-white text-lotus-deep font-semibold text-sm cursor-pointer hover:bg-lotus-cream"
+            className="px-4 py-2 rounded-lg border border-border bg-white text-adminInk font-semibold text-sm cursor-pointer hover:bg-adminGray-50"
             onClick={onUndo}
           >
             Hoàn tác
@@ -158,8 +159,12 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
         <button
           onClick={onSave}
           disabled={!isDirty || isSaving}
-          className="px-5 py-2 rounded-lg text-white font-semibold text-sm border-0 transition-colors disabled:cursor-not-allowed"
-          style={{ background: isDirty ? '#3E7A3E' : '#C5D9C5', cursor: isDirty ? 'pointer' : 'not-allowed' }}
+          className={cn(
+            'px-5 py-2 rounded-lg text-white font-semibold text-sm border-0 transition-colors',
+            isDirty
+              ? 'bg-adminGreen-600 cursor-pointer hover:bg-adminGreen-500'
+              : 'bg-adminGreen-200 cursor-not-allowed',
+          )}
         >
           {isSaving ? 'Đang lưu...' : 'Lưu thay đổi'}
         </button>

@@ -58,7 +58,7 @@ export function useActiveCertificateTypeColumns({
         accessorKey: "code",
         header: cols.code,
         cell: ({ row }) => (
-          <span className="font-mono text-lotus-admin-md bg-stone-100 px-1.5 py-0.5 rounded text-lotus-deep font-medium">
+          <span className="font-mono text-xs bg-adminGray-100 px-1.5 py-0.5 rounded text-adminInk font-medium">
             {row.original.code}
           </span>
         ),
@@ -68,7 +68,7 @@ export function useActiveCertificateTypeColumns({
         accessorKey: "name",
         header: cols.name,
         cell: ({ row }) => (
-          <span className="font-semibold text-lotus-deep">{row.original.name}</span>
+          <span className="font-semibold text-adminInk">{row.original.name}</span>
         ),
         size: 250,
       },
@@ -76,7 +76,7 @@ export function useActiveCertificateTypeColumns({
         accessorKey: "description",
         header: cols.description,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/70 text-lotus-admin-md">{row.original.description || "—"}</span>
+          <span className="text-adminInk/70 text-xs">{row.original.description || "—"}</span>
         ),
         size: 280,
       },
@@ -90,8 +90,8 @@ export function useActiveCertificateTypeColumns({
               variant="outline"
               className={
                 s === 1
-                  ? "bg-green-100 text-green-700 border-green-200 text-lotus-admin-base"
-                  : "bg-stone-100 text-stone-500 border-stone-200 text-lotus-admin-base"
+                  ? "bg-state-success-bg text-state-success-text border-state-success-border text-xs"
+                  : "bg-state-neutral-bg text-state-neutral-text border-state-neutral-border text-xs"
               }
             >
               {s === 1 ? "Hoạt động" : "Tạm đóng"}

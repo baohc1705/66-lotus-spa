@@ -239,8 +239,8 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
                       className={[
                         'h-[120px] w-[160px] rounded-lg overflow-hidden transition-all',
                         preview
-                          ? 'border border-stone-200 hover:border-lotus-leaf/60'
-                          : 'border-2 border-dashed border-stone-300 bg-stone-50 hover:border-lotus-leaf hover:bg-lotus-leaf/5',
+                          ? 'border border-adminGray-100 hover:border-adminGreen-600/60'
+                          : 'border-2 border-dashed border-adminGray-300 bg-adminGray-50 hover:border-adminGreen-600 hover:bg-adminGreen-50',
                       ].join(' ')}
                     >
                       {preview ? (
@@ -251,9 +251,9 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
                           </div>
                         </>
                       ) : (
-                        <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-stone-400 group-hover/card:text-lotus-leaf transition-colors">
+                        <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-adminGray-400 group-hover/card:text-adminGreen-600 transition-colors">
                           <ImageIcon className="h-6 w-6" />
-                          <span className="text-lotus-admin-base font-medium">Chọn ảnh</span>
+                          <span className="text-xs font-medium">Chọn ảnh</span>
                         </div>
                       )}
                     </button>
@@ -265,13 +265,13 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
                           setPreview('')
                           setValue('documentUrl', '')
                         }}
-                        className="absolute -top-1.5 -right-1.5 z-10 h-5 w-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity hover:bg-red-600 shadow-sm"
+                        className="absolute -top-1.5 -right-1.5 z-10 h-5 w-5 rounded-full bg-state-danger-solid text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity hover:bg-state-danger-solid shadow-sm"
                       >
                         <X className="h-3 w-3" />
                       </button>
                     )}
                   </div>
-                  <p className="text-lotus-admin-base text-lotus-stone mt-1">
+                  <p className="text-xs text-adminGray-600 mt-1">
                     Tải ảnh scan/chụp chứng chỉ (JPG, PNG, WEBP).
                   </p>
                   <input
@@ -290,7 +290,7 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
               </FormField>
 
               <FormField label="Ghi chú" error={errors.note?.message}>
-                <AdminTextarea {...register('note')} placeholder="Ghi chú thêm..." className="text-lotus-admin-lg min-h-[64px]" />
+                <AdminTextarea {...register('note')} placeholder="Ghi chú thêm..." className="text-sm min-h-[64px]" />
               </FormField>
             </div>
           </FormSection>

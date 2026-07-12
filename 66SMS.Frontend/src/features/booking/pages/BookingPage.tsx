@@ -96,7 +96,7 @@ export const BookingPage: React.FC = () => {
                           )}
                         </div>
                         <span
-                          className={`mt-2 whitespace-nowrap font-geist text-[11px] leading-tight sm:text-xs ${
+                          className={`mt-2 whitespace-nowrap font-geist text-xs leading-tight sm:text-xs ${
                             isFirst
                               ? "text-left"
                               : isLast

@@ -129,7 +129,7 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
 
           {/* Thông tin cơ bản */}
           <div>
-            <p className="text-lotus-admin-base font-semibold uppercase tracking-wider text-lotus-stone mb-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-adminGray-600 mb-3">
               Thông tin cơ bản
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-4">
@@ -153,7 +153,7 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
 
           {/* Địa chỉ */}
           <div>
-            <p className="text-lotus-admin-base font-semibold uppercase tracking-wider text-lotus-stone mb-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-adminGray-600 mb-3">
               Địa chỉ
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
@@ -189,7 +189,7 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
 
           {/* Mô tả & Trạng thái */}
           <div>
-            <p className="text-lotus-admin-base font-semibold uppercase tracking-wider text-lotus-stone mb-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-adminGray-600 mb-3">
               Mô tả & Trạng thái
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-4">
@@ -224,7 +224,7 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
                 <AdminTextarea
                   {...register('description')}
                   placeholder="Mô tả chi nhánh..."
-                  className="text-lotus-admin-lg min-h-[80px]"
+                  className="text-sm min-h-[80px]"
                 />
               </FormField>
             </div>
@@ -268,13 +268,13 @@ function FormField({
 
   return (
     <div className={`space-y-1.5 ${className ?? ''}`}>
-      <Label className="flex items-center gap-1.5 text-lotus-admin-md font-semibold text-lotus-deep/80">
+      <Label className="flex items-center gap-1.5 text-xs font-semibold text-adminInk/80">
         {cleanLabel}
-        {isRequired && <span className="text-red-500">*</span>}
+        {isRequired && <span className="text-state-danger-text">*</span>}
         {tooltip && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <Info className="w-3.5 h-3.5 text-lotus-stone cursor-help hover:text-lotus-leaf transition-colors" />
+              <Info className="w-3.5 h-3.5 text-adminGray-600 cursor-help hover:text-adminGreen-600 transition-colors" />
             </TooltipTrigger>
             <TooltipContent>
               <p className="max-w-xs text-xs">{tooltip}</p>
@@ -283,7 +283,7 @@ function FormField({
         )}
       </Label>
       {children}
-      {error && <p className="text-lotus-admin-base text-red-500 font-medium">{error}</p>}
+      {error && <p className="text-xs text-state-danger-text font-medium">{error}</p>}
     </div>
   )
 }

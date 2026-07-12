@@ -75,7 +75,7 @@ export function useActiveMembershipCardColumns({
         accessorKey: "id",
         header: cols.id,
         cell: ({ row }) => (
-          <span className="text-lotus-admin-xs font-mono font-bold text-stone-500">
+          <span className="text-2xs font-mono font-bold text-adminGray-600">
             #{row.original.id}
           </span>
         ),
@@ -85,7 +85,7 @@ export function useActiveMembershipCardColumns({
         accessorKey: "customerId",
         header: cols.customerId,
         cell: ({ row }) => (
-          <span className="text-lotus-admin-xs font-mono text-stone-500">
+          <span className="text-2xs font-mono text-adminGray-600">
             #{row.original.customerId}
           </span>
         ),
@@ -104,8 +104,8 @@ export function useActiveMembershipCardColumns({
         ),
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
-            <CreditCard className="w-4 h-4 text-violet-500" />
-            <span className="font-bold text-lotus-deep">
+            <CreditCard className="w-4 h-4 text-adminGold-600" />
+            <span className="font-bold text-adminInk">
               {row.original.cardCode}
             </span>
           </div>
@@ -116,7 +116,7 @@ export function useActiveMembershipCardColumns({
         accessorKey: "customerName",
         header: cols.customerName,
         cell: ({ row }) => (
-          <span className="font-semibold text-lotus-deep/80">
+          <span className="font-semibold text-adminInk/80">
             {row.original.customerName ?? "—"}
           </span>
         ),
@@ -126,7 +126,7 @@ export function useActiveMembershipCardColumns({
         accessorKey: "membershipTierId",
         header: cols.membershipTierId,
         cell: ({ row }) => (
-          <span className="text-lotus-admin-xs font-mono text-stone-500">
+          <span className="text-2xs font-mono text-adminGray-600">
             #{row.original.membershipTierId}
           </span>
         ),
@@ -136,7 +136,7 @@ export function useActiveMembershipCardColumns({
         accessorKey: "tierName",
         header: cols.tierName,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80 font-medium">
+          <span className="text-adminInk/80 font-medium">
             {row.original.tierName ?? "—"}
           </span>
         ),
@@ -146,7 +146,7 @@ export function useActiveMembershipCardColumns({
         accessorKey: "issuedAt",
         header: cols.issuedAt,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80 text-lotus-admin-lg">
+          <span className="text-adminInk/80 text-sm">
             {row.original.issuedAt
               ? new Date(row.original.issuedAt).toLocaleDateString("vi-VN")
               : "—"}
@@ -158,7 +158,7 @@ export function useActiveMembershipCardColumns({
         accessorKey: "expiresAt",
         header: cols.expiresAt,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80 text-lotus-admin-lg">
+          <span className="text-adminInk/80 text-sm">
             {row.original.expiresAt
               ? new Date(row.original.expiresAt).toLocaleDateString("vi-VN")
               : "Vĩnh viễn"}
@@ -181,7 +181,7 @@ export function useActiveMembershipCardColumns({
         accessorKey: "createdAt",
         header: cols.createdAt,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80 text-lotus-admin-lg">
+          <span className="text-adminInk/80 text-sm">
             {row.original.createdAt
               ? new Date(row.original.createdAt).toLocaleDateString("vi-VN")
               : "—"}
@@ -193,7 +193,7 @@ export function useActiveMembershipCardColumns({
         accessorKey: "updatedAt",
         header: cols.updatedAt,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80 text-lotus-admin-lg">
+          <span className="text-adminInk/80 text-sm">
             {row.original.updatedAt
               ? new Date(row.original.updatedAt).toLocaleDateString("vi-VN")
               : "—"}

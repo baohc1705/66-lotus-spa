@@ -117,21 +117,21 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       {/* Header inside Form card */}
       <div className="text-center mb-6">
-        <h3 className="text-[26px] font-bold text-[#2a1f1a] font-sans">Đăng ký</h3>
-        <div className="w-12 h-[2px] bg-[#be7a87] mx-auto mt-2" />
+        <h3 className="text-2xl font-bold text-ink font-sans">Đăng ký</h3>
+        <div className="w-12 h-[2px] bg-rose-600 mx-auto mt-2" />
       </div>
 
       {/* Họ và tên */}
       <div className="space-y-1.5">
         <div className="relative">
-          <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-[#a3a3a3] pointer-events-none w-5 h-5">
+          <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-warm-400 pointer-events-none w-5 h-5">
             <User className="w-5 h-5" />
           </span>
           <Input
             id="fullName"
             type="text"
             placeholder="Họ và tên"
-            className="w-full h-11 pl-11 pr-4 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm outline-none transition-all duration-200 focus:border-[#be7a87] focus:ring-1 focus:ring-[#be7a87]"
+            className="w-full h-11 pl-11 pr-4 rounded-xl border border-warm-100 bg-white text-warm-600 text-sm outline-none transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
             aria-invalid={!!errors.fullName}
             {...register("fullName")}
           />
@@ -142,14 +142,14 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
       {/* Số điện thoại */}
       <div className="space-y-1.5">
         <div className="relative">
-          <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-[#a3a3a3] pointer-events-none w-5 h-5">
+          <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-warm-400 pointer-events-none w-5 h-5">
             <Phone className="w-5 h-5" />
           </span>
           <Input
             id="phone"
             type="tel"
             placeholder="Số điện thoại"
-            className="w-full h-11 pl-11 pr-4 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm outline-none transition-all duration-200 focus:border-[#be7a87] focus:ring-1 focus:ring-[#be7a87]"
+            className="w-full h-11 pl-11 pr-4 rounded-xl border border-warm-100 bg-white text-warm-600 text-sm outline-none transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
             aria-invalid={!!errors.phone}
             {...register("phone")}
           />
@@ -160,7 +160,7 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
       {/* Tên đăng nhập */}
       <div className="space-y-1.5">
         <div className="relative">
-          <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-[#a3a3a3] pointer-events-none w-5 h-5">
+          <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-warm-400 pointer-events-none w-5 h-5">
             <User className="w-5 h-5" />
           </span>
           <Input
@@ -168,7 +168,7 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
             type="text"
             placeholder="Tên đăng nhập"
             autoComplete="username"
-            className="w-full h-11 pl-11 pr-4 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm outline-none transition-all duration-200 focus:border-[#be7a87] focus:ring-1 focus:ring-[#be7a87]"
+            className="w-full h-11 pl-11 pr-4 rounded-xl border border-warm-100 bg-white text-warm-600 text-sm outline-none transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
             aria-invalid={!!errors.userName}
             {...register("userName")}
           />
@@ -179,7 +179,7 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
       {/* Email */}
       <div className="space-y-1.5">
         <div className="relative">
-          <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-[#a3a3a3] pointer-events-none w-5 h-5">
+          <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-warm-400 pointer-events-none w-5 h-5">
             <Mail className="w-5 h-5" />
           </span>
           <Input
@@ -187,7 +187,7 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
             type="email"
             placeholder="Email"
             autoComplete="email"
-            className="w-full h-11 pl-11 pr-4 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm outline-none transition-all duration-200 focus:border-[#be7a87] focus:ring-1 focus:ring-[#be7a87]"
+            className="w-full h-11 pl-11 pr-4 rounded-xl border border-warm-100 bg-white text-warm-600 text-sm outline-none transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
             aria-invalid={!!errors.email}
             {...register("email")}
           />
@@ -234,17 +234,17 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
       {/* Divider */}
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200" />
+          <div className="w-full border-t border-warm-100" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-white px-3 text-gray-400">hoặc</span>
+          <span className="bg-white px-3 text-warm-400">hoặc</span>
         </div>
       </div>
 
       {/* Login Link */}
-      <div className="text-center text-xs text-gray-500">
+      <div className="text-center text-xs text-warm-600">
         Đã có tài khoản?{" "}
-        <Link to="/login" className="font-semibold text-[#be7a87] hover:text-[#ac6a77] hover:underline transition-colors">
+        <Link to="/login" className="font-semibold text-rose-600 hover:text-rose-500 hover:underline transition-colors">
           Đăng nhập ngay
         </Link>
       </div>
@@ -361,15 +361,15 @@ const OtpStep = ({ email }: OtpStepProps) => {
     <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in" noValidate>
       {/* Header inside Form card */}
       <div className="text-center mb-6">
-        <h3 className="text-[26px] font-bold text-[#2a1f1a] font-sans">Xác thực OTP</h3>
-        <div className="w-12 h-[2px] bg-[#be7a87] mx-auto mt-2" />
+        <h3 className="text-2xl font-bold text-ink font-sans">Xác thực OTP</h3>
+        <div className="w-12 h-[2px] bg-rose-600 mx-auto mt-2" />
       </div>
 
       <div className="text-center">
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-warm-600">
           Chúng tôi đã gửi mã OTP 6 chữ số đến email
         </p>
-        <p className="text-sm font-semibold text-[#be7a87] mt-1">
+        <p className="text-sm font-semibold text-rose-600 mt-1">
           {maskedEmail}
         </p>
       </div>
@@ -388,10 +388,10 @@ const OtpStep = ({ email }: OtpStepProps) => {
             value={digit}
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
-            className="w-11 h-12 text-center text-lg font-bold rounded-xl border transition-all duration-150 outline-none focus:border-[#be7a87] focus:ring-1 focus:ring-[#be7a87] bg-white"
+            className="w-11 h-12 text-center text-lg font-bold rounded-xl border transition-all duration-150 outline-none focus:border-rose-600 focus:ring-1 focus:ring-rose-600 bg-white"
             style={{
-              borderColor: digit ? "#be7a87" : "#e5e7eb",
-              color: "#374151",
+              borderColor: digit ? 'var(--rose-600)' : 'var(--warm-100)',
+              color: 'var(--ink)',
             }}
             aria-label={`Ký tự OTP thứ ${i + 1}`}
           />
@@ -406,11 +406,11 @@ const OtpStep = ({ email }: OtpStepProps) => {
       />
 
       {/* Resend */}
-      <div className="text-center text-xs text-gray-500">
+      <div className="text-center text-xs text-warm-600">
         {countdown > 0 ? (
           <span>
             Gửi lại sau{" "}
-            <span className="font-semibold text-[#be7a87]">
+            <span className="font-semibold text-rose-600">
               {countdown}s
             </span>
           </span>
@@ -419,7 +419,7 @@ const OtpStep = ({ email }: OtpStepProps) => {
             type="button"
             onClick={handleResend}
             disabled={sendOtpMutation.isPending}
-            className="inline-flex items-center gap-1 font-semibold text-[#be7a87] hover:text-[#ac6a77] hover:underline transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-1 font-semibold text-rose-600 hover:text-rose-500 hover:underline transition-colors disabled:opacity-50"
           >
             {sendOtpMutation.isPending ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -439,7 +439,7 @@ const OtpStep = ({ email }: OtpStepProps) => {
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
   return (
-    <p className="text-xs text-red-500 font-medium pl-1 mt-1">
+    <p className="text-xs text-state-danger-text font-medium pl-1 mt-1">
       {message}
     </p>
   );
@@ -457,18 +457,18 @@ function PasswordField({
 }: PasswordFieldProps) {
   return (
     <div className="relative">
-      <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-[#a3a3a3] pointer-events-none w-5 h-5">
+      <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-warm-400 pointer-events-none w-5 h-5">
         <Lock className="w-5 h-5" />
       </span>
       <Input
         {...inputProps}
         type={show ? "text" : "password"}
-        className={`w-full h-11 pl-11 pr-12 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm outline-none transition-all duration-200 focus:border-[#be7a87] focus:ring-1 focus:ring-[#be7a87] ${inputProps.className ?? ""}`}
+        className={`w-full h-11 pl-11 pr-12 rounded-xl border border-warm-100 bg-white text-warm-600 text-sm outline-none transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600 ${inputProps.className ?? ""}`}
       />
       <button
         type="button"
         onClick={onToggle}
-        className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 transition-colors"
+        className="absolute inset-y-0 right-0 flex items-center pr-3 text-warm-400 hover:text-warm-600 transition-colors"
         aria-label={show ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
       >
         <Eye className="w-5 h-5" />
@@ -495,7 +495,7 @@ function SubmitButton({
     <button
       type="submit"
       disabled={isDisabled}
-      className="w-full h-11 flex items-center justify-center gap-2 rounded-xl text-white bg-[#be7a87] font-semibold text-sm transition-all duration-200 outline-none hover:bg-[#ac6a77] hover:shadow-lg active:bg-[#995f6a] disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-[#9ca3af] mt-2"
+      className="w-full h-11 flex items-center justify-center gap-2 rounded-xl text-white bg-rose-600 font-semibold text-sm transition-all duration-200 outline-none hover:bg-rose-500 hover:shadow-lg active:bg-rose-800 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-warm-400 mt-2"
     >
       {pending ? (
         <>

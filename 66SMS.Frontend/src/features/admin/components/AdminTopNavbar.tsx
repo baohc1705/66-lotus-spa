@@ -73,10 +73,10 @@ export function AdminTopNavbar() {
             {tab.path ? (
               <Link
                 to={tab.path}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] font-sans text-lotus-admin-lg font-normal whitespace-nowrap transition-all duration-300 ${
+                className={`admin-nav-tab flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] font-sans text-sm font-normal whitespace-nowrap transition-all duration-300 ${
                   isActive
-                    ? "text-white"
-                    : "text-white/85 hover:text-white hover:bg-white/10"
+                    ? "is-active"
+                    : "hover:bg-white/10"
                 }`}
               >
                 {Icon && (
@@ -90,12 +90,12 @@ export function AdminTopNavbar() {
               </Link>
             ) : (
               <button
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] font-sans text-lotus-admin-lg font-normal whitespace-nowrap transition-all duration-300 outline-none ${
+                className={`admin-nav-tab flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] font-sans text-sm font-normal whitespace-nowrap transition-all duration-300 outline-none ${
                   isActive
-                    ? "text-white"
+                    ? "is-active"
                     : isTabOpen
                     ? "bg-white/15 text-white"
-                    : "text-white/85 hover:text-white hover:bg-white/10"
+                    : "hover:bg-white/10"
                 }`}
               >
                 {Icon && (
@@ -115,7 +115,7 @@ export function AdminTopNavbar() {
             )}
 
             {isActive && (
-              <span className="absolute bottom-0 left-2.5 right-2.5 h-[2px] bg-white rounded-full animate-in fade-in-0 duration-300" />
+              <span className="admin-nav-tab-underline absolute bottom-0 left-2.5 right-2.5 h-[2px] rounded-full animate-in fade-in-0 duration-300" />
             )}
 
             {/* Dropdown / Mega Menu Card */}
@@ -126,7 +126,7 @@ export function AdminTopNavbar() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 6, scale: 0.99 }}
                   transition={{ duration: 0.15, ease: "easeOut" }}
-                  className={`absolute top-full left-0 mt-0.5 bg-white shadow-[0_12px_30px_rgba(0,0,0,0.12)] rounded-[4px] p-4 z-50 grid gap-5`}
+                  className="absolute top-full left-0 mt-0.5 bg-white shadow-[0_12px_30px_rgba(0,0,0,0.12)] border border-adminGray-100 rounded-[4px] p-4 z-50 grid gap-5"
                   style={{
                     gridTemplateColumns: `repeat(${tab.columns?.length ?? 3}, minmax(160px, 1fr))`,
                     minWidth: `${(tab.columns?.length ?? 3) * 180 + 32}px`,
@@ -141,7 +141,7 @@ export function AdminTopNavbar() {
 
                     return (
                       <div key={col.title} className="flex flex-col">
-                        <span className="text-lotus-admin-base font-medium text-lotus-stone/85 mb-2 select-none whitespace-nowrap capitalize">
+                        <span className="text-xs font-medium text-adminGray-600 mb-2 select-none whitespace-nowrap capitalize">
                           {col.title.toLowerCase()}
                         </span>
                         <ul className="space-y-0.5">
@@ -154,17 +154,17 @@ export function AdminTopNavbar() {
                                 <Link
                                   to={item.path}
                                   onClick={() => setActiveTab(null)}
-                                  className={`group flex items-center gap-2 px-2 py-1 rounded-[4px] text-lotus-admin-md transition-all duration-300 ${
+                                  className={`group flex items-center gap-2 px-2 py-1 rounded-[4px] text-xs transition-all duration-300 ${
                                     isItemActive
-                                      ? "bg-lotus-surface/30 text-lotus-primary font-semibold"
-                                      : "text-lotus-deep/80 hover:text-lotus-primary hover:bg-lotus-cream"
+                                      ? "bg-adminGreen-100 text-adminGreen-900 font-semibold"
+                                      : "text-adminInk/80 hover:text-adminGreen-600 hover:bg-adminGray-50"
                                   }`}
                                 >
                                   <Icon
                                     className={`w-3.5 h-3.5 shrink-0 transition-transform duration-300 ${
                                       isItemActive
-                                        ? "text-lotus-primary scale-110"
-                                        : "text-lotus-deep/40 group-hover:text-lotus-primary group-hover:scale-110"
+                                        ? "text-adminGold-600 scale-110"
+                                        : "text-adminGold-600/70 group-hover:text-adminGold-600 group-hover:scale-110"
                                     }`}
                                   />
                                   <span className="whitespace-nowrap truncate">

@@ -101,7 +101,7 @@ export function CertificateTypeFormDialog({ open, onOpenChange, item }: Props) {
                 <AdminInput {...register('name')} placeholder="Chứng chỉ Massage Trị liệu" />
               </FormField>
               <FormField label="Mô tả" error={errors.description?.message}>
-                <AdminTextarea {...register('description')} placeholder="Mô tả loại chứng chỉ..." className="text-lotus-admin-lg min-h-[72px]" />
+                <AdminTextarea {...register('description')} placeholder="Mô tả loại chứng chỉ..." className="text-sm min-h-[72px]" />
               </FormField>
               <div className="grid grid-cols-2 gap-4">
                 <FormField label="Thứ tự hiển thị" error={errors.sortOrder?.message}>

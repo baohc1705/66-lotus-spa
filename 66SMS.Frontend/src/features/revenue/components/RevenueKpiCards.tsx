@@ -24,14 +24,14 @@ export const RevenueKpiCards = memo(function RevenueKpiCards({ summary, isLoadin
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="animate-pulse bg-white rounded-admin border border-stone-100 p-4 h-[100px]"
+            className="animate-pulse bg-white rounded-admin border border-adminGray-100 p-4 h-[100px]"
           >
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded bg-stone-100" />
-              <div className="w-16 h-3 rounded bg-stone-100" />
+              <div className="w-7 h-7 rounded bg-adminGray-100" />
+              <div className="w-16 h-3 rounded bg-adminGray-100" />
             </div>
-            <div className="w-24 h-5 rounded bg-stone-100 mb-1" />
-            <div className="w-14 h-3 rounded bg-stone-100" />
+            <div className="w-24 h-5 rounded bg-adminGray-100 mb-1" />
+            <div className="w-14 h-3 rounded bg-adminGray-100" />
           </div>
         ))}
       </div>
@@ -60,8 +60,8 @@ export const RevenueKpiCards = memo(function RevenueKpiCards({ summary, isLoadin
     const Icon = isPositive ? ArrowUpRight : ArrowDownRight;
     return (
       <span
-        className={`inline-flex items-center gap-0.5 text-lotus-admin-xs font-bold ${
-          isGood ? "text-lotus-leaf" : "text-lotus-rose"
+        className={`inline-flex items-center gap-0.5 text-2xs font-bold ${
+          isGood ? "text-adminGreen-600" : "text-state-danger-text"
         }`}
       >
         <Icon className="w-3 h-3" />
@@ -76,42 +76,42 @@ export const RevenueKpiCards = memo(function RevenueKpiCards({ summary, isLoadin
       value: formatCurrency(cashIn),
       trend: renderTrend(cashIn, previousPeriod?.cashIn),
       icon: DollarSign,
-      iconColor: "text-lotus-leaf bg-lotus-leaf/10",
+      iconColor: "admin-stat-icon--gold",
     },
     {
       label: "Dòng tiền ra",
       value: formatCurrency(cashOut),
       trend: renderTrend(cashOut, previousPeriod?.cashOut, true),
       icon: Wallet,
-      iconColor: "text-lotus-rose bg-lotus-rose-light",
+      iconColor: "bg-state-danger-bg text-state-danger-text",
     },
     {
       label: "Dòng tiền ròng",
       value: formatCurrency(netCashFlow),
       trend: renderTrend(netCashFlow, previousPeriod?.netCashFlow),
       icon: TrendingUp,
-      iconColor: "text-lotus-gold bg-lotus-gold/10",
+      iconColor: "admin-stat-icon--gold",
     },
     {
       label: "Doanh thu",
       value: formatCurrency(grossRevenue),
       trend: renderTrend(grossRevenue, previousPeriod?.grossRevenue),
       icon: CreditCard,
-      iconColor: "text-lotus-accent bg-lotus-surface",
+      iconColor: "admin-stat-icon--gold",
     },
     {
       label: "Số giao dịch",
       value: transactionCount.toLocaleString("vi-VN"),
       trend: renderTrend(transactionCount, previousPeriod?.transactionCount),
       icon: Activity,
-      iconColor: "text-lotus-leaf bg-lotus-leaf/10",
+      iconColor: "admin-stat-icon--gold",
     },
     {
       label: "Giá trị TB / đơn",
       value: formatCurrency(averageOrderValue),
       trend: renderTrend(averageOrderValue, previousPeriod?.averageOrderValue),
       icon: ShoppingBag,
-      iconColor: "text-lotus-gold bg-lotus-gold/10",
+      iconColor: "admin-stat-icon--gold",
     },
   ];
 
@@ -122,7 +122,7 @@ export const RevenueKpiCards = memo(function RevenueKpiCards({ summary, isLoadin
         return (
           <div
             key={i}
-            className="bg-white border border-stone-100 rounded-admin p-4 flex flex-col gap-2 hover:border-stone-200 transition-colors"
+            className="bg-white border border-adminGray-100 rounded-admin p-4 flex flex-col gap-2 hover:border-adminGray-100 transition-colors"
           >
             <div className="flex items-center justify-between">
               <div
@@ -133,10 +133,10 @@ export const RevenueKpiCards = memo(function RevenueKpiCards({ summary, isLoadin
               {card.trend}
             </div>
             <div>
-              <div className="text-lotus-admin-xs text-stone-400 font-medium mb-0.5">
+              <div className="text-2xs text-adminGray-400 font-medium mb-0.5">
                 {card.label}
               </div>
-              <div className="text-base font-bold text-stone-800 truncate">
+              <div className="text-base font-bold text-adminInk truncate">
                 {card.value}
               </div>
             </div>

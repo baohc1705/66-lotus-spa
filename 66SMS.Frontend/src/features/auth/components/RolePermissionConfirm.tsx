@@ -8,10 +8,10 @@ export function RolePermissionConfirm({ message, onConfirm, onCancel, loading }:
 }) {
   return (
     <RolePermissionModal title="Xác nhận xóa" onClose={onCancel}>
-      <p className="text-sm text-lotus-stone mb-5">{message}</p>
+      <p className="text-sm text-adminGray-600 mb-5">{message}</p>
       <div className="flex justify-end gap-2">
         <button
-          className="px-4 py-2 rounded-lg border border-border bg-white text-lotus-deep font-semibold text-sm cursor-pointer hover:bg-lotus-cream"
+          className="px-4 py-2 rounded-lg border border-border bg-white text-adminInk font-semibold text-sm cursor-pointer hover:bg-adminGray-50"
           onClick={onCancel}
         >
           Hủy

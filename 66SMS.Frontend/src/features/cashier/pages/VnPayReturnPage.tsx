@@ -57,30 +57,30 @@ export function VnPayReturnPage() {
     phase === "deposit" ? "Quay lại trang cá nhân" : "Quay lại trang thu ngân";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-lotus-cream">
-      <div className="bg-white p-8 rounded-[24px] shadow-[0_20px_40px_rgba(42,31,26,0.1)] w-full max-w-md text-center border border-lotus-gold/20">
+    <div className="min-h-screen flex items-center justify-center bg-adminGray-50">
+      <div className="bg-white p-8 rounded-[24px] shadow-[0_20px_40px_rgba(42,31,26,0.1)] w-full max-w-md text-center border border-adminGold-600/20">
         {status === "loading" && (
           <div className="flex flex-col items-center">
-            <Loader2 className="w-16 h-16 text-lotus-primary animate-spin mb-4" />
-            <h2 className="text-xl font-semibold text-lotus-deep">
+            <Loader2 className="w-16 h-16 text-adminGreen-600 animate-spin mb-4" />
+            <h2 className="text-xl font-semibold text-adminInk">
               Đang xử lý kết quả...
             </h2>
-            <p className="text-lotus-stone mt-2">Vui lòng đợi trong giây lát</p>
+            <p className="text-adminGray-600 mt-2">Vui lòng đợi trong giây lát</p>
           </div>
         )}
 
         {status === "success" && (
           <div className="flex flex-col items-center animate-in fade-in zoom-in duration-300">
-            <div className="w-20 h-20 bg-lotus-primary/10 rounded-full flex items-center justify-center mb-4 border border-lotus-primary/20">
-              <CheckCircle2 className="w-10 h-10 text-lotus-primary" />
+            <div className="w-20 h-20 bg-adminGreen-100 rounded-full flex items-center justify-center mb-4 border border-adminGreen-200">
+              <CheckCircle2 className="w-10 h-10 text-adminGreen-600" />
             </div>
-            <h2 className="text-2xl font-bold text-lotus-deep mb-2">
+            <h2 className="text-2xl font-bold text-adminInk mb-2">
               Thanh toán thành công!
             </h2>
-            <p className="text-lotus-stone mb-6">{message}</p>
+            <p className="text-adminGray-600 mb-6">{message}</p>
             <button
               onClick={handleReturn}
-              className="px-6 py-3 bg-lotus-primary text-white rounded-admin font-medium hover:bg-lotus-primary/90 transition-colors w-full shadow-md shadow-lotus-primary/20"
+              className="px-6 py-3 bg-adminGreen-600 text-white rounded-admin font-medium hover:bg-adminGreen-600/90 transition-colors w-full shadow-md shadow-sm"
             >
               {returnText}
             </button>
@@ -89,16 +89,16 @@ export function VnPayReturnPage() {
 
         {status === "error" && (
           <div className="flex flex-col items-center animate-in fade-in zoom-in duration-300">
-            <div className="w-20 h-20 bg-lotus-rose/10 rounded-full flex items-center justify-center mb-4 border border-lotus-rose/20">
-              <XCircle className="w-10 h-10 text-lotus-rose" />
+            <div className="w-20 h-20 bg-adminGreen-600/10 rounded-full flex items-center justify-center mb-4 border border-adminGreen-600/20">
+              <XCircle className="w-10 h-10 text-adminGreen-600" />
             </div>
-            <h2 className="text-2xl font-bold text-lotus-deep mb-2">
+            <h2 className="text-2xl font-bold text-adminInk mb-2">
               Thanh toán thất bại
             </h2>
-            <p className="text-lotus-stone mb-6">{message}</p>
+            <p className="text-adminGray-600 mb-6">{message}</p>
             <button
               onClick={handleReturn}
-              className="px-6 py-3 bg-lotus-cream text-lotus-deep border border-lotus-gold/20 rounded-admin font-medium hover:bg-lotus-gold/20 transition-colors w-full"
+              className="px-6 py-3 bg-adminGray-50 text-adminInk border border-adminGold-600/20 rounded-admin font-medium hover:bg-adminGold-600/20 transition-colors w-full"
             >
               {returnText}
             </button>

@@ -162,21 +162,21 @@ export function AddStaffDialog({
               <div className="relative flex-1">
                 <Search
                   size={14}
-                  className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-400"
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 text-adminGray-400"
                 />
                 <input
                   type="text"
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
                   placeholder="Tìm theo tên hoặc mã nhân viên..."
-                  className="w-full pl-8 pr-3 py-1.5 border border-stone-200 rounded-lg text-lotus-admin-lg focus:outline-none focus:ring-2 focus:ring-lotus-leaf bg-white"
+                  className="w-full pl-8 pr-3 py-1.5 border border-adminGray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adminGreen-600 bg-white"
                 />
               </div>
               <button
                 type="button"
                 onClick={toggleAll}
                 disabled={filteredStaffs.length === 0}
-                className="flex items-center gap-1.5 text-lotus-admin-md font-semibold text-lotus-leaf hover:text-lotus-deep transition-colors whitespace-nowrap disabled:opacity-40"
+                className="flex items-center gap-1.5 text-xs font-semibold text-adminGreen-600 hover:text-adminInk transition-colors whitespace-nowrap disabled:opacity-40"
               >
                 {allFilteredSelected ? (
                   <CheckSquare size={14} />
@@ -188,19 +188,19 @@ export function AddStaffDialog({
             </div>
 
             {/* Staff list */}
-            <div className="border border-stone-200 rounded-lg overflow-hidden">
+            <div className="border border-adminGray-100 rounded-lg overflow-hidden">
               {isLoadingStaffs ? (
-                <div className="py-8 text-center text-lotus-admin-lg text-stone-400">
+                <div className="py-8 text-center text-sm text-adminGray-400">
                   Đang tải danh sách nhân viên...
                 </div>
               ) : filteredStaffs.length === 0 ? (
-                <div className="py-8 text-center text-lotus-admin-lg text-stone-400">
+                <div className="py-8 text-center text-sm text-adminGray-400">
                   {searchText
                     ? "Không tìm thấy nhân viên phù hợp"
                     : "Tất cả nhân viên đã được xếp ca này"}
                 </div>
               ) : (
-                <ul className="divide-y divide-stone-100 max-h-[260px] overflow-y-auto">
+                <ul className="divide-y divide-adminGray-100 max-h-[260px] overflow-y-auto">
                   {filteredStaffs.map((staff) => {
                     const isSelected = selectedIds.includes(staff.id!);
                     return (
@@ -208,15 +208,15 @@ export function AddStaffDialog({
                         <button
                           type="button"
                           onClick={() => toggleStaff(staff.id!)}
-                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-stone-50 ${
-                            isSelected ? "bg-lotus-cream/40" : ""
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-adminGray-50 ${
+                            isSelected ? "bg-adminGray-50/40" : ""
                           }`}
                         >
                           <div
                             className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${
                               isSelected
-                                ? "bg-lotus-leaf border-lotus-leaf"
-                                : "border-stone-300"
+                                ? "bg-adminGreen-600 border-adminGreen-600"
+                                : "border-adminGray-300"
                             }`}
                           >
                             {isSelected && (
@@ -232,11 +232,11 @@ export function AddStaffDialog({
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <span className="text-lotus-admin-lg font-medium text-lotus-deep truncate block">
+                            <span className="text-sm font-medium text-adminInk truncate block">
                               {staff.fullName}
                             </span>
                             {staff.code && (
-                              <span className="text-lotus-admin-base text-stone-400">
+                              <span className="text-xs text-adminGray-400">
                                 {staff.code}
                               </span>
                             )}
@@ -252,14 +252,14 @@ export function AddStaffDialog({
             {/* Selected count + validation */}
             <div className="mt-2 flex items-center justify-between min-h-[20px]">
               {selectedIds.length > 0 ? (
-                <span className="text-lotus-admin-md text-lotus-leaf font-medium">
+                <span className="text-xs text-adminGreen-600 font-medium">
                   Đã chọn {selectedIds.length} nhân viên
                 </span>
               ) : (
                 <span />
               )}
               {validationError && (
-                <span className="text-lotus-admin-md text-red-500">{validationError}</span>
+                <span className="text-xs text-state-danger-text">{validationError}</span>
               )}
             </div>
           </FormSection>

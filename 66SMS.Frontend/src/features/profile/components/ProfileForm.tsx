@@ -305,7 +305,7 @@ export function ProfileForm({
                   <input
                     {...register("fullName")}
                     placeholder="Nhập họ tên của bạn"
-                    className="w-full px-4 py-3 rounded-md border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all text-lotus-deep"
+                    className="w-full px-4 py-3 rounded-md border border-warm-100 bg-white focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all text-lotus-deep"
                   />
                   {errors.fullName && (
                     <p className="text-sm text-lotus-error">
@@ -322,7 +322,7 @@ export function ProfileForm({
                   <input
                     {...register("phoneNumber")}
                     placeholder="Nhập số điện thoại"
-                    className="w-full px-4 py-3 rounded-md border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all text-lotus-deep"
+                    className="w-full px-4 py-3 rounded-md border border-warm-100 bg-white focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all text-lotus-deep"
                   />
                   {errors.phoneNumber && (
                     <p className="text-sm text-lotus-error">
@@ -344,7 +344,7 @@ export function ProfileForm({
                         e.target.value === "" ? null : Number(e.target.value),
                       )
                     }
-                    className="w-full px-4 py-3 rounded-md border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all text-lotus-deep"
+                    className="w-full px-4 py-3 rounded-md border border-warm-100 bg-white focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all text-lotus-deep"
                   >
                     <option value="">Chọn giới tính</option>
                     <option value="0">Nam</option>
@@ -366,7 +366,7 @@ export function ProfileForm({
                   <input
                     type="date"
                     {...register("dateOfBirth")}
-                    className="w-full px-4 py-3 rounded-md border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all text-lotus-deep"
+                    className="w-full px-4 py-3 rounded-md border border-warm-100 bg-white focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all text-lotus-deep"
                   />
                   {errors.dateOfBirth && (
                     <p className="text-sm text-lotus-error">

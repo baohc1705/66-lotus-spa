@@ -47,7 +47,7 @@ export function SearchableSelect({
           type="button"
           disabled={disabled}
           className={cn(
-            'lotus-admin-select-trigger flex items-center justify-between gap-2 rounded-md bg-stone-100/80 whitespace-nowrap select-none text-lotus-deep outline-none transition-all duration-200 hover:bg-stone-100 focus:bg-white focus:ring-2 focus:ring-lotus-leaf/30 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
+            'lotus-admin-select-trigger flex items-center justify-between gap-2 rounded-md bg-adminGray-100/80 whitespace-nowrap select-none text-lotus-deep outline-none transition-all duration-200 hover:bg-adminGray-100 focus:bg-white focus:ring-2 focus:ring-adminGreen-600/30 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
             !selected && 'text-lotus-stone',
             className,
           )}
@@ -61,18 +61,18 @@ export function SearchableSelect({
         <Popover.Content
           sideOffset={4}
           align="start"
-          className="z-50 w-[var(--radix-popover-trigger-width)] min-w-[200px] bg-white rounded-md shadow-md border border-stone-100 overflow-hidden animate-in fade-in-0 zoom-in-95"
+          className="z-50 w-[var(--radix-popover-trigger-width)] min-w-[200px] bg-white rounded-md shadow-md border border-adminGray-100 overflow-hidden animate-in fade-in-0 zoom-in-95"
           onOpenAutoFocus={e => e.preventDefault()}
         >
           {/* Search input */}
-          <div className="flex items-center gap-2 px-3 py-2 border-b border-stone-100">
+          <div className="flex items-center gap-2 px-3 py-2 border-b border-adminGray-100">
             <SearchIcon className="size-3.5 text-lotus-stone shrink-0" />
             <input
               ref={inputRef}
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder={searchPlaceholder}
-              className="flex-1 text-[13px] text-lotus-deep bg-transparent outline-none placeholder:text-lotus-stone"
+              className="flex-1 text-sm text-lotus-deep bg-transparent outline-none placeholder:text-lotus-stone"
             />
           </div>
 
@@ -82,7 +82,7 @@ export function SearchableSelect({
             onWheel={e => e.stopPropagation()}
           >
             {filtered.length === 0 ? (
-              <p className="py-2 px-3 text-[13px] text-lotus-stone text-center">Không tìm thấy</p>
+              <p className="py-2 px-3 text-sm text-lotus-stone text-center">Không tìm thấy</p>
             ) : (
               filtered.map(opt => (
                 <button
@@ -92,10 +92,10 @@ export function SearchableSelect({
                     onValueChange(opt.value)
                     setOpen(false)
                   }}
-                  className="relative flex w-full items-center gap-2 rounded-sm py-2 pl-3 pr-8 text-[13px] text-lotus-deep text-left hover:bg-lotus-cream/50 outline-none"
+                  className="relative flex w-full items-center gap-2 rounded-sm py-2 pl-3 pr-8 text-sm text-lotus-deep text-left hover:bg-adminGray-50/50 outline-none"
                 >
                   {opt.value === value && (
-                    <span className="absolute right-2 flex size-4 items-center justify-center text-lotus-leaf">
+                    <span className="absolute right-2 flex size-4 items-center justify-center text-adminGreen-600">
                       <CheckIcon className="size-4" />
                     </span>
                   )}

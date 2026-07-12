@@ -7,7 +7,7 @@ interface PaymentMethodChartProps {
   isLoading: boolean;
 }
 
-const COLORS = ["#3e7a3e", "#b08d57", "#eaa9ba", "#3b82f6"]; // CASH, BANK, WALLET, VNPAY
+const COLORS = ["var(--admin-green-600)", "var(--admin-gold-600)", "var(--admin-green-200)", "var(--state-info-solid)"]; // CASH, BANK, WALLET, VNPAY
 
 interface CustomTooltipProps {
   active?: boolean;
@@ -24,9 +24,9 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-white/95 backdrop-blur-sm border border-stone-200/50 p-2.5 rounded-admin shadow-lg text-xs font-sans">
-        <p className="font-semibold text-lotus-deep">{data.label}</p>
-        <p className="font-bold text-lotus-deep mt-0.5">
+      <div className="bg-white/95 backdrop-blur-sm border border-adminGray-100/50 p-2.5 rounded-admin shadow-lg text-xs font-sans">
+        <p className="font-semibold text-adminInk">{data.label}</p>
+        <p className="font-bold text-adminInk mt-0.5">
           {formatCurrency(data.amount)} ({data.percent}%)
         </p>
       </div>
@@ -38,29 +38,29 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
 export function PaymentMethodChart({ data = [], isLoading }: PaymentMethodChartProps) {
   if (isLoading) {
     return (
-      <div className="card-glow bg-white/70 backdrop-blur-md rounded-admin p-6 border border-stone-200/30 h-[280px] flex flex-col justify-between">
-        <div className="h-5 w-48 bg-stone-100 rounded animate-pulse" />
-        <div className="flex-1 mt-4 bg-stone-50 border border-dashed border-stone-100 rounded-admin flex items-center justify-center">
-          <div className="h-6 w-6 border-2 border-lotus-leaf border-t-transparent rounded-full animate-spin" />
+      <div className="card-glow bg-white/70 backdrop-blur-md rounded-admin p-6 border border-adminGray-100/30 h-[280px] flex flex-col justify-between">
+        <div className="h-5 w-48 bg-adminGray-100 rounded animate-pulse" />
+        <div className="flex-1 mt-4 bg-adminGray-50 border border-dashed border-adminGray-100 rounded-admin flex items-center justify-center">
+          <div className="h-6 w-6 border-2 border-adminGreen-600 border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="card-glow bg-white/70 backdrop-blur-md rounded-admin p-6 border border-stone-200/30 flex flex-col h-[280px]">
+    <div className="card-glow bg-white/70 backdrop-blur-md rounded-admin p-6 border border-adminGray-100/30 flex flex-col h-[280px]">
       <div className="mb-4">
-        <h3 className="font-sans text-lotus-admin-lg font-bold text-lotus-deep">
+        <h3 className="font-sans text-sm font-bold text-adminInk">
           Thu Nhập Theo Kênh Thanh Toán
         </h3>
-        <p className="text-lotus-admin-base text-lotus-stone mt-0.5">
+        <p className="text-xs text-adminGray-600 mt-0.5">
           Tỷ lệ và tổng dòng tiền thu vào (Cash In) của từng kênh
         </p>
       </div>
 
-      <div className="flex-1 w-full min-h-0 text-lotus-admin-base">
+      <div className="flex-1 w-full min-h-0 text-xs">
         {data.length === 0 ? (
-          <div className="w-full h-full flex items-center justify-center text-lotus-stone">
+          <div className="w-full h-full flex items-center justify-center text-adminGray-600">
             Chưa có dữ liệu
           </div>
         ) : (
@@ -75,14 +75,14 @@ export function PaymentMethodChart({ data = [], isLoading }: PaymentMethodChartP
                 tickFormatter={(v) => v >= 1000000 ? `${v / 1000000}M` : v}
                 tickLine={false}
                 axisLine={false}
-                stroke="#888888"
+                stroke="var(--admin-gray-400)"
               />
               <YAxis 
                 dataKey="label" 
                 type="category" 
                 tickLine={false}
                 axisLine={false}
-                stroke="#888888"
+                stroke="var(--admin-gray-400)"
                 width={85}
                 style={{ fontWeight: "bold" }}
               />

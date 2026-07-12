@@ -54,7 +54,7 @@ export function CashierHeader({ activeTab = "calendar", onTabChange }: CashierHe
   const cashierName = user?.username || "Thu ngân";
 
   return (
-    <header className="lotus-cashier-header h-15 py-3 border-b border-purple-950/40 text-white flex items-center justify-between px-4 sticky top-0 z-50 shadow-md font-sans">
+    <header className="lotus-cashier-header h-15 py-3 border-b border-adminGreen-900/40 text-white flex items-center justify-between px-4 sticky top-0 z-50 shadow-md font-sans">
       {/* Left side: Logo & Tabs */}
       <div className="flex items-center gap-4 h-full">
         {/* Lotus Spa Logo */}
@@ -74,7 +74,7 @@ export function CashierHeader({ activeTab = "calendar", onTabChange }: CashierHe
             className={cn(
               "flex items-center gap-1.5 h-full px-2.5 text-xs font-semibold transition-colors border-b-2 whitespace-nowrap",
               activeTab === "calendar"
-                ? "border-lotus-rose bg-white/10 text-white"
+                ? "border-adminGreen-600 bg-white/10 text-white"
                 : "border-transparent hover:bg-white/5 text-white/70 hover:text-white",
             )}
           >
@@ -87,13 +87,13 @@ export function CashierHeader({ activeTab = "calendar", onTabChange }: CashierHe
             className={cn(
               "flex items-center gap-1.5 h-full px-2.5 text-xs font-semibold transition-colors border-b-2 whitespace-nowrap",
               activeTab === "invoices"
-                ? "border-lotus-rose bg-white/10 text-white"
+                ? "border-adminGreen-600 bg-white/10 text-white"
                 : "border-transparent hover:bg-white/5 text-white/70 hover:text-white",
             )}
           >
             <ReceiptText className="w-3.5 h-3.5" />
             Hóa đơn
-            <div className="ml-0.5 w-4 h-4 rounded-[3px] bg-lotus-gold text-white flex items-center justify-center transition-colors shadow-sm">
+            <div className="ml-0.5 w-4 h-4 rounded-[3px] bg-adminGold-600 text-white flex items-center justify-center transition-colors shadow-sm">
               <Plus className="w-2.5 h-2.5 font-bold" />
             </div>
           </button>
@@ -107,14 +107,14 @@ export function CashierHeader({ activeTab = "calendar", onTabChange }: CashierHe
           className={cn(
             "flex items-center gap-1.5 transition-colors relative px-2 py-1 rounded-[3px] whitespace-nowrap",
             hasPendingBookings
-              ? "text-lotus-rose bg-lotus-rose/10 hover:bg-lotus-rose/20 animate-pulse"
+              ? "text-adminGreen-600 bg-adminGreen-600/10 hover:bg-adminGreen-600/20 animate-pulse"
               : "hover:text-white text-white/80",
           )}
         >
           <CalendarIcon className="w-3.5 h-3.5" />
           <span className="hidden lg:inline">Lịch online</span>
           {hasPendingBookings && (
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-lotus-rose rounded-full shadow-sm"></span>
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-adminGreen-600 rounded-full shadow-sm"></span>
           )}
         </button>
 
@@ -135,7 +135,7 @@ export function CashierHeader({ activeTab = "calendar", onTabChange }: CashierHe
             className="flex items-center gap-2 text-left hover:opacity-90 transition-opacity focus:outline-none"
           >
             <div className="text-right hidden sm:block">
-              <div className="text-lotus-admin-xs text-white/60 font-bold uppercase tracking-wider">
+              <div className="text-2xs text-white/60 font-bold uppercase tracking-wider">
                 Thu ngân
               </div>
               <div className="leading-none text-white font-bold text-xs whitespace-nowrap">
@@ -153,12 +153,12 @@ export function CashierHeader({ activeTab = "calendar", onTabChange }: CashierHe
                 className="fixed inset-0 z-40"
                 onClick={() => setIsProfileOpen(false)}
               />
-              <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-[3px] shadow-lg py-1.5 z-50 border border-stone-200 text-gray-800 animate-in fade-in zoom-in-95 duration-100">
-                <div className="px-4 py-2 border-b border-stone-100 mb-1.5">
-                  <p className="text-xs font-bold text-lotus-deep truncate">
+              <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-[3px] shadow-lg py-1.5 z-50 border border-adminGray-100 text-adminInk animate-in fade-in zoom-in-95 duration-100">
+                <div className="px-4 py-2 border-b border-adminGray-100 mb-1.5">
+                  <p className="text-xs font-bold text-adminInk truncate">
                     {user?.username || "Tài khoản"}
                   </p>
-                  <p className="text-lotus-admin-xs text-lotus-stone truncate">
+                  <p className="text-2xs text-adminGray-600 truncate">
                     {user?.email || ""}
                   </p>
                 </div>
@@ -166,7 +166,7 @@ export function CashierHeader({ activeTab = "calendar", onTabChange }: CashierHe
                 <Link
                   to="/"
                   onClick={() => setIsProfileOpen(false)}
-                  className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-lotus-deep/70 hover:bg-lotus-cream hover:text-lotus-primary transition-colors whitespace-nowrap"
+                  className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-adminInk/70 hover:bg-adminGray-50 hover:text-adminGreen-600 transition-colors whitespace-nowrap"
                 >
                   <Home className="w-3.5 h-3.5" />
                   Trang chủ
@@ -176,7 +176,7 @@ export function CashierHeader({ activeTab = "calendar", onTabChange }: CashierHe
                   <Link
                     to="/admin"
                     onClick={() => setIsProfileOpen(false)}
-                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-lotus-deep/70 hover:bg-lotus-cream hover:text-lotus-primary transition-colors whitespace-nowrap"
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-adminInk/70 hover:bg-adminGray-50 hover:text-adminGreen-600 transition-colors whitespace-nowrap"
                   >
                     <Settings className="w-3.5 h-3.5" />
                     Trang quản trị
@@ -186,17 +186,17 @@ export function CashierHeader({ activeTab = "calendar", onTabChange }: CashierHe
                 <Link
                   to="/admin/profile"
                   onClick={() => setIsProfileOpen(false)}
-                  className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-lotus-deep/70 hover:bg-lotus-cream hover:text-lotus-primary transition-colors whitespace-nowrap"
+                  className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-adminInk/70 hover:bg-adminGray-50 hover:text-adminGreen-600 transition-colors whitespace-nowrap"
                 >
                   <User className="w-3.5 h-3.5" />
                   Hồ sơ cá nhân
                 </Link>
 
-                <div className="h-px bg-stone-100 my-1.5" />
+                <div className="h-px bg-adminGray-100 my-1.5" />
 
                 <button
                   onClick={handleLogoutClick}
-                  className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-lotus-rose hover:bg-lotus-rose/5 transition-colors text-left whitespace-nowrap"
+                  className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-adminGreen-600 hover:bg-adminGreen-600/5 transition-colors text-left whitespace-nowrap"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   Đăng xuất

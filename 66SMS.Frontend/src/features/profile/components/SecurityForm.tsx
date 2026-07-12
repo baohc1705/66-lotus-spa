@@ -50,7 +50,7 @@ export function SecurityForm() {
           <input
             type="password"
             {...register("currentPassword")}
-            className="w-full px-4 py-3 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all bg-white text-lotus-deep"
+            className="w-full px-4 py-3 rounded-md border border-warm-100 focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all bg-white text-lotus-deep"
           />
           {errors.currentPassword && (
             <p className="text-xs text-lotus-error ml-1">
@@ -67,7 +67,7 @@ export function SecurityForm() {
             <input
               type="password"
               {...register("newPassword")}
-              className="w-full px-4 py-3 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all bg-white text-lotus-deep"
+              className="w-full px-4 py-3 rounded-md border border-warm-100 focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all bg-white text-lotus-deep"
             />
             {errors.newPassword && (
               <p className="text-xs text-lotus-error ml-1">
@@ -82,7 +82,7 @@ export function SecurityForm() {
             <input
               type="password"
               {...register("confirmPassword")}
-              className="w-full px-4 py-3 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all bg-white text-lotus-deep"
+              className="w-full px-4 py-3 rounded-md border border-warm-100 focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 focus:border-lotus-rose transition-all bg-white text-lotus-deep"
             />
             {errors.confirmPassword && (
               <p className="text-xs text-lotus-error ml-1">

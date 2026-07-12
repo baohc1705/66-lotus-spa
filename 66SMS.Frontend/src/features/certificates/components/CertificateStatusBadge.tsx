@@ -10,16 +10,16 @@ export function CertificateStatusBadge({ status }: Props) {
   if (status === 9 || status === undefined) return null
 
   const statusLabels: Record<number, { label: string; className: string }> = {
-    0: { label: 'Chờ xác minh', className: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
-    1: { label: 'Hiệu lực', className: 'bg-green-100 text-green-700 border-green-200' },
-    2: { label: 'Hết hạn', className: 'bg-red-100 text-red-700 border-red-200' },
-    3: { label: 'Đã thu hồi', className: 'bg-stone-100 text-stone-500 border-stone-200' },
+    0: { label: 'Chờ xác minh', className: 'bg-state-warning-bg text-state-warning-text border-state-warning-border' },
+    1: { label: 'Hiệu lực', className: 'bg-state-success-bg text-state-success-text border-state-success-border' },
+    2: { label: 'Hết hạn', className: 'bg-state-danger-bg text-state-danger-text border-state-danger-border' },
+    3: { label: 'Đã thu hồi', className: 'bg-state-neutral-bg text-state-neutral-text border-state-neutral-border' },
   }
 
-  const config = statusLabels[status] ?? { label: 'Không rõ', className: 'bg-stone-100 text-stone-500' }
+  const config = statusLabels[status] ?? { label: 'Không rõ', className: 'bg-state-neutral-bg text-state-neutral-text' }
 
   return (
-    <Badge variant="outline" className={`text-lotus-admin-base font-medium ${config.className}`}>
+    <Badge variant="outline" className={`text-xs font-medium ${config.className}`}>
       {config.label}
     </Badge>
   )
@@ -28,7 +28,7 @@ export function CertificateStatusBadge({ status }: Props) {
 export function ExpiryBadge({ expiryDate }: { expiryDate?: string }) {
   if (!expiryDate) {
     return (
-      <span className="text-lotus-admin-md text-stone-400">Không hết hạn</span>
+      <span className="text-xs text-adminGray-400">Không hết hạn</span>
     )
   }
 
@@ -37,10 +37,10 @@ export function ExpiryBadge({ expiryDate }: { expiryDate?: string }) {
   const diffDays = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
   if (diffDays < 0) {
-    return <span className="text-lotus-admin-md font-medium text-red-600">{formatDisplayDate(expiryDate)} (Hết hạn)</span>
+    return <span className="text-xs font-medium text-state-danger-text">{formatDisplayDate(expiryDate)} (Hết hạn)</span>
   }
   if (diffDays <= 30) {
-    return <span className="text-lotus-admin-md font-medium text-yellow-600">{formatDisplayDate(expiryDate)} (còn {diffDays} ngày)</span>
+    return <span className="text-xs font-medium text-state-warning-text">{formatDisplayDate(expiryDate)} (còn {diffDays} ngày)</span>
   }
-  return <span className="text-lotus-admin-md text-stone-600">{formatDisplayDate(expiryDate)}</span>
+  return <span className="text-xs text-adminGray-600">{formatDisplayDate(expiryDate)}</span>
 }

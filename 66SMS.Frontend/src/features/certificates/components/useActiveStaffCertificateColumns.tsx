@@ -61,7 +61,7 @@ export function useActiveStaffCertificateColumns({
         accessorKey: "staffName",
         header: cols.staffName,
         cell: ({ row }) => (
-          <span className="font-semibold text-lotus-deep">{row.original.staffName}</span>
+          <span className="font-semibold text-adminInk">{row.original.staffName}</span>
         ),
         size: 160,
       },
@@ -70,8 +70,8 @@ export function useActiveStaffCertificateColumns({
         header: cols.certificateName,
         cell: ({ row }) => (
           <div>
-            <p className="text-lotus-admin-lg font-medium text-lotus-deep">{row.original.certificateName}</p>
-            <p className="text-lotus-admin-base text-lotus-stone">{row.original.typeName}</p>
+            <p className="text-sm font-medium text-adminInk">{row.original.certificateName}</p>
+            <p className="text-xs text-adminGray-600">{row.original.typeName}</p>
           </div>
         ),
         size: 220,
@@ -80,7 +80,7 @@ export function useActiveStaffCertificateColumns({
         accessorKey: "issuingOrganization",
         header: cols.issuingOrganization,
         cell: ({ row }) => (
-          <span className="text-lotus-admin-md text-lotus-deep/80">{row.original.issuingOrganization}</span>
+          <span className="text-xs text-adminInk/80">{row.original.issuingOrganization}</span>
         ),
         size: 180,
       },
@@ -88,7 +88,7 @@ export function useActiveStaffCertificateColumns({
         accessorKey: "issuedDate",
         header: cols.issuedDate,
         cell: ({ row }) => (
-          <span className="text-lotus-admin-md text-lotus-deep/70">{formatDisplayDate(row.original.issuedDate)}</span>
+          <span className="text-xs text-adminInk/70">{formatDisplayDate(row.original.issuedDate)}</span>
         ),
         size: 110,
       },

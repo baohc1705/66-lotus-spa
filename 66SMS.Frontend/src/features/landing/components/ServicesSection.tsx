@@ -178,7 +178,7 @@ export const ServicesSection = () => {
               </div>
 
               <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-5 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
-                <h3 className="mb-2 font-display text-xl font-semibold leading-snug text-white sm:text-[1.35rem]">
+                <h3 className="mb-2 font-display text-xl font-semibold leading-snug text-white sm:text-xl">
                   {category.title}
                 </h3>
 

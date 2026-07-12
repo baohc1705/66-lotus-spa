@@ -75,7 +75,7 @@ export function useActiveTimeSlotColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="font-semibold text-lotus-deep">
+          <span className="font-semibold text-adminInk">
             {formatDisplayTime(row.original.startTime)}
           </span>
         ),
@@ -93,7 +93,7 @@ export function useActiveTimeSlotColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="font-semibold text-lotus-deep">
+          <span className="font-semibold text-adminInk">
             {formatDisplayTime(row.original.endTime)}
           </span>
         ),

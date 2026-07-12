@@ -109,7 +109,7 @@ export const ProcessTimeline = () => {
             <span className="mb-4 font-geist text-xs font-semibold uppercase tracking-[0.14em] text-rose-600">
               Bước {String(active + 1).padStart(2, "0")}
             </span>
-            <h3 className="mb-3 font-geist text-[clamp(1.5rem,2.5vw,2rem)] font-semibold tracking-[-0.02em] text-ink">
+            <h3 className="mb-3 font-geist text-display-section-sm font-semibold tracking-[-0.02em] text-ink">
               {STEPS[active].title}
             </h3>
             <p className="max-w-prose font-geist text-base leading-[1.7] text-warm-600">

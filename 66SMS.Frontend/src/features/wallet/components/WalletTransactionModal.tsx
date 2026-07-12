@@ -65,18 +65,18 @@ export function WalletTransactionModal({ walletId, customerName, isOpen, onClose
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
-        <DialogHeader className="p-5 border-b border-stone-100 shrink-0">
-          <DialogTitle className="text-lg font-bold text-lotus-deep">
+        <DialogHeader className="p-5 border-b border-adminGray-100 shrink-0">
+          <DialogTitle className="text-lg font-bold text-adminInk">
             Chi tiết ví: {customerName}
           </DialogTitle>
-          <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
+          <p className="text-xs text-adminGray-600 mt-0.5">
             Lịch sử giao dịch và biến động số dư của ví khách hàng.
           </p>
         </DialogHeader>
 
         <div className="p-5 overflow-y-auto flex-1 custom-scrollbar">
           <div className="mb-6 flex justify-between items-center shrink-0">
-            <h3 className="font-semibold text-lotus-deep text-lotus-admin-lg">Lịch sử giao dịch</h3>
+            <h3 className="font-semibold text-adminInk text-sm">Lịch sử giao dịch</h3>
             <Button
               onClick={() => setIsAdding(!isAdding)}
               variant="admin"
@@ -88,7 +88,7 @@ export function WalletTransactionModal({ walletId, customerName, isOpen, onClose
           </div>
 
           {isAdding && (
-            <form onSubmit={handleAddSubmit} className="mb-6 p-4 border border-stone-200/50 rounded-xl bg-stone-50/50 space-y-4">
+            <form onSubmit={handleAddSubmit} className="mb-6 p-4 border border-adminGray-100/50 rounded-xl bg-adminGray-50/50 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <FormField label="Số tiền (Âm để trừ tiền)">
                   <AdminInput
@@ -114,7 +114,7 @@ export function WalletTransactionModal({ walletId, customerName, isOpen, onClose
                   type="button"
                   variant="ghost"
                   onClick={() => setIsAdding(false)}
-                  className="text-lotus-stone hover:bg-stone-100 text-lotus-admin-md h-9"
+                  className="text-adminGray-600 hover:bg-adminGray-100 text-xs h-9"
                 >
                   Hủy
                 </Button>
@@ -122,7 +122,7 @@ export function WalletTransactionModal({ walletId, customerName, isOpen, onClose
                   type="submit"
                   variant="admin"
                   disabled={isPending}
-                  className="text-lotus-admin-md h-9 gap-1.5"
+                  className="text-xs h-9 gap-1.5"
                 >
                   {isPending && <Loader2 className="w-4 h-4 animate-spin" />} Xác nhận
                 </Button>
@@ -132,11 +132,11 @@ export function WalletTransactionModal({ walletId, customerName, isOpen, onClose
 
           {isLoading ? (
             <div className="py-20 flex justify-center">
-              <Loader2 className="w-8 h-8 animate-spin text-lotus-rose" />
+              <Loader2 className="w-8 h-8 animate-spin text-adminGreen-600" />
             </div>
           ) : transactions.length === 0 ? (
-            <div className="text-center py-10 bg-stone-50 border border-dashed border-stone-200 rounded-xl">
-              <p className="text-lotus-stone text-lotus-admin-md">Chưa có giao dịch nào.</p>
+            <div className="text-center py-10 bg-adminGray-50 border border-dashed border-adminGray-100 rounded-xl">
+              <p className="text-adminGray-600 text-xs">Chưa có giao dịch nào.</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -145,20 +145,20 @@ export function WalletTransactionModal({ walletId, customerName, isOpen, onClose
                 
                 const getTypeLabel = (type: number) => {
                   switch (type) {
-                    case 1: return { label: "Hoàn tiền", className: "bg-indigo-50 text-indigo-700 border-indigo-200/50" };
-                    case 2: return { label: "Thanh toán", className: "bg-sky-50 text-sky-700 border-sky-200/50" };
-                    case 3: return { label: "Nạp tiền", className: "bg-emerald-50 text-emerald-700 border-emerald-200/50" };
-                    case 4: return { label: "Thủ công", className: "bg-amber-50 text-amber-700 border-amber-200/50" };
-                    default: return { label: "Khác", className: "bg-stone-50 text-stone-700 border-stone-200/50" };
+                    case 1: return { label: "Hoàn tiền", className: "bg-state-info-bg text-state-info-text border-state-info-border/50" };
+                    case 2: return { label: "Thanh toán", className: "bg-state-info-bg text-state-info-text border-state-info-border/50" };
+                    case 3: return { label: "Nạp tiền", className: "bg-state-success-bg text-state-success-text border-state-success-border" };
+                    case 4: return { label: "Thủ công", className: "bg-state-warning-bg text-state-warning-text border-state-warning-border/50" };
+                    default: return { label: "Khác", className: "bg-adminGray-50 text-adminInk border-adminGray-100/50" };
                   }
                 };
 
                 const getStatusLabel = (status: number) => {
                   switch (status) {
-                    case 1: return { label: "Thành công", className: "bg-green-50 text-green-700 border-green-200/50" };
-                    case 2: return { label: "Thất bại", className: "bg-rose-50 text-rose-700 border-rose-200/50" };
-                    case 3: return { label: "Đã đảo", className: "bg-stone-50 text-stone-700 border-stone-200/50" };
-                    default: return { label: "Không rõ", className: "bg-stone-50 text-stone-700 border-stone-200/50" };
+                    case 1: return { label: "Thành công", className: "bg-state-success-bg text-state-success-text border-state-success-border/50" };
+                    case 2: return { label: "Thất bại", className: "bg-state-danger-bg text-state-danger-text border-state-danger-border" };
+                    case 3: return { label: "Đã đảo", className: "bg-adminGray-50 text-adminInk border-adminGray-100/50" };
+                    default: return { label: "Không rõ", className: "bg-adminGray-50 text-adminInk border-adminGray-100/50" };
                   }
                 };
 
@@ -166,44 +166,44 @@ export function WalletTransactionModal({ walletId, customerName, isOpen, onClose
                 const statusInfo = getStatusLabel(tx.status);
 
                 return (
-                  <div key={tx.id} className="flex flex-col p-4 rounded-xl border border-stone-100 bg-white shadow-sm gap-3">
+                  <div key={tx.id} className="flex flex-col p-4 rounded-xl border border-adminGray-100 bg-white shadow-sm gap-3">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-4">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 mt-1 sm:mt-0 ${
-                          isPositive ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
+                          isPositive ? 'bg-state-success-bg text-state-success-text' : 'bg-state-danger-bg text-state-danger-text'
                         }`}>
                           {isPositive ? <ArrowDownLeft className="w-5 h-5" /> : <ArrowUpRight className="w-5 h-5" />}
                         </div>
                         <div>
                           <div className="flex flex-wrap items-center gap-1.5">
-                            <span className="text-lotus-admin-xs font-mono font-bold text-stone-400">#{tx.id}</span>
-                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${typeInfo.className}`}>
+                            <span className="text-2xs font-mono font-bold text-adminGray-400">#{tx.id}</span>
+                            <span className={`text-2xs font-bold px-1.5 py-0.5 rounded border ${typeInfo.className}`}>
                               {typeInfo.label}
                             </span>
-                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${statusInfo.className}`}>
+                            <span className={`text-2xs font-bold px-1.5 py-0.5 rounded border ${statusInfo.className}`}>
                               {statusInfo.label}
                             </span>
                             {tx.appointmentPaymentId && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border bg-slate-50 text-slate-700 border-slate-200/50">
+                              <span className="text-2xs font-bold px-1.5 py-0.5 rounded border bg-adminGray-50 text-adminInk border-adminGray-100/50">
                                 Thanh toán: #{tx.appointmentPaymentId}
                               </span>
                             )}
                           </div>
-                          <p className="font-semibold text-lotus-deep text-lotus-admin-md mt-1">{tx.note}</p>
-                          <div className="flex items-center gap-2 mt-1 text-lotus-admin-xs text-lotus-stone">
+                          <p className="font-semibold text-adminInk text-xs mt-1">{tx.note}</p>
+                          <div className="flex items-center gap-2 mt-1 text-2xs text-adminGray-600">
                             <span>{new Date(tx.createdAt).toLocaleString('vi-VN')}</span>
-                            <span className="w-1 h-1 rounded-full bg-stone-300" />
+                            <span className="w-1 h-1 rounded-full bg-adminGray-300" />
                             <span>Bởi: {tx.createdByName}</span>
                           </div>
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <div className={`font-bold text-lotus-admin-lg ${
-                          isPositive ? 'text-emerald-600' : 'text-rose-600'
+                        <div className={`font-bold text-sm ${
+                          isPositive ? 'text-state-success-text' : 'text-state-danger-text'
                         }`}>
                           {isPositive ? '+' : ''}{formatCurrency(tx.amount)}
                         </div>
-                        <div className="text-lotus-admin-xs text-lotus-stone mt-1">
+                        <div className="text-2xs text-adminGray-600 mt-1">
                           Số dư sau: {formatCurrency(tx.balanceAfter)}
                         </div>
                       </div>

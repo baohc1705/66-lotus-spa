@@ -46,20 +46,20 @@ export function OnlineBookingsDrawer({
         className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 transition-opacity"
         onClick={onClose}
       />
-      <div className="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-lotus-cream shadow-[0_20px_40px_rgba(42,31,26,0.1)] z-50 flex flex-col animate-in slide-in-from-right duration-300 border-l border-lotus-gold/20">
-        <div className="h-14 flex items-center justify-between px-4 border-b border-lotus-gold/20 bg-lotus-cream">
-          <h2 className="font-semibold text-lotus-deep flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-lotus-primary" />
+      <div className="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-adminGray-50 shadow-[0_20px_40px_rgba(42,31,26,0.1)] z-50 flex flex-col animate-in slide-in-from-right duration-300 border-l border-adminGold-600/20">
+        <div className="h-14 flex items-center justify-between px-4 border-b border-adminGold-600/20 bg-adminGray-50">
+          <h2 className="font-semibold text-adminInk flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-adminGreen-600" />
             Lịch online chờ xác nhận
             {bookings.length > 0 && (
-              <span className="bg-lotus-rose text-white text-xs px-2 py-0.5 rounded-full">
+              <span className="bg-adminGreen-600 text-white text-xs px-2 py-0.5 rounded-full">
                 {bookings.length}
               </span>
             )}
           </h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-admin hover:bg-lotus-gold/10 text-lotus-stone hover:text-lotus-deep transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-admin hover:bg-adminGold-600/10 text-adminGray-600 hover:text-adminInk transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -68,24 +68,24 @@ export function OnlineBookingsDrawer({
         <div className="flex-1 overflow-y-auto p-4">
           {isLoading ? (
             <div className="flex items-center justify-center h-32">
-              <Loader2 className="w-6 h-6 animate-spin text-lotus-primary" />
+              <Loader2 className="w-6 h-6 animate-spin text-adminGreen-600" />
             </div>
           ) : isError ? (
             <div className="text-center py-8">
-              <p className="text-red-500 text-sm mb-2">Lỗi khi tải lịch hẹn</p>
+              <p className="text-state-danger-text text-sm mb-2">Lỗi khi tải lịch hẹn</p>
               <button
                 onClick={() => refetch()}
-                className="text-lotus-primary text-sm hover:underline font-medium"
+                className="text-adminGreen-600 text-sm hover:underline font-medium"
               >
                 Thử lại
               </button>
             </div>
           ) : bookings.length === 0 ? (
             <div className="text-center py-12 flex flex-col items-center">
-              <div className="w-16 h-16 bg-lotus-cream rounded-full flex items-center justify-center mb-4 border border-lotus-gold/20">
-                <Calendar className="w-8 h-8 text-lotus-stone" />
+              <div className="w-16 h-16 bg-adminGray-50 rounded-full flex items-center justify-center mb-4 border border-adminGold-600/20">
+                <Calendar className="w-8 h-8 text-adminGray-600" />
               </div>
-              <p className="text-lotus-deep/70 font-medium">
+              <p className="text-adminInk/70 font-medium">
                 Không có lịch hẹn chờ duyệt
               </p>
             </div>
@@ -94,22 +94,22 @@ export function OnlineBookingsDrawer({
               {bookings.map((b) => (
                 <div
                   key={b.id}
-                  className="bg-white border border-lotus-gold/20 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-lotus-gold/40 transition-all"
+                  className="bg-white border border-adminGold-600/20 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-adminGold-600/40 transition-all"
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <h3 className="font-semibold text-lotus-deep">
+                      <h3 className="font-semibold text-adminInk">
                         {b.customerName}
                       </h3>
                       {b.customerPhone && (
-                        <p className="text-sm text-lotus-stone flex items-center gap-1 mt-0.5">
+                        <p className="text-sm text-adminGray-600 flex items-center gap-1 mt-0.5">
                           <Phone className="w-3.5 h-3.5" />
                           {b.customerPhone}
                         </p>
                       )}
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-lotus-rose">
+                      <p className="font-semibold text-adminGreen-600">
                         {new Intl.NumberFormat("vi-VN", {
                           style: "currency",
                           currency: "VND",
@@ -118,32 +118,32 @@ export function OnlineBookingsDrawer({
                     </div>
                   </div>
 
-                  <div className="space-y-2 mb-4 text-sm bg-lotus-cream/30 rounded-xl p-3 border border-lotus-gold/10">
-                    <div className="flex items-center gap-2 text-lotus-deep/80">
-                      <Calendar className="w-4 h-4 text-lotus-stone" />
+                  <div className="space-y-2 mb-4 text-sm bg-adminGray-50/30 rounded-xl p-3 border border-adminGold-600/10">
+                    <div className="flex items-center gap-2 text-adminInk/80">
+                      <Calendar className="w-4 h-4 text-adminGray-600" />
                       <span>{b.bookingDate}</span>
-                      <span className="text-lotus-gold/40">|</span>
-                      <Clock className="w-4 h-4 text-lotus-stone" />
-                      <span className="font-medium text-lotus-deep">
+                      <span className="text-adminGold-600/40">|</span>
+                      <Clock className="w-4 h-4 text-adminGray-600" />
+                      <span className="font-medium text-adminInk">
                         {b.startTime} - {b.endTime}
                       </span>
                     </div>
-                    <div className="flex flex-col gap-1.5 pt-2 border-t border-lotus-gold/10">
+                    <div className="flex flex-col gap-1.5 pt-2 border-t border-adminGold-600/10">
                       <div className="flex items-center gap-2">
-                        <span className="w-20 text-lotus-stone">Dịch vụ:</span>
-                        <span className="font-medium text-lotus-deep">
+                        <span className="w-20 text-adminGray-600">Dịch vụ:</span>
+                        <span className="font-medium text-adminInk">
                           {b.serviceName}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="w-20 text-lotus-stone">KTV:</span>
-                        <span className="font-medium text-lotus-deep">
+                        <span className="w-20 text-adminGray-600">KTV:</span>
+                        <span className="font-medium text-adminInk">
                           {b.staffName}
                         </span>
                       </div>
                     </div>
                     {b.note && (
-                      <div className="mt-2 pt-2 border-t border-lotus-gold/10 text-lotus-deep/70 text-xs italic">
+                      <div className="mt-2 pt-2 border-t border-adminGold-600/10 text-adminInk/70 text-xs italic">
                         " {b.note} "
                       </div>
                     )}
@@ -155,7 +155,7 @@ export function OnlineBookingsDrawer({
                       onClick={() =>
                         handleUpdateStatus(b.id, BookingStatus.Waiting)
                       }
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-lotus-primary text-white py-2 rounded-admin text-sm font-medium hover:bg-lotus-primary/90 disabled:opacity-50 transition-colors shadow-sm"
+                      className="flex-1 flex items-center justify-center gap-1.5 bg-adminGreen-600 text-white py-2 rounded-admin text-sm font-medium hover:bg-adminGreen-600/90 disabled:opacity-50 transition-colors shadow-sm"
                     >
                       {updatingId === b.id ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -175,9 +175,9 @@ export function OnlineBookingsDrawer({
                           handleUpdateStatus(b.id, BookingStatus.Cancelled);
                         }
                       }}
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-lotus-cream text-lotus-deep py-2 rounded-admin text-sm font-medium hover:bg-lotus-gold/20 disabled:opacity-50 transition-colors border border-lotus-gold/20"
+                      className="flex-1 flex items-center justify-center gap-1.5 bg-adminGray-50 text-adminInk py-2 rounded-admin text-sm font-medium hover:bg-adminGold-600/20 disabled:opacity-50 transition-colors border border-adminGold-600/20"
                     >
-                      <Ban className="w-4 h-4 text-lotus-stone" />
+                      <Ban className="w-4 h-4 text-adminGray-600" />
                       Hủy
                     </button>
                   </div>

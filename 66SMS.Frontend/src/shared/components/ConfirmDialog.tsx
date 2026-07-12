@@ -46,8 +46,8 @@ export function ConfirmDialog({
   loading = false,
   variant = 'default',
 }: ConfirmDialogProps) {
-  const iconColor = variant === 'danger' ? 'text-red-500' : variant === 'warning' ? 'text-yellow-500' : 'text-lotus-leaf'
-  const iconBg = variant === 'danger' ? 'bg-red-50' : variant === 'warning' ? 'bg-yellow-50' : 'bg-lotus-leaf/10'
+  const iconColor = variant === 'danger' ? 'text-state-danger-text' : variant === 'warning' ? 'text-state-warning-text' : 'text-adminGreen-600'
+  const iconBg = variant === 'danger' ? 'bg-state-danger-bg' : variant === 'warning' ? 'bg-state-warning-bg' : 'bg-adminGreen-100'
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -59,7 +59,7 @@ export function ConfirmDialog({
             </div>
             <div className="flex-1 min-w-0">
               <DialogTitle className="text-base">{title}</DialogTitle>
-              <DialogDescription className="mt-1.5 text-[13px] leading-relaxed">
+              <DialogDescription className="mt-1.5 text-sm leading-relaxed">
                 {description}
               </DialogDescription>
             </div>

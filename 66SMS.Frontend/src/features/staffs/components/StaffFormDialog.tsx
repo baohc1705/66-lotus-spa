@@ -435,13 +435,13 @@ export function StaffFormDialog({
           {/* KPI section removed */}
 
           {!isEdit && (
-            <div className="p-3.5 bg-lotus-leaf/5 border border-lotus-leaf/10 rounded-lg text-lotus-deep/80 text-lotus-admin-md flex items-start gap-2.5">
-              <KeyRound className="w-4 h-4 text-lotus-leaf mt-0.5 shrink-0" />
+            <div className="p-3.5 bg-adminGreen-50 border border-adminGreen-600/10 rounded-lg text-adminInk/80 text-xs flex items-start gap-2.5">
+              <KeyRound className="w-4 h-4 text-adminGreen-600 mt-0.5 shrink-0" />
               <div>
-                <p className="font-semibold text-lotus-deep">
+                <p className="font-semibold text-adminInk">
                   Tài khoản đăng nhập tự động
                 </p>
-                <p className="text-stone-500 mt-0.5">
+                <p className="text-adminGray-600 mt-0.5">
                   Tài khoản (Tên đăng nhập & Mật khẩu mặc định) sẽ được hệ thống
                   tạo tự động dựa trên mã nhân viên sau khi bạn nhấn nút tạo
                   mới.
@@ -488,9 +488,9 @@ function FormSection({
 }) {
   return (
     <div>
-      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-stone-100">
-        <Icon className="w-4 h-4 text-lotus-leaf" />
-        <h3 className="text-lotus-admin-lg font-semibold text-lotus-deep">{title}</h3>
+      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-adminGray-100">
+        <Icon className="w-4 h-4 text-adminGreen-600" />
+        <h3 className="text-sm font-semibold text-adminInk">{title}</h3>
       </div>
       {children}
     </div>
@@ -515,13 +515,13 @@ function FormField({
 
   return (
     <div className={`space-y-1 ${className ?? ""}`}>
-      <label className="flex items-center gap-1 text-lotus-admin-md font-semibold text-lotus-deep/80">
+      <label className="flex items-center gap-1 text-xs font-semibold text-adminInk/80">
         {cleanLabel}
         {isRequired &&
           (tooltip ? (
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-red-500 cursor-help hover:text-red-600 focus:outline-none select-none">
+                <span className="text-state-danger-text cursor-help hover:text-state-danger-text focus:outline-none select-none">
                   *
                 </span>
               </TooltipTrigger>
@@ -530,11 +530,11 @@ function FormField({
               </TooltipContent>
             </Tooltip>
           ) : (
-            <span className="text-red-500">*</span>
+            <span className="text-state-danger-text">*</span>
           ))}
       </label>
       {children}
-      {error && <p className="text-lotus-admin-base text-red-500 font-medium">{error}</p>}
+      {error && <p className="text-xs text-state-danger-text font-medium">{error}</p>}
     </div>
   );
 }

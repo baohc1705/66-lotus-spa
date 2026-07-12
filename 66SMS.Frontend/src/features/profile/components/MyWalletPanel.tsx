@@ -60,9 +60,9 @@ export function MyWalletPanel() {
               const amount = Number(tx.amount) || 0
               const isPositive = amount > 0
               return (
-                <div key={tx.id} className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 hover:border-lotus-rose-light transition-colors bg-white">
+                <div key={tx.id} className="flex items-center justify-between p-4 rounded-2xl border border-warm-100 hover:border-lotus-rose-light transition-colors bg-white">
                   <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isPositive ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isPositive ? 'bg-success-bg text-success-text' : 'bg-rose-100 text-rose-600'}`}>
                       {isPositive ? <ArrowDownLeft className="w-5 h-5" /> : <ArrowUpRight className="w-5 h-5" />}
                     </div>
                     <div>
@@ -72,7 +72,7 @@ export function MyWalletPanel() {
                       </p>
                     </div>
                   </div>
-                  <div className={`font-bold ${isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  <div className={`font-bold ${isPositive ? 'text-success-text' : 'text-rose-600'}`}>
                     {isPositive ? '+' : ''}{formatCurrency(amount)}
                   </div>
                 </div>

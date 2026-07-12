@@ -79,7 +79,7 @@ export function StaffCategorySidebar({
       {/* Search */}
       <div className="px-3 pt-3 pb-2 shrink-0">
         <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-adminGray-400 pointer-events-none" />
           <input
             type="text"
             value={searchText}
@@ -98,14 +98,14 @@ export function StaffCategorySidebar({
           onClick={() => onSelectRole(null)}
           className={`lotus-admin-sidebar-item ${
             selectedRole === null
-              ? "bg-lotus-leaf/10 text-lotus-leaf font-semibold border-l-[3px] border-lotus-leaf"
-              : "text-lotus-deep/70 hover:bg-lotus-leaf/5 hover:text-lotus-leaf border-l-[3px] border-transparent"
+              ? "bg-adminGreen-100 text-adminGreen-600 font-semibold border-l-[3px] border-adminGreen-600"
+              : "text-adminInk/70 hover:bg-adminGreen-50 hover:text-adminGreen-600 border-l-[3px] border-transparent"
           }`}
         >
           <div className="flex items-center gap-2 min-w-0">
             <Users
               className={`w-4 h-4 shrink-0 ${
-                selectedRole === null ? "text-lotus-leaf" : "text-stone-400"
+                selectedRole === null ? "text-adminGreen-600" : "text-adminGray-400"
               }`}
             />
             <span className="truncate">Tất cả vai trò</span>
@@ -113,8 +113,8 @@ export function StaffCategorySidebar({
           <span
             className={`lotus-admin-sidebar-badge ${
               selectedRole === null
-                ? "bg-lotus-leaf/20 text-lotus-leaf"
-                : "bg-stone-100 text-stone-500"
+                ? "bg-adminGreen-600/20 text-adminGreen-600"
+                : "bg-adminGray-100 text-adminGray-600"
             }`}
           >
             {totalCount}
@@ -126,7 +126,7 @@ export function StaffCategorySidebar({
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
-                className="h-7 bg-stone-100/50 rounded animate-pulse"
+                className="h-7 bg-adminGray-100/50 rounded animate-pulse"
               />
             ))}
           </div>
@@ -142,16 +142,16 @@ export function StaffCategorySidebar({
                 onClick={() => onSelectRole(role.name ?? null)}
                 className={`lotus-admin-sidebar-item group ${
                   isActive
-                    ? "bg-lotus-leaf/10 text-lotus-leaf font-semibold border-l-[3px] border-lotus-leaf"
-                    : "text-lotus-deep/70 hover:bg-lotus-leaf/5 hover:text-lotus-leaf border-l-[3px] border-transparent"
+                    ? "bg-adminGreen-100 text-adminGreen-600 font-semibold border-l-[3px] border-adminGreen-600"
+                    : "text-adminInk/70 hover:bg-adminGreen-50 hover:text-adminGreen-600 border-l-[3px] border-transparent"
                 }`}
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <Icon
                     className={`w-4 h-4 shrink-0 ${
                       isActive
-                        ? "text-lotus-leaf"
-                        : "text-stone-400 group-hover:text-stone-500"
+                        ? "text-adminGreen-600"
+                        : "text-adminGray-400 group-hover:text-adminGray-600"
                     }`}
                   />
                   <span className="truncate">{role.name ?? "—"}</span>
@@ -159,8 +159,8 @@ export function StaffCategorySidebar({
                 <span
                   className={`lotus-admin-sidebar-badge ${
                     isActive
-                      ? "bg-lotus-leaf/20 text-lotus-leaf"
-                      : "bg-stone-100 text-stone-500"
+                      ? "bg-adminGreen-600/20 text-adminGreen-600"
+                      : "bg-adminGray-100 text-adminGray-600"
                   }`}
                 >
                   {count}

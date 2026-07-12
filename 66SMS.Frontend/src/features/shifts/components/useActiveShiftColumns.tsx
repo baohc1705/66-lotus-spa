@@ -81,8 +81,8 @@ export function useActiveShiftColumns({
           const currentPeriod = row.original.shiftPeriodDTOs?.[0];
           if (!currentPeriod) return "—";
           return (
-            <div className="flex items-center gap-1.5 text-lotus-deep/90">
-              <Clock className="w-4 h-4 text-lotus-stone" />
+            <div className="flex items-center gap-1.5 text-adminInk/90">
+              <Clock className="w-4 h-4 text-adminGray-600" />
               <span>
                 {currentPeriod.shiftStart?.substring(0, 5)} -{" "}
                 {currentPeriod.shiftEnd?.substring(0, 5)}
@@ -105,7 +105,7 @@ export function useActiveShiftColumns({
             ? formatDate(currentPeriod.effectiveTo).format("DD/MM/YYYY")
             : "Vô thời hạn";
           return (
-            <span className="text-lotus-deep/80 text-lotus-admin-lg">
+            <span className="text-adminInk/80 text-sm">
               {from} - {to}
             </span>
           );

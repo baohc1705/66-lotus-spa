@@ -121,7 +121,7 @@ export function AttendanceFormDialog({
               <span className="block">Ca: {attendance.shiftName}</span>
             )}
             {attendance?.workCredits != null && (
-              <span className="block mt-1 text-lotus-deep/70">
+              <span className="block mt-1 text-adminInk/70">
                 Công tính được: <strong>{attendance.workCredits}</strong>
               </span>
             )}
@@ -212,11 +212,11 @@ function FormField({
 }) {
   return (
     <div className={`space-y-1 ${className ?? ""}`}>
-      <Label className="text-lotus-admin-md font-semibold text-lotus-deep/80">
+      <Label className="text-xs font-semibold text-adminInk/80">
         {label}
       </Label>
       {children}
-      {error && <p className="text-lotus-admin-base text-red-500 font-medium">{error}</p>}
+      {error && <p className="text-xs text-state-danger-text font-medium">{error}</p>}
     </div>
   );
 }

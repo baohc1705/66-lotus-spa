@@ -27,7 +27,7 @@ export function StaffDetailExpanded({
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-4 bg-stone-50/30">
+      <div className="p-6 space-y-4 bg-adminGray-50/30">
         <div className="flex gap-4 mb-4">
           <Skeleton className="w-24 h-8" />
           <Skeleton className="w-24 h-8" />
@@ -43,45 +43,45 @@ export function StaffDetailExpanded({
 
   if (!staff) {
     return (
-      <div className="p-6 text-center text-lotus-stone text-sm bg-stone-50/30">
+      <div className="p-6 text-center text-adminGray-600 text-sm bg-adminGray-50/30">
         Không tìm thấy thông tin nhân viên
       </div>
     );
   }
 
   return (
-    <div className="bg-stone-50/30 w-full overflow-hidden">
+    <div className="bg-adminGray-50/30 w-full overflow-hidden">
       <Tabs defaultValue="info" className="w-full flex-col">
         {/* Tab Headers */}
         <div className="px-4 pt-2">
-          <TabsList className="h-10 border-b border-stone-200/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
+          <TabsList className="h-10 border-b border-adminGray-100/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
             <TabsTrigger
               value="info"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Thông tin
             </TabsTrigger>
             <TabsTrigger
               value="schedule"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Lịch làm việc
             </TabsTrigger>
             <TabsTrigger
               value="salary_config"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Thiết lập lương
             </TabsTrigger>
             <TabsTrigger
               value="payslip"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Phiếu lương
             </TabsTrigger>
             <TabsTrigger
               value="debt"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Nợ và tạm ứng
             </TabsTrigger>
@@ -93,7 +93,7 @@ export function StaffDetailExpanded({
           <div className="flex flex-col gap-4">
             {/* Header profile info */}
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+              <div className="w-14 h-14 rounded-full bg-adminGreen-100 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
                 {staff.avatarUrl ? (
                   <img
                     src={staff.avatarUrl}
@@ -101,14 +101,14 @@ export function StaffDetailExpanded({
                     className="w-14 h-14 object-cover"
                   />
                 ) : (
-                  <User className="w-7 h-7 text-blue-400" />
+                  <User className="w-7 h-7 text-adminGreen-500" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-base font-bold text-lotus-deep truncate">
+                <h3 className="text-base font-bold text-adminInk truncate">
                   {staff.fullName ?? "—"}
                 </h3>
-                <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
+                <p className="text-xs text-adminGray-600 mt-0.5">
                   Mã nhân viên: {staff.code ?? "—"}
                 </p>
               </div>
@@ -146,9 +146,9 @@ export function StaffDetailExpanded({
             </div>
 
             {/* Note & Actions */}
-            <div className="flex items-end justify-between mt-2 pt-4 border-t border-stone-100/80">
-              <div className="flex items-center gap-2 text-lotus-admin-lg text-lotus-deep">
-                <Pencil className="w-4 h-4 text-lotus-stone" />
+            <div className="flex items-end justify-between mt-2 pt-4 border-t border-adminGray-100/80">
+              <div className="flex items-center gap-2 text-sm text-adminInk">
+                <Pencil className="w-4 h-4 text-adminGray-600" />
                 <span className="font-semibold">Ghi chú:</span>
               </div>
               <PermissionGate resource="staffs" action="update">
@@ -156,7 +156,7 @@ export function StaffDetailExpanded({
                   variant="admin"
                   size="sm"
                   onClick={() => onEdit?.(staff)}
-                  className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-lotus-admin-lg gap-1.5 ml-auto rounded-md transition-opacity"
+                  className="bg-adminGreen-600 hover:opacity-90 text-white shadow-sm h-8 px-4 text-sm gap-1.5 ml-auto rounded-md transition-opacity"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                   Cập nhật
@@ -168,25 +168,25 @@ export function StaffDetailExpanded({
 
         <TabsContent
           value="schedule"
-          className="p-10 text-center text-lotus-stone text-sm"
+          className="p-10 text-center text-adminGray-600 text-sm"
         >
           Chưa có dữ liệu lịch làm việc
         </TabsContent>
         <TabsContent
           value="salary_config"
-          className="p-10 text-center text-lotus-stone text-sm"
+          className="p-10 text-center text-adminGray-600 text-sm"
         >
           Chưa cấu hình thiết lập lương
         </TabsContent>
         <TabsContent
           value="payslip"
-          className="p-10 text-center text-lotus-stone text-sm"
+          className="p-10 text-center text-adminGray-600 text-sm"
         >
           Không có phiếu lương nào
         </TabsContent>
         <TabsContent
           value="debt"
-          className="p-10 text-center text-lotus-stone text-sm"
+          className="p-10 text-center text-adminGray-600 text-sm"
         >
           Không có nợ và tạm ứng
         </TabsContent>
@@ -203,9 +203,9 @@ function DetailField({
   value: string | null | undefined;
 }) {
   return (
-    <div className="py-3.5 border-b border-stone-100/80 last:border-b-0 group">
-      <p className="text-lotus-admin-md text-lotus-stone mb-1">{label}</p>
-      <p className="text-lotus-admin-lg font-medium text-lotus-deep truncate">
+    <div className="py-3.5 border-b border-adminGray-100/80 last:border-b-0 group">
+      <p className="text-xs text-adminGray-600 mb-1">{label}</p>
+      <p className="text-sm font-medium text-adminInk truncate">
         {value || "—"}
       </p>
     </div>

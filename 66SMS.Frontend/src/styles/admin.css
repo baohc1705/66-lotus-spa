@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════
-   Admin Dashboard — single source for admin UI styles
-   Sửa giao diện admin chỉ tại file này.
+   Admin Dashboard — bảng màu admin-color.md
+   Sửa giao diện admin chỉ tại file này + shell components.
    ═══════════════════════════════════════════════════════ */
 
 @layer base {
@@ -9,217 +9,387 @@
     --font-display: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
     --font-mono: "DM Mono", ui-monospace, SFMono-Regular, monospace;
 
+    /* Default shadcn (landing / public) — Rose brand */
     --background: 253 251 251;
     --foreground: 30 23 24;
     --card: 255 255 255;
     --card-foreground: 30 23 24;
     --popover: 255 255 255;
     --popover-foreground: 30 23 24;
-    --primary: 210 91 124;
+    --primary: 157 23 77;
     --primary-foreground: 255 255 255;
     --secondary: 247 229 233;
     --secondary-foreground: 30 23 24;
     --muted: 248 240 242;
     --muted-foreground: 180 160 165;
-    --accent: 210 91 124;
+    --accent: 157 23 77;
     --accent-foreground: 255 255 255;
-    --destructive: 239 68 68;
+    --destructive: 178 58 58;
     --border: 235 222 225;
     --input: 235 222 225;
-    --ring: 210 91 124;
+    --ring: 157 23 77;
     --radius: 0.625rem;
     --admin-radius: 10px;
 
-    --lotus-primary: #d25b7c;
-    --lotus-secondary: #eaa9ba;
-    --lotus-background: #fdfbfb;
-    --lotus-foreground: #1e1718;
-    --lotus-accent: #b08d57;
-    --lotus-highlight: #e8c87a;
-    --lotus-muted: #b4a0a5;
-    --lotus-surface: #f7e5e9;
+    /* Admin palette on :root — portals (dialog/select) vẫn resolve được */
+    --admin-green-900: #0f2a20;
+    --admin-green-800: #1b4332;
+    --admin-green-700: #285c43;
+    --admin-green-600: #2f6b4f;
+    --admin-green-500: #3c8560;
+    --admin-green-200: #bfe0cf;
+    --admin-green-100: #dcefe3;
+    --admin-green-50: #f0f8f3;
 
-    --status-pending: 245 158 11;
-    --status-confirmed: 59 130 246;
-    --status-waiting: 234 179 8;
-    --status-in-progress: 14 165 233;
-    --status-completed: 74 122 89;
-    --status-cancelled: 239 68 68;
+    --admin-gold-700: #8c6608;
+    --admin-gold-600: #b8860b;
+    --admin-gold-100: #f3e4be;
 
-    --lotus-admin-text-xs: 10px;
-    --lotus-admin-text-base: 11px;
-    --lotus-admin-text-md: 12px;
-    --lotus-admin-text-lg: 13px;
-    --lotus-admin-radius-xs: 4px;
+    --admin-ink: #23262b;
+    --admin-gray-600: #5b6168;
+    --admin-gray-400: #979da4;
+    --admin-gray-300: #c7cbd1;
+    --admin-gray-100: #edeff1;
+    --admin-gray-50: #f7f8f9;
+
+    --admin-bg-page: #f7f8f9;
+    --admin-bg-header: #1b4332;
+    --admin-bg-surface: #ffffff;
+    --admin-border: #e5e7ea;
+
+    --state-success-bg: #dcefe3;
+    --state-success-text: #1f5c3f;
+    --state-success-border: #a8d5bc;
+    --state-success-solid: #2f6b4f;
+
+    --state-danger-bg: #fbe4e4;
+    --state-danger-text: #9b2c2c;
+    --state-danger-border: #f0b8b8;
+    --state-danger-solid: #b23a3a;
+
+    --state-warning-bg: #fdecc8;
+    --state-warning-text: #92400e;
+    --state-warning-border: #f6d28c;
+    --state-warning-solid: #b45309;
+
+    --state-info-bg: #dce8fa;
+    --state-info-text: #1d4ed8;
+    --state-info-border: #b3d0f5;
+    --state-info-solid: #2563eb;
+
+    --state-neutral-bg: #edeff1;
+    --state-neutral-text: #5b6168;
+    --state-neutral-border: #c7cbd1;
+    --state-neutral-solid: #7a828c;
+
+    /* Booking status (RGB channels for Tailwind opacity) */
+    --status-pending: 122 130 140;
+    --status-confirmed: 37 99 235;
+    --status-waiting: 180 83 9;
+    --status-in-progress: 37 99 235;
+    --status-completed: 31 92 63;
+    --status-cancelled: 178 58 58;
+
     --lotus-admin-radius-sm: 5px;
     --lotus-admin-cell-max: 300px;
-    --lotus-admin-dialog-max-h: 90vh;
     --lotus-admin-textarea-min-h: 80px;
-  }
-
-  * {
-    box-sizing: border-box;
-    border-color: var(--lotus-muted);
-  }
-
-  html {
-    scroll-behavior: smooth;
-    font-family: var(--font-sans);
-  }
-
-  body {
-    background-color: var(--lotus-background);
-    color: var(--lotus-foreground);
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  .font-display {
-    font-family: var(--font-display);
   }
 }
 
 @layer utilities {
-  .text-lotus-admin-xs {
-    font-size: var(--lotus-admin-text-xs);
-  }
-  .text-lotus-admin-base {
-    font-size: var(--lotus-admin-text-base);
-  }
-  .text-lotus-admin-md {
-    font-size: var(--lotus-admin-text-md);
-  }
-  .text-lotus-admin-lg {
-    font-size: var(--lotus-admin-text-lg);
-  }
-  .rounded-lotus-admin-xs {
-    border-radius: var(--lotus-admin-radius-xs);
-  }
   .rounded-lotus-admin-sm {
     border-radius: var(--lotus-admin-radius-sm);
   }
   .max-w-lotus-admin-cell {
     max-width: var(--lotus-admin-cell-max);
   }
-  .max-h-lotus-admin-dialog {
-    max-height: var(--lotus-admin-dialog-max-h);
-  }
   .min-h-lotus-admin-textarea {
     min-height: var(--lotus-admin-textarea-min-h);
   }
 }
 
+/* ── Admin palette (scoped override + lotus remap) ── */
+.admin-dashboard-container {
+  /* shadcn tokens (RGB channels) — Green 600 */
+  --background: 247 248 249;
+  --foreground: 35 38 43;
+  --card: 255 255 255;
+  --card-foreground: 35 38 43;
+  --popover: 255 255 255;
+  --popover-foreground: 35 38 43;
+  --primary: 47 107 79;
+  --primary-foreground: 255 255 255;
+  --secondary: 220 239 227;
+  --secondary-foreground: 15 42 32;
+  --muted: 247 248 249;
+  --muted-foreground: 91 97 104;
+  --accent: 47 107 79;
+  --accent-foreground: 255 255 255;
+  --destructive: 178 58 58;
+  --border: 229 231 234;
+  --input: 199 203 209;
+  --ring: 47 107 79;
+
+  /* Remap lotus-* aliases → admin palette (các page CRUD dùng lotus-*) */
+  --lotus-primary: var(--admin-green-600);
+  --lotus-secondary: var(--admin-green-200);
+  --lotus-background: var(--admin-bg-page);
+  --lotus-foreground: var(--admin-ink);
+  --lotus-accent: var(--admin-gold-600);
+  --lotus-highlight: var(--admin-gold-100);
+  --lotus-muted: var(--admin-gray-100);
+  --lotus-surface: var(--admin-bg-surface);
+
+  --lotus-rose: var(--admin-green-600);
+  --lotus-rose-dark: var(--admin-green-700);
+  --lotus-rose-light: var(--admin-green-50);
+  --lotus-gold: var(--admin-gold-600);
+  --lotus-leaf: var(--admin-green-600);
+  --lotus-leaf-light: var(--admin-green-100);
+  --lotus-cream: var(--admin-gray-50);
+  --lotus-deep: var(--admin-ink);
+  --lotus-stone: var(--admin-gray-600);
+  --lotus-inset: var(--admin-gray-50);
+  --lotus-error: var(--state-danger-solid);
+
+  font-family: "Be Vietnam Pro", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
+  background-color: var(--admin-bg-page);
+  color: var(--admin-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.admin-dashboard-container *,
+.admin-dashboard-container *::before,
+.admin-dashboard-container *::after {
+  font-family: inherit;
+  border-color: var(--admin-border);
+}
+
+.admin-dashboard-container ::selection {
+  background: var(--admin-green-100);
+  color: var(--admin-green-900);
+}
+
 @layer components {
   /* ── Form ── */
   .lotus-admin-input {
-    @apply h-9 w-full text-lotus-admin-lg;
+    @apply h-9 w-full text-sm;
+    border-color: var(--admin-gray-100);
+    color: var(--admin-ink);
   }
+  .lotus-admin-input:hover {
+    border-color: var(--admin-gray-300);
+  }
+  .lotus-admin-input:focus {
+    border-color: var(--admin-green-600);
+    box-shadow: 0 0 0 1.5px var(--admin-green-600);
+  }
+  .lotus-admin-input:disabled {
+    background: var(--admin-gray-50);
+    color: var(--admin-gray-400);
+  }
+
   .lotus-admin-textarea {
-    @apply w-full text-lotus-admin-lg min-h-lotus-admin-textarea resize-none;
-  }
-  .lotus-admin-textarea-short {
-    @apply w-full text-lotus-admin-lg min-h-16 resize-none;
+    @apply w-full text-sm min-h-lotus-admin-textarea resize-none;
   }
   .lotus-admin-select-trigger {
-    @apply h-9 w-full text-lotus-admin-lg;
+    @apply h-9 w-full text-sm;
   }
   .lotus-admin-form-label {
-    @apply flex items-center gap-1 text-lotus-admin-md font-semibold;
-    color: color-mix(in srgb, var(--lotus-deep) 80%, transparent);
+    @apply flex items-center gap-1 text-xs font-semibold;
+    color: var(--admin-gray-600);
   }
   .lotus-admin-form-error {
-    @apply text-lotus-admin-base text-red-500 font-medium;
+    @apply text-2xs font-medium;
+    color: var(--state-danger-text);
   }
   .lotus-admin-form-section-title {
-    @apply text-lotus-admin-lg font-semibold text-lotus-deep;
+    @apply text-sm font-semibold;
+    color: var(--admin-ink);
   }
 
   /* ── Buttons ── */
   .lotus-admin-btn-toolbar {
-    @apply text-lotus-admin-md h-7 px-2;
-  }
-  .lotus-admin-btn-toolbar-action {
-    @apply text-lotus-admin-md gap-1.5;
+    @apply text-xs h-7 px-2;
   }
 
   /* ── DataTable ── */
   .lotus-admin-table-page-card {
-    @apply relative bg-white rounded-admin border border-stone-200/30 overflow-hidden;
+    @apply relative overflow-hidden rounded-admin;
+    background: var(--admin-bg-surface);
+    border: 1px solid var(--admin-border);
   }
   .lotus-admin-table-fetch-bar {
-    @apply absolute top-0 left-0 right-0 h-0.5 bg-lotus-leaf overflow-hidden;
+    @apply absolute top-0 left-0 right-0 h-0.5 overflow-hidden;
+    background: var(--admin-green-100);
   }
   .lotus-admin-table-fetch-bar-inner {
-    @apply h-full w-1/3 bg-lotus-leaf animate-[slide_1s_ease-in-out_infinite];
+    @apply h-full w-1/3 animate-[slide_1s_ease-in-out_infinite];
+    background: var(--admin-green-600);
   }
   .lotus-admin-table-cell-index {
-    @apply text-lotus-stone;
+    color: var(--admin-gray-600);
   }
   .lotus-admin-table-cell-name {
-    @apply font-semibold text-lotus-deep;
+    @apply font-semibold;
+    color: var(--admin-ink);
   }
   .lotus-admin-table-cell-muted {
-    @apply text-lotus-deep;
+    color: var(--admin-ink);
   }
   .lotus-admin-table-cell-muted-sm {
-    @apply text-lotus-deep text-lotus-admin-md;
+    @apply text-xs;
+    color: var(--admin-ink);
   }
   .lotus-admin-table-cell-truncate {
-    @apply text-lotus-deep truncate max-w-lotus-admin-cell inline-block;
+    @apply truncate max-w-lotus-admin-cell inline-block;
+    color: var(--admin-ink);
   }
   .lotus-admin-table-toolbar-btn {
-    @apply text-lotus-admin-md gap-1.5;
+    @apply text-xs gap-1.5;
   }
   .lotus-admin-table-selection-bar {
-    @apply flex items-center gap-2 mr-auto text-lotus-admin-lg text-lotus-deep font-medium bg-lotus-cream px-3 py-1.5 rounded-lg border border-stone-200/50;
+    @apply flex items-center gap-2 mr-auto text-sm font-medium px-3 py-1.5 rounded-lg;
+    color: var(--admin-ink);
+    background: var(--admin-green-50);
+    border: 1px solid var(--admin-green-200);
   }
   .lotus-admin-table-sort-btn {
-    @apply flex items-center gap-1.5 hover:text-lotus-leaf transition-colors;
+    @apply flex items-center gap-1.5 transition-colors;
+  }
+  .lotus-admin-table-sort-btn:hover {
+    color: var(--admin-green-600);
   }
 
   /* ── Category sidebar ── */
   .lotus-admin-sidebar-search {
-    @apply w-full text-lotus-admin-md h-8 pl-8 pr-3 bg-stone-50 border border-stone-200 rounded focus:outline-none focus:ring-1 focus:ring-lotus-leaf focus:border-lotus-leaf placeholder:text-stone-400 text-stone-700;
+    @apply w-full text-xs h-8 pl-8 pr-3 rounded focus:outline-none;
+    background: var(--admin-gray-50);
+    border: 1px solid var(--admin-gray-100);
+    color: var(--admin-ink);
+  }
+  .lotus-admin-sidebar-search::placeholder {
+    color: var(--admin-gray-400);
+  }
+  .lotus-admin-sidebar-search:hover {
+    border-color: var(--admin-gray-300);
+  }
+  .lotus-admin-sidebar-search:focus {
+    border-color: var(--admin-green-600);
+    box-shadow: 0 0 0 1px var(--admin-green-600);
   }
   .lotus-admin-sidebar-item {
-    @apply w-full flex items-center justify-between gap-2 px-3 py-1.5 text-lotus-admin-lg transition-all duration-150 rounded;
+    @apply w-full flex items-center justify-between gap-2 px-3 py-1.5 text-sm transition-all duration-150 rounded;
+    color: var(--admin-gray-600);
+  }
+  .lotus-admin-sidebar-item:hover {
+    background: var(--admin-gray-50);
+  }
+  .lotus-admin-sidebar-item.is-active,
+  .lotus-admin-sidebar-item[data-active="true"] {
+    background: var(--admin-green-100);
+    color: var(--admin-green-900);
   }
   .lotus-admin-sidebar-badge {
-    @apply text-lotus-admin-base shrink-0 font-medium px-1.5 py-0.5 rounded-full;
+    @apply text-2xs shrink-0 font-medium px-1.5 py-0.5 rounded-full;
   }
   .lotus-admin-sidebar-add-btn {
-    @apply w-full text-lotus-admin-md h-8 gap-1.5 justify-center font-bold;
+    @apply w-full text-xs h-8 gap-1.5 justify-center font-bold;
+  }
+
+  /* ── Shell helpers ── */
+  .admin-header {
+    background: var(--admin-bg-header);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .admin-nav-tab {
+    color: var(--admin-green-100);
+  }
+  .admin-nav-tab:hover {
+    color: #ffffff;
+  }
+  .admin-nav-tab.is-active {
+    color: #ffffff;
+  }
+  .admin-nav-tab-underline {
+    background: var(--admin-gold-600);
+  }
+  /* Logo mark → admin gold (same as nav icons) */
+  .logo-icon-gold {
+    filter: brightness(0) saturate(100%) invert(52%) sepia(72%) saturate(650%)
+      hue-rotate(8deg) brightness(95%) contrast(92%);
+  }
+
+  /* Shell sidebar (green bg) — inactive text = gold like icons; active = white */
+  .admin-sidebar-section-title {
+    color: var(--admin-gold-600);
+    opacity: 0.7;
+  }
+  .admin-sidebar-nav-item {
+    color: var(--admin-gold-600);
+  }
+  .admin-sidebar-nav-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+  }
+  .admin-sidebar-nav-item.is-active {
+    background: var(--admin-green-600);
+    color: #ffffff;
+  }
+  .admin-sidebar-nav-child {
+    color: var(--admin-gold-600);
+    opacity: 0.85;
+  }
+  .admin-sidebar-nav-child:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    opacity: 1;
+  }
+  .admin-sidebar-nav-child.is-active {
+    background: var(--admin-green-600);
+    color: #ffffff;
+    opacity: 1;
+  }
+  .admin-stat-icon--green {
+    background: var(--admin-green-100);
+    color: var(--admin-green-600);
+  }
+  .admin-stat-icon--gold {
+    background: var(--admin-gold-100);
+    color: var(--admin-gold-600);
+  }
+
+  /* Top-nav mega menu / sidebar icons */
+  .admin-dashboard-container .admin-nav-tab svg {
+    color: var(--admin-gold-600);
+  }
+  .admin-dashboard-container .admin-nav-tab.is-active svg {
+    color: var(--admin-gold-600);
+  }
+  .admin-dashboard-container .admin-sidebar-nav-item svg,
+  .admin-dashboard-container .admin-sidebar-nav-child svg {
+    color: var(--admin-gold-600);
+  }
+  .admin-dashboard-container .admin-sidebar-nav-item.is-active svg,
+  .admin-dashboard-container .admin-sidebar-nav-child.is-active svg {
+    color: #ffffff;
+  }
+
+  /* Form section / empty / filter icons mặc định gold */
+  .admin-dashboard-container .lotus-admin-form-section-title + svg,
+  .admin-dashboard-container [data-slot="empty-icon"] {
+    color: var(--admin-gold-600);
   }
 
   /* ── Cashier shell ── */
   .lotus-cashier-header {
     background-image: linear-gradient(
       to right,
-      var(--lotus-cashier-header-from),
-      var(--lotus-cashier-header-via),
-      var(--lotus-cashier-header-to)
+      var(--admin-green-900),
+      var(--admin-green-800),
+      var(--admin-green-600)
     );
   }
-}
-
-/* Admin dashboard theme override */
-.admin-dashboard-container,
-.admin-dashboard-container * {
-  font-family:
-    "Be Vietnam Pro",
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    sans-serif !important;
-}
-
-.admin-dashboard-container {
-  --primary: 62 122 62 !important;
-  --accent: 62 122 62 !important;
-  --lotus-primary: #3e7a3e !important;
-  --lotus-rose: #3e7a3e !important;
-  --lotus-rose-light: rgba(62, 122, 62, 0.08) !important;
 }

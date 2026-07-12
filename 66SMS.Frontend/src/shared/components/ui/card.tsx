@@ -12,7 +12,7 @@ function Card({
     <div
       data-slot="card"
       data-variant={variant}
-      className={cn("flex flex-col overflow-hidden text-lotus-deep", variant === "default" && "bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300", variant === "service" && "group relative bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300", variant === "product" && "group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300", variant === "admin" && "bg-white rounded-md shadow-sm", variant === "flat" && "bg-stone-50 rounded-lg", className)}
+      className={cn("flex flex-col overflow-hidden text-lotus-deep", variant === "default" && "bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300", variant === "service" && "group relative bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300", variant === "product" && "group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300", variant === "admin" && "bg-white rounded-md shadow-sm", variant === "flat" && "bg-adminGray-50 rounded-lg", className)}
       {...props}
     />
   )

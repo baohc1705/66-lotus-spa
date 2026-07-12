@@ -71,7 +71,7 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
   }
 
   return (
-    <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-4 md:p-5 relative overflow-hidden mb-4">
+    <div className="w-full bg-white rounded-2xl border border-warm-100 shadow-sm p-4 md:p-5 relative overflow-hidden mb-4">
       {/* Top thin brand accent border */}
       <div className="absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-r from-lotus-rose via-lotus-rose/70 to-lotus-rose" />
 
@@ -79,7 +79,7 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
         {/* Left: Avatar & User Basic Info */}
         <div className="flex items-center gap-4 w-full lg:w-auto">
           <div className="relative">
-            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border border-pink-100 flex items-center justify-center p-1 bg-white shadow-sm">
+            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border border-rose-100 flex items-center justify-center p-1 bg-white shadow-sm">
               {profile?.avatarUrl ? (
                 <img
                   src={profile.avatarUrl}
@@ -87,7 +87,7 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
                   className="w-full h-full rounded-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full rounded-full bg-pink-50 flex items-center justify-center text-lotus-rose">
+                <div className="w-full h-full rounded-full bg-rose-50 flex items-center justify-center text-lotus-rose">
                   <UserIcon className="w-10 h-10" />
                 </div>
               )}
@@ -95,7 +95,7 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
           </div>
 
           <div className="space-y-1">
-            <h2 className="text-xl md:text-2xl font-extrabold text-gray-900 tracking-tight uppercase leading-none">
+            <h2 className="text-xl md:text-2xl font-extrabold text-ink tracking-tight uppercase leading-none">
               {profile?.fullName || profile?.username || "Khách hàng"}
             </h2>
 
@@ -105,14 +105,14 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
                 Hạng {currentTierName}
               </div>
             ) : (
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-blue-50 text-blue-600 text-xs font-bold border border-blue-100">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-rose-50 text-rose-600 text-xs font-bold border border-rose-100">
                 Nhân viên Spa
               </div>
             )}
 
-            <p className="text-xs text-gray-500 font-medium">
+            <p className="text-xs text-warm-600 font-medium">
               Mã thành viên:{" "}
-              <span className="font-bold text-gray-900">
+              <span className="font-bold text-ink">
                 {card?.cardCode ||
                   "HS-" + (profile?.customerInfo?.id || "668899")}
               </span>
@@ -123,10 +123,10 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
         {/* Middle: Progress Bar */}
         {isCustomer && (
           <div className="flex-1 flex flex-col justify-center max-w-md w-full">
-            <p className="text-sm font-bold text-gray-900 mb-2">
+            <p className="text-sm font-bold text-ink mb-2">
               Tiến độ thăng hạng
             </p>
-            <div className="flex items-center justify-between text-xs text-gray-500 mb-1.5">
+            <div className="flex items-center justify-between text-xs text-warm-600 mb-1.5">
               <span>
                 Hiện tại:{" "}
                 <span className="text-lotus-gold font-bold">
@@ -135,14 +135,14 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
               </span>
               <span>
                 Mục tiêu:{" "}
-                <span className="text-indigo-600 font-bold">
+                <span className="text-rose-600 font-bold">
                   {nextTier ? nextTier.name : "Bạc"}
                 </span>
               </span>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
+              <div className="flex-1 bg-warm-100 rounded-full h-2 overflow-hidden">
                 <div
                   className="bg-lotus-rose h-full rounded-full transition-all duration-500"
                   style={{ width: `${progressPercent}%` }}
@@ -153,11 +153,11 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
               </span>
             </div>
 
-            <p className="text-xs text-gray-400 mt-2 font-medium">
+            <p className="text-xs text-warm-400 mt-2 font-medium">
               {nextTier ? (
                 <>
                   Còn{" "}
-                  <span className="font-bold text-gray-800">
+                  <span className="font-bold text-ink">
                     {formatCurrency(spendingNeeded)}
                   </span>{" "}
                   để đạt hạng {nextTier.name}
@@ -165,7 +165,7 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
               ) : (
                 <>
                   Còn{" "}
-                  <span className="font-bold text-gray-800">
+                  <span className="font-bold text-ink">
                     {formatCurrency(spendingNeeded)}
                   </span>{" "}
                   để đạt hạng Bạc
@@ -177,70 +177,70 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
 
         {/* Right: Stats Panel */}
         {isCustomer ? (
-          <div className="border border-gray-100 rounded-xl p-3 bg-white shadow-sm flex items-center justify-between w-full lg:w-[45%] lg:max-w-md">
+          <div className="border border-warm-100 rounded-xl p-3 bg-white shadow-sm flex items-center justify-between w-full lg:w-[45%] lg:max-w-md">
             <div className="flex-1 text-center">
-              <Calendar className="text-pink-500 w-5 h-5 mx-auto mb-1.5" />
-              <p className="text-lg md:text-xl font-extrabold text-gray-900">
+              <Calendar className="text-rose-500 w-5 h-5 mx-auto mb-1.5" />
+              <p className="text-lg md:text-xl font-extrabold text-ink">
                 {bookings.length}
               </p>
-              <p className="text-lotus-admin-xs md:text-xs text-gray-500 font-semibold tracking-wide uppercase">
+              <p className="text-2xs md:text-xs text-warm-600 font-semibold tracking-wide uppercase">
                 Lịch hẹn
               </p>
             </div>
-            <div className="w-[1px] h-10 bg-gray-200" />
+            <div className="w-[1px] h-10 bg-warm-100" />
             <div className="flex-1 text-center">
-              <Star className="text-yellow-500 w-5 h-5 mx-auto mb-1.5" />
-              <p className="text-lg md:text-xl font-extrabold text-gray-900">
+              <Star className="text-gold-600 w-5 h-5 mx-auto mb-1.5" />
+              <p className="text-lg md:text-xl font-extrabold text-ink">
                 {loyaltyPoints}
               </p>
-              <p className="text-lotus-admin-xs md:text-xs text-gray-500 font-semibold tracking-wide uppercase">
+              <p className="text-2xs md:text-xs text-warm-600 font-semibold tracking-wide uppercase">
                 Điểm thưởng
               </p>
             </div>
-            <div className="w-[1px] h-10 bg-gray-200" />
+            <div className="w-[1px] h-10 bg-warm-100" />
             <div className="flex-1 text-center">
-              <Wallet className="text-green-600 w-5 h-5 mx-auto mb-1.5" />
-              <p className="text-lg md:text-xl font-extrabold text-gray-900">
+              <Wallet className="text-success-text w-5 h-5 mx-auto mb-1.5" />
+              <p className="text-lg md:text-xl font-extrabold text-ink">
                 {formatCurrency(calculatedSpending)}
               </p>
-              <p className="text-lotus-admin-xs md:text-xs text-gray-500 font-semibold tracking-wide uppercase">
+              <p className="text-2xs md:text-xs text-warm-600 font-semibold tracking-wide uppercase">
                 Chi tiêu tích lũy
               </p>
             </div>
           </div>
         ) : (
           // Staff Stats Panel
-          <div className="border border-gray-100 rounded-xl p-3 bg-white shadow-sm flex items-center justify-between w-full lg:w-[40%] lg:max-w-sm">
+          <div className="border border-warm-100 rounded-xl p-3 bg-white shadow-sm flex items-center justify-between w-full lg:w-[40%] lg:max-w-sm">
             <div className="flex-1 text-center">
-              <Calendar className="text-pink-500 w-5 h-5 mx-auto mb-1.5" />
-              <p className="text-base md:text-lg font-bold text-gray-900">
+              <Calendar className="text-rose-500 w-5 h-5 mx-auto mb-1.5" />
+              <p className="text-base md:text-lg font-bold text-ink">
                 {bookings.length || 0}
               </p>
-              <p className="text-lotus-admin-xs text-gray-500 font-semibold uppercase">
+              <p className="text-2xs text-warm-600 font-semibold uppercase">
                 Lịch hẹn
               </p>
             </div>
-            <div className="w-[1px] h-10 bg-gray-200" />
+            <div className="w-[1px] h-10 bg-warm-100" />
             <div className="flex-1 text-center">
-              <Award className="text-yellow-500 w-5 h-5 mx-auto mb-1.5" />
-              <p className="text-sm md:text-base font-bold text-gray-900">
+              <Award className="text-gold-600 w-5 h-5 mx-auto mb-1.5" />
+              <p className="text-sm md:text-base font-bold text-ink">
                 {profile?.staffInfo?.contractType || "---"}
               </p>
-              <p className="text-lotus-admin-xs text-gray-500 font-semibold uppercase">
+              <p className="text-2xs text-warm-600 font-semibold uppercase">
                 Hợp đồng
               </p>
             </div>
-            <div className="w-[1px] h-10 bg-gray-200" />
+            <div className="w-[1px] h-10 bg-warm-100" />
             <div className="flex-1 text-center">
-              <Star className="text-blue-500 w-5 h-5 mx-auto mb-1.5" />
-              <p className="text-xs font-bold text-gray-900">
+              <Star className="text-state-info-text w-5 h-5 mx-auto mb-1.5" />
+              <p className="text-xs font-bold text-ink">
                 {profile?.staffInfo?.hireDate
                   ? new Date(profile.staffInfo.hireDate).toLocaleDateString(
                       "vi-VN",
                     )
                   : "---"}
               </p>
-              <p className="text-lotus-admin-xs text-gray-500 font-semibold uppercase">
+              <p className="text-2xs text-warm-600 font-semibold uppercase">
                 Ngày làm
               </p>
             </div>

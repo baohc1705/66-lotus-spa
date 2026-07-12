@@ -75,7 +75,7 @@ export function ProfilePage() {
     if (isError) {
       return (
         <div className="h-full flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-red-500 font-medium mb-4">
+          <p className="text-error-text font-medium mb-4">
             Không thể tải thông tin tài khoản
           </p>
           <button
@@ -162,7 +162,7 @@ export function ProfilePage() {
               />
 
               {/* Main Content Area */}
-              <div className="flex-1 bg-white rounded-2xl border border-gray-100 shadow-sm min-h-[500px] relative overflow-hidden">
+              <div className="flex-1 bg-white rounded-2xl border border-warm-100 shadow-sm min-h-[500px] relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-lotus-rose/80 via-lotus-rose/70 to-lotus-gold/80" />
                 <div className="p-6 md:p-8">{renderContent()}</div>
               </div>

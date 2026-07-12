@@ -74,7 +74,7 @@ export function SalonDetailExpanded({
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-4 bg-stone-50/30">
+      <div className="p-6 space-y-4 bg-adminGray-50/30">
         <div className="flex gap-4 mb-4">
           <Skeleton className="w-24 h-8" />
           <Skeleton className="w-24 h-8" />
@@ -89,40 +89,40 @@ export function SalonDetailExpanded({
 
   if (!salon) {
     return (
-      <div className="p-6 text-center text-lotus-stone text-sm bg-stone-50/30">
+      <div className="p-6 text-center text-adminGray-600 text-sm bg-adminGray-50/30">
         Không tìm thấy thông tin chi nhánh
       </div>
     );
   }
 
   return (
-    <div className="bg-stone-50/30 w-full overflow-hidden max-h-[400px] overflow-y-auto custom-scrollbar">
+    <div className="bg-adminGray-50/30 w-full overflow-hidden max-h-[400px] overflow-y-auto custom-scrollbar">
       <Tabs defaultValue="info" className="w-full flex-col">
         {/* Tab Headers */}
-        <div className="px-4 pt-2 sticky top-0 bg-stone-50/95 backdrop-blur-sm z-10">
-          <TabsList className="h-10 border-b border-stone-200/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
+        <div className="px-4 pt-2 sticky top-0 bg-adminGray-50/95 backdrop-blur-sm z-10">
+          <TabsList className="h-10 border-b border-adminGray-100/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
             <TabsTrigger
               value="info"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Thông tin chung
             </TabsTrigger>
             <TabsTrigger
               value="address"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Địa chỉ
             </TabsTrigger>
             <TabsTrigger
               value="staff"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               <Users className="w-3.5 h-3.5 mr-1.5 inline" />
               Nhân viên
             </TabsTrigger>
             <TabsTrigger
               value="manager"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               <UserCog className="w-3.5 h-3.5 mr-1.5 inline" />
               Quản lý
@@ -135,7 +135,7 @@ export function SalonDetailExpanded({
           <div className="flex flex-col gap-4">
             {/* Header */}
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-xl bg-lotus-cream/50 flex items-center justify-center shrink-0 shadow-sm border border-stone-200/50 overflow-hidden">
+              <div className="w-14 h-14 rounded-xl bg-adminGray-50/50 flex items-center justify-center shrink-0 shadow-sm border border-adminGray-100/50 overflow-hidden">
                 {salon.imageUrl ? (
                   <img
                     src={salon.imageUrl}
@@ -143,15 +143,15 @@ export function SalonDetailExpanded({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <Building2 className="w-7 h-7 text-lotus-stone" />
+                  <Building2 className="w-7 h-7 text-adminGray-600" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="text-base font-bold text-lotus-deep truncate">
+                  <h3 className="text-base font-bold text-adminInk truncate">
                     {salon.name ?? "—"}
                   </h3>
-                  <span className="font-mono text-lotus-admin-base bg-stone-100 px-1.5 py-0.5 rounded text-lotus-stone border border-stone-200">
+                  <span className="font-mono text-xs bg-adminGray-100 px-1.5 py-0.5 rounded text-adminGray-600 border border-adminGray-100">
                     {salon.code}
                   </span>
                 </div>
@@ -198,23 +198,23 @@ export function SalonDetailExpanded({
             </div>
 
             {salon.description && (
-              <div className="rounded-lg bg-white border border-stone-100 p-3">
-                <p className="text-lotus-admin-base font-semibold text-lotus-stone mb-1 flex items-center gap-1">
+              <div className="rounded-lg bg-white border border-adminGray-100 p-3">
+                <p className="text-xs font-semibold text-adminGray-600 mb-1 flex items-center gap-1">
                   <FileText className="w-3.5 h-3.5" /> Mô tả
                 </p>
-                <p className="text-lotus-admin-lg text-lotus-deep/80 whitespace-pre-line">
+                <p className="text-sm text-adminInk/80 whitespace-pre-line">
                   {salon.description}
                 </p>
               </div>
             )}
 
             {/* Actions */}
-            <div className="flex items-end justify-end mt-2 pt-4 border-t border-stone-100/80">
+            <div className="flex items-end justify-end mt-2 pt-4 border-t border-adminGray-100/80">
               <Button
                 variant="admin"
                 size="sm"
                 onClick={() => onEdit?.(salon)}
-                className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-lotus-admin-lg gap-1.5 rounded-md transition-opacity"
+                className="bg-adminGreen-600 hover:opacity-90 text-white shadow-sm h-8 px-4 text-sm gap-1.5 rounded-md transition-opacity"
               >
                 <Pencil className="w-3.5 h-3.5" />
                 Cập nhật
@@ -229,9 +229,9 @@ export function SalonDetailExpanded({
           className="p-4 m-0 border-none outline-none"
         >
           <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2 text-lotus-stone mb-1">
-              <MapPin className="w-4 h-4 text-lotus-leaf" />
-              <span className="text-lotus-admin-lg font-medium">Thông tin địa chỉ</span>
+            <div className="flex items-center gap-2 text-adminGray-600 mb-1">
+              <MapPin className="w-4 h-4 text-adminGreen-600" />
+              <span className="text-sm font-medium">Thông tin địa chỉ</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0">
@@ -265,7 +265,7 @@ export function SalonDetailExpanded({
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(salon.fullAddress)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-lotus-admin-md text-lotus-leaf hover:underline mt-1"
+                className="inline-flex items-center gap-1.5 text-xs text-adminGreen-600 hover:underline mt-1"
               >
                 <MapPin className="w-3.5 h-3.5" />
                 Xem trên Google Maps
@@ -286,13 +286,13 @@ export function SalonDetailExpanded({
         >
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <p className="text-lotus-admin-lg font-semibold text-lotus-deep">
+              <p className="text-sm font-semibold text-adminInk">
                 Quản lý hiện tại
               </p>
               <Button
                 variant="admin"
                 size="sm"
-                className="h-8 px-3 text-lotus-admin-md gap-1.5"
+                className="h-8 px-3 text-xs gap-1.5"
                 onClick={() => setAssignOpen(true)}
               >
                 <UserCog className="w-3.5 h-3.5" />
@@ -301,19 +301,19 @@ export function SalonDetailExpanded({
             </div>
 
             {currentManager ? (
-              <div className="rounded-lg border border-stone-100 bg-white p-3 flex items-center justify-between gap-3">
+              <div className="rounded-lg border border-adminGray-100 bg-white p-3 flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-lotus-admin-lg font-medium text-lotus-deep">
+                  <p className="text-sm font-medium text-adminInk">
                     Nhân viên #{currentManager.staffId}
                   </p>
-                  <p className="text-lotus-admin-base text-lotus-stone mt-0.5">
+                  <p className="text-xs text-adminGray-600 mt-0.5">
                     Từ: {currentManager.startDate ?? "—"}
                   </p>
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-7 px-2.5 text-lotus-admin-md text-red-500 border-red-200 hover:bg-red-50"
+                  className="h-7 px-2.5 text-xs text-state-danger-text border-state-danger-border hover:bg-state-danger-bg"
                   disabled={removePending}
                   onClick={() =>
                     removeManager({ staffId: currentManager.staffId!, salonId })
@@ -323,7 +323,7 @@ export function SalonDetailExpanded({
                 </Button>
               </div>
             ) : (
-              <p className="text-lotus-admin-lg text-lotus-stone italic">
+              <p className="text-sm text-adminGray-600 italic">
                 Chưa có quản lý được phân công.
               </p>
             )}
@@ -350,12 +350,12 @@ function DetailField({
   icon?: React.ElementType;
 }) {
   return (
-    <div className="py-3.5 border-b border-stone-100/80 last:border-b-0">
-      <p className="text-lotus-admin-md text-lotus-stone mb-1 flex items-center gap-1">
+    <div className="py-3.5 border-b border-adminGray-100/80 last:border-b-0">
+      <p className="text-xs text-adminGray-600 mb-1 flex items-center gap-1">
         {Icon && <Icon className="w-3 h-3" />}
         {label}
       </p>
-      <p className="text-lotus-admin-lg font-medium text-lotus-deep truncate">
+      <p className="text-sm font-medium text-adminInk truncate">
         {value || "—"}
       </p>
     </div>

@@ -29,7 +29,7 @@ export function ProfileSidebar({ activeTab, onTabChange, isCustomer = false }: P
 
   return (
     <div className="w-full lg:w-64 space-y-2">
-      <div className="bg-white rounded-b-2xl rounded-t-none p-4 border border-gray-100 shadow-sm relative overflow-hidden">
+      <div className="bg-white rounded-b-2xl rounded-t-none p-4 border border-warm-100 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-lotus-rose/80 via-lotus-rose/70 to-lotus-gold/80" />
         <nav className="space-y-1">
           {menuItems.map((item) => {
@@ -43,11 +43,11 @@ export function ProfileSidebar({ activeTab, onTabChange, isCustomer = false }: P
                   `w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                   isActive
                     ? 'bg-lotus-rose-light text-lotus-rose shadow-sm'
-                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                    : 'text-warm-600 hover:bg-warm-50 hover:text-ink'
                   }`
                 }
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-lotus-rose' : 'text-gray-400'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-lotus-rose' : 'text-warm-400'}`} />
                 {item.label}
               </button>
             )
@@ -57,7 +57,7 @@ export function ProfileSidebar({ activeTab, onTabChange, isCustomer = false }: P
         <div className="mt-4 pt-4 border-t border-[var(--spa-border)]">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-red-500 hover:bg-red-50 transition-all duration-200"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-error-text hover:bg-error-bg transition-all duration-200"
           >
             <LogOut className="w-4 h-4" />
             Đăng xuất

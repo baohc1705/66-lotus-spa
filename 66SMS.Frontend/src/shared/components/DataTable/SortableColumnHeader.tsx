@@ -19,9 +19,9 @@ export function SortableColumnHeader({
     orderBy !== column ? (
       <ArrowUpDown className="w-3 h-3 opacity-40" />
     ) : isDescending ? (
-      <ArrowDown className="w-3 h-3 text-lotus-leaf" />
+      <ArrowDown className="w-3 h-3 text-adminGreen-600" />
     ) : (
-      <ArrowUp className="w-3 h-3 text-lotus-leaf" />
+      <ArrowUp className="w-3 h-3 text-adminGreen-600" />
     );
 
   return (

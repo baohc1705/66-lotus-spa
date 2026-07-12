@@ -22,7 +22,7 @@ export const ContactBookingSection = () => {
               </span>
               <h2
                 id="booking-heading"
-                className="font-geist text-balance text-[clamp(1.75rem,3vw,2.5rem)] font-semibold leading-[1.12] tracking-[-0.02em] text-white"
+                className="font-geist text-balance text-display-section-md font-semibold leading-[1.12] tracking-[-0.02em] text-white"
               >
                 Đặt lịch hôm nay — chỉ mất 2 phút
               </h2>

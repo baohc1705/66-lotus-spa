@@ -43,7 +43,7 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
   return (
     <tfoot
       data-slot="table-footer"
-      className={cn("bg-stone-50 font-medium", className)}
+      className={cn("bg-adminGray-50 font-medium", className)}
       {...props}
     />
   );
@@ -54,7 +54,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "transition-colors group hover:bg-lotus-leaf-light data-[state=selected]:bg-lotus-leaf-light data-[state=expanded]:bg-lotus-leaf-light",
+        "transition-colors group hover:bg-adminGreen-50 data-[state=selected]:bg-adminGreen-50 data-[state=expanded]:bg-adminGreen-50 even:bg-adminGray-50/60",
         className,
       )}
       {...props}
@@ -80,7 +80,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        "px-3 py-2 text-[13px] text-lotus-deep align-middle whitespace-nowrap overflow-hidden text-ellipsis [&:has([role=checkbox])]:text-center [&:has([role=checkbox])]:w-[50px]",
+        "px-3 py-2 text-sm text-lotus-deep align-middle whitespace-nowrap overflow-hidden text-ellipsis [&:has([role=checkbox])]:text-center [&:has([role=checkbox])]:w-[50px]",
         className,
       )}
       {...props}

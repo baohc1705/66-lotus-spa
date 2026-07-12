@@ -263,12 +263,12 @@ export function TreatmentCourseFormDialog({
           {/* Danh sách buổi */}
           <FormSection icon={ListOrdered} title="Danh sách buổi dịch vụ">
             {errors.items?.root?.message && (
-              <p className="text-lotus-admin-base text-red-500 font-medium mb-2">
+              <p className="text-xs text-state-danger-text font-medium mb-2">
                 {errors.items.root.message}
               </p>
             )}
             {typeof errors.items?.message === "string" && (
-              <p className="text-lotus-admin-base text-red-500 font-medium mb-2">
+              <p className="text-xs text-state-danger-text font-medium mb-2">
                 {errors.items.message}
               </p>
             )}
@@ -276,9 +276,9 @@ export function TreatmentCourseFormDialog({
               {fields.map((field, index) => (
                 <div
                   key={field.id}
-                  className="grid grid-cols-12 gap-2 items-start p-3 bg-stone-50 rounded-lg border border-stone-200"
+                  className="grid grid-cols-12 gap-2 items-start p-3 bg-adminGray-50 rounded-lg border border-adminGray-100"
                 >
-                    <p className="text-lotus-admin-base font-semibold text-lotus-stone">
+                    <p className="text-xs font-semibold text-adminGray-600">
                       #{index + 1}
                     </p>
                   <div className="col-span-4">
@@ -298,7 +298,7 @@ export function TreatmentCourseFormDialog({
                       searchPlaceholder="Tìm dịch vụ..."
                     />
                     {errors.items?.[index]?.serviceId && (
-                      <p className="text-lotus-admin-base text-red-500 mt-0.5">
+                      <p className="text-xs text-state-danger-text mt-0.5">
                         {errors.items[index]?.serviceId?.message}
                       </p>
                     )}
@@ -311,7 +311,7 @@ export function TreatmentCourseFormDialog({
                       min={1}
                     />
                     {errors.items?.[index]?.sessionNumber && (
-                      <p className="text-lotus-admin-base text-red-500 mt-0.5">
+                      <p className="text-xs text-state-danger-text mt-0.5">
                         {errors.items[index]?.sessionNumber?.message}
                       </p>
                     )}
@@ -337,7 +337,7 @@ export function TreatmentCourseFormDialog({
                       variant="ghost"
                       size="icon-sm"
                       onClick={() => remove(index)}
-                      className="text-red-400 hover:text-red-600 hover:bg-red-50"
+                      className="text-state-danger-text hover:text-state-danger-text hover:bg-state-danger-bg"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -358,7 +358,7 @@ export function TreatmentCourseFormDialog({
                   status: 1,
                 })
               }
-              className="mt-3 text-lotus-admin-md gap-1.5"
+              className="mt-3 text-xs gap-1.5"
             >
               <Plus className="w-3.5 h-3.5" /> Thêm buổi
             </Button>

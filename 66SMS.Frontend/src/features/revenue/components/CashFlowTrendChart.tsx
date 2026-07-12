@@ -35,15 +35,15 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     }
 
     return (
-      <div className="bg-white border border-stone-100 p-3 rounded-admin shadow-sm text-lotus-admin-md font-sans">
-        <p className="font-semibold text-stone-700 mb-2">{displayDate}</p>
+      <div className="bg-white border border-adminGray-100 p-3 rounded-admin shadow-sm text-xs font-sans">
+        <p className="font-semibold text-adminInk mb-2">{displayDate}</p>
         {payload.map((p, idx) => (
           <div key={idx} className="flex items-center gap-4 justify-between mt-1">
-            <span className="flex items-center gap-1.5 text-stone-500">
+            <span className="flex items-center gap-1.5 text-adminGray-600">
               <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
               {p.name}:
             </span>
-            <span className="font-bold text-stone-800">{formatCurrency(p.value)}</span>
+            <span className="font-bold text-adminInk">{formatCurrency(p.value)}</span>
           </div>
         ))}
       </div>
@@ -59,30 +59,30 @@ const formatDateXAxis = (dateStr: string) => {
 export const CashFlowTrendChart = memo(function CashFlowTrendChart({ data = [], isLoading }: CashFlowTrendChartProps) {
   if (isLoading) {
     return (
-      <div className="bg-white border border-stone-100 rounded-admin p-5 h-[300px] flex flex-col justify-between">
-        <div className="h-5 w-32 bg-stone-100 rounded animate-pulse" />
-        <div className="flex-1 mt-4 bg-stone-50 rounded-admin flex items-center justify-center">
-          <div className="h-5 w-5 border-2 border-lotus-leaf border-t-transparent rounded-full animate-spin" />
+      <div className="bg-white border border-adminGray-100 rounded-admin p-5 h-[300px] flex flex-col justify-between">
+        <div className="h-5 w-32 bg-adminGray-100 rounded animate-pulse" />
+        <div className="flex-1 mt-4 bg-adminGray-50 rounded-admin flex items-center justify-center">
+          <div className="h-5 w-5 border-2 border-adminGreen-600 border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white border border-stone-100 rounded-admin p-5 flex flex-col h-[300px]">
+    <div className="bg-white border border-adminGray-100 rounded-admin p-5 flex flex-col h-[300px]">
       <div className="flex items-center justify-between mb-3 shrink-0">
-        <span className="text-lotus-admin-lg font-bold text-stone-800">Dòng tiền</span>
+        <span className="text-sm font-bold text-adminInk">Dòng tiền</span>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-3 text-lotus-admin-xs">
-            <span className="flex items-center gap-1 text-stone-500"><span className="w-2.5 h-0.5 bg-lotus-leaf rounded inline-block" />Dòng tiền vào</span>
-            <span className="flex items-center gap-1 text-stone-500"><span className="w-2.5 h-0.5 bg-lotus-rose rounded inline-block" />Dòng tiền ra</span>
+          <div className="flex items-center gap-3 text-2xs">
+            <span className="flex items-center gap-1 text-adminGray-600"><span className="w-2.5 h-0.5 bg-adminGreen-600 rounded inline-block" />Dòng tiền vào</span>
+            <span className="flex items-center gap-1 text-adminGray-600"><span className="w-2.5 h-0.5 bg-state-danger-solid rounded inline-block" />Dòng tiền ra</span>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 w-full min-h-0 text-lotus-admin-xs">
+      <div className="flex-1 w-full min-h-0 text-2xs">
         {data.length === 0 ? (
-          <div className="w-full h-full flex items-center justify-center text-lotus-stone">
+          <div className="w-full h-full flex items-center justify-center text-adminGray-600">
             Chưa có dữ liệu trong khoảng thời gian này
           </div>
         ) : (
@@ -93,34 +93,34 @@ export const CashFlowTrendChart = memo(function CashFlowTrendChart({ data = [], 
             >
               <defs>
                 <linearGradient id="colorCashIn" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3e7a3e" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#3e7a3e" stopOpacity={0.0} />
+                  <stop offset="5%" stopColor="var(--admin-green-600)" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="var(--admin-green-600)" stopOpacity={0.0} />
                 </linearGradient>
                 <linearGradient id="colorCashOut" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0.0} />
+                  <stop offset="5%" stopColor="var(--state-danger-solid)" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="var(--state-danger-solid)" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f1" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-gray-100)" vertical={false} />
               <XAxis 
                 dataKey="date" 
                 tickFormatter={formatDateXAxis}
                 tickLine={false} 
                 axisLine={false} 
-                stroke="#888888"
+                stroke="var(--admin-gray-400)"
               />
               <YAxis 
                 tickFormatter={(v) => v >= 1000000 ? `${v / 1000000}M` : v}
                 tickLine={false} 
                 axisLine={false} 
-                stroke="#888888"
+                stroke="var(--admin-gray-400)"
               />
               <Tooltip content={<CustomTooltip />} />
               <Area
                 name="Dòng tiền vào"
                 type="monotone"
                 dataKey="cashIn"
-                stroke="#3e7a3e"
+                stroke="var(--admin-green-600)"
                 strokeWidth={2}
                 fillOpacity={1}
                 fill="url(#colorCashIn)"
@@ -129,7 +129,7 @@ export const CashFlowTrendChart = memo(function CashFlowTrendChart({ data = [], 
                 name="Dòng tiền ra"
                 type="monotone"
                 dataKey="cashOut"
-                stroke="#ef4444"
+                stroke="var(--state-danger-solid)"
                 strokeWidth={2}
                 fillOpacity={1}
                 fill="url(#colorCashOut)"

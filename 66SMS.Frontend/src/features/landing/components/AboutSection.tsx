@@ -61,7 +61,7 @@ export const AboutSection = () => {
           <div className="relative z-10 mx-auto w-full max-w-xl text-center lg:mx-0 lg:text-left">
             <h2
               id="about-heading"
-              className="font-display text-[clamp(1.75rem,3.2vw,2.5rem)] font-semibold leading-[1.15] tracking-[0.02em] text-white"
+              className="font-display text-display-section-md font-semibold leading-[1.15] tracking-[0.02em] text-white"
             >
               Tại sao chọn Sen Spa
             </h2>

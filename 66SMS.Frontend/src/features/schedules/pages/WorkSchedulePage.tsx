@@ -119,12 +119,12 @@ export function WorkSchedulePage() {
   return (
     <div className="space-y-4">
       {/* Header & Controls */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-4 rounded-admin border border-stone-200/30">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-4 rounded-admin border border-adminGray-100/30">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full xl:w-auto">
           {isAdminOrManager && (
             <div className="relative w-full sm:w-64">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-lotus-stone"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-adminGray-600"
                 size={16}
               />
               <input
@@ -132,19 +132,19 @@ export function WorkSchedulePage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm kiếm nhân viên..."
-                className="pl-9 pr-4 py-2 bg-white border border-stone-200/50 rounded-lg text-lotus-admin-lg focus:outline-none focus:ring-1 focus:ring-lotus-leaf w-full transition-shadow placeholder:text-stone-400"
+                className="pl-9 pr-4 py-2 bg-white border border-adminGray-100/50 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-adminGreen-600 w-full transition-shadow placeholder:text-adminGray-400"
               />
             </div>
           )}
 
           {isAdminOrManager && (
-            <div className="flex bg-stone-100 p-0.5 rounded-lg border border-stone-200/50 h-9">
+            <div className="flex bg-adminGray-100 p-0.5 rounded-lg border border-adminGray-100/50 h-9">
               <button
                 onClick={() => setViewMode("shift")}
-                className={`flex items-center gap-1.5 px-3 rounded-md text-lotus-admin-lg font-semibold transition-colors ${
+                className={`flex items-center gap-1.5 px-3 rounded-md text-sm font-semibold transition-colors ${
                   viewMode === "shift"
-                    ? "bg-white text-lotus-leaf shadow-sm"
-                    : "text-lotus-stone hover:text-lotus-deep"
+                    ? "bg-white text-adminGreen-600 shadow-sm"
+                    : "text-adminGray-600 hover:text-adminInk"
                 }`}
               >
                 <Briefcase size={14} />
@@ -152,10 +152,10 @@ export function WorkSchedulePage() {
               </button>
               <button
                 onClick={() => setViewMode("staff")}
-                className={`flex items-center gap-1.5 px-3 rounded-md text-lotus-admin-lg font-semibold transition-colors ${
+                className={`flex items-center gap-1.5 px-3 rounded-md text-sm font-semibold transition-colors ${
                   viewMode === "staff"
-                    ? "bg-white text-lotus-leaf shadow-sm"
-                    : "text-lotus-stone hover:text-lotus-deep"
+                    ? "bg-white text-adminGreen-600 shadow-sm"
+                    : "text-adminGray-600 hover:text-adminInk"
                 }`}
               >
                 <Users size={14} />
@@ -163,10 +163,10 @@ export function WorkSchedulePage() {
               </button>
               <button
                 onClick={() => setViewMode("single")}
-                className={`flex items-center gap-1.5 px-3 rounded-md text-lotus-admin-lg font-semibold transition-colors ${
+                className={`flex items-center gap-1.5 px-3 rounded-md text-sm font-semibold transition-colors ${
                   viewMode === "single"
-                    ? "bg-white text-lotus-leaf shadow-sm"
-                    : "text-lotus-stone hover:text-lotus-deep"
+                    ? "bg-white text-adminGreen-600 shadow-sm"
+                    : "text-adminGray-600 hover:text-adminInk"
                 }`}
               >
                 <User size={14} />
@@ -181,7 +181,7 @@ export function WorkSchedulePage() {
               onChange={(e) =>
                 setSelectedStaffId(Number(e.target.value) || null)
               }
-              className="px-3 py-1.5 border border-stone-200/50 rounded-lg bg-white text-lotus-admin-lg font-semibold h-9 focus:outline-none focus:ring-1 focus:ring-lotus-leaf text-lotus-deep"
+              className="px-3 py-1.5 border border-adminGray-100/50 rounded-lg bg-white text-sm font-semibold h-9 focus:outline-none focus:ring-1 focus:ring-adminGreen-600 text-adminInk"
             >
               <option value="">-- Chọn nhân viên --</option>
               {staffList.map((emp) => (
@@ -194,21 +194,21 @@ export function WorkSchedulePage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto justify-end">
-          <div className="flex items-center bg-white border border-stone-200/50 rounded-lg overflow-hidden h-9">
+          <div className="flex items-center bg-white border border-adminGray-100/50 rounded-lg overflow-hidden h-9">
             <button
               onClick={handlePrevWeek}
-              className="px-3 h-full hover:bg-stone-50 flex items-center justify-center text-lotus-stone transition-colors"
+              className="px-3 h-full hover:bg-adminGray-50 flex items-center justify-center text-adminGray-600 transition-colors"
             >
               <ChevronLeft size={16} />
             </button>
 
-            <div className="px-4 text-lotus-admin-lg font-semibold text-lotus-deep select-none min-w-[170px] text-center border-x border-stone-100">
+            <div className="px-4 text-sm font-semibold text-adminInk select-none min-w-[170px] text-center border-x border-adminGray-100">
               {weekLabel}
             </div>
 
             <button
               onClick={handleNextWeek}
-              className="px-3 h-full hover:bg-stone-50 flex items-center justify-center text-lotus-stone transition-colors"
+              className="px-3 h-full hover:bg-adminGray-50 flex items-center justify-center text-adminGray-600 transition-colors"
             >
               <ChevronRight size={16} />
             </button>
@@ -217,7 +217,7 @@ export function WorkSchedulePage() {
           <Button
             onClick={handleThisWeek}
             variant="outline"
-            className="text-lotus-admin-lg h-9"
+            className="text-sm h-9"
           >
             Tuần này
           </Button>
@@ -226,7 +226,7 @@ export function WorkSchedulePage() {
             <Button
               onClick={() => setIsRepeatDialogOpen(true)}
               variant="outline"
-              className="text-lotus-admin-lg h-9 gap-1.5"
+              className="text-sm h-9 gap-1.5"
               disabled={!schedulesData?.data?.items?.length}
               title={
                 !schedulesData?.data?.items?.length
@@ -251,10 +251,10 @@ export function WorkSchedulePage() {
 
       {/* Content */}
       {isPageLoading ? (
-        <div className="flex items-center justify-center py-20 backdrop-blur-md rounded-admin border border-stone-200/30 p-4 min-h-[500px]">
+        <div className="flex items-center justify-center py-20 backdrop-blur-md rounded-admin border border-adminGray-100/30 p-4 min-h-[500px]">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 animate-spin rounded-full border-4 border-stone-200 border-t-lotus-leaf" />
-            <p className="text-sm text-lotus-stone">
+            <div className="w-8 h-8 animate-spin rounded-full border-4 border-adminGray-100 border-t-lotus-leaf" />
+            <p className="text-sm text-adminGray-600">
               Đang tải lịch làm việc...
             </p>
           </div>

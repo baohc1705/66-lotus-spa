@@ -65,6 +65,8 @@ export function AdminLayout() {
   for (const link of allLinks) {
     if (location.pathname.startsWith(link.path)) {
       currentTitle = link.label;
+      if (currentTitle === "Danh sách nhân viên")
+        currentTitle = "Quản lý nhân viên";
       if (currentTitle === "Nhân viên") currentTitle = "Quản lý nhân viên";
       if (currentTitle === "Khách hàng") currentTitle = "Quản lý khách hàng";
       if (currentTitle === "Sản phẩm") currentTitle = "Quản lý sản phẩm";
@@ -81,12 +83,11 @@ export function AdminLayout() {
   }
 
   return (
-    <div className="admin-dashboard-container min-h-screen bg-lotus-cream font-sans text-lotus-deep overflow-clip flex selection:bg-lotus-rose-light selection:text-lotus-rose">
-      {/* Decorative Background Elements for Luxury Feel */}
-      <div className="fixed top-0 left-0 w-[50vw] h-[50vw] rounded-full bg-lotus-rose/5 blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
-      <div className="fixed bottom-0 right-0 w-[40vw] h-[40vw] rounded-full bg-lotus-gold/5 blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3" />
+    <div className="admin-dashboard-container min-h-screen font-sans overflow-clip flex">
+      {/* Soft green atmosphere */}
+      <div className="fixed top-0 left-0 w-[50vw] h-[50vw] rounded-full bg-adminGreen-100/40 blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
+      <div className="fixed bottom-0 right-0 w-[40vw] h-[40vw] rounded-full bg-adminGold-100/30 blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3" />
 
-      {/* Sidebar */}
       <AdminSidebar
         isOpen={isSidebarOpen}
         isMobileOpen={isMobileSidebarOpen}
@@ -95,7 +96,6 @@ export function AdminLayout() {
         layoutMode={layoutMode}
       />
 
-      {/* Main Content Area */}
       <div
         className={cn(
           "flex-1 min-w-0 flex flex-col min-h-screen transition-all duration-500 ease-out z-10",
@@ -113,7 +113,6 @@ export function AdminLayout() {
           toggleLayoutMode={toggleLayoutMode}
         />
 
-        {/* Page Content */}
         <main className="flex-1 min-w-0 p-2 overflow-x-hidden flex flex-col">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -121,13 +120,12 @@ export function AdminLayout() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="mx-auto w-full flex-1 flex flex-col min-h-0"
           >
-            {/* Title for desktop layout since header now displays navigation */}
             {layoutMode === "top-nav" && (
               <div className="hidden lg:block mb-4">
-                <h1 className="text-xl font-bold text-lotus-deep tracking-tight">
+                <h1 className="text-xl font-bold text-adminInk tracking-tight">
                   {currentTitle}
                 </h1>
-                <div className="h-0.5 w-12 bg-lotus-gold mt-1.5 rounded-full" />
+                <div className="h-0.5 w-12 bg-adminGold-600 mt-1.5 rounded-full" />
               </div>
             )}
             <Outlet context={{ layoutMode }} />

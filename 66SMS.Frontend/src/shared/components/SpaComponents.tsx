@@ -132,7 +132,7 @@ export function ProductCard({ image, name, category, price, originalPrice, ratin
         <img src={image} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
       </div>
       <div className="p-5 flex flex-col flex-1">
-        <Eyebrow className="mb-2 !text-[10px]">{category}</Eyebrow>
+        <Eyebrow className="mb-2 !text-2xs">{category}</Eyebrow>
         <h4 className="font-display font-medium text-lotus-foreground text-base mb-2 line-clamp-2">{name}</h4>
         
         <div className="flex mb-4">

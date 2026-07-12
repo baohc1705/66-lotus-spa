@@ -373,7 +373,7 @@ export function ProductListPage() {
                         variant="admin"
                         size="sm"
                         onClick={() => setCreateOpen(true)}
-                        className="mt-1 text-lotus-admin-md"
+                        className="mt-1 text-xs"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         Thêm sản phẩm

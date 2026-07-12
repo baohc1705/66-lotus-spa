@@ -25,7 +25,7 @@ export function CustomerDetailExpanded({
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-4 bg-stone-50/30">
+      <div className="p-6 space-y-4 bg-adminGray-50/30">
         <div className="flex gap-4 mb-4">
           <Skeleton className="w-24 h-8" />
           <Skeleton className="w-24 h-8" />
@@ -41,39 +41,39 @@ export function CustomerDetailExpanded({
 
   if (!customer) {
     return (
-      <div className="p-6 text-center text-lotus-stone text-sm bg-stone-50/30">
+      <div className="p-6 text-center text-adminGray-600 text-sm bg-adminGray-50/30">
         Không tìm thấy thông tin khách hàng
       </div>
     );
   }
 
   return (
-    <div className="bg-stone-50/30 w-full overflow-hidden">
+    <div className="bg-adminGray-50/30 w-full overflow-hidden">
       <Tabs defaultValue="info" className="w-full flex-col">
         {/* Tab Headers */}
         <div className="px-4 pt-2">
-          <TabsList className="h-10 border-b border-stone-200/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
+          <TabsList className="h-10 border-b border-adminGray-100/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
             <TabsTrigger
               value="info"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Thông tin
             </TabsTrigger>
             <TabsTrigger
               value="purchase"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Lịch sử mua hàng
             </TabsTrigger>
             <TabsTrigger
               value="appointments"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Lịch hẹn
             </TabsTrigger>
             <TabsTrigger
               value="loyalty"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-lotus-admin-lg font-medium text-lotus-stone hover:text-lotus-leaf/80 data-[state=active]:border-lotus-leaf data-[state=active]:text-lotus-leaf data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Tích lũy & Ưu đãi
             </TabsTrigger>
@@ -85,7 +85,7 @@ export function CustomerDetailExpanded({
           <div className="flex flex-col gap-4">
             {/* Header profile info */}
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+              <div className="w-14 h-14 rounded-full bg-state-warning-bg flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
                 {customer.avatarUrl ? (
                   <img
                     src={customer.avatarUrl}
@@ -93,14 +93,14 @@ export function CustomerDetailExpanded({
                     className="w-14 h-14 object-cover"
                   />
                 ) : (
-                  <User className="w-7 h-7 text-amber-400" />
+                  <User className="w-7 h-7 text-adminGold-600" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-base font-bold text-lotus-deep truncate">
+                <h3 className="text-base font-bold text-adminInk truncate">
                   {customer.fullName ?? "—"}
                 </h3>
-                <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
+                <p className="text-xs text-adminGray-600 mt-0.5">
                   Điểm: {customer.loyaltyPoint ?? 0}
                 </p>
               </div>
@@ -147,12 +147,12 @@ export function CustomerDetailExpanded({
             </div>
 
             {/* Note & Actions */}
-            <div className="flex items-end justify-between mt-2 pt-4 border-t border-stone-100/80">
-              <div className="flex items-start gap-2 text-lotus-admin-lg text-lotus-deep flex-1 min-w-0">
-                <Pencil className="w-4 h-4 text-lotus-stone shrink-0 mt-0.5" />
+            <div className="flex items-end justify-between mt-2 pt-4 border-t border-adminGray-100/80">
+              <div className="flex items-start gap-2 text-sm text-adminInk flex-1 min-w-0">
+                <Pencil className="w-4 h-4 text-adminGray-600 shrink-0 mt-0.5" />
                 <div>
                   <span className="font-semibold">Ghi chú:</span>
-                  <span className="ml-1 text-lotus-stone">
+                  <span className="ml-1 text-adminGray-600">
                     {customer.note || "Chưa có ghi chú"}
                   </span>
                 </div>
@@ -162,7 +162,7 @@ export function CustomerDetailExpanded({
                   variant="admin"
                   size="sm"
                   onClick={() => onEdit?.(customer)}
-                  className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-lotus-admin-lg gap-1.5 ml-auto rounded-md transition-opacity"
+                  className="bg-adminGreen-600 hover:opacity-90 text-white shadow-sm h-8 px-4 text-sm gap-1.5 ml-auto rounded-md transition-opacity"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                   Cập nhật
@@ -174,19 +174,19 @@ export function CustomerDetailExpanded({
 
         <TabsContent
           value="purchase"
-          className="p-10 text-center text-lotus-stone text-sm"
+          className="p-10 text-center text-adminGray-600 text-sm"
         >
           Chưa có dữ liệu lịch sử mua hàng
         </TabsContent>
         <TabsContent
           value="appointments"
-          className="p-10 text-center text-lotus-stone text-sm"
+          className="p-10 text-center text-adminGray-600 text-sm"
         >
           Chưa có lịch hẹn nào
         </TabsContent>
         <TabsContent
           value="loyalty"
-          className="p-10 text-center text-lotus-stone text-sm"
+          className="p-10 text-center text-adminGray-600 text-sm"
         >
           Chưa có thông tin tích lũy & ưu đãi
         </TabsContent>
@@ -203,9 +203,9 @@ function DetailField({
   value: string | null | undefined;
 }) {
   return (
-    <div className="py-3.5 border-b border-stone-100/80 last:border-b-0 group">
-      <p className="text-lotus-admin-md text-lotus-stone mb-1">{label}</p>
-      <p className="text-lotus-admin-lg font-medium text-lotus-deep truncate">
+    <div className="py-3.5 border-b border-adminGray-100/80 last:border-b-0 group">
+      <p className="text-xs text-adminGray-600 mb-1">{label}</p>
+      <p className="text-sm font-medium text-adminInk truncate">
         {value || "—"}
       </p>
     </div>

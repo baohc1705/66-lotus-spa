@@ -62,7 +62,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
                 HOA SEN
               </span>
               <span
-                className={`text-[10px] tracking-[0.28em] uppercase font-sans mt-0.5 transition-colors duration-500 ${isDark ? "text-gold-600" : "text-white/60"}`}
+                className={`text-2xs tracking-[0.28em] uppercase font-sans mt-0.5 transition-colors duration-500 ${isDark ? "text-gold-600" : "text-white/60"}`}
               >
                 Spa & Wellness
               </span>

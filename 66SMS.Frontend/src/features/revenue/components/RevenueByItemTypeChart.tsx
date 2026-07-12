@@ -8,7 +8,7 @@ interface RevenueByItemTypeChartProps {
   isLoading: boolean;
 }
 
-const COLORS = ["#3e7a3e", "#b08d57", "#eaa9ba"]; // lotus-primary, lotus-accent, lotus-secondary
+const COLORS = ["var(--admin-green-600)", "var(--admin-gold-600)", "var(--admin-green-200)"]; // lotus-primary, lotus-accent, lotus-secondary
 
 interface CustomTooltipProps {
   active?: boolean;
@@ -25,14 +25,14 @@ interface CustomTooltipProps {
 const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
-    const color = payload[0].color ?? "#3e7a3e";
+    const color = payload[0].color ?? "var(--admin-green-600)";
     return (
-      <div className="bg-white/95 backdrop-blur-sm border border-stone-200/50 p-2.5 rounded-admin shadow-lg text-xs font-sans">
-        <p className="font-semibold text-lotus-deep flex items-center gap-1.5">
+      <div className="bg-white/95 backdrop-blur-sm border border-adminGray-100/50 p-2.5 rounded-admin shadow-lg text-xs font-sans">
+        <p className="font-semibold text-adminInk flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
           {data.label}
         </p>
-        <p className="font-bold text-lotus-deep mt-1 ml-3.5">
+        <p className="font-bold text-adminInk mt-1 ml-3.5">
           {formatCurrency(data.amount)} ({data.percent}%)
         </p>
       </div>
@@ -44,26 +44,26 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
 export const RevenueByItemTypeChart = memo(function RevenueByItemTypeChart({ data = [], isLoading }: RevenueByItemTypeChartProps) {
   if (isLoading) {
     return (
-      <div className="bg-white border border-stone-100 rounded-admin p-5 h-[300px] flex flex-col justify-between">
-        <div className="h-5 w-40 bg-stone-100 rounded animate-pulse" />
-        <div className="flex-1 mt-4 bg-stone-50 rounded-admin flex items-center justify-center">
-          <div className="h-5 w-5 border-2 border-lotus-leaf border-t-transparent rounded-full animate-spin" />
+      <div className="bg-white border border-adminGray-100 rounded-admin p-5 h-[300px] flex flex-col justify-between">
+        <div className="h-5 w-40 bg-adminGray-100 rounded animate-pulse" />
+        <div className="flex-1 mt-4 bg-adminGray-50 rounded-admin flex items-center justify-center">
+          <div className="h-5 w-5 border-2 border-adminGreen-600 border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white border border-stone-100 rounded-admin p-5 flex flex-col h-[300px]">
+    <div className="bg-white border border-adminGray-100 rounded-admin p-5 flex flex-col h-[300px]">
       <div className="mb-3">
-        <span className="text-lotus-admin-lg font-bold text-stone-800">
+        <span className="text-sm font-bold text-adminInk">
           Cơ cấu doanh thu
         </span>
       </div>
 
-      <div className="flex-1 flex items-center min-h-0 text-lotus-admin-xs">
+      <div className="flex-1 flex items-center min-h-0 text-2xs">
         {data.length === 0 ? (
-          <div className="w-full h-full flex items-center justify-center text-lotus-stone">
+          <div className="w-full h-full flex items-center justify-center text-adminGray-600">
             Chưa có dữ liệu
           </div>
         ) : (
@@ -101,13 +101,13 @@ export const RevenueByItemTypeChart = memo(function RevenueByItemTypeChart({ dat
                         className="w-2 h-2 rounded-full shrink-0" 
                         style={{ backgroundColor: COLORS[index % COLORS.length] }} 
                       />
-                      <span className="font-bold text-stone-700 text-lotus-admin-md">{item.label}</span>
+                      <span className="font-bold text-adminInk text-xs">{item.label}</span>
                     </div>
-                    <span className="font-semibold text-stone-400 text-lotus-admin-xs">
+                    <span className="font-semibold text-adminGray-400 text-2xs">
                       {item.percent}%
                     </span>
                   </div>
-                  <span className="text-lotus-admin-base font-bold text-stone-800 pl-3.5 mt-0.5">
+                  <span className="text-xs font-bold text-adminInk pl-3.5 mt-0.5">
                     {formatCurrency(item.amount)}
                   </span>
                 </div>

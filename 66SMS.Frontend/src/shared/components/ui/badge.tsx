@@ -20,12 +20,14 @@ const badgeVariants = cva(
         white:
           "bg-white/20 text-white border border-white/30 backdrop-blur-sm",
         admin:
-          "bg-[var(--spa-admin-accent)] text-[var(--spa-admin-primary)]",
-        success: "bg-green-50 text-green-700",
-        warning: "bg-yellow-50 text-yellow-700",
-        error: "bg-red-50 text-red-600",
+          "bg-adminGreen-100 text-adminGreen-900",
+        success: "bg-state-success-bg text-state-success-text",
+        warning: "bg-state-warning-bg text-state-warning-text",
+        error: "bg-state-danger-bg text-state-danger-text",
+        info: "bg-state-info-bg text-state-info-text",
+        neutral: "bg-state-neutral-bg text-state-neutral-text",
         outline:
-          "border border-[var(--spa-border)] text-[var(--spa-text-muted)]",
+          "border border-adminGray-300 text-adminGray-600",
       },
       size: {
         sm: "text-xs px-2.5 py-1",

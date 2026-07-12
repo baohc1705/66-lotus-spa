@@ -151,22 +151,22 @@ export function BookingPositionFormDialog({
                 <div className="relative" ref={dropdownRef}>
                   <div
                     className={cn(
-                      "flex w-full items-center justify-between gap-2 rounded-md bg-stone-100/80 px-3 py-2 text-lotus-admin-lg text-lotus-deep outline-none cursor-pointer border border-transparent hover:bg-stone-100 focus-within:bg-white focus-within:ring-2 focus-within:ring-lotus-leaf/30 transition-all",
-                      dropdownOpen && "bg-white ring-2 ring-lotus-leaf/30"
+                      "flex w-full items-center justify-between gap-2 rounded-md bg-adminGray-100/80 px-3 py-2 text-sm text-adminInk outline-none cursor-pointer border border-transparent hover:bg-adminGray-100 focus-within:bg-white focus-within:ring-2 focus-within:ring-adminGreen-600/30 transition-all",
+                      dropdownOpen && "bg-white ring-2 ring-adminGreen-600/30"
                     )}
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                   >
-                    <span>{selectedRoom ? selectedRoom.name : <span className="text-lotus-stone">Chọn phòng...</span>}</span>
-                    <ChevronDown className="w-4 h-4 text-lotus-stone" />
+                    <span>{selectedRoom ? selectedRoom.name : <span className="text-adminGray-600">Chọn phòng...</span>}</span>
+                    <ChevronDown className="w-4 h-4 text-adminGray-600" />
                   </div>
 
                   {dropdownOpen && (
-                    <div className="absolute z-50 mt-1 w-full rounded-md border border-stone-200 bg-white shadow-md overflow-hidden">
-                      <div className="flex items-center px-3 py-2 border-b border-stone-100 text-lotus-deep">
-                        <Search className="w-4 h-4 mr-2 text-lotus-stone" />
+                    <div className="absolute z-50 mt-1 w-full rounded-md border border-adminGray-100 bg-white shadow-md overflow-hidden">
+                      <div className="flex items-center px-3 py-2 border-b border-adminGray-100 text-adminInk">
+                        <Search className="w-4 h-4 mr-2 text-adminGray-600" />
                         <input
                           autoFocus
-                          className="w-full bg-transparent outline-none text-lotus-admin-lg placeholder:text-lotus-stone"
+                          className="w-full bg-transparent outline-none text-sm placeholder:text-adminGray-600"
                           placeholder="Tìm phòng..."
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
@@ -174,14 +174,14 @@ export function BookingPositionFormDialog({
                       </div>
                       <div className="max-h-48 overflow-y-auto p-1">
                         {filteredRooms.length === 0 ? (
-                          <div className="px-3 py-2 text-lotus-admin-lg text-lotus-stone text-center">Không tìm thấy phòng</div>
+                          <div className="px-3 py-2 text-sm text-adminGray-600 text-center">Không tìm thấy phòng</div>
                         ) : (
                           filteredRooms.map((room) => (
                             <div
                               key={room.id}
                               className={cn(
-                                "flex items-center justify-between px-3 py-2 text-lotus-admin-lg rounded-sm cursor-pointer hover:bg-lotus-cream/50",
-                                selectedRoomId === room.id ? "bg-lotus-cream/30 text-lotus-leaf font-medium" : "text-lotus-deep"
+                                "flex items-center justify-between px-3 py-2 text-sm rounded-sm cursor-pointer hover:bg-adminGray-50/50",
+                                selectedRoomId === room.id ? "bg-adminGray-50/30 text-adminGreen-600 font-medium" : "text-adminInk"
                               )}
                               onClick={() => {
                                 setValue("roomId", room.id as number, { shouldValidate: true });

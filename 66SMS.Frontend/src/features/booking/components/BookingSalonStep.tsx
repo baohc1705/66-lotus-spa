@@ -61,7 +61,7 @@ export const BookingSalonStep: React.FC = () => {
                     <h4 className="font-bold text-ink text-sm leading-snug">
                       {salon.name}
                     </h4>
-                    <span className="shrink-0 text-[10px] font-bold uppercase tracking-wide bg-success-bg text-success-text px-2 py-0.5 rounded-sm">
+                    <span className="shrink-0 text-2xs font-bold uppercase tracking-wide bg-success-bg text-success-text px-2 py-0.5 rounded-sm">
                       Đang hoạt động
                     </span>
                   </div>

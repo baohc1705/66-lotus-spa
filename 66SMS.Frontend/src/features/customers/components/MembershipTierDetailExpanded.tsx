@@ -28,7 +28,7 @@ export function MembershipTierDetailExpanded({
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-4 bg-stone-50/30">
+      <div className="p-6 space-y-4 bg-adminGray-50/30">
         <Skeleton className="w-48 h-6" />
         <div className="grid grid-cols-2 gap-8">
           <Skeleton className="h-24" />
@@ -40,29 +40,29 @@ export function MembershipTierDetailExpanded({
 
   if (!tier) {
     return (
-      <div className="p-6 text-center text-lotus-stone text-sm bg-stone-50/30">
+      <div className="p-6 text-center text-adminGray-600 text-sm bg-adminGray-50/30">
         Không tìm thấy thông tin loại thẻ
       </div>
     );
   }
 
   return (
-    <div className="bg-stone-50/30 w-full overflow-hidden p-6 border-t border-stone-200/50">
+    <div className="bg-adminGray-50/30 w-full overflow-hidden p-6 border-t border-adminGray-100/50">
       <div className="flex flex-col gap-5">
         {/* Header info */}
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center shrink-0 shadow-sm border border-amber-200/50">
-            <Crown className="w-6 h-6 text-amber-500" />
+          <div className="w-12 h-12 rounded-xl bg-state-warning-bg flex items-center justify-center shrink-0 shadow-sm border border-state-warning-border/50">
+            <Crown className="w-6 h-6 text-adminGold-600" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-base font-bold text-lotus-deep truncate">
+            <h3 className="text-base font-bold text-adminInk truncate">
               {tier.name}
             </h3>
-            <p className="text-lotus-admin-md font-medium text-lotus-stone mt-0.5">
+            <p className="text-xs font-medium text-adminGray-600 mt-0.5">
               Trạng thái:{" "}
               <span
                 className={
-                  tier.status === 1 ? "text-green-600" : "text-amber-600"
+                  tier.status === 1 ? "text-adminGreen-600" : "text-state-warning-text"
                 }
               >
                 {STATUS_MAP[tier.status] ?? "Không rõ"}
@@ -89,22 +89,22 @@ export function MembershipTierDetailExpanded({
             value={`x${tier.pointMultiplier}`}
           />
           <div className="flex flex-col">
-            <p className="text-lotus-admin-md font-medium text-lotus-stone mb-1">
+            <p className="text-xs font-medium text-adminGray-600 mb-1">
               Ngày tạo
             </p>
-            <p className="text-lotus-admin-lg text-lotus-deep font-medium">
+            <p className="text-sm text-adminInk font-medium">
               {tier.createdAt || "—"}
             </p>
           </div>
         </div>
 
         {/* Benefits & Actions */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mt-2 pt-4 border-t border-stone-100/80">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mt-2 pt-4 border-t border-adminGray-100/80">
           <div className="flex-1">
-            <p className="text-lotus-admin-md font-medium text-lotus-stone mb-1">
+            <p className="text-xs font-medium text-adminGray-600 mb-1">
               Quyền lợi chi tiết
             </p>
-            <p className="text-lotus-admin-lg text-lotus-deep whitespace-pre-wrap">
+            <p className="text-sm text-adminInk whitespace-pre-wrap">
               {tier.benefits || "Chưa cập nhật quyền lợi"}
             </p>
           </div>
@@ -113,7 +113,7 @@ export function MembershipTierDetailExpanded({
               variant="admin"
               size="sm"
               onClick={() => onEdit?.(tier)}
-              className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-lotus-admin-lg gap-1.5 rounded-md transition-opacity shrink-0"
+              className="bg-adminGreen-600 hover:opacity-90 text-white shadow-sm h-8 px-4 text-sm gap-1.5 rounded-md transition-opacity shrink-0"
             >
               <Pencil className="w-3.5 h-3.5" />
               Chỉnh sửa
@@ -135,15 +135,15 @@ function DetailCard({
   value: string;
 }) {
   return (
-    <div className="bg-white rounded-lg p-3 border border-stone-100 shadow-sm flex items-start gap-3">
-      <div className="w-8 h-8 rounded-md bg-stone-50 flex items-center justify-center shrink-0 text-lotus-stone">
+    <div className="bg-white rounded-lg p-3 border border-adminGray-100 shadow-sm flex items-start gap-3">
+      <div className="w-8 h-8 rounded-md bg-adminGray-50 flex items-center justify-center shrink-0 text-adminGray-600">
         <Icon className="w-4 h-4" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-lotus-admin-base font-medium text-lotus-stone truncate mb-0.5">
+        <p className="text-xs font-medium text-adminGray-600 truncate mb-0.5">
           {label}
         </p>
-        <p className="text-lotus-admin-lg font-semibold text-lotus-deep truncate">
+        <p className="text-sm font-semibold text-adminInk truncate">
           {value}
         </p>
       </div>

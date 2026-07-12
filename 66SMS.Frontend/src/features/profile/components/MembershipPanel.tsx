@@ -7,13 +7,6 @@ import type { MembershipCardDto } from '@/features/customers/types/membershipCar
 import type { MembershipTierDto } from '@/features/customers/types/membershipTier.types'
 
 interface TierStyle {
-  bgGradient: string
-  borderColor: string
-  accentColor: string
-  textColor: string
-  glowColor: string
-  chipColor: string
-  // Light card styles for carousel (swapping background and text colors)
   cardBg: string
   cardBgEnd: string
   cardBorder: string
@@ -24,101 +17,65 @@ interface TierStyle {
 
 const getTierStyle = (tierName: string): TierStyle => {
   const name = tierName.toLowerCase()
-  
+
   if (name.includes('đồng') || name.includes('bronze')) {
     return {
-      bgGradient: 'from-amber-50 via-amber-200 to-amber-300',
-      borderColor: 'border-amber-700/30',
-      accentColor: 'text-amber-800',
-      textColor: 'text-amber-950',
-      glowColor: 'shadow-amber-700/10',
-      chipColor: 'bg-gradient-to-br from-amber-600 to-amber-800',
       cardBg: 'var(--membership-bronze-bg)',
       cardBgEnd: 'var(--membership-bronze-bg-end)',
       cardBorder: 'var(--membership-bronze-border)',
       cardAccent: 'var(--membership-bronze-accent)',
       cardText: 'var(--membership-bronze-text)',
-      cardGlow: 'rgba(139, 90, 43, 0.15)',
+      cardGlow: 'color-mix(in srgb, var(--membership-bronze-border) 15%, transparent)',
     }
   }
   if (name.includes('bạc') || name.includes('silver')) {
     return {
-      bgGradient: 'from-slate-50 via-slate-200 to-slate-300',
-      borderColor: 'border-slate-300',
-      accentColor: 'text-slate-600',
-      textColor: 'text-slate-900',
-      glowColor: 'shadow-slate-300/10',
-      chipColor: 'bg-gradient-to-br from-slate-400 to-slate-600',
       cardBg: 'var(--membership-silver-bg)',
       cardBgEnd: 'var(--membership-silver-bg-end)',
       cardBorder: 'var(--membership-silver-border)',
       cardAccent: 'var(--membership-silver-accent)',
       cardText: 'var(--membership-silver-text)',
-      cardGlow: 'rgba(158, 158, 158, 0.15)',
+      cardGlow: 'color-mix(in srgb, var(--membership-silver-border) 15%, transparent)',
     }
   }
   if (name.includes('vàng') || name.includes('gold')) {
     return {
-      bgGradient: 'from-yellow-50 via-yellow-200 to-yellow-400',
-      borderColor: 'border-yellow-600/40',
-      accentColor: 'text-yellow-800',
-      textColor: 'text-yellow-950',
-      glowColor: 'shadow-yellow-600/25',
-      chipColor: 'bg-gradient-to-br from-yellow-500 to-yellow-700',
       cardBg: 'var(--membership-gold-bg)',
       cardBgEnd: 'var(--membership-gold-bg-end)',
       cardBorder: 'var(--membership-gold-border)',
       cardAccent: 'var(--membership-gold-accent)',
       cardText: 'var(--membership-gold-text)',
-      cardGlow: 'rgba(201, 150, 12, 0.2)',
+      cardGlow: 'color-mix(in srgb, var(--membership-gold-border) 20%, transparent)',
     }
   }
   if (name.includes('bạch kim') || name.includes('platinum')) {
     return {
-      bgGradient: 'from-slate-50 via-slate-200 to-slate-400',
-      borderColor: 'border-slate-300',
-      accentColor: 'text-slate-600',
-      textColor: 'text-slate-900',
-      glowColor: 'shadow-slate-300/10',
-      chipColor: 'bg-gradient-to-br from-slate-300 to-slate-600',
       cardBg: 'var(--membership-platinum-bg)',
       cardBgEnd: 'var(--membership-platinum-bg-end)',
       cardBorder: 'var(--membership-platinum-border)',
       cardAccent: 'var(--membership-platinum-accent)',
       cardText: 'var(--membership-platinum-text)',
-      cardGlow: 'rgba(200, 203, 212, 0.15)',
+      cardGlow: 'color-mix(in srgb, var(--membership-platinum-border) 15%, transparent)',
     }
   }
   if (name.includes('kim cương') || name.includes('diamond')) {
     return {
-      bgGradient: 'from-sky-50 via-sky-200 to-sky-300',
-      borderColor: 'border-sky-400/40',
-      accentColor: 'text-sky-800',
-      textColor: 'text-sky-950',
-      glowColor: 'shadow-sky-400/25',
-      chipColor: 'bg-gradient-to-br from-sky-400 to-sky-900',
       cardBg: 'var(--membership-diamond-bg)',
       cardBgEnd: 'var(--membership-diamond-bg-end)',
       cardBorder: 'var(--membership-diamond-border)',
       cardAccent: 'var(--membership-diamond-accent)',
       cardText: 'var(--membership-diamond-text)',
-      cardGlow: 'rgba(109, 206, 245, 0.2)',
+      cardGlow: 'color-mix(in srgb, var(--membership-diamond-border) 20%, transparent)',
     }
   }
-  
+
   return {
-    bgGradient: 'from-purple-50 via-purple-200 to-purple-300',
-    borderColor: 'border-purple-300',
-    accentColor: 'text-purple-700',
-    textColor: 'text-purple-950',
-    glowColor: 'shadow-purple-300/10',
-    chipColor: 'bg-gradient-to-br from-purple-400 to-purple-700',
     cardBg: 'var(--membership-default-bg)',
     cardBgEnd: 'var(--membership-default-bg-end)',
     cardBorder: 'var(--membership-default-border)',
     cardAccent: 'var(--membership-default-accent)',
     cardText: 'var(--membership-default-text)',
-    cardGlow: 'rgba(167, 139, 250, 0.15)',
+    cardGlow: 'color-mix(in srgb, var(--membership-default-border) 15%, transparent)',
   }
 }
 
@@ -215,7 +172,7 @@ function TierCarousel({ sortedTiers, currentTierName, currentTierIndex, isLoadin
         </h3>
         <div className="flex gap-6 justify-center">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-48 w-72 bg-gray-50 rounded-2xl animate-pulse" />
+            <div key={i} className="h-48 w-72 bg-warm-50 rounded-2xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -229,7 +186,7 @@ function TierCarousel({ sortedTiers, currentTierName, currentTierIndex, isLoadin
           <Gift className="w-5 h-5 text-lotus-rose" />
           Các hạng thẻ thành viên
         </h3>
-        <div className="text-center py-10 bg-white rounded-2xl border border-dashed border-gray-200">
+        <div className="text-center py-10 bg-white rounded-2xl border border-dashed border-warm-100">
           <p className="text-lotus-stone">Không tìm thấy thông tin hạng thành viên nào.</p>
         </div>
       </div>
@@ -261,7 +218,7 @@ function TierCarousel({ sortedTiers, currentTierName, currentTierIndex, isLoadin
         {/* Left Arrow */}
         <button
           onClick={goLeft}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-gray-200 shadow-lg flex items-center justify-center hover:bg-white hover:shadow-xl hover:scale-110 transition-all duration-200 -ml-3"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-warm-100 shadow-lg flex items-center justify-center hover:bg-white hover:shadow-xl hover:scale-110 transition-all duration-200 -ml-3"
           aria-label="Thẻ trước"
         >
           <ChevronLeft className="w-5 h-5 text-lotus-deep" />
@@ -270,7 +227,7 @@ function TierCarousel({ sortedTiers, currentTierName, currentTierIndex, isLoadin
         {/* Right Arrow */}
         <button
           onClick={goRight}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-gray-200 shadow-lg flex items-center justify-center hover:bg-white hover:shadow-xl hover:scale-110 transition-all duration-200 -mr-3"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-warm-100 shadow-lg flex items-center justify-center hover:bg-white hover:shadow-xl hover:scale-110 transition-all duration-200 -mr-3"
           aria-label="Thẻ sau"
         >
           <ChevronRight className="w-5 h-5 text-lotus-deep" />
@@ -340,28 +297,28 @@ function TierCarousel({ sortedTiers, currentTierName, currentTierIndex, isLoadin
                     <div
                       className="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm z-[2] transition-all duration-300"
                       style={{
-                        background: isLocked ? 'rgba(239, 68, 68, 0.12)' : 'rgba(16, 185, 129, 0.12)',
-                        border: `1.5px solid ${isLocked ? 'rgba(239, 68, 68, 0.6)' : 'rgba(16, 185, 129, 0.6)'}`,
+                        background: isLocked ? 'var(--error-bg)' : 'var(--success-bg)',
+                        border: `1.5px solid ${isLocked ? 'var(--error-text)' : 'var(--success-text)'}`,
                       }}
                       title={isLocked ? 'Chưa mở khóa hạng' : 'Đã mở khóa hạng'}
                     >
                       {isLocked ? (
-                        <Lock className="w-3.5 h-3.5 text-red-500" />
+                        <Lock className="w-3.5 h-3.5 text-error-text" />
                       ) : (
-                        <Unlock className="w-3.5 h-3.5 text-emerald-500" />
+                        <Unlock className="w-3.5 h-3.5 text-success-text" />
                       )}
                     </div>
 
                     {/* Top: Brand + Tier Badge */}
                     <div className="flex justify-between items-start mb-3 relative z-[1] pr-8">
-                      <p className="text-lotus-admin-xs font-extrabold tracking-widest uppercase" style={{ color: `${style.cardText}90` }}>
+                      <p className="text-2xs font-extrabold tracking-widest uppercase" style={{ color: `${style.cardText}90` }}>
                         HOA SEN SPA
                       </p>
                       <span
-                        className="text-lotus-admin-xs font-bold px-2.5 py-0.5 rounded-full shadow-sm"
+                        className="text-2xs font-bold px-2.5 py-0.5 rounded-full shadow-sm"
                         style={{
                           background: `linear-gradient(135deg, ${style.cardAccent}, ${style.cardBorder})`,
-                          color: '#fff',
+                          color: '#ffffff',
                         }}
                       >
                         {tier.name}
@@ -375,29 +332,29 @@ function TierCarousel({ sortedTiers, currentTierName, currentTierIndex, isLoadin
                           className="w-6 h-6 rounded-full flex items-center justify-center"
                           style={{ background: `${style.cardBorder}20` }}
                         >
-                          <span className="text-lotus-admin-xs" style={{ color: style.cardBorder }}>👤</span>
+                          <span className="text-2xs" style={{ color: style.cardBorder }}>👤</span>
                         </div>
                         <p className="text-xs font-bold truncate" style={{ color: style.cardText }}>
                           {holderName}
                         </p>
                       </div>
-                      <p className="text-lotus-admin-xs font-medium" style={{ color: `${style.cardText}B0` }}>
+                      <p className="text-2xs font-medium" style={{ color: `${style.cardText}B0` }}>
                         Mã thẻ: <span className="font-bold" style={{ color: style.cardBorder }}>{card?.cardCode || 'HS-668899'}</span>
                       </p>
                     </div>
 
                     {/* Bottom: Status hint / Upgrade condition */}
                     <div className="mt-auto pt-3 relative z-[1]" style={{ borderTop: `1px solid ${style.cardBorder}20` }}>
-                      <p className="text-lotus-admin-xs font-medium" style={{ color: `${style.cardText}90` }}>
+                      <p className="text-2xs font-medium" style={{ color: `${style.cardText}90` }}>
                         {isCurrent ? (
-                          <span className="flex items-center gap-1 text-emerald-600 font-bold">
-                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          <span className="flex items-center gap-1 text-success-text font-bold">
+                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-success-text animate-pulse" />
                             Hạng hiện tại của bạn
                           </span>
                         ) : isLocked ? (
                           <span>Yêu cầu tích lũy: <strong style={{ color: style.cardBorder }}>{formatCurrency(tier.minSpending)}</strong></span>
                         ) : (
-                          <span className="text-emerald-600 font-medium">Đặc quyền đã được kích hoạt</span>
+                          <span className="text-success-text font-medium">Đặc quyền đã được kích hoạt</span>
                         )}
                       </p>
                     </div>
@@ -428,10 +385,10 @@ function TierCarousel({ sortedTiers, currentTierName, currentTierIndex, isLoadin
                   width: isActive ? '24px' : '8px',
                   height: '8px',
                   background: isActive
-                    ? 'var(--lotus-primary, #E8527A)'
+                    ? 'var(--rose-600)'
                     : isCurrent
-                      ? 'var(--lotus-primary, #E8527A)'
-                      : '#CBD5E1',
+                      ? 'var(--rose-600)'
+                      : 'var(--warm-300)',
                   opacity: isActive ? 1 : isCurrent ? 0.6 : 0.4,
                 }}
                 aria-label={`Xem thẻ ${tier.name}`}
@@ -501,7 +458,7 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
 
       {/* SECTION 1: Progress Tracker Timeline */}
       {sortedTiers.length > 0 && (
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm relative overflow-hidden">
+        <div className="bg-white rounded-2xl p-6 border border-warm-100 shadow-sm relative overflow-hidden">
           <h3 className="text-lg font-bold text-lotus-deep mb-6 font-sans flex items-center gap-2">
             <Award className="w-5 h-5 text-lotus-rose" />
             Lộ trình thăng hạng
@@ -509,7 +466,7 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
 
           <div className="relative pt-4 pb-8 px-4 md:px-8">
             {/* Horizontal Line background */}
-            <div className="absolute top-[28px] left-[32px] right-[32px] h-[3px] bg-gray-100 -translate-y-1/2 z-0" />
+            <div className="absolute top-[28px] left-[32px] right-[32px] h-[3px] bg-warm-100 -translate-y-1/2 z-0" />
             
             {/* Filled Progress Line */}
             {currentTierIndex !== -1 && sortedTiers.length > 1 && (
@@ -537,7 +494,7 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
                           ? 'bg-lotus-gold text-white ring-4 ring-lotus-gold/20 scale-110 shadow-md shadow-lotus-gold/25'
                           : isPassed
                             ? 'bg-lotus-rose text-white'
-                            : 'bg-white border-2 border-gray-200 text-gray-400 group-hover:border-lotus-rose group-hover:text-lotus-rose'
+                            : 'bg-white border-2 border-warm-100 text-warm-400 group-hover:border-lotus-rose group-hover:text-lotus-rose'
                       }`}
                     >
                       {isPassed ? (
@@ -554,7 +511,7 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
                       <p className={`text-xs font-bold ${isCurrent ? 'text-lotus-gold' : 'text-lotus-deep'}`}>
                         {tier.name}
                       </p>
-                      <p className="text-lotus-admin-xs text-lotus-stone font-medium mt-0.5">
+                      <p className="text-2xs text-lotus-stone font-medium mt-0.5">
                         {tier.minSpending === 0 ? 'Mở đầu' : `${formatCurrency(tier.minSpending)}`}
                       </p>
                     </div>
@@ -579,10 +536,10 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
       />
 
       {/* SECTION 3: Selected Tier Details */}
-      <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm relative overflow-hidden">
+      <div className="bg-white rounded-2xl p-6 border border-warm-100 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 w-48 h-48 bg-lotus-rose-light/10 rounded-full blur-3xl -mr-24 -mt-24 pointer-events-none" />
         
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-gray-100">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-warm-100">
           <div>
             <span className="text-xs font-bold text-lotus-rose uppercase tracking-widest">Chi tiết hạng thẻ</span>
             <h3 className="text-2xl font-bold text-lotus-deep font-sans mt-1 flex items-center gap-2">
@@ -594,22 +551,22 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
           {selectedTier && (
             <div className="flex flex-wrap gap-3">
               {/* Spending Condition */}
-              <div className="px-4 py-2 rounded-xl bg-gray-50 border border-gray-100">
-                <p className="text-lotus-admin-xs text-lotus-stone uppercase font-bold tracking-wider">Chi tiêu tối thiểu</p>
+              <div className="px-4 py-2 rounded-xl bg-warm-50 border border-warm-100">
+                <p className="text-2xs text-lotus-stone uppercase font-bold tracking-wider">Chi tiêu tối thiểu</p>
                 <p className="text-sm font-extrabold text-lotus-deep mt-0.5">
                   {selectedTier.minSpending === 0 ? 'Mở đầu (Miễn phí)' : formatCurrency(selectedTier.minSpending)}
                 </p>
               </div>
               {/* Discount */}
               <div className="px-4 py-2 rounded-xl bg-lotus-rose/5 border border-lotus-rose/10">
-                <p className="text-lotus-admin-xs text-lotus-rose uppercase font-bold tracking-wider">Ưu đãi giảm giá</p>
+                <p className="text-2xs text-lotus-rose uppercase font-bold tracking-wider">Ưu đãi giảm giá</p>
                 <p className="text-sm font-extrabold text-lotus-rose mt-0.5">
                   {selectedTier.discountPercent}% hóa đơn
                 </p>
               </div>
               {/* Point multiplier */}
               <div className="px-4 py-2 rounded-xl bg-lotus-gold/5 border border-lotus-gold/10">
-                <p className="text-lotus-admin-xs text-lotus-gold uppercase font-bold tracking-wider">Tích điểm</p>
+                <p className="text-2xs text-lotus-gold uppercase font-bold tracking-wider">Tích điểm</p>
                 <p className="text-sm font-extrabold text-lotus-gold mt-0.5">
                   Nhân hệ số x{selectedTier.pointMultiplier}
                 </p>
@@ -703,12 +660,12 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
       </div>
 
       {/* SECTION 4: Ưu đãi của bạn */}
-      <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm relative overflow-hidden">
+      <div className="bg-white rounded-2xl p-6 border border-warm-100 shadow-sm relative overflow-hidden">
         <h3 className="text-lg font-bold text-lotus-deep mb-4 font-sans flex items-center gap-2">
           <Gift className="w-5 h-5 text-lotus-gold" />
           Mã giảm giá & Quà tặng của bạn
         </h3>
-        <div className="flex flex-col items-center justify-center py-10 text-center border border-dashed border-gray-200 rounded-xl bg-gray-50/50">
+        <div className="flex flex-col items-center justify-center py-10 text-center border border-dashed border-warm-100 rounded-xl bg-warm-50/50">
           <Gift className="w-10 h-10 text-lotus-stone/60 mb-3" />
           <p className="text-sm font-bold text-lotus-deep">Chưa có ưu đãi nào</p>
           <p className="text-xs text-lotus-stone max-w-xs mt-1">

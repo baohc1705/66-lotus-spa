@@ -172,14 +172,14 @@ export const BookingTimeStep: React.FC = () => {
                       : "border-warm-100 bg-surface text-ink hover:border-rose-200"
                 }`}
               >
-                <span className="text-[10px] font-semibold opacity-80">
+                <span className="text-2xs font-semibold opacity-80">
                   {d.dayName}
                 </span>
                 <span className="text-base font-extrabold mt-0.5">
                   {d.dayNum}
                 </span>
                 {d.isBookedOut && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-error-bg text-error-text text-[9px] font-bold rounded-sm px-1 scale-90 whitespace-nowrap">
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-error-bg text-error-text text-3xs font-bold rounded-sm px-1 scale-90 whitespace-nowrap">
                     Hết chỗ
                   </span>
                 )}
@@ -234,7 +234,7 @@ export const BookingTimeStep: React.FC = () => {
                       <Sofa className="w-3.5 h-3.5 text-rose-400" />
                       <h4 className="font-bold text-xs truncate">{pos.name}</h4>
                     </div>
-                    <p className="text-[11px] text-warm-600 truncate ml-5">
+                    <p className="text-xs text-warm-600 truncate ml-5">
                       {pos.roomName}
                     </p>
                   </div>
@@ -302,10 +302,10 @@ export const BookingTimeStep: React.FC = () => {
                     <h4 className="font-bold text-ink text-xs truncate">
                       {tech.name || "Kỹ thuật viên"}
                     </h4>
-                    <p className="text-[11px] text-warm-600 truncate mt-0.5">
+                    <p className="text-xs text-warm-600 truncate mt-0.5">
                       {tech.role || "Nhân viên"}
                     </p>
-                    <span className="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-sm mt-1.5 bg-success-bg text-success-text">
+                    <span className="inline-block text-2xs font-bold px-1.5 py-0.5 rounded-sm mt-1.5 bg-success-bg text-success-text">
                       {tech.slotsLeft !== undefined
                         ? `Còn ${tech.slotsLeft} slot`
                         : "Sẵn sàng"}
@@ -324,7 +324,7 @@ export const BookingTimeStep: React.FC = () => {
           <p className="text-xs text-gold-600 uppercase tracking-wider font-semibold">
             4. Chọn khung giờ phục vụ
           </p>
-          <div className="flex items-center gap-3 text-[10px] text-warm-600">
+          <div className="flex items-center gap-3 text-2xs text-warm-600">
             <div className="flex items-center gap-1">
               <span className="w-2.5 h-2.5 rounded-full bg-surface border border-warm-100 inline-block" />
               Trống

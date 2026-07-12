@@ -51,7 +51,7 @@ export function useDeletedCustomerColumns({
           const cust = row.original;
           return (
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0 overflow-hidden">
+              <div className="w-8 h-8 rounded-lg bg-adminGold-600/10 flex items-center justify-center shrink-0 overflow-hidden">
                 {cust.avatarUrl ? (
                   <img
                     src={cust.avatarUrl}
@@ -59,12 +59,12 @@ export function useDeletedCustomerColumns({
                     className="w-8 h-8 object-cover"
                   />
                 ) : (
-                  <span className="text-lotus-admin-base font-bold text-amber-600">
+                  <span className="text-xs font-bold text-state-warning-text">
                     {(cust.fullName ?? "?").charAt(0).toUpperCase()}
                   </span>
                 )}
               </div>
-              <span className="text-lotus-admin-lg font-semibold text-lotus-deep truncate max-w-[140px]">
+              <span className="text-sm font-semibold text-adminInk truncate max-w-[140px]">
                 {cust.fullName ?? "â€”"}
               </span>
             </div>
@@ -76,7 +76,7 @@ export function useDeletedCustomerColumns({
         accessorKey: "phone",
         header: cols.phone,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80">
+          <span className="text-adminInk/80">
             {row.original.phone ?? "â€”"}
           </span>
         ),
@@ -86,7 +86,7 @@ export function useDeletedCustomerColumns({
         accessorKey: "email",
         header: cols.email,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/70">
+          <span className="text-adminInk/70">
             {row.original.email ?? "â€”"}
           </span>
         ),
@@ -96,7 +96,7 @@ export function useDeletedCustomerColumns({
         accessorKey: "gender",
         header: cols.gender,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/70">
+          <span className="text-adminInk/70">
             {GENDER_MAP[row.original.gender ?? ""] ?? "â€”"}
           </span>
         ),
@@ -106,7 +106,7 @@ export function useDeletedCustomerColumns({
         accessorKey: "loyaltyPoint",
         header: cols.loyaltyPoint,
         cell: ({ row }) => (
-          <span className="font-semibold text-lotus-deep">
+          <span className="font-semibold text-adminInk">
             {row.original.loyaltyPoint ?? 0}
           </span>
         ),

@@ -128,7 +128,7 @@ export function useActiveStaffColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="text-lotus-leaf/80">{row.original.code ?? "—"}</span>
+          <span className="text-adminGreen-600/80">{row.original.code ?? "—"}</span>
         ),
         size: 100,
       },
@@ -147,7 +147,7 @@ export function useActiveStaffColumns({
           const staff = row.original;
           return (
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-lotus-leaf/10 flex items-center justify-center shrink-0 overflow-hidden">
+              <div className="w-8 h-8 rounded-lg bg-adminGreen-100 flex items-center justify-center shrink-0 overflow-hidden">
                 {staff.avatarUrl ? (
                   <img
                     src={staff.avatarUrl}
@@ -155,12 +155,12 @@ export function useActiveStaffColumns({
                     className="w-8 h-8 object-cover"
                   />
                 ) : (
-                  <span className="text-lotus-admin-base font-bold text-lotus-leaf">
+                  <span className="text-xs font-bold text-adminGreen-600">
                     {(staff.fullName ?? "?").charAt(0).toUpperCase()}
                   </span>
                 )}
               </div>
-              <span className="text-lotus-admin-lg font-semibold text-lotus-deep truncate max-w-[140px]">
+              <span className="text-sm font-semibold text-adminInk truncate max-w-[140px]">
                 {staff.fullName ?? "—"}
               </span>
             </div>
@@ -172,7 +172,7 @@ export function useActiveStaffColumns({
         accessorKey: "phone",
         header: cols.phone,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80">
+          <span className="text-adminInk/80">
             {row.original.phone ?? "—"}
           </span>
         ),
@@ -190,7 +190,7 @@ export function useActiveStaffColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="text-lotus-deep/70">
+          <span className="text-adminInk/70">
             {row.original.email ?? "—"}
           </span>
         ),
@@ -200,7 +200,7 @@ export function useActiveStaffColumns({
         accessorKey: "gender",
         header: cols.gender,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/70">
+          <span className="text-adminInk/70">
             {GENDER_MAP[row.original.gender ?? ""] ?? "—"}
           </span>
         ),
@@ -210,7 +210,7 @@ export function useActiveStaffColumns({
         accessorKey: "contractType",
         header: cols.contractType,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/70">
+          <span className="text-adminInk/70">
             {row.original.contractType ?? "—"}
           </span>
         ),
@@ -226,7 +226,7 @@ export function useActiveStaffColumns({
         accessorKey: "createdAt",
         header: cols.createdAt,
         cell: ({ row }) => (
-          <span className="text-lotus-deep/70">
+          <span className="text-adminInk/70">
             {row.original.createdAt
               ? formatDate(row.original.createdAt).format("DD/MM/YYYY")
               : "—"}

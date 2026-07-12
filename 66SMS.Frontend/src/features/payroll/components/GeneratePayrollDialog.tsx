@@ -148,7 +148,7 @@ export function GeneratePayrollDialog({ open, onOpenChange }: GeneratePayrollDia
               checked={watch("excludeSaturday") ?? true}
               onCheckedChange={(checked) => setValue("excludeSaturday", checked === true)}
             />
-            <Label htmlFor="excludeSaturday" className="text-lotus-admin-lg cursor-pointer">
+            <Label htmlFor="excludeSaturday" className="text-sm cursor-pointer">
               Trừ cả Thứ 7 khi tính ngày công chuẩn (chỉ giữ T2–T6)
             </Label>
           </div>
@@ -186,9 +186,9 @@ function FormField({
 }) {
   return (
     <div className={`space-y-1 ${className ?? ""}`}>
-      <Label className="text-lotus-admin-md font-semibold text-lotus-deep/80">{label}</Label>
+      <Label className="text-xs font-semibold text-adminInk/80">{label}</Label>
       {children}
-      {error && <p className="text-lotus-admin-base text-red-500 font-medium">{error}</p>}
+      {error && <p className="text-xs text-state-danger-text font-medium">{error}</p>}
     </div>
   );
 }

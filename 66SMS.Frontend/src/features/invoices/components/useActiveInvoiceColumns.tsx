@@ -87,7 +87,7 @@ export function useActiveInvoiceColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="font-mono text-lotus-admin-md text-lotus-stone">
+          <span className="font-mono text-xs text-adminGray-600">
             {row.original.invoiceCode ?? "—"}
           </span>
         ),
@@ -98,11 +98,11 @@ export function useActiveInvoiceColumns({
         header: cols.customerName,
         cell: ({ row }) => (
           <div>
-            <p className="text-lotus-admin-lg font-semibold text-lotus-deep truncate max-w-[180px]">
+            <p className="text-sm font-semibold text-adminInk truncate max-w-[180px]">
               {row.original.customerName ?? "Khách vãng lai"}
             </p>
             {row.original.customerPhone && (
-              <p className="text-lotus-admin-base text-lotus-stone">
+              <p className="text-xs text-adminGray-600">
                 {row.original.customerPhone}
               </p>
             )}
@@ -128,7 +128,7 @@ export function useActiveInvoiceColumns({
         accessorKey: "paymentMethod",
         header: cols.paymentMethod,
         cell: ({ row }) => (
-          <span className="text-lotus-admin-md text-lotus-stone">
+          <span className="text-xs text-adminGray-600">
             {PAYMENT_LABEL[row.original.paymentMethod ?? 0] ?? "—"}
           </span>
         ),

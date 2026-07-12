@@ -86,7 +86,7 @@ export const BookingSummarySidebar: React.FC = () => {
               </p>
               <button
                 onClick={addGuest}
-                className="flex items-center gap-1 text-[11px] font-bold text-rose-600 hover:text-rose-400 transition-colors"
+                className="flex items-center gap-1 text-xs font-bold text-rose-600 hover:text-rose-400 transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Thêm
@@ -159,7 +159,7 @@ export const BookingSummarySidebar: React.FC = () => {
                             </div>
                           )}
                           <div className="min-w-0">
-                            <p className="text-[10px] font-bold uppercase tracking-wider text-gold-600 mb-0.5">
+                            <p className="text-2xs font-bold uppercase tracking-wider text-gold-600 mb-0.5">
                               Chi nhánh
                             </p>
                             <div className="font-bold text-ink truncate">
@@ -182,7 +182,7 @@ export const BookingSummarySidebar: React.FC = () => {
                       {/* Dịch vụ */}
                       {guest.selectedService ? (
                         <div className="px-2">
-                          <p className="text-[10px] font-bold tracking-wider text-gold-600 uppercase mb-1">
+                          <p className="text-2xs font-bold tracking-wider text-gold-600 uppercase mb-1">
                             Dịch vụ
                           </p>
                           <div className="font-bold line-clamp-1">
@@ -193,7 +193,7 @@ export const BookingSummarySidebar: React.FC = () => {
                               <Clock className="w-3.5 h-3.5 text-rose-400" />
                               {guest.selectedService.durationMins} phút
                             </span>
-                            <span className="bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full text-[10px] uppercase">
+                            <span className="bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full text-2xs uppercase">
                               {guest.selectedService.categoryName || "Dịch vụ"}
                             </span>
                           </div>
@@ -320,10 +320,10 @@ export const BookingSummarySidebar: React.FC = () => {
                 className="flex flex-col items-center gap-1 text-center"
               >
                 <Icon className={`w-5 h-5 ${color}`} />
-                <span className="text-[10px] font-bold text-ink leading-tight">
+                <span className="text-2xs font-bold text-ink leading-tight">
                   {title}
                 </span>
-                <span className="text-[9px] text-warm-600 leading-tight">
+                <span className="text-3xs text-warm-600 leading-tight">
                   {subtitle}
                 </span>
               </div>
@@ -333,7 +333,7 @@ export const BookingSummarySidebar: React.FC = () => {
 
         <TicketPunchRow edge="bottom" />
 
-        <div className="px-4 pb-5 pt-2 text-[10px] text-warm-600 leading-relaxed text-center flex flex-col gap-0.5">
+        <div className="px-4 pb-5 pt-2 text-2xs text-warm-600 leading-relaxed text-center flex flex-col gap-0.5">
           <span>Miễn phí hủy lịch trước 2 giờ</span>
           <span>Bảo mật thông tin tuyệt đối</span>
         </div>

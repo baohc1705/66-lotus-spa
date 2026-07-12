@@ -22,7 +22,7 @@ export function ProductDetailExpanded({
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-4 bg-stone-50/30">
+      <div className="p-6 space-y-4 bg-adminGray-50/30">
         <div className="flex gap-4 mb-4">
           <Skeleton className="w-14 h-14 rounded-xl" />
           <div className="space-y-2">
@@ -40,7 +40,7 @@ export function ProductDetailExpanded({
 
   if (!product) {
     return (
-      <div className="p-6 text-center text-lotus-stone text-sm bg-stone-50/30">
+      <div className="p-6 text-center text-adminGray-600 text-sm bg-adminGray-50/30">
         Không tìm thấy thông tin sản phẩm
       </div>
     );
@@ -51,10 +51,10 @@ export function ProductDetailExpanded({
     product.images?.[0]?.url;
 
   return (
-    <div className="bg-stone-50/30 w-full overflow-hidden max-h-[400px] overflow-y-auto custom-scrollbar p-4 m-0">
+    <div className="bg-adminGray-50/30 w-full overflow-hidden max-h-[400px] overflow-y-auto custom-scrollbar p-4 m-0">
       <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-4 pb-4 border-b border-stone-200/50">
-          <div className="w-16 h-16 rounded-xl bg-lotus-cream/50 flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-stone-200/50 p-1">
+        <div className="flex items-center gap-4 pb-4 border-b border-adminGray-100/50">
+          <div className="w-16 h-16 rounded-xl bg-adminGray-50/50 flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-adminGray-100/50 p-1">
             {primaryImage ? (
               <img
                 src={primaryImage}
@@ -62,14 +62,14 @@ export function ProductDetailExpanded({
                 className="w-full h-full object-cover rounded-lg"
               />
             ) : (
-              <Package className="w-8 h-8 text-lotus-stone" />
+              <Package className="w-8 h-8 text-adminGray-600" />
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-base font-bold text-lotus-deep truncate">
+            <h3 className="text-base font-bold text-adminInk truncate">
               {product.name ?? "—"}
             </h3>
-            <p className="text-lotus-admin-md text-lotus-stone mt-0.5 font-medium">
+            <p className="text-xs text-adminGray-600 mt-0.5 font-medium">
               Mã: {product.code || "—"} · Danh mục:{" "}
               {product.categoryName || "—"}
             </p>
@@ -102,13 +102,13 @@ export function ProductDetailExpanded({
           </div>
         </div>
 
-        <div className="flex items-end justify-end mt-2 pt-4 border-t border-stone-100/80">
+        <div className="flex items-end justify-end mt-2 pt-4 border-t border-adminGray-100/80">
           <PermissionGate resource={perm.resource} action={perm.update}>
             <Button
               variant="admin"
               size="sm"
               onClick={() => onEdit?.(product)}
-              className="bg-lotus-leaf hover:opacity-90 text-white shadow-sm h-8 px-4 text-lotus-admin-lg gap-1.5 rounded-md transition-opacity"
+              className="bg-adminGreen-600 hover:opacity-90 text-white shadow-sm h-8 px-4 text-sm gap-1.5 rounded-md transition-opacity"
             >
               <Pencil className="w-3.5 h-3.5" />
               Cập nhật
@@ -128,9 +128,9 @@ function DetailField({
   value: string | null | undefined;
 }) {
   return (
-    <div className="py-3.5 border-b border-stone-100/80 last:border-b-0 group">
-      <p className="text-lotus-admin-md text-lotus-stone mb-1">{label}</p>
-      <p className="text-lotus-admin-lg font-medium text-lotus-deep break-words whitespace-pre-wrap">
+    <div className="py-3.5 border-b border-adminGray-100/80 last:border-b-0 group">
+      <p className="text-xs text-adminGray-600 mb-1">{label}</p>
+      <p className="text-sm font-medium text-adminInk break-words whitespace-pre-wrap">
         {value || "—"}
       </p>
     </div>

@@ -134,7 +134,7 @@ export function StaffAppointmentsPage() {
 
   if (!canView) {
     return (
-      <div className="p-8 text-center text-gray-500">
+      <div className="p-8 text-center text-adminGray-600">
         Bạn không có quyền xem lịch hẹn.
       </div>
     );
@@ -150,25 +150,25 @@ export function StaffAppointmentsPage() {
         weekLabel={weekLabel}
       />
 
-      <div className="flex-1 flex flex-col min-h-[500px] bg-white/70 backdrop-blur-md rounded-admin border border-stone-200/30 overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-[500px] bg-white/70 backdrop-blur-md rounded-admin border border-adminGray-100/30 overflow-hidden">
         {isLoadingStaff || schedule.isLoading ? (
           <div className="flex-1 flex items-center justify-center py-20 min-h-[400px]">
             <div className="flex flex-col items-center gap-3">
-              <div className="w-8 h-8 animate-spin rounded-full border-4 border-stone-200 border-t-primary" />
-              <p className="text-sm text-lotus-stone font-medium">
+              <div className="w-8 h-8 animate-spin rounded-full border-4 border-adminGray-100 border-t-primary" />
+              <p className="text-sm text-adminGray-600 font-medium">
                 Đang tải lịch hẹn...
               </p>
             </div>
           </div>
         ) : schedule.isError ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 min-h-[400px] text-center gap-3 bg-white">
-            <p className="text-red-500 font-semibold text-lotus-admin-lg">
+            <p className="text-state-danger-text font-semibold text-sm">
               {schedule.error}
             </p>
             <button
               type="button"
               onClick={() => schedule.refetch()}
-              className="px-4 py-1.5 rounded-lg border border-stone-200 text-lotus-admin-md text-primary font-bold hover:bg-stone-50 transition-colors"
+              className="px-4 py-1.5 rounded-lg border border-adminGray-100 text-xs text-primary font-bold hover:bg-adminGray-50 transition-colors"
             >
               Thử lại
             </button>
@@ -195,7 +195,7 @@ export function StaffAppointmentsPage() {
             onBookingClick={handleBookingClick}
           />
         ) : (
-          <div className="flex-1 flex items-center justify-center text-lotus-stone font-medium min-h-[400px] bg-white">
+          <div className="flex-1 flex items-center justify-center text-adminGray-600 font-medium min-h-[400px] bg-white">
             Không có dữ liệu lịch tuần
           </div>
         )}

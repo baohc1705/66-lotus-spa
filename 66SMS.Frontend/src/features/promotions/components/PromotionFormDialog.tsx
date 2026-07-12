@@ -110,7 +110,7 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-lotus-deep">
+          <DialogTitle className="text-adminInk">
             {isEdit ? 'Chỉnh sửa khuyến mãi' : 'Thêm khuyến mãi mới'}
           </DialogTitle>
         </DialogHeader>

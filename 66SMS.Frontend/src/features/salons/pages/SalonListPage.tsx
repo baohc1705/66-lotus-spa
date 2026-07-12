@@ -93,7 +93,7 @@ export function SalonListPage() {
 
   return (
     <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-      <div className="bg-white/70 backdrop-blur-md rounded-admin border border-stone-200/30 overflow-hidden relative">
+      <div className="bg-white/70 backdrop-blur-md rounded-admin border border-adminGray-100/30 overflow-hidden relative">
         <div className="px-4 pt-4">
           <DataTableToolbar
             searchValue={filter}
@@ -133,14 +133,14 @@ export function SalonListPage() {
           }
           emptyState={
             <div className="flex flex-col items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-lotus-cream flex items-center justify-center">
-                <Building2 className="w-7 h-7 text-lotus-leaf" />
+              <div className="w-14 h-14 rounded-2xl bg-adminGray-50 flex items-center justify-center">
+                <Building2 className="w-7 h-7 text-adminGreen-600" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-lotus-deep">
+                <p className="text-sm font-semibold text-adminInk">
                   Chưa có chi nhánh
                 </p>
-                <p className="text-lotus-admin-md text-lotus-stone mt-0.5">
+                <p className="text-xs text-adminGray-600 mt-0.5">
                   Thêm chi nhánh để bắt đầu quản lý hệ thống.
                 </p>
               </div>
@@ -149,7 +149,7 @@ export function SalonListPage() {
                   variant="admin"
                   size="sm"
                   onClick={() => setCreateOpen(true)}
-                  className="mt-1 text-lotus-admin-md"
+                  className="mt-1 text-xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Thêm chi nhánh

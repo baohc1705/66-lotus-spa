@@ -577,8 +577,8 @@ export function CashierPOS({
           className={cn(
             "px-3 py-1 rounded-full text-xs font-semibold tracking-wide border transition-all duration-200",
             activeCategoryId === null
-              ? "bg-lotus-rose text-white border-lotus-rose shadow-sm"
-              : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50",
+              ? "bg-adminGreen-600 text-white border-adminGreen-600 shadow-sm"
+              : "bg-white text-adminGray-600 border-adminGray-100 hover:bg-adminGray-50",
           )}
         >
           Tất cả
@@ -590,8 +590,8 @@ export function CashierPOS({
             className={cn(
               "px-3 py-1 rounded-full text-xs font-semibold tracking-wide border transition-all duration-200",
               activeCategoryId === c.id
-                ? "bg-lotus-rose text-white border-lotus-rose shadow-sm"
-                : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50",
+                ? "bg-adminGreen-600 text-white border-adminGreen-600 shadow-sm"
+                : "bg-white text-adminGray-600 border-adminGray-100 hover:bg-adminGray-50",
             )}
           >
             {c.name}
@@ -602,13 +602,13 @@ export function CashierPOS({
   };
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 min-w-0 w-full bg-lotus-cream font-sans p-2 gap-2 relative z-10 overflow-hidden">
+    <div className="flex-1 flex flex-col min-h-0 min-w-0 w-full bg-adminGray-50 font-sans p-2 gap-2 relative z-10 overflow-hidden">
       {/* ── SECTION 1: THANH NGANG (Top Bar) ── */}
-      <div className="bg-white border border-stone-200 rounded-[3px] p-2 shadow-sm shrink-0 flex items-center justify-between gap-3 relative">
+      <div className="bg-white border border-adminGray-100 rounded-[3px] p-2 shadow-sm shrink-0 flex items-center justify-between gap-3 relative">
         {/* Left: Customer search */}
         <div className="relative w-96 max-w-full">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-            <Search className="w-4 h-4 text-stone-400" />
+            <Search className="w-4 h-4 text-adminGray-400" />
           </div>
           <input
             type="text"
@@ -619,7 +619,7 @@ export function CashierPOS({
             }}
             onFocus={() => setShowCustomerDropdown(true)}
             placeholder="Tìm khách hàng theo tên hoặc số điện thoại"
-            className="w-full text-xs bg-stone-50 border border-stone-300 rounded-[3px] py-2 pl-9 pr-4 text-lotus-deep focus:outline-none focus:border-lotus-rose focus:ring-1 focus:ring-lotus-rose transition shadow-inner"
+            className="w-full text-xs bg-adminGray-50 border border-adminGray-300 rounded-[3px] py-2 pl-9 pr-4 text-adminInk focus:outline-none focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 transition shadow-inner"
           />
 
           {/* Customer Dropdown Results */}
@@ -629,9 +629,9 @@ export function CashierPOS({
                 className="fixed inset-0 z-20"
                 onClick={() => setShowCustomerDropdown(false)}
               />
-              <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-stone-200 rounded-[3px] shadow-lg max-h-56 overflow-y-auto z-30 divide-y divide-stone-100">
+              <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-adminGray-100 rounded-[3px] shadow-lg max-h-56 overflow-y-auto z-30 divide-y divide-adminGray-100">
                 {customerList.length === 0 ? (
-                  <div className="p-3 text-xs text-stone-400 font-medium text-center">
+                  <div className="p-3 text-xs text-adminGray-400 font-medium text-center">
                     Không tìm thấy khách hàng nào khớp.
                   </div>
                 ) : (
@@ -640,20 +640,20 @@ export function CashierPOS({
                       key={c.id}
                       type="button"
                       onClick={() => selectCustomer(c)}
-                      className="w-full text-left p-2.5 text-xs text-lotus-deep hover:bg-lotus-cream/50 transition flex items-center justify-between"
+                      className="w-full text-left p-2.5 text-xs text-adminInk hover:bg-adminGray-50/50 transition flex items-center justify-between"
                     >
                       <div>
                         <div className="font-bold flex items-center gap-1.5">
                           {c.fullName}
-                          <span className="text-lotus-admin-xs text-stone-400 font-normal">
+                          <span className="text-2xs text-adminGray-400 font-normal">
                             (CS{String(c.id).padStart(5, "0")})
                           </span>
                         </div>
-                        <div className="text-lotus-admin-base text-stone-500 mt-0.5">
+                        <div className="text-xs text-adminGray-600 mt-0.5">
                           {c.phone}
                         </div>
                       </div>
-                      <div className="text-lotus-admin-xs text-lotus-gold font-bold">
+                      <div className="text-2xs text-adminGold-600 font-bold">
                         {c.loyaltyPoint ?? 0} điểm
                       </div>
                     </button>
@@ -668,14 +668,14 @@ export function CashierPOS({
         <div className="flex items-center gap-2">
           <button
             onClick={() => toast.info("Tính năng Danh sách đơn hàng...")}
-            className="flex items-center gap-1.5 bg-lotus-rose hover:bg-lotus-rose/90 text-white px-3.5 py-1.5 rounded-[3px] text-xs font-bold transition shadow-sm"
+            className="flex items-center gap-1.5 bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white px-3.5 py-1.5 rounded-[3px] text-xs font-bold transition shadow-sm"
           >
             <span>Danh sách đơn hàng</span>
           </button>
 
           <button
             onClick={handleCreateNewOrder}
-            className="flex items-center gap-1.5 bg-lotus-rose hover:bg-lotus-rose/90 text-white px-3.5 py-1.5 rounded-[3px] text-xs font-bold transition shadow-sm"
+            className="flex items-center gap-1.5 bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white px-3.5 py-1.5 rounded-[3px] text-xs font-bold transition shadow-sm"
           >
             <Plus className="w-4 h-4" />
             <span>Tạo Đơn Hàng</span>
@@ -686,15 +686,15 @@ export function CashierPOS({
       {/* Bottom area: Columns split 50/50 */}
       <div className="flex-1 flex min-h-0 min-w-0 w-full gap-2 relative lg:grid lg:grid-cols-12">
         {/* ── SECTION 2: KHUNG BÊN TRÁI (Left Panel - 50%) ── */}
-        <div className="lg:col-span-6 bg-white border border-stone-200 rounded-[3px] shadow-sm flex flex-col overflow-hidden h-full">
+        <div className="lg:col-span-6 bg-white border border-adminGray-100 rounded-[3px] shadow-sm flex flex-col overflow-hidden h-full">
           {/* Order selection header inside Left Column */}
-          <div className="p-3 bg-white border-b border-stone-150 flex items-center justify-between shrink-0 flex-wrap gap-2">
+          <div className="p-3 bg-white border-b border-adminGray-100 flex items-center justify-between shrink-0 flex-wrap gap-2">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="font-bold text-sm text-lotus-rose flex items-center gap-1">
+              <span className="font-bold text-sm text-adminGreen-600 flex items-center gap-1">
                 <span>{activeOrder.code}</span>
               </span>
               {/* Stars rating */}
-              <div className="flex items-center gap-0.5 text-stone-300">
+              <div className="flex items-center gap-0.5 text-adminGray-300">
                 {[1, 2, 3, 4, 5].map((i: number) => (
                   <span key={i} className="text-sm">
                     ★
@@ -704,9 +704,9 @@ export function CashierPOS({
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-lotus-admin-base text-stone-500 flex items-center gap-1">
+              <span className="text-xs text-adminGray-600 flex items-center gap-1">
                 Chờ thanh toán
-                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-lotus-rose text-white text-lotus-admin-xs font-bold">
+                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-adminGreen-600 text-white text-2xs font-bold">
                   2
                 </span>
               </span>
@@ -717,7 +717,7 @@ export function CashierPOS({
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                     setActiveOrderId(e.target.value)
                   }
-                  className="appearance-none bg-lotus-rose hover:bg-lotus-rose/90 text-white rounded-[3px] py-1 pl-2.5 pr-8 text-lotus-admin-base font-bold shadow-sm focus:outline-none cursor-pointer"
+                  className="appearance-none bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white rounded-[3px] py-1 pl-2.5 pr-8 text-xs font-bold shadow-sm focus:outline-none cursor-pointer"
                 >
                   {orders.map((o: POSOrder) => (
                     <option key={o.id} value={o.id}>
@@ -731,37 +731,37 @@ export function CashierPOS({
           </div>
 
           {/* Customer profile card details inside Left Column */}
-          <div className="p-3 border-b border-stone-150 bg-stone-50/20 shrink-0 grid grid-cols-12 gap-3 text-xs">
+          <div className="p-3 border-b border-adminGray-100 bg-adminGray-50/20 shrink-0 grid grid-cols-12 gap-3 text-xs">
             {/* Left Part: Customer Basic */}
-            <div className="col-span-6 flex items-start gap-2.5 border-r border-stone-200 pr-2">
-              <div className="w-10 h-10 rounded-full bg-stone-100 border border-stone-200 flex items-center justify-center text-stone-500 font-bold shrink-0 shadow-inner">
+            <div className="col-span-6 flex items-start gap-2.5 border-r border-adminGray-100 pr-2">
+              <div className="w-10 h-10 rounded-full bg-adminGray-100 border border-adminGray-100 flex items-center justify-center text-adminGray-600 font-bold shrink-0 shadow-inner">
                 {activeOrder.customer?.fullName?.charAt(0) || (
-                  <UserIcon className="w-5 h-5 text-stone-400" />
+                  <UserIcon className="w-5 h-5 text-adminGray-400" />
                 )}
               </div>
               <div className="space-y-0.5 min-w-0">
-                <div className="font-bold text-lotus-rose flex items-center gap-1">
+                <div className="font-bold text-adminGreen-600 flex items-center gap-1">
                   <span className="truncate">
                     {activeOrder.customer?.fullName || "Khách vãng lai"}
                   </span>
                 </div>
-                <div className="text-lotus-admin-base text-stone-500 font-medium">
+                <div className="text-xs text-adminGray-600 font-medium">
                   {activeOrder.customer?.phone || "Chưa có SĐT"}
                 </div>
-                <div className="text-lotus-admin-base text-stone-500">
+                <div className="text-xs text-adminGray-600">
                   Mã:{" "}
                   <span className="font-medium">
                     CS{String(activeOrder.customer?.id || 0).padStart(6, "0")}
                   </span>
                 </div>
-                <div className="text-lotus-admin-base text-red-500 font-bold flex items-center gap-1">
+                <div className="text-xs text-state-danger-text font-bold flex items-center gap-1">
                   Điểm: {activeOrder.customer?.loyaltyPoint ?? 0} điểm
                 </div>
               </div>
             </div>
 
             {/* Right Part: Booking Metadata */}
-            <div className="col-span-6 space-y-1 relative text-lotus-admin-base">
+            <div className="col-span-6 space-y-1 relative text-xs">
               {/* Call Client Button */}
               {activeOrder.customer && (
                 <button
@@ -770,34 +770,34 @@ export function CashierPOS({
                       `Đang gọi khách hàng: ${activeOrder.customer?.phone}`,
                     )
                   }
-                  className="absolute top-0 right-0 bg-lotus-rose hover:bg-lotus-rose/90 text-white font-bold py-0.5 px-2 rounded-[3px] text-lotus-admin-xs shadow-sm"
+                  className="absolute top-0 right-0 bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white font-bold py-0.5 px-2 rounded-[3px] text-2xs shadow-sm"
                 >
                   Gọi điện
                 </button>
               )}
 
-              <div className="flex justify-between gap-1 text-stone-500">
+              <div className="flex justify-between gap-1 text-adminGray-600">
                 <span>Đặt lịch từ:</span>
-                <span className="font-semibold text-stone-700">--:--</span>
+                <span className="font-semibold text-adminInk">--:--</span>
               </div>
-              <div className="flex justify-between gap-1 text-stone-500">
+              <div className="flex justify-between gap-1 text-adminGray-600">
                 <span>Ngày hóa đơn:</span>
-                <span className="font-semibold text-stone-700 flex items-center gap-0.5">
+                <span className="font-semibold text-adminInk flex items-center gap-0.5">
                   {new Date().toLocaleDateString("vi-VN")}
                 </span>
               </div>
-              <div className="flex justify-between gap-1 text-stone-500">
+              <div className="flex justify-between gap-1 text-adminGray-600">
                 <span>Giờ vào/ra:</span>
-                <span className="font-semibold text-stone-700 flex items-center gap-0.5">
+                <span className="font-semibold text-adminInk flex items-center gap-0.5">
                   {new Date().toLocaleTimeString("vi-VN", {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
                 </span>
               </div>
-              <div className="flex justify-between gap-1 text-stone-500">
+              <div className="flex justify-between gap-1 text-adminGray-600">
                 <span>N.viên thu ngân:</span>
-                <span className="font-semibold text-stone-700 truncate">
+                <span className="font-semibold text-adminInk truncate">
                   {cashierName}
                 </span>
               </div>
@@ -807,51 +807,51 @@ export function CashierPOS({
           {/* Cart Table inside Left Column */}
           <div className="flex-1 overflow-y-auto min-h-0 bg-white">
             {activeOrder.items.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-stone-400 p-6">
-                <div className="w-16 h-16 rounded-full bg-stone-50 flex items-center justify-center mb-2.5">
-                  <Barcode className="w-8 h-8 text-stone-300" />
+              <div className="h-full flex flex-col items-center justify-center text-adminGray-400 p-6">
+                <div className="w-16 h-16 rounded-full bg-adminGray-50 flex items-center justify-center mb-2.5">
+                  <Barcode className="w-8 h-8 text-adminGray-300" />
                 </div>
-                <p className="text-xs font-semibold text-stone-500">
+                <p className="text-xs font-semibold text-adminGray-600">
                   Đơn hàng chưa có sản phẩm & dịch vụ nào.
                 </p>
               </div>
             ) : (
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-stone-50/80 border-b border-stone-150 text-lotus-admin-xs text-stone-500 font-bold uppercase tracking-wider sticky top-0 z-10 backdrop-blur-sm">
+                  <tr className="bg-adminGray-50/80 border-b border-adminGray-100 text-2xs text-adminGray-600 font-bold uppercase tracking-wider sticky top-0 z-10 backdrop-blur-sm">
                     <th className="py-2.5 px-3">Sản phẩm & dịch vụ</th>
                     <th className="py-2.5 px-2 text-center w-24">Số lượng</th>
                     <th className="py-2.5 px-2 text-center w-24">Nhân viên</th>
                     <th className="py-2.5 px-3 text-right w-28">Thành tiền</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-150 text-xs">
+                <tbody className="divide-y divide-adminGray-100 text-xs">
                   {activeOrder.items.map((item: POSOrderItem) => (
                     <tr
                       key={`${item.itemType}-${item.id}`}
-                      className="hover:bg-stone-50/50 group transition-colors"
+                      className="hover:bg-adminGray-50/50 group transition-colors"
                     >
                       <td className="py-3 px-3">
-                        <div className="font-bold text-lotus-deep leading-tight">
+                        <div className="font-bold text-adminInk leading-tight">
                           {item.name}
                         </div>
-                        <div className="text-lotus-admin-xs text-stone-400 font-medium mt-0.5">
+                        <div className="text-2xs text-adminGray-400 font-medium mt-0.5">
                           Mã: {item.code} | Giá:{" "}
                           {item.price.toLocaleString("vi-VN")}đ
                         </div>
                       </td>
                       <td className="py-3 px-2 text-center">
-                        <div className="flex items-center justify-center border border-stone-200 rounded-[3px] bg-white w-20 mx-auto shadow-inner">
+                        <div className="flex items-center justify-center border border-adminGray-100 rounded-[3px] bg-white w-20 mx-auto shadow-inner">
                           <button
                             type="button"
                             onClick={() =>
                               updateCartItemQuantity(item.itemType, item.id, -1)
                             }
-                            className="px-2 py-1 text-stone-500 hover:bg-stone-100 hover:text-stone-800 font-bold text-xs"
+                            className="px-2 py-1 text-adminGray-600 hover:bg-adminGray-100 hover:text-adminInk font-bold text-xs"
                           >
                             -
                           </button>
-                          <span className="flex-1 font-bold text-center text-xs text-lotus-deep select-none">
+                          <span className="flex-1 font-bold text-center text-xs text-adminInk select-none">
                             {item.quantity}
                           </span>
                           <button
@@ -859,7 +859,7 @@ export function CashierPOS({
                             onClick={() =>
                               updateCartItemQuantity(item.itemType, item.id, 1)
                             }
-                            className="px-2 py-1 text-stone-500 hover:bg-stone-100 hover:text-stone-800 font-bold text-xs"
+                            className="px-2 py-1 text-adminGray-600 hover:bg-adminGray-100 hover:text-adminInk font-bold text-xs"
                           >
                             +
                           </button>
@@ -880,7 +880,7 @@ export function CashierPOS({
                                   Number(val),
                                 );
                             }}
-                            className="appearance-none bg-stone-50 border border-stone-200 rounded-[3px] py-1 pl-2 pr-6 text-lotus-admin-xs font-bold text-lotus-deep shadow-sm cursor-pointer hover:bg-stone-100 focus:outline-none"
+                            className="appearance-none bg-adminGray-50 border border-adminGray-100 rounded-[3px] py-1 pl-2 pr-6 text-2xs font-bold text-adminInk shadow-sm cursor-pointer hover:bg-adminGray-100 focus:outline-none"
                           >
                             <option value="">Chọn...</option>
                             {staffs.map((s: StaffDto) => (
@@ -889,10 +889,10 @@ export function CashierPOS({
                               </option>
                             ))}
                           </select>
-                          <ChevronDown className="w-3 h-3 text-stone-500 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                          <ChevronDown className="w-3 h-3 text-adminGray-600 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                         </div>
                       </td>
-                      <td className="py-3 px-3 text-right font-bold text-lotus-deep">
+                      <td className="py-3 px-3 text-right font-bold text-adminInk">
                         <div className="flex items-center justify-end gap-1.5">
                           <span>
                             {(item.price * item.quantity).toLocaleString(
@@ -909,7 +909,7 @@ export function CashierPOS({
                                 -item.quantity,
                               )
                             }
-                            className="p-1 text-stone-400 hover:text-lotus-error transition-colors rounded hover:bg-stone-100"
+                            className="p-1 text-adminGray-400 hover:text-lotus-error transition-colors rounded hover:bg-adminGray-100"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -923,57 +923,57 @@ export function CashierPOS({
           </div>
 
           {/* Calculations footer inside Left Column */}
-          <div className="p-3 bg-white border-t border-stone-150 shrink-0 text-xs space-y-1.5">
-            <div className="flex justify-between items-center text-stone-650 font-medium">
+          <div className="p-3 bg-white border-t border-adminGray-100 shrink-0 text-xs space-y-1.5">
+            <div className="flex justify-between items-center text-adminGray-600 font-medium">
               <span>Thành tiền</span>
-              <span className="font-bold text-stone-800">
+              <span className="font-bold text-adminInk">
                 {subTotal.toLocaleString("vi-VN")} đ
               </span>
             </div>
-            <div className="flex justify-between items-center text-stone-650 font-medium">
+            <div className="flex justify-between items-center text-adminGray-600 font-medium">
               <button
                 onClick={() => {
                   setTempDiscount(activeOrder.discountAmount);
                   setIsDiscountModalOpen(true);
                 }}
-                className="text-red-500 hover:underline flex items-center gap-0.5"
+                className="text-state-danger-text hover:underline flex items-center gap-0.5"
               >
                 Giảm giá{" "}
-                <span className="text-lotus-admin-xs text-stone-400 font-normal">
+                <span className="text-2xs text-adminGray-400 font-normal">
                   (Thêm giảm giá)
                 </span>
               </button>
-              <span className="font-bold text-red-500">
+              <span className="font-bold text-state-danger-text">
                 -{activeOrder.discountAmount.toLocaleString("vi-VN")} đ
               </span>
             </div>
-            <div className="flex justify-between items-center text-stone-650 font-medium">
-              <button className="text-blue-500 hover:underline flex items-center gap-0.5">
+            <div className="flex justify-between items-center text-adminGray-600 font-medium">
+              <button className="text-state-info-text hover:underline flex items-center gap-0.5">
                 Thẻ giảm giá/voucher{" "}
-                <span className="text-lotus-admin-xs text-stone-400 font-normal">
+                <span className="text-2xs text-adminGray-400 font-normal">
                   (Chọn thẻ)
                 </span>
               </button>
-              <span className="font-bold text-stone-800">0 đ</span>
+              <span className="font-bold text-adminInk">0 đ</span>
             </div>
 
-            <div className="flex justify-between items-center pt-2 border-t border-stone-150 text-sm font-bold text-lotus-deep">
+            <div className="flex justify-between items-center pt-2 border-t border-adminGray-100 text-sm font-bold text-adminInk">
               <div className="flex items-center gap-2">
                 <span className="text-base font-bold">Tổng tiền</span>
                 {activeOrder.customer &&
                   (activeOrder.customer.loyaltyPoint ?? 0) > 0 && (
-                    <label className="flex items-center gap-1 text-lotus-admin-base text-stone-500 font-normal cursor-pointer select-none">
+                    <label className="flex items-center gap-1 text-xs text-adminGray-600 font-normal cursor-pointer select-none">
                       <input
                         type="checkbox"
                         checked={activeOrder.useLoyaltyPoints}
                         onChange={toggleLoyaltyPoints}
-                        className="w-3.5 h-3.5 text-lotus-rose border-stone-300 rounded focus:ring-lotus-rose"
+                        className="w-3.5 h-3.5 text-adminGreen-600 border-adminGray-300 rounded focus:ring-adminGreen-600"
                       />
                       <span>Điểm thưởng: {pointsUsed} điểm</span>
                     </label>
                   )}
               </div>
-              <span className="text-lg font-bold text-lotus-rose">
+              <span className="text-lg font-bold text-adminGreen-600">
                 {totalAmount.toLocaleString("vi-VN")} đ
               </span>
             </div>
@@ -984,7 +984,7 @@ export function CashierPOS({
                 {/* Huy Button */}
                 <button
                   onClick={() => handleRemoveOrder(activeOrderId)}
-                  className="bg-orange-700 hover:bg-orange-800 text-white py-2 px-3 rounded-[3px] flex items-center justify-center gap-1 text-lotus-admin-base font-bold shadow-sm"
+                  className="bg-state-warning-solid hover:bg-state-warning-solid text-white py-2 px-3 rounded-[3px] flex items-center justify-center gap-1 text-xs font-bold shadow-sm"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Hủy</span>
@@ -995,7 +995,7 @@ export function CashierPOS({
                   onClick={() =>
                     toast.info("Tính năng hoa hồng & doanh thu...")
                   }
-                  className="bg-lotus-rose hover:bg-lotus-rose/90 text-white py-2 px-2.5 rounded-[3px] flex items-center justify-center gap-1 text-lotus-admin-base font-bold shadow-sm flex-1"
+                  className="bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white py-2 px-2.5 rounded-[3px] flex items-center justify-center gap-1 text-xs font-bold shadow-sm flex-1"
                 >
                   <span>Hoa hồng & doanh thu</span>
                 </button>
@@ -1004,7 +1004,7 @@ export function CashierPOS({
                 <div className="relative">
                   <button
                     onClick={() => toast.info("Tính năng mở rộng...")}
-                    className="bg-lotus-rose hover:bg-lotus-rose/90 text-white py-2 px-3 rounded-[3px] text-lotus-admin-base font-bold shadow-sm"
+                    className="bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white py-2 px-3 rounded-[3px] text-xs font-bold shadow-sm"
                   >
                     ... ▾
                   </button>
@@ -1015,7 +1015,7 @@ export function CashierPOS({
                 {/* In Hoa Don */}
                 <button
                   onClick={() => window.print()}
-                  className="bg-lotus-rose hover:bg-lotus-rose/90 text-white py-2 px-3 rounded-[3px] flex items-center justify-center gap-1.5 text-lotus-admin-base font-bold shadow-sm"
+                  className="bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white py-2 px-3 rounded-[3px] flex items-center justify-center gap-1.5 text-xs font-bold shadow-sm"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>In hóa đơn ▾</span>
@@ -1032,7 +1032,7 @@ export function CashierPOS({
                     setIsCheckoutModalOpen(true);
                   }}
                   disabled={createInvoiceMutation.isPending || isPayingInvoice}
-                  className="bg-lotus-rose hover:bg-lotus-rose/90 text-white py-2 px-4 rounded-[3px] flex items-center justify-center gap-1.5 text-lotus-admin-base font-bold shadow-sm disabled:opacity-50"
+                  className="bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white py-2 px-4 rounded-[3px] flex items-center justify-center gap-1.5 text-xs font-bold shadow-sm disabled:opacity-50"
                 >
                   <span>Thanh toán</span>
                 </button>
@@ -1042,13 +1042,13 @@ export function CashierPOS({
         </div>
 
         {/* ── SECTION 3: KHUNG BÊN PHẢI (Right Panel - 50%) ── */}
-        <div className="lg:col-span-6 bg-white border border-stone-200 rounded-[3px] shadow-sm flex flex-col overflow-hidden h-full">
+        <div className="lg:col-span-6 bg-white border border-adminGray-100 rounded-[3px] shadow-sm flex flex-col overflow-hidden h-full">
           {/* Search & Tabs inside Right Column */}
-          <div className="p-3 bg-white border-b border-stone-150 flex flex-col gap-3 shrink-0">
+          <div className="p-3 bg-white border-b border-adminGray-100 flex flex-col gap-3 shrink-0">
             {/* Search box for catalog items */}
             <div className="relative">
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                <Search className="w-4 h-4 text-stone-400" />
+                <Search className="w-4 h-4 text-adminGray-400" />
               </div>
               <input
                 type="text"
@@ -1057,12 +1057,12 @@ export function CashierPOS({
                   setSearchQuery(e.target.value)
                 }
                 placeholder="Quét mã hoặc Tìm kiếm theo tên hoặc mã sản phẩm & dịch vụ"
-                className="w-full text-xs bg-stone-50 border border-stone-300 rounded-[3px] py-2.5 pl-9 pr-4 text-lotus-deep focus:outline-none focus:border-lotus-rose focus:ring-1 focus:ring-lotus-rose transition shadow-inner"
+                className="w-full text-xs bg-adminGray-50 border border-adminGray-300 rounded-[3px] py-2.5 pl-9 pr-4 text-adminInk focus:outline-none focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 transition shadow-inner"
               />
             </div>
 
             {/* Main Tabs */}
-            <div className="flex bg-stone-100 p-1 rounded-md border border-stone-200/60 shadow-sm">
+            <div className="flex bg-adminGray-100 p-1 rounded-md border border-adminGray-100/60 shadow-sm">
               <button
                 onClick={() => {
                   setActiveTab("services");
@@ -1071,8 +1071,8 @@ export function CashierPOS({
                 className={cn(
                   "flex-1 py-2 text-xs font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 focus:outline-none",
                   activeTab === "services"
-                    ? "bg-gradient-to-r from-lotus-rose to-lotus-rose-dark text-white shadow-md transform scale-[1.02]"
-                    : "text-stone-500 hover:bg-stone-200/50 hover:text-stone-700",
+                    ? "bg-gradient-to-r from-adminGreen-600 to-adminGreen-700 text-white shadow-md transform scale-[1.02]"
+                    : "text-adminGray-600 hover:bg-adminGray-100/50 hover:text-adminInk",
                 )}
               >
                 <Sparkles
@@ -1092,8 +1092,8 @@ export function CashierPOS({
                 className={cn(
                   "flex-1 py-2 text-xs font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 focus:outline-none",
                   activeTab === "products"
-                    ? "bg-gradient-to-r from-lotus-rose to-lotus-rose-dark text-white shadow-md transform scale-[1.02]"
-                    : "text-stone-500 hover:bg-stone-200/50 hover:text-stone-700",
+                    ? "bg-gradient-to-r from-adminGreen-600 to-adminGreen-700 text-white shadow-md transform scale-[1.02]"
+                    : "text-adminGray-600 hover:bg-adminGray-100/50 hover:text-adminInk",
                 )}
               >
                 <Package className="w-3.5 h-3.5" />
@@ -1108,8 +1108,8 @@ export function CashierPOS({
                 className={cn(
                   "flex-1 py-2 text-xs font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 focus:outline-none",
                   activeTab === "courses"
-                    ? "bg-gradient-to-r from-lotus-rose to-lotus-rose-dark text-white shadow-md transform scale-[1.02]"
-                    : "text-stone-500 hover:bg-stone-200/50 hover:text-stone-700",
+                    ? "bg-gradient-to-r from-adminGreen-600 to-adminGreen-700 text-white shadow-md transform scale-[1.02]"
+                    : "text-adminGray-600 hover:bg-adminGray-100/50 hover:text-adminInk",
                 )}
               >
                 <CreditCard className="w-3.5 h-3.5" />
@@ -1122,19 +1122,19 @@ export function CashierPOS({
           </div>
 
           {/* Catalog items grid inside Right Column */}
-          <div className="flex-1 overflow-y-auto min-h-0 p-3 bg-stone-50/10">
+          <div className="flex-1 overflow-y-auto min-h-0 p-3 bg-adminGray-50/10">
             {loadingServices || loadingProducts || loadingCourses ? (
               <div className="grid grid-cols-2 gap-3">
                 {[1, 2, 3, 4].map((i: number) => (
                   <div
                     key={i}
-                    className="bg-white border border-stone-150 h-28 rounded-[3px] animate-pulse"
+                    className="bg-white border border-adminGray-100 h-28 rounded-[3px] animate-pulse"
                   />
                 ))}
               </div>
             ) : filteredCatalogItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center text-stone-400 py-12">
-                <SlidersHorizontal className="w-10 h-10 text-stone-300 mb-2" />
+              <div className="flex flex-col items-center justify-center text-adminGray-400 py-12">
+                <SlidersHorizontal className="w-10 h-10 text-adminGray-300 mb-2" />
                 <p className="text-xs font-semibold">
                   Không tìm thấy kết quả phù hợp
                 </p>
@@ -1175,19 +1175,19 @@ export function CashierPOS({
                         className={cn(
                           "bg-white border rounded-[3px] p-2 flex items-start gap-2.5 cursor-pointer hover:shadow-sm transition-all duration-150 select-none relative min-h-[72px]",
                           cartQty > 0
-                            ? "border-lotus-rose ring-1 ring-lotus-rose/40"
-                            : "border-stone-200",
+                            ? "border-adminGreen-600 ring-1 ring-adminGreen-600/40"
+                            : "border-adminGray-100",
                         )}
                       >
                         {/* Badge count overlay */}
                         {cartQty > 0 && (
-                          <div className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-lotus-rose text-white flex items-center justify-center text-lotus-admin-xs font-bold shadow-sm z-10">
+                          <div className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-adminGreen-600 text-white flex items-center justify-center text-2xs font-bold shadow-sm z-10">
                             {cartQty}
                           </div>
                         )}
 
                         {/* Thumbnail image */}
-                        <div className="w-12 h-12 rounded-[3px] overflow-hidden bg-stone-100 flex items-center justify-center shrink-0 shadow-inner">
+                        <div className="w-12 h-12 rounded-[3px] overflow-hidden bg-adminGray-100 flex items-center justify-center shrink-0 shadow-inner">
                           {imageUrl ? (
                             <img
                               src={imageUrl}
@@ -1201,20 +1201,20 @@ export function CashierPOS({
                               }}
                             />
                           ) : (
-                            <span className="text-lotus-admin-xs text-stone-400 font-bold uppercase tracking-wider text-center">
+                            <span className="text-2xs text-adminGray-400 font-bold uppercase tracking-wider text-center">
                               IMAGE
                             </span>
                           )}
                         </div>
 
                         <div className="flex-1 min-w-0 space-y-0.5">
-                          <div className="font-bold text-lotus-admin-base text-lotus-deep uppercase tracking-wide truncate">
+                          <div className="font-bold text-xs text-adminInk uppercase tracking-wide truncate">
                             {item.name}
                           </div>
-                          <div className="text-lotus-admin-xs text-stone-400 font-medium">
+                          <div className="text-2xs text-adminGray-400 font-medium">
                             {item.code}
                           </div>
-                          <div className="text-lotus-admin-base font-bold text-stone-800 pt-1">
+                          <div className="text-xs font-bold text-adminInk pt-1">
                             {item.sellingPrice?.toLocaleString("vi-VN")} đ
                           </div>
                         </div>
@@ -1227,12 +1227,12 @@ export function CashierPOS({
           </div>
 
           {/* Footer info inside Right Column */}
-          <div className="bg-white border-t border-stone-150 p-2.5 text-lotus-admin-xs text-stone-500 font-medium flex items-center justify-between shrink-0">
+          <div className="bg-white border-t border-adminGray-100 p-2.5 text-2xs text-adminGray-600 font-medium flex items-center justify-between shrink-0">
             <button
               onClick={() =>
                 toast.info("Đang hiển thị danh sách thẻ khách hàng...")
               }
-              className="text-lotus-rose hover:underline font-bold"
+              className="text-adminGreen-600 hover:underline font-bold"
             >
               Danh sách khách hàng dùng thẻ
             </button>
@@ -1243,15 +1243,15 @@ export function CashierPOS({
 
       {/* ── DISCOUNT MODAL DIALOG ── */}
       {isDiscountModalOpen && (
-        <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-stone-200 rounded-[3px] shadow-2xl max-w-sm w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-4 bg-stone-50 border-b border-stone-150 flex items-center justify-between">
-              <span className="font-bold text-xs text-lotus-deep uppercase tracking-wider">
+        <div className="fixed inset-0 bg-adminInk/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-adminGray-100 rounded-[3px] shadow-2xl max-w-sm w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-4 bg-adminGray-50 border-b border-adminGray-100 flex items-center justify-between">
+              <span className="font-bold text-xs text-adminInk uppercase tracking-wider">
                 Áp dụng giảm giá
               </span>
               <button
                 onClick={() => setIsDiscountModalOpen(false)}
-                className="text-stone-400 hover:text-stone-600 transition"
+                className="text-adminGray-400 hover:text-adminGray-600 transition"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1259,7 +1259,7 @@ export function CashierPOS({
 
             <div className="p-4 space-y-4">
               <div className="space-y-1">
-                <label className="text-lotus-admin-xs font-bold text-stone-500 uppercase tracking-wider">
+                <label className="text-2xs font-bold text-adminGray-600 uppercase tracking-wider">
                   Số tiền giảm (VND)
                 </label>
                 <input
@@ -1269,15 +1269,15 @@ export function CashierPOS({
                     setTempDiscount(Number(e.target.value))
                   }
                   placeholder="Nhập số tiền..."
-                  className="w-full text-sm border border-stone-300 rounded-[3px] p-2 text-lotus-deep focus:outline-none focus:border-lotus-rose"
+                  className="w-full text-sm border border-adminGray-300 rounded-[3px] p-2 text-adminInk focus:outline-none focus:border-adminGreen-600"
                 />
               </div>
             </div>
 
-            <div className="p-3 bg-stone-50 border-t border-stone-150 flex justify-end gap-2">
+            <div className="p-3 bg-adminGray-50 border-t border-adminGray-100 flex justify-end gap-2">
               <button
                 onClick={() => setIsDiscountModalOpen(false)}
-                className="px-4 py-2 border border-stone-200 rounded-[3px] text-xs font-bold text-stone-600 hover:bg-stone-100 transition"
+                className="px-4 py-2 border border-adminGray-100 rounded-[3px] text-xs font-bold text-adminGray-600 hover:bg-adminGray-100 transition"
               >
                 Hủy
               </button>
@@ -1287,7 +1287,7 @@ export function CashierPOS({
                   setIsDiscountModalOpen(false);
                   toast.success("Đã áp dụng giảm giá!");
                 }}
-                className="px-4 py-2 bg-lotus-rose text-white rounded-[3px] text-xs font-bold hover:bg-lotus-rose/90 transition"
+                className="px-4 py-2 bg-adminGreen-600 text-white rounded-[3px] text-xs font-bold hover:bg-adminGreen-600/90 transition"
               >
                 Xác nhận
               </button>
@@ -1298,31 +1298,31 @@ export function CashierPOS({
 
       {/* ── CHECKOUT PAYMENT MODAL DIALOG ── */}
       {isCheckoutModalOpen && (
-        <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-stone-200 rounded-[3px] shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-4 bg-stone-50 border-b border-stone-150 flex items-center justify-between">
-              <span className="font-bold text-xs text-lotus-deep uppercase tracking-wider">
+        <div className="fixed inset-0 bg-adminInk/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-adminGray-100 rounded-[3px] shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-4 bg-adminGray-50 border-b border-adminGray-100 flex items-center justify-between">
+              <span className="font-bold text-xs text-adminInk uppercase tracking-wider">
                 Xác nhận thanh toán
               </span>
               <button
                 onClick={() => setIsCheckoutModalOpen(false)}
-                className="text-stone-400 hover:text-stone-600 transition"
+                className="text-adminGray-400 hover:text-adminGray-600 transition"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="p-4 space-y-4">
-              <div className="p-3 bg-lotus-rose-light rounded-[3px] border border-lotus-rose/10">
-                <div className="flex justify-between items-center text-xs font-semibold text-stone-600">
+              <div className="p-3 bg-adminGreen-600-light rounded-[3px] border border-adminGreen-600/10">
+                <div className="flex justify-between items-center text-xs font-semibold text-adminGray-600">
                   <span>Khách hàng:</span>
-                  <span className="font-bold text-lotus-deep">
+                  <span className="font-bold text-adminInk">
                     {activeOrder.customer?.fullName || "Khách vãng lai"}
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-xs font-semibold text-stone-600 mt-1">
+                <div className="flex justify-between items-center text-xs font-semibold text-adminGray-600 mt-1">
                   <span>Số tiền cần thanh toán:</span>
-                  <span className="font-bold text-lotus-rose text-sm">
+                  <span className="font-bold text-adminGreen-600 text-sm">
                     {totalAmount.toLocaleString("vi-VN")}đ
                   </span>
                 </div>
@@ -1330,7 +1330,7 @@ export function CashierPOS({
 
               {/* Payment Method Selector */}
               <div className="space-y-2">
-                <label className="text-lotus-admin-xs font-bold text-stone-500 uppercase tracking-wider">
+                <label className="text-2xs font-bold text-adminGray-600 uppercase tracking-wider">
                   Phương thức thanh toán
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -1365,8 +1365,8 @@ export function CashierPOS({
                       className={cn(
                         "flex items-center gap-2 p-2.5 border rounded-[3px] text-xs font-bold transition duration-200",
                         activeOrder.paymentMethod === item.method
-                          ? "border-lotus-rose bg-lotus-rose-light/40 text-lotus-rose"
-                          : "border-stone-200 bg-white text-stone-600 hover:bg-stone-50",
+                          ? "border-adminGreen-600 bg-adminGreen-600-light/40 text-adminGreen-600"
+                          : "border-adminGray-100 bg-white text-adminGray-600 hover:bg-adminGray-50",
                       )}
                     >
                       <item.icon className="w-4 h-4 shrink-0" />
@@ -1378,7 +1378,7 @@ export function CashierPOS({
 
               {/* Amount paid by customer */}
               <div className="space-y-1">
-                <label className="text-lotus-admin-xs font-bold text-stone-500 uppercase tracking-wider">
+                <label className="text-2xs font-bold text-adminGray-600 uppercase tracking-wider">
                   Khách thanh toán (VND)
                 </label>
                 <input
@@ -1387,13 +1387,13 @@ export function CashierPOS({
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setTempPaidAmount(Number(e.target.value))
                   }
-                  className="w-full text-sm border border-stone-300 rounded-[3px] p-2 font-bold text-lotus-deep focus:outline-none focus:border-lotus-rose"
+                  className="w-full text-sm border border-adminGray-300 rounded-[3px] p-2 font-bold text-adminInk focus:outline-none focus:border-adminGreen-600"
                 />
               </div>
 
               {/* Note / Memo */}
               <div className="space-y-1">
-                <label className="text-lotus-admin-xs font-bold text-stone-500 uppercase tracking-wider">
+                <label className="text-2xs font-bold text-adminGray-600 uppercase tracking-wider">
                   Ghi chú đơn hàng
                 </label>
                 <textarea
@@ -1408,33 +1408,33 @@ export function CashierPOS({
                   }}
                   placeholder="Ghi chú thêm về dịch vụ, yêu cầu khách hàng..."
                   rows={2}
-                  className="w-full text-xs border border-stone-300 rounded-[3px] p-2 text-lotus-deep focus:outline-none focus:border-lotus-rose placeholder:text-stone-400"
+                  className="w-full text-xs border border-adminGray-300 rounded-[3px] p-2 text-adminInk focus:outline-none focus:border-adminGreen-600 placeholder:text-adminGray-400"
                 />
               </div>
 
               {/* Change computation if paying cash */}
               {activeOrder.paymentMethod === PAYMENT_METHOD.CASH &&
                 tempPaidAmount > totalAmount && (
-                  <div className="flex justify-between items-center text-xs font-bold text-stone-600 border-t border-dashed border-stone-200 pt-3">
+                  <div className="flex justify-between items-center text-xs font-bold text-adminGray-600 border-t border-dashed border-adminGray-100 pt-3">
                     <span>Tiền thừa trả khách:</span>
-                    <span className="text-lotus-leaf text-sm font-bold">
+                    <span className="text-adminGreen-600 text-sm font-bold">
                       {(tempPaidAmount - totalAmount).toLocaleString("vi-VN")}đ
                     </span>
                   </div>
                 )}
             </div>
 
-            <div className="p-3 bg-stone-50 border-t border-stone-150 flex justify-end gap-2">
+            <div className="p-3 bg-adminGray-50 border-t border-adminGray-100 flex justify-end gap-2">
               <button
                 onClick={() => setIsCheckoutModalOpen(false)}
-                className="px-4 py-2 border border-stone-200 rounded-[3px] text-xs font-bold text-stone-600 hover:bg-stone-100 transition"
+                className="px-4 py-2 border border-adminGray-100 rounded-[3px] text-xs font-bold text-adminGray-600 hover:bg-adminGray-100 transition"
               >
                 Hủy
               </button>
               <button
                 onClick={handleCheckoutSubmit}
                 disabled={createInvoiceMutation.isPending || isPayingInvoice}
-                className="px-5 py-2 bg-lotus-rose text-white rounded-[3px] text-xs font-bold hover:bg-lotus-rose/90 transition flex items-center gap-1.5 disabled:opacity-50"
+                className="px-5 py-2 bg-adminGreen-600 text-white rounded-[3px] text-xs font-bold hover:bg-adminGreen-600/90 transition flex items-center gap-1.5 disabled:opacity-50"
               >
                 {(createInvoiceMutation.isPending || isPayingInvoice) && (
                   <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />

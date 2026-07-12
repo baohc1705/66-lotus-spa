@@ -230,7 +230,7 @@ export const HeroSection = () => {
 
             <motion.h1
               variants={textVariants}
-              className="mb-4 font-display text-[clamp(2rem,9vw,2.75rem)] font-normal leading-[1.08] text-white md:mb-6 md:text-[68px] lg:text-[84px]"
+              className="mb-4 font-display text-display-hero font-normal text-white md:mb-6"
             >
               {SLIDES[currentIndex].title}
             </motion.h1>

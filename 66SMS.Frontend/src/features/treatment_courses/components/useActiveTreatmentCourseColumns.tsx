@@ -130,7 +130,7 @@ export function useActiveTreatmentCourseColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="font-mono text-xs px-2 py-1 bg-stone-100 rounded text-stone-600">
+          <span className="font-mono text-xs px-2 py-1 bg-adminGray-100 rounded text-adminGray-600">
             {row.original.code ?? "—"}
           </span>
         ),
@@ -149,11 +149,11 @@ export function useActiveTreatmentCourseColumns({
         ),
         cell: ({ row }) => (
           <div>
-            <p className="text-lotus-admin-lg font-semibold text-lotus-deep truncate max-w-[200px]">
+            <p className="text-sm font-semibold text-adminInk truncate max-w-[200px]">
               {row.original.name ?? "—"}
             </p>
             {row.original.categoryName && (
-              <p className="text-lotus-admin-base text-lotus-stone">
+              <p className="text-xs text-adminGray-600">
                 {row.original.categoryName}
               </p>
             )}
@@ -165,7 +165,7 @@ export function useActiveTreatmentCourseColumns({
         accessorKey: "totalSessions",
         header: cols.totalSessions,
         cell: ({ row }) => (
-          <span className="font-semibold text-lotus-deep">
+          <span className="font-semibold text-adminInk">
             {row.original.totalSessions ?? 0}
           </span>
         ),

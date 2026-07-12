@@ -188,7 +188,7 @@ export function MembershipTierFormDialog({
                 <AdminTextarea
                   {...register("benefits")}
                   placeholder="- Giảm 10% các dịch vụ chăm sóc da&#10;- Quà tặng sinh nhật"
-                  className="text-lotus-admin-lg min-h-[80px]"
+                  className="text-sm min-h-[80px]"
                 />
               </FormField>
             </div>
