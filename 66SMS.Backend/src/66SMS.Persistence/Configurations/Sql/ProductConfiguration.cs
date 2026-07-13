@@ -23,6 +23,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.MinStock).HasColumnName(ProductConst.FIELD_MIN_STOCK);
             builder.Property(x => x.Status).HasColumnName(ProductConst.FIELD_STATUS);
             builder.Property(x => x.CreatedAt).HasColumnName(ProductConst.FIELD_CREATED_AT);
+            builder.Property(x => x.UpdatedAt).HasColumnName(ProductConst.FIELD_UPDATED_AT);
             builder.HasOne(x => x.Category).WithMany(c => c.Products).HasForeignKey(x => x.CategoryId).IsRequired(false);
             builder.ToTable(ProductConst.TABLE_NAME);
         }

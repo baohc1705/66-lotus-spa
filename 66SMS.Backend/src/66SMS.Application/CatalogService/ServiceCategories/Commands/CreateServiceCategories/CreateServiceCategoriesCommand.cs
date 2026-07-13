@@ -14,5 +14,6 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateSer
         public int? SortOrder { get; set; } = 0;
         public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
         public string? Icon { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

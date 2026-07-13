@@ -1,11 +1,9 @@
-using _66SMS.Application.DTOs.ProductImages;
-using _66SMS.Application.DTOs.Products;
-using _66SMS.Contracts.Extensions;
+using _66SMS.Contracts.Extensions;  
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
-using _66SMS.Domain.Constants;
 using _66SMS.Domain.Enums;
 using MediatR;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.Products.Queries.GetAllProducts
 {
@@ -65,10 +63,12 @@ namespace _66SMS.Application.CatalogService.Products.Queries.GetAllProducts
                 "name" => request.IsDescending ? query.OrderByDescending(x => x.Name) : query.OrderBy(x => x.Name),
                 "sellingprice" => request.IsDescending ? query.OrderByDescending(x => x.SellingPrice) : query.OrderBy(x => x.SellingPrice),
                 "costprice" => request.IsDescending ? query.OrderByDescending(x => x.CostPrice) : query.OrderBy(x => x.CostPrice),
+                "stockquantity" => request.IsDescending ? query.OrderByDescending(x => x.StockQuantity) : query.OrderBy(x => x.StockQuantity),
+                "minstock" => request.IsDescending ? query.OrderByDescending(x => x.MinStock) : query.OrderBy(x => x.MinStock),
                 _ => request.IsDescending ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt),
             };
 
-            PagedResult<ProductDto> result = await query
+            var result = await query
                 .Select(x => new ProductDto
                 {
                     Id = x.Id,
@@ -76,23 +76,15 @@ namespace _66SMS.Application.CatalogService.Products.Queries.GetAllProducts
                     CategoryName = x.Category!.Name,
                     Code = x.Code,
                     Name = x.Name,
-                    Description = x.Description,
-                    Content = x.Content,
                     Unit = x.Unit,
                     CostPrice = x.CostPrice,
                     SellingPrice = x.SellingPrice,
                     StockQuantity = x.StockQuantity,
                     MinStock = x.MinStock,
                     Status = x.Status,
-                    CreatedAt = x.CreatedAt.ToString(),
-                    UpdatedAt = null,
-                    Images = x.Images!.Select(x => new ProductImageDto
-                    {
-                        Id = x.Id,
-                        Url = x.Url,
-                        SortOrder = x.SortOrder,
-                        IsPrimary = x.IsPrimary
-                    }).ToList(),
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
+                    ImageUrl = x.Images!.Where(x => x.IsPrimary).Select(x => x.Url).FirstOrDefault(),
                 })
                 .ToPagedAsync(request, cancellationToken);
 

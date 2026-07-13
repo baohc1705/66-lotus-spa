@@ -1,5 +1,4 @@
 using _66SMS.Contract.Abstractions;
-using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -39,7 +38,7 @@ namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
             try
             {
                 Product product = mapper.Map<Product>(request);
-                product.Code = request.Code ?? GenerateProductCode();
+                product.Code = string.Empty;
 
                 var pendingUploads = new List<(ProductImage Image, string Base64)>();
 
@@ -77,12 +76,8 @@ namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
                         image.Url = url;
                 }
 
-                if (pendingUploads.Count > 0)
-                {
-                    productSqlRepository.Update(product);
-                    await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-                }
-
+                product.Code = $"PRO{product.Id:D6}";
+                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
                 return Result<int>.Success(product.Id);
             }
@@ -93,11 +88,6 @@ namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
             }
         }
 
-        private string GenerateProductCode()
-        {
-            string random = Random.Shared.Next(100000, 999999).ToString();
-            string dateNowStr = DateTimeHelper.VietnamNowString("HHmmss");
-            return $"PRO{random}{dateNowStr}";
-        }
+
     }
 }

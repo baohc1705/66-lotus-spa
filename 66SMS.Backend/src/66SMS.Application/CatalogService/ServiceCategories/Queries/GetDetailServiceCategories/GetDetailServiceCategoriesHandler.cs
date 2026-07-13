@@ -33,7 +33,8 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetDetailS
                     Description = x.Description,
                     SortOrder = x.SortOrder,
                     Status = x.Status,
-                    Icon = x.Icon
+                    Icon = x.Icon,
+                    ImageUrl = x.ImageUrl,
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

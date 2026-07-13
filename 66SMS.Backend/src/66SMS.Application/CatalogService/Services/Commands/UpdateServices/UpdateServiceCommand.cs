@@ -1,3 +1,4 @@
+using _66SMS.Application.CatalogService.Services.Commands.CreateServices;
 using _66SMS.Contracts.Shared;
 using MediatR;
 using System.Text.Json.Serialization;
@@ -12,7 +13,6 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
         [JsonIgnore]
         public int? Id { get; set; }
         public int? CategoryId { get; set; }
-        public string? Code { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
         public string? Content { get; set; }
@@ -23,6 +23,11 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
         public int? SortOrder { get; set; }
         public int? Status { get; set; }
         public string? ImageUrl { get; set; }
+        /// <summary>
+        /// Khi gửi (kể cả rỗng): xóa sản phẩm cũ và thêm lại danh sách mới.
+        /// Null = không đụng tới sản phẩm đi kèm.
+        /// </summary>
+        public List<ServiceProductItems>? ServiceProducts { get; set; }
         [JsonIgnore]
         public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
     }

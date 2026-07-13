@@ -16,5 +16,6 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.UpdateSer
         public int? SortOrder { get; set; }
         public int? Status { get; set; }
         public string? Icon { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

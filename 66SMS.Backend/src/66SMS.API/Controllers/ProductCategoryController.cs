@@ -5,12 +5,11 @@ using _66SMS.Application.CatalogService.ProductCategories.Commands.DeleteProduct
 using _66SMS.Application.CatalogService.ProductCategories.Commands.UpdateProductCategories;
 using _66SMS.Application.CatalogService.ProductCategories.Queries.GetAllProductCategories;
 using _66SMS.Application.CatalogService.ProductCategories.Queries.GetDetailProductCategory;
-using _66SMS.Contracts.Abstractions;
 using _66SMS.Infrastructure.Security;
-using Asp.Versioning;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace _66SMS.API.Controllers
 {
@@ -18,19 +17,16 @@ namespace _66SMS.API.Controllers
     public class ProductCategoryController : ApiController<ProductCategoryController>
     {
         private readonly IMediator mediator;
-        private readonly IJwtService jwtService;
 
-        public ProductCategoryController(IMediator mediator, IJwtService jwtService)
+        public ProductCategoryController(IMediator mediator)
         {
             this.mediator = mediator;
-            this.jwtService = jwtService;
         }
 
         [HttpPost]
         [PermissionAuthorize("products", "create")]
         public async Task<IActionResult> Create([FromBody] CreateProductCategoryCommand command)
         {
-            command.CreatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -40,7 +36,6 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] UpdateProductCategoryCommand command)
         {
             command.Id = id;
-            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -50,7 +45,6 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var command = new DeleteProductCategoryCommand { Id = id };
-            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -60,7 +54,6 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> DeleteMultiples(
             [FromBody] DeleteProductCategoryMultiplesCommand command)
         {
-            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }

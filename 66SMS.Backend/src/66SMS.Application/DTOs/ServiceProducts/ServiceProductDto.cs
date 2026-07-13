@@ -1,4 +1,4 @@
-using _66SMS.Application.DTOs.Products;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.DTOs.ServiceProducts
 {
@@ -14,6 +14,6 @@ namespace _66SMS.Application.DTOs.ServiceProducts
         public string? CreatedAt { get; set; }
         public string? UpdatedAt { get; set; }
 
-        public ProductDto? Product { get; set; }
+        public ProductFullDto? Product { get; set; }
     }
 }

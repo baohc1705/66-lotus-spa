@@ -8,5 +8,6 @@ namespace _66SMS.Application.DTOs
         public int? SortOrder { get; set; }
         public int? Status { get; set; }
         public string? Icon { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

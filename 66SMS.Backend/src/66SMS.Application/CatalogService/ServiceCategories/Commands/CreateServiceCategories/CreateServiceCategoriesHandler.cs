@@ -45,8 +45,15 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateSer
                 // Upload icon if provided
                 if (!string.IsNullOrWhiteSpace(request.Icon))
                 {
-                    service.Icon = await imageUploadService.UploadAsync(request.Icon, ServiceCategoryConst.GenerateImageFileName(service.Id), ServiceCategoryConst.IMAGE_FOLDER, cancellationToken);
+                    service.Icon = await imageUploadService.UploadAsync(request.Icon, ServiceCategoryConst.GenerateIconFileName(service.Id), ServiceCategoryConst.IMAGE_FOLDER, cancellationToken);
                 }
+
+                // Upload image if provided
+                if (!string.IsNullOrWhiteSpace(request.ImageUrl))
+                {
+                    service.ImageUrl = await imageUploadService.UploadAsync(request.ImageUrl, ServiceCategoryConst.GenerateImageFileName(service.Id), ServiceCategoryConst.IMAGE_FOLDER, cancellationToken);
+                }
+
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 // Commit transaction
                 transaction.Commit();

@@ -21,8 +21,6 @@ namespace _66SMS.Application.CatalogService.Products.Commands.UpdateProducts
         public int? Status { get; set; }
         public List<ProductImageDto>? Images { get; set; }
         [JsonIgnore]
-        public int? UpdatedBy { get; set; }
-        [JsonIgnore]
         public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
     }
 }

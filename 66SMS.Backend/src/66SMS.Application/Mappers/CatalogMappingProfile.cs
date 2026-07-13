@@ -12,7 +12,6 @@ using _66SMS.Application.CatalogService.Services.Commands.CreateServices;
 using _66SMS.Application.CatalogService.Services.Commands.UpdateServices;
 using _66SMS.Application.CatalogService.TreatmentCourses.Commands.CreateTreatmentCourse;
 using _66SMS.Application.CatalogService.TreatmentCourses.Commands.UpdateTreatmentCourse;
-using _66SMS.Application.DTOs.ProductCategories;
 using _66SMS.Application.DTOs.ProductImages;
 using _66SMS.Application.DTOs.ServiceImages;
 using _66SMS.Application.DTOs.ServiceProducts;
@@ -65,7 +64,12 @@ namespace _66SMS.Application.Mappers
             CreateMap<CreateServiceCommand, Service>().IgnoreNullValueTypes();
             CreateMap<ServiceImageItems, ServiceImage>().IgnoreNullValueTypes();
             CreateMap<ServiceProductItems, ServiceProduct>().IgnoreNullValueTypes();
-            CreateMap<UpdateServiceCommand, Service>().IgnoreNullValueTypes();
+            // ServiceProducts/ImageUrl/Code xử lý riêng trong handler — không map vào navigation (tránh INSERT trùng UNIQUE)
+            CreateMap<UpdateServiceCommand, Service>()
+                .ForMember(d => d.ServiceProducts, opt => opt.Ignore())
+                .ForMember(d => d.ImageUrl, opt => opt.Ignore())
+                .ForMember(d => d.Code, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
             #endregion
 
             #region Treament Course

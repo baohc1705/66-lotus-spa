@@ -17,6 +17,7 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_MIN_STOCK = "min_stock";
         public const string FIELD_STATUS = "status";
         public const string FIELD_CREATED_AT = "created_at";
+        public const string FIELD_UPDATED_AT = "updated_at";
         #endregion
 
         #region Constraint

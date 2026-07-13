@@ -9,6 +9,7 @@ namespace _66SMS.Domain.Entities
         public int SortOrder { get; set; }
         public int Status { get; set; }
         public string? Icon { get; set; }
+        public string? ImageUrl { get; set; }
         #region Navigation Properties
         public List<Service>? Services { get; set; }
         #endregion

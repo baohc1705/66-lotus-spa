@@ -31,27 +31,34 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.UpdateSer
 
         public async Task<Result<object>> Handle(UpdateServiceCategoriesCommand request, CancellationToken cancellationToken)
         {
+            // find by id and tracking
+            ServiceCategory? service = await serviceCategorySqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
+
+            // return not found if service is not null
+            if (service == null)
+            {
+                return Result<object>.NotFound(ServiceCategoryConst.MSG_SERVICE_CATEGORY_NOT_FOUND, ErrorCodes.ERR_SERVICE_CATEGORY_NOT_FOUND);
+            }
+
+            // map request to domain entity, ignore null
+            mapper.Map(request, service);
+
             // Begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // find by id and tracking
-                ServiceCategory? service = await serviceCategorySqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
-
-                // return not found if service is not null
-                if (service == null)
-                {
-                    return Result<object>.NotFound(ServiceCategoryConst.MSG_SERVICE_CATEGORY_NOT_FOUND, ErrorCodes.ERR_SERVICE_CATEGORY_NOT_FOUND);
-                }
-
-                // map request to domain entity, ignore null
-                mapper.Map(request, service);
-
                 // Upload icon if provided
                 if (!string.IsNullOrWhiteSpace(request.Icon))
                 {
-                    service.Icon = await imageUploadService.UploadAsync(request.Icon, ServiceCategoryConst.GenerateImageFileName(service.Id), ServiceCategoryConst.IMAGE_FOLDER, cancellationToken);
+                    service.Icon = await imageUploadService.UploadAsync(request.Icon, ServiceCategoryConst.GenerateIconFileName(service.Id), ServiceCategoryConst.IMAGE_FOLDER, cancellationToken);
                 }
+
+                // Upload image if provided
+                if (!string.IsNullOrWhiteSpace(request.ImageUrl))
+                {
+                    service.ImageUrl = await imageUploadService.UploadAsync(request.ImageUrl, ServiceCategoryConst.GenerateImageFileName(service.Id), ServiceCategoryConst.IMAGE_FOLDER, cancellationToken);
+                }
+
                 // update and persist to database
                 serviceCategorySqlRepository.Update(service);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

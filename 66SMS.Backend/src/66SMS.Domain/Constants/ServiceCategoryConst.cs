@@ -10,12 +10,14 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_SORT_ORDER = "sort_order";
         public const string FIELD_STATUS = "status";
         public const string FIELD_ICON = "icon";
+        public const string FIELD_IMAGE_URL = "image_url";
         #endregion
 
         #region Constraint
         public const int NAME_MAX_LENGTH = 100;
         public const int DESCRIPTION_MAX_LENGTH = 500;
         public const int ICON_MAX_LENGTH = 200;
+        public const int IMAGE_URL_MAX_LENGTH = 200;
         #endregion
 
         #region Status
@@ -31,10 +33,12 @@ namespace _66SMS.Domain.Constants
 
         #region Image Storage
         public const string IMAGE_FOLDER = "services";
-        public const string IMAGE_FILE_PREFIX = "icon";
+        public const string ICON_FILE_PREFIX = "cat_icon";
+        public const string IMAGE_FILE_PREFIX = "cat_image";
 
-        public static string GenerateImageFileName(int entityId)
-            => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmss"));
+        public static string GenerateIconFileName(int entityId) => string.Format("{0}_{1}_{2}", ICON_FILE_PREFIX, entityId, DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmss"));
+
+        public static string GenerateImageFileName(int entityId)  => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmss"));
         #endregion
 
     }

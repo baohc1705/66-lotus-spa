@@ -1,5 +1,4 @@
 using _66SMS.Application.DTOs.ProductImages;
-using _66SMS.Application.DTOs.Products;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -7,13 +6,14 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.Products.Queries.GetDetailProduct
 {
     /// <summary>
     /// Handler for <see cref="GetDetailProductQuery"/>
     /// </summary>
-    public class GetDetailProductHandler : IRequestHandler<GetDetailProductQuery, Result<ProductDto>>
+    public class GetDetailProductHandler : IRequestHandler<GetDetailProductQuery, Result<ProductFullDto>>
     {
         private readonly IProductSqlRepository productSqlRepository;
 
@@ -22,12 +22,12 @@ namespace _66SMS.Application.CatalogService.Products.Queries.GetDetailProduct
             this.productSqlRepository = productSqlRepository;
         }
 
-        public async Task<Result<ProductDto>> Handle(GetDetailProductQuery request, CancellationToken cancellationToken)
+        public async Task<Result<ProductFullDto>> Handle(GetDetailProductQuery request, CancellationToken cancellationToken)
         {
-            ProductDto? productDto = await productSqlRepository
+            ProductFullDto? productDto = await productSqlRepository
                 .AsQueryable(true)
                 .Where(x => x.Id == request.Id && x.Status != (int)StatusActiveEnum.DELETED)
-                .Select(x => new ProductDto
+                .Select(x => new ProductFullDto
                 {
                     Id = x.Id,
                     CategoryId = x.CategoryId,
@@ -42,8 +42,8 @@ namespace _66SMS.Application.CatalogService.Products.Queries.GetDetailProduct
                     StockQuantity = x.StockQuantity,
                     MinStock = x.MinStock,
                     Status = x.Status,
-                    CreatedAt = x.CreatedAt.ToString(),
-                    UpdatedAt = null,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
                     Images = x.Images!.Select(x => new ProductImageDto
                     {
                         Id = x.Id,
@@ -56,10 +56,10 @@ namespace _66SMS.Application.CatalogService.Products.Queries.GetDetailProduct
 
             if (productDto == null)
             {
-                return Result<ProductDto>.NotFound(ProductConst.MSG_PRODUCT_ID_NOT_FOUND, ErrorCodes.ERR_PRODUCT_NOT_FOUND);
+                return Result<ProductFullDto>.NotFound(ProductConst.MSG_PRODUCT_ID_NOT_FOUND, ErrorCodes.ERR_PRODUCT_NOT_FOUND);
             }
 
-            return Result<ProductDto>.Success(productDto);
+            return Result<ProductFullDto>.Success(productDto);
         }
     }
 }

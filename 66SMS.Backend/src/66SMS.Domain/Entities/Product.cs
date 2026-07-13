@@ -20,6 +20,7 @@ namespace _66SMS.Domain.Entities
         public int Status { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
 
         public ProductCategory? Category { get; set; }
         public List<ProductImage>? Images { get; set; }

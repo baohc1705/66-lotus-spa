@@ -16,6 +16,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.SortOrder).HasColumnName(ServiceCategoryConst.FIELD_SORT_ORDER);
             builder.Property(x => x.Status).HasColumnName(ServiceCategoryConst.FIELD_STATUS);
             builder.Property(x => x.Icon).HasColumnName(ServiceCategoryConst.FIELD_ICON).HasMaxLength(ServiceCategoryConst.ICON_MAX_LENGTH);
+            builder.Property(x => x.ImageUrl).HasColumnName(ServiceCategoryConst.FIELD_IMAGE_URL).HasMaxLength(ServiceCategoryConst.IMAGE_URL_MAX_LENGTH);
             builder.ToTable(ServiceCategoryConst.TABLE_NAME);
         }
     }

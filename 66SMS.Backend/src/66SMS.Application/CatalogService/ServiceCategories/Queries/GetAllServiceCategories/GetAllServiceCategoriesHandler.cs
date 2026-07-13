@@ -62,6 +62,7 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetAllServ
                     SortOrder = x.SortOrder,
                     Status = x.Status,
                     Icon = x.Icon,
+                    ImageUrl = x.ImageUrl,
                 })
                 .ToPagedAsync(request, cancellationToken);
 

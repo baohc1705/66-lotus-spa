@@ -13,7 +13,7 @@ namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
     public class CreateProductCommand : IRequest<Result<int>>
     {
         public int CategoryId { get; set; }
-        public string? Code { get; set; }
+        //public string? Code { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public string? Content { get; set; }
@@ -23,8 +23,6 @@ namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
         public int StockQuantity { get; set; }
         public int MinStock { get; set; }
         public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
-        [JsonIgnore]
-        public int? CreatedBy { get; set; }
         [JsonIgnore]
         public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
         public List<ProductImageDto> Images { get; set; } = new();

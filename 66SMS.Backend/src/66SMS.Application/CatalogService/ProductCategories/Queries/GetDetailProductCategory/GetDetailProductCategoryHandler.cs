@@ -1,12 +1,11 @@
-using _66SMS.Application.DTOs.ProductCategories;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Enums;
-using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.ProductCategories.Queries.GetDetailProductCategory
 {
@@ -34,9 +33,7 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Queries.GetDetailP
                     Name = x.Name,
                     Description = x.Description,
                     SortOrder = x.SortOrder,
-                    Status = x.Status,
-                    CreatedAt = null,
-                    UpdatedAt = null
+                    Status = x.Status,      
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

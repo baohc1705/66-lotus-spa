@@ -1,11 +1,9 @@
-using _66SMS.Application.DTOs.ProductCategories;
 using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
-using _66SMS.Domain.Entities;
 using _66SMS.Domain.Enums;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.ProductCategories.Queries.GetAllProductCategories
 {
@@ -15,12 +13,10 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Queries.GetAllProd
     public class GetAllProductCategoryHandler : IRequestHandler<GetAllProductCategoryQuery, Result<PagedResult<ProductCategoryDto>>>
     {
         private readonly IProductCategorySqlRepository productCategorySqlRepository;
-        private readonly IUserSqlRepository userSqlRepository;
 
-        public GetAllProductCategoryHandler(IProductCategorySqlRepository productCategorySqlRepository, IUserSqlRepository userSqlRepository)
+        public GetAllProductCategoryHandler(IProductCategorySqlRepository productCategorySqlRepository)
         {
             this.productCategorySqlRepository = productCategorySqlRepository;
-            this.userSqlRepository = userSqlRepository;
         }
 
         public async Task<Result<PagedResult<ProductCategoryDto>>> Handle(GetAllProductCategoryQuery request, CancellationToken cancellationToken)
@@ -58,10 +54,7 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Queries.GetAllProd
                     Name = x.Name,
                     Description = x.Description,
                     SortOrder = x.SortOrder,
-                    Status = x.Status,
-                    CreatedAt = null,
-                    UpdatedAt = null,
-                   
+                    Status = x.Status
                 })
                 .ToPagedAsync(request, cancellationToken);
 
