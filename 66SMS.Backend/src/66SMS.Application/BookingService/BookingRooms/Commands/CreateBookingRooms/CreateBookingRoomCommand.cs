@@ -9,6 +9,8 @@ namespace _66SMS.Application.BookingService.BookingRooms.Commands.CreateBookingR
         public int? SalonId { get; set; }
         public string? Name { get; set; }
         public string? ImageUrl { get; set; }
+        /// <summary>Base64 ảnh mới — upload qua IImageUploadService.</summary>
+        public string? ImageBase64 { get; set; }
         public string? Note { get; set; }
         public int? Status { get; set; }
         [JsonIgnore]

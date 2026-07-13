@@ -21,7 +21,7 @@ namespace _66SMS.Domain.Entities
         public int? SortOrder { get; set; }
         public int Status { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
 
         // Navigation
         public List<StaffSalon>? StaffSalons { get; set; }

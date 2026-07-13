@@ -1,3 +1,4 @@
+using _66SMS.Contract.Abstractions;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Helpers;
@@ -21,6 +22,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
         private readonly IPasswordHash passwordHash;
+        private readonly IImageUploadService imageUploadService;
 
         public CreateStaffHandler(
             IUserSqlRepository userSqlRepository,
@@ -28,7 +30,8 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
             ISqlUnitOfWork sqlUnitOfWork,
             IMapper mapper,
             IPasswordHash passwordHash,
-            IRoleSqlRepository roleSqlRepository)
+            IRoleSqlRepository roleSqlRepository,
+            IImageUploadService imageUploadService)
         {
             this.userSqlRepository = userSqlRepository;
             this.staffSqlRepository = staffSqlRepository;
@@ -36,15 +39,14 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
             this.mapper = mapper;
             this.passwordHash = passwordHash;
             this.roleSqlRepository = roleSqlRepository;
+            this.imageUploadService = imageUploadService;
         }
 
         public async Task<Result<object>> Handle(CreateStaffCommand request, CancellationToken cancellationToken)
         {
-            // generate code and email for staff
             string staffCode = await GenerateUniqueStaffCodeAsync(cancellationToken);
             string staffEmail = $"{staffCode}@lotusspa.com.vn";
 
-            // Create user account for staff
             User? user = new User
             {
                 Username = staffCode,
@@ -55,7 +57,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
                 Status = (int)request.Status!,
             };
 
-            // create role for staff
             string roleRequest = request.Role ?? "staff";
             Role? role = await roleSqlRepository.AsQueryable()
                 .Where(x => x.Name.Equals(roleRequest))
@@ -73,11 +74,12 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
             };
             user.UserRoles = new List<UserRole> { userRole };
 
-            // map request to domain entity
+            if (!string.IsNullOrWhiteSpace(request.ImageBase64))
+                request.AvatarUrl = null;
+
             Staff? staff = mapper.Map<Staff>(request);
             staff.Code = staffCode;
 
-            // Assign staff to salon if request has provived salon id
             if (request.SalonId.HasValue)
             {
                 staff.StaffSalons = new List<StaffSalon>
@@ -92,28 +94,36 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
                 };
             }
 
-            // begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // save and persist user to database
                 userSqlRepository.Add(user);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // save and persist staff to database
                 staff.UserId = user.Id;
                 staffSqlRepository.Add(staff);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // commit transaction
-                transaction.Commit();
+                if (!string.IsNullOrWhiteSpace(request.ImageBase64))
+                {
+                    staff.AvatarUrl = await imageUploadService.UploadAsync(
+                        request.ImageBase64,
+                        StaffConst.GenerateImageFileName(staff.Id),
+                        StaffConst.IMAGE_FOLDER,
+                        cancellationToken);
 
-                // return staff id was created
+                    if (!string.IsNullOrWhiteSpace(staff.AvatarUrl))
+                    {
+                        staffSqlRepository.Update(staff);
+                        await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                    }
+                }
+
+                transaction.Commit();
                 return Result<object>.Created(staff.Id);
             }
             catch
             {
-                // Rollback on failure
                 transaction.Rollback();
                 throw;
             }
@@ -121,7 +131,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
 
         private async Task<string> GenerateUniqueStaffCodeAsync(CancellationToken cancellationToken)
         {
-            // find first staff with code order by descending => last code
             Staff? staff = await staffSqlRepository.AsQueryable()
                 .Where(x => x.Code!.StartsWith("SEN"))
                 .OrderByDescending(x => x.Code)
@@ -130,7 +139,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
             int nextNumber = 1;
             if (staff != null && !string.IsNullOrEmpty(staff.Code) && staff.Code.Length > 7)
             {
-                // get number last code then add one number
                 string numberPart = staff.Code.Substring(7);
                 if (int.TryParse(numberPart, out int parsedNumber))
                 {
@@ -142,21 +150,18 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
             bool isUnique = false;
             do
             {
-                // create new code with next number
                 newCode = $"SEN{nextNumber:D4}";
 
-                // check if new code exisited
                 bool exists = await staffSqlRepository.AsQueryable()
                     .Where(x => x.Code == newCode)
                     .AnyAsync(cancellationToken);
 
-                // if not existed then newCode is unique else increment 1
                 if (!exists)
                     isUnique = true;
                 else
                     nextNumber++;
 
-            } while (!isUnique); // loop util find new code is unique
+            } while (!isUnique);
 
             return newCode;
         }

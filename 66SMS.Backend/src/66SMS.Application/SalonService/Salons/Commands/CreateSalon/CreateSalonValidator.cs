@@ -11,7 +11,6 @@ namespace _66SMS.Application.SalonService.Salons.Commands.CreateSalon
     {
         public CreateSalonValidator()
         {
-            RuleFor(x => x.Code).MaximumLength(SalonConst.CODE_MAX_LENGTH).When(x => x.Code != null);
             RuleFor(x => x.Name).MaximumLength(SalonConst.NAME_MAX_LENGTH).When(x => x.Name != null);
             RuleFor(x => x.Phone).NotNull().Matches(RegexConst.VIETNAM_PHONE_REGEX).MaximumLength(SalonConst.PHONE_MAX_LENGTH);
             RuleFor(x => x.Email).NotNull().Matches(RegexConst.EMAIL_REGEX).MaximumLength(SalonConst.EMAIL_MAX_LENGTH);

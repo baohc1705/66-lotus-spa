@@ -32,8 +32,8 @@ namespace _66SMS.Application.SalonService.Helpers
         public static decimal CalculateWorkCredit(
             int status,
             decimal workedHours,
-            DateTime? checkInAt,
-            DateTime? checkOutAt,
+            DateTimeOffset? checkInAt,
+            DateTimeOffset? checkOutAt,
             TimeOnly? shiftStart)
         {
             if (status == AttendanceConst.STATUS_PAID_LEAVE || status == AttendanceConst.STATUS_HOLIDAY)
@@ -68,10 +68,10 @@ namespace _66SMS.Application.SalonService.Helpers
             return 0m;
         }
 
-        private static DateTime GetScheduledStart(DateTime checkInAt, TimeOnly? shiftStart)
+        private static DateTimeOffset GetScheduledStart(DateTimeOffset checkInAt, TimeOnly? shiftStart)
         {
             var startTime = shiftStart ?? PayrollConst.DEFAULT_SHIFT_START;
-            return checkInAt.Date.Add(startTime.ToTimeSpan());
+            return new DateTimeOffset(checkInAt.Date.Add(startTime.ToTimeSpan()), checkInAt.Offset);
         }
     }
 }

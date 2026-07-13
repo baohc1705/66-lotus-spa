@@ -1,5 +1,6 @@
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Constants;
+using _66SMS.Domain.Enums;
 using MediatR;
 using System.Text.Json.Serialization;
 
@@ -10,7 +11,7 @@ namespace _66SMS.Application.SalonService.Salons.Commands.CreateSalon
     /// </summary>
     public class CreateSalonCommand : IRequest<Result<object>>
     {
-        public string? Code { get; set; }
+        //public string? Code { get; set; } 
         public string? Name { get; set; }
         public string? Phone { get; set; }
         public string? Email { get; set; }
@@ -23,13 +24,15 @@ namespace _66SMS.Application.SalonService.Salons.Commands.CreateSalon
         public string? WorkingDays { get; set; }
         public string? TaxCode { get; set; }
         public string? ImageUrl { get; set; }
+        /// <summary>Base64 ảnh mới — upload qua IImageUploadService.</summary>
+        public string? ImageBase64 { get; set; }
         public string? Description { get; set; }
         public int? SortOrder { get; set; } = 0;
-        public int? Status { get; set; } = SalonConst.STATUS_ACTIVE;
+        public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
         [JsonIgnore]
         public int? CreatedBy { get; set; }
         [JsonIgnore]
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
         
     }
 }

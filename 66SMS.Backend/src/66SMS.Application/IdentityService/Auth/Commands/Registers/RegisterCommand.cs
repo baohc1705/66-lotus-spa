@@ -1,4 +1,4 @@
-﻿using _66SMS.Application.DTOs.Auth;
+using _66SMS.Application.DTOs.Auth;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Enums;
 using MediatR;
@@ -18,7 +18,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
         public string? Password { get; set; }
         public string? ConfirmPassword { get; set; }
         [JsonIgnore]
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
         
         public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
     }

@@ -14,13 +14,13 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.CreateMemb
         public int? MembershipTierId { get; set; }
         public string? MembershipTierName { get; set; } // client 
         public string CardCode { get; set; } = string.Empty;
-        public DateTime? IssuedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? ExpiresAt { get; set; } 
+        public DateTimeOffset? IssuedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? ExpiresAt { get; set; } 
         public int? Status { get; set; } = MembershipCardConst.STATUS_ACTIVE;
 
         [JsonIgnore]
         public int? CreatedBy { get; set; }
 
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     }
 }

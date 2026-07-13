@@ -4,8 +4,7 @@ using _66SMS.Application.SalonService.Salons.Commands.DeleteSalon;
 using _66SMS.Application.SalonService.Salons.Commands.UpdateSalon;
 using _66SMS.Application.SalonService.Salons.Queries.GetAllSalons;
 using _66SMS.Application.SalonService.Salons.Queries.GetDetailSalon;
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Domain.Constants;
+using _66SMS.Domain.Enums;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
@@ -18,19 +17,16 @@ namespace _66SMS.API.Controllers
     public class SalonsController : ApiController<SalonsController>
     {
         private readonly IMediator mediator;
-        private readonly IJwtService jwtService;
 
-        public SalonsController(IMediator mediator, IJwtService jwtService)
+        public SalonsController(IMediator mediator)
         {
             this.mediator = mediator;
-            this.jwtService = jwtService;
         }
 
         [HttpPost]
         [PermissionAuthorize("salons", "create")]
         public async Task<IActionResult> Create([FromBody] CreateSalonCommand command)
         {
-            command.CreatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -40,7 +36,6 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] UpdateSalonCommand command)
         {
             command.Id = id;
-            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -50,7 +45,6 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             DeleteSalonCommand command = new DeleteSalonCommand { Id = id };
-            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -62,7 +56,7 @@ namespace _66SMS.API.Controllers
             var query = new GetAllSalonsQuery 
             {
                 Filter = filter,
-                Status = SalonConst.STATUS_ACTIVE,
+                Status = (int)StatusActiveEnum.ACTIVED,
                 OrderBy = orderBy,
                 IsDescending = isDescending ?? false,
                 PageIndex = pageIndex ?? 1,

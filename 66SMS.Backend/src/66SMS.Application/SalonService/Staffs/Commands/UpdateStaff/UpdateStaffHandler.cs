@@ -1,3 +1,5 @@
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -5,12 +7,8 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
-using System.Data;
-using System.Threading;
-using System.Threading.Tasks;
-using System;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using System.Data;
 
 namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
 {
@@ -23,6 +21,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
         private readonly IRoleSqlRepository roleSqlRepository;
         private readonly IUserRoleSqlRepository userRoleSqlRepository;
         private readonly IStaffSalonSqlRepository staffSalonSqlRepository;
+        private readonly IImageUploadService imageUploadService;
 
         public UpdateStaffHandler(
             IStaffSqlRepository staffSqlRepository,
@@ -31,7 +30,8 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
             IMapper mapper,
             IRoleSqlRepository roleSqlRepository,
             IUserRoleSqlRepository userRoleSqlRepository,
-            IStaffSalonSqlRepository staffSalonSqlRepository)
+            IStaffSalonSqlRepository staffSalonSqlRepository,
+            IImageUploadService imageUploadService)
         {
             this.staffSqlRepository = staffSqlRepository;
             this.userSqlRepository = userSqlRepository;
@@ -40,6 +40,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
             this.roleSqlRepository = roleSqlRepository;
             this.userRoleSqlRepository = userRoleSqlRepository;
             this.staffSalonSqlRepository = staffSalonSqlRepository;
+            this.imageUploadService = imageUploadService;
         }
 
         public async Task<Result<object>> Handle(UpdateStaffCommand request, CancellationToken cancellationToken)
@@ -51,18 +52,32 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
                 if (staff == null)
                     return Result<object>.NotFound();
 
+                if (!string.IsNullOrWhiteSpace(request.ImageBase64))
+                    request.AvatarUrl = null;
+
                 mapper.Map(request, staff);
+
+                if (!string.IsNullOrWhiteSpace(request.ImageBase64))
+                {
+                    var url = await imageUploadService.UploadAsync(
+                        request.ImageBase64,
+                        StaffConst.GenerateImageFileName(staff.Id),
+                        StaffConst.IMAGE_FOLDER,
+                        cancellationToken);
+
+                    if (!string.IsNullOrWhiteSpace(url))
+                        staff.AvatarUrl = url;
+                }
+
                 staffSqlRepository.Update(staff);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // Update StaffSalon relationship if SalonId has changed
                 if (request.SalonId.HasValue)
                 {
                     var activeAssignments = await staffSalonSqlRepository.AsQueryable()
                         .Where(x => x.StaffId == staff.Id && x.Status == StaffSalonConst.STATUS_ACTIVE)
                         .ToListAsync(cancellationToken);
 
-                    // If request.SalonId is not in the active assignments, deactivate existing ones and add a new one
                     if (!activeAssignments.Any(x => x.SalonId == request.SalonId.Value))
                     {
                         foreach (var assignment in activeAssignments)
@@ -100,7 +115,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
                     }
                 }
 
-                // Update UserRole
                 if (!string.IsNullOrEmpty(request.Role))
                 {
                     var role = await roleSqlRepository.AsQueryable()

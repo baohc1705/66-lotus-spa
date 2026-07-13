@@ -6,15 +6,15 @@ namespace _66SMS.Domain.Entities
     {
         public int UserId { get; set; }
         public string Token { get; set; } = null!;
-        public DateTime ExpiresAt { get; set; }
+        public DateTimeOffset ExpiresAt { get; set; }
         public bool IsRevoked { get; set; }
         public string? CreatedByIp { get; set; }
         public string? RevokedByIp { get; set; }
-        public DateTime? RevokedAt { get; set; }
+        public DateTimeOffset? RevokedAt { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
 
-        public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
+        public bool IsExpired => DateTimeOffset.UtcNow >= ExpiresAt;
         public bool IsActive => RevokedAt == null && !IsExpired;
 
         public User? User { get; set; }

@@ -17,6 +17,6 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateSer
         [JsonIgnore]
         public int? CreatedBy { get; set; }
         [JsonIgnore]
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     }
 }

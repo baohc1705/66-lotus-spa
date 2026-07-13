@@ -1,10 +1,10 @@
-using _66SMS.Application.DTOs.Salons;
 using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using AutoMapper;
 using MediatR;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.SalonService.Salons.Queries.GetAllSalons
 {
@@ -58,11 +58,10 @@ namespace _66SMS.Application.SalonService.Salons.Queries.GetAllSalons
                     WorkingDays = x.WorkingDays,
                     TaxCode = x.TaxCode,
                     ImageUrl = x.ImageUrl,
-                    Description = x.Description,
+                    //Description = x.Description,
                     SortOrder = x.SortOrder,
                     Status = x.Status,
-                    CreatedAt = x.CreatedAt.ToString(),
-                    UpdatedAt = null
+                    CreatedAt = x.CreatedAt
                 })
                 .ToPagedAsync(request, cancellationToken);
 

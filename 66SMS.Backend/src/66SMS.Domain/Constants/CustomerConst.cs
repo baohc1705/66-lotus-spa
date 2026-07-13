@@ -47,5 +47,12 @@ namespace _66SMS.Domain.Constants
         public const string MSG_CUSTOMER_ID_NOT_FOUND = $"{nameof(Entities.Customer)} with id not found";
         public const string MSG_CUSTOMER_NOT_FOUND = "Customer not found.";
         #endregion
+        #region Image Storage
+        public const string IMAGE_FOLDER = "customers";
+        public const string IMAGE_FILE_PREFIX = "customer";
+
+        public static string GenerateImageFileName(int entityId)
+            => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTime.Now.ToString("yyyyMMddHHmmss"));
+        #endregion
     }
 }

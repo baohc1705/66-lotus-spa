@@ -29,5 +29,12 @@ namespace _66SMS.Domain.Constants
         #region Message
         public const string MSG_PRODUCT_ID_NOT_FOUND = $"{nameof(Entities.Product)} with id not found";
         #endregion
+        #region Image Storage
+        public const string IMAGE_FOLDER = "products";
+        public const string IMAGE_FILE_PREFIX = "product";
+
+        public static string GenerateImageFileName(int entityId)
+            => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTime.Now.ToString("yyyyMMddHHmmss"));
+        #endregion
     }
 }

@@ -15,6 +15,8 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.CreateTrea
         public decimal? OriginalPrice { get; set; }
         public decimal? SellingPrice { get; set; }
         public string? ImageUrl { get; set; }
+        /// <summary>Base64 ảnh mới — upload qua IImageUploadService.</summary>
+        public string? ImageBase64 { get; set; }
         public int? SortOrder { get; set; }
         public int? Status { get; set; } = TreatmentCourseConst.STATUS_ACTIVED;
         public List<CreateTreatmentCourseItemDto>? Items { get; set; }
@@ -22,7 +24,7 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.CreateTrea
         [JsonIgnore]
         public int? CreatedBy { get; set; }
         [JsonIgnore]
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     }
 
     public class CreateTreatmentCourseItemDto

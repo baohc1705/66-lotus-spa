@@ -19,6 +19,6 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Commands.UpdatePro
         [JsonIgnore]
         public int? UpdatedBy { get; set; }
         [JsonIgnore]
-        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
     }
 }

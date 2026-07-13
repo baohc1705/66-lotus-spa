@@ -18,8 +18,8 @@ namespace _66SMS.Application.BookingService.Promotions.Commands.UpdatePromotion
         public int? BuyQuantity { get; set; }
         public int? GetQuantity { get; set; }
         public int? UsageLimit { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
+        public DateTimeOffset? StartDate { get; set; }
+        public DateTimeOffset? EndDate { get; set; }
         public int? Status { get; set; }
 
         [JsonIgnore]

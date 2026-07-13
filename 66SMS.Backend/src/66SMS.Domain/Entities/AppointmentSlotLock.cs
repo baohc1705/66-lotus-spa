@@ -11,9 +11,9 @@ namespace _66SMS.Domain.Entities
         public int LockedByUserId { get; set; }
         public DateOnly AppointmentDate { get; set; }
         public int SlotsNeeded { get; set; }
-        public DateTime LockedAt { get; set; }
-        public DateTime ExpiresAt { get; set; }
-        public DateTime? ReleasedAt { get; set; }
+        public DateTimeOffset LockedAt { get; set; }
+        public DateTimeOffset ExpiresAt { get; set; }
+        public DateTimeOffset? ReleasedAt { get; set; }
         public int Status { get; set; }
 
         // Navigation properties

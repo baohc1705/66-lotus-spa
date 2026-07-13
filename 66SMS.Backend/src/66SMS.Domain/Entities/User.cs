@@ -11,14 +11,14 @@ namespace _66SMS.Domain.Entities
         public bool IsEmailConfirmed { get; set; }
         public int AccessFailedCount { get; set; }
         public int Status { get; set; }
-        public DateTime? LockoutEnd { get; set; }
-        public DateTime? LastLoginAt { get; set; }
+        public DateTimeOffset? LockoutEnd { get; set; }
+        public DateTimeOffset? LastLoginAt { get; set; }
         public string? PasswordResetToken { get; set; }
-        public DateTime? PasswordResetTokenExpiry { get; set; }
+        public DateTimeOffset? PasswordResetTokenExpiry { get; set; }
         
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
         public int? CreatedBy { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
         public int? UpdatedBy { get; set; }
         public string? OtpCode { get; set; }
 

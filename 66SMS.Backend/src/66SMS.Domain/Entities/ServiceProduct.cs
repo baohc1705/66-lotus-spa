@@ -10,8 +10,8 @@ namespace _66SMS.Domain.Entities
         public string? Note { get; set; }
         public int Status { get; set; }
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
 
         public Service? Service { get; set; }
         public Product? Product { get; set; }

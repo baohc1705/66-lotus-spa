@@ -27,7 +27,7 @@ namespace _66SMS.Application.DTOs.Cashier
         public decimal DepositAmount { get; set; }
         public decimal RemainingAmount { get; set; }
         public bool DepositPaid { get; set; }
-        public DateTime? DepositDeadlineAt { get; set; }
+        public DateTimeOffset? DepositDeadlineAt { get; set; }
         public string? Note { get; set; }
         public decimal CustomerWalletBalance { get; set; }
         public int? InvoiceId { get; set; }

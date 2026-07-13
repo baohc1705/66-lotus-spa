@@ -14,12 +14,14 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.UpdateCustomer
         public int? Id { get; set; }
         public string? FullName { get; set; }
         public string? AvatarUrl { get; set; }
+        /// <summary>Base64 ảnh mới — upload qua IImageUploadService.</summary>
+        public string? ImageBase64 { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public int? Gender { get; set; }
         public string? Phone { get; set; }
         public int? LoyaltyPoint { get; set; }
-        public DateTime? FirstPurchaseAt { get; set; }
-        public DateTime? LastPurchaseAt { get; set; }
+        public DateTimeOffset? FirstPurchaseAt { get; set; }
+        public DateTimeOffset? LastPurchaseAt { get; set; }
         public string? Source { get; set; }
         public int? Status { get; set; } = CustomerConst.STATUS_ACTIVED;
         public string? Note { get; set; }
@@ -29,6 +31,6 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.UpdateCustomer
         public string? FullAddress { get; set; }
         public int? UpdatedBy { get; set; }
         [JsonIgnore]
-        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
     }
 }

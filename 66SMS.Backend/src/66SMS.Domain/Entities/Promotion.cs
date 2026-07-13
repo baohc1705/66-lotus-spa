@@ -15,10 +15,10 @@ namespace _66SMS.Domain.Entities
         public int? GetQuantity { get; set; }
         public int? UsageLimit { get; set; }
         public int UsedCount { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTimeOffset StartDate { get; set; }
+        public DateTimeOffset EndDate { get; set; }
         public int Status { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
     }
 }

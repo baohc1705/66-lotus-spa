@@ -1,3 +1,4 @@
+using _66SMS.Contract.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -13,15 +14,18 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.UpdateSta
         private readonly IStaffCertificateSqlRepository staffCertificateRepository;
         private readonly ICertificateTypeSqlRepository certificateTypeRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
+        private readonly IImageUploadService imageUploadService;
 
         public UpdateStaffCertificateHandler(
             IStaffCertificateSqlRepository staffCertificateRepository,
             ICertificateTypeSqlRepository certificateTypeRepository,
-            ISqlUnitOfWork sqlUnitOfWork)
+            ISqlUnitOfWork sqlUnitOfWork,
+            IImageUploadService imageUploadService)
         {
             this.staffCertificateRepository = staffCertificateRepository;
             this.certificateTypeRepository = certificateTypeRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
+            this.imageUploadService = imageUploadService;
         }
 
         public async Task<Result<object>> Handle(UpdateStaffCertificateCommand request, CancellationToken cancellationToken)
@@ -44,7 +48,8 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.UpdateSta
             if (request.IssuedDate != null) entity.IssuedDate = DateOnly.Parse(request.IssuedDate);
             entity.ExpiryDate = string.IsNullOrEmpty(request.ExpiryDate) ? null : DateOnly.Parse(request.ExpiryDate);
             entity.CertificateNumber = request.CertificateNumber;
-            entity.DocumentUrl = request.DocumentUrl;
+            if (string.IsNullOrWhiteSpace(request.ImageBase64) && request.DocumentUrl != null)
+                entity.DocumentUrl = request.DocumentUrl;
             entity.Note = request.Note;
             if (request.Status.HasValue) entity.Status = request.Status.Value;
             entity.UpdatedAt = DateTime.UtcNow;
@@ -52,9 +57,22 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.UpdateSta
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
+                if (!string.IsNullOrWhiteSpace(request.ImageBase64))
+                {
+                    var url = await imageUploadService.UploadAsync(
+                        request.ImageBase64,
+                        StaffCertificateConst.GenerateImageFileName(entity.Id),
+                        StaffCertificateConst.IMAGE_FOLDER,
+                        cancellationToken);
+
+                    if (!string.IsNullOrWhiteSpace(url))
+                        entity.DocumentUrl = url;
+                }
+
                 staffCertificateRepository.Update(entity);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
+
                 return Result<object>.Ok();
             }
             catch

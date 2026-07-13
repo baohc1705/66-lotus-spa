@@ -14,7 +14,7 @@ namespace _66SMS.Application.IdentityService.Roles.Commands.UpdateRole
         public string? Name { get; set; }
         public string? Description { get; set; }
         [JsonIgnore]
-        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
         [JsonIgnore]
         public int? UpdatedBy { get; set; }
 

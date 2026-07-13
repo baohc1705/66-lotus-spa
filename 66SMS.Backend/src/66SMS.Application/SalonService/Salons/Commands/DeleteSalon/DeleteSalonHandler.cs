@@ -5,6 +5,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
+using _66SMS.Domain.Enums;
 using MediatR;
 using System.Data;
 
@@ -27,13 +28,12 @@ namespace _66SMS.Application.SalonService.Salons.Commands.DeleteSalon
             if (salon == null)
                 return Result<object>.NotFound(SalonConst.MSG_SALON_NOT_FOUND, ErrorCodes.ERR_SALON_NOT_FOUND);
 
-            salon.Status = SalonConst.STATUS_DELETED;
+            salon.Status = (int)StatusActiveEnum.DELETED;
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
                 salonSqlRepository.Update(salon);
-
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
                 return Result<object>.Ok();

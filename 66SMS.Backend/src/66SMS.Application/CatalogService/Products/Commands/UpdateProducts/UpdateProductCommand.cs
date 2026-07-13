@@ -1,3 +1,4 @@
+using _66SMS.Application.DTOs.ProductImages;
 using _66SMS.Contracts.Shared;
 using MediatR;
 using System.Text.Json.Serialization;
@@ -18,9 +19,10 @@ namespace _66SMS.Application.CatalogService.Products.Commands.UpdateProducts
         public int? StockQuantity { get; set; }
         public int? MinStock { get; set; }
         public int? Status { get; set; }
+        public List<ProductImageDto>? Images { get; set; }
         [JsonIgnore]
         public int? UpdatedBy { get; set; }
         [JsonIgnore]
-        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
     }
 }

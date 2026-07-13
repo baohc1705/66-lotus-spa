@@ -1,3 +1,4 @@
+using _66SMS.Contract.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -15,17 +16,20 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.CreateSta
         private readonly IStaffSqlRepository staffRepository;
         private readonly ICertificateTypeSqlRepository certificateTypeRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
+        private readonly IImageUploadService imageUploadService;
 
         public CreateStaffCertificateHandler(
             IStaffCertificateSqlRepository staffCertificateRepository,
             IStaffSqlRepository staffRepository,
             ICertificateTypeSqlRepository certificateTypeRepository,
-            ISqlUnitOfWork sqlUnitOfWork)
+            ISqlUnitOfWork sqlUnitOfWork,
+            IImageUploadService imageUploadService)
         {
             this.staffCertificateRepository = staffCertificateRepository;
             this.staffRepository = staffRepository;
             this.certificateTypeRepository = certificateTypeRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
+            this.imageUploadService = imageUploadService;
         }
 
         public async Task<Result<int>> Handle(CreateStaffCertificateCommand request, CancellationToken cancellationToken)
@@ -47,7 +51,7 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.CreateSta
                 IssuingOrganization = request.IssuingOrganization!,
                 IssuedDate = DateOnly.Parse(request.IssuedDate!),
                 ExpiryDate = string.IsNullOrEmpty(request.ExpiryDate) ? null : DateOnly.Parse(request.ExpiryDate),
-                DocumentUrl = request.DocumentUrl,
+                DocumentUrl = string.IsNullOrWhiteSpace(request.ImageBase64) ? request.DocumentUrl : null,
                 Note = request.Note,
                 Status = request.Status ?? StaffCertificateConst.STATUS_PENDING_VERIFICATION,
                 CreatedAt = request.CreatedAt ?? DateTime.UtcNow,
@@ -58,6 +62,22 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.CreateSta
             {
                 staffCertificateRepository.Add(entity);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+
+                if (!string.IsNullOrWhiteSpace(request.ImageBase64))
+                {
+                    entity.DocumentUrl = await imageUploadService.UploadAsync(
+                        request.ImageBase64,
+                        StaffCertificateConst.GenerateImageFileName(entity.Id),
+                        StaffCertificateConst.IMAGE_FOLDER,
+                        cancellationToken);
+
+                    if (!string.IsNullOrWhiteSpace(entity.DocumentUrl))
+                    {
+                        staffCertificateRepository.Update(entity);
+                        await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                    }
+                }
+
                 transaction.Commit();
                 return Result<int>.Created(entity.Id);
             }

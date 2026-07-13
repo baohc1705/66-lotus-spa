@@ -1,3 +1,4 @@
+using _66SMS.Contract.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -16,13 +17,18 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.UpdateTrea
         private readonly ITreatmentCourseSqlRepository treatmentCourseRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
+        private readonly IImageUploadService imageUploadService;
 
-        public UpdateTreatmentCourseHandler(ITreatmentCourseSqlRepository treatmentCourseRepository, ISqlUnitOfWork sqlUnitOfWork, IMapper mapper)
+        public UpdateTreatmentCourseHandler(
+            ITreatmentCourseSqlRepository treatmentCourseRepository,
+            ISqlUnitOfWork sqlUnitOfWork,
+            IMapper mapper,
+            IImageUploadService imageUploadService)
         {
             this.treatmentCourseRepository = treatmentCourseRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
-
+            this.imageUploadService = imageUploadService;
         }
 
         public async Task<Result<object>> Handle(UpdateTreatmentCourseCommand request, CancellationToken cancellationToken)
@@ -34,7 +40,10 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.UpdateTrea
 
             if (course == null)
                 return Result<object>.NotFound(TreatmentCourseConst.MSG_NOT_FOUND, ErrorCodes.ERR_TREATMENT_COURSE_NOT_FOUND);
-            
+
+            if (!string.IsNullOrWhiteSpace(request.ImageBase64))
+                request.ImageUrl = null;
+
             mapper.Map(request, course);
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
@@ -42,11 +51,22 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.UpdateTrea
             {
                 if (request.Items != null)
                 {
-                    // drop all item old then insert new item
                     course.Items?.Clear();
                     var newItems = request.Items.Select(x => mapper.Map<TreatmentCourseItem>(x)).ToList();
                     course.Items = newItems;
                     course.TotalSessions = newItems.Count;
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.ImageBase64))
+                {
+                    var url = await imageUploadService.UploadAsync(
+                        request.ImageBase64,
+                        TreatmentCourseConst.GenerateImageFileName(course.Id),
+                        TreatmentCourseConst.IMAGE_FOLDER,
+                        cancellationToken);
+
+                    if (!string.IsNullOrWhiteSpace(url))
+                        course.ImageUrl = url;
                 }
 
                 treatmentCourseRepository.Update(course);

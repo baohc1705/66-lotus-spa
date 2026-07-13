@@ -15,8 +15,8 @@ namespace _66SMS.Domain.Entities
         public string? Note { get; set; }
         public int Status { get; set; }
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
 
         public Staff? Staff { get; set; }
         public CertificateType? CertificateType { get; set; }

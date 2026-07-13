@@ -1,6 +1,6 @@
-using _66SMS.Application.DTOs.Salons;
 using _66SMS.Contracts.Shared;
 using MediatR;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.SalonService.Salons.Queries.GetDetailSalon
 {

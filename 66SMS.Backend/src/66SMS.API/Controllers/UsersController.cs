@@ -2,6 +2,7 @@ using _66SMS.API.Abstractions;
 using _66SMS.Application.CustomerService.MembershipCards.Queries.GetDetailMembershipCard;
 using _66SMS.Application.IdentityService.Users.Commands.DeleteUser;
 using _66SMS.Application.IdentityService.Users.Commands.UpdateUser;
+using _66SMS.Application.IdentityService.Users.Queries.GetAllUserAccounts;
 using _66SMS.Application.IdentityService.Users.Queries.GetAllUsers;
 using _66SMS.Application.IdentityService.Users.Queries.GetDetailUser;
 using _66SMS.Application.IdentityService.Users.Queries.GetMyWallet;
@@ -78,9 +79,9 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetMyWallet()
         {
-            var result = await mediator.Send(new GetMyWalletQuery 
-            { 
-                UserId = jwtService.GetUserId() 
+            var result = await mediator.Send(new GetMyWalletQuery
+            {
+                UserId = jwtService.GetUserId()
             });
             return HandleResult(result);
         }
@@ -89,9 +90,9 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetMyWalletTransactions()
         {
-            var result = await mediator.Send(new GetMyWalletTransactionsQuery 
-            { 
-                UserId = jwtService.GetUserId() 
+            var result = await mediator.Send(new GetMyWalletTransactionsQuery
+            {
+                UserId = jwtService.GetUserId()
             });
             return HandleResult(result);
         }
@@ -101,9 +102,17 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> GetMyMembershipCard()
         {
             var result = await mediator.Send(new GetDetailMembershipCardQuery
-            { 
+            {
                 UserId = jwtService.GetUserId()
             });
+            return HandleResult(result);
+        }
+        
+        [HttpGet("accounts")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetAllAccounts([FromQuery] GetAllUserAccountQuery query)
+        {
+            var result = await mediator.Send(query);
             return HandleResult(result);
         }
     }

@@ -1,3 +1,4 @@
+using _66SMS.Contract.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -18,45 +19,46 @@ namespace _66SMS.Application.SalonService.Salons.Commands.CreateSalon
         private readonly ISalonSqlRepository salonSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
+        private readonly IImageUploadService imageUploadService;
 
-        public CreateSalonHandler(ISalonSqlRepository salonSqlRepository, ISqlUnitOfWork sqlUnitOfWork, IMapper mapper)
+        public CreateSalonHandler(
+            ISalonSqlRepository salonSqlRepository,
+            ISqlUnitOfWork sqlUnitOfWork,
+            IMapper mapper,
+            IImageUploadService imageUploadService)
         {
             this.salonSqlRepository = salonSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
+            this.imageUploadService = imageUploadService;
         }
 
         public async Task<Result<object>> Handle(CreateSalonCommand request, CancellationToken cancellationToken)
         {
-            // check if code existed
-            bool codeExists = salonSqlRepository
-                .AsQueryable()
-                .Where(x => x.Code == request.Code)
-                .Any();
+            if (!string.IsNullOrWhiteSpace(request.ImageBase64))
+                request.ImageUrl = null;
 
-            if (codeExists)
-                return Result<object>.Conflict(SalonConst.MSG_CODE_EXISTED, ErrorCodes.ERR_SALON_CODE_EXISTED);
-
-            // map request to domain entity
             Salon salon = mapper.Map<Salon>(request);
+            salon.Code = string.Empty;
 
-            // begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // save and persist to database
                 salonSqlRepository.Add(salon);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // commit transaction
-                transaction.Commit();
+                if (!string.IsNullOrWhiteSpace(request.ImageBase64))
+                {
+                    salon.ImageUrl = await imageUploadService.UploadAsync(request.ImageBase64, SalonConst.GenerateImageFileName(salon.Id), SalonConst.IMAGE_FOLDER, cancellationToken);
+                }
+                salon.Code = $"CN{salon.Id:D3}";
+                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // return success result
+                transaction.Commit();
                 return Result<object>.Created(salon.Id);
             }
             catch
             {
-                // rollback transaction
                 transaction.Rollback();
                 throw;
             }

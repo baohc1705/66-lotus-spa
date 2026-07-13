@@ -16,6 +16,8 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.UpdateTrea
         public decimal? OriginalPrice { get; set; }
         public decimal? SellingPrice { get; set; }
         public string? ImageUrl { get; set; }
+        /// <summary>Base64 ảnh mới — upload qua IImageUploadService.</summary>
+        public string? ImageBase64 { get; set; }
         public int? SortOrder { get; set; }
         public int? Status { get; set; }
         public List<UpdateTreatmentCourseItemDto>? Items { get; set; }
@@ -23,7 +25,7 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.UpdateTrea
         [JsonIgnore]
         public int? UpdatedBy { get; set; }
         [JsonIgnore]
-        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
     }
 
     public class UpdateTreatmentCourseItemDto

@@ -57,5 +57,12 @@ namespace _66SMS.Domain.Constants
         public const string MSG_STAFF_UPDATE_STATUS_SUCCESS = "Cập nhật trạng thái thành công.";
         public const string MSG_KPI_INCOMPLETE = "Nếu cấu hình KPI thì phải nhập cả số lượng mục tiêu và tiền thưởng.";
         #endregion
+        #region Image Storage
+        public const string IMAGE_FOLDER = "staffs";
+        public const string IMAGE_FILE_PREFIX = "staff";
+
+        public static string GenerateImageFileName(int entityId)
+            => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTime.Now.ToString("yyyyMMddHHmmss"));
+        #endregion
     }
 }

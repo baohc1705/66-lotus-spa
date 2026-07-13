@@ -27,11 +27,11 @@ namespace _66SMS.Domain.Entities
         public string? TransactionId { get; set; }
         public int Status { get; set; }
         public string? Note { get; set; }
-        public DateTime IssuedAt { get; set; }
+        public DateTimeOffset IssuedAt { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
         public int? CreatedBy { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
         public int? UpdatedBy { get; set; }
 
         public Customer? Customer { get; set; }

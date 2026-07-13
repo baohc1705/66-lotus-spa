@@ -15,6 +15,8 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.CreateSta
         public string? IssuedDate { get; set; }
         public string? ExpiryDate { get; set; }
         public string? DocumentUrl { get; set; }
+        /// <summary>Base64 ảnh mới — upload qua IImageUploadService.</summary>
+        public string? ImageBase64 { get; set; }
         public string? Note { get; set; }
         public int? Status { get; set; } = StaffCertificateConst.STATUS_PENDING_VERIFICATION;
 

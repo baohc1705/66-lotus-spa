@@ -7,8 +7,8 @@ namespace _66SMS.Application.DTOs.Users
         public string Email { get; set; } = string.Empty;
         public bool IsEmailConfirmed { get; set; } = false;
         public string Status { get; set; } = null!;
-        public string? LockoutEnd { get; set; }
-        public string? LastLoginAt { get; set; }
+        public DateTimeOffset? LockoutEnd { get; set; }
+        public DateTimeOffset? LastLoginAt { get; set; }
         public List<string>? Roles { get; set; }
         public List<string>? Permissions { get; set; }
 
@@ -37,8 +37,8 @@ namespace _66SMS.Application.DTOs.Users
     {
         public int Id { get; set; }
         public int? LoyaltyPoint { get; set; }
-        public DateTime? FirstPurchaseAt { get; set; }
-        public DateTime? LastPurchaseAt { get; set; }
+        public DateTimeOffset? FirstPurchaseAt { get; set; }
+        public DateTimeOffset? LastPurchaseAt { get; set; }
         public string? Source { get; set; }
         public int Status { get; set; }
         public string? Note { get; set; }

@@ -8,7 +8,6 @@ namespace _66SMS.Application.SalonService.Salons.Commands.UpdateSalon
     {
         [JsonIgnore]
         public int? Id { get; set; }
-        public string? Code { get; set; }
         public string? Name { get; set; }
         public string? Phone { get; set; }
         public string? Email { get; set; }
@@ -21,12 +20,10 @@ namespace _66SMS.Application.SalonService.Salons.Commands.UpdateSalon
         public string? WorkingDays { get; set; }
         public string? TaxCode { get; set; }
         public string? ImageUrl { get; set; }
+        /// <summary>Base64 ảnh mới — upload qua IImageUploadService.</summary>
+        public string? ImageBase64 { get; set; }
         public string? Description { get; set; }
         public int? SortOrder { get; set; }
         public int? Status { get; set; }
-        [JsonIgnore]
-        public int? UpdatedBy { get; set; }
-        [JsonIgnore]
-        public DateTime? UpdatedAt {  get; set; } = DateTime.UtcNow;
     }
 }

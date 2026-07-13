@@ -12,8 +12,8 @@ namespace _66SMS.Domain.Entities
         public int? Gender { get; set; }
         public string? Phone { get; set; }
         public int? LoyaltyPoint { get; set; }
-        public DateTime? FirstPurchaseAt { get; set; }
-        public DateTime? LastPurchaseAt { get; set; }
+        public DateTimeOffset? FirstPurchaseAt { get; set; }
+        public DateTimeOffset? LastPurchaseAt { get; set; }
         public string? Source { get; set; }
         public int Status { get; set; }
         public string? Note { get; set; }
@@ -22,8 +22,8 @@ namespace _66SMS.Domain.Entities
         public string? WardCode { get; set; }
         public string? FullAddress { get; set; }
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
 
         [JsonIgnore]
         public User User { get; set; } = null!;

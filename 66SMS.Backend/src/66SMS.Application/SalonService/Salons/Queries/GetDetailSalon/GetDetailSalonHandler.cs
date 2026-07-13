@@ -1,10 +1,10 @@
-using _66SMS.Application.DTOs.Salons;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.SalonService.Salons.Queries.GetDetailSalon
 {
@@ -43,8 +43,7 @@ namespace _66SMS.Application.SalonService.Salons.Queries.GetDetailSalon
                     Description = x.Description,
                     SortOrder = x.SortOrder,
                     Status = x.Status,
-                    CreatedAt = x.CreatedAt.ToString(),
-                    UpdatedAt = null
+                    CreatedAt = x.CreatedAt
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

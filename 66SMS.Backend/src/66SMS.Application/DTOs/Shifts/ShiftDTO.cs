@@ -15,6 +15,6 @@ namespace _66SMS.Application.DTOs.Shifts
         public TimeOnly? ShiftEnd { get; set; }
         public DateOnly? EffectiveFrom { get; set; }
         public DateOnly? EffectiveTo { get; set; }
-        public DateTime? CreatedAt { get; set; } = DateTime.Now;
+        public DateTimeOffset? CreatedAt { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace _66SMS.Domain.Entities
         public decimal Balance { get; set; }
         public int Status { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
 
         public Customer? Customer { get; set; }
         public ICollection<WalletTransaction> Transactions { get; set; } = null!;

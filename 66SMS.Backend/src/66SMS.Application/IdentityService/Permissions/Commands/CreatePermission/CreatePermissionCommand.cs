@@ -17,7 +17,7 @@ namespace _66SMS.Application.IdentityService.Permissions.Commands.CreatePermissi
         [JsonIgnore]
         public int? Status { get; set;  } = PermissionConst.STATUS_ACTIVED;
         [JsonIgnore]
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
         [JsonIgnore]
         public int? CreatedBy { get; set; }
     }

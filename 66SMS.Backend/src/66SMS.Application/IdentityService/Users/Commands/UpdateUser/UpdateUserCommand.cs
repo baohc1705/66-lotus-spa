@@ -16,10 +16,10 @@ namespace _66SMS.Application.IdentityService.Users.Commands.UpdateUser
         public bool? IsEmailConfirmed { get; set; }
         public int? AccessFailedCount { get; set; }
         public int? Status { get; set; }
-        public DateTime? LockoutEnd { get; set; }
+        public DateTimeOffset? LockoutEnd { get; set; }
         [JsonIgnore]
         public int? UpdatedBy { get; set; }
         [JsonIgnore]
-        public DateTime? UpdateAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? UpdateAt { get; set; } = DateTimeOffset.UtcNow;
     }
 }

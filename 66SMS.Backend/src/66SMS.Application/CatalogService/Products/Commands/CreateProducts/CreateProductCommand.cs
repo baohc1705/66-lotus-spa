@@ -26,7 +26,7 @@ namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
         [JsonIgnore]
         public int? CreatedBy { get; set; }
         [JsonIgnore]
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
         public List<ProductImageDto> Images { get; set; } = new();
     }
 }

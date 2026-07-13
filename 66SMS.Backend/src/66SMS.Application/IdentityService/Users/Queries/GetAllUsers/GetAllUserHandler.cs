@@ -43,8 +43,8 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetAllUsers
                 Email = x.Email,
                 IsEmailConfirmed = x.IsEmailConfirmed,
                 Status = x.Status.ToString(),
-                LockoutEnd = x.LockoutEnd.HasValue ? x.LockoutEnd.Value.ToString("HH:mm:ss dd/MM/yyyy") : null,
-                LastLoginAt = x.LastLoginAt.HasValue ? x.LastLoginAt.Value.ToString("HH:mm:ss dd/MM/yyyy") : null,
+                LockoutEnd = x.LockoutEnd,
+                LastLoginAt = x.LastLoginAt,
                 Roles = x.UserRoles!.Select(ur => ur.Role!.Name).ToList(),
                 Permissions = x.UserRoles!
                     .SelectMany(ur => ur.Role!.RolePermissions!

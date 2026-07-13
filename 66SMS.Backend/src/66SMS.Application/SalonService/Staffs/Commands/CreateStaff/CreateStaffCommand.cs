@@ -12,6 +12,8 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
         public int? SalonId { get; set; }
         public string? FullName { get; set; }
         public string? AvatarUrl { get; set; }
+        /// <summary>Base64 ảnh mới — upload qua IImageUploadService.</summary>
+        public string? ImageBase64 { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public int? Gender { get; set; }
         public string? NationalId { get; set; }
@@ -29,7 +31,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
         public string? Role { get; set; }
         [JsonIgnore]
         public int? CreatedBy { get; set; }
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
         public string? Email { get; set; }
     }

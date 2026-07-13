@@ -1,3 +1,4 @@
+using _66SMS.Contract.Abstractions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -17,23 +18,30 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
         private readonly ICustomerSqlRepository customerSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
+        private readonly IImageUploadService imageUploadService;
 
-        public CreateCustomerHandler(ICustomerSqlRepository customerSqlRepository,ISqlUnitOfWork sqlUnitOfWork,IMapper mapper)
+        public CreateCustomerHandler(
+            ICustomerSqlRepository customerSqlRepository,
+            ISqlUnitOfWork sqlUnitOfWork,
+            IMapper mapper,
+            IImageUploadService imageUploadService)
         {
             this.customerSqlRepository = customerSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
+            this.imageUploadService = imageUploadService;
         }
 
         public async Task<Result<object>> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
         {
-            // Map request to domain entity
+            if (!string.IsNullOrWhiteSpace(request.ImageBase64))
+                request.AvatarUrl = null;
+
             Customer? customer = mapper.Map<Customer>(request);
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Auto-create wallet for customer
                 customer.Wallet = new Wallet
                 {
                     CustomerId = customer.Id,
@@ -42,19 +50,29 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
                     CreatedAt = DateTime.UtcNow
                 };
 
-                // add and persist to database
                 customerSqlRepository.Add(customer);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // commit transaction
-                transaction.Commit();
+                if (!string.IsNullOrWhiteSpace(request.ImageBase64))
+                {
+                    customer.AvatarUrl = await imageUploadService.UploadAsync(
+                        request.ImageBase64,
+                        CustomerConst.GenerateImageFileName(customer.Id),
+                        CustomerConst.IMAGE_FOLDER,
+                        cancellationToken);
 
-                // return created result
+                    if (!string.IsNullOrWhiteSpace(customer.AvatarUrl))
+                    {
+                        customerSqlRepository.Update(customer);
+                        await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                    }
+                }
+
+                transaction.Commit();
                 return Result<object>.Created(customer.Id);
             }
             catch
             {
-                // rollback transaction on failure
                 transaction.Rollback();
                 throw;
             }

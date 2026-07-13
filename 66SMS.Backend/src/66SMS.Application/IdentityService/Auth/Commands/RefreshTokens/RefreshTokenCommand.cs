@@ -14,6 +14,6 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
 
         [JsonIgnore]
         public string? IpAddress { get; set; }
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     }
 }

@@ -39,5 +39,12 @@ namespace _66SMS.Domain.Constants
         public const string MSG_NOT_FOUND = "Chứng chỉ nhân viên không tồn tại.";
         public const string MSG_ID_NOT_FOUND = $"{nameof(Entities.StaffCertificate)} with id not found";
         #endregion
+        #region Image Storage
+        public const string IMAGE_FOLDER = "certificates";
+        public const string IMAGE_FILE_PREFIX = "certificate";
+
+        public static string GenerateImageFileName(int entityId)
+            => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTime.Now.ToString("yyyyMMddHHmmss"));
+        #endregion
     }
 }

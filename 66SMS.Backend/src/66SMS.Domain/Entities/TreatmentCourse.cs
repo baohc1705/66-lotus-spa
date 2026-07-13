@@ -16,7 +16,7 @@ namespace _66SMS.Domain.Entities
         public int? SortOrder { get; set; }
         public int Status { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
 
         public ServiceCategory? Category { get; set; }
         public List<TreatmentCourseItem>? Items { get; set; }

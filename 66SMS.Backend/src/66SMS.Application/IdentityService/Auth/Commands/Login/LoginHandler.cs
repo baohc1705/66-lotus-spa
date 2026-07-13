@@ -83,7 +83,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Login
             userExisted.AccessFailedCount = 0;
             userExisted.Status = (int)StatusActiveEnum.ACTIVED;
             userExisted.LockoutEnd = null;
-            userExisted.LastLoginAt = DateTime.UtcNow;
+            userExisted.LastLoginAt = DateTimeOffset.UtcNow;
             userSqlRepository.Update(userExisted);
 
             string? role = await userRoleSqlRepository

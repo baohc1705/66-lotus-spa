@@ -7,8 +7,8 @@ namespace _66SMS.Domain.Entities
         public int CustomerId { get; set; }
         public int MembershipTierId { get; set; }
         public string CardCode { get; set; } = string.Empty;
-        public DateTime IssuedAt { get; set; }
-        public DateTime? ExpiresAt { get; set; }
+        public DateTimeOffset IssuedAt { get; set; }
+        public DateTimeOffset? ExpiresAt { get; set; }
         public int Status { get; set; }
 
         // Navigation properties

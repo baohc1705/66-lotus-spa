@@ -11,7 +11,7 @@ namespace _66SMS.Application.DTOs.Wallets
         public string CustomerAvatar { get; set; } = null!;
         public decimal Balance { get; set; }
         public int Status { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
     }
 }

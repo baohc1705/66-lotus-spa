@@ -22,7 +22,7 @@ namespace _66SMS.Domain.Entities
         public string? WardCode { get; set; }
         public string? FullAddress { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
 
         public User? User { get; set; }
         public List<StaffSalon>? StaffSalons { get; set; }

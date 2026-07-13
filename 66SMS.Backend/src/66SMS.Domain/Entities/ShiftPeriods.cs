@@ -10,7 +10,7 @@ namespace _66SMS.Domain.Entities
         public DateOnly EffectiveFrom { get; set; }
         public DateOnly? EffectiveTo { get; set; }
         
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
         public int? CreatedBy { get; set; }
 
         public Shift? Shift { get; set; }

@@ -60,7 +60,7 @@ namespace _66SMS.Infrastructure.Storage.Cloudinary
                     ? settings.CommonFolder
                     : $"{settings.RootFolder}/{request.Folder}",
                 UseFilename = true,
-                UniqueFilename = true, // tránh ghi đè ảnh trùng tên
+                UniqueFilename = false,
                 Overwrite = false
             };
 

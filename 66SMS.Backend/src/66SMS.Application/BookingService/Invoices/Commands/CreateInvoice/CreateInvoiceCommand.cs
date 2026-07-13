@@ -30,7 +30,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
         [JsonIgnore]
         public int? CreatedBy { get; set; }
         [JsonIgnore]
-        public DateTime? IssuedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? IssuedAt { get; set; } = DateTimeOffset.UtcNow;
     }
 
     public class CreateInvoiceItemDto

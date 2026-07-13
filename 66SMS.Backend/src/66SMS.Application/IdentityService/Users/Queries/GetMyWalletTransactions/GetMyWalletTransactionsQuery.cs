@@ -1,7 +1,5 @@
 using _66SMS.Contracts.Shared;
-using MediatR;
-using System;
-using System.Collections.Generic;
+using MediatR;  
 
 namespace _66SMS.Application.IdentityService.Users.Queries.GetMyWalletTransactions
 {
@@ -15,6 +13,6 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetMyWalletTransactio
         public int Id { get; set; }
         public decimal Amount { get; set; }
         public string? Note { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
     }
 }

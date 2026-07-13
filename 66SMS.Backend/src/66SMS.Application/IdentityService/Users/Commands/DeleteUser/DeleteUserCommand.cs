@@ -12,7 +12,7 @@ namespace _66SMS.Application.IdentityService.Users.Commands.DeleteUser
         public int? Id { get; set; }
         public List<int>? Ids { get; set; }
         [JsonIgnore]
-        public DateTime? UpdatedAt { get; set; } = DateTime.Now;
+        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
         [JsonIgnore]
         public int? UpdatedBy { get; set; }
 

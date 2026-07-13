@@ -31,12 +31,22 @@ namespace _66SMS.Application.Mappers
             CreateMap<UpdateProductCategoryCommand, ProductCategory>().IgnoreNullValueTypes();
             CreateMap<ProductCategory, ProductCategoryDto>().IgnoreNullValueTypes();
 
-            CreateMap<CreateProductCommand, Product>().IgnoreNullValueTypes();
-            CreateMap<UpdateProductCommand, Product>().IgnoreNullValueTypes();
+            CreateMap<CreateProductCommand, Product>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<UpdateProductCommand, Product>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
 
-            CreateMap<CreateProductImageCommand, ProductImage>().IgnoreNullValueTypes();
-            CreateMap<UpdateProductImageCommand, ProductImage>().IgnoreNullValueTypes();
-            CreateMap<ProductImage, ProductImageDto>().IgnoreNullValueTypes();
+            CreateMap<CreateProductImageCommand, ProductImage>()
+                .ForMember(dest => dest.Url, opt => opt.MapFrom(src => src.Url ?? string.Empty))
+                .IgnoreNullValueTypes();
+            CreateMap<UpdateProductImageCommand, ProductImage>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<ProductImage, ProductImageDto>()
+                .ForMember(dest => dest.ImageBase64, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
             CreateMap<ProductImageDto, ProductImage>().IgnoreNullValueTypes();
             #endregion
 

@@ -9,7 +9,7 @@ namespace _66SMS.Domain.Entities
         public string? Description { get; set; }
         public int Status { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
 
         public List<UserRole>? UserRoles { get; set; }
         public List<RolePermission>? RolePermissions { get; set; }

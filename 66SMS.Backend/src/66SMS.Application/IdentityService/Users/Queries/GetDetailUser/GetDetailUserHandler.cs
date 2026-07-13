@@ -48,8 +48,8 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetDetailUser
                 Email = user.Email,
                 IsEmailConfirmed = user.IsEmailConfirmed,
                 Status = user.Status.ToString(),
-                LockoutEnd = user.LockoutEnd.ToVietnamTimeString(),
-                LastLoginAt = user.LastLoginAt.ToVietnamTimeString(),
+                LockoutEnd = user.LockoutEnd,
+                LastLoginAt = user.LastLoginAt,
                 Roles = role == null ? [] : [role.Name],
                 Permissions = permissions ?? [],
             };

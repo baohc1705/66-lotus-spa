@@ -13,7 +13,7 @@ namespace _66SMS.Application.IdentityService.Roles.Commands.CreateRole
         public string Description { get; set; } = null!;
 
         [JsonIgnore]
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
         [JsonIgnore]
         public int? CreatedBy { get; set; }
     }

@@ -12,7 +12,7 @@ namespace _66SMS.Application.DTOs.Wallets
         public int Type { get; set; }
         public string Note { get; set; } = null!;
         public int Status { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
         public int? CreatedBy { get; set; }
         public string CreatedByName { get; set; } = null!;
     }

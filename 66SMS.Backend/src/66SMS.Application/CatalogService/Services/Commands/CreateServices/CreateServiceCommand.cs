@@ -24,7 +24,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
         [JsonIgnore]
         public int? CreatedBy { get; set; }
         [JsonIgnore]
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
         public List<ServiceProductItems>? ServiceProducts { get; set; }
         public List<ServiceImageItems>? ServiceImages { get; set; }
@@ -38,7 +38,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
         public string? Note { get; set; }
         public int? Status { get; set; } = ServiceProductConst.STATUS_ACTIVED;
         [JsonIgnore]
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
         [JsonIgnore]
         public int? CreatedBy { get; set; }
     }

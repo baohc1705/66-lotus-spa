@@ -19,14 +19,14 @@ namespace _66SMS.Domain.Entities
         public decimal TotalAmount { get; set; }
         public decimal PaidAmount { get; set; }
         public int? DepositPercent { get; set; }
-        public DateTime? DepositDeadlineAt { get; set; }
-        public DateTime? DepositRequestedAt { get; set; }
-        public DateTime? ConfirmedAt { get; set; }
-        public DateTime? CompletedAt { get; set; }
+        public DateTimeOffset? DepositDeadlineAt { get; set; }
+        public DateTimeOffset? DepositRequestedAt { get; set; }
+        public DateTimeOffset? ConfirmedAt { get; set; }
+        public DateTimeOffset? CompletedAt { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
         public int? CreatedBy { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
         public int? UpdatedBy { get; set; }
 
         // Navigation properties

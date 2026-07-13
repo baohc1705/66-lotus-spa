@@ -10,12 +10,12 @@ namespace _66SMS.Domain.Entities
         public decimal RefundedAmount { get; set; }
         public int Method { get; set; }
         public string? TransactionId { get; set; }
-        public DateTime? DueDate { get; set; }
+        public DateTimeOffset? DueDate { get; set; }
         public string? Note { get; set; }
         public int Status { get; set; }
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
 
         // Navigation properties
         public Appointment? Appointment { get; set; }

@@ -1,4 +1,3 @@
-using _66SMS.Application.DTOs.Salons;
 using _66SMS.Application.DTOs.Staffs;
 using _66SMS.Application.DTOs.StaffSalons;
 using _66SMS.Application.SalonService.Salons.Commands.CreateSalon;
@@ -10,6 +9,7 @@ using _66SMS.Application.SalonService.StaffSalons.Commands.UpdateStaffSalon;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Entities;
 using AutoMapper;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.Mappers
 {
@@ -61,10 +61,6 @@ namespace _66SMS.Application.Mappers
             CreateMap<CreateSalonCommand, Salon>().IgnoreNullValueTypes();
             CreateMap<UpdateSalonCommand, Salon>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .IgnoreNullValueTypes();
-            CreateMap<Salon, SalonDto>()
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => (string?)null))
                 .IgnoreNullValueTypes();
         }
     }

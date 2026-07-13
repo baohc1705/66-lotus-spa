@@ -19,7 +19,7 @@ namespace _66SMS.Domain.Entities
         public int MinStock { get; set; }
         public int Status { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
 
         public ProductCategory? Category { get; set; }
         public List<ProductImage>? Images { get; set; }

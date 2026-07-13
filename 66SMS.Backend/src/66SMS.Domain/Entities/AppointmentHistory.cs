@@ -11,7 +11,7 @@ namespace _66SMS.Domain.Entities
         public int? ChangedBy { get; set; }
         public int? ChangedByRole { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
         public int? CreatedBy { get; set; }
 
         // Navigation properties
