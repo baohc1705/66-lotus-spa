@@ -1,5 +1,5 @@
 using _66SMS.Contracts.Shared;
-using _66SMS.Domain.Constants;
+using _66SMS.Domain.Enums;
 using MediatR;
 using System.Text.Json.Serialization;
 
@@ -20,14 +20,13 @@ namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
         public decimal? SellingPrice { get; set; }
         public decimal? CommissionRate { get; set; }
         public int? SortOrder { get; set; } = 0;
-        public int? Status { get; set; } = ServiceConst.STATUS_ACTIVED;
-        [JsonIgnore]
-        public int? CreatedBy { get; set; }
+        public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
+        public string? ImageUrl { get; set; }
+    
         [JsonIgnore]
         public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
-
         public List<ServiceProductItems>? ServiceProducts { get; set; }
-        public List<ServiceImageItems>? ServiceImages { get; set; }
+        //public List<ServiceImageItems>? ServiceImages { get; set; }
     }
 
     public class ServiceProductItems
@@ -36,7 +35,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
         public int? ProductId { get; set; }
         public int? QuantityUsed { get; set; }
         public string? Note { get; set; }
-        public int? Status { get; set; } = ServiceProductConst.STATUS_ACTIVED;
+        public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
         [JsonIgnore]
         public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
         [JsonIgnore]

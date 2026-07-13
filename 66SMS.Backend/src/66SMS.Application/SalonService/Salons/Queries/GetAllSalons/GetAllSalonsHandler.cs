@@ -39,7 +39,11 @@ namespace _66SMS.Application.SalonService.Salons.Queries.GetAllSalons
                 query = query.Where(x => x.Status != SalonConst.STATUS_DELETED);
             }
 
-            query = query.OrderByDescending(x => x.CreatedAt);
+            query = request.OrderBy switch
+            {
+                "sortorder" => request.IsDescending ? query.OrderByDescending(x => x.SortOrder) : query.OrderBy(x => x.SortOrder),
+                _ => request.IsDescending ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt)
+            };
 
             PagedResult<SalonDto> result = await query
                 .Select(x => new SalonDto

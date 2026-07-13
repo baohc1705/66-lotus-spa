@@ -10,7 +10,5 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteSer
     public class DeleteServiceCategoriesCommand : IRequest<Result<object>>
     {
         public int Id { get; set; }
-        [JsonIgnore]
-        public int? UpdatedBy { get; set; }
     }
 }

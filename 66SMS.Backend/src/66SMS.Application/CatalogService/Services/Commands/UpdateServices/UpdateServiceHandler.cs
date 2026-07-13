@@ -7,6 +7,7 @@ using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
 using System.Data;
+using _66SMS.Contract.Abstractions;
 
 namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
 {
@@ -18,33 +19,42 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
         private readonly IServiceSqlRepository serviceSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
+        private readonly IImageUploadService imageUploadService;
 
         public UpdateServiceHandler(
             IServiceSqlRepository serviceSqlRepository,
             ISqlUnitOfWork sqlUnitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            IImageUploadService imageUploadService)
         {
             this.serviceSqlRepository = serviceSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
+            this.imageUploadService = imageUploadService;
         }
 
         public async Task<Result<object>> Handle(UpdateServiceCommand request, CancellationToken cancellationToken)
         {
+            // Find service by id
+            Service? service = await serviceSqlRepository.FindByIdAsync((int)request.Id!, false, cancellationToken);
+            if (service == null)
+            {
+                return Result<object>.NotFound(ServiceConst.MSG_SERVICE_NOT_FOUND, ErrorCodes.ERR_SERVICE_NOT_FOUND);
+            }
+
+            // map request to domain entity, ignore null
+            mapper.Map(request, service);
+
             // Begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Find service by id
-                Service? service = await serviceSqlRepository.FindByIdAsync((int)request.Id!, false, cancellationToken);
-                if (service == null)
+                // Upload image for service if request provived
+                if (!string.IsNullOrWhiteSpace(request.ImageUrl))
                 {
-                    return Result<object>.NotFound(ServiceConst.MSG_SERVICE_NOT_FOUND, ErrorCodes.ERR_SERVICE_NOT_FOUND);
+                    service.ImageUrl = await imageUploadService.UploadAsync(request.ImageUrl, ServiceConst.GenerateImageFileName(service.Id), ServiceConst.IMAGE_FOLDER, cancellationToken);
                 }
-
-                // map request to domain entity, ignore null
-                mapper.Map(request, service);
-
+                
                 // update and persist to database
                 serviceSqlRepository.Update(service);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
@@ -55,7 +65,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
                 // return success result
                 return Result<object>.Ok();
             }
-            catch 
+            catch
             {
                 // rollback transaction on failure
                 transaction.Rollback();

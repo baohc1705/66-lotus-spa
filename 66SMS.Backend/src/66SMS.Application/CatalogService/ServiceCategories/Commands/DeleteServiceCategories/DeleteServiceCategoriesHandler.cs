@@ -4,6 +4,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
+using _66SMS.Domain.Enums;
 using MediatR;
 using System.Data;
 
@@ -25,22 +26,22 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteSer
 
         public async Task<Result<object>> Handle(DeleteServiceCategoriesCommand request, CancellationToken cancellationToken)
         {
+            // Find service by id
+            ServiceCategory? entity = await serviceCategorySqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
+
+            // Return not found if service is null
+            if (entity == null)
+            {
+                return Result<object>.NotFound(ServiceCategoryConst.MSG_SERVICE_CATEGORY_NOT_FOUND, ErrorCodes.ERR_SERVICE_CATEGORY_NOT_FOUND);
+            }
+
+            // Update status is deleted
+            entity.Status = (int)StatusActiveEnum.DELETED;
+            
             // Begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Find service by id
-                ServiceCategory? entity = await serviceCategorySqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
-
-                // Return not found if service is null
-                if (entity == null)
-                {
-                    return Result<object>.NotFound(ServiceCategoryConst.MSG_SERVICE_CATEGORY_NOT_FOUND, ErrorCodes.ERR_SERVICE_CATEGORY_NOT_FOUND);
-                }
-
-                // Update status is deleted
-                entity.Status = ServiceCategoryConst.STATUS_DELETED;
-
                 // Update and persist to database
                 serviceCategorySqlRepository.Update(entity);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

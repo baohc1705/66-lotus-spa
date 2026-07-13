@@ -17,12 +17,15 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_SORT_ORDER = "sort_order";
         public const string FIELD_STATUS = "status";
         public const string FIELD_CREATED_AT = "created_at";
+        public const string FIELD_IMAGE_URL = "image_url";
+        public const string FIELD_UPDATED_AT = "updated_at";
         #endregion
 
         #region Constraint
         public const int CODE_MAX_LENGTH = 32;
         public const int NAME_MAX_LENGTH = 200;
         public const int DESCRIPTION_MAX_LENGTH = 500;
+        public const int IMAGE_URL_MAX_LENGTH = 200;
         #endregion
 
         #region Status
@@ -35,6 +38,14 @@ namespace _66SMS.Domain.Constants
         public const string MSG_SERVICE_ID_NOT_FOUND = $"{nameof(Entities.Service)} with id not found";
         public const string MSG_SERVICE_NOT_FOUND = "Service not found.";
         public const string MSG_SERVICE_PRODUCT_NOT_FOUND = "Dịch vụ không tồn tại.";
+        #endregion
+
+        #region Image Storage
+        public const string IMAGE_FOLDER = "services";
+        public const string IMAGE_FILE_PREFIX = "service";
+
+        public static string GenerateImageFileName(int entityId)
+            => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmss"));
         #endregion
     }
 }

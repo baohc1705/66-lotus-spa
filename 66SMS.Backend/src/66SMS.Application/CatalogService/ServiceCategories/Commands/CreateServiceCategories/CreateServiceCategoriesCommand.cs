@@ -1,7 +1,6 @@
 using _66SMS.Contracts.Shared;
-using _66SMS.Domain.Constants;
+using _66SMS.Domain.Enums;
 using MediatR;
-using System.Text.Json.Serialization;
 
 namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateServiceCategories
 {
@@ -13,10 +12,7 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateSer
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public int? SortOrder { get; set; } = 0;
-        public int? Status { get; set; } = ServiceCategoryConst.STATUS_ACTIVED;
-        [JsonIgnore]
-        public int? CreatedBy { get; set; }
-        [JsonIgnore]
-        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
+        public string? Icon { get; set; }
     }
 }

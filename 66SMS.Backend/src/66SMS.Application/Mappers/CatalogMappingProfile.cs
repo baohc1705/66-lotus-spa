@@ -16,9 +16,9 @@ using _66SMS.Application.DTOs.ProductCategories;
 using _66SMS.Application.DTOs.ProductImages;
 using _66SMS.Application.DTOs.ServiceImages;
 using _66SMS.Application.DTOs.ServiceProducts;
-using _66SMS.Application.DTOs.Services;
 using _66SMS.Domain.Entities;
 using AutoMapper;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.Mappers
 {
@@ -57,10 +57,10 @@ namespace _66SMS.Application.Mappers
             CreateMap<CreateServiceImagesCommand, ServiceImage>().IgnoreNullValueTypes();
             CreateMap<UpdateServiceImagesCommand, ServiceImage>().IgnoreNullValueTypes();
             CreateMap<ServiceImage, ServiceImageDto>().IgnoreNullValueTypes();
-            CreateMap<ServiceImage, ServiceImageResponse>().IgnoreNullValueTypes();
             CreateMap<ServiceProduct, ServiceProductDto>().IgnoreNullValueTypes();
             CreateMap<ServiceProduct, ServiceProductResponse>().IgnoreNullValueTypes();
-            CreateMap<Service, ServiceDto>().IgnoreNullValueTypes();
+            CreateMap<Service, ServiceListDto>().IgnoreNullValueTypes();
+            CreateMap<Service, ServiceDetailDto>().IgnoreNullValueTypes();
 
             CreateMap<CreateServiceCommand, Service>().IgnoreNullValueTypes();
             CreateMap<ServiceImageItems, ServiceImage>().IgnoreNullValueTypes();

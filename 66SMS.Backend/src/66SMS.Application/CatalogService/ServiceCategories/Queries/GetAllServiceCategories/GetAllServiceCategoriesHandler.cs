@@ -1,11 +1,10 @@
-using _66SMS.Application.DTOs.ServiceCategories;
 using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Enums;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using MediatR;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetAllServiceCategories
 {
@@ -26,7 +25,7 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetAllServ
         public async Task<Result<PagedResult<ServiceCategoryDto>>> Handle(GetAllServiceCategoriesQuery request, CancellationToken cancellationToken)
         {
             // As queryable
-            var query = serviceCategorySqlRepository.AsQueryable();
+            var query = serviceCategorySqlRepository.AsQueryable(true);
             
             if (!string.IsNullOrEmpty(request.Keyword))
             {
@@ -50,6 +49,7 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetAllServ
             query = request.OrderBy?.Trim().ToLower() switch
             {
                 "name" => request.IsDescending ? query.OrderByDescending(x => x.Name) : query.OrderBy(x => x.Name),
+                "sortorder" => request.IsDescending ? query.OrderByDescending(x => x.SortOrder) : query.OrderBy(x => x.SortOrder),
                 _ => request.IsDescending ? query.OrderByDescending(x => x.Id) : query.OrderBy(x => x.Id)
             };
 
@@ -61,8 +61,7 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetAllServ
                     Description = x.Description,
                     SortOrder = x.SortOrder,
                     Status = x.Status,
-                    CreatedAt = null,
-                    UpdatedAt = null
+                    Icon = x.Icon,
                 })
                 .ToPagedAsync(request, cancellationToken);
 

@@ -9,11 +9,13 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_DESCRIPTION = "description";
         public const string FIELD_SORT_ORDER = "sort_order";
         public const string FIELD_STATUS = "status";
+        public const string FIELD_ICON = "icon";
         #endregion
 
         #region Constraint
         public const int NAME_MAX_LENGTH = 100;
         public const int DESCRIPTION_MAX_LENGTH = 500;
+        public const int ICON_MAX_LENGTH = 200;
         #endregion
 
         #region Status
@@ -26,5 +28,14 @@ namespace _66SMS.Domain.Constants
         public const string MSG_SERVICE_CATEGORY_ID_NOT_FOUND = $"{nameof(Entities.ServiceCategory)} with id not found";
         public const string MSG_SERVICE_CATEGORY_NOT_FOUND = "Service category not found.";
         #endregion
+
+        #region Image Storage
+        public const string IMAGE_FOLDER = "services";
+        public const string IMAGE_FILE_PREFIX = "icon";
+
+        public static string GenerateImageFileName(int entityId)
+            => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmss"));
+        #endregion
+
     }
 }

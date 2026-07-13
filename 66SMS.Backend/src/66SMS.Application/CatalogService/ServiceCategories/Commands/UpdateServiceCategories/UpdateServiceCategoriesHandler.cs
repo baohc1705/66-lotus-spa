@@ -7,6 +7,7 @@ using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
 using System.Data;
+using _66SMS.Contract.Abstractions;
 
 namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.UpdateServiceCategories
 {
@@ -18,12 +19,14 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.UpdateSer
         private readonly IServiceCategorySqlRepository serviceCategorySqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
+        private readonly IImageUploadService imageUploadService;
 
-        public UpdateServiceCategoriesHandler(IServiceCategorySqlRepository serviceCategorySqlRepository, ISqlUnitOfWork sqlUnitOfWork, IMapper mapper)
+        public UpdateServiceCategoriesHandler(IServiceCategorySqlRepository serviceCategorySqlRepository, ISqlUnitOfWork sqlUnitOfWork, IMapper mapper, IImageUploadService imageUploadService)
         {
             this.serviceCategorySqlRepository = serviceCategorySqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
+            this.imageUploadService = imageUploadService;
         }
 
         public async Task<Result<object>> Handle(UpdateServiceCategoriesCommand request, CancellationToken cancellationToken)
@@ -44,6 +47,11 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.UpdateSer
                 // map request to domain entity, ignore null
                 mapper.Map(request, service);
 
+                // Upload icon if provided
+                if (!string.IsNullOrWhiteSpace(request.Icon))
+                {
+                    service.Icon = await imageUploadService.UploadAsync(request.Icon, ServiceCategoryConst.GenerateImageFileName(service.Id), ServiceCategoryConst.IMAGE_FOLDER, cancellationToken);
+                }
                 // update and persist to database
                 serviceCategorySqlRepository.Update(service);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

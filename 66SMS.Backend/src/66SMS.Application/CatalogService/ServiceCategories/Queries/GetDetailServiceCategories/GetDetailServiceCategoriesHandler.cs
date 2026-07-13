@@ -1,10 +1,11 @@
-using _66SMS.Application.DTOs.ServiceCategories;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
+using _66SMS.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetDetailServiceCategories
 {
@@ -23,8 +24,8 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetDetailS
         public async Task<Result<ServiceCategoryDto>> Handle(GetDetailServiceCategoriesQuery request, CancellationToken cancellationToken)
         {
             ServiceCategoryDto? service = await serviceCategorySqlRepository
-                .AsQueryable()
-                .Where(x => x.Id == request.Id && x.Status != ServiceCategoryConst.STATUS_DELETED)
+                .AsQueryable(true)
+                .Where(x => x.Id == request.Id && x.Status != (int)StatusActiveEnum.DELETED)
                 .Select(x => new ServiceCategoryDto
                 {
                     Id = x.Id,
@@ -32,8 +33,7 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetDetailS
                     Description = x.Description,
                     SortOrder = x.SortOrder,
                     Status = x.Status,
-                    CreatedAt = null,
-                    UpdatedAt = null
+                    Icon = x.Icon
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

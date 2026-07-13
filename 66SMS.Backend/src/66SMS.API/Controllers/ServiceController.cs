@@ -5,8 +5,7 @@ using _66SMS.Application.CatalogService.Services.Commands.DeleteServiceMultiples
 using _66SMS.Application.CatalogService.Services.Commands.UpdateServices;
 using _66SMS.Application.CatalogService.Services.Queries.GetAllServices;
 using _66SMS.Application.CatalogService.Services.Queries.GetDetailService;
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Domain.Constants;
+using _66SMS.Domain.Enums;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
@@ -19,12 +18,10 @@ namespace _66SMS.API.Controllers
     public class ServiceController : ApiController<ServiceController>
     {
         private readonly IMediator mediator;
-        private readonly IJwtService jwtService;
 
-        public ServiceController(IMediator mediator, IJwtService jwtService)
+        public ServiceController(IMediator mediator)
         {
             this.mediator = mediator;
-            this.jwtService = jwtService;
         }
 
         [HttpGet("admin")]
@@ -54,7 +51,7 @@ namespace _66SMS.API.Controllers
                 Keyword = keyword,
                 MinPrice = minPrice,
                 MaxPrice = maxPrice,
-                Status = ServiceConst.STATUS_ACTIVED,
+                Status = (int)StatusActiveEnum.ACTIVED,
                 OrderBy = orderBy,
                 IsDescending = isDescending ?? false,
                 PageIndex = pageIndex ?? 1,
@@ -78,7 +75,6 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("services", "create")]
         public async Task<IActionResult> Create([FromBody] CreateServiceCommand command)
         {
-            command.CreatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -88,7 +84,6 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] UpdateServiceCommand command)
         {
             command.Id = id;
-            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -98,7 +93,6 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var command = new DeleteServiceCommand { Id = id };
-            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -107,7 +101,6 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("services", "delete")]
         public async Task<IActionResult> DeleteMultiples([FromBody] DeleteServiceMultiplesCommand command)
         {
-            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }

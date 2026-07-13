@@ -22,8 +22,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
         public decimal? CommissionRate { get; set; }
         public int? SortOrder { get; set; }
         public int? Status { get; set; }
-        [JsonIgnore]
-        public int? UpdatedBy { get; set; }
+        public string? ImageUrl { get; set; }
         [JsonIgnore]
         public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
     }

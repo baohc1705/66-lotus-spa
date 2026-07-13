@@ -15,9 +15,6 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.UpdateSer
         public string? Description { get; set; }
         public int? SortOrder { get; set; }
         public int? Status { get; set; }
-        [JsonIgnore]
-        public int? UpdatedBy { get; set; }
-        [JsonIgnore]
-        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public string? Icon { get; set; }
     }
 }

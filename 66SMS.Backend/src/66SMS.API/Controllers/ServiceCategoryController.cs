@@ -1,12 +1,11 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.BookingService.Appointments.Queries.GetDetailAppointment;
 using _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateServiceCategories;
 using _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteServiceCategories;
 using _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteServiceCategoryMultiples;
 using _66SMS.Application.CatalogService.ServiceCategories.Commands.UpdateServiceCategories;
 using _66SMS.Application.CatalogService.ServiceCategories.Queries.GetAllServiceCategories;
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Domain.Constants;
+using _66SMS.Application.CatalogService.ServiceCategories.Queries.GetDetailServiceCategories;
+using _66SMS.Domain.Enums;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
@@ -19,12 +18,10 @@ namespace _66SMS.API.Controllers
     public class ServiceCategoryController : ApiController<ServiceCategoryController>
     {
         private readonly IMediator mediator;
-        private readonly IJwtService jwtService;
 
-        public ServiceCategoryController(IMediator mediator, IJwtService jwtService)
+        public ServiceCategoryController(IMediator mediator)
         {
             this.mediator = mediator;
-            this.jwtService = jwtService;
         }
 
         [HttpGet]
@@ -34,7 +31,7 @@ namespace _66SMS.API.Controllers
             var query = new GetAllServiceCategoriesQuery
             {
                 Keyword = keyword,
-                Status =  ServiceCategoryConst.STATUS_ACTIVED,
+                Status =  (int)StatusActiveEnum.ACTIVED,
                 OrderBy = orderBy,
                 IsDescending = isDescending ?? false,
                 PageIndex = pageIndex ?? 1,
@@ -48,7 +45,7 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
-            var result = await mediator.Send(new GetDetailAppointmentQuery { Id = id });
+            var result = await mediator.Send(new GetDetailServiceCategoriesQuery { Id = id });
             return HandleResult(result);
         }
 
@@ -73,7 +70,6 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("services", "create")]
         public async Task<IActionResult> Create([FromBody] CreateServiceCategoriesCommand command)
         {
-            command.CreatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -83,7 +79,6 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] UpdateServiceCategoriesCommand command)
         {
             command.Id = id;
-            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -93,7 +88,6 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var command = new DeleteServiceCategoriesCommand { Id = id };
-            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -101,8 +95,7 @@ namespace _66SMS.API.Controllers
         [HttpDelete("bulk")]
         [PermissionAuthorize("services", "delete")]
         public async Task<IActionResult> DeleteMultiples([FromBody] DeleteServiceCategoryMultiplesCommand command)
-        {
-            command.UpdatedBy = jwtService.GetUserId();
+        {   
             var result = await mediator.Send(command);
             return HandleResult(result);
         }

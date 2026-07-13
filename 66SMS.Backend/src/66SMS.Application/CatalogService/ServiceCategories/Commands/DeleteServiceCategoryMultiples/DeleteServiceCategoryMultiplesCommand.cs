@@ -7,8 +7,5 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteSer
     public class DeleteServiceCategoryMultiplesCommand : IRequest<Result<object>>
     {
         public List<int> Ids { get; set; } = new();
-
-        [JsonIgnore]
-        public int? UpdatedBy { get; set; }
     }
 }
