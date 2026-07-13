@@ -1,4 +1,4 @@
-import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+﻿import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
 import { AdminInput } from '@/shared/components/forms/AdminInput';
 import { useForm, type Resolver } from "react-hook-form";
 import {
@@ -30,7 +30,7 @@ import { DoorOpen } from "lucide-react";
 import { FormField } from "@/shared/components/forms/FormField";
 import { Switch } from "@/shared/components/ui/switch";
 import { ImageUpload } from "@/shared/components/ImageUpload";
-import { uploadApi } from "@/shared/api/upload.api";
+import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 interface BookingRoomFormDialogProps {
@@ -77,12 +77,15 @@ export function BookingRoomFormDialog({
   const onSubmit = async (data: BookingRoomFormValues) => {
     setIsUploading(true);
     try {
-      let imageUrl = data.imageUrl ?? '';
+      let imageBase64: string | undefined;
       if (pendingFile) {
-        const result = await uploadApi.uploadImage(pendingFile, 'booking-room');
-        imageUrl = (result.isSuccess && result.data) ? result.data : '';
+        imageBase64 = await fileToBase64(pendingFile);
       }
-      const payload = { ...data, imageUrl };
+      const payload = {
+        ...data,
+        imageUrl: data.imageUrl ?? '',
+        imageBase64,
+      };
 
       if (isEdit && bookingRoom?.id) {
         updateMutation.mutate(
@@ -115,7 +118,7 @@ export function BookingRoomFormDialog({
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <FormSection icon={DoorOpen} title="Thông tin phòng dịch vụ">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField
                 label="Tên phòng"
                 tooltip="Vui lòng nhập vào tên phòng dịch vụ"

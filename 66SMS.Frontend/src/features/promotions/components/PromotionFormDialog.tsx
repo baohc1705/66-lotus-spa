@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+﻿import { useEffect } from 'react'
 import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -117,7 +117,7 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-2">
           {/* Row 1: code + name */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <FormField label="Mã khuyến mãi *" error={errors.code?.message}>
               <AdminInput {...register('code')} placeholder="VD: SUMMER2025" />
             </FormField>
@@ -132,7 +132,7 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
           </FormField>
 
           {/* Row 2: discountType + status */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <FormField label="Kiểu giảm *" error={errors.discountType?.message}>
               <Select
                 value={String(discountType)}
@@ -172,7 +172,7 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
 
           {/* Dynamic fields by discountType */}
           {discountType === 1 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField label="Phần trăm giảm (%) *" error={errors.discountValue?.message}>
                 <AdminInput
                   type="number"
@@ -206,7 +206,7 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
           )}
 
           {discountType === 3 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField label="Số lượng mua (X) *" error={errors.buyQuantity?.message}>
                 <AdminInput
                   type="number"
@@ -227,7 +227,7 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
           )}
 
           {/* Row: minOrderValue + usageLimit */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <FormField label="Đơn hàng tối thiểu (VNĐ)" error={errors.minOrderValue?.message}>
               <AdminInput
                 type="number"
@@ -247,7 +247,7 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
           </div>
 
           {/* Row: startDate + endDate */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <FormField label="Ngày bắt đầu *" error={errors.startDate?.message}>
               <AdminInput
                 type="datetime-local"

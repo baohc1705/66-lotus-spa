@@ -1,4 +1,4 @@
-import { AdminInput } from '@/shared/components/forms/AdminInput';
+﻿import { AdminInput } from '@/shared/components/forms/AdminInput';
 import { useForm, type Resolver } from "react-hook-form";
 import {
   useCreateTimeSlot,
@@ -115,7 +115,7 @@ export function TimeSlotFormDialog({
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <FormSection icon={Clock} title="Thông tin khung giờ">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField
                 label="Giờ bắt đầu"
                 tooltip="Chọn thời gian bắt đầu khung giờ"

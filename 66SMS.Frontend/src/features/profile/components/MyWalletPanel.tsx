@@ -17,8 +17,8 @@ export function MyWalletPanel() {
 
   if (isLoadingWallet || isLoadingTransactions) {
     return (
-      <div className="py-20 flex justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-lotus-rose" />
+      <div className="py-10 flex justify-center">
+        <Loader2 className="w-7 h-7 animate-spin text-lotus-rose" />
       </div>
     )
   }
@@ -27,32 +27,32 @@ export function MyWalletPanel() {
   const transactions = transactionsData?.data ?? []
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <div>
-        <h2 className="text-2xl font-bold text-lotus-deep mb-2">Ví của tôi</h2>
+        <h2 className="text-xl font-bold text-lotus-deep mb-1">Ví của tôi</h2>
         <p className="text-lotus-stone text-sm">
           Quản lý số dư và lịch sử giao dịch từ việc hoàn/hủy lịch hẹn.
         </p>
       </div>
 
-      <div className="bg-gradient-to-br from-lotus-rose to-lotus-gold rounded-3xl p-8 text-white shadow-xl shadow-lotus-rose/20 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32" />
-        <div className="relative z-10 flex flex-col justify-between h-full">
-          <div className="flex items-center gap-3 opacity-90 mb-6">
-            <Wallet className="w-6 h-6" />
-            <span className="font-medium text-lg">Số dư hiện tại</span>
+      <div className="bg-gradient-to-br from-lotus-rose to-lotus-gold rounded-xl p-5 text-white shadow-md shadow-lotus-rose/15 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-2xl -mr-16 -mt-16" />
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 opacity-90 mb-3">
+            <Wallet className="w-5 h-5" />
+            <span className="font-medium">Số dư hiện tại</span>
           </div>
-          <div className="text-4xl md:text-5xl font-bold tracking-tight">
+          <div className="text-3xl md:text-4xl font-bold tracking-tight">
             {formatCurrency(balance)}
           </div>
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-bold text-lotus-deep mb-4">Lịch sử giao dịch</h3>
+        <h3 className="text-base font-bold text-lotus-deep mb-3">Lịch sử giao dịch</h3>
         {transactions.length === 0 ? (
-          <div className="text-center py-10 bg-lotus-cream/50 rounded-2xl border border-lotus-rose-light border-dashed">
-            <p className="text-lotus-stone">Chưa có giao dịch nào.</p>
+          <div className="text-center py-6 bg-lotus-cream/50 rounded-xl">
+            <p className="text-lotus-stone text-sm">Chưa có giao dịch nào.</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -60,7 +60,7 @@ export function MyWalletPanel() {
               const amount = Number(tx.amount) || 0
               const isPositive = amount > 0
               return (
-                <div key={tx.id} className="flex items-center justify-between p-4 rounded-2xl border border-warm-100 hover:border-lotus-rose-light transition-colors bg-white">
+                <div key={tx.id} className="flex items-center justify-between p-4 rounded-xl bg-lotus-cream/50 hover:bg-lotus-cream transition-colors">
                   <div className="flex items-center gap-4">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isPositive ? 'bg-success-bg text-success-text' : 'bg-rose-100 text-rose-600'}`}>
                       {isPositive ? <ArrowDownLeft className="w-5 h-5" /> : <ArrowUpRight className="w-5 h-5" />}

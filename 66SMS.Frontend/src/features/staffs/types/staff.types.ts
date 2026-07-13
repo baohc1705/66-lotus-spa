@@ -30,6 +30,7 @@ export interface CreateStaffPayload {
   salonId?: number;
   fullName: string;
   avatarUrl?: string;
+  imageBase64?: string;
   dateOfBirth?: string;
   gender?: number;
   nationalId?: string;
@@ -51,6 +52,7 @@ export interface UpdateStaffPayload {
   salonId?: number;
   fullName?: string;
   avatarUrl?: string;
+  imageBase64?: string;
   dateOfBirth?: string;
   gender?: number;
   nationalId?: string;

@@ -142,15 +142,15 @@ export function MyBookingsPanel() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 text-rose-600 animate-spin" />
+      <div className="flex items-center justify-center py-10">
+        <Loader2 className="w-7 h-7 text-rose-600 animate-spin" />
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="text-center py-20 text-error-text">
+      <div className="text-center py-10 text-error-text">
         Không thể tải danh sách lịch hẹn. Vui lòng thử lại sau.
       </div>
     );
@@ -158,12 +158,12 @@ export function MyBookingsPanel() {
 
   if (!bookings || bookings.length === 0) {
     return (
-      <div className="text-center py-20">
-        <div className="bg-page w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Calendar className="w-10 h-10 text-gold-600" />
+      <div className="text-center py-10">
+        <div className="bg-page w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3">
+          <Calendar className="w-7 h-7 text-gold-600" />
         </div>
-        <p className="text-warm-600 text-lg">Bạn chưa có lịch hẹn nào.</p>
-        <p className="text-sm text-warm-600 mt-2">
+        <p className="text-warm-600">Bạn chưa có lịch hẹn nào.</p>
+        <p className="text-sm text-warm-600 mt-1">
           Các lịch hẹn đã đặt sẽ hiển thị tại đây.
         </p>
       </div>
@@ -224,27 +224,27 @@ export function MyBookingsPanel() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between border-b border-warm-100 pb-4">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between pb-3">
         <h2
-          className="text-2xl font-semibold text-ink"
+          className="text-xl font-semibold text-ink"
           style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
         >
           Lịch hẹn của tôi
         </h2>
-        <span className="bg-page text-rose-600 px-3 py-1 rounded-full text-sm font-medium">
+        <span className="bg-page text-rose-600 px-2.5 py-0.5 rounded-md text-sm font-medium">
           {bookings.length} lịch hẹn
         </span>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {bookings.map((booking: AppointmentDto) => (
           <div
             key={booking.id}
-            className={`border rounded-lg overflow-hidden transition-all duration-300 ${
+            className={`rounded-lg overflow-hidden transition-all duration-300 ${
               expandedId === booking.id
-                ? "border-rose-600 ring-1 ring-rose-600/20 bg-white"
-                : "border-warm-100 bg-warm-50/50 hover:border-gold-600/50 hover:bg-white shadow-sm"
+                ? "bg-white ring-1 ring-rose-600/20 shadow-sm"
+                : "bg-warm-50/80 hover:bg-white shadow-sm"
             }`}
           >
             {/* Header (Always visible) */}

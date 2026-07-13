@@ -1,4 +1,4 @@
-import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+﻿import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
 import { AdminInput } from '@/shared/components/forms/AdminInput';
 import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect, useState } from "react";
@@ -45,7 +45,7 @@ import type {
 } from "@/features/address/types/address.types";
 import { User, ShoppingBag } from "lucide-react";
 import { ImageUpload } from "@/shared/components/ImageUpload";
-import { uploadApi } from "@/shared/api/upload.api";
+import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import axiosInstance from "@/shared/api/axiosInstance";
 import { API } from "@/shared/api/endpoints";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
@@ -120,10 +120,9 @@ export function CustomerFormDialog({
   const onSubmit = async (data: CustomerFormValues) => {
     setIsUploading(true);
     try {
-      let avatarUrl = data.avatarUrl ?? "";
+      let imageBase64: string | undefined;
       if (pendingFile) {
-        const result = await uploadApi.uploadImage(pendingFile, "customer");
-        avatarUrl = result.isSuccess && result.data ? result.data : "";
+        imageBase64 = await fileToBase64(pendingFile);
       }
       const provinceName =
         provincesQuery.data?.data?.find(
@@ -137,7 +136,8 @@ export function CustomerFormDialog({
       );
       const payload = {
         ...data,
-        avatarUrl,
+        avatarUrl: data.avatarUrl ?? "",
+        imageBase64,
         fullAddress: parts.join(", "),
         dateOfBirth: data.dateOfBirth ? data.dateOfBirth : undefined,
       };
@@ -205,7 +205,7 @@ export function CustomerFormDialog({
                 label="Đổi ảnh đại diện"
               />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField
                 label="Họ tên *"
                 tooltip="Vui lòng nhập họ và tên đầy đủ của khách hàng"
@@ -300,7 +300,7 @@ export function CustomerFormDialog({
 
           {/* === Section: Thông tin khách hàng === */}
           <FormSection icon={ShoppingBag} title="Thông tin khách hàng">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField label="Nguồn khách">
                 <Select
                   value={watch("source") ?? ""}

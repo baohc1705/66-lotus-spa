@@ -1,4 +1,4 @@
-import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+﻿import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
 import { AdminInput } from '@/shared/components/forms/AdminInput';
 import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect } from 'react'
@@ -153,7 +153,7 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Khách hàng */}
           <FormSection icon={User} title="Khách hàng">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField label="Khách hàng (có sẵn)">
                 <SearchableSelect
                   value={watch('customerId')?.toString() ?? ''}
@@ -276,7 +276,7 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
 
           {/* Thanh toán */}
           <FormSection icon={Wallet} title="Thanh toán">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <FormField label="Giảm giá hóa đơn">
                 <AdminInput {...register('discountAmount')} type="number" min={0} />
               </FormField>

@@ -243,6 +243,17 @@ export const MENU_GROUPS: MenuGroup[] = [
       },
     ],
   },
+  {
+    title: "Thiết lập",
+    items: [
+      {
+        label: "Tài khoản",
+        path: "/admin/accounts",
+        icon: User,
+        allowedRoles: ["Admin"],
+      }
+    ]
+  }
 ];
 
 /** Flat list — dùng cho breadcrumb / tìm title trang. */
@@ -386,6 +397,7 @@ export const TOP_NAV_TABS: ParentTab[] = [
         items: [
           { label: "Chi nhánh", path: "/admin/salons", icon: Building2, allowedRoles: ["Admin"] },
           { label: "Phân quyền", path: "/admin/roles", icon: ShieldCheck, allowedRoles: ["Admin"] },
+          { label: "Tài khoản", path: "/admin/accounts", icon: User, allowedRoles: ["Admin"] },
         ],
       },
       {

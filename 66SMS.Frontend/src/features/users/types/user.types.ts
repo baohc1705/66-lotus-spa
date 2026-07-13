@@ -4,7 +4,7 @@ export interface UserDto {
   email: string;
   isEmailConfirmed: boolean;
   status: string;
-  logoutEnd?: string;
+  lockoutEnd?: string;
   lastLoginAt?: string;
   roles?: string[];
   permissions?: string[];
@@ -33,7 +33,27 @@ export interface CustomerProfileDto {
   id?: number;
   loyaltyPoint?: number;
   firstPurchaseAt?: string;
+  lastPurchaseAt?: string;
   source?: string;
+  status?: number;
+  note?: string;
+  streetAddress?: string;
+  provinceCode?: string;
+  wardCode?: string;
+  fullAddress?: string;
+}
+
+export interface UserAccountDto {
+  username: string;
+  email: string;
+  role?: string;
+  isEmailConfirmed: boolean;
+  accessFailedCount: number;
+  status: string | number;
+  lastLoginAt?: string;
+  createdAt: string;
+  createdBy?: number;
+  updatedAt?: string;
 }
 
 export type {
@@ -41,4 +61,3 @@ export type {
   UpdateUserPayload,
   UserFormValues,
 } from "../schemas/user.schema";
-

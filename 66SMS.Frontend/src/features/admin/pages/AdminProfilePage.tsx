@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+﻿import { useState, useEffect, useCallback } from "react";
+import { Navigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "motion/react";
 import { User, Lock, Loader2, Camera, Save } from "lucide-react";
 import { useProfile } from "@/features/profile/hooks/useProfile";
-import { useUpdateProfile } from "@/features/profile/hooks/useUpdateProfile";
 import { useChangePassword } from "@/features/profile/hooks/useChangePassword";
 import { useUpdateStaffMutation } from "@/features/staffs/hooks/useStaffs";
 import {
@@ -15,7 +15,7 @@ import {
 } from "@/features/profile/schemas/profile.schemas";
 import { formatDisplayDate, parseToDateInput } from "@/shared/utils/date.utils";
 import { useAuthStore } from "@/features/auth/stores/authStore";
-import { uploadApi } from "@/shared/api/upload.api";
+import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/shared/components/ui/button";
@@ -32,16 +32,15 @@ import { containerVariants, itemVariants } from "@/shared/motion/pageVariants";
 
 export function AdminProfilePage() {
   const [activeTab, setActiveTab] = useState<"profile" | "security">("profile");
+  const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
+  const [localAvatarPreview, setLocalAvatarPreview] = useState<string | null>(null);
   const qc = useQueryClient();
   const { data: profile, isLoading, isError } = useProfile();
-  const isStaff = profile?.profileType === "Staff";
 
-  const updateProfileMutation = useUpdateProfile();
   const updateStaffMutation = useUpdateStaffMutation();
   const changePasswordMutation = useChangePassword();
 
-  const isProfilePending =
-    updateProfileMutation.isPending || updateStaffMutation.isPending;
+  const isProfilePending = updateStaffMutation.isPending;
   const isSecurityPending = changePasswordMutation.isPending;
 
   const { mySalon } = useAuthStore();
@@ -81,6 +80,8 @@ export function AdminProfilePage() {
   useEffect(() => {
     if (profile) {
       resetProfile(getInitialProfileValues());
+      setPendingAvatarFile(null);
+      setLocalAvatarPreview(null);
     }
   }, [profile, resetProfile, getInitialProfileValues]);
 
@@ -99,11 +100,22 @@ export function AdminProfilePage() {
     },
   });
 
-  const onSubmitProfile = (data: ProfileFormValues) => {
+  const onSubmitProfile = async (data: ProfileFormValues) => {
+    if (!profile?.staffInfo?.id) {
+      toast.error("Không tìm thấy thông tin nhân viên");
+      return;
+    }
+
+    let imageBase64: string | undefined;
+    if (pendingAvatarFile) {
+      imageBase64 = await fileToBase64(pendingAvatarFile);
+    }
+
     const payload = {
       fullName: data.fullName,
       phone: data.phoneNumber,
       avatarUrl: data.profilePhotoUrl ?? undefined,
+      imageBase64,
       gender:
         data.gender !== null && data.gender !== undefined
           ? Number(data.gender)
@@ -111,24 +123,18 @@ export function AdminProfilePage() {
       dateOfBirth: data.dateOfBirth ? data.dateOfBirth : undefined,
     };
 
-    if (isStaff && profile?.staffInfo?.id) {
-      updateStaffMutation.mutate(
-        { id: profile.staffInfo.id, payload },
-        {
-          onSuccess: (res) => {
-            if (res.isSuccess) {
-              qc.invalidateQueries({ queryKey: ["profile"] });
-            }
-          },
+    updateStaffMutation.mutate(
+      { id: profile.staffInfo.id, payload },
+      {
+        onSuccess: (res) => {
+          if (res.isSuccess) {
+            setPendingAvatarFile(null);
+            setLocalAvatarPreview(null);
+            qc.invalidateQueries({ queryKey: ["profile"] });
+          }
         },
-      );
-    } else {
-      updateProfileMutation.mutate({
-        fullName: data.fullName,
-        phoneNumber: data.phoneNumber,
-        profilePhotoUrl: data.profilePhotoUrl,
-      });
-    }
+      },
+    );
   };
 
   const onSubmitSecurity = (data: ChangePasswordFormValues) => {
@@ -146,26 +152,19 @@ export function AdminProfilePage() {
     fileInput?.click();
   };
 
-  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = (e: { target: { files: FileList | null } }) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    try {
-      const result = await uploadApi.uploadImage(file, "profile");
-      if (result.isSuccess && result.data) {
-        setValueProfile("profilePhotoUrl", result.data);
-        toast.success(
-          "Tải ảnh đại diện lên thành công. Đừng quên bấm Lưu thông tin!",
-        );
-      } else {
-        toast.error(result.message || "Tải ảnh đại diện thất bại");
-      }
-    } catch {
-      toast.error("Đã xảy ra lỗi khi tải ảnh đại diện");
-    }
+    setPendingAvatarFile(file);
+    setLocalAvatarPreview(URL.createObjectURL(file));
+    toast.success("Đã chọn ảnh mới. Đừng quên bấm Lưu thông tin!");
   };
 
-  const avatarUrl = watchProfile("profilePhotoUrl");
+  const avatarUrl = localAvatarPreview ?? watchProfile("profilePhotoUrl");
+
+  if (!isLoading && profile?.profileType === "Customer") {
+    return <Navigate to="/profile" replace />;
+  }
 
   if (isLoading) {
     return (
@@ -312,7 +311,7 @@ export function AdminProfilePage() {
                   onSubmit={handleSubmitProfile(onSubmitProfile)}
                   className="space-y-6"
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {/* Email đăng nhập */}
                     <FormField label="Email đăng nhập">
                       <AdminInput
@@ -482,7 +481,7 @@ export function AdminProfilePage() {
                     />
                   </FormField>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {/* Mật khẩu mới */}
                     <FormField
                       label="Mật khẩu mới *"

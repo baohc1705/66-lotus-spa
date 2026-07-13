@@ -1,4 +1,4 @@
-import { useForm, type Resolver } from "react-hook-form";
+﻿import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { Box } from "lucide-react";
@@ -110,7 +110,7 @@ export function ProductCategoryFormDialog({
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <FormSection icon={Box} title="Thông tin danh mục sản phẩm">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField
                 label="Tên danh mục"
                 tooltip="Vui lòng nhập vào tên danh mục sản phẩm"

@@ -1,4 +1,4 @@
-import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+﻿import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
 import { AdminInput } from '@/shared/components/forms/AdminInput';
 import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect, useState } from 'react'
@@ -23,8 +23,8 @@ import {
 } from '@/shared/components/ui/select'
 import { Info } from 'lucide-react'
 import { ImageUpload } from '@/shared/components/ImageUpload'
-import { uploadApi } from '@/shared/api/upload.api'
-import { useCreateSalonMutation, useUpdateSalonMutation } from '../hooks/useSalons'
+import { fileToBase64 } from '@/shared/lib/fileToBase64'
+import { useCreateSalonMutation, useUpdateSalonMutation, useSalonDetail } from '../hooks/useSalons'
 import { useProvinces, useWardsByProvince } from '@/features/address/hooks/useAddress'
 import { SearchableSelect } from '@/shared/components/ui/searchable-select'
 import {
@@ -34,11 +34,13 @@ import {
 } from '../schemas/salon.schema'
 import type { SalonDTO } from '../types/salon.types'
 import type { ProvinceDto, WardDto } from '@/features/address/types/address.types'
+import { Loader2 } from 'lucide-react'
 
 interface SalonFormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  salon?: SalonDTO | null
+  /** Khi có salonId → chế độ edit, form load getDetail (đủ field kể cả description). */
+  salonId?: number | null
 }
 
 const STATUS_OPTIONS = [
@@ -47,8 +49,10 @@ const STATUS_OPTIONS = [
   { value: '3', label: 'Đóng cửa' },
 ]
 
-export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogProps) {
-  const isEdit = !!salon
+export function SalonFormDialog({ open, onOpenChange, salonId = null }: SalonFormDialogProps) {
+  const isEdit = salonId != null && salonId > 0
+  const detailQuery = useSalonDetail(open && isEdit ? salonId : null)
+  const salon = detailQuery.data?.data
   const createMutation = useCreateSalonMutation()
   const updateMutation = useUpdateSalonMutation()
   const isPending = createMutation.isPending || updateMutation.isPending
@@ -59,7 +63,7 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
     resolver: zodResolver(
       isEdit ? updateSalonSchema : createSalonSchema
     ) as Resolver<SalonFormValues>,
-    defaultValues: getDefaultValues(salon),
+    defaultValues: getDefaultValues(null),
   })
 
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = form
@@ -70,28 +74,35 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
   const wardsQuery = useWardsByProvince(selectedProvince)
 
   useEffect(() => {
-    if (open) {
-      setPendingFile(null)
-      reset(getDefaultValues(salon))
+    if (!open) return
+    setPendingFile(null)
+    if (isEdit) {
+      if (salon) reset(getDefaultValues(salon))
+    } else {
+      reset(getDefaultValues(null))
     }
-  }, [open, salon, reset])
+  }, [open, isEdit, salon, reset])
 
   const onSubmit = async (data: SalonFormValues) => {
     setIsUploading(true)
     try {
-      let imageUrl = data.imageUrl ?? ''
+      let imageBase64: string | undefined
       if (pendingFile) {
-        const result = await uploadApi.uploadImage(pendingFile, 'salon')
-        imageUrl = (result.isSuccess && result.data) ? result.data : ''
+        imageBase64 = await fileToBase64(pendingFile)
       }
       const provinceName = provincesQuery.data?.data?.find((p: ProvinceDto) => p.code === data.provinceCode)?.name ?? ''
       const wardName = wardsQuery.data?.data?.find((w: WardDto) => w.code === data.wardCode)?.name ?? ''
       const parts = [data.streetAddress, wardName, provinceName].filter(Boolean)
-      const payload = { ...data, imageUrl, fullAddress: parts.join(', ') }
+      const payload = {
+        ...data,
+        imageUrl: data.imageUrl ?? '',
+        imageBase64,
+        fullAddress: parts.join(', '),
+      }
 
-      if (isEdit && salon?.id) {
+      if (isEdit && salonId) {
         updateMutation.mutate(
-          { id: salon.id, payload },
+          { id: salonId, payload },
           { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) } }
         )
       } else {
@@ -117,6 +128,12 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
           </DialogDescription>
         </DialogHeader>
 
+        {isEdit && detailQuery.isLoading ? (
+          <div className="flex items-center justify-center py-16 text-adminGray-600 gap-2">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span className="text-sm">Đang tải thông tin chi nhánh...</span>
+          </div>
+        ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="mb-5">
             <ImageUpload
@@ -132,9 +149,17 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
             <p className="text-xs font-semibold uppercase tracking-wider text-adminGray-600 mb-3">
               Thông tin cơ bản
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-4">
-              <FormField label="Mã chi nhánh *" error={errors.code?.message}>
-                <AdminInput {...register('code')} placeholder="CN001" />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <FormField
+                label="Mã chi nhánh"
+                tooltip={isEdit ? 'Mã được hệ thống tạo tự động, không chỉnh sửa.' : 'Mã sẽ được hệ thống tạo tự động sau khi lưu.'}
+              >
+                <AdminInput
+                  value={isEdit ? (salon?.code ?? '') : ''}
+                  placeholder={isEdit ? '' : 'Tự động tạo'}
+                  disabled
+                  readOnly
+                />
               </FormField>
               <FormField label="Tên chi nhánh *" error={errors.name?.message} className="sm:col-span-2">
                 <AdminInput {...register('name')} placeholder="Chi nhánh Quận 1" />
@@ -156,7 +181,7 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
             <p className="text-xs font-semibold uppercase tracking-wider text-adminGray-600 mb-3">
               Địa chỉ
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField label="Tỉnh/Thành phố" error={errors.provinceCode?.message}>
                 <SearchableSelect
                   value={watch('provinceCode') ?? ''}
@@ -192,7 +217,7 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
             <p className="text-xs font-semibold uppercase tracking-wider text-adminGray-600 mb-3">
               Mô tả & Trạng thái
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <FormField
                 label="Ngày làm việc"
                 tooltip='Chuỗi số thứ trong tuần, ví dụ "1234567" = tất cả các ngày'
@@ -245,6 +270,7 @@ export function SalonFormDialog({ open, onOpenChange, salon }: SalonFormDialogPr
             </Button>
           </DialogFooter>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   )
@@ -291,7 +317,6 @@ function FormField({
 function getDefaultValues(salon?: SalonDTO | null): SalonFormValues {
   if (salon) {
     return {
-      code: salon.code ?? '',
       name: salon.name ?? '',
       phone: salon.phone ?? '',
       email: salon.email ?? '',
@@ -308,7 +333,6 @@ function getDefaultValues(salon?: SalonDTO | null): SalonFormValues {
     }
   }
   return {
-    code: '',
     name: '',
     phone: '',
     email: '',

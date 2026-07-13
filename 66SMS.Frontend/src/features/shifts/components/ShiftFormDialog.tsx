@@ -1,4 +1,4 @@
-import { useForm, type Resolver } from "react-hook-form";
+﻿import { useForm, type Resolver } from "react-hook-form";
 import { useCreateShift, useUpdateShift } from "../hooks/useShifts";
 import type { ShiftDTO } from "../types/shift.types";
 import {
@@ -148,7 +148,7 @@ export function ShiftFormDialog({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Thông tin chung */}
           <FormSection icon={Info} title="Thông tin cơ bản">
-            <div className="grid grid-cols-1 gap-y-5">
+            <div className="grid grid-cols-1 gap-2">
               <FormField
                 label="Tên ca"
                 tooltip="Vui lòng nhập tên ca (VD: Ca Sáng)"
@@ -175,7 +175,7 @@ export function ShiftFormDialog({
 
           {/* Thời gian */}
           <FormSection icon={Clock} title="Thời gian làm việc">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField
                 label="Giờ bắt đầu"
                 tooltip="Giờ bắt đầu làm việc"

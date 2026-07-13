@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+﻿import { useEffect } from "react";
 import { useForm, useFieldArray, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -173,7 +173,7 @@ export function TreatmentCourseFormDialog({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Thông tin liệu trình */}
           <FormSection icon={Leaf} title="Thông tin liệu trình">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField label="Mã liệu trình *" error={errors.code?.message}>
                 <AdminInput
                   {...register("code")}

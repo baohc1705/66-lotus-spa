@@ -7,7 +7,7 @@ import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage } from "
 import RolePermissionPage from "@/features/auth/pages/RolePermissionPage";
 import { BookingPage } from "@/features/booking";
 import { CashierPage, VnPayReturnPage } from "@/features/cashier";
-import { UsersPage } from "@/features/users";
+import { AccountListPage, UsersPage } from "@/features/users";
 import { StaffListPage } from "@/features/staffs";
 import { StaffAppointmentsPage } from "@/features/staff_appointments";
 import { CustomerListPage, MembershipCardListPage, MembershipTierListPage } from "@/features/customers";
@@ -189,7 +189,10 @@ export const router = createBrowserRouter([
             path: "marketing/promotions",
             element: <PromotionListPage />,
           },
-          // Placeholders for other admin routes
+          {
+            path: "accounts",
+            element: <AccountListPage />,
+          },
         ],
       },
     ],

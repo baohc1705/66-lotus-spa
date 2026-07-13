@@ -242,9 +242,9 @@
 
 .landing-container {
   width: 100%;
-  max-width: 72rem;
+  max-width: 80rem; /* max-w-7xl */
   margin-inline: auto;
-  padding-inline: clamp(1rem, 3vw, 1.5rem);
+  padding-inline: clamp(1rem, 3vw, 2rem);
 }
 
 .landing-surface {

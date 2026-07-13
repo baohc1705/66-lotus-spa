@@ -1,4 +1,4 @@
-import { useForm, type Resolver } from "react-hook-form";
+﻿import { useForm, type Resolver } from "react-hook-form";
 import {
   useCreateServiceCategory,
   useUpdateServiceCategory,
@@ -118,7 +118,7 @@ export function ServiceCategoryFormDialog({
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <FormSection icon={Box} title="Thông tin nhóm dịch vụ">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField
                 label="Tên nhóm dịch vụ"
                 tooltip="Vui lòng nhập vào tên nhóm dịch vụ"

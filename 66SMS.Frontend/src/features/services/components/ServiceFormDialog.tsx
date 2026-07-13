@@ -1,4 +1,4 @@
-import { useForm, useFieldArray, type Resolver } from "react-hook-form";
+﻿import { useForm, useFieldArray, type Resolver } from "react-hook-form";
 import {
   useCreateService,
   useUpdateService,
@@ -187,7 +187,7 @@ export function ServiceFormDialog({
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <FormSection icon={Activity} title="Thông tin cơ bản">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <FormField
                   label="Mã dịch vụ"
                   tooltip="Để trống hệ thống sẽ tự sinh"

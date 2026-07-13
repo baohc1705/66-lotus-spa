@@ -2,7 +2,6 @@ import { z } from 'zod'
 import { VALIDATION_MSG } from '@/shared/constants/validation.messages'
 
 const salonBaseSchema = z.object({
-  code: z.string().min(1, VALIDATION_MSG.required('Mã chi nhánh')).max(32, VALIDATION_MSG.max(32)),
   name: z.string().min(1, VALIDATION_MSG.required('Tên chi nhánh')).max(200, VALIDATION_MSG.max(200)),
   phone: z.string().min(1, VALIDATION_MSG.required('Số điện thoại')).max(20, VALIDATION_MSG.max(20)),
   email: z.string().email('Email không hợp lệ').max(200).optional().or(z.literal('')),

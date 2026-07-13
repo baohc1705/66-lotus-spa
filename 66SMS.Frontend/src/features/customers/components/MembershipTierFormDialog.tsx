@@ -1,4 +1,4 @@
-import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+﻿import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
 import { AdminInput } from '@/shared/components/forms/AdminInput';
 import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect } from "react";
@@ -111,7 +111,7 @@ export function MembershipTierFormDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div className="sm:col-span-2">
               <FormField
                 label="Tên loại thẻ *"

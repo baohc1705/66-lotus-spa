@@ -38,8 +38,8 @@ export function SalonListPage() {
     handleSearchChange,
     createOpen,
     setCreateOpen,
-    editTarget,
-    setEditTarget,
+    editSalonId,
+    setEditSalonId,
     deleteTarget,
     setDeleteTarget,
   } = listState;
@@ -73,7 +73,9 @@ export function SalonListPage() {
   const columns = useActiveSalonColumns({
     pageIndex,
     pageSize,
-    onEdit: setEditTarget,
+    onEdit: (item) => {
+      if (item.id) setEditSalonId(item.id);
+    },
     onDelete: setDeleteTarget,
   });
 
@@ -127,7 +129,9 @@ export function SalonListPage() {
             row.original.id ? (
               <SalonDetailExpanded
                 salonId={row.original.id}
-                onEdit={setEditTarget}
+                onEdit={(salon) => {
+                  if (salon.id) setEditSalonId(salon.id);
+                }}
               />
             ) : null
           }
@@ -177,11 +181,11 @@ export function SalonListPage() {
       <SalonFormDialog open={createOpen} onOpenChange={setCreateOpen} />
 
       <SalonFormDialog
-        open={!!editTarget}
+        open={editSalonId != null}
         onOpenChange={(open) => {
-          if (!open) setEditTarget(null);
+          if (!open) setEditSalonId(null);
         }}
-        salon={editTarget}
+        salonId={editSalonId}
       />
 
       <ConfirmDialog

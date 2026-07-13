@@ -47,7 +47,7 @@ export function SearchableSelect({
           type="button"
           disabled={disabled}
           className={cn(
-            'lotus-admin-select-trigger flex items-center justify-between gap-2 rounded-md bg-adminGray-100/80 whitespace-nowrap select-none text-lotus-deep outline-none transition-all duration-200 hover:bg-adminGray-100 focus:bg-white focus:ring-2 focus:ring-adminGreen-600/30 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
+            'lotus-admin-select-trigger flex items-center justify-between gap-2 rounded-none border border-adminGray-300 bg-white whitespace-nowrap select-none text-lotus-deep outline-none transition-colors duration-150 hover:border-adminGray-400 focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-adminGray-50',
             !selected && 'text-lotus-stone',
             className,
           )}

@@ -204,7 +204,7 @@ export const HeroSection = () => {
       </div>
 
       {/* Content — brand + headline + one sentence + CTAs */}
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pb-20 pt-28 md:px-8 md:pb-28 md:pt-32">
+      <div className="landing-container relative z-10 pb-20 pt-28 md:pb-28 md:pt-32">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}

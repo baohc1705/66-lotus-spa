@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -25,7 +25,7 @@ import {
 } from "@/shared/components/ui/select";
 import { SearchableSelect } from "@/shared/components/ui/searchable-select";
 import { useCreateStaffMutation, useUpdateStaffMutation } from "../hooks/useStaffs";
-import { uploadApi } from "@/shared/api/upload.api";
+import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { ImageUpload } from "@/shared/components/ImageUpload";
 import {
   useProvinces,
@@ -126,10 +126,9 @@ export function StaffFormDialog({
   const onSubmit = async (data: StaffFormValues) => {
     setIsUploading(true);
     try {
-      let avatarUrl = data.avatarUrl ?? "";
+      let imageBase64: string | undefined;
       if (pendingFile) {
-        const result = await uploadApi.uploadImage(pendingFile, "staff");
-        avatarUrl = result.isSuccess && result.data ? result.data : "";
+        imageBase64 = await fileToBase64(pendingFile);
       }
       const provinceName =
         provincesQuery.data?.data?.find((p) => p.code === data.provinceCode)
@@ -145,7 +144,8 @@ export function StaffFormDialog({
         salonId: data.salonId,
         fullName: data.fullName,
         phone: data.phone,
-        avatarUrl,
+        avatarUrl: data.avatarUrl ?? "",
+        imageBase64,
         dateOfBirth: data.dateOfBirth || undefined,
         gender: data.gender,
         nationalId: data.nationalId || undefined,
@@ -206,7 +206,7 @@ export function StaffFormDialog({
                 label="Đổi ảnh đại diện"
               />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField
                 label="Họ tên *"
                 tooltip="Vui lòng nhập họ và tên đầy đủ của nhân viên"
@@ -302,7 +302,7 @@ export function StaffFormDialog({
 
           {/* === Section: Thông tin công việc === */}
           <FormSection icon={Briefcase} title="Thông tin công việc">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField
                 label="Chi nhánh *"
                 tooltip="Chọn chi nhánh mà nhân viên này thuộc về"

@@ -1,4 +1,4 @@
-import { AdminInput } from '@/shared/components/forms/AdminInput';
+﻿import { AdminInput } from '@/shared/components/forms/AdminInput';
 import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect, useMemo } from "react";
 import { useForm, type Resolver } from "react-hook-form";
@@ -130,7 +130,7 @@ export function MembershipCardFormDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <FormField label="Mã thẻ *" error={errors.cardCode?.message}>
               <AdminInput
                 {...register("cardCode")}

@@ -31,7 +31,14 @@ export class DateUtil {
   static fromApi(val?: string | null): DateUtil | null {
     if (!val) return null;
 
-    const parsed = new Date(val);
+    let normalized = val.trim();
+    const isIsoUtcNoTz =
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/.test(normalized);
+    if (isIsoUtcNoTz) {
+      normalized = `${normalized}Z`;
+    }
+
+    const parsed = new Date(normalized);
     if (!Number.isNaN(parsed.getTime())) {
       return new DateUtil(parsed);
     }
@@ -164,8 +171,8 @@ export function formatDateTimeDisplay(
 ): string {
   if (!val) return fallback;
   const d = DateUtil.fromApi(val);
-  if (d) return d.toDisplayDateTime();
-  return val || fallback;
+  const out = d ? d.toDisplayDateTime() : val || fallback;
+  return out;
 }
 
 /** Chuyển sang yyyy-MM-dd cho input type="date" */

@@ -41,7 +41,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
         id="main-nav"
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "nav--scrolled h-[68px]" : alwaysDark ? "nav--scrolled h-[68px]" : "bg-transparent h-[80px]"}`}
       >
-        <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-4 sm:px-6">
+        <div className="landing-container h-full flex items-center justify-between">
           {/* Logo */}
           <a
             href="/"
@@ -165,7 +165,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             className="fixed inset-x-0 top-[68px] z-40 bg-surface border-b border-card-border shadow-jade-lg lg:hidden"
           >
-            <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-1">
+            <div className="landing-container py-6 flex flex-col gap-1">
               {NAV_ITEMS.map((item, i) => (
                 <motion.a
                   key={item.href}

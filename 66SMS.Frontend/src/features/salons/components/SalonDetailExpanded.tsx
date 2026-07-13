@@ -34,24 +34,6 @@ interface SalonDetailExpandedProps {
   onEdit?: (salon: SalonDTO) => void;
 }
 
-const WORKING_DAYS_MAP: Record<string, string> = {
-  "1": "T2",
-  "2": "T3",
-  "3": "T4",
-  "4": "T5",
-  "5": "T6",
-  "6": "T7",
-  "7": "CN",
-};
-
-function parseWorkingDays(workingDays?: string): string {
-  if (!workingDays) return "—";
-  return workingDays
-    .split("")
-    .map((d) => WORKING_DAYS_MAP[d] ?? d)
-    .join(", ");
-}
-
 export function SalonDetailExpanded({
   salonId,
   onEdit,
@@ -162,7 +144,7 @@ export function SalonDetailExpanded({
             </div>
 
             {/* Fields grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-0">
               <div className="flex flex-col">
                 <DetailField
                   label="Số điện thoại"
@@ -179,21 +161,31 @@ export function SalonDetailExpanded({
               <div className="flex flex-col">
                 <DetailField
                   label="Ngày làm việc"
-                  value={parseWorkingDays(salon.workingDays)}
+                  value={salon.workingDays}
                   icon={Calendar}
                 />
                 <DetailField
                   label="Thứ tự hiển thị"
                   value={salon.sortOrder?.toString()}
                 />
+              </div>
+              <div className="flex flex-col">
                 <DetailField
-                  label="Cập nhật lần cuối"
-                  value={
-                    salon.updatedAt
-                      ? new Date(salon.updatedAt).toLocaleString("vi-VN")
-                      : undefined
-                  }
+                  label="Địa chỉ"
+                  value={salon.fullAddress}
+                  icon={MapPin}
                 />
+                {salon.fullAddress && (
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(salon.fullAddress)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs text-adminGreen-600 hover:underline mt-1"
+                  >
+                    <MapPin className="w-3.5 h-3.5" />
+                    Xem trên Google Maps
+                  </a>
+                )}
               </div>
             </div>
 
@@ -259,18 +251,6 @@ export function SalonDetailExpanded({
                 )}
               </div>
             </div>
-
-            {salon.fullAddress && (
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(salon.fullAddress)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs text-adminGreen-600 hover:underline mt-1"
-              >
-                <MapPin className="w-3.5 h-3.5" />
-                Xem trên Google Maps
-              </a>
-            )}
           </div>
         </TabsContent>
 

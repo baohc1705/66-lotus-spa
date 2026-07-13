@@ -22,6 +22,7 @@ export const API = {
     meMembershipCard: "/users/me/membership-card",
     meWallet: "/users/me/wallet",
     meWalletTx: "/users/me/wallet/transactions",
+    accounts: "/users/accounts",
   },
   staffs: {
     base: "/staffs",

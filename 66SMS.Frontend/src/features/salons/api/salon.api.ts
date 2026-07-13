@@ -3,6 +3,7 @@ import { API } from "@/shared/api/endpoints";
 import type { Result, PagedResult } from "@/shared/types/common.types";
 import type {
   SalonDTO,
+  SalonListItem,
   CreateSalonPayload,
   UpdateSalonPayload,
   SalonQueryParams,
@@ -13,12 +14,12 @@ const BASE = API.salons;
 export const salonApi = {
   getAll: (params: SalonQueryParams) =>
     axiosInstance
-      .get<Result<PagedResult<SalonDTO>>>(BASE, { params })
+      .get<Result<PagedResult<SalonListItem>>>(BASE, { params })
       .then((r) => r.data),
 
   getAdminAll: (params: SalonQueryParams) =>
     axiosInstance
-      .get<Result<PagedResult<SalonDTO>>>(`${BASE}/admin`, { params })
+      .get<Result<PagedResult<SalonListItem>>>(`${BASE}/admin`, { params })
       .then((r) => r.data),
 
   getDetail: (id: number) =>

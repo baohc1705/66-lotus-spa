@@ -1,4 +1,4 @@
-import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+﻿import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
 import { AdminInput } from '@/shared/components/forms/AdminInput';
 import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
 import { useEffect, useState } from 'react'
@@ -27,7 +27,7 @@ import { FormField } from '@/shared/components/forms/FormField'
 import { useCreateStaffCertificate, useUpdateStaffCertificate } from '../hooks/useStaffCertificates'
 import { useCertificateTypes } from '../hooks/useCertificateTypes'
 import { useStaffs } from '@/features/staffs/hooks/useStaffs'
-import { uploadApi } from '@/shared/api/upload.api'
+import { fileToBase64 } from '@/shared/lib/fileToBase64'
 import { parseToDateInput } from '@/shared/utils/date.utils'
 import type { StaffDto } from '@/features/staffs/types/staff.types'
 import { createStaffCertificateSchema, type StaffCertificateFormValues } from '../schemas/staffCertificate.schema'
@@ -101,13 +101,11 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
       return
     }
 
-    // Upload ảnh scan chứng chỉ lên server nếu có file mới được chọn
-    let documentUrl = data.documentUrl || undefined
+    let imageBase64: string | undefined
     if (pendingFile) {
       setIsUploading(true)
       try {
-        const result = await uploadApi.uploadImage(pendingFile, 'certificate')
-        if (result.isSuccess && result.data) documentUrl = result.data
+        imageBase64 = await fileToBase64(pendingFile)
       } finally {
         setIsUploading(false)
       }
@@ -121,7 +119,8 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
         issuingOrganization: data.issuingOrganization,
         issuedDate: data.issuedDate,
         expiryDate: data.expiryDate || undefined,
-        documentUrl,
+        documentUrl: data.documentUrl || undefined,
+        imageBase64,
         note: data.note || undefined,
         status: data.status,
       }
@@ -138,7 +137,8 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
         issuingOrganization: data.issuingOrganization,
         issuedDate: data.issuedDate,
         expiryDate: data.expiryDate || undefined,
-        documentUrl,
+        documentUrl: data.documentUrl || undefined,
+        imageBase64,
         note: data.note || undefined,
         status: data.status,
       }
@@ -178,7 +178,7 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
                   </Select>
                 </FormField>
               )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <FormField label="Loại chứng chỉ *" error={errors.certificateTypeId?.message}>
                   <Select
                     value={watch('certificateTypeId')?.toString() ?? ''}
@@ -212,7 +212,7 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
                 <AdminInput {...register('certificateName')} placeholder="Chứng chỉ Massage Trị liệu Quốc tế" />
               </FormField>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <FormField label="Số chứng chỉ" error={errors.certificateNumber?.message}>
                   <AdminInput {...register('certificateNumber')} placeholder="VN-2024-12345" />
                 </FormField>
@@ -221,7 +221,7 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
                 </FormField>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <FormField label="Ngày cấp *" error={errors.issuedDate?.message}>
                   <AdminInput {...register('issuedDate')} type="date" />
                 </FormField>

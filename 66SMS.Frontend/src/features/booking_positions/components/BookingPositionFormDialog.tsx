@@ -1,4 +1,4 @@
-import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+﻿import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
 import { AdminInput } from '@/shared/components/forms/AdminInput';
 import { useForm, type Resolver } from "react-hook-form";
 import {
@@ -141,7 +141,7 @@ export function BookingPositionFormDialog({
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <FormSection icon={MapPin} title="Thông tin vị trí dịch vụ">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               
               <FormField
                 label="Phòng dịch vụ"

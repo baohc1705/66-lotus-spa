@@ -115,3 +115,11 @@ export function useDeleteUserMultiples() {
     },
   });
 }
+
+export function useGetAllAccounts(params?: PageRequest) {
+  return useQuery({
+    queryKey: USER_KEYS.adminList(params ?? {}),
+    queryFn: () => usersApi.getAllAccounts(params),
+    staleTime: 1000 * 30, // 30s
+  });
+}

@@ -19,7 +19,7 @@ import { IndexCell } from "@/shared/components/DataTable/tableCells";
 import { SalonStatusBadge } from "./SalonStatusBadge";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { SALON_PERM } from "../constants/salon.permissions";
-import type { SalonDTO } from "../types/salon.types";
+import type { SalonListItem } from "../types/salon.types";
 
 export const SALON_COLUMN_LABELS = {
   code: "Mã",
@@ -32,8 +32,8 @@ export const SALON_COLUMN_LABELS = {
 interface UseActiveSalonColumnsParams {
   pageIndex: number;
   pageSize: number;
-  onEdit: (item: SalonDTO) => void;
-  onDelete: (item: SalonDTO) => void;
+  onEdit: (item: SalonListItem) => void;
+  onDelete: (item: SalonListItem) => void;
 }
 
 export function useActiveSalonColumns({
@@ -45,7 +45,7 @@ export function useActiveSalonColumns({
   const cols = SALON_COLUMN_LABELS;
   const perm = SALON_PERM;
 
-  return useMemo<ColumnDef<SalonDTO>[]>(
+  return useMemo<ColumnDef<SalonListItem>[]>(
     () => [
       {
         id: "index",
@@ -64,7 +64,7 @@ export function useActiveSalonColumns({
         accessorKey: "code",
         header: cols.code,
         cell: ({ row }) => (
-          <span className="font-mono text-xs bg-adminGray-100 px-1.5 py-0.5 rounded text-adminInk">
+          <span className="text-xs bg-adminGray-100 px-1.5 py-0.5 rounded text-adminInk">
             {row.original.code}
           </span>
         ),
@@ -157,4 +157,4 @@ export function useActiveSalonColumns({
   );
 }
 
-export type SalonTableRow = Row<SalonDTO>;
+export type SalonTableRow = Row<SalonListItem>;

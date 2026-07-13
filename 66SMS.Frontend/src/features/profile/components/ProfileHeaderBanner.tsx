@@ -1,4 +1,4 @@
-import { Calendar, Award, Wallet, Star, User as UserIcon } from "lucide-react";
+import { Calendar, Wallet, Star, User as UserIcon } from "lucide-react";
 import { formatCurrency } from "@/shared/utils/currency";
 import {
   useMyMembershipCard,
@@ -12,21 +12,14 @@ interface ProfileHeaderBannerProps {
 }
 
 export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
-  const isCustomer = profile?.profileType === "Customer";
-
-  // Call hooks conditionally (React Query will handle query key caching, enabled parameter prevents errors)
-  const { data: card } = useMyMembershipCard(isCustomer);
+  const { data: card } = useMyMembershipCard(true);
   const { data: tiers = [] } = useMembershipTiers();
   const { data: bookings = [] } = useMyBookings();
 
-  // Calculate tier details
   const currentTierName = card?.tierName || "Đồng";
   const loyaltyPoints = profile?.customerInfo?.loyaltyPoint || 0;
-
-  // Calculate total spending (using 10,000đ per loyalty point)
   const calculatedSpending = loyaltyPoints * 10000;
 
-  // Find current tier index and next tier
   const sortedTiers = [...tiers].sort((a, b) => a.minSpending - b.minSpending);
   const currentTierIndex = sortedTiers.findIndex(
     (t) => t.name.toLowerCase() === currentTierName.toLowerCase(),
@@ -37,7 +30,6 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
       ? sortedTiers[currentTierIndex + 1]
       : null;
 
-  // Calculate progress percent
   let progressPercent = 0;
   let spendingNeeded = 0;
 
@@ -63,52 +55,36 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
     progressPercent = 100;
   }
 
-  // Fallback calculations matching mock if tiers array is empty (standard client setup)
-  if (tiers.length === 0 && isCustomer) {
-    // If no tiers loaded yet, default to Bronze -> Silver progress mock
+  if (tiers.length === 0) {
     spendingNeeded = 600000;
     progressPercent = 40;
   }
 
   return (
-    <div className="w-full bg-white rounded-2xl border border-warm-100 shadow-sm p-4 md:p-5 relative overflow-hidden mb-4">
-      {/* Top thin brand accent border */}
-      <div className="absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-r from-lotus-rose via-lotus-rose/70 to-lotus-rose" />
-
-      <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-4 md:gap-6">
-        {/* Left: Avatar & User Basic Info */}
-        <div className="flex items-center gap-4 w-full lg:w-auto">
-          <div className="relative">
-            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border border-rose-100 flex items-center justify-center p-1 bg-white shadow-sm">
-              {profile?.avatarUrl ? (
-                <img
-                  src={profile.avatarUrl}
-                  alt={profile.fullName || "User avatar"}
-                  className="w-full h-full rounded-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full rounded-full bg-rose-50 flex items-center justify-center text-lotus-rose">
-                  <UserIcon className="w-10 h-10" />
-                </div>
-              )}
-            </div>
+    <div className="w-full bg-white rounded-xl shadow-sm p-3 md:p-4">
+      <div className="flex flex-col lg:flex-row items-center justify-between gap-3 md:gap-4">
+        <div className="flex items-center gap-3 w-full lg:w-auto">
+          <div className="w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center bg-rose-50">
+            {profile?.avatarUrl ? (
+              <img
+                src={profile.avatarUrl}
+                alt={profile.fullName || "User avatar"}
+                className="w-full h-full rounded-full object-cover"
+              />
+            ) : (
+              <UserIcon className="w-7 h-7 text-lotus-rose" />
+            )}
           </div>
 
-          <div className="space-y-1">
-            <h2 className="text-xl md:text-2xl font-extrabold text-ink tracking-tight uppercase leading-none">
+          <div className="space-y-0.5">
+            <h2 className="text-lg md:text-xl font-extrabold text-ink tracking-tight uppercase leading-none">
               {profile?.fullName || profile?.username || "Khách hàng"}
             </h2>
 
-            {isCustomer ? (
-              <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-lotus-gold text-white text-xs font-bold shadow-sm">
-                <Star className="w-3.5 h-3.5 fill-white text-white" />
-                Hạng {currentTierName}
-              </div>
-            ) : (
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-rose-50 text-rose-600 text-xs font-bold border border-rose-100">
-                Nhân viên Spa
-              </div>
-            )}
+            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-lotus-gold text-white text-xs font-bold">
+              <Star className="w-3.5 h-3.5 fill-white text-white" />
+              Hạng {currentTierName}
+            </div>
 
             <p className="text-xs text-warm-600 font-medium">
               Mã thành viên:{" "}
@@ -120,132 +96,85 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
           </div>
         </div>
 
-        {/* Middle: Progress Bar */}
-        {isCustomer && (
-          <div className="flex-1 flex flex-col justify-center max-w-md w-full">
-            <p className="text-sm font-bold text-ink mb-2">
-              Tiến độ thăng hạng
+        <div className="flex-1 flex flex-col justify-center max-w-md w-full">
+          <p className="text-xs font-bold text-ink mb-1.5">Tiến độ thăng hạng</p>
+          <div className="flex items-center justify-between text-xs text-warm-600 mb-1">
+            <span>
+              Hiện tại:{" "}
+              <span className="text-lotus-gold font-bold">{currentTierName}</span>
+            </span>
+            <span>
+              Mục tiêu:{" "}
+              <span className="text-rose-600 font-bold">
+                {nextTier ? nextTier.name : "Bạc"}
+              </span>
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="flex-1 bg-warm-100 rounded-full h-1.5 overflow-hidden">
+              <div
+                className="bg-lotus-rose h-full rounded-full transition-all duration-500"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <span className="text-xs font-extrabold text-lotus-rose shrink-0">
+              {Math.round(progressPercent)}%
+            </span>
+          </div>
+
+          <p className="text-xs text-warm-400 mt-1.5 font-medium">
+            {nextTier ? (
+              <>
+                Còn{" "}
+                <span className="font-bold text-ink">
+                  {formatCurrency(spendingNeeded)}
+                </span>{" "}
+                để đạt hạng {nextTier.name}
+              </>
+            ) : (
+              <>
+                Còn{" "}
+                <span className="font-bold text-ink">
+                  {formatCurrency(spendingNeeded)}
+                </span>{" "}
+                để đạt hạng Bạc
+              </>
+            )}
+          </p>
+        </div>
+
+        <div className="rounded-lg p-2.5 bg-lotus-cream/60 flex items-center justify-between w-full lg:w-[45%] lg:max-w-md">
+          <div className="flex-1 text-center">
+            <Calendar className="text-rose-500 w-4 h-4 mx-auto mb-1" />
+            <p className="text-base md:text-lg font-extrabold text-ink">
+              {bookings.length}
             </p>
-            <div className="flex items-center justify-between text-xs text-warm-600 mb-1.5">
-              <span>
-                Hiện tại:{" "}
-                <span className="text-lotus-gold font-bold">
-                  {currentTierName}
-                </span>
-              </span>
-              <span>
-                Mục tiêu:{" "}
-                <span className="text-rose-600 font-bold">
-                  {nextTier ? nextTier.name : "Bạc"}
-                </span>
-              </span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="flex-1 bg-warm-100 rounded-full h-2 overflow-hidden">
-                <div
-                  className="bg-lotus-rose h-full rounded-full transition-all duration-500"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
-              <span className="text-xs font-extrabold text-lotus-rose shrink-0">
-                {Math.round(progressPercent)}%
-              </span>
-            </div>
-
-            <p className="text-xs text-warm-400 mt-2 font-medium">
-              {nextTier ? (
-                <>
-                  Còn{" "}
-                  <span className="font-bold text-ink">
-                    {formatCurrency(spendingNeeded)}
-                  </span>{" "}
-                  để đạt hạng {nextTier.name}
-                </>
-              ) : (
-                <>
-                  Còn{" "}
-                  <span className="font-bold text-ink">
-                    {formatCurrency(spendingNeeded)}
-                  </span>{" "}
-                  để đạt hạng Bạc
-                </>
-              )}
+            <p className="text-2xs md:text-xs text-warm-600 font-semibold tracking-wide uppercase">
+              Lịch hẹn
             </p>
           </div>
-        )}
-
-        {/* Right: Stats Panel */}
-        {isCustomer ? (
-          <div className="border border-warm-100 rounded-xl p-3 bg-white shadow-sm flex items-center justify-between w-full lg:w-[45%] lg:max-w-md">
-            <div className="flex-1 text-center">
-              <Calendar className="text-rose-500 w-5 h-5 mx-auto mb-1.5" />
-              <p className="text-lg md:text-xl font-extrabold text-ink">
-                {bookings.length}
-              </p>
-              <p className="text-2xs md:text-xs text-warm-600 font-semibold tracking-wide uppercase">
-                Lịch hẹn
-              </p>
-            </div>
-            <div className="w-[1px] h-10 bg-warm-100" />
-            <div className="flex-1 text-center">
-              <Star className="text-gold-600 w-5 h-5 mx-auto mb-1.5" />
-              <p className="text-lg md:text-xl font-extrabold text-ink">
-                {loyaltyPoints}
-              </p>
-              <p className="text-2xs md:text-xs text-warm-600 font-semibold tracking-wide uppercase">
-                Điểm thưởng
-              </p>
-            </div>
-            <div className="w-[1px] h-10 bg-warm-100" />
-            <div className="flex-1 text-center">
-              <Wallet className="text-success-text w-5 h-5 mx-auto mb-1.5" />
-              <p className="text-lg md:text-xl font-extrabold text-ink">
-                {formatCurrency(calculatedSpending)}
-              </p>
-              <p className="text-2xs md:text-xs text-warm-600 font-semibold tracking-wide uppercase">
-                Chi tiêu tích lũy
-              </p>
-            </div>
+          <div className="w-[1px] h-8 bg-warm-200/80" />
+          <div className="flex-1 text-center">
+            <Star className="text-gold-600 w-4 h-4 mx-auto mb-1" />
+            <p className="text-base md:text-lg font-extrabold text-ink">
+              {loyaltyPoints}
+            </p>
+            <p className="text-2xs md:text-xs text-warm-600 font-semibold tracking-wide uppercase">
+              Điểm thưởng
+            </p>
           </div>
-        ) : (
-          // Staff Stats Panel
-          <div className="border border-warm-100 rounded-xl p-3 bg-white shadow-sm flex items-center justify-between w-full lg:w-[40%] lg:max-w-sm">
-            <div className="flex-1 text-center">
-              <Calendar className="text-rose-500 w-5 h-5 mx-auto mb-1.5" />
-              <p className="text-base md:text-lg font-bold text-ink">
-                {bookings.length || 0}
-              </p>
-              <p className="text-2xs text-warm-600 font-semibold uppercase">
-                Lịch hẹn
-              </p>
-            </div>
-            <div className="w-[1px] h-10 bg-warm-100" />
-            <div className="flex-1 text-center">
-              <Award className="text-gold-600 w-5 h-5 mx-auto mb-1.5" />
-              <p className="text-sm md:text-base font-bold text-ink">
-                {profile?.staffInfo?.contractType || "---"}
-              </p>
-              <p className="text-2xs text-warm-600 font-semibold uppercase">
-                Hợp đồng
-              </p>
-            </div>
-            <div className="w-[1px] h-10 bg-warm-100" />
-            <div className="flex-1 text-center">
-              <Star className="text-state-info-text w-5 h-5 mx-auto mb-1.5" />
-              <p className="text-xs font-bold text-ink">
-                {profile?.staffInfo?.hireDate
-                  ? new Date(profile.staffInfo.hireDate).toLocaleDateString(
-                      "vi-VN",
-                    )
-                  : "---"}
-              </p>
-              <p className="text-2xs text-warm-600 font-semibold uppercase">
-                Ngày làm
-              </p>
-            </div>
+          <div className="w-[1px] h-8 bg-warm-200/80" />
+          <div className="flex-1 text-center">
+            <Wallet className="text-success-text w-4 h-4 mx-auto mb-1" />
+            <p className="text-base md:text-lg font-extrabold text-ink">
+              {formatCurrency(calculatedSpending)}
+            </p>
+            <p className="text-2xs md:text-xs text-warm-600 font-semibold tracking-wide uppercase">
+              Chi tiêu tích lũy
+            </p>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

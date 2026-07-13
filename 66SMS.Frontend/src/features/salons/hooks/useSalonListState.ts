@@ -1,19 +1,20 @@
 import { useState } from "react";
 import { useTableQueryParams } from "@/shared/hooks/useTableQueryParams";
-import type { SalonDTO } from "../types/salon.types";
+import type { SalonListItem } from "../types/salon.types";
 
 export function useSalonListState() {
   const table = useTableQueryParams();
   const [createOpen, setCreateOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<SalonDTO | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<SalonDTO | null>(null);
+  /** Chỉ lưu id — form edit sẽ gọi getDetail để lấy đủ field (kể cả description). */
+  const [editSalonId, setEditSalonId] = useState<number | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<SalonListItem | null>(null);
 
   return {
     ...table,
     createOpen,
     setCreateOpen,
-    editTarget,
-    setEditTarget,
+    editSalonId,
+    setEditSalonId,
     deleteTarget,
     setDeleteTarget,
   };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useForm, useFieldArray, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -44,7 +44,7 @@ import {
   Star,
   X,
 } from "lucide-react";
-import { uploadApi } from "@/shared/api/upload.api";
+import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { StatusActive } from "@/shared/constants/status.enum";
 
 interface ProductFormDialogProps {
@@ -121,19 +121,23 @@ export function ProductFormDialog({
         await Promise.all(
           (data.images || []).map(async (img, index) => {
             const file = pendingFiles[index];
-            let url = img.url || "";
             if (file) {
-              const result = await uploadApi.uploadImage(file, "product");
-              url = result.isSuccess && result.data ? result.data : "";
+              const imageBase64 = await fileToBase64(file);
+              return {
+                id: img.id,
+                url: img.url || "",
+                imageBase64,
+                isPrimary: !!img.isPrimary,
+              };
             }
             return {
               id: img.id,
-              url,
+              url: img.url || "",
               isPrimary: !!img.isPrimary,
             };
           }),
         )
-      ).filter((img) => img.url !== "");
+      ).filter((img) => img.url !== "" || !!(img as { imageBase64?: string }).imageBase64);
       const payload = { ...data, images };
 
       if (isEdit && product?.id) {
@@ -173,7 +177,7 @@ export function ProductFormDialog({
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <FormSection icon={Package} title="Thông tin cơ bản">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField
                 label="Mã sản phẩm *"
                 tooltip="Mã định danh duy nhất (SKU)"
@@ -220,7 +224,7 @@ export function ProductFormDialog({
           </FormSection>
 
           <FormSection icon={Tag} title="Giá bán & Tồn kho">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField label="Giá vốn *" error={errors.costPrice?.message}>
                 <AdminInput
                   {...register("costPrice")}
@@ -370,7 +374,7 @@ export function ProductFormDialog({
           </FormSection>
 
           <FormSection icon={Box} title="Trạng thái & Chi tiết">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField label="Trạng thái">
                 <Select
                   value={watch("status")?.toString() ?? "1"}

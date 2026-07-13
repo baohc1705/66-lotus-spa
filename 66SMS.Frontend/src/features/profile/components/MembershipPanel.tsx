@@ -433,8 +433,8 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
 
   if (!isCustomer) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <ShieldAlert className="w-12 h-12 text-lotus-stone mb-4" />
+      <div className="flex flex-col items-center justify-center py-10 text-center">
+        <ShieldAlert className="w-10 h-10 text-lotus-stone mb-3" />
         <h3 className="text-lg font-bold text-lotus-deep font-sans">Dành riêng cho Khách hàng</h3>
         <p className="text-sm text-lotus-stone max-w-sm mt-2">
           Thông tin thẻ thành viên và các ưu đãi chỉ áp dụng cho tài khoản khách hàng.
@@ -454,12 +454,12 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
   const benefitIcons = [Gift, Zap, Coffee, Sparkles]
 
   return (
-    <div className="space-y-10 animate-fade-in">
+    <div className="space-y-5">
 
       {/* SECTION 1: Progress Tracker Timeline */}
       {sortedTiers.length > 0 && (
-        <div className="bg-white rounded-2xl p-6 border border-warm-100 shadow-sm relative overflow-hidden">
-          <h3 className="text-lg font-bold text-lotus-deep mb-6 font-sans flex items-center gap-2">
+        <div className="bg-white rounded-xl p-4 shadow-sm relative overflow-hidden">
+          <h3 className="text-base font-bold text-lotus-deep mb-4 font-sans flex items-center gap-2">
             <Award className="w-5 h-5 text-lotus-rose" />
             Lộ trình thăng hạng
           </h3>
@@ -536,36 +536,33 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
       />
 
       {/* SECTION 3: Selected Tier Details */}
-      <div className="bg-white rounded-2xl p-6 border border-warm-100 shadow-sm relative overflow-hidden">
+      <div className="bg-white rounded-xl p-5 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 w-48 h-48 bg-lotus-rose-light/10 rounded-full blur-3xl -mr-24 -mt-24 pointer-events-none" />
         
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-warm-100">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5 pb-5">
           <div>
             <span className="text-xs font-bold text-lotus-rose uppercase tracking-widest">Chi tiết hạng thẻ</span>
-            <h3 className="text-2xl font-bold text-lotus-deep font-sans mt-1 flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-lotus-gold" />
+            <h3 className="text-xl font-bold text-lotus-deep font-sans mt-1 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-lotus-gold" />
               Hạng {selectedTier?.name}
             </h3>
           </div>
           
           {selectedTier && (
             <div className="flex flex-wrap gap-3">
-              {/* Spending Condition */}
-              <div className="px-4 py-2 rounded-xl bg-warm-50 border border-warm-100">
+              <div className="px-4 py-2 rounded-xl bg-warm-50">
                 <p className="text-2xs text-lotus-stone uppercase font-bold tracking-wider">Chi tiêu tối thiểu</p>
                 <p className="text-sm font-extrabold text-lotus-deep mt-0.5">
                   {selectedTier.minSpending === 0 ? 'Mở đầu (Miễn phí)' : formatCurrency(selectedTier.minSpending)}
                 </p>
               </div>
-              {/* Discount */}
-              <div className="px-4 py-2 rounded-xl bg-lotus-rose/5 border border-lotus-rose/10">
+              <div className="px-4 py-2 rounded-xl bg-lotus-rose/5">
                 <p className="text-2xs text-lotus-rose uppercase font-bold tracking-wider">Ưu đãi giảm giá</p>
                 <p className="text-sm font-extrabold text-lotus-rose mt-0.5">
                   {selectedTier.discountPercent}% hóa đơn
                 </p>
               </div>
-              {/* Point multiplier */}
-              <div className="px-4 py-2 rounded-xl bg-lotus-gold/5 border border-lotus-gold/10">
+              <div className="px-4 py-2 rounded-xl bg-lotus-gold/5">
                 <p className="text-2xs text-lotus-gold uppercase font-bold tracking-wider">Tích điểm</p>
                 <p className="text-sm font-extrabold text-lotus-gold mt-0.5">
                   Nhân hệ số x{selectedTier.pointMultiplier}
@@ -660,12 +657,12 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
       </div>
 
       {/* SECTION 4: Ưu đãi của bạn */}
-      <div className="bg-white rounded-2xl p-6 border border-warm-100 shadow-sm relative overflow-hidden">
-        <h3 className="text-lg font-bold text-lotus-deep mb-4 font-sans flex items-center gap-2">
+      <div className="bg-white rounded-xl p-5 shadow-sm relative overflow-hidden">
+        <h3 className="text-base font-bold text-lotus-deep mb-4 font-sans flex items-center gap-2">
           <Gift className="w-5 h-5 text-lotus-gold" />
           Mã giảm giá & Quà tặng của bạn
         </h3>
-        <div className="flex flex-col items-center justify-center py-10 text-center border border-dashed border-warm-100 rounded-xl bg-warm-50/50">
+        <div className="flex flex-col items-center justify-center py-8 text-center rounded-xl bg-warm-50/50">
           <Gift className="w-10 h-10 text-lotus-stone/60 mb-3" />
           <p className="text-sm font-bold text-lotus-deep">Chưa có ưu đãi nào</p>
           <p className="text-xs text-lotus-stone max-w-xs mt-1">
