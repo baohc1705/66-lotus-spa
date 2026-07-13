@@ -8,6 +8,6 @@ const BASE = API.salons;
 export const salonPublicApi = {
   getActive: () =>
     axiosInstance
-      .get<Result<PagedResult<SalonListItem>>>(BASE, { params: { pageSize: 100 } })
+      .get<Result<PagedResult<SalonListItem>>>(BASE, { params: { pageSize: 100, orderBy: "sortorder" } })
       .then((r) => r.data.data?.items || []),
 };

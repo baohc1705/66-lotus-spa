@@ -1,12 +1,6 @@
 import { z } from "zod";
 import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
-
-export const serviceImageSchema = z.object({
-  id: z.number().optional(),
-  url: z.string().url("URL không hợp lệ").or(z.literal("")),
-  sortOrder: z.coerce.number().optional(),
-  isPrimary: z.boolean().optional(),
-});
+import { SERVICE_DURATION_OPTIONS } from "../constants/service.durations";
 
 export const serviceProductSchema = z.object({
   id: z.number().optional(),
@@ -15,6 +9,8 @@ export const serviceProductSchema = z.object({
   note: z.string().optional(),
   costPrice: z.coerce.number().optional(),
 });
+
+const durationValues = [...SERVICE_DURATION_OPTIONS] as number[];
 
 const serviceBaseSchema = z.object({
   categoryId: z.coerce.number().min(1, VALIDATION_MSG.selectRequired("nhóm dịch vụ")),
@@ -29,7 +25,9 @@ const serviceBaseSchema = z.object({
     .optional()
     .or(z.literal("")),
   content: z.string().optional().or(z.literal("")),
-  durationMins: z.coerce.number().min(0, VALIDATION_MSG.min(0)).optional(),
+  durationMins: z.coerce
+    .number()
+    .refine((v) => durationValues.includes(v), "Chọn thời gian hợp lệ"),
   costPrice: z.coerce.number().min(0, VALIDATION_MSG.notNegative("Giá cơ bản")),
   sellingPrice: z
     .coerce
@@ -44,7 +42,8 @@ const serviceBaseSchema = z.object({
     .optional(),
   sortOrder: z.coerce.number().min(0, VALIDATION_MSG.min(0)).optional(),
   status: z.coerce.number().optional(),
-  images: z.array(serviceImageSchema).optional(),
+  /** Base64 khi upload ảnh mới; URL khi hiển thị từ API */
+  imageUrl: z.string().optional().or(z.literal("")),
   serviceProducts: z.array(serviceProductSchema).optional(),
 });
 

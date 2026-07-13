@@ -16,10 +16,8 @@ import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Switch } from "@/shared/components/ui/switch";
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
 import {
-  DateTimeCell,
   IndexCell,
   MutedCell,
-  NameCell,
   TextCell,
 } from "@/shared/components/DataTable/tableCells";
 import { StatusActive } from "@/shared/constants/status.enum";
@@ -125,8 +123,30 @@ export function useActiveServiceCategoryColumns({
             onSort={onSort}
           />
         ),
-        cell: ({ row }) => <NameCell value={row.original.name} />,
-        size: 200,
+        cell: ({ row }) => {
+          const item = row.original;
+          return (
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-adminGold-600/10 flex items-center justify-center shrink-0 overflow-hidden">
+                {item.icon ? (
+                  <img
+                    src={item.icon}
+                    alt=""
+                    className="w-8 h-8 object-cover"
+                  />
+                ) : (
+                  <span className="text-xs font-bold text-state-warning-text">
+                    {(item.name ?? "?").charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <span className="text-sm font-semibold text-adminInk truncate max-w-[160px]">
+                {item.name ?? "—"}
+              </span>
+            </div>
+          );
+        },
+        size: 220,
       },
       {
         accessorKey: "description",
@@ -178,18 +198,6 @@ export function useActiveServiceCategoryColumns({
           );
         },
         size: 120,
-      },
-      {
-        accessorKey: "createdAt",
-        header: "Ngày tạo",
-        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
-        size: 140,
-      },
-      {
-        accessorKey: "updatedAt",
-        header: "Ngày cập nhật",
-        cell: ({ row }) => <DateTimeCell value={row.original.updatedAt} />,
-        size: 140,
       },
       {
         id: "actions",

@@ -6,10 +6,8 @@ import { Button } from "@/shared/components/ui/button";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import {
-  DateTimeCell,
   IndexCell,
   MutedCell,
-  NameCell,
   TextCell,
 } from "@/shared/components/DataTable/tableCells";
 
@@ -49,8 +47,30 @@ export function useDeletedServiceCategoryColumns({
       {
         accessorKey: "name",
         header: cols.name,
-        cell: ({ row }) => <NameCell value={row.original.name} />,
-        size: 200,
+        cell: ({ row }) => {
+          const item = row.original;
+          return (
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-adminGold-600/10 flex items-center justify-center shrink-0 overflow-hidden">
+                {item.icon ? (
+                  <img
+                    src={item.icon}
+                    alt=""
+                    className="w-8 h-8 object-cover"
+                  />
+                ) : (
+                  <span className="text-xs font-bold text-state-warning-text">
+                    {(item.name ?? "?").charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <span className="text-sm font-semibold text-adminInk truncate max-w-[160px]">
+                {item.name ?? "—"}
+              </span>
+            </div>
+          );
+        },
+        size: 220,
       },
       {
         accessorKey: "description",
@@ -63,12 +83,6 @@ export function useDeletedServiceCategoryColumns({
         header: cols.sortOrder,
         cell: ({ row }) => <MutedCell value={row.original.sortOrder} />,
         size: 100,
-      },
-      {
-        accessorKey: "updatedAt",
-        header: "Ngày xóa",
-        cell: ({ row }) => <DateTimeCell value={row.original.updatedAt} />,
-        size: 140,
       },
       {
         id: "actions",

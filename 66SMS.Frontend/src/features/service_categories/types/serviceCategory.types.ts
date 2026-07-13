@@ -4,10 +4,7 @@ export interface ServiceCategoryDto {
   description?: string;
   sortOrder?: number;
   status?: number;
-  createdAt?: string;
-  createdBy?: number;
-  updatedAt?: string;
-  updatedBy?: number;
+  icon?: string;
 }
 
 export interface DeleteServiceCategoryMultiplesPayload {

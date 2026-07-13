@@ -108,12 +108,9 @@ export function ServiceListPage() {
     [services],
   );
 
-  const servicesWithProducts = useMemo(
+  const servicesWithImage = useMemo(
     () =>
-      services.filter(
-        (s: ServiceDto) =>
-          s.serviceProducts != null && s.serviceProducts.length > 0,
-      ).length,
+      services.filter((s: ServiceDto) => !!s.imageUrl).length,
     [services],
   );
 
@@ -250,7 +247,7 @@ export function ServiceListPage() {
           <ServiceStatCards
             totalServices={totalCount}
             activeServices={activeServiceCount}
-            servicesWithProducts={servicesWithProducts}
+            servicesWithImage={servicesWithImage}
             avgDurationMins={avgDurationMins}
             isLoading={isLoading}
           />

@@ -1,14 +1,14 @@
 import { useState, useCallback } from "react";
 import { useTableQueryParams } from "@/shared/hooks/useTableQueryParams";
-import type { ServiceDto } from "../types/service.types";
+import type { ServiceListDto } from "../types/service.types";
 
 export function useServiceListState() {
   const table = useTableQueryParams();
   const [showDeleted, setShowDeleted] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<ServiceDto | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<ServiceDto | null>(null);
-  const [restoreTarget, setRestoreTarget] = useState<ServiceDto | null>(null);
+  const [editTarget, setEditTarget] = useState<ServiceListDto | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ServiceListDto | null>(null);
+  const [restoreTarget, setRestoreTarget] = useState<ServiceListDto | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 

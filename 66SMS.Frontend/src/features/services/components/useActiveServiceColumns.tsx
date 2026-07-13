@@ -19,7 +19,6 @@ import {
   DateTimeCell,
   IndexCell,
   MutedCell,
-  NameCell,
   PriceCell,
 } from "@/shared/components/DataTable/tableCells";
 import { StatusActive } from "@/shared/constants/status.enum";
@@ -27,7 +26,7 @@ import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type { Result } from "@/shared/types/common.types";
 
 import { SERVICE_PERM } from "../constants/service.permissions";
-import type { ServiceDto } from "../types/service.types";
+import type { ServiceListDto } from "../types/service.types";
 import type { UpdateServicePayload } from "../schemas/service.schema";
 
 export const SERVICE_COLUMN_LABELS = {
@@ -50,8 +49,8 @@ interface UseActiveServiceColumnsParams {
   selectedRowIds: Set<number>;
   onToggleAll: (checked: boolean | "indeterminate") => void;
   onToggleOne: (id: number, checked: boolean) => void;
-  onEdit: (item: ServiceDto) => void;
-  onDelete: (item: ServiceDto) => void;
+  onEdit: (item: ServiceListDto) => void;
+  onDelete: (item: ServiceListDto) => void;
   updateMutation: UseMutationResult<
     Result<object>,
     Error,
@@ -78,7 +77,7 @@ export function useActiveServiceColumns({
   const cols = SERVICE_COLUMN_LABELS;
   const perm = SERVICE_PERM;
 
-  return useMemo<ColumnDef<ServiceDto>[]>(
+  return useMemo<ColumnDef<ServiceListDto>[]>(
     () => [
       {
         id: "select",
@@ -148,8 +147,30 @@ export function useActiveServiceColumns({
             onSort={onSort}
           />
         ),
-        cell: ({ row }) => <NameCell value={row.original.name} />,
-        size: 200,
+        cell: ({ row }) => {
+          const item = row.original;
+          return (
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-adminGold-600/10 flex items-center justify-center shrink-0 overflow-hidden">
+                {item.imageUrl ? (
+                  <img
+                    src={item.imageUrl}
+                    alt=""
+                    className="w-8 h-8 object-cover"
+                  />
+                ) : (
+                  <span className="text-xs font-bold text-state-warning-text">
+                    {(item.name ?? "?").charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <span className="text-sm font-semibold text-adminInk truncate max-w-[140px]">
+                {item.name ?? "—"}
+              </span>
+            </div>
+          );
+        },
+        size: 220,
       },
       {
         accessorKey: "categoryName",

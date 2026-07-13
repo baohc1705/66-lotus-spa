@@ -1,11 +1,5 @@
 import type { PageRequest } from "@/shared/types/common.types";
-
-export interface ServiceImageResponse {
-  id?: number;
-  url?: string;
-  sortOrder?: number;
-  isPrimary?: boolean;
-}
+import { SERVICE_DURATION_OPTIONS } from "../constants/service.durations";
 
 export interface ServiceProductResponse {
   id?: number;
@@ -17,7 +11,24 @@ export interface ServiceProductResponse {
   status?: number;
 }
 
-export interface ServiceDto {
+/** DTO nhẹ cho bảng (GetAll) */
+export interface ServiceListDto {
+  id?: number;
+  categoryId?: number;
+  categoryName?: string;
+  code?: string;
+  name?: string;
+  durationMins?: number;
+  costPrice?: number;
+  sellingPrice?: number;
+  status?: number;
+  imageUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/** DTO đầy đủ cho expand + form sửa (GetDetail) */
+export interface ServiceDetailDto {
   id?: number;
   categoryId?: number;
   categoryName?: string;
@@ -31,20 +42,14 @@ export interface ServiceDto {
   commissionRate?: number;
   sortOrder?: number;
   status?: number;
-  createdAt?: string;
-  createdBy?: number;
-  updatedAt?: string;
-  updatedBy?: number;
   imageUrl?: string;
-  images?: ServiceImageResponse[];
+  createdAt?: string;
+  updatedAt?: string;
   serviceProducts?: ServiceProductResponse[];
 }
 
-export interface ServiceImagePayload {
-  url?: string;
-  sortOrder?: number;
-  isPrimary?: boolean;
-}
+/** Alias giữ tương thích chỗ còn dùng tên cũ (ưu tiên list) */
+export type ServiceDto = ServiceListDto;
 
 export interface ServiceProductPayload {
   productId?: number;
@@ -60,38 +65,11 @@ export interface GetAllServiceQuery extends PageRequest {
   status?: number;
 }
 
-export interface CreateServiceImagePayload {
-  serviceId: number;
-  url: string;
-  sortOrder: number;
-  isPrimary: boolean;
-}
-
-export interface UpdateServiceImagePayload {
-  serviceId?: number;
-  url?: string;
-  sortOrder?: number;
-  isPrimary?: boolean;
-}
-
-export interface CreateServiceProductPayload {
-  serviceId: number;
-  productId: number;
-  quantityUsed: number;
-  note?: string;
-}
-
-export interface UpdateServiceProductPayload {
-  serviceId?: number;
-  productId?: number;
-  quantityUsed?: number;
-  note?: string;
-  status?: number;
-}
-
 export interface DeleteServiceMultiplesPayload {
   ids: number[];
 }
+
+export { SERVICE_DURATION_OPTIONS };
 
 export type {
   CreateServicePayload,

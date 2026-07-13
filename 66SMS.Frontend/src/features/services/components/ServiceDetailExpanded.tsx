@@ -10,13 +10,13 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { useServiceDetail } from "../hooks/useServices";
-import type { ServiceDto, ServiceProductResponse } from "../types/service.types";
+import type { ServiceDetailDto, ServiceProductResponse } from "../types/service.types";
 import { SERVICE_PERM } from "../constants/service.permissions";
 import { formatCurrency } from "@/shared/utils/currency";
 
 interface ServiceDetailExpandedProps {
   serviceId: number;
-  onEdit?: (service: ServiceDto) => void;
+  onEdit?: (service: ServiceDetailDto) => void;
 }
 
 const PRODUCT_STATUS_MAP: StatusMap = {
@@ -56,10 +56,7 @@ export function ServiceDetailExpanded({
   }
 
   const products = service.serviceProducts || [];
-  // Lấy ảnh đại diện nếu có
-  const primaryImage =
-    service.images?.find((img) => img.isPrimary)?.url ||
-    service.images?.[0]?.url;
+  const primaryImage = service.imageUrl;
 
   return (
     <div className="bg-adminGray-50/30 w-full overflow-hidden max-h-[400px] overflow-y-auto custom-scrollbar">

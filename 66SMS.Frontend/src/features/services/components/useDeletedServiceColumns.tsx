@@ -9,18 +9,17 @@ import {
   DateTimeCell,
   IndexCell,
   MutedCell,
-  NameCell,
   PriceCell,
 } from "@/shared/components/DataTable/tableCells";
 
 import { SERVICE_COLUMN_LABELS } from "./useActiveServiceColumns";
 import { SERVICE_PERM } from "../constants/service.permissions";
-import type { ServiceDto } from "../types/service.types";
+import type { ServiceListDto } from "../types/service.types";
 
 interface UseDeletedServiceColumnsParams {
   pageIndex: number;
   pageSize: number;
-  onRestore: (item: ServiceDto) => void;
+  onRestore: (item: ServiceListDto) => void;
 }
 
 export function useDeletedServiceColumns({
@@ -31,7 +30,7 @@ export function useDeletedServiceColumns({
   const cols = SERVICE_COLUMN_LABELS;
   const perm = SERVICE_PERM;
 
-  return useMemo<ColumnDef<ServiceDto>[]>(
+  return useMemo<ColumnDef<ServiceListDto>[]>(
     () => [
       {
         id: "index",
@@ -59,8 +58,30 @@ export function useDeletedServiceColumns({
       {
         accessorKey: "name",
         header: cols.name,
-        cell: ({ row }) => <NameCell value={row.original.name} />,
-        size: 200,
+        cell: ({ row }) => {
+          const item = row.original;
+          return (
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-adminGold-600/10 flex items-center justify-center shrink-0 overflow-hidden">
+                {item.imageUrl ? (
+                  <img
+                    src={item.imageUrl}
+                    alt=""
+                    className="w-8 h-8 object-cover"
+                  />
+                ) : (
+                  <span className="text-xs font-bold text-state-warning-text">
+                    {(item.name ?? "?").charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <span className="text-sm font-semibold text-adminInk truncate max-w-[140px]">
+                {item.name ?? "—"}
+              </span>
+            </div>
+          );
+        },
+        size: 220,
       },
       {
         accessorKey: "categoryName",
