@@ -5,6 +5,7 @@ export interface ServiceCategoryDto {
   sortOrder?: number;
   status?: number;
   icon?: string;
+  imageUrl?: string;
 }
 
 export interface DeleteServiceCategoryMultiplesPayload {

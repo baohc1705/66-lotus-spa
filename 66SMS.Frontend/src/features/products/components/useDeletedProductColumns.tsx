@@ -52,7 +52,7 @@ export function useDeletedProductColumns({
         header: cols.code,
         cell: ({ row }) => (
           <span className="text-adminInk/80 font-medium">
-            {row.original.code ?? "â€”"}
+            {row.original.code ?? "—"}
           </span>
         ),
         size: 100,
@@ -62,13 +62,12 @@ export function useDeletedProductColumns({
         header: cols.name,
         cell: ({ row }) => {
           const prod = row.original;
-          const primaryImage = prod.images?.find((img) => img.isPrimary)?.url;
           return (
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-adminGray-100 flex items-center justify-center shrink-0 overflow-hidden">
-                {primaryImage ? (
+                {prod.imageUrl ? (
                   <img
-                    src={primaryImage}
+                    src={prod.imageUrl}
                     alt=""
                     className="w-8 h-8 object-cover"
                   />
@@ -77,7 +76,7 @@ export function useDeletedProductColumns({
                 )}
               </div>
               <span className="text-sm font-semibold text-adminInk truncate max-w-[180px]">
-                {prod.name ?? "â€”"}
+                {prod.name ?? "—"}
               </span>
             </div>
           );

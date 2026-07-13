@@ -3,13 +3,13 @@ import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { useProductDetail } from "../hooks/useProducts";
-import type { ProductDto } from "../types/product.types";
+import type { ProductFullDto } from "../types/product.types";
 import { PRODUCT_PERM } from "../constants/product.permissions";
 import { formatCurrency } from "@/shared/utils/currency";
 
 interface ProductDetailExpandedProps {
   productId: number;
-  onEdit?: (product: ProductDto) => void;
+  onEdit?: (product: ProductFullDto) => void;
 }
 
 export function ProductDetailExpanded({
@@ -130,7 +130,7 @@ function DetailField({
   return (
     <div className="py-3.5 border-b border-adminGray-100/80 last:border-b-0 group">
       <p className="text-xs text-adminGray-600 mb-1">{label}</p>
-      <p className="text-sm font-medium text-adminInk break-words whitespace-pre-wrap">
+      <p className="text-sm font-medium text-adminInk truncate">
         {value || "—"}
       </p>
     </div>

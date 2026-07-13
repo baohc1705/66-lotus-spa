@@ -76,4 +76,9 @@ export const serviceApi = {
         params: toAdminQuery(params),
       })
       .then((r) => r.data),
+
+  deleteServiceProduct: (id: number) =>
+    axiosInstance
+      .delete<Result<object>>(`${API.serviceProducts}/${id}`)
+      .then((r) => r.data),
 };

@@ -13,8 +13,9 @@ const serviceCategoryBaseSchema = z.object({
     .or(z.literal("")),
   sortOrder: z.coerce.number().min(0, VALIDATION_MSG.min(0)).optional(),
   status: z.coerce.number().optional(),
-  /** Base64 khi upload ảnh mới; URL khi hiển thị từ API */
+  /** Base64 khi upload mới; URL khi hiển thị từ API */
   icon: z.string().optional().or(z.literal("")),
+  imageUrl: z.string().optional().or(z.literal("")),
 });
 
 export const createServiceCategorySchema = serviceCategoryBaseSchema;

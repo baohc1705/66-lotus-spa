@@ -50,7 +50,8 @@ export function ServiceCategoryFormDialog({
   const createMutation = useCreateServiceCategory();
   const updateMutation = useUpdateServiceCategory();
   const isPending = createMutation.isPending || updateMutation.isPending;
-  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [pendingIconFile, setPendingIconFile] = useState<File | null>(null);
+  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<ServiceCategoryFormValues>({
@@ -71,7 +72,8 @@ export function ServiceCategoryFormDialog({
 
   useEffect(() => {
     if (open) {
-      setPendingFile(null);
+      setPendingIconFile(null);
+      setPendingImageFile(null);
       reset(getDefaultValues(serviceCategory));
     }
   }, [open, serviceCategory, reset]);
@@ -86,8 +88,11 @@ export function ServiceCategoryFormDialog({
         status: data.status,
       };
 
-      if (pendingFile) {
-        payload.icon = await fileToBase64(pendingFile);
+      if (pendingIconFile) {
+        payload.icon = await fileToBase64(pendingIconFile);
+      }
+      if (pendingImageFile) {
+        payload.imageUrl = await fileToBase64(pendingImageFile);
       }
 
       if (isEdit && serviceCategory?.id) {
@@ -139,15 +144,25 @@ export function ServiceCategoryFormDialog({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <FormSection icon={Box} title="Thông tin nhóm dịch vụ">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div className="sm:col-span-2">
+              <FormField label="Icon" tooltip="Ảnh icon nhỏ cho nhóm dịch vụ">
                 <ImageUpload
-                  key={`${open}-${serviceCategory?.id ?? "new"}`}
+                  key={`icon-${open}-${serviceCategory?.id ?? "new"}`}
                   value={watch("icon") || serviceCategory?.icon}
-                  onFileChange={setPendingFile}
+                  onFileChange={setPendingIconFile}
                   shape="square"
                   label="Chọn icon"
                 />
-              </div>
+              </FormField>
+
+              <FormField label="Ảnh đại diện" tooltip="Ảnh lớn hiển thị nhóm dịch vụ">
+                <ImageUpload
+                  key={`image-${open}-${serviceCategory?.id ?? "new"}`}
+                  value={watch("imageUrl") || serviceCategory?.imageUrl}
+                  onFileChange={setPendingImageFile}
+                  shape="square"
+                  label="Chọn ảnh"
+                />
+              </FormField>
 
               <FormField
                 label="Tên nhóm dịch vụ"
@@ -240,6 +255,7 @@ function getDefaultValues(
       sortOrder: serviceCategory.sortOrder ?? 0,
       status: serviceCategory.status ?? StatusActive.Active,
       icon: serviceCategory.icon ?? "",
+      imageUrl: serviceCategory.imageUrl ?? "",
     };
   }
   return {
@@ -248,5 +264,6 @@ function getDefaultValues(
     sortOrder: 0,
     status: StatusActive.Active,
     icon: "",
+    imageUrl: "",
   };
 }

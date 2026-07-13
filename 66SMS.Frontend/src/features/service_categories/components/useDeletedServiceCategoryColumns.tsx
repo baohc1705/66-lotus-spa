@@ -45,32 +45,50 @@ export function useDeletedServiceCategoryColumns({
         enableResizing: false,
       },
       {
-        accessorKey: "name",
-        header: cols.name,
+        accessorKey: "icon",
+        header: cols.icon,
         cell: ({ row }) => {
-          const item = row.original;
+          const icon = row.original.icon;
           return (
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-adminGold-600/10 flex items-center justify-center shrink-0 overflow-hidden">
-                {item.icon ? (
-                  <img
-                    src={item.icon}
-                    alt=""
-                    className="w-8 h-8 object-cover"
-                  />
-                ) : (
-                  <span className="text-xs font-bold text-state-warning-text">
-                    {(item.name ?? "?").charAt(0).toUpperCase()}
-                  </span>
-                )}
-              </div>
-              <span className="text-sm font-semibold text-adminInk truncate max-w-[160px]">
-                {item.name ?? "—"}
-              </span>
+            <div className="w-9 h-9 rounded-lg bg-adminGold-600/10 flex items-center justify-center overflow-hidden">
+              {icon ? (
+                <img src={icon} alt="" className="w-9 h-9 object-cover" />
+              ) : (
+                <span className="text-xs text-adminGray-400">—</span>
+              )}
             </div>
           );
         },
-        size: 220,
+        size: 64,
+        enableResizing: false,
+      },
+      {
+        accessorKey: "imageUrl",
+        header: cols.imageUrl,
+        cell: ({ row }) => {
+          const imageUrl = row.original.imageUrl;
+          return (
+            <div className="w-14 h-9 rounded-lg bg-adminGray-100 flex items-center justify-center overflow-hidden">
+              {imageUrl ? (
+                <img src={imageUrl} alt="" className="w-14 h-9 object-cover" />
+              ) : (
+                <span className="text-xs text-adminGray-400">—</span>
+              )}
+            </div>
+          );
+        },
+        size: 80,
+        enableResizing: false,
+      },
+      {
+        accessorKey: "name",
+        header: cols.name,
+        cell: ({ row }) => (
+          <span className="text-sm font-semibold text-adminInk truncate max-w-[180px] block">
+            {row.original.name ?? "—"}
+          </span>
+        ),
+        size: 200,
       },
       {
         accessorKey: "description",

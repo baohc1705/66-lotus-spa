@@ -6,7 +6,6 @@ import { Button } from "@/shared/components/ui/button";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import {
-  DateTimeCell,
   IndexCell,
   MutedCell,
   NameCell,
@@ -63,12 +62,6 @@ export function useDeletedCategoryColumns({
         header: cols.sortOrder,
         cell: ({ row }) => <MutedCell value={row.original.sortOrder} />,
         size: 100,
-      },
-      {
-        accessorKey: "updatedAt",
-        header: "Ngày xóa",
-        cell: ({ row }) => <DateTimeCell value={row.original.updatedAt} />,
-        size: 140,
       },
       {
         id: "actions",

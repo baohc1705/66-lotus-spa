@@ -4,10 +4,6 @@ export interface ProductCategoryDto {
   description?: string;
   sortOrder?: number;
   status?: number;
-  createdAt?: string;
-  createdBy?: number;
-  updatedAt?: string;
-  updatedBy?: number;
 }
 
 export interface DeleteProductCategoryMultiplesPayload {

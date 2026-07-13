@@ -1,5 +1,5 @@
 ﻿import { useEffect, useState } from "react";
-import { useForm, useFieldArray, type Resolver } from "react-hook-form";
+import { useForm, useFieldArray, Controller, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
@@ -19,6 +19,7 @@ import {
 import { FormSection } from "@/shared/components/forms/FormSection";
 import { FormField } from "@/shared/components/forms/FormField";
 import { AdminInput } from "@/shared/components/forms/AdminInput";
+import { AdminCurrencyInput } from "@/shared/components/forms/AdminCurrencyInput";
 import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
 import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import { useProductCategories } from "@/features/product_categories/hooks/useProductCategories";
@@ -26,13 +27,14 @@ import type { ProductCategoryDto } from "@/features/product_categories/types/pro
 import {
   useCreateProduct,
   useUpdateProduct,
+  useProductDetail,
 } from "../hooks/useProducts";
 import {
   createProductSchema,
   type CreateProductPayload,
   type ProductFormValues,
 } from "../schemas/product.schema";
-import type { ProductDto } from "../types/product.types";
+import type { ProductDto, ProductFullDto } from "../types/product.types";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import {
   Package,
@@ -43,6 +45,7 @@ import {
   Camera,
   Star,
   X,
+  Loader2,
 } from "lucide-react";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { StatusActive } from "@/shared/constants/status.enum";
@@ -63,7 +66,7 @@ export function ProductFormDialog({
   onOpenChange,
   product,
 }: ProductFormDialogProps) {
-  const isEdit = !!product;
+  const isEdit = !!product?.id;
   const createMutation = useCreateProduct();
   const updateMutation = useUpdateProduct();
   const isPending = createMutation.isPending || updateMutation.isPending;
@@ -72,6 +75,10 @@ export function ProductFormDialog({
     {},
   );
   const [isUploading, setIsUploading] = useState(false);
+
+  const detailQuery = useProductDetail(open && isEdit ? product!.id! : null);
+  const detail = detailQuery.data?.data;
+  const formSource = isEdit ? (detail ?? null) : null;
 
   const { data: categoriesResult } = useProductCategories({
     pageIndex: 1,
@@ -83,7 +90,7 @@ export function ProductFormDialog({
     resolver: zodResolver(
       createProductSchema,
     ) as Resolver<ProductFormValues>,
-    defaultValues: getDefaultValues(product),
+    defaultValues: getDefaultValues(null),
   });
 
   const {
@@ -107,12 +114,15 @@ export function ProductFormDialog({
   });
 
   useEffect(() => {
-    if (open) {
-      setPendingFiles({});
-      setImagePreviews({});
-      reset(getDefaultValues(product));
+    if (!open) return;
+    setPendingFiles({});
+    setImagePreviews({});
+    if (isEdit) {
+      if (formSource) reset(getDefaultValues(formSource));
+    } else {
+      reset(getDefaultValues(null));
     }
-  }, [open, product, reset]);
+  }, [open, isEdit, formSource, reset]);
 
   const onSubmit = async (data: ProductFormValues) => {
     setIsUploading(true);
@@ -137,7 +147,10 @@ export function ProductFormDialog({
             };
           }),
         )
-      ).filter((img) => img.url !== "" || !!(img as { imageBase64?: string }).imageBase64);
+      ).filter(
+        (img) =>
+          img.url !== "" || !!(img as { imageBase64?: string }).imageBase64,
+      );
       const payload = { ...data, images };
 
       if (isEdit && product?.id) {
@@ -175,280 +188,315 @@ export function ProductFormDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <FormSection icon={Package} title="Thông tin cơ bản">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <FormField
-                label="Mã sản phẩm *"
-                tooltip="Mã định danh duy nhất (SKU)"
-                error={errors.code?.message}
-              >
-                <AdminInput
-                  {...register("code")}
-                  placeholder="SP001"
-                />
-              </FormField>
-              <FormField label="Tên sản phẩm *" error={errors.name?.message}>
-                <AdminInput
-                  {...register("name")}
-                  placeholder="Tên sản phẩm..."
-                />
-              </FormField>
-              <FormField label="Danh mục *" error={errors.categoryId?.message}>
-                <Select
-                  value={watch("categoryId")?.toString() ?? ""}
-                  onValueChange={(v) => setValue("categoryId", Number(v))}
+        {isEdit && detailQuery.isLoading ? (
+          <div className="flex items-center justify-center py-16 text-adminGray-600 gap-2">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span className="text-sm">Đang tải thông tin sản phẩm...</span>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <FormSection icon={Package} title="Thông tin cơ bản">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <FormField
+                  label="Mã sản phẩm"
+                  tooltip={
+                    isEdit
+                      ? "Mã được hệ thống tạo tự động, không chỉnh sửa."
+                      : "Mã sẽ được hệ thống tạo tự động sau khi lưu (PRO000001…)."
+                  }
                 >
-                  <AdminSelectTrigger>
-                    <SelectValue placeholder="Chọn danh mục" />
-                  </AdminSelectTrigger>
-                  <SelectContent>
-                    {categories.map((cat: ProductCategoryDto) => (
-                      <SelectItem
-                        key={cat.id}
-                        value={cat.id!.toString()}
-                      >
-                        {cat.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-              <FormField label="Đơn vị tính *" error={errors.unit?.message}>
-                <AdminInput
-                  {...register("unit")}
-                  placeholder="Cái, Hộp, Chai..."
-                />
-              </FormField>
-            </div>
-          </FormSection>
-
-          <FormSection icon={Tag} title="Giá bán & Tồn kho">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <FormField label="Giá vốn *" error={errors.costPrice?.message}>
-                <AdminInput
-                  {...register("costPrice")}
-                  type="number"
-                  placeholder="0"
-                />
-              </FormField>
-              <FormField label="Giá bán" error={errors.sellingPrice?.message}>
-                <AdminInput
-                  {...register("sellingPrice")}
-                  type="number"
-                  placeholder="0"
-                />
-              </FormField>
-              <FormField label="Tồn kho *" error={errors.stockQuantity?.message}>
-                <AdminInput
-                  {...register("stockQuantity")}
-                  type="number"
-                  placeholder="0"
-                />
-              </FormField>
-              <FormField
-                label="Tồn kho tối thiểu *"
-                tooltip="Cảnh báo khi số lượng dưới mức này"
-                error={errors.minStock?.message}
-              >
-                <AdminInput
-                  {...register("minStock")}
-                  type="number"
-                  placeholder="0"
-                />
-              </FormField>
-            </div>
-          </FormSection>
-
-          <FormSection icon={ImageIcon} title="Hình ảnh sản phẩm">
-            <div className="flex flex-wrap gap-3">
-              {imageFields.map((field, index) => {
-                const isPrimary = watch(`images.${index}.isPrimary`);
-                const preview =
-                  imagePreviews[index] || watch(`images.${index}.url`);
-                return (
-                  <div
-                    key={field.id}
-                    className="flex flex-col gap-1.5 w-[110px]"
+                  <AdminInput
+                    value={
+                      isEdit
+                        ? (formSource?.code ?? product?.code ?? "")
+                        : ""
+                    }
+                    placeholder={isEdit ? "" : "Tự động tạo"}
+                    disabled
+                    readOnly
+                  />
+                </FormField>
+                <FormField label="Tên sản phẩm *" error={errors.name?.message}>
+                  <AdminInput
+                    {...register("name")}
+                    placeholder="Tên sản phẩm..."
+                  />
+                </FormField>
+                <FormField label="Danh mục *" error={errors.categoryId?.message}>
+                  <Select
+                    value={watch("categoryId")?.toString() ?? ""}
+                    onValueChange={(v) => setValue("categoryId", Number(v))}
                   >
-                    <div className="relative group/card">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          document
-                            .getElementById(`product-img-${index}`)
-                            ?.click()
-                        }
-                        className={[
-                          "h-[88px] w-full rounded-lg overflow-hidden transition-all",
-                          preview
-                            ? "border border-adminGray-100 hover:border-adminGreen-600/60"
-                            : "border-2 border-dashed border-adminGray-300 bg-adminGray-50 hover:border-adminGreen-600 hover:bg-adminGreen-50",
-                        ].join(" ")}
-                      >
-                        {preview ? (
-                          <>
-                            <img
-                              src={preview}
-                              alt=""
-                              className="h-full w-full object-cover"
-                            />
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/card:opacity-100 transition-opacity rounded-lg">
-                              <Camera className="h-5 w-5 text-white" />
+                    <AdminSelectTrigger>
+                      <SelectValue placeholder="Chọn danh mục" />
+                    </AdminSelectTrigger>
+                    <SelectContent>
+                      {categories.map((cat: ProductCategoryDto) => (
+                        <SelectItem key={cat.id} value={cat.id!.toString()}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+                <FormField label="Đơn vị tính *" error={errors.unit?.message}>
+                  <AdminInput
+                    {...register("unit")}
+                    placeholder="Cái, Hộp, Chai..."
+                  />
+                </FormField>
+              </div>
+            </FormSection>
+
+            <FormSection icon={Tag} title="Giá bán & Tồn kho">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <FormField label="Giá vốn *" error={errors.costPrice?.message}>
+                  <Controller
+                    name="costPrice"
+                    control={control}
+                    render={({ field }) => (
+                      <AdminCurrencyInput
+                        value={field.value}
+                        onChange={(v) => field.onChange(v ?? 0)}
+                        onBlur={field.onBlur}
+                        placeholder="0"
+                      />
+                    )}
+                  />
+                </FormField>
+                <FormField label="Giá bán" error={errors.sellingPrice?.message}>
+                  <Controller
+                    name="sellingPrice"
+                    control={control}
+                    render={({ field }) => (
+                      <AdminCurrencyInput
+                        value={field.value}
+                        onChange={(v) => field.onChange(v ?? 0)}
+                        onBlur={field.onBlur}
+                        placeholder="0"
+                      />
+                    )}
+                  />
+                </FormField>
+                <FormField
+                  label="Tồn kho *"
+                  error={errors.stockQuantity?.message}
+                >
+                  <AdminInput
+                    {...register("stockQuantity", { valueAsNumber: true })}
+                    type="number"
+                    placeholder="0"
+                  />
+                </FormField>
+                <FormField
+                  label="Tồn kho tối thiểu *"
+                  tooltip="Cảnh báo khi số lượng dưới mức này"
+                  error={errors.minStock?.message}
+                >
+                  <AdminInput
+                    {...register("minStock", { valueAsNumber: true })}
+                    type="number"
+                    placeholder="0"
+                  />
+                </FormField>
+              </div>
+            </FormSection>
+
+            <FormSection icon={ImageIcon} title="Hình ảnh sản phẩm">
+              <div className="flex flex-wrap gap-3">
+                {imageFields.map((field, index) => {
+                  const isPrimary = watch(`images.${index}.isPrimary`);
+                  const preview =
+                    imagePreviews[index] || watch(`images.${index}.url`);
+                  return (
+                    <div
+                      key={field.id}
+                      className="flex flex-col gap-1.5 w-[110px]"
+                    >
+                      <div className="relative group/card">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            document
+                              .getElementById(`product-img-${index}`)
+                              ?.click()
+                          }
+                          className={[
+                            "h-[88px] w-full rounded-lg overflow-hidden transition-all",
+                            preview
+                              ? "border border-adminGray-100 hover:border-adminGreen-600/60"
+                              : "border-2 border-dashed border-adminGray-300 bg-adminGray-50 hover:border-adminGreen-600 hover:bg-adminGreen-50",
+                          ].join(" ")}
+                        >
+                          {preview ? (
+                            <>
+                              <img
+                                src={preview}
+                                alt=""
+                                className="h-full w-full object-cover"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/card:opacity-100 transition-opacity rounded-lg">
+                                <Camera className="h-5 w-5 text-white" />
+                              </div>
+                            </>
+                          ) : (
+                            <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-adminGray-400 group-hover/card:text-adminGreen-600 transition-colors">
+                              <ImageIcon className="h-6 w-6" />
+                              <span className="text-2xs font-medium">
+                                Chọn ảnh
+                              </span>
                             </div>
-                          </>
-                        ) : (
-                          <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-adminGray-400 group-hover/card:text-adminGreen-600 transition-colors">
-                            <ImageIcon className="h-6 w-6" />
-                            <span className="text-2xs font-medium">
-                              Chọn ảnh
-                            </span>
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute -top-1.5 -right-1.5 z-10 h-5 w-5 rounded-full bg-state-danger-solid text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity hover:bg-state-danger-solid shadow-sm"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                        {isPrimary && (
+                          <div className="absolute bottom-1.5 left-1.5 bg-adminGreen-600 text-white text-2xs font-bold px-1.5 py-0.5 rounded-full leading-none pointer-events-none">
+                            Chính
                           </div>
                         )}
-                      </button>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        className="hidden"
+                        id={`product-img-${index}`}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          setPendingFiles((prev) => ({
+                            ...prev,
+                            [index]: file,
+                          }));
+                          setImagePreviews((prev) => ({
+                            ...prev,
+                            [index]: URL.createObjectURL(file),
+                          }));
+                        }}
+                      />
                       <button
                         type="button"
-                        onClick={() => removeImage(index)}
-                        className="absolute -top-1.5 -right-1.5 z-10 h-5 w-5 rounded-full bg-state-danger-solid text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity hover:bg-state-danger-solid shadow-sm"
+                        onClick={() => {
+                          const imgs = getValues("images") || [];
+                          imgs.forEach((_, i) => {
+                            if (i !== index)
+                              setValue(`images.${i}.isPrimary`, false);
+                          });
+                          setValue(`images.${index}.isPrimary`, !isPrimary);
+                        }}
+                        className={[
+                          "flex items-center gap-1 text-xs font-medium transition-colors self-start",
+                          isPrimary
+                            ? "text-adminGreen-600"
+                            : "text-adminGray-400 hover:text-adminGray-600",
+                        ].join(" ")}
                       >
-                        <X className="h-3 w-3" />
+                        <Star
+                          className={`h-3 w-3 ${isPrimary ? "fill-lotus-leaf" : ""}`}
+                        />
+                        {isPrimary ? "Ảnh chính" : "Đặt chính"}
                       </button>
-                      {isPrimary && (
-                        <div className="absolute bottom-1.5 left-1.5 bg-adminGreen-600 text-white text-2xs font-bold px-1.5 py-0.5 rounded-full leading-none pointer-events-none">
-                          Chính
-                        </div>
-                      )}
                     </div>
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      className="hidden"
-                      id={`product-img-${index}`}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        setPendingFiles((prev) => ({ ...prev, [index]: file }));
-                        setImagePreviews((prev) => ({
-                          ...prev,
-                          [index]: URL.createObjectURL(file),
-                        }));
-                      }}
+                  );
+                })}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    appendImage({
+                      url: "",
+                      isPrimary: imageFields.length === 0,
+                    })
+                  }
+                  className="flex h-[88px] w-[110px] flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-adminGray-300 text-adminGray-400 transition-all hover:border-adminGreen-600 hover:bg-adminGreen-50 hover:text-adminGreen-600 self-start"
+                >
+                  <Plus className="h-5 w-5" />
+                  <span className="text-2xs font-medium">Thêm ảnh</span>
+                </button>
+              </div>
+            </FormSection>
+
+            <FormSection icon={Box} title="Trạng thái & Chi tiết">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <FormField label="Trạng thái">
+                  <Select
+                    value={watch("status")?.toString() ?? "1"}
+                    onValueChange={(v) => setValue("status", Number(v))}
+                  >
+                    <AdminSelectTrigger>
+                      <SelectValue placeholder="Trạng thái" />
+                    </AdminSelectTrigger>
+                    <SelectContent>
+                      {STATUS_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+                <div className="sm:col-span-2">
+                  <FormField
+                    label="Mô tả ngắn"
+                    error={errors.description?.message}
+                  >
+                    <AdminTextarea
+                      {...register("description")}
+                      placeholder="Mô tả ngắn gọn về sản phẩm..."
+                      className="min-h-[60px] resize-none"
                     />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const imgs = getValues("images") || [];
-                        imgs.forEach((_, i) => {
-                          if (i !== index)
-                            setValue(`images.${i}.isPrimary`, false);
-                        });
-                        setValue(`images.${index}.isPrimary`, !isPrimary);
-                      }}
-                      className={[
-                        "flex items-center gap-1 text-xs font-medium transition-colors self-start",
-                        isPrimary
-                          ? "text-adminGreen-600"
-                          : "text-adminGray-400 hover:text-adminGray-600",
-                      ].join(" ")}
-                    >
-                      <Star
-                        className={`h-3 w-3 ${isPrimary ? "fill-lotus-leaf" : ""}`}
-                      />
-                      {isPrimary ? "Ảnh chính" : "Đặt chính"}
-                    </button>
-                  </div>
-                );
-              })}
+                  </FormField>
+                </div>
+                <div className="sm:col-span-2">
+                  <FormField
+                    label="Nội dung chi tiết"
+                    error={errors.content?.message}
+                  >
+                    <AdminTextarea
+                      {...register("content")}
+                      placeholder="Bài viết chi tiết sản phẩm..."
+                      className="min-h-[100px]"
+                    />
+                  </FormField>
+                </div>
+              </div>
+            </FormSection>
 
-              <button
+            <DialogFooter>
+              <Button
                 type="button"
-                onClick={() =>
-                  appendImage({ url: "", isPrimary: imageFields.length === 0 })
-                }
-                className="flex h-[88px] w-[110px] flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-adminGray-300 text-adminGray-400 transition-all hover:border-adminGreen-600 hover:bg-adminGreen-50 hover:text-adminGreen-600 self-start"
+                variant="outline"
+                size="sm"
+                onClick={() => onOpenChange(false)}
+                disabled={isPending || isUploading}
               >
-                <Plus className="h-5 w-5" />
-                <span className="text-2xs font-medium">Thêm ảnh</span>
-              </button>
-            </div>
-          </FormSection>
-
-          <FormSection icon={Box} title="Trạng thái & Chi tiết">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <FormField label="Trạng thái">
-                <Select
-                  value={watch("status")?.toString() ?? "1"}
-                  onValueChange={(v) => setValue("status", Number(v))}
-                >
-                  <AdminSelectTrigger>
-                    <SelectValue placeholder="Trạng thái" />
-                  </AdminSelectTrigger>
-                  <SelectContent>
-                    {STATUS_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-              <div className="sm:col-span-2">
-                <FormField
-                  label="Mô tả ngắn"
-                  error={errors.description?.message}
-                >
-                  <AdminTextarea
-                    {...register("description")}
-                    placeholder="Mô tả ngắn gọn về sản phẩm..."
-                    className="min-h-[60px] resize-none"
-                  />
-                </FormField>
-              </div>
-              <div className="sm:col-span-2">
-                <FormField
-                  label="Nội dung chi tiết"
-                  error={errors.content?.message}
-                >
-                  <AdminTextarea
-                    {...register("content")}
-                    placeholder="Bài viết chi tiết sản phẩm..."
-                    className="min-h-[100px]"
-                  />
-                </FormField>
-              </div>
-            </div>
-          </FormSection>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
-            >
-              {COMMON_MSG.cancel}
-            </Button>
-            <Button
-              type="submit"
-              variant="admin"
-              size="sm"
-              loading={isPending || isUploading}
-            >
-              {isEdit ? "Cập nhật" : "Tạo sản phẩm"}
-            </Button>
-          </DialogFooter>
-        </form>
+                {COMMON_MSG.cancel}
+              </Button>
+              <Button
+                type="submit"
+                variant="admin"
+                size="sm"
+                loading={isPending || isUploading}
+              >
+                {isEdit ? "Cập nhật" : "Tạo sản phẩm"}
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );
 }
 
-function getDefaultValues(product?: ProductDto | null): ProductFormValues {
+function getDefaultValues(product?: ProductFullDto | null): ProductFormValues {
   if (product) {
     return {
       categoryId: product.categoryId ?? 0,
-      code: product.code ?? "",
       name: product.name ?? "",
       description: product.description ?? "",
       content: product.content ?? "",
@@ -457,18 +505,20 @@ function getDefaultValues(product?: ProductDto | null): ProductFormValues {
       sellingPrice: product.sellingPrice ?? 0,
       stockQuantity: product.stockQuantity ?? 0,
       minStock: product.minStock ?? 0,
-      status: product.status !== null ? Number(product.status) : 1,
+      status:
+        product.status != null
+          ? Number(product.status)
+          : StatusActive.Active,
       images:
         product.images?.map((img) => ({
           id: img.id,
-          url: img.url,
-          isPrimary: img.isPrimary,
+          url: img.url ?? "",
+          isPrimary: !!img.isPrimary,
         })) || [],
     };
   }
   return {
     categoryId: 0,
-    code: "",
     name: "",
     description: "",
     content: "",

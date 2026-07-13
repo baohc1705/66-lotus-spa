@@ -1,4 +1,5 @@
-import { Activity, Pencil, Box } from "lucide-react";
+import { useState } from "react";
+import { Activity, Pencil, Box, Trash2 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import {
   Tabs,
@@ -9,7 +10,11 @@ import {
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
-import { useServiceDetail } from "../hooks/useServices";
+import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
+import {
+  useDeleteServiceProduct,
+  useServiceDetail,
+} from "../hooks/useServices";
 import type { ServiceDetailDto, ServiceProductResponse } from "../types/service.types";
 import { SERVICE_PERM } from "../constants/service.permissions";
 import { formatCurrency } from "@/shared/utils/currency";
@@ -30,6 +35,10 @@ export function ServiceDetailExpanded({
 }: ServiceDetailExpandedProps) {
   const { data: result, isLoading } = useServiceDetail(serviceId);
   const service = result?.data;
+  const deleteMutation = useDeleteServiceProduct();
+  const [deleteTarget, setDeleteTarget] = useState<ServiceProductResponse | null>(
+    null,
+  );
 
   if (isLoading) {
     return (
@@ -175,6 +184,9 @@ export function ServiceDetailExpanded({
                     <th className="py-2.5 px-4 font-semibold">Thành tiền</th>
                     <th className="py-2.5 px-4 font-semibold">Trạng thái</th>
                     <th className="py-2.5 px-4 font-semibold">Ghi chú</th>
+                    <th className="py-2.5 px-4 font-semibold text-center w-16">
+                      Xóa
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-adminGray-100 bg-white">
@@ -211,6 +223,24 @@ export function ServiceDetailExpanded({
                       >
                         {prod.note || "—"}
                       </td>
+                      <td className="py-2.5 px-4 text-center">
+                        <PermissionGate
+                          resource={SERVICE_PERM.resource}
+                          action={SERVICE_PERM.update}
+                        >
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            className="text-state-danger-text hover:text-state-danger-text hover:bg-state-danger-bg"
+                            disabled={!prod.id}
+                            onClick={() => setDeleteTarget(prod)}
+                            title="Xóa sản phẩm khỏi dịch vụ"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </PermissionGate>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -219,6 +249,32 @@ export function ServiceDetailExpanded({
           )}
         </TabsContent>
       </Tabs>
+
+      <ConfirmDialog
+        open={deleteTarget != null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        onConfirm={() => {
+          if (!deleteTarget?.id) return;
+          deleteMutation.mutate(deleteTarget.id, {
+            onSuccess: () => setDeleteTarget(null),
+          });
+        }}
+        title="Xóa sản phẩm tiêu hao"
+        description={
+          <>
+            Bạn có chắc muốn xóa{" "}
+            <span className="font-semibold text-adminInk">
+              {deleteTarget?.productName || "sản phẩm này"}
+            </span>{" "}
+            khỏi dịch vụ? Hành động không thể hoàn tác.
+          </>
+        }
+        confirmLabel="Xóa"
+        loading={deleteMutation.isPending}
+        variant="danger"
+      />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import type {
 } from "@/shared/types/common.types";
 import type {
   ProductDto,
+  ProductFullDto,
   CreateProductPayload,
   UpdateProductPayload,
   GetAllProductQuery,
@@ -57,7 +58,7 @@ export const productApi = {
 
   getDetail: (id: number) =>
     axiosInstance
-      .get<Result<ProductDto>>(`${BASE_PRODUCT}/${id}`)
+      .get<Result<ProductFullDto>>(`${BASE_PRODUCT}/${id}`)
       .then((r) => r.data),
 
   create: (payload: CreateProductPayload) =>

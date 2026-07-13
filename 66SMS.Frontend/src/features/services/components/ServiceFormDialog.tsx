@@ -138,7 +138,6 @@ export function ServiceFormDialog({
   const serializedProducts = JSON.stringify(watchProducts);
 
   useEffect(() => {
-    if (isEdit) return;
     let productsCost = 0;
     if (watchProducts && watchProducts.length > 0) {
       for (const p of watchProducts) {
@@ -154,7 +153,7 @@ export function ServiceFormDialog({
       shouldDirty: true,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serializedProducts, watchCostPrice, products, setValue, isEdit]);
+  }, [serializedProducts, watchCostPrice, products, setValue]);
 
   const onSubmit = async (data: ServiceFormValues) => {
     setIsUploading(true);
@@ -163,6 +162,14 @@ export function ServiceFormDialog({
       if (pendingFile) {
         imageBase64 = await fileToBase64(pendingFile);
       }
+
+      const serviceProducts = (data.serviceProducts || [])
+        .filter((sp) => sp.productId && sp.productId > 0)
+        .map((sp) => ({
+          productId: sp.productId,
+          quantityUsed: sp.quantityUsed,
+          note: sp.note || undefined,
+        }));
 
       if (isEdit && service?.id) {
         const payload: UpdateServicePayload = {
@@ -176,6 +183,7 @@ export function ServiceFormDialog({
           commissionRate: data.commissionRate,
           sortOrder: data.sortOrder,
           status: data.status,
+          serviceProducts,
         };
         if (imageBase64) {
           payload.imageUrl = imageBase64;
@@ -204,11 +212,7 @@ export function ServiceFormDialog({
           commissionRate: data.commissionRate,
           sortOrder: data.sortOrder,
           status: data.status,
-          serviceProducts: data.serviceProducts?.map((sp) => ({
-            productId: sp.productId,
-            quantityUsed: sp.quantityUsed,
-            note: sp.note || undefined,
-          })),
+          serviceProducts,
         };
         if (imageBase64) {
           payload.imageUrl = imageBase64;
@@ -227,8 +231,6 @@ export function ServiceFormDialog({
       setIsUploading(false);
     }
   };
-
-  const existingProducts = formSource?.serviceProducts ?? [];
 
   return (
     <>
@@ -383,11 +385,7 @@ export function ServiceFormDialog({
 
                   <FormField
                     label="Giá bán"
-                    tooltip={
-                      isEdit
-                        ? "Giá bán dịch vụ"
-                        : "Giá bán = Giá vốn + Chi phí sản phẩm tiêu hao"
-                    }
+                    tooltip="Giá bán = Giá vốn + Chi phí sản phẩm tiêu hao"
                     error={errors.sellingPrice?.message}
                   >
                     <Controller
@@ -399,8 +397,8 @@ export function ServiceFormDialog({
                           onChange={(v) => field.onChange(v ?? 0)}
                           onBlur={field.onBlur}
                           placeholder="0"
-                          disabled={!isEdit}
-                          className={!isEdit ? "bg-adminGray-50" : undefined}
+                          disabled
+                          className="bg-adminGray-50"
                         />
                       )}
                     />
@@ -471,159 +469,118 @@ export function ServiceFormDialog({
                 </div>
               </FormSection>
 
-              {!isEdit && (
-                <FormSection icon={Box} title="Sản phẩm đi kèm">
-                  <div className="space-y-4">
-                    {productFields.map((field, index) => {
-                      const errorObj = errors.serviceProducts?.[index];
-                      const productId = watch(
-                        `serviceProducts.${index}.productId`,
-                      );
-                      const quantity =
-                        watch(`serviceProducts.${index}.quantityUsed`) || 0;
-                      const selectedProduct = products.find(
-                        (p: ProductDto) => p.id === productId,
-                      );
-                      const costPrice = selectedProduct?.costPrice || 0;
-                      const total = costPrice * quantity;
+              <FormSection icon={Box} title="Sản phẩm đi kèm">
+                <div className="space-y-4">
+                  {productFields.map((field, index) => {
+                    const errorObj = errors.serviceProducts?.[index];
+                    const productId = watch(
+                      `serviceProducts.${index}.productId`,
+                    );
+                    const quantity =
+                      watch(`serviceProducts.${index}.quantityUsed`) || 0;
+                    const selectedProduct = products.find(
+                      (p: ProductDto) => p.id === productId,
+                    );
+                    const costPrice = selectedProduct?.costPrice || 0;
+                    const total = costPrice * quantity;
 
-                      return (
-                        <div
-                          key={field.id}
-                          className="grid grid-cols-12 gap-3 items-start border p-3 rounded-lg bg-adminGray-50/50"
-                        >
-                          <div className="col-span-4">
-                            <Select
-                              value={productId?.toString() || ""}
-                              onValueChange={(val) => {
-                                setValue(
-                                  `serviceProducts.${index}.productId`,
-                                  parseInt(val),
-                                );
-                              }}
-                            >
-                              <AdminSelectTrigger>
-                                <SelectValue placeholder="Chọn sản phẩm" />
-                              </AdminSelectTrigger>
-                              <SelectContent>
-                                {products.map((p: ProductDto) => (
-                                  <SelectItem
-                                    key={p.id}
-                                    value={p.id?.toString() || ""}
-                                  >
-                                    {p.name} - {formatCurrency(p.costPrice)}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            {errorObj?.productId && (
-                              <span className="text-state-danger-text text-xs mt-1 block">
-                                {errorObj.productId.message}
-                              </span>
+                    return (
+                      <div
+                        key={field.id}
+                        className="grid grid-cols-12 gap-3 items-start border p-3 rounded-lg bg-adminGray-50/50"
+                      >
+                        <div className="col-span-4">
+                          <Select
+                            value={productId?.toString() || ""}
+                            onValueChange={(val) => {
+                              setValue(
+                                `serviceProducts.${index}.productId`,
+                                parseInt(val),
+                              );
+                            }}
+                          >
+                            <AdminSelectTrigger>
+                              <SelectValue placeholder="Chọn sản phẩm" />
+                            </AdminSelectTrigger>
+                            <SelectContent>
+                              {products.map((p: ProductDto) => (
+                                <SelectItem
+                                  key={p.id}
+                                  value={p.id?.toString() || ""}
+                                >
+                                  {p.name} - {formatCurrency(p.costPrice)}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          {errorObj?.productId && (
+                            <span className="text-state-danger-text text-xs mt-1 block">
+                              {errorObj.productId.message}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="col-span-2">
+                          <AdminInput
+                            {...register(
+                              `serviceProducts.${index}.quantityUsed`,
+                              { valueAsNumber: true },
                             )}
-                          </div>
+                            type="number"
+                            placeholder="SL"
+                          />
+                          {errorObj?.quantityUsed && (
+                            <span className="text-state-danger-text text-xs mt-1 block">
+                              {errorObj.quantityUsed.message}
+                            </span>
+                          )}
+                        </div>
 
-                          <div className="col-span-2">
-                            <AdminInput
-                              {...register(
-                                `serviceProducts.${index}.quantityUsed`,
-                                { valueAsNumber: true },
-                              )}
-                              type="number"
-                              placeholder="SL"
-                            />
-                            {errorObj?.quantityUsed && (
-                              <span className="text-state-danger-text text-xs mt-1 block">
-                                {errorObj.quantityUsed.message}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="col-span-3">
-                            <div className="lotus-admin-select-trigger flex items-center justify-end bg-adminGray-100 border border-transparent text-xs text-adminInk font-medium">
-                              {formatCurrency(total > 0 ? total : 0)}
-                            </div>
-                          </div>
-
-                          <div className="col-span-2">
-                            <AdminInput
-                              {...register(`serviceProducts.${index}.note`)}
-                              placeholder="Ghi chú"
-                            />
-                          </div>
-
-                          <div className="col-span-1 flex justify-end">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon-sm"
-                              className="text-state-danger-text hover:text-state-danger-text hover:bg-state-danger-bg"
-                              onClick={() => removeProduct(index)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                        <div className="col-span-3">
+                          <div className="lotus-admin-select-trigger flex items-center justify-end bg-adminGray-100 border border-transparent text-xs text-adminInk font-medium">
+                            {formatCurrency(total > 0 ? total : 0)}
                           </div>
                         </div>
-                      );
-                    })}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="w-full border-dashed"
-                      onClick={() =>
-                        appendProduct({
-                          productId: 0,
-                          quantityUsed: 1,
-                          note: "",
-                        })
-                      }
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Thêm sản phẩm
-                    </Button>
-                  </div>
-                </FormSection>
-              )}
 
-              {isEdit && (
-                <FormSection icon={Box} title="Sản phẩm đi kèm">
-                  {existingProducts.length === 0 ? (
-                    <p className="text-sm text-adminGray-600">
-                      Chưa có sản phẩm tiêu hao. (Chỉ thêm được khi tạo mới)
-                    </p>
-                  ) : (
-                    <div className="rounded-md border border-adminGray-100 overflow-hidden">
-                      <table className="w-full text-left text-sm">
-                        <thead className="bg-adminGray-50 border-b border-adminGray-100 text-adminGray-600">
-                          <tr>
-                            <th className="py-2 px-3 font-semibold">Sản phẩm</th>
-                            <th className="py-2 px-3 font-semibold text-center">
-                              SL
-                            </th>
-                            <th className="py-2 px-3 font-semibold">Ghi chú</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-adminGray-100">
-                          {existingProducts.map((prod: ServiceProductResponse) => (
-                            <tr key={prod.id || prod.productId}>
-                              <td className="py-2 px-3">
-                                {prod.productName || "—"}
-                              </td>
-                              <td className="py-2 px-3 text-center">
-                                {prod.quantityUsed ?? "—"}
-                              </td>
-                              <td className="py-2 px-3 text-adminGray-600">
-                                {prod.note || "—"}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </FormSection>
-              )}
+                        <div className="col-span-2">
+                          <AdminInput
+                            {...register(`serviceProducts.${index}.note`)}
+                            placeholder="Ghi chú"
+                          />
+                        </div>
+
+                        <div className="col-span-1 flex justify-end">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            className="text-state-danger-text hover:text-state-danger-text hover:bg-state-danger-bg"
+                            onClick={() => removeProduct(index)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-full border-dashed"
+                    onClick={() =>
+                      appendProduct({
+                        productId: 0,
+                        quantityUsed: 1,
+                        note: "",
+                      })
+                    }
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Thêm sản phẩm
+                  </Button>
+                </div>
+              </FormSection>
 
               <DialogFooter>
                 <Button
@@ -670,14 +627,20 @@ function getDefaultValues(
       name: service.name ?? "",
       description: service.description ?? "",
       content: service.content ?? "",
-      durationMins: service.durationMins ?? 0,
+      durationMins: service.durationMins ?? 60,
       costPrice: service.costPrice ?? 0,
       sellingPrice: service.sellingPrice ?? 0,
       commissionRate: service.commissionRate ?? 0,
       sortOrder: service.sortOrder ?? 0,
       status: service.status ?? StatusActive.Active,
       imageUrl: service.imageUrl ?? "",
-      serviceProducts: [],
+      serviceProducts:
+        service.serviceProducts?.map((sp: ServiceProductResponse) => ({
+          id: sp.id,
+          productId: sp.productId ?? 0,
+          quantityUsed: sp.quantityUsed ?? 1,
+          note: sp.note ?? "",
+        })) ?? [],
     };
   }
 

@@ -20,7 +20,6 @@ import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Switch } from "@/shared/components/ui/switch";
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
 import {
-  DateTimeCell,
   IndexCell,
   MutedCell,
   NameCell,
@@ -181,18 +180,6 @@ export function useActiveCategoryColumns({
           );
         },
         size: 120,
-      },
-      {
-        accessorKey: "createdAt",
-        header: "Ngày tạo",
-        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
-        size: 140,
-      },
-      {
-        accessorKey: "updatedAt",
-        header: "Ngày cập nhật",
-        cell: ({ row }) => <DateTimeCell value={row.original.updatedAt} />,
-        size: 140,
       },
       {
         id: "actions",

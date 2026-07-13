@@ -151,3 +151,23 @@ export function useRestoreService() {
     },
   });
 }
+
+export function useDeleteServiceProduct() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => serviceApi.deleteServiceProduct(id),
+    onSuccess: (result) => {
+      if (result.isSuccess) {
+        qc.invalidateQueries({ queryKey: SERVICE_KEYS.all });
+        toast.success("Đã xóa sản phẩm khỏi dịch vụ");
+      } else {
+        toast.error(result.message || COMMON_MSG.error);
+      }
+    },
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(
+        getErrorMessage(error, "Không thể xóa sản phẩm khỏi dịch vụ"),
+      );
+    },
+  });
+}

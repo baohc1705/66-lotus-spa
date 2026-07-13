@@ -5,10 +5,6 @@ const productBaseSchema = z.object({
   categoryId: z.coerce
     .number()
     .min(1, VALIDATION_MSG.selectRequired("danh mục")),
-  code: z
-    .string()
-    .min(1, VALIDATION_MSG.required("Mã sản phẩm"))
-    .max(50, VALIDATION_MSG.max(50)),
   name: z
     .string()
     .min(1, VALIDATION_MSG.required("Tên sản phẩm"))
