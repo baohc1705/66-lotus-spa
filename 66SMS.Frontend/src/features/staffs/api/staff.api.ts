@@ -7,6 +7,7 @@ import type {
 } from "@/shared/types/common.types";
 import type {
   StaffDto,
+  StaffFullDto,
   CreateStaffPayload,
   UpdateStaffPayload,
 } from "../types/staff.types";
@@ -26,7 +27,7 @@ export const staffApi = {
 
   /** GET /staffs/:id — Chi tiết nhân viên — quyền: staffs.read */
   getDetail: (id: number) =>
-    axiosInstance.get<Result<StaffDto>>(`${BASE}/${id}`).then((r) => r.data),
+    axiosInstance.get<Result<StaffFullDto>>(`${BASE}/${id}`).then((r) => r.data),
 
   /** POST /staffs — Tạo nhân viên — quyền: staffs.create, role: admin */
   create: (payload: CreateStaffPayload) =>

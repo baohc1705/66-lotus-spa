@@ -24,20 +24,26 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { SearchableSelect } from "@/shared/components/ui/searchable-select";
-import { useCreateStaffMutation, useUpdateStaffMutation } from "../hooks/useStaffs";
+import { useCreateStaffMutation, useUpdateStaffMutation, useStaffDetail } from "../hooks/useStaffs";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { ImageUpload } from "@/shared/components/ImageUpload";
 import {
   useProvinces,
   useWardsByProvince,
 } from "@/features/address/hooks/useAddress";
+import type { ProvinceDto, WardDto } from "@/features/address/types/address.types";
 import {
   createStaffSchema,
   updateStaffSchema,
   type StaffFormValues,
 } from "../schemas/staff.schema";
 
-import type { StaffDto, CreateStaffPayload, UpdateStaffPayload } from "../types/staff.types";
+import type {
+  StaffDto,
+  StaffFullDto,
+  CreateStaffPayload,
+  UpdateStaffPayload,
+} from "../types/staff.types";
 import { parseToDateInput } from "@/shared/utils/date.utils";
 import { useGetAllRoles } from "@/features/auth/hooks/useGetAllRoles";
 import { Briefcase, KeyRound, User } from "lucide-react";
@@ -47,7 +53,8 @@ import { useSalons } from "@/features/salons/hooks/useSalons";
 interface StaffFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  staff?: StaffDto | null;
+  /** List hoặc detail — form sẽ load GetDetail khi sửa */
+  staff?: StaffDto | StaffFullDto | null;
 }
 
 const GENDER_OPTIONS = [
@@ -64,8 +71,8 @@ const CONTRACT_TYPE_OPTIONS = [
 
 const STATUS_OPTIONS = [
   { value: "1", label: "Đang làm" },
-  { value: "0", label: "Nghỉ việc" },
-  { value: "2", label: "Tạm nghỉ" },
+  { value: "0", label: "Tạm nghỉ" },
+  { value: "2", label: "Nghỉ việc" },
 ];
 
 const SALARY_TYPE_OPTIONS = [
@@ -78,9 +85,8 @@ export function StaffFormDialog({
   onOpenChange,
   staff,
 }: StaffFormDialogProps) {
-  const isEdit = !!staff;
+  const isEdit = !!staff?.id;
   const managedSalonId = useAuthStore((s) => s.managedSalonId);
-  //const isAdmin = managedSalonId === null;
   const { data: salonsResult } = useSalons({ pageIndex: 1, pageSize: 100 });
   const salons = salonsResult?.data?.items ?? [];
   const { data: rolesResult } = useGetAllRoles();
@@ -92,12 +98,15 @@ export function StaffFormDialog({
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Dynamic schema & form based on create vs edit
+  const detailQuery = useStaffDetail(open && isEdit ? staff!.id! : null);
+  const detail = detailQuery.data?.data;
+  const formSource = isEdit ? (detail ?? null) : null;
+
   const form = useForm<StaffFormValues>({
     resolver: zodResolver(
       isEdit ? updateStaffSchema : createStaffSchema,
     ) as Resolver<StaffFormValues>,
-    defaultValues: getDefaultValues(staff, managedSalonId),
+    defaultValues: getDefaultValues(null, managedSalonId),
   });
 
   const {
@@ -115,27 +124,31 @@ export function StaffFormDialog({
   const provincesQuery = useProvinces();
   const wardsQuery = useWardsByProvince(selectedProvince);
 
-  // Reset form when dialog opens/closes or staff changes
   useEffect(() => {
-    if (open) {
-      setPendingFile(null);
-      reset(getDefaultValues(staff, managedSalonId));
+    if (!open) return;
+    setPendingFile(null);
+    if (isEdit) {
+      if (formSource) reset(getDefaultValues(formSource, managedSalonId));
+    } else {
+      reset(getDefaultValues(null, managedSalonId));
     }
-  }, [open, staff, reset, managedSalonId]);
+  }, [open, isEdit, formSource, reset, managedSalonId]);
 
   const onSubmit = async (data: StaffFormValues) => {
     setIsUploading(true);
     try {
-      let imageBase64: string | undefined;
+      let avatarBase64: string | undefined;
       if (pendingFile) {
-        imageBase64 = await fileToBase64(pendingFile);
+        avatarBase64 = await fileToBase64(pendingFile);
       }
       const provinceName =
-        provincesQuery.data?.data?.find((p) => p.code === data.provinceCode)
-          ?.name ?? "";
+        provincesQuery.data?.data?.find(
+          (p: ProvinceDto) => p.code === data.provinceCode,
+        )?.name ?? "";
       const wardName =
-        wardsQuery.data?.data?.find((w) => w.code === data.wardCode)?.name ??
-        "";
+        wardsQuery.data?.data?.find(
+          (w: WardDto) => w.code === data.wardCode,
+        )?.name ?? "";
       const parts = [data.streetAddress, wardName, provinceName].filter(
         Boolean,
       );
@@ -144,8 +157,6 @@ export function StaffFormDialog({
         salonId: data.salonId,
         fullName: data.fullName,
         phone: data.phone,
-        avatarUrl: data.avatarUrl ?? "",
-        imageBase64,
         dateOfBirth: data.dateOfBirth || undefined,
         gender: data.gender,
         nationalId: data.nationalId || undefined,
@@ -160,6 +171,11 @@ export function StaffFormDialog({
         fullAddress: parts.join(", "),
         role: data.role,
       };
+
+      // AvatarUrl trên API = base64 khi có ảnh mới
+      if (avatarBase64) {
+        payload.avatarUrl = avatarBase64;
+      }
 
       if (isEdit && staff?.id) {
         updateMutation.mutate(
@@ -196,6 +212,11 @@ export function StaffFormDialog({
           </DialogDescription>
         </DialogHeader>
 
+        {isEdit && detailQuery.isLoading ? (
+          <div className="py-10 text-center text-sm text-adminGray-600">
+            Đang tải thông tin nhân viên...
+          </div>
+        ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* === Section: Thông tin cá nhân === */}
           <FormSection icon={User} title="Thông tin cá nhân">
@@ -422,7 +443,7 @@ export function StaffFormDialog({
                   </AdminSelectTrigger>
                   <SelectContent>
                     {roles.map((r) => (
-                      <SelectItem key={r.id} value={r.name}>
+                      <SelectItem key={r.id} value={r.code || r.name}>
                         {r.name}
                       </SelectItem>
                     ))}
@@ -470,6 +491,7 @@ export function StaffFormDialog({
             </Button>
           </DialogFooter>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );
@@ -542,7 +564,7 @@ function FormField({
 // ---- Default Values ----
 
 function getDefaultValues(
-  staff?: StaffDto | null,
+  staff?: StaffFullDto | null,
   managedSalonId?: number | null,
 ): StaffFormValues {
   if (staff) {
@@ -551,14 +573,14 @@ function getDefaultValues(
       fullName: staff.fullName ?? "",
       phone: staff.phone ?? "",
       dateOfBirth: parseToDateInput(staff.dateOfBirth),
-      gender: staff.gender ? Number(staff.gender) : undefined,
+      gender: staff.gender ?? undefined,
       nationalId: staff.nationalId ?? "",
       avatarUrl: staff.avatarUrl ?? "",
       hireDate: parseToDateInput(staff.hireDate),
       contractType: staff.contractType ?? "",
       basicSalary: staff.basicSalary ?? undefined,
       salaryType: staff.salaryType ?? 2,
-      status: staff.status ? Number(staff.status) : 1,
+      status: staff.status ?? 1,
       role: staff.role ?? "staff",
       streetAddress: staff.streetAddress ?? "",
       provinceCode: staff.provinceCode ?? "",

@@ -9,13 +9,15 @@ import {
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { useStaffDetail } from "../hooks/useStaffs";
-import type { StaffDto } from "../types/staff.types";
+import { useGetAllRoles } from "@/features/auth/hooks/useGetAllRoles";
+import type { StaffFullDto } from "../types/staff.types";
+import type { RoleDTO } from "@/features/auth/types/auth.types";
 import { formatDisplayDate } from "@/shared/utils/date.utils";
 import { GENDER_MAP } from "@/shared/constants/display.const";
 
 interface StaffDetailExpandedProps {
   staffId: number;
-  onEdit?: (staff: StaffDto) => void;
+  onEdit?: (staff: StaffFullDto) => void;
 }
 
 export function StaffDetailExpanded({
@@ -24,6 +26,13 @@ export function StaffDetailExpanded({
 }: StaffDetailExpandedProps) {
   const { data: result, isLoading } = useStaffDetail(staffId);
   const staff = result?.data;
+  const { data: rolesResult } = useGetAllRoles();
+  const roles = rolesResult?.data ?? [];
+
+  const roleLabel =
+    roles.find((r: RoleDTO) => r.code === staff?.role)?.name ??
+    staff?.role ??
+    null;
 
   if (isLoading) {
     return (
@@ -52,7 +61,6 @@ export function StaffDetailExpanded({
   return (
     <div className="bg-adminGray-50/30 w-full overflow-hidden">
       <Tabs defaultValue="info" className="w-full flex-col">
-        {/* Tab Headers */}
         <div className="px-4 pt-2">
           <TabsList className="h-10 border-b border-adminGray-100/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
             <TabsTrigger
@@ -88,10 +96,8 @@ export function StaffDetailExpanded({
           </TabsList>
         </div>
 
-        {/* Tab Content - Info */}
         <TabsContent value="info" className="p-4 m-0 border-none outline-none">
           <div className="flex flex-col gap-4">
-            {/* Header profile info */}
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-full bg-adminGreen-100 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
                 {staff.avatarUrl ? (
@@ -124,19 +130,22 @@ export function StaffDetailExpanded({
                 />
               </div>
               <div className="flex flex-col">
-                <DetailField label="Phòng ban" value={staff.role} />
-                <DetailField label="Chức danh" value={staff.role} />
+                <DetailField label="Vai trò" value={roleLabel} />
                 <DetailField
                   label="Chi nhánh làm việc"
                   value={staff.salonName}
                 />
+                <DetailField label="Địa chỉ" value={staff.fullAddress} />
               </div>
               <div className="flex flex-col">
                 <DetailField label="Tài khoản" value={staff.username} />
                 <DetailField label="Email" value={staff.email} />
                 <DetailField
                   label="Giới tính"
-                  value={GENDER_MAP[staff.gender ?? ""] ?? staff.gender}
+                  value={
+                    GENDER_MAP[staff.gender ?? ""] ??
+                    (staff.gender != null ? String(staff.gender) : null)
+                  }
                 />
                 <DetailField
                   label="Ngày sinh"
@@ -145,7 +154,6 @@ export function StaffDetailExpanded({
               </div>
             </div>
 
-            {/* Note & Actions */}
             <div className="flex items-end justify-between mt-2 pt-4 border-t border-adminGray-100/80">
               <div className="flex items-center gap-2 text-sm text-adminInk">
                 <Pencil className="w-4 h-4 text-adminGray-600" />

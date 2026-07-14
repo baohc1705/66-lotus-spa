@@ -11,19 +11,22 @@ import {
 } from "lucide-react";
 import { useGetAllRoles } from "@/features/auth/hooks/useGetAllRoles";
 import { useAdminStaffs } from "../hooks/useStaffs";
+import type { RoleDTO } from "@/features/auth/types/auth.types";
+import type { StaffDto } from "../types/staff.types";
 
 interface StaffCategorySidebarProps {
   selectedRole: string | null;
-  onSelectRole: (role: string | null) => void;
+  onSelectRole: (roleCode: string | null) => void;
   salonId: number | null;
 }
 
-function getRoleIcon(roleName: string): LucideIcon {
-  const r = roleName.toLowerCase();
-  if (r.includes("admin") || r.includes("quản trị")) return ShieldCheck;
-  if (r.includes("manager") || r.includes("quản lý")) return Shield;
-  if (r.includes("tech") || r.includes("kỹ thuật viên") || r.includes("thợ")) return Scissors;
-  if (r.includes("receptionist") || r.includes("lễ tân")) return Contact;
+function getRoleIcon(role: RoleDTO): LucideIcon {
+  const key = `${role.code ?? ""} ${role.name ?? ""}`.toLowerCase();
+  if (key.includes("admin") || key.includes("quản trị")) return ShieldCheck;
+  if (key.includes("manager") || key.includes("quản lý")) return Shield;
+  if (key.includes("tech") || key.includes("kỹ thuật") || key.includes("thợ"))
+    return Scissors;
+  if (key.includes("reception") || key.includes("lễ tân")) return Contact;
   return User;
 }
 
@@ -41,7 +44,6 @@ export function StaffCategorySidebar({
     [rolesResult?.data],
   );
 
-  // Fetch all staff members in the salon without role filter for counting
   const { data: countStaffsResult } = useAdminStaffs({
     pageIndex: 1,
     pageSize: 10000,
@@ -52,12 +54,13 @@ export function StaffCategorySidebar({
     return countStaffsResult?.data?.items ?? [];
   }, [countStaffsResult]);
 
+  // Đếm theo role code
   const countMap = useMemo(() => {
     const map = new Map<string, number>();
     for (const s of countStaffs) {
-      if (s.role) {
-        // Tên vai trò thường được lưu ở StaffDto.role dưới dạng chuỗi (ví dụ "Admin", "Technician")
-        const key = s.role.toLowerCase();
+      const staff: StaffDto = s;
+      if (staff.role) {
+        const key = staff.role.toLowerCase();
         map.set(key, (map.get(key) ?? 0) + 1);
       }
     }
@@ -69,14 +72,15 @@ export function StaffCategorySidebar({
   const filteredRoles = useMemo(() => {
     if (!searchText.trim()) return roles;
     const lower = searchText.toLowerCase();
-    return roles.filter((r) =>
-      (r.name ?? "").toLowerCase().includes(lower),
+    return roles.filter(
+      (r: RoleDTO) =>
+        (r.name ?? "").toLowerCase().includes(lower) ||
+        (r.code ?? "").toLowerCase().includes(lower),
     );
   }, [roles, searchText]);
 
   return (
     <aside className="w-2/12 shrink-0 flex flex-col h-full bg-white rounded overflow-hidden">
-      {/* Search */}
       <div className="px-3 pt-3 pb-2 shrink-0">
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-adminGray-400 pointer-events-none" />
@@ -90,9 +94,7 @@ export function StaffCategorySidebar({
         </div>
       </div>
 
-      {/* Category list */}
       <nav className="flex-1 flex-col h-full overflow-y-auto custom-scrollbar px-2 pb-2 space-y-0.5">
-        {/* Tất cả vai trò */}
         <button
           type="button"
           onClick={() => onSelectRole(null)}
@@ -131,15 +133,19 @@ export function StaffCategorySidebar({
             ))}
           </div>
         ) : (
-          filteredRoles.map((role) => {
-            const isActive = selectedRole?.toLowerCase() === role.name?.toLowerCase();
-            const count = role.name ? (countMap.get(role.name.toLowerCase()) ?? 0) : 0;
-            const Icon = getRoleIcon(role.name ?? "");
+          filteredRoles.map((role: RoleDTO) => {
+            const roleCode = role.code ?? "";
+            const isActive =
+              selectedRole?.toLowerCase() === roleCode.toLowerCase();
+            const count = roleCode
+              ? (countMap.get(roleCode.toLowerCase()) ?? 0)
+              : 0;
+            const Icon = getRoleIcon(role);
             return (
               <button
                 key={role.id}
                 type="button"
-                onClick={() => onSelectRole(role.name ?? null)}
+                onClick={() => onSelectRole(roleCode || null)}
                 className={`lotus-admin-sidebar-item group ${
                   isActive
                     ? "bg-adminGreen-100 text-adminGreen-600 font-semibold border-l-[3px] border-adminGreen-600"

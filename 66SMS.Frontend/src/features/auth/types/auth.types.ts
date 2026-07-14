@@ -43,6 +43,7 @@ export interface TokenResponseDTO {
 
 export interface RoleDTO {
   id: number;
+  code?: string | null;
   name: string;
   desctiption: string;
   status: string;

@@ -15,7 +15,7 @@ const staffBaseSchema = z.object({
   dateOfBirth: z.string().optional(),
   gender: z.coerce.number().min(0).optional(),
   nationalId: z.string().max(20, VALIDATION_MSG.max(20)).optional().or(z.literal('')),
-  avatarUrl: z.string().max(500).optional().or(z.literal('')),
+  
 
   // Thông tin công việc
   hireDate: z.string().optional(),

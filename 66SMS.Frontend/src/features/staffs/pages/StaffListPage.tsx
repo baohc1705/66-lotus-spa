@@ -81,12 +81,12 @@ export function StaffListPage() {
 
   // Stat card calculations
   const activeStaffs = useMemo(
-    () => staffs.filter((s: StaffDto) => s.status === "1").length,
+    () => staffs.filter((s: StaffDto) => s.status === 1).length,
     [staffs],
   );
 
   const inactiveStaffs = useMemo(
-    () => staffs.filter((s: StaffDto) => s.status === "0").length,
+    () => staffs.filter((s: StaffDto) => s.status === 0).length,
     [staffs],
   );
 

@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useTableQueryParams } from "@/shared/hooks/useTableQueryParams";
 import { useAuthStore } from "@/features/auth/stores/authStore";
-import type { StaffDto } from "../types/staff.types";
+import type { StaffDto, StaffFullDto } from "../types/staff.types";
 
 export function useStaffListState() {
   const table = useTableQueryParams();
   const [createOpen, setCreateOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<StaffDto | null>(null);
+  const [editTarget, setEditTarget] = useState<StaffDto | StaffFullDto | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<StaffDto | null>(null);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
 

@@ -106,21 +106,20 @@ export function AdminProfilePage() {
       return;
     }
 
-    let imageBase64: string | undefined;
+    let avatarBase64: string | undefined;
     if (pendingAvatarFile) {
-      imageBase64 = await fileToBase64(pendingAvatarFile);
+      avatarBase64 = await fileToBase64(pendingAvatarFile);
     }
 
     const payload = {
       fullName: data.fullName,
       phone: data.phoneNumber,
-      avatarUrl: data.profilePhotoUrl ?? undefined,
-      imageBase64,
       gender:
         data.gender !== null && data.gender !== undefined
           ? Number(data.gender)
           : undefined,
       dateOfBirth: data.dateOfBirth ? data.dateOfBirth : undefined,
+      ...(avatarBase64 ? { avatarUrl: avatarBase64 } : {}),
     };
 
     updateStaffMutation.mutate(

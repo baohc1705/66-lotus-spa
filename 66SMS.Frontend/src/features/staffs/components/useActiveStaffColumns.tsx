@@ -239,7 +239,9 @@ export function useActiveStaffColumns({
         header: cols.status,
         cell: ({ row }) => (
           <StatusBadge
-            status={row.original.status}
+            status={
+              row.original.status != null ? String(row.original.status) : null
+            }
             statusMap={STAFF_STATUS_MAP}
           />
         ),
