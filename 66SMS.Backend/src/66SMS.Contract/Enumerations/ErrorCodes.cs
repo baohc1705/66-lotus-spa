@@ -207,6 +207,8 @@ namespace _66SMS.Contracts.Enumerations
         ERR_PROMOTION_INACTIVE,
         ERR_PROMOTION_USAGE_LIMIT,
         ERR_PROMOTION_MIN_ORDER,
+        ERR_BOOKING_ROOM_HAS_POSITIONS,
+
         #endregion
     }
 }

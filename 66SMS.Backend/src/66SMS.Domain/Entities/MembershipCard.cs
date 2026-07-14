@@ -14,6 +14,5 @@ namespace _66SMS.Domain.Entities
         // Navigation properties
         public Customer? Customer { get; set; }
         public MembershipTier? Tier { get; set; }
-        public ICollection<MembershipCardHistory>? Histories { get; set; }
     }
 }

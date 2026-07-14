@@ -58,10 +58,12 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.CreateMemb
 
             if (tier == null && !string.IsNullOrEmpty(request.MembershipTierName))
             {
-                string cleanName = request.MembershipTierName.Trim().ToLower();
+                string clean = request.MembershipTierName.Trim().ToLower();
                 tier = await membershipTierSqlRepository
                     .AsQueryable()
-                    .FirstOrDefaultAsync(x => x.Name.ToLower() == cleanName, cancellationToken);
+                    .FirstOrDefaultAsync(
+                        x => x.Code.ToLower() == clean || x.Name.ToLower() == clean,
+                        cancellationToken);
             }
 
             // Fallback to the default tier (lowest MinSpending) if not found

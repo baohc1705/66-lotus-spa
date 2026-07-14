@@ -29,7 +29,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PostponeAppoin
             }
 
             var appointment = await appointmentSqlRepository.AsQueryable(asNoTracking: false)
-                .Include(a => a.Histories)
                 .Include(a => a.Payments)
                 .FirstOrDefaultAsync(a => a.Id == request.AppointmentId, cancellationToken);
 
@@ -63,7 +62,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PostponeAppoin
             using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                var oldStatus = appointment.Status;
                 var paidAmount = appointment.PaidAmount;
                 appointment.Status = AppointmentConst.STATUS_CANCELLED;
 
@@ -114,19 +112,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PostponeAppoin
                     };
                     walletTransactionSqlRepository.Add(walletTx);
                 }
-
-                appointment.Histories ??= new List<AppointmentHistory>();
-                appointment.Histories.Add(new AppointmentHistory
-                {
-                    OldStatus = oldStatus,
-                    NewStatus = AppointmentConst.STATUS_CANCELLED,
-                    Note = paidAmount > 0 
-                        ? $"Khách hàng hoãn lịch (tiền cọc {paidAmount:N0}đ đã được hoàn về ví)" 
-                        : "Khách hàng hoãn lịch",
-                    CreatedBy = request.UserId,
-                    ChangedBy = request.UserId,
-                    CreatedAt = DateTime.UtcNow,
-                });
 
                 appointment.UpdatedAt = DateTime.UtcNow;
                 appointment.UpdatedBy = request.UserId;

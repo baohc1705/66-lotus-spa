@@ -34,7 +34,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
 
             // Bước 2: Truy vấn CSDL để tìm ra lịch hẹn (Appointment) tương ứng với AppointmentId gửi lên từ VNPAY
             var appointment = await appointmentRepository.AsQueryable()
-                .Include(a => a.Histories)
                 .Include(a => a.Payments)
                 .FirstOrDefaultAsync(a => a.Id == result.AppointmentId, cancellationToken);
 
@@ -91,7 +90,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                         cancellationToken);
                 }
 
-                // Cập nhật sự thay đổi (Trạng thái đơn hàng, History) vào CSDL
+                // Cập nhật trạng thái đơn hàng vào CSDL
                 appointmentRepository.Update(appointment);
                 // Lưu các thay đổi xuống database
                 await unitOfWork.SaveChangeAsync(cancellationToken);

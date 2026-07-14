@@ -47,16 +47,6 @@ namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // // Set image for service if request provived
-                // if (request.ServiceImages != null && request.ServiceImages.Any())
-                // {
-                //     service.Images = request.ServiceImages.Select(x =>
-                //     {
-                //         var image = mapper.Map<ServiceImage>(x);
-                //         return image;
-                //     }).ToList();
-                // }
-
                 // Set product for service if request provived
                 if (request.ServiceProducts != null && request.ServiceProducts.Any())
                 {

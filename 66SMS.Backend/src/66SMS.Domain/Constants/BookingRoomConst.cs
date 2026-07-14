@@ -26,14 +26,21 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_BOOKING_ROOM_ID_NOT_FOUND = $"{nameof(Entities.BookingRoom)} with id not found";
+        public const string MSG_BOOKING_ROOM_FK_CONSTRAINT = $"{nameof(Entities.BookingRoom)} has positions";
         public const string MSG_BOOKING_ROOM_NOT_FOUND = "Booking room not found.";
         #endregion
         #region Image Storage
         public const string IMAGE_FOLDER = "booking_rooms";
         public const string IMAGE_FILE_PREFIX = "booking_room";
+        public static string GenerateImageFileName(int entityId) => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTime.Now.ToString("yyyyMMddHHmmss"));
+        #endregion
 
-        public static string GenerateImageFileName(int entityId)
-            => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTime.Now.ToString("yyyyMMddHHmmss"));
+        #region Cache
+        public const string CACHE_PREFIX = "booking_rooms:";
+        public static readonly TimeSpan CACHE_TTL_LIST = TimeSpan.FromMinutes(20);
+        public static readonly TimeSpan CACHE_TTL_DETAIL = TimeSpan.FromMinutes(45);
+        public static string CacheKeyDetail(int id) => $"booking_room:v2:{id}";
+        public static string CacheKeyList(string filterHash) => $"booking_rooms:{filterHash}";
         #endregion
     }
 }

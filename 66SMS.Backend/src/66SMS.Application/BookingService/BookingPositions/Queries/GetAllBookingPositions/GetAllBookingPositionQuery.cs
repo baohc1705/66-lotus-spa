@@ -1,6 +1,6 @@
-using _66SMS.Application.DTOs.BookingPositions;
 using _66SMS.Contracts.Shared;
 using MediatR;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.BookingService.BookingPositions.Queries.GetAllBookingPositions
 {

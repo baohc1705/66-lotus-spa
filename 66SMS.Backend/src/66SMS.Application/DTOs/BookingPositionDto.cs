@@ -1,4 +1,4 @@
-namespace _66SMS.Application.DTOs.BookingPositions
+namespace _66SMS.Application.DTOs
 {
     public class BookingPositionDto
     {
@@ -8,8 +8,8 @@ namespace _66SMS.Application.DTOs.BookingPositions
         public int? SortOrder { get; set; }
         public string? Note { get; set; }
         public int? Status { get; set; }
-        public string? CreatedAt { get; set; }
-        public string? UpdatedAt { get; set; }
+        public DateTimeOffset? CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
 
         public string? RoomName { get; set; }
     }

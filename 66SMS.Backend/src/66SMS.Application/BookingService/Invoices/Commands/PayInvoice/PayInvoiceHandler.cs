@@ -75,7 +75,6 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
             {
                 appointment = await appointmentRepository.AsQueryable(asNoTracking: false)
                     .Include(a => a.Payments)
-                    .Include(a => a.Histories)
                     .FirstOrDefaultAsync(a => a.Id == invoice.AppointmentId.Value, cancellationToken);
             }
 
@@ -174,16 +173,6 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                             return Result<object>.BadRequest(error!);
                         }
                     }
-
-                    appointment.Histories ??= new List<AppointmentHistory>();
-                    appointment.Histories.Add(new AppointmentHistory
-                    {
-                        OldStatus = appointment.Status,
-                        NewStatus = appointment.Status,
-                        Note = $"Đã thanh toán hóa đơn #{invoice.InvoiceCode}",
-                        CreatedBy = request.CashierId,
-                        CreatedAt = DateTime.UtcNow
-                    });
 
                     appointment.UpdatedAt = DateTime.UtcNow;
                     appointment.UpdatedBy = request.CashierId;

@@ -29,7 +29,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
             }
 
             var appointment = await appointmentSqlRepository.AsQueryable(asNoTracking: false)
-                .Include(a => a.Histories)
                 .Include(a => a.Payments)
                 .FirstOrDefaultAsync(a => a.Id == request.AppointmentId, cancellationToken);
 
@@ -110,22 +109,9 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                 }
 
                 // Cập nhật trạng thái appointment
-                var oldStatus = appointment.Status;
                 appointment.Status = AppointmentConst.STATUS_WAITING;
-
                 appointment.UpdatedAt = DateTime.UtcNow;
                 appointment.UpdatedBy = request.UserId;
-
-                appointment.Histories ??= new List<AppointmentHistory>();
-                appointment.Histories.Add(new AppointmentHistory
-                {
-                    OldStatus = oldStatus,
-                    NewStatus = AppointmentConst.STATUS_WAITING,
-                    Note = "Thanh toán cọc bằng Ví thành công",
-                    CreatedBy = request.UserId,
-                    ChangedBy = request.UserId,
-                    CreatedAt = DateTime.UtcNow
-                });
 
                 appointmentSqlRepository.Update(appointment);
                 

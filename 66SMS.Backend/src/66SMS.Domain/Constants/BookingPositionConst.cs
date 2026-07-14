@@ -29,5 +29,13 @@ namespace _66SMS.Domain.Constants
         public const string MSG_BOOKING_POSITION_ID_NOT_FOUND = $"{nameof(Entities.BookingPosition)} with id not found";
         public const string MSG_BOOKING_POSITION_NOT_FOUND = "Booking position not found.";
         #endregion
+
+        #region Cache
+        public const string CACHE_PREFIX = "booking_positions:";
+        public static readonly TimeSpan CACHE_TTL_LIST = TimeSpan.FromMinutes(120);
+        public static readonly TimeSpan CACHE_TTL_DETAIL = TimeSpan.FromMinutes(120);
+        public static string CacheKeyDetail(int id) => $"booking_position:{id}";
+        public static string CacheKeyList(string filterHash) => $"booking_positions:{filterHash}";
+        #endregion
     }
 }

@@ -66,14 +66,12 @@ namespace _66SMS.Persistence.DependencyInjection
             services.AddScoped<IAppointmentSlotLockSqlRepository, AppointmentSlotLockSqlRepository>();
             services.AddScoped<IAppointmentServiceSqlRepository, AppointmentServiceSqlRepository>();
             services.AddScoped<IAppointmentPaymentSqlRepository, AppointmentPaymentSqlRepository>();
-            services.AddScoped<IAppointmentHistorySqlRepository, AppointmentHistorySqlRepository>();
 
             services.AddScoped<IWalletSqlRepository, WalletSqlRepository>();
             services.AddScoped<IWalletTransactionSqlRepository, WalletTransactionSqlRepository>();
 
             services.AddScoped<IMembershipTierSqlRepository, MembershipTierSqlRepository>();
             services.AddScoped<IMembershipCardSqlRepository, MembershipCardSqlRepository>();
-            services.AddScoped<IMembershipCardHistorySqlRepository, MembershipCardHistorySqlRepository>();
 
             services.AddScoped<ITimeSlotSqlRepository, TimeSlotSqlRepository>();
             services.AddScoped<IBookingContextProvider, BookingContextProvider>();

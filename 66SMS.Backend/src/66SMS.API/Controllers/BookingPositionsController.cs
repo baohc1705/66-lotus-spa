@@ -4,7 +4,7 @@ using _66SMS.Application.BookingService.BookingPositions.Commands.DeleteBookingP
 using _66SMS.Application.BookingService.BookingPositions.Commands.UpdateBookingPositions;
 using _66SMS.Application.BookingService.BookingPositions.Queries.GetAllBookingPositions;
 using _66SMS.Application.BookingService.BookingPositions.Queries.GetDetailBookingPositions;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -16,45 +16,40 @@ namespace _66SMS.API.Controllers
     public class BookingPositionsController : ApiController<BookingPositionsController>
     {
         private readonly IMediator mediator;
-        private readonly IJwtService jwtService;
 
-        public BookingPositionsController(IMediator mediator, IJwtService jwtService)
+        public BookingPositionsController(IMediator mediator)
         {
             this.mediator = mediator;
-            this.jwtService = jwtService;
         }
 
         [HttpPost]
-        [AllowAnonymous]
+        [PermissionAuthorize("positions", "create")]
         public async Task<IActionResult> Create([FromBody] CreateBookingPositionCommand command)
         {
-            command.CreatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
 
         [HttpPatch("{id}")]
-        [AllowAnonymous]
+        [PermissionAuthorize("positions", "update")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateBookingPositionCommand command)
         {
             command.Id = id;
-            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
 
         [HttpDelete("{id}")]
-        [AllowAnonymous]
+        [PermissionAuthorize("positions", "delete")]
         public async Task<IActionResult> Delete(int id)
         {
             var command = new DeleteBookingPositionCommand { Id = id };
-            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
 
         [HttpGet]
-        [AllowAnonymous]
+        [PermissionAuthorize("positions", "read")]
         public async Task<IActionResult> GetAll([FromQuery] GetAllBookingPositionQuery query)
         {
             var result = await mediator.Send(query);
@@ -62,7 +57,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [AllowAnonymous]
+        [PermissionAuthorize("positions", "read")]
         public async Task<IActionResult> GetDetail(int id)
         {
             var result = await mediator.Send(new GetDetailBookingPositionQuery { Id = id });

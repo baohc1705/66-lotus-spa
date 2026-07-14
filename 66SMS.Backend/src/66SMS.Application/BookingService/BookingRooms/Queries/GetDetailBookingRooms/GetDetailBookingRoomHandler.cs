@@ -1,8 +1,9 @@
-using _66SMS.Application.DTOs.BookingRooms;
+using _66SMS.Application.DTOs;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
-using _66SMS.Domain.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
@@ -14,26 +15,59 @@ namespace _66SMS.Application.BookingService.BookingRooms.Queries.GetDetailBookin
     {
         private readonly IBookingRoomSqlRepository bookingRoomSqlRepository;
         private readonly IMapper mapper;
-
-        public GetDetailBookingRoomHandler(IBookingRoomSqlRepository bookingRoomSqlRepository, IMapper mapper)
+        private readonly ICacheService cacheService;
+        public GetDetailBookingRoomHandler(IBookingRoomSqlRepository bookingRoomSqlRepository, IMapper mapper, ICacheService cacheService)
         {
             this.bookingRoomSqlRepository = bookingRoomSqlRepository;
             this.mapper = mapper;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<BookingRoomDto>> Handle(GetDetailBookingRoomQuery request, CancellationToken cancellationToken)
         {
-            BookingRoomDto? bookingRoomDto = await bookingRoomSqlRepository.AsQueryable()
-                .Where(x => x.Id == request.Id)
-                .ProjectTo<BookingRoomDto>(mapper.ConfigurationProvider)
+            var cacheKey = BookingRoomConst.CacheKeyDetail((int)request.Id!);
+            var cached = await cacheService.GetAsync<BookingRoomDto>(cacheKey, cancellationToken);
+            if (cached is not null)
+            {
+                return Result<BookingRoomDto>.Success(cached);
+            }
+
+            // Get data from database.
+            var result = await bookingRoomSqlRepository
+                .AsQueryable(true)
+                .Where(room => room.Id == request.Id)
+                .Select(room => new BookingRoomDto
+                {
+                    Id = room.Id,
+                    Name = room.Name,
+                    ImageUrl = room.ImageUrl,
+                    Note = room.Note,
+                    Status = room.Status,
+                    Positions = room.Positions!
+                        .Where(p => p.Status != BookingPositionConst.STATUS_DELETED)
+                        .OrderBy(p => p.SortOrder)
+                        .Select(p => new BookingPositionDto
+                        {
+                            Id = p.Id,
+                            RoomId = p.RoomId,
+                            Name = p.Name,
+                            SortOrder = p.SortOrder,
+                            Note = p.Note,
+                            Status = p.Status,
+                        })
+                        .ToList(),
+                })
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (bookingRoomDto == null)
+            if (result == null)
             {
                 return Result<BookingRoomDto>.NotFound(BookingRoomConst.MSG_BOOKING_ROOM_NOT_FOUND, ErrorCodes.ERR_BOOKING_ROOM_NOT_FOUND);
             }
 
-            return Result<BookingRoomDto>.Success(bookingRoomDto);
+            // Set cached data.
+            await cacheService.SetAsync(cacheKey, result, BookingRoomConst.CACHE_TTL_DETAIL, cancellationToken);
+
+            return Result<BookingRoomDto>.Success(result);
         }
     }
 }

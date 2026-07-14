@@ -1,4 +1,4 @@
-using _66SMS. Application.Abstractions;
+using _66SMS.Application.Abstractions;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -50,7 +50,9 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                     if (service == null)
                         return Result<List<int>>.BadRequest(ServiceConst.MSG_SERVICE_PRODUCT_NOT_FOUND, ErrorCodes.ERR_SERVICE_NOT_FOUND);
 
-                    var slotsNeeded = Math.Max(1, (int)Math.Ceiling(service.DurationMins / (double)TimeSlotConst.DEFAULT_SLOT_MINUTES));
+                    var slotsNeeded = TimeSlotConst.CalcSlotsNeeded(
+                        service.DurationMins,
+                        TimeSlotConst.DEFAULT_SLOT_MINUTES);
                     var slotLock = new AppointmentSlotLock
                     {
                         SlotId = (int)lockRequest.SlotId,

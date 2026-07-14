@@ -1,4 +1,3 @@
-using _66SMS.Application.DTOs.BookingPositions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Constants;
@@ -7,6 +6,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.BookingService.BookingPositions.Queries.GetDetailBookingPositions
 {

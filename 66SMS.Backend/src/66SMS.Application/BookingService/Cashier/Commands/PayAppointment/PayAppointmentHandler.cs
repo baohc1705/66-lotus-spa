@@ -41,7 +41,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.PayAppointment
             }
 
             var appointment = await appointmentSqlRepository.AsQueryable(asNoTracking: false)
-                .Include(a => a.Histories)
                 .Include(a => a.Payments)
                 .FirstOrDefaultAsync(a => a.Id == request.Id, cancellationToken);
 
@@ -138,18 +137,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.PayAppointment
                 {
                     return Result<object>.BadRequest(error!);
                 }
-
-                var oldStatus = appointment.Status;
-
-                appointment.Histories ??= new List<AppointmentHistory>();
-                appointment.Histories.Add(new AppointmentHistory
-                {
-                    OldStatus = oldStatus,
-                    NewStatus = appointment.Status,
-                    Note = note,
-                    CreatedBy =request.UserId,
-                    CreatedAt = DateTime.UtcNow
-                });
 
                 appointment.UpdatedAt = DateTime.UtcNow;
                 appointment.UpdatedBy = request.UserId;

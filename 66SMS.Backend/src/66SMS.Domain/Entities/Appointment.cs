@@ -40,7 +40,6 @@ namespace _66SMS.Domain.Entities
         public ICollection<AppointmentSlotLock>? SlotLocks { get; set; }
         public ICollection<AppointmentService>? Services { get; set; }
         public ICollection<AppointmentPayment>? Payments { get; set; }
-        public ICollection<AppointmentHistory>? Histories { get; set; }
         public Salon? Salon { get; set; }
     }
 }

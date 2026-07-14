@@ -5,6 +5,7 @@ namespace _66SMS.Domain.Constants
         #region Database
         public const string TABLE_NAME = "membership_tiers";
         public const string FIELD_ID = "id";
+        public const string FIELD_CODE = "code";
         public const string FIELD_NAME = "name";
         public const string FIELD_MIN_SPENDING = "min_spending";
         public const string FIELD_DISCOUNT_PERCENT = "discount_percent";
@@ -14,6 +15,7 @@ namespace _66SMS.Domain.Constants
         #endregion
 
         #region Constraint
+        public const int CODE_MAX_LENGTH = 100;
         public const int NAME_MAX_LENGTH = 100;
         public const int BENEFITS_MAX_LENGTH = 1000;
         public const string MEMBERSHIP_CARD_TIER_COMMON = "common";

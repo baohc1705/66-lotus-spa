@@ -1,7 +1,10 @@
-using _66SMS.Application.DTOs.BookingRooms;
+using _66SMS.Application.DTOs;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Extensions;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
@@ -12,15 +15,39 @@ namespace _66SMS.Application.BookingService.BookingRooms.Queries.GetAllBookingRo
     {
         private readonly IBookingRoomSqlRepository bookingRoomSqlRepository;
         private readonly IMapper mapper;
+        private readonly ICacheService cacheService;
 
-        public GetAllBookingRoomHandler(IBookingRoomSqlRepository bookingRoomSqlRepository, IMapper mapper)
+        public GetAllBookingRoomHandler(IBookingRoomSqlRepository bookingRoomSqlRepository, IMapper mapper, ICacheService cacheService)
         {
             this.bookingRoomSqlRepository = bookingRoomSqlRepository;
             this.mapper = mapper;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<PagedResult<BookingRoomDto>>> Handle(GetAllBookingRoomQuery request, CancellationToken cancellationToken)
         {
+            // Generate cache key.
+            var filterHash = CacheKeyHash.FromObject(new
+            {
+                request.SalonId,
+                request.Keyword,
+                request.PageIndex,
+                request.PageSize,
+                request.OrderBy,
+                request.IsDescending,
+            });
+
+            // Generate cache key.
+            var cacheKey = BookingRoomConst.CacheKeyList(filterHash);
+
+            // Get cached data.
+            var cached = await cacheService.GetAsync<PagedResult<BookingRoomDto>>(cacheKey, cancellationToken);
+
+            // If cached data is not null, return cached data.
+            if (cached is not null)
+                return Result<PagedResult<BookingRoomDto>>.Success(cached);
+
+            // Get data from database.
             var query = bookingRoomSqlRepository.AsQueryable();
 
             if (request.SalonId.HasValue)
@@ -35,8 +62,18 @@ namespace _66SMS.Application.BookingService.BookingRooms.Queries.GetAllBookingRo
             }
 
             PagedResult<BookingRoomDto> result = await query
-                .ProjectTo<BookingRoomDto>(mapper.ConfigurationProvider)
+                .Select(x => new BookingRoomDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    ImageUrl = x.ImageUrl,
+                    Note = x.Note,
+                    Status = x.Status
+                })
                 .ToPagedAsync(request, cancellationToken);
+
+            // Set cached data.
+            await cacheService.SetAsync(cacheKey, result, BookingRoomConst.CACHE_TTL_LIST, cancellationToken);
 
             return Result<PagedResult<BookingRoomDto>>.Success(result);
         }

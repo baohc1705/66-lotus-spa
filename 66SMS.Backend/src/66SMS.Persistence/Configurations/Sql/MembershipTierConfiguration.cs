@@ -11,6 +11,7 @@ namespace _66SMS.Persistence.Configurations.Sql
         {
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).HasColumnName(MembershipTierConst.FIELD_ID);
+            builder.Property(x => x.Code).HasColumnName(MembershipTierConst.FIELD_CODE).HasMaxLength(MembershipTierConst.CODE_MAX_LENGTH).IsRequired();
             builder.Property(x => x.Name).HasColumnName(MembershipTierConst.FIELD_NAME).HasMaxLength(MembershipTierConst.NAME_MAX_LENGTH);
             builder.Property(x => x.MinSpending).HasColumnName(MembershipTierConst.FIELD_MIN_SPENDING).HasColumnType("decimal(18, 0)");
             builder.Property(x => x.DiscountPercent).HasColumnName(MembershipTierConst.FIELD_DISCOUNT_PERCENT);
@@ -18,7 +19,6 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.Benefits).HasColumnName(MembershipTierConst.FIELD_BENEFITS).HasMaxLength(MembershipTierConst.BENEFITS_MAX_LENGTH);
             builder.Property(x => x.Status).HasColumnName(MembershipTierConst.FIELD_STATUS);
             builder.ToTable(MembershipTierConst.TABLE_NAME);
-           
         }
     }
 }

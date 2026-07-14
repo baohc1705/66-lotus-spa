@@ -1,3 +1,4 @@
+using System.Data;
 using _66SMS.Contract.Abstractions;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
@@ -10,7 +11,6 @@ using _66SMS.Domain.Enums;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Data;
 
 namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
 {
@@ -55,6 +55,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = request.CreatedBy,
                 Status = (int)StatusActiveEnum.ACTIVED,
+                IsEmailConfirmed = true,
             };
 
             string roleCode = request.Role ?? RoleConst.CODE_STAFF;
@@ -108,9 +109,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
 
                 staff.Code = $"SEN{staff.Id:D4}";
                 staff.User!.Username = staff.Code;
-                staff.User.Email = string.IsNullOrEmpty(request.Email)
-                    ? $"{staff.Code}@lotusspa.com.vn"
-                    : request.Email;
+                staff.User.Email = string.IsNullOrEmpty(request.Email) ? $"{staff.Code}@lotusspa.com.vn" : request.Email;
                 staff.User.PasswordHash = passwordHash.Hash(staff.Code);
 
                 if (!string.IsNullOrEmpty(request.AvatarUrl))

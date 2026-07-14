@@ -1,6 +1,4 @@
 using _66SMS.Application.DTOs.Appointments;
-using _66SMS.Application.DTOs.BookingPositions;
-using _66SMS.Application.DTOs.BookingRooms;
 using _66SMS.Application.DTOs.Shifts;
 using _66SMS.Application.DTOs.TimeSlots;
 using _66SMS.Application.BookingService.BookingPositions.Commands.CreateBookingPositions;
@@ -20,6 +18,7 @@ using AutoMapper;
 using System.Collections.Generic;
 using System.Linq;
 using _66SMS.Application.BookingService.Helpers;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.Mappers
 {
@@ -78,8 +77,6 @@ namespace _66SMS.Application.Mappers
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .IgnoreNullValueTypes();
             CreateMap<BookingRoom, BookingRoomDto>()
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => (string?)null))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => (string?)null))
                 .IgnoreNullValueTypes();
 
             // BookingPosition
@@ -90,8 +87,6 @@ namespace _66SMS.Application.Mappers
                 .IgnoreNullValueTypes();
             CreateMap<BookingPosition, BookingPositionDto>()
                 .ForMember(dest => dest.RoomName, opt => opt.MapFrom(src => src.Room != null ? src.Room.Name : null))
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt != null ? src.UpdatedAt.Value.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss") : null))
                 .IgnoreNullValueTypes();
 
             // TimeSlot

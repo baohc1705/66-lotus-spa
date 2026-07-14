@@ -9,6 +9,7 @@ namespace _66SMS.Application.CustomerService.MembershipTiers.Commands.UpdateMemb
         [JsonIgnore]
         public int Id { get; set; }
 
+        public string? Code { get; set; }
         public string? Name { get; set; }
         public decimal? MinSpending { get; set; }
         public int? DiscountPercent { get; set; }

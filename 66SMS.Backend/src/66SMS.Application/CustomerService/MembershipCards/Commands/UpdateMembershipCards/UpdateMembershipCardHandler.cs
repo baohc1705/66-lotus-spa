@@ -18,7 +18,6 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMemb
         private readonly IMembershipCardSqlRepository membershipCardSqlRepository;
         private readonly ICustomerSqlRepository customerSqlRepository;
         private readonly IMembershipTierSqlRepository membershipTierSqlRepository;
-        private readonly IMembershipCardHistorySqlRepository membershipCardHistorySqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
 
@@ -26,14 +25,12 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMemb
             IMembershipCardSqlRepository membershipCardSqlRepository,
             ICustomerSqlRepository customerSqlRepository,
             IMembershipTierSqlRepository membershipTierSqlRepository,
-            IMembershipCardHistorySqlRepository membershipCardHistorySqlRepository,
             ISqlUnitOfWork sqlUnitOfWork,
             IMapper mapper)
         {
             this.membershipCardSqlRepository = membershipCardSqlRepository;
             this.customerSqlRepository = customerSqlRepository;
             this.membershipTierSqlRepository = membershipTierSqlRepository;
-            this.membershipCardHistorySqlRepository = membershipCardHistorySqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
         }
@@ -59,8 +56,6 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMemb
                 }
             }
 
-            // set oldtier id 
-            int? oldTierId = null;
             if (request.MembershipTierId.HasValue && request.MembershipTierId.Value != membershipCard.MembershipTierId)
             {
                 MembershipTier? tier = await membershipTierSqlRepository.FindByIdAsync(request.MembershipTierId.Value);
@@ -68,48 +63,22 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMemb
                 {
                     return Result<object>.NotFound(MembershipTierConst.MSG_MEMBERSHIP_TIER_NOT_FOUND, ErrorCodes.ERR_MEMBERSHIP_TIER_NOT_FOUND);
                 }
-                oldTierId = membershipCard.MembershipTierId;
             }
 
-            // map request to domain entity
             mapper.Map(request, membershipCard);
 
-            // begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // tracking update
                 membershipCardSqlRepository.Update(membershipCard);
-
-                // save log if change membership card tier
-                if (oldTierId.HasValue && request.MembershipTierId.HasValue)
-                {
-                    MembershipCardHistory history = new MembershipCardHistory
-                    {
-                        MembershipCardId = membershipCard.Id,
-                        OldTierId = oldTierId,
-                        NewTierId = request.MembershipTierId.Value,
-                        Reason = "Manual tier update",
-                        ChangedBy = request.UpdatedBy ?? 1,
-                        CreatedAt = DateTime.UtcNow,
-                        CreatedBy = request.UpdatedBy ?? 1
-                    };
-                    membershipCardHistorySqlRepository.Add(history);
-                }
-
-                // persist to database
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-
-                // commit transaction
                 transaction.Commit();
-
-                // return success result
                 return Result<object>.Ok();
             }
-            catch (Exception ex)
+            catch
             {
-                // rollback transaction on failure
-                transaction.Rollback(); throw;
+                transaction.Rollback();
+                throw;
             }
         }
     }

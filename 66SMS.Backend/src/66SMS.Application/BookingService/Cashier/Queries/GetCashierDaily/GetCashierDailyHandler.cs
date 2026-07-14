@@ -35,7 +35,12 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
             var dto = new CashierDailyDto();
 
             var staffsQuery = staffRepository.AsQueryable()
-                .Where(x => x.User != null && x.Status != StaffConst.STATUS_DELETED && x.User.UserRoles!.Any(ur => ur.Role != null && ur.Role.Name.ToLower() == "staff"));
+                .Where(x => x.User != null
+                    && x.Status != StaffConst.STATUS_DELETED
+                    && x.User.UserRoles!.Any(ur =>
+                        ur.Role != null
+                        && ur.Role.Status == RoleConst.STATUS_ACTIVED
+                        && ur.Role.Code!.ToLower() == RoleConst.CODE_STAFF));
             if (request.SalonId.HasValue)
             {
                 staffsQuery = staffsQuery.Where(x => staffSalonSqlRepository.AsQueryable(true)

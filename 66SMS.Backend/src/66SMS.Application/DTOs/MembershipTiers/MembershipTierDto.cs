@@ -3,6 +3,7 @@ namespace _66SMS.Application.DTOs.MembershipTiers
     public class MembershipTierDto
     {
         public int? Id { get; set; }
+        public string? Code { get; set; }
         public string? Name { get; set; }
         public decimal? MinSpending { get; set; }
         public int? DiscountPercent { get; set; }

@@ -23,7 +23,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
             CancellationToken cancellationToken)
         {
             var appointment = await appointmentSqlRepository.AsQueryable()
-                .Include(a => a.Histories)
                 .Include(a => a.Payments)
                 .FirstOrDefaultAsync(a => a.Id == request.Id, cancellationToken);
 
@@ -36,13 +35,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
             {
                 return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_ALREADY_THIS_STATUS, ErrorCodes.ERR_APPOINTMENT_ALREADY_THIS_STATUS);
             }
-
-            // TODO: Bổ sung logic IsCashierTransition trong AppointmentStatusTransitions nếu cần
-            // if (!AppointmentStatusTransitions.IsCashierTransition(appointment.Status, request.Status))
-            // {
-            //     return Result<object>.BadRequest(
-            //         "Thu ngân chỉ có thể duyệt (chờ phục vụ) hoặc hủy lịch đang chờ xác nhận.");
-            // }
 
             if (request.Status == AppointmentConst.STATUS_CONFIRMED
                 && appointment.Status == AppointmentConst.STATUS_PENDING
@@ -62,23 +54,13 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                 {
                     var now = DateTime.UtcNow;
                     appointment.DepositRequestedAt = now;
-                    // Mặc định cho 24h để đặt cọc
                     appointment.DepositDeadlineAt = now.AddHours(24);
-
                     appointment.Status = AppointmentConst.STATUS_CONFIRMED;
                     appointment.ConfirmedAt = now;
                     appointment.UpdatedAt = now;
                     appointment.UpdatedBy = request.UserId;
-
-                    appointment.Histories ??= new List<AppointmentHistory>();
-                    appointment.Histories.Add(new AppointmentHistory
-                    {
-                        OldStatus = AppointmentConst.STATUS_PENDING,
-                        NewStatus = AppointmentConst.STATUS_CONFIRMED,
-                        Note = request.Note ?? "Thu ngân xác nhận lịch — yêu cầu đặt cọc trong 24h",
-                        CreatedBy = request.UserId,
-                        CreatedAt = now
-                    });
+                    if (!string.IsNullOrWhiteSpace(request.Note))
+                        appointment.Note = request.Note;
 
                     appointmentSqlRepository.Update(appointment);
                     await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
@@ -88,13 +70,14 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                         "Đã xác nhận lịch. Khách có 24 giờ để đặt cọc qua VNPAY.");
                 }
 
-                var oldStatus = appointment.Status;
                 var paidBeforeCancel = appointment.PaidAmount;
                 appointment.Status = request.Status;
 
                 var nowTime = DateTime.UtcNow;
                 appointment.UpdatedAt = nowTime;
                 appointment.UpdatedBy = request.UserId;
+                if (!string.IsNullOrWhiteSpace(request.Note))
+                    appointment.Note = request.Note;
 
                 if (request.Status == AppointmentConst.STATUS_CONFIRMED)
                 {
@@ -105,10 +88,8 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                     appointment.CompletedAt = nowTime;
                 }
 
-                // Xử lý hoàn tiền khi Hủy (Cancel)
                 if (request.Status == AppointmentConst.STATUS_CANCELLED && paidBeforeCancel > 0)
                 {
-                    // Hoàn tiền vào Wallet
                     Wallet wallet;
                     try
                     {
@@ -122,7 +103,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
 
                     wallet.Balance += paidBeforeCancel;
                     walletSqlRepository.Update(wallet);
-                    
+
                     walletTransactionSqlRepository.Add(new WalletTransaction
                     {
                         WalletId = wallet.Id,
@@ -146,23 +127,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                         }
                     }
                 }
-
-                appointment.Histories ??= new List<AppointmentHistory>();
-                appointment.Histories.Add(new AppointmentHistory
-                {
-                    OldStatus = oldStatus,
-                    NewStatus = request.Status,
-                    Note = request.Note ?? (request.Status switch
-                    {
-                        AppointmentConst.STATUS_WAITING => "Thu ngân duyệt lịch online",
-                        AppointmentConst.STATUS_CANCELLED when paidBeforeCancel > 0
-                            => $"Thu ngân từ chối lịch online (cần hoàn 100% — {paidBeforeCancel:N0}đ)",
-                        AppointmentConst.STATUS_CANCELLED => "Thu ngân từ chối lịch online",
-                        _ => "Thu ngân cập nhật",
-                    }),
-                    CreatedBy = request.UserId,
-                    CreatedAt = DateTime.UtcNow
-                });
 
                 appointmentSqlRepository.Update(appointment);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

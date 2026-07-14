@@ -25,6 +25,7 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
 
         public async Task<Result<PagedResult<ServiceListDto>>> Handle(GetAllServicesQuery request, CancellationToken cancellationToken)
         {
+            // Generate cache key.
             var filterHash = CacheKeyHash.FromObject(new
             {
                 request.CategoryId,
@@ -39,12 +40,15 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
                 request.IsDescending,
             });
             var cacheKey = ServiceConst.CacheKeyList(filterHash);
+
+            // Get cached data.
             var cached = await cacheService.GetAsync<PagedResult<ServiceListDto>>(cacheKey, cancellationToken);
             if (cached is not null)
             {
                 return Result<PagedResult<ServiceListDto>>.Success(cached);
             }
 
+            // Get data from database.
             var query = serviceSqlRepository.AsQueryable();
             // Filter here
             if (request.CategoryId.HasValue)
@@ -91,6 +95,7 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
                 _ => request.IsDescending ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt),
             };
 
+            // Get paged result.
             PagedResult<ServiceListDto> pagedResult = await query
                 .Select(x => new ServiceListDto
                 {
@@ -109,6 +114,7 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
                 })
                 .ToPagedAsync(request, cancellationToken);
 
+            // Set cached data.
             await cacheService.SetAsync(cacheKey, pagedResult, ServiceConst.CACHE_TTL_LIST, cancellationToken);
             return Result<PagedResult<ServiceListDto>>.Success(pagedResult);
         }

@@ -9,7 +9,6 @@ namespace _66SMS.Application.BookingService.BookingRooms.Commands.UpdateBookingR
         {
             RuleFor(x => x.Id).NotNull().GreaterThan(0);
             RuleFor(x => x.Name).MaximumLength(BookingRoomConst.NAME_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.Name));
-            RuleFor(x => x.ImageUrl).MaximumLength(BookingRoomConst.IMAGE_URL_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.ImageUrl));
             RuleFor(x => x.Note).MaximumLength(BookingRoomConst.NOTE_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.Note));
         }
     }

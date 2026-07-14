@@ -42,7 +42,10 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
                 .ToListAsync(cancellationToken);
             if (timeSlots.Count == 0) return null;
 
-            var slotsNeeded = Math.Max(1, (int)Math.Ceiling(service.DurationMins / (double)TimeSlotConst.DEFAULT_SLOT_MINUTES));
+            // Tính số slot theo độ dài slot THỰC TẾ trong DB (không hard-code 15').
+            // Bug cũ: DEFAULT=15' trong khi slot = 30' → dịch vụ 60' bị tính 4 slot (=120') → cuối mỗi ca bị "ngoài giờ".
+            var slotMinutes = TimeSlotConst.ResolveSlotMinutes(timeSlots[0].StartTime, timeSlots[0].EndTime);
+            var slotsNeeded = TimeSlotConst.CalcSlotsNeeded(service.DurationMins, slotMinutes);
 
             var schedules = await workScheduleSqlRepository
                 .AsQueryable()
@@ -91,6 +94,13 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
                 staffScheduleIds[ws.StaffId] = ws.Id;
             }
 
+            // Gộp ca liền kề (vd: Sáng 08-12 + Chiều 12-16 → 08-16) để dịch vụ không bị
+            // "ngoài giờ" chỉ vì nằm sát biên giữa hai ca liên tiếp.
+            foreach (var staffId in staffShiftWindows.Keys.ToList())
+            {
+                staffShiftWindows[staffId] = MergeContiguousWindows(staffShiftWindows[staffId]);
+            }
+
             var now = DateTimeHelper.UtcNow();
             var appointments = await appointmentSqlRepository
                 .AsQueryable()
@@ -102,8 +112,8 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var bookedSlots = new Dictionary<(int StaffId, int SlotId), byte>();
             foreach (var appointment in appointments)
             {
-                var duration = appointment.Services?.Sum(bs => bs.DurationSnapshot * bs.Quantity) ?? TimeSlotConst.DEFAULT_SLOT_MINUTES;
-                var needed = (int)Math.Ceiling(duration / (double)TimeSlotConst.DEFAULT_SLOT_MINUTES);
+                var duration = appointment.Services?.Sum(bs => bs.DurationSnapshot * bs.Quantity) ?? slotMinutes;
+                var needed = TimeSlotConst.CalcSlotsNeeded(duration, slotMinutes);
                 MarkConsecutiveSlots(bookedSlots, appointment.StaffId, appointment.SlotId, needed, timeSlots);
             }
 
@@ -151,7 +161,13 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             {
                 if (!usersById.TryGetValue(staff.UserId, out var user)) continue;
 
-                if (user.UserRoles != null && user.UserRoles.Any(ur => ur.Role != null && ur.Role.Name == "staff"))
+                // Dùng Role.Code (không phải Name) — Name có thể là "Nhân viên" / "Staff".
+                var isStaffRole = user.UserRoles != null && user.UserRoles.Any(ur =>
+                    ur.Role != null
+                    && ur.Role.Status == RoleConst.STATUS_ACTIVED
+                    && string.Equals(ur.Role.Code, RoleConst.CODE_STAFF, StringComparison.OrdinalIgnoreCase));
+
+                if (isStaffRole)
                 {
                     staffs.Add(staff);
                 }
@@ -159,6 +175,36 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
 
             return staffs;
         }
+
+        /// <summary>
+        /// Gộp các ca làm việc liền kề/chồng nhau thành một cửa sổ giờ liên tục.
+        /// </summary>
+        private static List<ShiftWindow> MergeContiguousWindows(List<ShiftWindow> windows)
+        {
+            if (windows.Count <= 1) return windows;
+
+            var ordered = windows.OrderBy(w => w.ShiftStart).ToList();
+            var merged = new List<ShiftWindow> { ordered[0] };
+
+            for (var i = 1; i < ordered.Count; i++)
+            {
+                var last = merged[^1];
+                var current = ordered[i];
+                // Ca = liền kề hoặc chồng (12:00 kết thúc ca trước = 12:00 bắt đầu ca sau)
+                if (current.ShiftStart <= last.ShiftEnd)
+                {
+                    var end = current.ShiftEnd > last.ShiftEnd ? current.ShiftEnd : last.ShiftEnd;
+                    merged[^1] = new ShiftWindow(last.ShiftStart, end);
+                }
+                else
+                {
+                    merged.Add(current);
+                }
+            }
+
+            return merged;
+        }
+
         private static void MarkConsecutiveSlots(Dictionary<(int StaffId, int SlotId), byte> map, int staffId, int startSlotId, int slotsNeeded, IReadOnlyList<TimeSlot> timeSlots)
         {
             var startIndex = -1;

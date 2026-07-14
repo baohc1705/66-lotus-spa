@@ -29,7 +29,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayReturn
             if (!result.Success) return Result<VnPayReturnDto>.BadRequest(AppointmentPaymentConst.MSG_PAYMENT_TRANSACTION_FAILED, ErrorCodes.ERR_PAYMENT_TRANSACTION_FAILED);
 
             var appointment = await appointmentRepository.AsQueryable()
-                .Include(a => a.Histories)
                 .Include(a => a.Payments)
                 .FirstOrDefaultAsync(a => a.Id == result.AppointmentId, cancellationToken);
 

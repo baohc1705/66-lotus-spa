@@ -8,7 +8,6 @@ namespace _66SMS.Application.BookingService.BookingRooms.Commands.CreateBookingR
         public CreateBookingRoomValidator()
         {
             RuleFor(x => x.Name).NotNull().NotEmpty().MaximumLength(BookingRoomConst.NAME_MAX_LENGTH);
-            RuleFor(x => x.ImageUrl).MaximumLength(BookingRoomConst.IMAGE_URL_MAX_LENGTH);
             RuleFor(x => x.Note).MaximumLength(BookingRoomConst.NOTE_MAX_LENGTH);
         }
     }

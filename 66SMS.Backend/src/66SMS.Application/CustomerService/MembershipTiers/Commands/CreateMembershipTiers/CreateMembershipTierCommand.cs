@@ -6,6 +6,7 @@ namespace _66SMS.Application.CustomerService.MembershipTiers.Commands.CreateMemb
 {
     public class CreateMembershipTierCommand : IRequest<Result<int>>
     {
+        public string? Code { get; set; }
         public string Name { get; set; } = string.Empty;
         public decimal MinSpending { get; set; }
         public int? DiscountPercent { get; set; }
