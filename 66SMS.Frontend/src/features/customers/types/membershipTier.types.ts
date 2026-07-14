@@ -2,6 +2,7 @@ import type { PageRequest } from "@/shared/types/common.types";
 
 export interface MembershipTierDto {
   id: number;
+  code?: string | null;
   name: string;
   minSpending: number;
   discountPercent: number;

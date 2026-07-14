@@ -1,5 +1,5 @@
 export const BOOKING_POSITION_PERM = {
-  resource: "booking_positions",
+  resource: "positions",
   create: "create",
   update: "update",
   delete: "delete",

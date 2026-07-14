@@ -1,14 +1,17 @@
-﻿import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
-import { AdminInput } from '@/shared/components/forms/AdminInput';
+﻿import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
+import { AdminInput } from "@/shared/components/forms/AdminInput";
 import { useForm, type Resolver } from "react-hook-form";
 import {
   useCreateBookingRoom,
   useUpdateBookingRoom,
 } from "../hooks/useBookingRooms";
+import { useAdminSalons } from "@/features/salons/hooks/useSalons";
+import { useAuthStore } from "@/features/auth/stores/authStore";
 import type { BookingRoomDTO } from "../types/booking_room.types";
+import type { SalonDTO } from "@/features/salons/types/salon.types";
 import {
   createBookingRoomSchema,
-  updateBookingRoomSchema,
+  updateBookingRoomFormSchema,
   type CreateBookingRoomPayload,
   type BookingRoomFormValues,
   type UpdateBookingRoomPayload,
@@ -32,6 +35,13 @@ import { Switch } from "@/shared/components/ui/switch";
 import { ImageUpload } from "@/shared/components/ImageUpload";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/shared/components/ui/select";
+import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 
 interface BookingRoomFormDialogProps {
   open: boolean;
@@ -51,11 +61,18 @@ export function BookingRoomFormDialog({
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
+  const effectiveSalonId = useAuthStore((s) => s.getEffectiveSalonId());
+  const { data: salonsResult } = useAdminSalons(
+    { pageIndex: 1, pageSize: 100 },
+    open && !isEdit,
+  );
+  const salons = salonsResult?.data?.items ?? [];
+
   const form = useForm<BookingRoomFormValues>({
     resolver: zodResolver(
-      isEdit ? updateBookingRoomSchema : createBookingRoomSchema,
+      isEdit ? updateBookingRoomFormSchema : createBookingRoomSchema,
     ) as Resolver<BookingRoomFormValues>,
-    defaultValues: getDefaultValues(bookingRoom),
+    defaultValues: getDefaultValues(bookingRoom, effectiveSalonId),
   });
 
   const {
@@ -70,31 +87,45 @@ export function BookingRoomFormDialog({
   useEffect(() => {
     if (open) {
       setPendingFile(null);
-      reset(getDefaultValues(bookingRoom));
+      reset(getDefaultValues(bookingRoom, effectiveSalonId));
     }
-  }, [open, bookingRoom, reset]);
+  }, [open, bookingRoom, effectiveSalonId, reset]);
 
   const onSubmit = async (data: BookingRoomFormValues) => {
     setIsUploading(true);
     try {
-      let imageBase64: string | undefined;
+      let imageUrl: string | undefined;
       if (pendingFile) {
-        imageBase64 = await fileToBase64(pendingFile);
+        imageUrl = await fileToBase64(pendingFile);
       }
-      const payload = {
-        ...data,
-        imageUrl: data.imageUrl ?? '',
-        imageBase64,
-      };
 
       if (isEdit && bookingRoom?.id) {
+        const payload: UpdateBookingRoomPayload = {
+          name: data.name,
+          note: data.note || undefined,
+          status: data.status,
+          ...(imageUrl ? { imageUrl } : {}),
+        };
         updateMutation.mutate(
-          { id: bookingRoom.id, payload: payload as UpdateBookingRoomPayload },
-          { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false); } },
+          { id: bookingRoom.id, payload },
+          {
+            onSuccess: (result) => {
+              if (result.isSuccess) onOpenChange(false);
+            },
+          },
         );
       } else {
-        createMutation.mutate(payload as CreateBookingRoomPayload, {
-          onSuccess: (result) => { if (result.isSuccess) onOpenChange(false); },
+        const payload: CreateBookingRoomPayload = {
+          salonId: data.salonId!,
+          name: data.name,
+          imageUrl,
+          note: data.note || undefined,
+          status: data.status,
+        };
+        createMutation.mutate(payload, {
+          onSuccess: (result) => {
+            if (result.isSuccess) onOpenChange(false);
+          },
         });
       }
     } finally {
@@ -119,15 +150,46 @@ export function BookingRoomFormDialog({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <FormSection icon={DoorOpen} title="Thông tin phòng dịch vụ">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {!isEdit && (
+                <FormField
+                  label="Chi nhánh *"
+                  tooltip="Phòng thuộc chi nhánh nào"
+                  error={errors.salonId?.message}
+                >
+                  <Select
+                    value={watch("salonId")?.toString() ?? ""}
+                    onValueChange={(v) =>
+                      setValue("salonId", Number(v), { shouldValidate: true })
+                    }
+                  >
+                    <AdminSelectTrigger>
+                      <SelectValue
+                        placeholder={
+                          salonsResult === undefined
+                            ? "Đang tải chi nhánh..."
+                            : salons.length === 0
+                              ? "Không có chi nhánh"
+                              : "Chọn chi nhánh..."
+                        }
+                      />
+                    </AdminSelectTrigger>
+                    <SelectContent>
+                      {salons.map((s: SalonDTO) => (
+                        <SelectItem key={s.id} value={String(s.id)}>
+                          {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+              )}
+
               <FormField
                 label="Tên phòng"
                 tooltip="Vui lòng nhập vào tên phòng dịch vụ"
                 error={errors.name?.message}
               >
-                <AdminInput
-                  {...register("name")}
-                  placeholder="Phòng VIP 1"
-                />
+                <AdminInput {...register("name")} placeholder="Phòng VIP 1" />
               </FormField>
 
               <FormField
@@ -138,11 +200,13 @@ export function BookingRoomFormDialog({
                 <div className="flex items-center h-9">
                   <Switch
                     checked={watch("status") === 1}
-                    onCheckedChange={(checked) => setValue("status", checked ? 1 : 0)}
+                    onCheckedChange={(checked) =>
+                      setValue("status", checked ? 1 : 0)
+                    }
                   />
                 </div>
               </FormField>
-              
+
               <div className="sm:col-span-2">
                 <ImageUpload
                   value={watch("imageUrl")}
@@ -178,7 +242,12 @@ export function BookingRoomFormDialog({
             >
               {COMMON_MSG.cancel}
             </Button>
-            <Button type="submit" variant="admin" size="sm" loading={isPending || isUploading}>
+            <Button
+              type="submit"
+              variant="admin"
+              size="sm"
+              loading={isPending || isUploading}
+            >
               {isEdit ? "Cập nhật" : "Tạo phòng"}
             </Button>
           </DialogFooter>
@@ -190,19 +259,21 @@ export function BookingRoomFormDialog({
 
 function getDefaultValues(
   bookingRoom?: BookingRoomDTO | null,
+  effectiveSalonId?: number | null,
 ): BookingRoomFormValues {
   if (bookingRoom) {
     return {
       name: bookingRoom.name ?? "",
       imageUrl: bookingRoom.imageUrl ?? "",
       note: bookingRoom.note ?? "",
-      status: bookingRoom.status ?? 0,
+      status: bookingRoom.status ?? 1,
     };
   }
   return {
+    salonId: effectiveSalonId ?? undefined,
     name: "",
     imageUrl: "",
     note: "",
-    status: 0,
+    status: 1,
   };
 }

@@ -46,7 +46,7 @@ export function useCreateTimeSlot() {
       timeSlotApi.create(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: TIME_SLOT_KEYS.lists() });
+        qc.invalidateQueries({ queryKey: TIME_SLOT_KEYS.all });
         toast.success(TOAST_MSG.createSuccess(ENTITY));
       } else {
         toast.error(result.message || COMMON_MSG.error);

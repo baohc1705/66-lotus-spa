@@ -1,8 +1,10 @@
 import { z } from "zod";
 import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
-const bookingPositionBaseSchema = z.object({
-  roomId: z.coerce.number().min(1, VALIDATION_MSG.selectRequired("phòng dịch vụ")),
+const bookingPositionFieldsSchema = z.object({
+  roomId: z.coerce
+    .number()
+    .min(1, VALIDATION_MSG.selectRequired("phòng dịch vụ")),
   name: z
     .string()
     .nonempty(VALIDATION_MSG.required("Tên vị trí"))
@@ -16,9 +18,13 @@ const bookingPositionBaseSchema = z.object({
   status: z.coerce.number().optional(),
 });
 
-export const createBookingPositionSchema = bookingPositionBaseSchema;
+export const createBookingPositionSchema = bookingPositionFieldsSchema;
 
-export const updateBookingPositionSchema = bookingPositionBaseSchema;
+/** Schema validate form edit. */
+export const updateBookingPositionFormSchema = bookingPositionFieldsSchema;
+
+/** Payload PATCH — mọi field optional. */
+export const updateBookingPositionSchema = bookingPositionFieldsSchema.partial();
 
 export const deleteBookingPositionSchema = z.object({
   id: z.number().min(1, "ID phải là số dương"),
@@ -34,4 +40,10 @@ export type DeleteBookingPositionPayload = z.infer<
   typeof deleteBookingPositionSchema
 >;
 
-export type BookingPositionFormValues = UpdateBookingPositionPayload;
+export type BookingPositionFormValues = {
+  roomId: number;
+  name: string;
+  sortOrder?: number;
+  note?: string;
+  status?: number;
+};

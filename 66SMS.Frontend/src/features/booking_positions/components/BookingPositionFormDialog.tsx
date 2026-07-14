@@ -6,10 +6,12 @@ import {
   useUpdateBookingPosition,
 } from "../hooks/useBookingPositions";
 import { useBookingRooms } from "@/features/booking_rooms/hooks/useBookingRooms";
+import { useAuthStore } from "@/features/auth/stores/authStore";
 import type { BookingPositionDTO } from "../types/booking_position.types";
+import type { BookingRoomDTO } from "@/features/booking_rooms/types/booking_room.types";
 import {
   createBookingPositionSchema,
-  updateBookingPositionSchema,
+  updateBookingPositionFormSchema,
   type CreateBookingPositionPayload,
   type BookingPositionFormValues,
   type UpdateBookingPositionPayload,
@@ -37,30 +39,33 @@ interface BookingPositionFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   bookingPosition?: BookingPositionDTO | null;
+  defaultRoomId?: number | null;
 }
 
 export function BookingPositionFormDialog({
   open,
   onOpenChange,
   bookingPosition,
+  defaultRoomId = null,
 }: BookingPositionFormDialogProps) {
   const isEdit = !!bookingPosition;
   const createMutation = useCreateBookingPosition();
   const updateMutation = useUpdateBookingPosition();
   const isPending = createMutation.isPending || updateMutation.isPending;
 
-  // Fetch rooms for the dropdown
+  const salonId = useAuthStore((s) => s.getEffectiveSalonId());
   const { data: roomData } = useBookingRooms({
     pageIndex: 1,
     pageSize: 1000,
+    salonId: salonId ?? undefined,
   });
   const rooms = roomData?.data?.items || [];
 
   const form = useForm<BookingPositionFormValues>({
     resolver: zodResolver(
-      isEdit ? updateBookingPositionSchema : createBookingPositionSchema,
+      isEdit ? updateBookingPositionFormSchema : createBookingPositionSchema,
     ) as Resolver<BookingPositionFormValues>,
-    defaultValues: getDefaultValues(bookingPosition),
+    defaultValues: getDefaultValues(bookingPosition, defaultRoomId),
   });
 
   const {
@@ -91,11 +96,11 @@ export function BookingPositionFormDialog({
 
   useEffect(() => {
     if (open) {
-      reset(getDefaultValues(bookingPosition));
+      reset(getDefaultValues(bookingPosition, defaultRoomId));
       setSearchQuery("");
       setDropdownOpen(false);
     }
-  }, [open, bookingPosition, reset]);
+  }, [open, bookingPosition, defaultRoomId, reset]);
 
   const onSubmit = (data: BookingPositionFormValues) => {
     if (isEdit && bookingPosition?.id) {
@@ -119,11 +124,13 @@ export function BookingPositionFormDialog({
     }
   };
 
-  const filteredRooms = rooms.filter((r) =>
-    r.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredRooms = rooms.filter((r: BookingRoomDTO) =>
+    r.name?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
-  
-  const selectedRoom = rooms.find((r) => r.id === selectedRoomId);
+
+  const selectedRoom = rooms.find(
+    (r: BookingRoomDTO) => r.id === selectedRoomId,
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -176,7 +183,7 @@ export function BookingPositionFormDialog({
                         {filteredRooms.length === 0 ? (
                           <div className="px-3 py-2 text-sm text-adminGray-600 text-center">Không tìm thấy phòng</div>
                         ) : (
-                          filteredRooms.map((room) => (
+                          filteredRooms.map((room: BookingRoomDTO) => (
                             <div
                               key={room.id}
                               className={cn(
@@ -274,6 +281,7 @@ export function BookingPositionFormDialog({
 
 function getDefaultValues(
   bookingPosition?: BookingPositionDTO | null,
+  defaultRoomId?: number | null,
 ): BookingPositionFormValues {
   if (bookingPosition) {
     return {
@@ -281,14 +289,14 @@ function getDefaultValues(
       name: bookingPosition.name ?? "",
       sortOrder: bookingPosition.sortOrder ?? 0,
       note: bookingPosition.note ?? "",
-      status: bookingPosition.status ?? 0,
+      status: bookingPosition.status ?? 1,
     };
   }
   return {
-    roomId: 0,
+    roomId: defaultRoomId ?? 0,
     name: "",
     sortOrder: 0,
     note: "",
-    status: 0,
+    status: 1,
   };
 }

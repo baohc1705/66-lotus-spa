@@ -1,8 +1,8 @@
-import type { AxiosError } from 'axios';
-import { createEntityQueryKeys } from '@/shared/utils/queryKeys';
-import { getErrorMessage } from '@/shared/utils/errorUtils';
+import type { AxiosError } from "axios";
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { bookingRoomApi } from "@/features/booking_rooms/api/bookingRoom.api";
-import type { PageRequest, Result } from "@/shared/types/common.types";
+import type { Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";
@@ -10,20 +10,25 @@ import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type {
   CreateBookingRoomPayload,
   UpdateBookingRoomPayload,
+  BookingRoomListParams,
 } from "../types/booking_room.types";
 
 const ENTITY = "phòng dịch vụ";
 
-export const BOOKING_ROOM_KEYS = createEntityQueryKeys<PageRequest>("booking-rooms");
+export const BOOKING_ROOM_KEYS =
+  createEntityQueryKeys<BookingRoomListParams>("booking-rooms");
 
-export function useBookingRooms(params: PageRequest) {
+export function useBookingRooms(params: BookingRoomListParams) {
   return useQuery({
     queryKey: BOOKING_ROOM_KEYS.list(params),
     queryFn: () => bookingRoomApi.getAll(params),
   });
 }
 
-export function useAdminBookingRooms(params: PageRequest, enabled = true) {
+export function useAdminBookingRooms(
+  params: BookingRoomListParams,
+  enabled = true,
+) {
   return useQuery({
     queryKey: BOOKING_ROOM_KEYS.adminList(params),
     queryFn: () => bookingRoomApi.getAll(params),
@@ -46,7 +51,7 @@ export function useCreateBookingRoom() {
       bookingRoomApi.create(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: BOOKING_ROOM_KEYS.lists() });
+        qc.invalidateQueries({ queryKey: BOOKING_ROOM_KEYS.all });
         toast.success(TOAST_MSG.createSuccess(ENTITY));
       } else {
         toast.error(result.message || COMMON_MSG.error);
@@ -77,7 +82,9 @@ export function useUpdateBookingRoom() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+      );
     },
   });
 }
@@ -89,6 +96,7 @@ export function useDeleteBookingRoom() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: BOOKING_ROOM_KEYS.all });
+        qc.invalidateQueries({ queryKey: ["booking-positions"] });
         toast.success(TOAST_MSG.deleteSuccess(ENTITY));
       } else {
         toast.error(result.message || COMMON_MSG.error);

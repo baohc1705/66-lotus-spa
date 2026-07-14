@@ -80,11 +80,11 @@ export function BookingPositionListPage() {
 
   const totalPositionsCount = allPositions.length;
   const activePositionsCount = useMemo(
-    () => allPositions.filter((p) => p.status === 1).length,
+    () => allPositions.filter((p: { status?: number }) => p.status === 1).length,
     [allPositions],
   );
   const maintenancePositionsCount = useMemo(
-    () => allPositions.filter((p) => p.status === 0).length,
+    () => allPositions.filter((p: { status?: number }) => p.status === 0).length,
     [allPositions],
   );
 
@@ -185,6 +185,7 @@ export function BookingPositionListPage() {
         open={createOpen}
         onOpenChange={setCreateOpen}
         bookingPosition={null}
+        defaultRoomId={selectedRoomId}
       />
 
       {editTarget && (

@@ -112,22 +112,31 @@ export function MembershipTierFormDialog({
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <div className="sm:col-span-2">
-              <FormField
-                label="Tên loại thẻ *"
-                tooltip="Ví dụ: Vàng, Bạc, Kim cương..."
-                error={errors.name?.message}
-              >
-                <AdminInput
-                  {...register("name")}
-                  placeholder="Vàng"
-                />
-              </FormField>
-            </div>
+            <FormField
+              label="Mã hạng"
+              tooltip="Để trống sẽ tự tạo từ tên (vd: common, gold)"
+              error={errors.code?.message}
+            >
+              <AdminInput
+                {...register("code")}
+                placeholder="gold"
+              />
+            </FormField>
+
+            <FormField
+              label="Tên loại thẻ *"
+              tooltip="Ví dụ: Vàng, Bạc, Kim cương..."
+              error={errors.name?.message}
+            >
+              <AdminInput
+                {...register("name")}
+                placeholder="Vàng"
+              />
+            </FormField>
 
             <FormField
               label="Chi tiêu tối thiểu *"
-              tooltip="Mức chi tiêu tối thiểu để đạt loại thẻ này"
+              tooltip="Mức chi tiêu tối thiểu (VND) để đạt loại thẻ này"
               error={errors.minSpending?.message}
             >
               <AdminInput
@@ -224,6 +233,7 @@ function getDefaultValues(
 ): MembershipTierFormValues {
   if (tier) {
     return {
+      code: tier.code ?? "",
       name: tier.name,
       minSpending: tier.minSpending,
       discountPercent: tier.discountPercent,
@@ -233,6 +243,7 @@ function getDefaultValues(
     };
   }
   return {
+    code: "",
     name: "",
     minSpending: 0,
     discountPercent: 0,

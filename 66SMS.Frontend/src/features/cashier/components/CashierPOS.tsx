@@ -210,6 +210,8 @@ export function CashierPOS({
   const { data: staffsResult } = useStaffs({
     pageIndex: 1,
     pageSize: 100,
+    salonId: effectiveSalonId ?? undefined,
+    role: "staff",
   });
   const staffs = useMemo(() => staffsResult?.data?.items ?? [], [staffsResult?.data?.items]);
 

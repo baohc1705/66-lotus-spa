@@ -2,6 +2,11 @@ import { z } from "zod";
 import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
 export const createMembershipTierSchema = z.object({
+  code: z
+    .string()
+    .max(100, VALIDATION_MSG.max(100))
+    .optional()
+    .or(z.literal("")),
   name: z
     .string()
     .min(1, VALIDATION_MSG.required("Tên loại thẻ"))

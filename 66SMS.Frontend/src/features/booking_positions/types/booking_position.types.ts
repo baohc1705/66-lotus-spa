@@ -3,6 +3,7 @@ import type {
   UpdateBookingPositionPayload as UpdatePayload,
   BookingPositionFormValues as FormValues,
 } from "../schemas/bookingPosition.schema";
+import type { PageRequest } from "@/shared/types/common.types";
 
 export type CreateBookingPositionPayload = CreatePayload;
 export type UpdateBookingPositionPayload = UpdatePayload;
@@ -16,8 +17,11 @@ export interface BookingPositionDTO {
   note?: string;
   status?: number;
   createdAt?: string;
-  createdBy?: number;
   updatedAt?: string;
-  updatedBy?: number;
   roomName?: string;
 }
+
+export type BookingPositionListParams = PageRequest & {
+  keyword?: string;
+  roomId?: number;
+};

@@ -106,9 +106,6 @@ export function useActiveBookingRoomColumns({
                     updateMutation.mutate({
                       id: item.id,
                       payload: {
-                        name: item.name ?? "",
-                        imageUrl: item.imageUrl ?? "",
-                        note: item.note ?? "",
                         status: checked ? 1 : 0,
                       },
                     });

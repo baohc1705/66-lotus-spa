@@ -1,8 +1,8 @@
-import type { AxiosError } from 'axios';
-import { createEntityQueryKeys } from '@/shared/utils/queryKeys';
-import { getErrorMessage } from '@/shared/utils/errorUtils';
+import type { AxiosError } from "axios";
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { bookingPositionApi } from "@/features/booking_positions/api/bookingPosition.api";
-import type { PageRequest, Result } from "@/shared/types/common.types";
+import type { Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";
@@ -10,20 +10,25 @@ import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type {
   CreateBookingPositionPayload,
   UpdateBookingPositionPayload,
+  BookingPositionListParams,
 } from "../types/booking_position.types";
 
 const ENTITY = "vị trí dịch vụ";
 
-export const BOOKING_POSITION_KEYS = createEntityQueryKeys<PageRequest & { roomId?: number }>("booking-positions");
+export const BOOKING_POSITION_KEYS =
+  createEntityQueryKeys<BookingPositionListParams>("booking-positions");
 
-export function useBookingPositions(params: PageRequest & { roomId?: number }) {
+export function useBookingPositions(params: BookingPositionListParams) {
   return useQuery({
     queryKey: BOOKING_POSITION_KEYS.list(params),
     queryFn: () => bookingPositionApi.getAll(params),
   });
 }
 
-export function useAdminBookingPositions(params: PageRequest & { roomId?: number }, enabled = true) {
+export function useAdminBookingPositions(
+  params: BookingPositionListParams,
+  enabled = true,
+) {
   return useQuery({
     queryKey: BOOKING_POSITION_KEYS.adminList(params),
     queryFn: () => bookingPositionApi.getAll(params),
@@ -46,7 +51,9 @@ export function useCreateBookingPosition() {
       bookingPositionApi.create(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: BOOKING_POSITION_KEYS.lists() });
+        // Phải dùng `.all` — list page dùng adminList, không khớp với lists().
+        qc.invalidateQueries({ queryKey: BOOKING_POSITION_KEYS.all });
+        qc.invalidateQueries({ queryKey: ["booking-rooms"] });
         toast.success(TOAST_MSG.createSuccess(ENTITY));
       } else {
         toast.error(result.message || COMMON_MSG.error);
@@ -71,13 +78,16 @@ export function useUpdateBookingPosition() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: BOOKING_POSITION_KEYS.all });
+        qc.invalidateQueries({ queryKey: ["booking-rooms"] });
         toast.success(TOAST_MSG.updateSuccess(ENTITY));
       } else {
         toast.error(result.message || COMMON_MSG.error);
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+      );
     },
   });
 }
@@ -89,6 +99,7 @@ export function useDeleteBookingPosition() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: BOOKING_POSITION_KEYS.all });
+        qc.invalidateQueries({ queryKey: ["booking-rooms"] });
         toast.success(TOAST_MSG.deleteSuccess(ENTITY));
       } else {
         toast.error(result.message || COMMON_MSG.error);

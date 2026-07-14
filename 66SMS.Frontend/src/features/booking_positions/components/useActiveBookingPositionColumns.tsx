@@ -121,10 +121,6 @@ export function useActiveBookingPositionColumns({
                     updateMutation.mutate({
                       id: item.id,
                       payload: {
-                        roomId: item.roomId ?? 0,
-                        name: item.name ?? "",
-                        sortOrder: item.sortOrder ?? 0,
-                        note: item.note ?? "",
                         status: checked ? 1 : 0,
                       },
                     });
