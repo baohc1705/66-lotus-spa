@@ -1,3 +1,5 @@
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -7,7 +9,6 @@ using _66SMS.Domain.Entities;
 using _66SMS.Domain.Enums;
 using MediatR;
 using System.Data;
-using _66SMS.Contract.Abstractions;
 
 namespace _66SMS.Application.CatalogService.Services.Commands.DeleteServices
 {
@@ -19,12 +20,18 @@ namespace _66SMS.Application.CatalogService.Services.Commands.DeleteServices
         private readonly IServiceSqlRepository serviceSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IImageUploadService imageUploadService;
+        private readonly ICacheService cacheService;
 
-        public DeleteServiceHandler(IServiceSqlRepository serviceSqlRepository, ISqlUnitOfWork sqlUnitOfWork, IImageUploadService imageUploadService)
+        public DeleteServiceHandler(
+            IServiceSqlRepository serviceSqlRepository,
+            ISqlUnitOfWork sqlUnitOfWork,
+            IImageUploadService imageUploadService,
+            ICacheService cacheService)
         {
             this.serviceSqlRepository = serviceSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.imageUploadService = imageUploadService;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<object>> Handle(DeleteServiceCommand request, CancellationToken cancellationToken)
@@ -50,6 +57,9 @@ namespace _66SMS.Application.CatalogService.Services.Commands.DeleteServices
 
                 // commit transaction
                 transaction.Commit();
+
+                await cacheService.RemoveAsync(ServiceConst.CacheKeyDetail(service.Id), cancellationToken);
+                await cacheService.RemoveByPrefixAsync(ServiceConst.CACHE_PREFIX, cancellationToken);
 
                 // Return success result
                 return Result<object>.Ok();

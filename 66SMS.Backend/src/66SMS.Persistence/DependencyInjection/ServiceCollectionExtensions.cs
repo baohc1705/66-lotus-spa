@@ -1,9 +1,12 @@
 using _66SMS.Application.Abstractions;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Constants;
+using _66SMS.Contracts.Settings;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Persistence.Repositories.Sql;
 using _66SMS.Persistence.Repositories.Sql.Base;
+using _66SMS.Persistence.StoredProcedures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,15 +17,18 @@ namespace _66SMS.Persistence.DependencyInjection
     {
         public static IServiceCollection AddPersistence(this IServiceCollection services,IConfiguration configuration)
         {
-            var connectionString = configuration.GetConnectionString(DatabaseConst.CONN_SQL_SERVER);
+            var connectionString = configuration.GetConnectionString(DatabaseConst.CONN_SQL_SERVER)
+                ?? configuration.GetConnectionString("SqlServerConn");
             services.AddDbContext<ApplicationDbContext>(options =>
             {
                options.UseSqlServer(connectionString)
-               //.EnableSensitiveDataLogging()
-               //.EnableDetailedErrors()
-               //.LogTo(Console.WriteLine)
                ;
             });
+
+            services.AddOptions<StoredProcedureSettings>()
+                .Bind(configuration.GetSection(StoredProcedureSettings.SectionName));
+            services.AddScoped<IStoredProcedureExecutor, SqlStoredProcedureExecutor>();
+
             services.RegisterRepositories();
             return services;
         }

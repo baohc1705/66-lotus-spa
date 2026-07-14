@@ -1,3 +1,5 @@
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -6,7 +8,6 @@ using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
 using System.Data;
-using _66SMS.Contract.Abstractions;
 
 namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateServiceCategories
 {
@@ -19,13 +20,20 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateSer
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
         private readonly IImageUploadService imageUploadService;
+        private readonly ICacheService cacheService;
 
-        public CreateServiceCategoriesHandler(IServiceCategorySqlRepository serviceCategorySqlRepository, ISqlUnitOfWork sqlUnitOfWork, IMapper mapper, IImageUploadService imageUploadService)
+        public CreateServiceCategoriesHandler(
+            IServiceCategorySqlRepository serviceCategorySqlRepository,
+            ISqlUnitOfWork sqlUnitOfWork,
+            IMapper mapper,
+            IImageUploadService imageUploadService,
+            ICacheService cacheService)
         {
             this.serviceCategorySqlRepository = serviceCategorySqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
             this.imageUploadService = imageUploadService;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<object>> Handle(CreateServiceCategoriesCommand request, CancellationToken cancellationToken)
@@ -57,6 +65,9 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateSer
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 // Commit transaction
                 transaction.Commit();
+
+                await cacheService.RemoveByPrefixAsync(ServiceCategoryConst.CACHE_PREFIX, cancellationToken);
+                await cacheService.RemoveByPrefixAsync(ServiceConst.CACHE_PREFIX, cancellationToken);
 
                 // return to created result
                 return Result<object>.Created(service.Id);

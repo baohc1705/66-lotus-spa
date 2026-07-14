@@ -1,27 +1,36 @@
+using _66SMS.Application.DTOs;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.Services.Queries.GetDetailService
 {
-    /// <summary>
-    /// Handler for <see cref="GetDetailServicesQuery"/>
-    /// </summary>
     public class GetDetailServicesHandler : IRequestHandler<GetDetailServicesQuery, Result<ServiceDetailDto>>
     {
         private readonly IServiceSqlRepository serviceSqlRepository;
+        private readonly ICacheService cacheService;
 
-        public GetDetailServicesHandler(IServiceSqlRepository serviceSqlRepository)
+        public GetDetailServicesHandler(
+            IServiceSqlRepository serviceSqlRepository,
+            ICacheService cacheService)
         {
             this.serviceSqlRepository = serviceSqlRepository;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<ServiceDetailDto>> Handle(GetDetailServicesQuery request, CancellationToken cancellationToken)
         {
+            var cacheKey = ServiceConst.CacheKeyDetail(request.Id);
+            var cached = await cacheService.GetAsync<ServiceDetailDto>(cacheKey, cancellationToken);
+            if (cached is not null)
+            {
+                return Result<ServiceDetailDto>.Success(cached);
+            }
+
             var entity = await serviceSqlRepository
                 .AsQueryable(true)
                 .Where(x => x.Id == request.Id)
@@ -60,6 +69,8 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetDetailService
             {
                 return Result<ServiceDetailDto>.NotFound(ServiceConst.MSG_SERVICE_NOT_FOUND, ErrorCodes.ERR_SERVICE_NOT_FOUND);
             }
+
+            await cacheService.SetAsync(cacheKey, entity, ServiceConst.CACHE_TTL_DETAIL, cancellationToken);
             return Result<ServiceDetailDto>.Success(entity);
         }
     }

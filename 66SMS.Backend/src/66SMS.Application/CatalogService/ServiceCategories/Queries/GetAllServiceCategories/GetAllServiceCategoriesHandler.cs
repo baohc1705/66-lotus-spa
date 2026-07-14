@@ -1,32 +1,49 @@
+using _66SMS.Application.DTOs;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Extensions;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Enums;
-using AutoMapper;
 using MediatR;
-using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetAllServiceCategories
 {
-    /// <summary>
-    /// Handler for <see cref="GetAllServiceCategoriesQuery"/>
-    /// </summary>
     public class GetAllServiceCategoriesHandler : IRequestHandler<GetAllServiceCategoriesQuery, Result<PagedResult<ServiceCategoryDto>>>
     {
         private readonly IServiceCategorySqlRepository serviceCategorySqlRepository;
-        private readonly IMapper mapper;
+        private readonly ICacheService cacheService;
 
-        public GetAllServiceCategoriesHandler(IServiceCategorySqlRepository serviceCategorySqlRepository, IMapper mapper)
+        public GetAllServiceCategoriesHandler(
+            IServiceCategorySqlRepository serviceCategorySqlRepository,
+            ICacheService cacheService)
         {
             this.serviceCategorySqlRepository = serviceCategorySqlRepository;
-            this.mapper = mapper;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<PagedResult<ServiceCategoryDto>>> Handle(GetAllServiceCategoriesQuery request, CancellationToken cancellationToken)
         {
-            // As queryable
+            var filterHash = CacheKeyHash.FromObject(new
+            {
+                request.Keyword,
+                request.Status,
+                request.IsDeleted,
+                request.PageIndex,
+                request.PageSize,
+                request.OrderBy,
+                request.IsDescending,
+            });
+            var cacheKey = ServiceCategoryConst.CacheKeyList(filterHash);
+            var cached = await cacheService.GetAsync<PagedResult<ServiceCategoryDto>>(cacheKey, cancellationToken);
+            if (cached is not null)
+            {
+                return Result<PagedResult<ServiceCategoryDto>>.Success(cached);
+            }
+
             var query = serviceCategorySqlRepository.AsQueryable(true);
-            
+
             if (!string.IsNullOrEmpty(request.Keyword))
             {
                 query = query.Where(x => x.Name.StartsWith(request.Keyword));
@@ -45,7 +62,7 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetAllServ
             {
                 query = query.Where(x => x.Status == request.Status);
             }
-            
+
             query = request.OrderBy?.Trim().ToLower() switch
             {
                 "name" => request.IsDescending ? query.OrderByDescending(x => x.Name) : query.OrderBy(x => x.Name),
@@ -66,6 +83,7 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetAllServ
                 })
                 .ToPagedAsync(request, cancellationToken);
 
+            await cacheService.SetAsync(cacheKey, result, ServiceCategoryConst.CACHE_TTL, cancellationToken);
             return Result<PagedResult<ServiceCategoryDto>>.Success(result);
         }
     }

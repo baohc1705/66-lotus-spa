@@ -1,3 +1,4 @@
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
@@ -18,19 +19,22 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.CreateStaffSalon
         private readonly ISalonSqlRepository salonSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
+        private readonly ICacheService cacheService;
 
         public CreateStaffSalonHandler(
             IStaffSalonSqlRepository staffSalonSqlRepository,
             IStaffSqlRepository staffSqlRepository,
             ISalonSqlRepository salonSqlRepository,
             ISqlUnitOfWork sqlUnitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            ICacheService cacheService)
         {
             this.staffSalonSqlRepository = staffSalonSqlRepository;
             this.staffSqlRepository = staffSqlRepository;
             this.salonSqlRepository = salonSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<object>> Handle(CreateStaffSalonCommand request, CancellationToken cancellationToken)
@@ -54,6 +58,7 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.CreateStaffSalon
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 transaction.Commit();
+                await cacheService.RemoveAsync(StaffConst.CacheKeyBySalon((int)request.SalonId!), cancellationToken);
                 return Result<object>.Created(staffSalon.Id);
             }
             catch

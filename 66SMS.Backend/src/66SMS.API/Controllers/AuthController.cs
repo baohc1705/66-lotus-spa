@@ -1,4 +1,5 @@
 using _66SMS.API.Abstractions;
+using _66SMS.API.Filters;
 using _66SMS.Application.IdentityService.Auth.Commands.ChangePassword;
 using _66SMS.Application.IdentityService.Auth.Commands.ForgotPassword;
 using _66SMS.Application.IdentityService.Auth.Commands.Login;
@@ -39,6 +40,7 @@ namespace _66SMS.API.Controllers
 
         [HttpPost("register")]
         [AllowAnonymous]
+        [RedisRateLimit("register")]
         public async Task<IActionResult> Register([FromBody] RegisterCommand command)
         {
             var result = await mediator.Send(command);
@@ -47,6 +49,7 @@ namespace _66SMS.API.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
+        [RedisRateLimit("login")]
         public async Task<IActionResult> Login(LoginCommand command)
         {
             command.IpAddress = GetIpAddress();
@@ -91,6 +94,7 @@ namespace _66SMS.API.Controllers
 
         [HttpPost("forgot-password")]
         [AllowAnonymous]
+        [RedisRateLimit("forgot")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordCommand command)
         {
             var result = await mediator.Send(command);
@@ -107,6 +111,7 @@ namespace _66SMS.API.Controllers
 
         [HttpPost("send-otp")]
         [AllowAnonymous]
+        [RedisRateLimit("otp")]
         public async Task<IActionResult> SendOtp([FromBody] SendEmailOtpCommand command)
         {
             var result = await mediator.Send(command);

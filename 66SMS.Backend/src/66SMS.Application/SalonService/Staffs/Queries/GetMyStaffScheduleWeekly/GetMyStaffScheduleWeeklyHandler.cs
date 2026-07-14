@@ -23,36 +23,69 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleWeekl
 
         public async Task<Result<StaffScheduleWeeklyDto>> Handle(GetMyStaffScheduleWeeklyQuery request, CancellationToken cancellationToken)
         {
-            var staff = await staffSqlRepository.AsQueryable()
-                .FirstOrDefaultAsync(s => s.UserId == request.UserId, cancellationToken);
-            
+            var staff = await staffSqlRepository.AsQueryable(true)
+                .Where(s => s.UserId == request.UserId)
+                .Select(s => new { s.Id })
+                .FirstOrDefaultAsync(cancellationToken);
+
             if (staff == null)
                 return Result<StaffScheduleWeeklyDto>.NotFound(StaffConst.MSG_STAFF_NOT_FOUND, ErrorCodes.ERR_STAFF_NOT_FOUND);
 
             var weekEnd = request.WeekStart.AddDays(6);
 
-            var appointments = await appointmentSqlRepository.AsQueryable()
-                .Include(a => a.CreatedByUser).ThenInclude(u => u!.Customer)
-                .Include(a => a.TimeSlot)
-                .Include(a => a.Services!).ThenInclude(s => s.Service)
-                .Where(a => a.StaffId == staff.Id && a.AppointmentDate >= request.WeekStart && a.AppointmentDate <= weekEnd)
+            var rows = await appointmentSqlRepository.AsQueryable(true)
+                .Where(a => a.StaffId == staff.Id
+                    && a.AppointmentDate >= request.WeekStart
+                    && a.AppointmentDate <= weekEnd)
+                .OrderBy(a => a.AppointmentDate)
+                .ThenBy(a => a.TimeSlot!.StartTime)
+                .Select(a => new
+                {
+                    a.Id,
+                    a.AppointmentDate,
+                    CustomerName = a.CreatedByUser!.Customer != null
+                        ? a.CreatedByUser.Customer.FullName
+                        : null,
+                    CustomerPhone = a.CreatedByUser!.Customer != null
+                        ? a.CreatedByUser.Customer.Phone
+                        : null,
+                    ServiceNames = a.Services!
+                        .Where(s => s.Service != null && s.Service.Name != null)
+                        .Select(s => s.Service!.Name!)
+                        .ToList(),
+                    DurationMins = a.Services!
+                        .Sum(s => s.Service != null ? s.Service.DurationMins : 0),
+                    StartTime = a.TimeSlot != null ? (TimeOnly?)a.TimeSlot.StartTime : null,
+                    a.Status,
+                    a.PaidAmount,
+                    a.TotalAmount,
+                    a.Note,
+                })
                 .ToListAsync(cancellationToken);
 
             var days = new List<StaffScheduleDayDto>();
-            
             for (int i = 0; i < 7; i++)
             {
                 var currentDate = request.WeekStart.AddDays(i);
-                var dailyBookings = appointments
+                var dailyBookings = rows
                     .Where(a => a.AppointmentDate == currentDate)
-                    .OrderBy(a => a.TimeSlot?.StartTime)
-                    .Select(MapBooking)
+                    .Select(r => StaffScheduleMapping.ToBookingDto(
+                        r.Id,
+                        r.CustomerName,
+                        r.CustomerPhone,
+                        r.ServiceNames,
+                        r.DurationMins,
+                        r.StartTime,
+                        r.Status,
+                        r.PaidAmount,
+                        r.TotalAmount,
+                        r.Note))
                     .ToList();
-                    
+
                 days.Add(new StaffScheduleDayDto
                 {
                     Date = currentDate.ToString("yyyy-MM-dd"),
-                    Bookings = dailyBookings
+                    Bookings = dailyBookings,
                 });
             }
 
@@ -60,45 +93,8 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleWeekl
             {
                 WeekStart = request.WeekStart.ToString("yyyy-MM-dd"),
                 WeekEnd = weekEnd.ToString("yyyy-MM-dd"),
-                Days = days
+                Days = days,
             });
-        }
-
-        private StaffScheduleBookingDto MapBooking(Domain.Entities.Appointment a)
-        {
-            string statusStr = a.Status switch
-            {
-                AppointmentConst.STATUS_PENDING => "pending",
-                AppointmentConst.STATUS_CONFIRMED => "confirmed",
-                AppointmentConst.STATUS_WAITING => "waiting",
-                AppointmentConst.STATUS_IN_SERVICE => "in-progress",
-                AppointmentConst.STATUS_COMPLETED => a.PaidAmount >= a.TotalAmount ? "paid" : "unpaid",
-                AppointmentConst.STATUS_CANCELLED => "cancelled",
-                AppointmentConst.STATUS_NO_SHOW => "not-arrived",
-                _ => "pending"
-            };
-
-            var serviceNames = a.Services?.Select(s => s.Service?.Name ?? "").Where(n => n != "").ToList() ?? new List<string>();
-            var serviceName = string.Join(", ", serviceNames);
-            if (string.IsNullOrEmpty(serviceName)) serviceName = "Dịch vụ";
-
-            var durationMins = a.Services?.Sum(s => s.Service?.DurationMins ?? 0) ?? 0;
-            if (durationMins == 0) durationMins = 15;
-            var startTs = a.TimeSlot?.StartTime ?? new TimeOnly(0, 0);
-            var endTs = startTs.AddMinutes(durationMins);
-
-            return new StaffScheduleBookingDto
-            {
-                Id = a.Id.ToString(),
-                CustomerName = a.CreatedByUser?.Customer?.FullName ?? "Khách hàng",
-                CustomerPhone = a.CreatedByUser?.Customer?.Phone ?? "",
-                ServiceName = serviceName,
-                StartTime = startTs.ToString(@"HH\:mm"),
-                EndTime = endTs.ToString(@"HH\:mm"),
-                Status = statusStr,
-                TotalAmount = a.TotalAmount,
-                Note = a.Note
-            };
         }
     }
 }

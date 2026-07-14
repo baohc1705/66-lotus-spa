@@ -23,6 +23,7 @@ namespace _66SMS.Domain.Entities
         public string? FullAddress { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
 
         public User? User { get; set; }
         public List<StaffSalon>? StaffSalons { get; set; }

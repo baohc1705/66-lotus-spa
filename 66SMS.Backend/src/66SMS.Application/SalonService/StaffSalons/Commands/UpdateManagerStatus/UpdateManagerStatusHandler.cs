@@ -1,3 +1,4 @@
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
@@ -16,17 +17,20 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateManagerStat
         private readonly IStaffSqlRepository staffSqlRepository;
         private readonly ISalonSqlRepository salonSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
+        private readonly ICacheService cacheService;
 
         public UpdateManagerStatusHandler(
             IStaffSalonSqlRepository staffSalonSqlRepository,
             IStaffSqlRepository staffSqlRepository,
             ISalonSqlRepository salonSqlRepository,
-            ISqlUnitOfWork sqlUnitOfWork)
+            ISqlUnitOfWork sqlUnitOfWork,
+            ICacheService cacheService)
         {
             this.staffSalonSqlRepository = staffSalonSqlRepository;
             this.staffSqlRepository = staffSqlRepository;
             this.salonSqlRepository = salonSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<object>> Handle(UpdateManagerStatusCommand request, CancellationToken cancellationToken)
@@ -41,7 +45,6 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateManagerStat
                 if (salon == null)
                     return Result<object>.NotFound(StaffSalonConst.MSG_STAFF_SALON_SALON_NOT_FOUND, ErrorCodes.ERR_SALON_NOT_FOUND);
 
-                // Deactivate any existing manager for this salon
                 var existingManagers = await staffSalonSqlRepository.AsQueryable(asNoTracking: false)
                     .Where(x => x.SalonId == request.SalonId && x.IsManager == true && x.Status == StaffSalonConst.STATUS_ACTIVE)
                     .ToListAsync(cancellationToken);
@@ -54,7 +57,6 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateManagerStat
                     staffSalonSqlRepository.Update(em);
                 }
 
-                // Upsert: check if this staff already has a record for this salon
                 var existing = await staffSalonSqlRepository.AsQueryable(asNoTracking: false)
                     .Where(x => x.StaffId == request.StaffId && x.SalonId == request.SalonId)
                     .FirstOrDefaultAsync(cancellationToken);
@@ -83,6 +85,7 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateManagerStat
                 }
 
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                await cacheService.RemoveAsync(StaffConst.CacheKeyBySalon(request.SalonId), cancellationToken);
                 return Result<object>.Success("Manager assigned successfully.");
             }
             else
@@ -100,6 +103,7 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateManagerStat
                 staffSalonSqlRepository.Update(staffSalon);
 
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                await cacheService.RemoveAsync(StaffConst.CacheKeyBySalon(request.SalonId), cancellationToken);
                 return Result<object>.Success("Manager removed successfully.");
             }
         }

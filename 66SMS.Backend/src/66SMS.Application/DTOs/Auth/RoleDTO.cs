@@ -3,6 +3,7 @@ namespace _66SMS.Application.DTOs.Auth
     public class RoleDTO
     {
         public int Id { get; set; }
+        public string? Code { get; set; }
         public string Name { get; set; } = null!;
         public string Desctiption { get; set; } = null!;
         public string Status { get; set; } = null!;

@@ -1,10 +1,12 @@
 using _66SMS.Contract.Abstractions;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
+using _66SMS.Domain.Enums;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -15,152 +17,215 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
     public class UpdateStaffHandler : IRequestHandler<UpdateStaffCommand, Result<object>>
     {
         private readonly IStaffSqlRepository staffSqlRepository;
-        private readonly IUserSqlRepository userSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
         private readonly IRoleSqlRepository roleSqlRepository;
         private readonly IUserRoleSqlRepository userRoleSqlRepository;
-        private readonly IStaffSalonSqlRepository staffSalonSqlRepository;
         private readonly IImageUploadService imageUploadService;
+        private readonly ICacheService cacheService;
 
         public UpdateStaffHandler(
             IStaffSqlRepository staffSqlRepository,
-            IUserSqlRepository userSqlRepository,
             ISqlUnitOfWork sqlUnitOfWork,
             IMapper mapper,
             IRoleSqlRepository roleSqlRepository,
             IUserRoleSqlRepository userRoleSqlRepository,
-            IStaffSalonSqlRepository staffSalonSqlRepository,
-            IImageUploadService imageUploadService)
+            IImageUploadService imageUploadService,
+            ICacheService cacheService)
         {
             this.staffSqlRepository = staffSqlRepository;
-            this.userSqlRepository = userSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
             this.roleSqlRepository = roleSqlRepository;
             this.userRoleSqlRepository = userRoleSqlRepository;
-            this.staffSalonSqlRepository = staffSalonSqlRepository;
             this.imageUploadService = imageUploadService;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<object>> Handle(UpdateStaffCommand request, CancellationToken cancellationToken)
         {
+            Staff? staff = await staffSqlRepository
+                .AsQueryable(false)
+                .Include(x => x.User!)
+                    .ThenInclude(u => u.UserRoles)
+                .Include(x => x.StaffSalons)
+                .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+
+            if (staff == null)
+                return Result<object>.NotFound(StaffConst.MSG_STAFF_NOT_FOUND, ErrorCodes.ERR_STAFF_NOT_FOUND);
+
+            mapper.Map(request, staff);
+
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                Staff? staff = await staffSqlRepository.FindByIdAsync((int)request.Id!, false);
-                if (staff == null)
-                    return Result<object>.NotFound();
-
-                if (!string.IsNullOrWhiteSpace(request.ImageBase64))
-                    request.AvatarUrl = null;
-
-                mapper.Map(request, staff);
-
-                if (!string.IsNullOrWhiteSpace(request.ImageBase64))
+                if (!string.IsNullOrEmpty(request.AvatarUrl))
                 {
-                    var url = await imageUploadService.UploadAsync(
-                        request.ImageBase64,
+                    staff.AvatarUrl = await imageUploadService.UploadAsync(
+                        request.AvatarUrl,
                         StaffConst.GenerateImageFileName(staff.Id),
                         StaffConst.IMAGE_FOLDER,
                         cancellationToken);
+                }
 
-                    if (!string.IsNullOrWhiteSpace(url))
-                        staff.AvatarUrl = url;
+                // 1) Đổi role trước (nếu có)
+                if (!string.IsNullOrEmpty(request.Role))
+                {
+                    if (staff.User == null)
+                    {
+                        transaction.Rollback();
+                        return Result<object>.NotFound(UserConst.MSG_USER_NOT_FOUND, ErrorCodes.ERR_USER_NOT_FOUND);
+                    }
+
+                    var roleId = await roleSqlRepository
+                        .AsQueryable(true)
+                        .Where(x => x.Code == request.Role)
+                        .Select(x => x.Id)
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    if (roleId == 0)
+                    {
+                        transaction.Rollback();
+                        return Result<object>.NotFound(RoleConst.MSG_ROLE_NOT_FOUND, ErrorCodes.ERR_ROLE_NOT_FOUND);
+                    }
+
+                    staff.User.UserRoles ??= new List<UserRole>();
+
+                    var rolesToRemove = staff.User.UserRoles
+                        .Where(x => x.RoleId != roleId)
+                        .ToList();
+
+                    if (rolesToRemove.Count > 0)
+                        userRoleSqlRepository.RemoveRange(rolesToRemove);
+
+                    if (!staff.User.UserRoles.Any(x => x.RoleId == roleId))
+                    {
+                        staff.User.UserRoles.Add(new UserRole
+                        {
+                            UserId = staff.UserId,
+                            RoleId = roleId,
+                            AssignedAt = DateTimeOffset.UtcNow,
+                            AssignedBy = request.UpdatedBy ?? 1,
+                        });
+                    }
+                }
+
+                // 2) Xác định IsManager: role manager + có salon
+                bool isManagerRole = await IsManagerRoleAsync(staff, request.Role, cancellationToken);
+
+                // 3) Đổi / giữ chi nhánh + set IsManager
+                if (request.SalonId.HasValue)
+                {
+                    SyncStaffSalon(staff, request.SalonId.Value, isManagerRole);
+                }
+                else if (!string.IsNullOrEmpty(request.Role))
+                {
+                    // Chỉ đổi role → cập nhật IsManager trên assignment đang active
+                    staff.StaffSalons ??= new List<StaffSalon>();
+                    foreach (var assignment in staff.StaffSalons.Where(x => x.Status == (int)StatusActiveEnum.ACTIVED))
+                    {
+                        assignment.IsManager = isManagerRole;
+                        assignment.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.Email))
+                {
+                    if (staff.User == null)
+                    {
+                        transaction.Rollback();
+                        return Result<object>.NotFound(UserConst.MSG_USER_NOT_FOUND, ErrorCodes.ERR_USER_NOT_FOUND);
+                    }
+
+                    staff.User.Email = request.Email;
+                    staff.User.UpdatedAt = DateTimeOffset.UtcNow;
+                    staff.User.UpdatedBy = request.UpdatedBy;
                 }
 
                 staffSqlRepository.Update(staff);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-
-                if (request.SalonId.HasValue)
-                {
-                    var activeAssignments = await staffSalonSqlRepository.AsQueryable()
-                        .Where(x => x.StaffId == staff.Id && x.Status == StaffSalonConst.STATUS_ACTIVE)
-                        .ToListAsync(cancellationToken);
-
-                    if (!activeAssignments.Any(x => x.SalonId == request.SalonId.Value))
-                    {
-                        foreach (var assignment in activeAssignments)
-                        {
-                            assignment.Status = StaffSalonConst.STATUS_INACTIVE;
-                            assignment.EndDate = DateOnly.FromDateTime(DateTime.UtcNow);
-                            assignment.UpdatedAt = DateTime.UtcNow;
-                            staffSalonSqlRepository.Update(assignment);
-                        }
-
-                        var newAssignment = new StaffSalon
-                        {
-                            StaffId = staff.Id,
-                            SalonId = request.SalonId.Value,
-                            IsManager = false,
-                            StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
-                            Status = StaffSalonConst.STATUS_ACTIVE,
-                            CreatedAt = DateTime.UtcNow,
-                        };
-                        staffSalonSqlRepository.Add(newAssignment);
-                        await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-                    }
-                }
-
-                if (request.UserName != null || request.Email != null)
-                {
-                    User? user = await userSqlRepository.FindByIdAsync(staff.UserId, false);
-                    if (user != null)
-                    {
-                        mapper.Map(request, user);
-                        user.UpdatedAt = DateTime.UtcNow;
-                        user.UpdatedBy = request.UpdatedBy;
-                        userSqlRepository.Update(user);
-                        await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(request.Role))
-                {
-                    var role = await roleSqlRepository.AsQueryable()
-                        .Where(x => x.Name.ToLower() == request.Role.ToLower())
-                        .FirstOrDefaultAsync(cancellationToken);
-
-                    if (role == null)
-                    {
-                        return Result<object>.BadRequest("Vai trò không hợp lệ.");
-                    }
-
-                    var currentRole = await userRoleSqlRepository.AsQueryable()
-                        .Where(x => x.UserId == staff.UserId)
-                        .FirstOrDefaultAsync(cancellationToken);
-
-                    if (currentRole != null)
-                    {
-                        if (currentRole.RoleId != role.Id)
-                        {
-                            currentRole.RoleId = role.Id;
-                            userRoleSqlRepository.Update(currentRole);
-                            await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-                        }
-                    }
-                    else
-                    {
-                        UserRole userRole = new()
-                        {
-                            UserId = staff.UserId,
-                            RoleId = role.Id,
-                            AssignedAt = DateTime.UtcNow,
-                            AssignedBy = request.UpdatedBy ?? 1,
-                        };
-                        userRoleSqlRepository.Add(userRole);
-                        await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-                    }
-                }
-
                 transaction.Commit();
-                return Result<object>.Created(staff.Id);
+
+                var salonIds = staff.StaffSalons?
+                    .Select(x => x.SalonId)
+                    .Distinct()
+                    .ToList() ?? new List<int>();
+                if (request.SalonId.HasValue && !salonIds.Contains(request.SalonId.Value))
+                    salonIds.Add(request.SalonId.Value);
+
+                foreach (var salonId in salonIds)
+                {
+                    await cacheService.RemoveAsync(StaffConst.CacheKeyBySalon(salonId), cancellationToken);
+                }
+
+                return Result<object>.Ok();
             }
             catch
             {
                 transaction.Rollback();
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Role manager nếu request.Role = manager, hoặc staff đang có role manager.
+        /// </summary>
+        private async Task<bool> IsManagerRoleAsync(
+            Staff staff,
+            string? requestRole,
+            CancellationToken cancellationToken)
+        {
+            if (!string.IsNullOrEmpty(requestRole))
+                return string.Equals(requestRole, RoleConst.CODE_MANAGER, StringComparison.OrdinalIgnoreCase);
+
+            var managerRoleId = await roleSqlRepository
+                .AsQueryable(true)
+                .Where(x => x.Code == RoleConst.CODE_MANAGER)
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (managerRoleId == 0 || staff.User?.UserRoles == null)
+                return false;
+
+            return staff.User.UserRoles.Any(x => x.RoleId == managerRoleId);
+        }
+
+        /// <summary>
+        /// Gán staff vào salon; IsManager = true khi role manager.
+        /// </summary>
+        private static void SyncStaffSalon(Staff staff, int salonId, bool isManager)
+        {
+            staff.StaffSalons ??= new List<StaffSalon>();
+
+            var activeAssignments = staff.StaffSalons
+                .Where(x => x.Status == (int)StatusActiveEnum.ACTIVED)
+                .ToList();
+
+            var current = activeAssignments.FirstOrDefault(x => x.SalonId == salonId);
+            if (current != null)
+            {
+                current.IsManager = isManager;
+                current.UpdatedAt = DateTimeOffset.UtcNow;
+                return;
+            }
+
+            foreach (var assignment in activeAssignments)
+            {
+                assignment.Status = (int)StatusActiveEnum.IACTIVED;
+                assignment.EndDate = DateOnly.FromDateTime(DateTime.UtcNow);
+                assignment.UpdatedAt = DateTimeOffset.UtcNow;
+                assignment.IsManager = false;
+            }
+
+            staff.StaffSalons.Add(new StaffSalon
+            {
+                StaffId = staff.Id,
+                SalonId = salonId,
+                IsManager = isManager,
+                StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                Status = (int)StatusActiveEnum.ACTIVED,
+                CreatedAt = DateTimeOffset.UtcNow,
+            });
         }
     }
 }

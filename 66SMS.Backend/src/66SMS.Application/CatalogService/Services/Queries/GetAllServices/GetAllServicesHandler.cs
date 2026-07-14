@@ -1,23 +1,50 @@
+using _66SMS.Application.DTOs;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Extensions;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Enums;
 using MediatR;
-using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
 {
     public class GetAllServicesHandler : IRequestHandler<GetAllServicesQuery, Result<PagedResult<ServiceListDto>>>
     {
         private readonly IServiceSqlRepository serviceSqlRepository;
+        private readonly ICacheService cacheService;
 
-        public GetAllServicesHandler(IServiceSqlRepository serviceSqlRepository)
+        public GetAllServicesHandler(
+            IServiceSqlRepository serviceSqlRepository,
+            ICacheService cacheService)
         {
             this.serviceSqlRepository = serviceSqlRepository;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<PagedResult<ServiceListDto>>> Handle(GetAllServicesQuery request, CancellationToken cancellationToken)
         {
+            var filterHash = CacheKeyHash.FromObject(new
+            {
+                request.CategoryId,
+                request.Status,
+                request.Keyword,
+                request.MinPrice,
+                request.MaxPrice,
+                request.IsDeleted,
+                request.PageIndex,
+                request.PageSize,
+                request.OrderBy,
+                request.IsDescending,
+            });
+            var cacheKey = ServiceConst.CacheKeyList(filterHash);
+            var cached = await cacheService.GetAsync<PagedResult<ServiceListDto>>(cacheKey, cancellationToken);
+            if (cached is not null)
+            {
+                return Result<PagedResult<ServiceListDto>>.Success(cached);
+            }
+
             var query = serviceSqlRepository.AsQueryable();
             // Filter here
             if (request.CategoryId.HasValue)
@@ -43,7 +70,6 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
             {
                 query = query.Where(x => x.Status == request.Status);
             }
-
 
             if (request.MinPrice.HasValue)
             {
@@ -82,6 +108,8 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
                     ImageUrl = x.ImageUrl
                 })
                 .ToPagedAsync(request, cancellationToken);
+
+            await cacheService.SetAsync(cacheKey, pagedResult, ServiceConst.CACHE_TTL_LIST, cancellationToken);
             return Result<PagedResult<ServiceListDto>>.Success(pagedResult);
         }
     }

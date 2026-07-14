@@ -14,5 +14,10 @@ namespace _66SMS.Domain.Constants
         public const int NAME_MAX_LENGTH = 255;
         public const int FULL_NAME_MAX_LENGTH = 255;
         #endregion
+
+        #region Cache
+        public const string CACHE_KEY_ALL = "provinces:all";
+        public static readonly TimeSpan CACHE_TTL = TimeSpan.FromHours(24);
+        #endregion
     }
 }

@@ -1,12 +1,12 @@
 using _66SMS.Contract.Abstractions;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
+using _66SMS.Domain.Enums;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +23,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
         private readonly IMapper mapper;
         private readonly IPasswordHash passwordHash;
         private readonly IImageUploadService imageUploadService;
+        private readonly ICacheService cacheService;
 
         public CreateStaffHandler(
             IUserSqlRepository userSqlRepository,
@@ -31,7 +32,8 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
             IMapper mapper,
             IPasswordHash passwordHash,
             IRoleSqlRepository roleSqlRepository,
-            IImageUploadService imageUploadService)
+            IImageUploadService imageUploadService,
+            ICacheService cacheService)
         {
             this.userSqlRepository = userSqlRepository;
             this.staffSqlRepository = staffSqlRepository;
@@ -40,59 +42,59 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
             this.passwordHash = passwordHash;
             this.roleSqlRepository = roleSqlRepository;
             this.imageUploadService = imageUploadService;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<object>> Handle(CreateStaffCommand request, CancellationToken cancellationToken)
         {
-            string staffCode = await GenerateUniqueStaffCodeAsync(cancellationToken);
-            string staffEmail = $"{staffCode}@lotusspa.com.vn";
-
-            User? user = new User
+            User user = new User
             {
-                Username = staffCode,
-                Email = staffEmail,
-                PasswordHash = passwordHash.Hash(staffCode),
+                Username = string.Empty,
+                Email = string.Empty,
+                PasswordHash = string.Empty,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = request.CreatedBy,
-                Status = (int)request.Status!,
+                Status = (int)StatusActiveEnum.ACTIVED,
             };
 
-            string roleRequest = request.Role ?? "staff";
-            Role? role = await roleSqlRepository.AsQueryable()
-                .Where(x => x.Name.Equals(roleRequest))
+            string roleCode = request.Role ?? RoleConst.CODE_STAFF;
+            var role = await roleSqlRepository
+                .AsQueryable(true)
+                .Where(x => x.Code == roleCode)
+                .Select(x => new { x.Id, x.Code })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (role == null)
-                return Result<object>.BadRequest(UserConst.MSG_USER_INVALID_ROLE, ErrorCodes.ERR_ROLE_NOT_FOUND);
+                return Result<object>.NotFound(RoleConst.MSG_ROLE_NOT_FOUND, ErrorCodes.ERR_ROLE_NOT_FOUND);
 
-            UserRole userRole = new()
+            // Role manager + có chi nhánh → IsManager = true
+            int salonId = request.SalonId ?? 1;
+            bool isManager = role.Code == RoleConst.CODE_MANAGER;
+
+            user.UserRoles = new List<UserRole>
             {
-                UserId = user.Id,
-                RoleId = role.Id,
-                AssignedAt = DateTimeHelper.UtcNow(),
-                AssignedBy = request.CreatedBy ?? 1,
-            };
-            user.UserRoles = new List<UserRole> { userRole };
-
-            if (!string.IsNullOrWhiteSpace(request.ImageBase64))
-                request.AvatarUrl = null;
-
-            Staff? staff = mapper.Map<Staff>(request);
-            staff.Code = staffCode;
-
-            if (request.SalonId.HasValue)
-            {
-                staff.StaffSalons = new List<StaffSalon>
+                new UserRole
                 {
-                    new StaffSalon
-                    {
-                        SalonId = request.SalonId.Value,
-                        StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
-                        CreatedAt = DateTime.UtcNow,
-                        Status = StaffSalonConst.STATUS_ACTIVE,
-                    }
-                };
-            }
+                    RoleId = role.Id,
+                    AssignedAt = DateTimeOffset.UtcNow,
+                    AssignedBy = request.CreatedBy,
+                }
+            };
+
+            Staff staff = mapper.Map<Staff>(request);
+            staff.Code = string.Empty;
+            staff.AvatarUrl = string.Empty;
+            staff.StaffSalons = new List<StaffSalon>
+            {
+                new StaffSalon
+                {
+                    SalonId = salonId,
+                    StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    Status = (int)StatusActiveEnum.ACTIVED,
+                    IsManager = isManager,
+                }
+            };
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
@@ -104,22 +106,26 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
                 staffSqlRepository.Add(staff);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                if (!string.IsNullOrWhiteSpace(request.ImageBase64))
+                staff.Code = $"SEN{staff.Id:D4}";
+                staff.User!.Username = staff.Code;
+                staff.User.Email = string.IsNullOrEmpty(request.Email)
+                    ? $"{staff.Code}@lotusspa.com.vn"
+                    : request.Email;
+                staff.User.PasswordHash = passwordHash.Hash(staff.Code);
+
+                if (!string.IsNullOrEmpty(request.AvatarUrl))
                 {
                     staff.AvatarUrl = await imageUploadService.UploadAsync(
-                        request.ImageBase64,
+                        request.AvatarUrl,
                         StaffConst.GenerateImageFileName(staff.Id),
                         StaffConst.IMAGE_FOLDER,
                         cancellationToken);
-
-                    if (!string.IsNullOrWhiteSpace(staff.AvatarUrl))
-                    {
-                        staffSqlRepository.Update(staff);
-                        await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-                    }
                 }
 
+                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
+
+                await cacheService.RemoveAsync(StaffConst.CacheKeyBySalon(salonId), cancellationToken);
                 return Result<object>.Created(staff.Id);
             }
             catch
@@ -127,43 +133,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
                 transaction.Rollback();
                 throw;
             }
-        }
-
-        private async Task<string> GenerateUniqueStaffCodeAsync(CancellationToken cancellationToken)
-        {
-            Staff? staff = await staffSqlRepository.AsQueryable()
-                .Where(x => x.Code!.StartsWith("SEN"))
-                .OrderByDescending(x => x.Code)
-                .FirstOrDefaultAsync(cancellationToken);
-
-            int nextNumber = 1;
-            if (staff != null && !string.IsNullOrEmpty(staff.Code) && staff.Code.Length > 7)
-            {
-                string numberPart = staff.Code.Substring(7);
-                if (int.TryParse(numberPart, out int parsedNumber))
-                {
-                    nextNumber = parsedNumber + 1;
-                }
-            }
-
-            string newCode;
-            bool isUnique = false;
-            do
-            {
-                newCode = $"SEN{nextNumber:D4}";
-
-                bool exists = await staffSqlRepository.AsQueryable()
-                    .Where(x => x.Code == newCode)
-                    .AnyAsync(cancellationToken);
-
-                if (!exists)
-                    isUnique = true;
-                else
-                    nextNumber++;
-
-            } while (!isUnique);
-
-            return newCode;
         }
     }
 }

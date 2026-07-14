@@ -1,3 +1,4 @@
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
@@ -16,15 +17,18 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateStaffSalon
         private readonly IStaffSalonSqlRepository staffSalonSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
+        private readonly ICacheService cacheService;
 
         public UpdateStaffSalonHandler(
             IStaffSalonSqlRepository staffSalonSqlRepository,
             ISqlUnitOfWork sqlUnitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            ICacheService cacheService)
         {
             this.staffSalonSqlRepository = staffSalonSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<object>> Handle(UpdateStaffSalonCommand request, CancellationToken cancellationToken)
@@ -36,6 +40,7 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateStaffSalon
                 if (staffSalon == null)
                     return Result<object>.NotFound(StaffSalonConst.MSG_STAFF_SALON_NOT_FOUND, ErrorCodes.ERR_STAFF_SALON_NOT_FOUND);
 
+                var salonId = staffSalon.SalonId;
                 mapper.Map(request, staffSalon);
                 staffSalon.UpdatedAt = DateTimeHelper.UtcNow();
 
@@ -43,6 +48,7 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateStaffSalon
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 transaction.Commit();
+                await cacheService.RemoveAsync(StaffConst.CacheKeyBySalon(salonId), cancellationToken);
                 return Result<object>.Ok();
             }
             catch

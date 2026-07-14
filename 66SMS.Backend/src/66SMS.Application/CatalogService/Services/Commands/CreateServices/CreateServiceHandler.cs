@@ -1,3 +1,5 @@
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -6,7 +8,6 @@ using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
 using System.Data;
-using _66SMS.Contract.Abstractions;
 
 namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
 {
@@ -19,13 +20,20 @@ namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
         private readonly IImageUploadService imageUploadService;
+        private readonly ICacheService cacheService;
 
-        public CreateServiceHandler(IServiceSqlRepository serviceSqlRepository, ISqlUnitOfWork sqlUnitOfWork, IMapper mapper, IImageUploadService imageUploadService)
+        public CreateServiceHandler(
+            IServiceSqlRepository serviceSqlRepository,
+            ISqlUnitOfWork sqlUnitOfWork,
+            IMapper mapper,
+            IImageUploadService imageUploadService,
+            ICacheService cacheService)
         {
             this.serviceSqlRepository = serviceSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
             this.imageUploadService = imageUploadService;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<object>> Handle(CreateServiceCommand request, CancellationToken cancellationToken)
@@ -75,6 +83,9 @@ namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
 
                 // commit transaction
                 transaction.Commit();
+
+                await cacheService.RemoveAsync(ServiceConst.CacheKeyDetail(service.Id), cancellationToken);
+                await cacheService.RemoveByPrefixAsync(ServiceConst.CACHE_PREFIX, cancellationToken);
 
                 // result success result
                 return Result<object>.Created(service.Id);

@@ -1,3 +1,4 @@
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -17,11 +18,16 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteSer
     {
         private readonly IServiceCategorySqlRepository serviceCategorySqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
+        private readonly ICacheService cacheService;
 
-        public DeleteServiceCategoriesHandler(IServiceCategorySqlRepository serviceCategorySqlRepository, ISqlUnitOfWork sqlUnitOfWork)
+        public DeleteServiceCategoriesHandler(
+            IServiceCategorySqlRepository serviceCategorySqlRepository,
+            ISqlUnitOfWork sqlUnitOfWork,
+            ICacheService cacheService)
         {
             this.serviceCategorySqlRepository = serviceCategorySqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<object>> Handle(DeleteServiceCategoriesCommand request, CancellationToken cancellationToken)
@@ -48,6 +54,9 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteSer
 
                 // Commit transaction
                 transaction.Commit();
+
+                await cacheService.RemoveByPrefixAsync(ServiceCategoryConst.CACHE_PREFIX, cancellationToken);
+                await cacheService.RemoveByPrefixAsync(ServiceConst.CACHE_PREFIX, cancellationToken);
 
                 // return success result
                 return Result<object>.Ok();

@@ -1,7 +1,7 @@
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Constants;
+using _66SMS.Domain.Enums;
 using MediatR;
-using System;
 using System.Text.Json.Serialization;
 
 namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
@@ -12,8 +12,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
         public int? SalonId { get; set; }
         public string? FullName { get; set; }
         public string? AvatarUrl { get; set; }
-        /// <summary>Base64 ảnh mới — upload qua IImageUploadService.</summary>
-        public string? ImageBase64 { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public int? Gender { get; set; }
         public string? NationalId { get; set; }
@@ -22,7 +20,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
         public string? ContractType { get; set; }
         public decimal? BasicSalary { get; set; }
         public int? SalaryType { get; set; } = StaffConst.SALARY_TYPE_DAILY;
-        public int? Status { get; set; } = StaffConst.STATUS_ACTIVED;
+        public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
         public string? StreetAddress { get; set; }
         public string? ProvinceCode { get; set; }
         public string? WardCode { get; set; }

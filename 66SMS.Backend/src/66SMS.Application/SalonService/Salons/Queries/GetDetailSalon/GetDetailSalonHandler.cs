@@ -1,27 +1,36 @@
+using _66SMS.Application.DTOs;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.SalonService.Salons.Queries.GetDetailSalon
 {
-    /// <summary>
-    /// handler for <see cref="GetDetailSalonQuery"/>
-    /// </summary>
     public class GetDetailSalonHandler : IRequestHandler<GetDetailSalonQuery, Result<SalonDto>>
     {
         private readonly ISalonSqlRepository salonSqlRepository;
+        private readonly ICacheService cacheService;
 
-        public GetDetailSalonHandler(ISalonSqlRepository salonSqlRepository)
+        public GetDetailSalonHandler(
+            ISalonSqlRepository salonSqlRepository,
+            ICacheService cacheService)
         {
             this.salonSqlRepository = salonSqlRepository;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<SalonDto>> Handle(GetDetailSalonQuery request, CancellationToken cancellationToken)
         {
+            var cacheKey = SalonConst.CacheKeyDetail(request.Id!.Value);
+            var cached = await cacheService.GetAsync<SalonDto>(cacheKey, cancellationToken);
+            if (cached is not null)
+            {
+                return Result<SalonDto>.Success(cached);
+            }
+
             SalonDto? salon = await salonSqlRepository.AsQueryable()
                 .Where(x => x.Id == request.Id && x.Status != SalonConst.STATUS_DELETED)
                 .Select(x => new SalonDto
@@ -50,6 +59,7 @@ namespace _66SMS.Application.SalonService.Salons.Queries.GetDetailSalon
             if (salon == null)
                 return Result<SalonDto>.NotFound(SalonConst.MSG_SALON_NOT_FOUND, ErrorCodes.ERR_SALON_NOT_FOUND);
 
+            await cacheService.SetAsync(cacheKey, salon, SalonConst.CACHE_TTL_DETAIL, cancellationToken);
             return Result<SalonDto>.Success(salon);
         }
     }

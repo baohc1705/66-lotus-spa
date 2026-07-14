@@ -23,6 +23,7 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_WARD_CODE = "ward_code";
         public const string FIELD_FULL_ADDRESS = "full_address";
         public const string FIELD_CREATED_AT = "created_at";
+        public const string FIELD_UPDATED_AT = "updated_at";
         #endregion
 
         #region Constraint
@@ -63,6 +64,11 @@ namespace _66SMS.Domain.Constants
 
         public static string GenerateImageFileName(int entityId)
             => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTime.Now.ToString("yyyyMMddHHmmss"));
+        #endregion
+
+        #region Cache
+        public static readonly TimeSpan CACHE_TTL_BY_SALON = TimeSpan.FromMinutes(12);
+        public static string CacheKeyBySalon(int salonId) => $"staffs:salon:{salonId}";
         #endregion
     }
 }

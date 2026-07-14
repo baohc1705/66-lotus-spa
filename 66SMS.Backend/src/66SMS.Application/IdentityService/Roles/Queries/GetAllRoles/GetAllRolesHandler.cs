@@ -44,6 +44,7 @@ namespace _66SMS.Application.IdentityService.Roles.Queries.GetAllRoles
             var roleDtos = roles.Select(x => new RoleDTO
             {
                 Id = x.Id,
+                Code = x.Code,
                 Name = x.Name,
                 Desctiption = x.Description!,
                 Status = x.Status.ToString(),

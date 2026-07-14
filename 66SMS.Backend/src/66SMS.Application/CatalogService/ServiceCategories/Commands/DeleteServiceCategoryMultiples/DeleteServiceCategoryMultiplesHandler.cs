@@ -1,11 +1,12 @@
-using MediatR;
+using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
-using _66SMS.Contracts.Enumerations;
-using Microsoft.EntityFrameworkCore;
 using _66SMS.Domain.Enums;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteServiceCategoryMultiples
@@ -14,11 +15,16 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteSer
     {
         private readonly IServiceCategorySqlRepository serviceCategorySqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
+        private readonly ICacheService cacheService;
 
-        public DeleteServiceCategoryMultiplesHandler(IServiceCategorySqlRepository serviceCategorySqlRepository, ISqlUnitOfWork sqlUnitOfWork)
+        public DeleteServiceCategoryMultiplesHandler(
+            IServiceCategorySqlRepository serviceCategorySqlRepository,
+            ISqlUnitOfWork sqlUnitOfWork,
+            ICacheService cacheService)
         {
             this.serviceCategorySqlRepository = serviceCategorySqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<object>> Handle(DeleteServiceCategoryMultiplesCommand request, CancellationToken cancellationToken)
@@ -46,6 +52,10 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteSer
             {
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
+
+                await cacheService.RemoveByPrefixAsync(ServiceCategoryConst.CACHE_PREFIX, cancellationToken);
+                await cacheService.RemoveByPrefixAsync(ServiceConst.CACHE_PREFIX, cancellationToken);
+
                 return Result<object>.Ok();
             }
             catch (Exception)

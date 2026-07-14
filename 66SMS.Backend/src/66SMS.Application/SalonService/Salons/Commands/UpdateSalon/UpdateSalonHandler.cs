@@ -1,4 +1,5 @@
 using _66SMS.Contract.Abstractions;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -17,17 +18,20 @@ namespace _66SMS.Application.SalonService.Salons.Commands.UpdateSalon
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
         private readonly IImageUploadService imageUploadService;
+        private readonly ICacheService cacheService;
 
         public UpdateSalonHandler(
             ISalonSqlRepository salonSqlRepository,
             ISqlUnitOfWork sqlUnitOfWork,
             IMapper mapper,
-            IImageUploadService imageUploadService)
+            IImageUploadService imageUploadService,
+            ICacheService cacheService)
         {
             this.salonSqlRepository = salonSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
             this.imageUploadService = imageUploadService;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<object>> Handle(UpdateSalonCommand request, CancellationToken cancellationToken)
@@ -53,6 +57,10 @@ namespace _66SMS.Application.SalonService.Salons.Commands.UpdateSalon
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 transaction.Commit();
+
+                await cacheService.RemoveAsync(SalonConst.CacheKeyDetail(salon.Id), cancellationToken);
+                await cacheService.RemoveByPrefixAsync(SalonConst.CACHE_PREFIX, cancellationToken);
+
                 return Result<object>.Ok();
             }
             catch

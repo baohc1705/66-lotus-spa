@@ -1,3 +1,5 @@
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -7,7 +9,6 @@ using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
 using System.Data;
-using _66SMS.Contract.Abstractions;
 
 namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.UpdateServiceCategories
 {
@@ -20,13 +21,20 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.UpdateSer
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
         private readonly IImageUploadService imageUploadService;
+        private readonly ICacheService cacheService;
 
-        public UpdateServiceCategoriesHandler(IServiceCategorySqlRepository serviceCategorySqlRepository, ISqlUnitOfWork sqlUnitOfWork, IMapper mapper, IImageUploadService imageUploadService)
+        public UpdateServiceCategoriesHandler(
+            IServiceCategorySqlRepository serviceCategorySqlRepository,
+            ISqlUnitOfWork sqlUnitOfWork,
+            IMapper mapper,
+            IImageUploadService imageUploadService,
+            ICacheService cacheService)
         {
             this.serviceCategorySqlRepository = serviceCategorySqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
             this.imageUploadService = imageUploadService;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<object>> Handle(UpdateServiceCategoriesCommand request, CancellationToken cancellationToken)
@@ -65,6 +73,9 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.UpdateSer
 
                 // commit transaction
                 transaction.Commit();
+
+                await cacheService.RemoveByPrefixAsync(ServiceCategoryConst.CACHE_PREFIX, cancellationToken);
+                await cacheService.RemoveByPrefixAsync(ServiceConst.CACHE_PREFIX, cancellationToken);
 
                 // return success result
                 return Result<object>.Ok();

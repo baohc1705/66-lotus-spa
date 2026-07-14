@@ -1,9 +1,10 @@
 using _66SMS.Application.DTOs.Staffs;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Extensions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
-using AutoMapper;
+using _66SMS.Domain.Enums;
 using MediatR;
 
 namespace _66SMS.Application.SalonService.Staffs.Queries.GetAllStaffs
@@ -12,83 +13,117 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetAllStaffs
     {
         private readonly IStaffSqlRepository staffSqlRepository;
         private readonly IStaffSalonSqlRepository staffSalonSqlRepository;
-        private readonly IMapper mapper;
+        private readonly ICacheService cacheService;
 
-        public GetAllStaffHandler(IStaffSqlRepository staffSqlRepository, IStaffSalonSqlRepository staffSalonSqlRepository, IMapper mapper)
+        public GetAllStaffHandler(
+            IStaffSqlRepository staffSqlRepository,
+            IStaffSalonSqlRepository staffSalonSqlRepository,
+            ICacheService cacheService)
         {
             this.staffSqlRepository = staffSqlRepository;
             this.staffSalonSqlRepository = staffSalonSqlRepository;
-            this.mapper = mapper;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<PagedResult<StaffDto>>> Handle(GetAllStaffQuery request, CancellationToken cancellationToken)
         {
-            var query = staffSqlRepository.AsQueryable();
+            string? cacheKey = null;
+            if (request.SalonId.HasValue
+                && string.IsNullOrEmpty(request.Role)
+                && string.IsNullOrEmpty(request.Filter))
+            {
+                cacheKey = StaffConst.CacheKeyBySalon(request.SalonId.Value);
+                var cached = await cacheService.GetAsync<PagedResult<StaffDto>>(cacheKey, cancellationToken);
+                if (cached is not null)
+                {
+                    return Result<PagedResult<StaffDto>>.Success(cached);
+                }
+            }
+
+            var query = staffSqlRepository.AsQueryable(true);
 
             if (request.SalonId.HasValue)
             {
+                var salonId = request.SalonId.Value;
                 query = query.Where(x => staffSalonSqlRepository.AsQueryable(true)
-                    .Any(ss => ss.StaffId == x.Id 
-                         && ss.SalonId == request.SalonId.Value 
-                         && ss.Status == StaffSalonConst.STATUS_ACTIVE));
+                    .Any(ss => ss.StaffId == x.Id
+                        && ss.SalonId == salonId
+                        && ss.Status == (int)StatusActiveEnum.ACTIVED));
             }
 
             if (!string.IsNullOrEmpty(request.Role))
             {
-                query = query.Where(x => x.User != null && x.User.UserRoles!.Any(ur => ur.Role != null && ur.Role.Name.ToLower() == request.Role.ToLower()));
+                var role = request.Role.ToLower();
+                query = query.Where(x => x.User != null
+                    && x.User.UserRoles!.Any(ur =>
+                        ur.Role != null && ur.Role.Code!.ToLower() == role));
             }
 
             if (!string.IsNullOrEmpty(request.Filter))
             {
-                query = query.Where(x => x.FullName.StartsWith(request.Filter) 
-                                      || x.Phone == request.Filter 
-                                      || x.User!.Email == request.Filter
-                                      || x.Code == request.Filter);
+                var filter = request.Filter;
+                query = query.Where(x =>
+                    x.FullName.StartsWith(filter)
+                    || x.Phone == filter
+                    || x.Code == filter
+                    || (x.User != null && x.User.Email == filter));
             }
 
             if (!request.IsDeleted)
             {
-                query = query.Where(x => x.Status != StaffConst.STATUS_DELETED);
+                query = query.Where(x => x.Status != (int)StatusActiveEnum.DELETED);
             }
-            
 
             query = request.OrderBy?.ToLower() switch
             {
-                "email" => request.IsDescending ? query.OrderByDescending(x => x.User!.Email) : query.OrderBy(x => x.User!.Email),
-                "fullname" => request.IsDescending ? query.OrderByDescending(x => x.FullName) : query.OrderBy(x => x.FullName),
-                "code" => request.IsDescending ? query.OrderByDescending(x => x.Code) : query.OrderBy(x => x.Code),
-                _ => request.IsDescending ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt)
+                "email" => request.IsDescending
+                    ? query.OrderByDescending(x => x.User!.Email)
+                    : query.OrderBy(x => x.User!.Email),
+                "fullname" => request.IsDescending
+                    ? query.OrderByDescending(x => x.FullName)
+                    : query.OrderBy(x => x.FullName),
+                "code" => request.IsDescending
+                    ? query.OrderByDescending(x => x.Code)
+                    : query.OrderBy(x => x.Code),
+                _ => request.IsDescending
+                    ? query.OrderByDescending(x => x.CreatedAt)
+                    : query.OrderBy(x => x.CreatedAt),
             };
 
+            var activeSalonStatus = (int)StatusActiveEnum.ACTIVED;
             PagedResult<StaffDto> pagedDto = await query
                 .Select(x => new StaffDto
                 {
                     Id = x.Id,
                     UserId = x.UserId,
-                    SalonId = x.StaffSalons != null ? x.StaffSalons.Where(ss => ss.Status == StaffSalonConst.STATUS_ACTIVE).Select(ss => (int?)ss.SalonId).FirstOrDefault() : null,
-                    SalonName = x.StaffSalons != null ? x.StaffSalons.Where(ss => ss.Status == StaffSalonConst.STATUS_ACTIVE && ss.Salon != null).Select(ss => ss.Salon!.Name).FirstOrDefault() : null,
+                    SalonId = x.StaffSalons!
+                        .Where(ss => ss.Status == activeSalonStatus)
+                        .Select(ss => (int?)ss.SalonId)
+                        .FirstOrDefault(),
+                    SalonName = x.StaffSalons!
+                        .Where(ss => ss.Status == activeSalonStatus)
+                        .Select(ss => ss.Salon!.Name)
+                        .FirstOrDefault(),
+                    Role = x.User!.UserRoles!
+                        .Select(ur => ur.Role!.Code)
+                        .FirstOrDefault(),
                     Code = x.Code,
                     FullName = x.FullName,
                     AvatarUrl = x.AvatarUrl,
-                    DateOfBirth = x.DateOfBirth.ToString(),
-                    Gender = x.Gender.ToString(),
-                    NationalId = x.NationalId,
+                    Gender = x.Gender,
                     Phone = x.Phone,
-                    HireDate = x.HireDate.ToString(),
                     ContractType = x.ContractType,
                     BasicSalary = x.BasicSalary,
-                    SalaryType = x.SalaryType,
                     Status = x.Status,
-                    StreetAddress = x.StreetAddress,
-                    ProvinceCode = x.ProvinceCode,
-                    WardCode = x.WardCode,
-                    FullAddress = x.FullAddress,
-                    Username = x.User != null ? x.User.Username : null,
                     Email = x.User != null ? x.User.Email : null,
-                    Role = x.User != null ? x.User.UserRoles!.Select(ur => ur.Role!.Name).FirstOrDefault() : null,
-                    CreatedAt  = x.CreatedAt.ToString(),
+                    CreatedAt = x.CreatedAt,
                 })
                 .ToPagedAsync(request, cancellationToken);
+
+            if (cacheKey is not null)
+            {
+                await cacheService.SetAsync(cacheKey, pagedDto, StaffConst.CACHE_TTL_BY_SALON, cancellationToken);
+            }
 
             return Result<PagedResult<StaffDto>>.Success(pagedDto);
         }

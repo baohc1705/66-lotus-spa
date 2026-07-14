@@ -32,6 +32,9 @@ namespace _66SMS.Infrastructure.DependencyInjection
             // Cloudinary (lưu trữ file/ảnh)
             services.AddCloudinaryStorage(configuration);
 
+            // Redis (cache + rate limit)
+            services.AddRedisCache(configuration);
+
             // MassTransit
             services.AddMassTransitExtensions(configuration);
 

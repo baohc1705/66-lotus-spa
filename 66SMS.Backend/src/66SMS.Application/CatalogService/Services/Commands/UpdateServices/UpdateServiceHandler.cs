@@ -1,3 +1,5 @@
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -9,7 +11,6 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using _66SMS.Contract.Abstractions;
 
 namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
 {
@@ -23,19 +24,22 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
         private readonly IImageUploadService imageUploadService;
+        private readonly ICacheService cacheService;
 
         public UpdateServiceHandler(
             IServiceSqlRepository serviceSqlRepository,
             IServiceProductSqlRepository serviceProductSqlRepository,
             ISqlUnitOfWork sqlUnitOfWork,
             IMapper mapper,
-            IImageUploadService imageUploadService)
+            IImageUploadService imageUploadService,
+            ICacheService cacheService)
         {
             this.serviceSqlRepository = serviceSqlRepository;
             this.serviceProductSqlRepository = serviceProductSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
             this.imageUploadService = imageUploadService;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<object>> Handle(UpdateServiceCommand request, CancellationToken cancellationToken)
@@ -69,6 +73,9 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
                 serviceSqlRepository.Update(service);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
+
+                await cacheService.RemoveAsync(ServiceConst.CacheKeyDetail(service.Id), cancellationToken);
+                await cacheService.RemoveByPrefixAsync(ServiceConst.CACHE_PREFIX, cancellationToken);
 
                 return Result<object>.Ok();
             }

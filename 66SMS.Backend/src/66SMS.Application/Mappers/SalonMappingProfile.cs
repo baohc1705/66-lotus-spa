@@ -32,14 +32,21 @@ namespace _66SMS.Application.Mappers
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .IgnoreNullValueTypes();
 
-            // Staff DTO
+            // Staff DTO (projection dùng trong query; map giữ cho chỗ còn dùng mapper)
             CreateMap<Staff, StaffDto>()
-                .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.DateOfBirth.ToDateOnlyString("dd/MM/yyyy")))
-                .ForMember(dest => dest.HireDate, opt => opt.MapFrom(src => src.HireDate.ToDateOnlyString("dd/MM/yyyy")))
-                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender.ToString()))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User != null ? src.User.Email : null))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src =>
+                    src.User != null && src.User.UserRoles != null
+                        ? src.User.UserRoles.Select(ur => ur.Role != null ? ur.Role.Code : null).FirstOrDefault()
+                        : null))
+                .IgnoreNullValueTypes();
+            CreateMap<Staff, StaffFullDto>()
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.User != null ? src.User.Username : null))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User != null ? src.User.Email : null))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src =>
+                    src.User != null && src.User.UserRoles != null
+                        ? src.User.UserRoles.Select(ur => ur.Role != null ? ur.Role.Code : null).FirstOrDefault()
+                        : null))
                 .IgnoreNullValueTypes();
 
             // StaffSalon

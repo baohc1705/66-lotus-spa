@@ -1,59 +1,67 @@
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
+using _66SMS.Domain.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
+
 namespace _66SMS.Application.SalonService.Staffs.Commands.DeleteStaff
 {
-    /// <summary>
-    /// Handler for <see cref="DeleteStaffCommand"/>
-    /// </summary>
     public class DeleteStaffHandler : IRequestHandler<DeleteStaffCommand, Result<object>>
     {
-        private readonly IUserSqlRepository userSqlRepository;
+        
         private readonly IStaffSqlRepository staffSqlRepository;
-        private readonly IUserRoleSqlRepository userRoleSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
+        private readonly ICacheService cacheService;
 
         public DeleteStaffHandler(
-            IUserSqlRepository userSqlRepository,
-            IUserRoleSqlRepository userRoleSqlRepository,
             IStaffSqlRepository staffSqlRepository,
-            ISqlUnitOfWork sqlUnitOfWork)
+            ISqlUnitOfWork sqlUnitOfWork,
+            ICacheService cacheService)
         {
-            this.userSqlRepository = userSqlRepository;
-            this.userRoleSqlRepository = userRoleSqlRepository;
             this.staffSqlRepository = staffSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<object>> Handle(DeleteStaffCommand request, CancellationToken cancellationToken)
         {
-            Staff? staff = await staffSqlRepository.FindByIdAsync((int)request.Id!, false);
+            Staff? staff = await staffSqlRepository
+                .AsQueryable(false)
+                .Include(x => x.User)
+                .Include(x => x.StaffSalons)
+                .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+
             if (staff == null)
                 return Result<object>.NotFound(StaffConst.MSG_STAFF_NOT_FOUND, ErrorCodes.ERR_STAFF_NOT_FOUND);
+
+            staff.Status = StaffConst.STATUS_DELETED;
+            staff.User!.Status = (int)StatusActiveEnum.DELETED;
+            staff.User.UpdatedAt = DateTimeOffset.UtcNow;
+            staff.User.UpdatedBy = request.UpdatedBy;
+
+            var salonIds = staff.StaffSalons?
+                .Select(x => x.SalonId)
+                .Distinct()
+                .ToList() ?? new List<int>();
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                staff.Status = StaffConst.STATUS_DELETED;
                 staffSqlRepository.Update(staff);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                transaction.Commit();
 
-                User? user = await userSqlRepository.FindByIdAsync(staff.UserId, false);
-                if (user != null)
+                foreach (var salonId in salonIds)
                 {
-                    user.Status = _66SMS.Domain.Constants.UserConst.STATUS_DELETED;
-                    user.UpdatedAt = DateTime.UtcNow;
-                    user.UpdatedBy = request.UpdatedBy;
-                    userSqlRepository.Update(user);
-                    await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                    await cacheService.RemoveAsync(StaffConst.CacheKeyBySalon(salonId), cancellationToken);
                 }
 
-                transaction.Commit();
                 return Result<object>.Ok();
             }
             catch

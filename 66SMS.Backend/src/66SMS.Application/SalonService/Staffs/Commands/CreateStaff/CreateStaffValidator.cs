@@ -11,10 +11,8 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
     {
         public CreateStaffValidator()
         {
-            
             RuleFor(x => x.FullName).NotNull().NotEmpty().MaximumLength(StaffConst.FULL_NAME_MAX_LENGTH);
             RuleFor(x => x.Phone).NotEmpty().Matches(RegexConst.VIETNAM_PHONE_REGEX).MaximumLength(StaffConst.PHONE_MAX_LENGTH);
-            RuleFor(x => x.AvatarUrl).MaximumLength(StaffConst.AVATAR_URL_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.AvatarUrl));
             RuleFor(x => x.Gender).GreaterThanOrEqualTo(0).When(x => x.Gender.HasValue);
             RuleFor(x => x.NationalId).MaximumLength(StaffConst.NATIONAL_ID_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.NationalId));
             RuleFor(x => x.ContractType).MaximumLength(StaffConst.CONTRACT_TYPE_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.ContractType));

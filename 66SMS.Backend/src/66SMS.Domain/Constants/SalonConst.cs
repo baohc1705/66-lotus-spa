@@ -57,5 +57,13 @@ namespace _66SMS.Domain.Constants
         public static string GenerateImageFileName(int entityId)
             => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmss"));
         #endregion
+
+        #region Cache
+        public const string CACHE_PREFIX = "salons:";
+        public static readonly TimeSpan CACHE_TTL_LIST = TimeSpan.FromMinutes(30);
+        public static readonly TimeSpan CACHE_TTL_DETAIL = TimeSpan.FromMinutes(45);
+        public static string CacheKeyDetail(int id) => $"salon:{id}";
+        public static string CacheKeyList(string filterHash) => $"salons:{filterHash}";
+        #endregion
     }
 }

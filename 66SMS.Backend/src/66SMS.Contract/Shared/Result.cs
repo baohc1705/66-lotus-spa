@@ -40,6 +40,9 @@ namespace _66SMS.Contracts.Shared
         public static Result<TData> ServerError(string message = "Internal server error", ErrorCodes? errorCode = ErrorCodes.ERR_SERVER_ERROR)
             => Failure(500, message, errorCode);
 
+        public static Result<TData> TooManyRequests(string message = "Too many requests", ErrorCodes? errorCode = ErrorCodes.ERR_BAD_REQUEST)
+            => Failure(429, message, errorCode);
+
         public static Result<object>Ok() => new () { Code = 200, Message = "Success" };
     }
 }

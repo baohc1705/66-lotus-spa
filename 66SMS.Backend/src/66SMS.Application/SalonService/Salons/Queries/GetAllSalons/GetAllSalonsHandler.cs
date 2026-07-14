@@ -1,26 +1,46 @@
+using _66SMS.Application.DTOs;
+using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Extensions;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
-using AutoMapper;
 using MediatR;
-using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.SalonService.Salons.Queries.GetAllSalons
 {
     public class GetAllSalonsHandler : IRequestHandler<GetAllSalonsQuery, Result<PagedResult<SalonDto>>>
     {
         private readonly ISalonSqlRepository salonSqlRepository;
-        private readonly IMapper mapper;
+        private readonly ICacheService cacheService;
 
-        public GetAllSalonsHandler(ISalonSqlRepository salonSqlRepository, IMapper mapper)
+        public GetAllSalonsHandler(
+            ISalonSqlRepository salonSqlRepository,
+            ICacheService cacheService)
         {
             this.salonSqlRepository = salonSqlRepository;
-            this.mapper = mapper;
+            this.cacheService = cacheService;
         }
 
         public async Task<Result<PagedResult<SalonDto>>> Handle(GetAllSalonsQuery request, CancellationToken cancellationToken)
         {
+            var filterHash = CacheKeyHash.FromObject(new
+            {
+                request.Filter,
+                request.Status,
+                request.IsDeleted,
+                request.PageIndex,
+                request.PageSize,
+                request.OrderBy,
+                request.IsDescending,
+            });
+            var cacheKey = SalonConst.CacheKeyList(filterHash);
+            var cached = await cacheService.GetAsync<PagedResult<SalonDto>>(cacheKey, cancellationToken);
+            if (cached is not null)
+            {
+                return Result<PagedResult<SalonDto>>.Success(cached);
+            }
+
             var query = salonSqlRepository.AsQueryable();
 
             if (!string.IsNullOrEmpty(request.Filter))
@@ -62,13 +82,13 @@ namespace _66SMS.Application.SalonService.Salons.Queries.GetAllSalons
                     WorkingDays = x.WorkingDays,
                     TaxCode = x.TaxCode,
                     ImageUrl = x.ImageUrl,
-                    //Description = x.Description,
                     SortOrder = x.SortOrder,
                     Status = x.Status,
                     CreatedAt = x.CreatedAt
                 })
                 .ToPagedAsync(request, cancellationToken);
 
+            await cacheService.SetAsync(cacheKey, result, SalonConst.CACHE_TTL_LIST, cancellationToken);
             return Result<PagedResult<SalonDto>>.Success(result);
         }
     }
