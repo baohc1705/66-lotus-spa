@@ -17,7 +17,9 @@ import {
 } from "../hooks/useBookingData";
 import { useBookingStore } from "../stores/bookingStore";
 import { formatDate } from "@/shared/utils/date.utils";
-
+import { getErrorMessage } from "@/shared/utils/errorUtils";
+import type { AxiosError } from "axios";
+import type { Result } from "@/shared/types/common.types";
 export const BookingTimeStep: React.FC = () => {
   const store = useBookingStore();
   const { nextStep, prevStep, selectedSalon } = store;
@@ -126,11 +128,17 @@ export const BookingTimeStep: React.FC = () => {
         });
         nextStep();
       } else {
-        toast.error("Không thể giữ khung giờ này, vui lòng chọn giờ khác.");
+        toast.error(
+          res.message || "Không thể giữ khung giờ này, vui lòng chọn giờ khác."
+        );
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Có lỗi xảy ra khi giữ lịch.");
+      toast.error(
+        getErrorMessage(
+          error as AxiosError<Result<unknown>>,
+          "Khung giờ vừa có người đặt, vui lòng chọn lại."
+        )
+      );
     } finally {
       setIsLocking(false);
     }
