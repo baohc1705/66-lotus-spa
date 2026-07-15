@@ -7,6 +7,7 @@ using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.IdentityService.Roles.Commands.AssignPermissions
 {
@@ -68,7 +69,7 @@ namespace _66SMS.Application.IdentityService.Roles.Commands.AssignPermissions
                     {
                         RoleId = (int)request.RoleId!,
                         PermissionId = permissionId,
-                        AssignedAt = DateTime.UtcNow,
+                        AssignedAt = DateTimeHelper.UtcNow(),
                     });
                 }
 

@@ -1,3 +1,5 @@
+using _66SMS.Contracts.Helpers;
+
 namespace _66SMS.Domain.Constants
 {
     public class ServiceCategoryConst
@@ -36,9 +38,9 @@ namespace _66SMS.Domain.Constants
         public const string ICON_FILE_PREFIX = "cat_icon";
         public const string IMAGE_FILE_PREFIX = "cat_image";
 
-        public static string GenerateIconFileName(int entityId) => string.Format("{0}_{1}_{2}", ICON_FILE_PREFIX, entityId, DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmss"));
+        public static string GenerateIconFileName(int entityId) => string.Format("{0}_{1}_{2}", ICON_FILE_PREFIX, entityId, DateTimeHelper.UtcNowString());
 
-        public static string GenerateImageFileName(int entityId)  => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmss"));
+        public static string GenerateImageFileName(int entityId)  => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTimeHelper.UtcNowString());
         #endregion
 
         #region Cache

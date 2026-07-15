@@ -1,6 +1,7 @@
 using _66SMS.Contracts.Shared;
 using MediatR;
 using System.Text.Json.Serialization;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.UpdateTreatmentCourse
 {
@@ -25,7 +26,7 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.UpdateTrea
         [JsonIgnore]
         public int? UpdatedBy { get; set; }
         [JsonIgnore]
-        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeHelper.UtcNow();
     }
 
     public class UpdateTreatmentCourseItemDto

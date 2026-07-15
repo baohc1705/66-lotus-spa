@@ -2,6 +2,7 @@ using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Constants;
 using MediatR;
 using System.Text.Json.Serialization;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.CreateTreatmentCourse
 {
@@ -24,7 +25,7 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.CreateTrea
         [JsonIgnore]
         public int? CreatedBy { get; set; }
         [JsonIgnore]
-        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeHelper.UtcNow();
     }
 
     public class CreateTreatmentCourseItemDto

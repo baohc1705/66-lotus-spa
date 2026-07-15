@@ -50,7 +50,7 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetDetailUser
                 Status = user.Status.ToString(),
                 LockoutEnd = user.LockoutEnd,
                 LastLoginAt = user.LastLoginAt,
-                Roles = role == null ? [] : [role.Name],
+                Roles = role == null ? [] : [role.Name!],
                 Permissions = permissions ?? [],
             };
 

@@ -6,6 +6,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using MediatR;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.UpdateStaffCertificate
 {
@@ -52,7 +53,7 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.UpdateSta
                 entity.DocumentUrl = request.DocumentUrl;
             entity.Note = request.Note;
             if (request.Status.HasValue) entity.Status = request.Status.Value;
-            entity.UpdatedAt = DateTime.UtcNow;
+            entity.UpdatedAt = DateTimeHelper.UtcNow();
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try

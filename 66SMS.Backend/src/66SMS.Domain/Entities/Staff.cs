@@ -27,5 +27,6 @@ namespace _66SMS.Domain.Entities
 
         public User? User { get; set; }
         public List<StaffSalon>? StaffSalons { get; set; }
+        public List<StaffService>? StaffServices { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Invoices.Commands.CancelInvoice
 {
@@ -70,13 +71,13 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CancelInvoice
                     {
                         customer.LoyaltyPoint = (customer.LoyaltyPoint ?? 0) + invoice.LoyaltyPointsUsed - invoice.LoyaltyPointsEarned;
                         if (customer.LoyaltyPoint < 0) customer.LoyaltyPoint = 0;
-                        customer.UpdatedAt = DateTime.UtcNow;
+                        customer.UpdatedAt = DateTimeHelper.UtcNow();
                         customerRepository.Update(customer);
                     }
                 }
 
                 invoice.Status = InvoiceConst.STATUS_CANCELLED;
-                invoice.UpdatedAt = DateTime.UtcNow;
+                invoice.UpdatedAt = DateTimeHelper.UtcNow();
                 invoice.UpdatedBy = request.UpdatedBy;
                 invoiceRepository.Update(invoice);
 

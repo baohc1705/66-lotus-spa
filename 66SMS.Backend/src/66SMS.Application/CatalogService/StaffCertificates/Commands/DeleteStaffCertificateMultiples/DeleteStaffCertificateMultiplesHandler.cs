@@ -6,6 +6,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Contracts.Enumerations;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.DeleteStaffCertificateMultiples
 {
@@ -34,7 +35,7 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.DeleteSta
                 return Result<object>.NotFound(StaffCertificateConst.MSG_NOT_FOUND, ErrorCodes.ERR_STAFF_CERTIFICATE_NOT_FOUND);
             }
 
-            var now = DateTime.UtcNow;
+            var now = DateTimeHelper.UtcNow();
             foreach (var cert in existingCerts)
             {
                 cert.Status = StaffCertificateConst.STATUS_DELETED;

@@ -1,4 +1,5 @@
 using _66SMS.Domain.Abstractions.Entities;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Domain.Entities
 {
@@ -14,7 +15,7 @@ namespace _66SMS.Domain.Entities
 
         public DateTimeOffset CreatedAt { get; set; }
 
-        public bool IsExpired => DateTimeOffset.UtcNow >= ExpiresAt;
+        public bool IsExpired => ExpiresAt.IsExpired();
         public bool IsActive => RevokedAt == null && !IsExpired;
 
         public User? User { get; set; }

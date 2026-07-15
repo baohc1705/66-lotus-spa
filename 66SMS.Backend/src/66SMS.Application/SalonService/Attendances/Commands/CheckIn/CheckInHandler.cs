@@ -7,6 +7,7 @@ using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.SalonService.Attendances.Commands.CheckIn
 {
@@ -33,8 +34,8 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CheckIn
                     AttendanceConst.MSG_WORK_SCHEDULE_REQUIRED,
                     ErrorCodes.ERR_ATTENDANCE_WORK_SCHEDULE_REQUIRED);
 
-            var now = DateTime.Now;
-            var today = DateOnly.FromDateTime(now);
+            var now = DateTimeHelper.UtcNow();
+            var today = now.ToDateOnly();
 
             var workSchedule = await workScheduleRepository.FindByIdAsync(
                 request.WorkScheduleId.Value, asNoTracking: true, cancellationToken);
@@ -61,7 +62,7 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CheckIn
                 WorkedHours = 0,
                 Status = AttendanceConst.STATUS_CHECKED_IN,
                 Note = request.Note,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTimeHelper.UtcNow(),
             };
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);

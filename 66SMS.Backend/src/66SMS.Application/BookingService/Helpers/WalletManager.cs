@@ -2,6 +2,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Helpers
 {
@@ -39,7 +40,7 @@ namespace _66SMS.Application.BookingService.Helpers
                     FullName = user.Staff?.FullName ?? user.Username ?? "User",
                     Phone = user.Staff?.Phone,
                     Status = CustomerConst.STATUS_ACTIVED,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTimeHelper.UtcNow()
                 };
             }
             else
@@ -63,7 +64,7 @@ namespace _66SMS.Application.BookingService.Helpers
                     Customer = customer,
                     Balance = 0,
                     Status = WalletConst.STATUS_ACTIVE,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTimeHelper.UtcNow()
                 };
 
                 // Gán CustomerId trực tiếp nếu Customer đã có Id (tránh trùng khi EF track navigation)

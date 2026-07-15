@@ -2,6 +2,7 @@ using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Constants;
 using MediatR;
 using System.Text.Json.Serialization;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
 {
@@ -30,7 +31,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
         [JsonIgnore]
         public int? CreatedBy { get; set; }
         [JsonIgnore]
-        public DateTimeOffset? IssuedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? IssuedAt { get; set; } = DateTimeHelper.UtcNow();
     }
 
     public class CreateInvoiceItemDto

@@ -11,6 +11,7 @@ using _66SMS.Domain.Enums;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
 {
@@ -52,7 +53,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
                 Username = string.Empty,
                 Email = string.Empty,
                 PasswordHash = string.Empty,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTimeHelper.UtcNow(),
                 CreatedBy = request.CreatedBy,
                 Status = (int)StatusActiveEnum.ACTIVED,
                 IsEmailConfirmed = true,
@@ -77,7 +78,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
                 new UserRole
                 {
                     RoleId = role.Id,
-                    AssignedAt = DateTimeOffset.UtcNow,
+                    AssignedAt = DateTimeHelper.UtcNow(),
                     AssignedBy = request.CreatedBy,
                 }
             };
@@ -90,8 +91,8 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
                 new StaffSalon
                 {
                     SalonId = salonId,
-                    StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
-                    CreatedAt = DateTimeOffset.UtcNow,
+                    StartDate = DateTimeHelper.UtcNow().ToDateOnly(),
+                    CreatedAt = DateTimeHelper.UtcNow(),
                     Status = (int)StatusActiveEnum.ACTIVED,
                     IsManager = isManager,
                 }

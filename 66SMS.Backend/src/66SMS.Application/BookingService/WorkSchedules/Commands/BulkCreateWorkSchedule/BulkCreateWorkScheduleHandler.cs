@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.WorkSchedules.Commands.BulkCreateWorkSchedule
 {
@@ -50,7 +51,7 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Commands.BulkCreateWor
                 if (!isDuplicate)
                 {
                     var entity = mapper.Map<WorkSchedule>(schedule);
-                    entity.CreatedAt = DateTime.UtcNow;
+                    entity.CreatedAt = DateTimeHelper.UtcNow();
                     entity.Status = _66SMS.Domain.Constants.WorkScheduleConst.STATUS_ACTIVED;
                     validSchedules.Add(entity);
                 }

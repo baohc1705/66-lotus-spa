@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromAppointment
 {
@@ -126,7 +127,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
 
                 var invoice = new Invoice
                 {
-                    InvoiceCode = $"HD-{DateTime.UtcNow:yyyyMMddHHmmssfff}",
+                    InvoiceCode = $"HD-{DateTimeHelper.UtcNow():yyyyMMddHHmmssfff}",
                     CustomerId = customer?.Id,
                     CustomerName = customer?.FullName ?? appointment.CreatedByUser?.Username,
                     CustomerPhone = customer?.Phone,
@@ -147,8 +148,8 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
                     PaymentMethod = paymentMethod,
                     Status = status,
                     Note = appointment.Note,
-                    IssuedAt = DateTime.UtcNow,
-                    CreatedAt = DateTime.UtcNow,
+                    IssuedAt = DateTimeHelper.UtcNow(),
+                    CreatedAt = DateTimeHelper.UtcNow(),
                     CreatedBy = request.CreatedBy,
                     Items = items
                 };

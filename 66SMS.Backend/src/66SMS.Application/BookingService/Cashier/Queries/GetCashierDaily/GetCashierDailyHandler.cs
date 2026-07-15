@@ -59,13 +59,13 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
 
             // Lấy danh sách lịch hẹn trong ngày
             var appointmentsQuery = appointmentRepository.AsQueryable()
-                .Include(a => a.Staff)
-                .Include(a => a.CreatedByUser)
-                    .ThenInclude(u => u!.Customer)
-                .Include(a => a.CreatedByUser)
-                    .ThenInclude(u => u!.Staff)
-                .Include(a => a.TimeSlot)
-                .Include(a => a.Services)
+                .Include(a => a.Staff!)
+                .Include(a => a.CreatedByUser!)
+                    .ThenInclude(u => u!.Customer!)
+                .Include(a => a.CreatedByUser!)
+                    .ThenInclude(u => u!.Staff!)
+                .Include(a => a.TimeSlot!)
+                .Include(a => a.Services!)
                     .ThenInclude(s => s.Service)
                 .Where(a => request.EndDate.HasValue 
                     ? a.AppointmentDate >= request.Date && a.AppointmentDate <= request.EndDate.Value

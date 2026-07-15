@@ -29,7 +29,7 @@ namespace _66SMS.Application.BookingService.TimeSlots.Commands.UpdateTimeSlot
 
         public async Task<Result<int>> Handle(UpdateTimeSlotCommand request, CancellationToken cancellationToken)
         {
-            TimeSlot? timeSlot = await timeSlotSqlRepository.FindByIdAsync((int)request.Id, false, cancellationToken);
+            TimeSlot? timeSlot = await timeSlotSqlRepository.FindByIdAsync((int)request.Id!, false, cancellationToken);
             if (timeSlot == null)
             {
                 return Result<int>.NotFound(TimeSlotConst.MSG_TIME_SLOT_NOT_FOUND, ErrorCodes.ERR_TIME_SLOT_NOT_FOUND);

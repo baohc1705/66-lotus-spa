@@ -32,16 +32,10 @@ namespace _66SMS.Application.SalonService.Attendances.Queries.GetAllAttendances
                 query = query.Where(x => x.Status == request.Status);
 
             if (request.FromDate.HasValue)
-            {
-                var from = DateOnly.FromDateTime(request.FromDate.Value);
-                query = query.Where(x => x.WorkDate >= from);
-            }
+                query = query.Where(x => x.WorkDate >= request.FromDate.Value);
 
             if (request.ToDate.HasValue)
-            {
-                var to = DateOnly.FromDateTime(request.ToDate.Value);
-                query = query.Where(x => x.WorkDate <= to);
-            }
+                query = query.Where(x => x.WorkDate <= request.ToDate.Value);
 
             query = request.IsDescending
                 ? query.OrderByDescending(x => x.WorkDate).ThenByDescending(x => x.Id)

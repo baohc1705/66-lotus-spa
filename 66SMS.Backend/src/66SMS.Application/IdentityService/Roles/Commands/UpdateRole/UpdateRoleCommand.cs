@@ -1,6 +1,7 @@
 using _66SMS.Contracts.Shared;
 using MediatR;
 using System.Text.Json.Serialization;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.IdentityService.Roles.Commands.UpdateRole
 {
@@ -14,7 +15,7 @@ namespace _66SMS.Application.IdentityService.Roles.Commands.UpdateRole
         public string? Name { get; set; }
         public string? Description { get; set; }
         [JsonIgnore]
-        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeHelper.UtcNow();
         [JsonIgnore]
         public int? UpdatedBy { get; set; }
 

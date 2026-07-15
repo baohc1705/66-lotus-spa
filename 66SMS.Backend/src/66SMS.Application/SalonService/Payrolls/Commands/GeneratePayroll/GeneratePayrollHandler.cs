@@ -8,6 +8,7 @@ using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
 {
@@ -120,7 +121,7 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
                         TotalAmount = totalAmount,
                         Status = PayrollConst.STATUS_DRAFT,
                         Note = BuildPayrollNote(standardWorkDays, excludeSaturday, commissionAmount),
-                        CreatedAt = DateTime.UtcNow,
+                        CreatedAt = DateTimeHelper.UtcNow(),
                         CreatedBy = request.CreatedBy,
                     };
                     payrollRepository.Add(payroll);
@@ -139,7 +140,7 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
                     payroll.CommissionAmount = commissionAmount;
                     payroll.TotalAmount = totalAmount;
                     payroll.Note = MergePayrollNote(payroll.Note, standardWorkDays, excludeSaturday, commissionAmount);
-                    payroll.UpdatedAt = DateTime.UtcNow;
+                    payroll.UpdatedAt = DateTimeHelper.UtcNow();
                     payroll.UpdatedBy = request.CreatedBy;
                     payrollRepository.Update(payroll);
                 }

@@ -1,4 +1,5 @@
 using System.Data;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
@@ -48,19 +49,21 @@ public class CreatedUserConsumer : IConsumer<CreatedUserEvent>
             .Select(x => x.Id)
             .FirstOrDefaultAsync(context.CancellationToken);
 
+        var now = DateTimeHelper.UtcNow();
+
         var wallet = new Wallet
         {
             CustomerId = message.CustomerId,
             Balance = 0,
             Status = (int)StatusActiveEnum.ACTIVED,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = now
         };
 
         var membershipCard = new MembershipCard
         {
             CustomerId = message.CustomerId,
             MembershipTierId = membershipTierId,
-            IssuedAt = DateTime.UtcNow,
+            IssuedAt = now,
             Status = (int)StatusActiveEnum.ACTIVED
         };
 

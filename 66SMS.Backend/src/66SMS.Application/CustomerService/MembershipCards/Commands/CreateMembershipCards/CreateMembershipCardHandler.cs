@@ -111,7 +111,7 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.CreateMemb
         private string GenerateCardCode()
         {
             string random = Random.Shared.Next(100000,999999).ToString();
-            string dateNowStr = DateTimeHelper.VietnamNowString("HHmmss");
+            string dateNowStr = DateTimeHelper.UtcNowString("HHmmss");
             return $"LOTUS{dateNowStr}{random}";
         }
     }

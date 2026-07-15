@@ -62,10 +62,10 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Queries.GetDetailMe
                     CustomerName = x.Customer!.FullName,
                     MembershipTierId = x.MembershipTierId,
                     TierName = x.Tier!.Name,
-                    IssuedAt = x.IssuedAt.ToString(),
-                    ExpiresAt = x.ExpiresAt.ToString(),
+                    IssuedAt = x.IssuedAt,
+                    ExpiresAt = x.ExpiresAt,
                     Status = x.Status,
-                    CreatedAt = x.IssuedAt.ToString()
+                    CreatedAt = x.IssuedAt
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

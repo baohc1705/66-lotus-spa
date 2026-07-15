@@ -4,6 +4,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Enums;
 using MediatR;
 using System.Text.Json.Serialization;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
 {
@@ -24,7 +25,7 @@ namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
         public int MinStock { get; set; }
         public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
         [JsonIgnore]
-        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeHelper.UtcNow();
         public List<ProductImageDto> Images { get; set; } = new();
     }
 }

@@ -9,8 +9,8 @@ namespace _66SMS.Application.BookingService.Invoices.Queries.GetAllInvoices
         public int? Status { get; set; }
         public int? CustomerId { get; set; }
         public int? SalonId { get; set; }
-        public DateTime? FromDate { get; set; }
-        public DateTime? ToDate { get; set; }
+        public DateTimeOffset? FromDate { get; set; }
+        public DateTimeOffset? ToDate { get; set; }
         public int? PaymentMethod { get; set; }
     }
 }

@@ -2,6 +2,7 @@ using _66SMS.Contracts.Shared;
 using MediatR;
 using System;
 using System.Text.Json.Serialization;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
 {
@@ -35,6 +36,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
         public int? UpdatedBy { get; set; }
 
         [JsonIgnore]
-        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeHelper.UtcNow();
     }
 }

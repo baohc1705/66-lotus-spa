@@ -7,6 +7,7 @@ using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using _66SMS.Application.BookingService.Helpers;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentStatus
 {
@@ -52,7 +53,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                     && appointment.Status == AppointmentConst.STATUS_PENDING
                     && !AppointmentPaymentCalculator.HasDepositPaid(appointment))
                 {
-                    var now = DateTime.UtcNow;
+                    var now = DateTimeHelper.UtcNow();
                     appointment.DepositRequestedAt = now;
                     appointment.DepositDeadlineAt = now.AddHours(24);
                     appointment.Status = AppointmentConst.STATUS_CONFIRMED;
@@ -73,7 +74,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                 var paidBeforeCancel = appointment.PaidAmount;
                 appointment.Status = request.Status;
 
-                var nowTime = DateTime.UtcNow;
+                var nowTime = DateTimeHelper.UtcNow();
                 appointment.UpdatedAt = nowTime;
                 appointment.UpdatedBy = request.UserId;
                 if (!string.IsNullOrWhiteSpace(request.Note))
@@ -112,7 +113,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                         Type = WalletTransactionConst.TYPE_REFUND_FROM_APPOINTMENT,
                         Note = $"Hoàn tiền do thu ngân hủy lịch hẹn #{appointment.Id}",
                         Status = WalletTransactionConst.STATUS_SUCCESS,
-                        CreatedAt = DateTime.UtcNow,
+                        CreatedAt = DateTimeHelper.UtcNow(),
                         CreatedBy = request.UserId
                     });
 

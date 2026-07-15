@@ -7,6 +7,7 @@ using _66SMS.Contracts.Enumerations;
 using Microsoft.EntityFrameworkCore;
 using _66SMS.Domain.Enums;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.DeleteTreatmentCourseMultiples
 {
@@ -35,7 +36,7 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.DeleteTrea
                 return Result<object>.NotFound(TreatmentCourseConst.MSG_NOT_FOUND, ErrorCodes.ERR_TREATMENT_COURSE_NOT_FOUND);
             }
 
-            var now = DateTime.UtcNow;
+            var now = DateTimeHelper.UtcNow();
             foreach (var course in existingCourses)
             {
                 course.Status = (int)StatusActiveEnum.DELETED;

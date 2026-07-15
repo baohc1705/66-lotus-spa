@@ -12,6 +12,7 @@ using _66SMS.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.Login
 {
@@ -69,7 +70,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Login
                 if (userExisted.AccessFailedCount >= jwtOptions.Value.MaxFailedAttempts)
                 {
                     userExisted.Status = (int)StatusActiveEnum.IACTIVED;
-                    userExisted.LockoutEnd = DateTime.UtcNow.AddMinutes(jwtOptions.Value.AccessTokenExpiryMinutes);
+                    userExisted.LockoutEnd = DateTimeHelper.UtcNow().AddMinutes(jwtOptions.Value.AccessTokenExpiryMinutes);
                 }
 
                 userSqlRepository.Update(userExisted);
@@ -83,7 +84,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Login
             userExisted.AccessFailedCount = 0;
             userExisted.Status = (int)StatusActiveEnum.ACTIVED;
             userExisted.LockoutEnd = null;
-            userExisted.LastLoginAt = DateTimeOffset.UtcNow;
+            userExisted.LastLoginAt = DateTimeHelper.UtcNow();
             userSqlRepository.Update(userExisted);
 
             string? role = await userRoleSqlRepository
@@ -113,9 +114,9 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Login
             {
                 UserId = userExisted.Id,
                 Token = rawRefreshToken,
-                ExpiresAt = DateTime.UtcNow.AddDays(jwtOptions.Value.RefreshTokenExpiryDays),
+                ExpiresAt = DateTimeHelper.UtcNow().AddDays(jwtOptions.Value.RefreshTokenExpiryDays),
                 CreatedByIp = request.IpAddress ?? "",
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTimeHelper.UtcNow(),
             });
 
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

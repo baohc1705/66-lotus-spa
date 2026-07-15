@@ -45,7 +45,7 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetAllUsers
                 Status = x.Status.ToString(),
                 LockoutEnd = x.LockoutEnd,
                 LastLoginAt = x.LastLoginAt,
-                Roles = x.UserRoles!.Select(ur => ur.Role!.Name).ToList(),
+                Roles = x.UserRoles!.Select(ur => ur.Role!.Name!).ToList(),
                 Permissions = x.UserRoles!
                     .SelectMany(ur => ur.Role!.RolePermissions!
                         .Where(rp => rp.Permission != null)

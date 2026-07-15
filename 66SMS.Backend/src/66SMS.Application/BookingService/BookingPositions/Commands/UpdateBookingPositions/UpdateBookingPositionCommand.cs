@@ -2,6 +2,7 @@ using _66SMS.Contracts.Shared;
 using MediatR;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text.Json.Serialization;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.BookingPositions.Commands.UpdateBookingPositions
 {
@@ -15,6 +16,6 @@ namespace _66SMS.Application.BookingService.BookingPositions.Commands.UpdateBook
         public string? Note { get; set; }
         public int? Status { get; set; }
         [JsonIgnore]
-        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeHelper.UtcNow();
     }
 }

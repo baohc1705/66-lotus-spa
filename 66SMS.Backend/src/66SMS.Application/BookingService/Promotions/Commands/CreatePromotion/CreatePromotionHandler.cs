@@ -7,6 +7,7 @@ using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Promotions.Commands.CreatePromotion
 {
@@ -33,7 +34,7 @@ namespace _66SMS.Application.BookingService.Promotions.Commands.CreatePromotion
 
             Promotion promotion = mapper.Map<Promotion>(request);
             promotion.UsedCount = 0;
-            promotion.CreatedAt = DateTime.UtcNow;
+            promotion.CreatedAt = DateTimeHelper.UtcNow();
 
             promotionSqlRepository.Add(promotion);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

@@ -24,7 +24,7 @@ namespace _66SMS.Application.IdentityService.Roles.Commands.UpdateRole
             if (role == null) return Result<object>.NotFound(RoleConst.MSG_ROLE_NOT_FOUND, ErrorCodes.ERR_ROLE_NOT_FOUND);
 
             bool nameExisted = await roleSqlRepository.AnyAsync(
-                x => x.Name.Equals(request.Name) && x.Id != request.Id, cancellationToken);
+                x => x.Name!.Equals(request.Name) && x.Id != request.Id, cancellationToken);
             if (nameExisted) return Result<object>.BadRequest(RoleConst.MSG_ROLE_NAME_EXISTED, ErrorCodes.ERR_ROLE_NAME_EXISTED);
 
             role.Name = request.Name;

@@ -7,6 +7,7 @@ using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.SalonService.Attendances.Commands.CheckOut
 {
@@ -30,8 +31,8 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CheckOut
                     AttendanceConst.MSG_WORK_SCHEDULE_REQUIRED,
                     ErrorCodes.ERR_ATTENDANCE_WORK_SCHEDULE_REQUIRED);
 
-            var now = DateTime.Now;
-            var today = DateOnly.FromDateTime(now);
+            var now = DateTimeHelper.UtcNow();
+            var today = now.ToDateOnly();
 
             var attendance = await attendanceRepository
                 .AsQueryable(asNoTracking: false)
@@ -47,7 +48,7 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CheckOut
             attendance.CheckOutAt = now;
             attendance.WorkedHours = Math.Round((decimal)(now - attendance.CheckInAt.Value).TotalHours, 2);
             attendance.Status = AttendanceConst.STATUS_CHECKED_OUT;
-            attendance.UpdatedAt = DateTime.UtcNow;
+            attendance.UpdatedAt = DateTimeHelper.UtcNow();
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try

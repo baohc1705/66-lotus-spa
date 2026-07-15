@@ -7,6 +7,7 @@ using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.WorkSchedules.Commands.UpdateWorkSchedule
 {
@@ -28,7 +29,7 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Commands.UpdateWorkSch
             if (workSchedule == null) return Result<object>.NotFound(WorkScheduleConst.MSG_WORK_SCHEDULE_NOT_FOUND, ErrorCodes.ERR_WORK_SCHEDULE_NOT_FOUND);
 
             mapper.Map(request, workSchedule);
-            workSchedule.UpdatedAt = DateTime.UtcNow;
+            workSchedule.UpdatedAt = DateTimeHelper.UtcNow();
 
             bool isDuplicate = await workScheduleSqlRepository.AnyAsync(x => x.Id != request.Id && x.StaffId == workSchedule.StaffId && x.ShiftPeriodId == workSchedule.ShiftPeriodId && x.WorkDate == workSchedule.WorkDate, cancellationToken);
             if (isDuplicate)

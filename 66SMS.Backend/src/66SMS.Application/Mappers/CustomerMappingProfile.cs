@@ -6,7 +6,6 @@ using _66SMS.Application.CustomerService.MembershipTiers.Commands.CreateMembersh
 using _66SMS.Application.CustomerService.MembershipTiers.Commands.UpdateMembershipTiers;
 using _66SMS.Application.DTOs.MembershipCards;
 using _66SMS.Application.DTOs.MembershipTiers;
-using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 
@@ -40,9 +39,6 @@ namespace _66SMS.Application.Mappers
             CreateMap<MembershipCard, MembershipCardDto>()
                 .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer != null ? src.Customer.FullName : null))
                 .ForMember(dest => dest.TierName, opt => opt.MapFrom(src => src.Tier != null ? src.Tier.Name : null))
-                .ForMember(dest => dest.IssuedAt, opt => opt.MapFrom(src => src.IssuedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
-                .ForMember(dest => dest.ExpiresAt, opt => opt.MapFrom(src => src.ExpiresAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.IssuedAt.ToVietnamTimeString("dd/MM/yyyy HH:mm:ss")))
                 .IgnoreNullValueTypes();
         }
     }

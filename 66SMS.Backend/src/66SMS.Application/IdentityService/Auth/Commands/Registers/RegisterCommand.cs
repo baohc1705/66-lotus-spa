@@ -3,6 +3,7 @@ using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Enums;
 using MediatR;
 using System.Text.Json.Serialization;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
 {
@@ -18,7 +19,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
         public string? Password { get; set; }
         public string? ConfirmPassword { get; set; }
         [JsonIgnore]
-        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeHelper.UtcNow();
         
         public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
     }

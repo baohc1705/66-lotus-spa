@@ -10,6 +10,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
 {
@@ -83,7 +84,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
             {
                 customer = await customerRepository.AsQueryable(asNoTracking: false)
                     .Include(c => c.MembershipCard)
-                        .ThenInclude(mc => mc.Tier)
+                        .ThenInclude(mc => mc!.Tier)
                     .FirstOrDefaultAsync(c => c.Id == invoice.CustomerId.Value, cancellationToken);
             }
 
@@ -125,7 +126,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                         Type = WalletTransactionConst.TYPE_PAYMENT_FOR_APPOINTMENT,
                         Note = $"Thanh toán phần còn lại cho hóa đơn #{invoice.InvoiceCode}",
                         Status = WalletTransactionConst.STATUS_SUCCESS,
-                        CreatedAt = DateTime.UtcNow,
+                        CreatedAt = DateTimeHelper.UtcNow(),
                         CreatedBy = request.CashierId ?? 0
                     };
                     walletTransactionRepository.Add(walletTx);
@@ -137,7 +138,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                 invoice.PaymentMethod = request.PaymentMethod;
                 invoice.Status = InvoiceConst.STATUS_PAID;
                 invoice.Note = request.Note;
-                invoice.UpdatedAt = DateTime.UtcNow;
+                invoice.UpdatedAt = DateTimeHelper.UtcNow();
                 invoice.UpdatedBy = request.CashierId;
                 invoiceRepository.Update(invoice);
 
@@ -174,7 +175,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                         }
                     }
 
-                    appointment.UpdatedAt = DateTime.UtcNow;
+                    appointment.UpdatedAt = DateTimeHelper.UtcNow();
                     appointment.UpdatedBy = request.CashierId;
                     appointmentRepository.Update(appointment);
                 }
@@ -204,9 +205,9 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                         }
                     }
 
-                    customer.LastPurchaseAt = DateTime.UtcNow;
-                    customer.FirstPurchaseAt ??= DateTime.UtcNow;
-                    customer.UpdatedAt = DateTime.UtcNow;
+                    customer.LastPurchaseAt = DateTimeHelper.UtcNow();
+                    customer.FirstPurchaseAt ??= DateTimeHelper.UtcNow();
+                    customer.UpdatedAt = DateTimeHelper.UtcNow();
                     customerRepository.Update(customer);
                 }
 

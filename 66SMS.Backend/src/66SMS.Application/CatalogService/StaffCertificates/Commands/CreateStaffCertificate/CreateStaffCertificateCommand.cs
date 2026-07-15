@@ -1,4 +1,5 @@
 using _66SMS.Contracts.Shared;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Constants;
 using MediatR;
 using System.Text.Json.Serialization;
@@ -23,6 +24,6 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.CreateSta
         [JsonIgnore]
         public int? CreatedBy { get; set; }
         [JsonIgnore]
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeHelper.UtcNow();
     }
 }

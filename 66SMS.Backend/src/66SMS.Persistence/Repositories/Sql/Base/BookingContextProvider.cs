@@ -4,6 +4,7 @@ using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
+using _66SMS.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Persistence.Repositories.Sql.Base
@@ -61,13 +62,16 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
                 .ToList();
             if (staffIdsOnDuty.Count == 0) return null;
 
+            // Chỉ lấy NV đang làm + đã được phân công dịch vụ này (StaffService active)
             var staffWithSalons = await staffSqlRepository
                 .AsQueryable()
                 .Where(x => staffIdsOnDuty.Contains(x.Id) && x.Status == StaffConst.STATUS_ACTIVED)
+                .Where(x => x.StaffServices != null && x.StaffServices.Any(ss =>
+                    ss.ServiceId == serviceId && ss.Status == (int)StatusActiveEnum.ACTIVED))
                 .Select(x => new
                 {
                     Staff = x,
-                    StaffSalons = x.StaffSalons.Where(ss => ss.Status == StaffSalonConst.STATUS_ACTIVE).ToList()
+                    StaffSalons = x.StaffSalons!.Where(ss => ss.Status == StaffSalonConst.STATUS_ACTIVE).ToList()
                 })
                 .ToListAsync(cancellationToken);
 
@@ -80,10 +84,11 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             activeStaff = await FilterEmployeeStaffAsync(activeStaff, cancellationToken);
             if (activeStaff.Count == 0) return null;
 
+            var activeStaffIds = activeStaff.Select(s => s.Id).ToHashSet();
             var staffShiftWindows = new Dictionary<int, List<ShiftWindow>>();
             var staffScheduleIds = new Dictionary<int, int>();
 
-            foreach (var ws in schedules.Where(ws => ws.ShiftPeriod != null))
+            foreach (var ws in schedules.Where(ws => ws.ShiftPeriod != null && activeStaffIds.Contains(ws.StaffId)))
             {
                 if (!staffShiftWindows.TryGetValue(ws.StaffId, out var windows))
                 {
@@ -125,6 +130,8 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var heldSlots = new Dictionary<(int StaffId, int SlotId), byte>();
             foreach (var slotLock in locks)
             {
+                // SlotsNeeded lưu lúc lock phải khớp DurationMins / độ dài slot DB (CreateSlotLock đã ResolveSlotMinutes).
+                // Không hard-code DEFAULT để tránh khóa lệch (vd chọn 8:30 khóa nhầm từ 8:00).
                 var lockSlotsNeeded = slotLock.SlotsNeeded > 0 ? slotLock.SlotsNeeded : slotsNeeded;
                 MarkConsecutiveSlots(heldSlots, slotLock.StaffId, slotLock.SlotId, lockSlotsNeeded, timeSlots);
             }

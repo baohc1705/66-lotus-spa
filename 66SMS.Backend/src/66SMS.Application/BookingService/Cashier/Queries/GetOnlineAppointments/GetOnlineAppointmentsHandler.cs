@@ -18,14 +18,14 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointment
         {
             
             var query = appointmentRepository.AsQueryable()
-                .Include(a => a.CreatedByUser)
-                    .ThenInclude(u => u!.Customer)
-                .Include(a => a.CreatedByUser)
-                    .ThenInclude(u => u!.Staff)
-                .Include(a => a.TimeSlot)
-                .Include(a => a.Services)
+                .Include(a => a.CreatedByUser!)
+                    .ThenInclude(u => u!.Customer!)
+                .Include(a => a.CreatedByUser!)
+                    .ThenInclude(u => u!.Staff!)
+                .Include(a => a.TimeSlot!)
+                .Include(a => a.Services!)
                     .ThenInclude(s => s.Service)
-                .Where(a => a.StaffId == null && a.Status != AppointmentConst.STATUS_CANCELLED && a.Status != AppointmentConst.STATUS_COMPLETED);
+                .Where(a => a.Status != AppointmentConst.STATUS_CANCELLED && a.Status != AppointmentConst.STATUS_COMPLETED);
 
             if (request.SalonId.HasValue)
             {

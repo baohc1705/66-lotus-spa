@@ -19,6 +19,7 @@ using _66SMS.Application.IdentityService.Roles.Commands.DeleteRole;
 using _66SMS.Application.IdentityService.Roles.Commands.UpdateRole;
 using _66SMS.Application.IdentityService.Roles.Queries.GetAllRoles;
 using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Helpers;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -228,7 +229,7 @@ namespace _66SMS.API.Controllers
             Response.Cookies.Append(
                 "refreshToken",
                 token,
-                RefreshTokenCookieOptions(DateTimeOffset.UtcNow.AddDays(7)));
+                RefreshTokenCookieOptions(DateTimeHelper.UtcNow().AddDays(7)));
         }
 
         private void DeleteRefreshTokenCookies()

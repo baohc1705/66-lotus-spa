@@ -9,6 +9,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using _66SMS.Application.BookingService.Helpers;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointment
 {
@@ -80,7 +81,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         validLock = await appointmentSlotLockSqlRepository.FindByIdAsync(guest.LockId.Value);
                         if (validLock == null ||
                             validLock.Status != AppointmentSlotLockConst.STATUS_ACTIVE ||
-                            validLock.ExpiresAt <= DateTime.UtcNow)
+                            validLock.ExpiresAt <= DateTimeHelper.UtcNow())
                         {
                             return Result<List<int>>.BadRequest(AppointmentConst.MSG_APPOINTMENT_SLOT_LOCK_INVALID, ErrorCodes.ERR_APPOINTMENT_SLOT_LOCK_INVALID);
                         }
@@ -100,6 +101,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                             mainServiceId,
                             guest.StaffId,
                             (int)guest.SlotId!,
+                            salonId: guest.SalonId,
                             cancellationToken);
 
                         if (resolvedStaff == null)
@@ -138,7 +140,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                             DurationSnapshot = serviceEntity.DurationMins,
                             Quantity = (int)reqService.Quantity!,
                             Status = AppointmentServiceConst.STATUS_ACTIVE, // Active
-                            CreatedAt = DateTime.UtcNow
+                            CreatedAt = DateTimeHelper.UtcNow()
                         });
                         totalAmount += serviceEntity.SellingPrice * (int)reqService.Quantity;
                     }
@@ -153,7 +155,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                     // Tạo record Appointment
                     var appointment = new Appointment
                     {
-                        AppointmentCode = $"APT-{DateTime.UtcNow:yyyyMMddHHmmss}-{new Random().Next(100, 999)}",
+                        AppointmentCode = $"APT-{DateTimeHelper.UtcNow():yyyyMMddHHmmss}-{new Random().Next(100, 999)}",
                         CreatedByUserId = (int)request.CreatedByUserId!,
                         StaffId = staffId,
                         SalonId = guest.SalonId,
@@ -167,7 +169,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         TotalAmount = totalAmount,
                         PaidAmount = 0,
                         Services = appointmentServices,
-                        CreatedAt = DateTime.UtcNow,
+                        CreatedAt = DateTimeHelper.UtcNow(),
                         CreatedBy = request.CreatedByUserId,
                         DepositPercent = AppointmentPaymentCalculator.DefaultDepositPercent
                     };
@@ -181,7 +183,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                     if (validLock != null)
                     {
                         validLock.Status = AppointmentSlotLockConst.STATUS_RELEASED;
-                        validLock.ReleasedAt = DateTime.UtcNow;
+                        validLock.ReleasedAt = DateTimeHelper.UtcNow();
                         validLock.Appointment = appointment;
                         appointmentSlotLockSqlRepository.Update(validLock);
                         await appointmentSlotLockSqlRepository.SaveChangeAsync(cancellationToken);
@@ -207,7 +209,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_INACTIVE, ErrorCodes.ERR_PROMOTION_INACTIVE);
                     }
 
-                    var now = DateTime.UtcNow;
+                    var now = DateTimeHelper.UtcNow();
                     if (promo.StartDate > now || promo.EndDate < now)
                     {
                         transaction.Rollback();

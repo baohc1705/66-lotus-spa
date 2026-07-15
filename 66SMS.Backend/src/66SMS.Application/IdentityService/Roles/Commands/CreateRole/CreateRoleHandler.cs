@@ -24,7 +24,7 @@ namespace _66SMS.Application.IdentityService.Roles.Commands.CreateRole
         public async Task<Result<int>> Handle(CreateRoleCommand request, CancellationToken cancellationToken)
         {
             // Check if name exsisted
-            bool hasNameExsited = await roleSqlRepository.AnyAsync(x => x.Name.Equals(request.Name), cancellationToken);
+            bool hasNameExsited = await roleSqlRepository.AnyAsync(x => x.Name!.Equals(request.Name), cancellationToken);
             
             // return if name existed
             if (hasNameExsited) 

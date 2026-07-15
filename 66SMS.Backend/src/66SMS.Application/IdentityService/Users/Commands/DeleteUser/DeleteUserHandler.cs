@@ -8,6 +8,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.IdentityService.Users.Commands.DeleteUser
 {
@@ -62,7 +63,7 @@ namespace _66SMS.Application.IdentityService.Users.Commands.DeleteUser
                     foreach (var user in users)
                     {
                         user.Status = UserConst.STATUS_DELETED;
-                        user.UpdatedAt = DateTime.UtcNow;
+                        user.UpdatedAt = DateTimeHelper.UtcNow();
                         user.UpdatedBy = request.UpdatedBy;
                         userSqlRepository.Update(user);
                     }

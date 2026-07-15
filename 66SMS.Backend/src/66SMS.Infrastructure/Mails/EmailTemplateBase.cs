@@ -1,5 +1,6 @@
 ﻿using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Constants;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 
 namespace _66SMS.Infrastructure.Mails
@@ -20,7 +21,7 @@ namespace _66SMS.Infrastructure.Mails
                     {innerHtml}
                     <hr style="margin-top:32px;border:none;border-top:1px solid #eee;"/>
                     <p style="color:{MailConst.Template.FooterTextColor};font-size:{MailConst.Template.FooterFontSize};margin-top:8px;">
-                        &copy; {DateTime.UtcNow.Year} {MailConst.Template.AppName}. All rights reserved.
+                        &copy; {DateTimeHelper.UtcNow().Year} {MailConst.Template.AppName}. All rights reserved.
                     </p>
                 </body>
                 </html>

@@ -28,7 +28,8 @@ namespace _66SMS.Infrastructure.Payments.VnPay
             vnpay.AddRequestData("vnp_Command", "pay");
             vnpay.AddRequestData("vnp_TmnCode", vnPaySettings.TmnCode);
             vnpay.AddRequestData("vnp_Amount", ((long)(amount * 100)).ToString()); // Quy tắc VNPAY: Amount phải nhân 100
-            vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
+            // VNPay yêu cầu chuỗi yyyyMMddHHmmss; dùng UTC thống nhất hệ thống
+            vnpay.AddRequestData("vnp_CreateDate", DateTimeHelper.UtcNowString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", "VND");
             vnpay.AddRequestData("vnp_IpAddr", ipAddress);
             vnpay.AddRequestData("vnp_Locale", "vn");

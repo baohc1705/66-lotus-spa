@@ -1,6 +1,7 @@
 using _66SMS.Contracts.Shared;
 using MediatR;
 using System.Text.Json.Serialization;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMembershipCards
 {
@@ -18,6 +19,6 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMemb
         [JsonIgnore]
         public int? UpdatedBy { get; set; }
         [JsonIgnore]
-        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeHelper.UtcNow();
     }
 }

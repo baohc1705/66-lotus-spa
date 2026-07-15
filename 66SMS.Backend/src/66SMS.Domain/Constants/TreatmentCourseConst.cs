@@ -1,3 +1,5 @@
+using _66SMS.Contracts.Helpers;
+
 namespace _66SMS.Domain.Constants
 {
     public class TreatmentCourseConst
@@ -33,7 +35,7 @@ namespace _66SMS.Domain.Constants
         #endregion
 
         #region Message
-        public const string MSG_NOT_FOUND = "Liệu trình không tồn tại.";
+        public const string MSG_NOT_FOUND = "Liá»‡u trÃ¬nh khÃ´ng tá»“n táº¡i.";
         public const string MSG_ID_NOT_FOUND = $"{nameof(Entities.TreatmentCourse)} with id not found";
         #endregion
         #region Image Storage
@@ -41,7 +43,7 @@ namespace _66SMS.Domain.Constants
         public const string IMAGE_FILE_PREFIX = "treatment_course";
 
         public static string GenerateImageFileName(int entityId)
-            => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTime.Now.ToString("yyyyMMddHHmmss"));
+            => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTimeHelper.UtcNowString());
         #endregion
     }
 }

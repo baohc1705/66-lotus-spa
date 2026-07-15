@@ -1,6 +1,7 @@
 using _66SMS.Contracts.Constants;
 using _66SMS.Domain.Constants;
 using FluentValidation;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
 {
@@ -16,7 +17,7 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
             RuleFor(x => x.Phone).NotNull().Matches(RegexConst.VIETNAM_PHONE_REGEX).MaximumLength(CustomerConst.PHONE_MAX_LENGTH);
 
             RuleFor(x => x.AvatarUrl).MaximumLength(CustomerConst.AVATAR_URL_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.AvatarUrl));
-            RuleFor(x => x.DateOfBirth).LessThan(DateOnly.FromDateTime(DateTime.Now)).When(x => x.DateOfBirth.HasValue);
+            RuleFor(x => x.DateOfBirth).LessThan(DateTimeHelper.UtcNow().ToDateOnly()).When(x => x.DateOfBirth.HasValue);
             RuleFor(x => x.Gender) .GreaterThanOrEqualTo(0).When(x => x.Gender.HasValue);
             RuleFor(x => x.LoyaltyPoint).GreaterThanOrEqualTo(0).When(x => x.LoyaltyPoint.HasValue);
             RuleFor(x => x.Note).MaximumLength(CustomerConst.NOTE_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.Note));

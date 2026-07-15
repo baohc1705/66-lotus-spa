@@ -3,6 +3,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Entities;
 using MediatR;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CatalogService.ServiceProducts.Commands.CreateServiceProducts
 {
@@ -26,7 +27,7 @@ namespace _66SMS.Application.CatalogService.ServiceProducts.Commands.CreateServi
                 QuantityUsed = request.QuantityUsed,
                 Note = request.Note,
                 Status = request.Status,
-                CreatedAt = request.CreatedAt ?? DateTime.UtcNow,
+                CreatedAt = request.CreatedAt ?? DateTimeHelper.UtcNow(),
             };
 
             repository.Add(entity);

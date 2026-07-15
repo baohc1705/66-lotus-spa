@@ -8,10 +8,10 @@ namespace _66SMS.Application.DTOs.MembershipCards
         public int? MembershipTierId { get; set; }
         public string? TierName { get; set; }
         public string? CardCode { get; set; }
-        public string? IssuedAt { get; set; }
-        public string? ExpiresAt { get; set; }
+        public DateTimeOffset? IssuedAt { get; set; }
+        public DateTimeOffset? ExpiresAt { get; set; }
         public int? Status { get; set; }
-        public string? CreatedAt { get; set; }
-        public string? UpdatedAt { get; set; }
+        public DateTimeOffset? CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
     }
 }

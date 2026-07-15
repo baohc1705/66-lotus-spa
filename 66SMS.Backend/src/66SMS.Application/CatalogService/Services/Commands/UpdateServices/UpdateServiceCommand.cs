@@ -2,6 +2,7 @@ using _66SMS.Application.CatalogService.Services.Commands.CreateServices;
 using _66SMS.Contracts.Shared;
 using MediatR;
 using System.Text.Json.Serialization;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
 {
@@ -29,6 +30,6 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
         /// </summary>
         public List<ServiceProductItems>? ServiceProducts { get; set; }
         [JsonIgnore]
-        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeHelper.UtcNow();
     }
 }

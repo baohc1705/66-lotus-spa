@@ -39,22 +39,22 @@ namespace _66SMS.Persistence.Repositories.Sql
                 .ToListAsync(cancellationToken);
         }
 
-        public void Add(UserRole entity)
-        {
-            if (entity.AssignedAt == default)
-                entity.AssignedAt = DateTimeHelper.UtcNow();
-            base.Add(entity);
-        }
+        // public void Add(UserRole entity)
+        // {
+        //     if (entity.AssignedAt == default)
+        //         entity.AssignedAt = DateTimeHelper.UtcNow();
+        //     base.Add(entity);
+        // }
 
-        public void AddRange(List<UserRole> entities)
-        {
-            foreach (var entity in entities)
-            {
-                if (entity.AssignedAt == default)
-                    entity.AssignedAt = DateTimeHelper.UtcNow();
-            }
-            base.AddRange(entities);
-        }
+        // public void AddRange(List<UserRole> entities)
+        // {
+        //     foreach (var entity in entities)
+        //     {
+        //         if (entity.AssignedAt == default)
+        //             entity.AssignedAt = DateTimeHelper.UtcNow();
+        //     }
+        //     base.AddRange(entities);
+        // }
 
         public async Task<Role?> GetRoleByUserIdAsync(int id, CancellationToken cancellationToken)
         {

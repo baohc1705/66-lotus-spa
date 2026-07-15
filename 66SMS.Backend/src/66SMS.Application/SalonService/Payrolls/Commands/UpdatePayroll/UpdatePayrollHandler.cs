@@ -5,6 +5,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using MediatR;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.SalonService.Payrolls.Commands.UpdatePayroll
 {
@@ -40,7 +41,7 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.UpdatePayroll
                 payroll.Status = request.Status.Value;
             }
 
-            payroll.UpdatedAt = DateTime.UtcNow;
+            payroll.UpdatedAt = DateTimeHelper.UtcNow();
             payroll.UpdatedBy = request.UpdatedBy;
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);

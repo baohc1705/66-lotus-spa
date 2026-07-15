@@ -22,5 +22,6 @@ namespace _66SMS.Domain.Entities
         public ServiceCategory? Category { get; set; }
         public List<ServiceImage>? Images { get; set; }
         public List<ServiceProduct>? ServiceProducts { get; set; }
+        public List<StaffService>? StaffServices { get; set; }
     }
 }

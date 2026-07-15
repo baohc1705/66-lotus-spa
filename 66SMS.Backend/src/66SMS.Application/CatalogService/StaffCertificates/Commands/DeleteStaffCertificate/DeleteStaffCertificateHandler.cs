@@ -5,6 +5,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using MediatR;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.DeleteStaffCertificate
 {
@@ -30,7 +31,7 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.DeleteSta
             try
             {
                 entity.Status = StaffCertificateConst.STATUS_DELETED;
-                entity.UpdatedAt = DateTime.UtcNow;
+                entity.UpdatedAt = DateTimeHelper.UtcNow();
                 staffCertificateRepository.Update(entity);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();

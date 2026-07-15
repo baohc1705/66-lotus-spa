@@ -43,7 +43,7 @@ namespace _66SMS.Infrastructure.Security
                 issuer: options.Value.Issuer,
                 audience: options.Value.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(options.Value.AccessTokenExpiryMinutes),
+                expires: DateTimeHelper.UtcNow().UtcDateTime.AddMinutes(options.Value.AccessTokenExpiryMinutes),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

@@ -9,7 +9,7 @@ namespace _66SMS.Application.SalonService.Attendances.Queries.GetAllAttendances
         public int? StaffId { get; set; }
         public int? SalonId { get; set; }
         public int? Status { get; set; }
-        public DateTime? FromDate { get; set; }
-        public DateTime? ToDate { get; set; }
+        public DateOnly? FromDate { get; set; }
+        public DateOnly? ToDate { get; set; }
     }
 }

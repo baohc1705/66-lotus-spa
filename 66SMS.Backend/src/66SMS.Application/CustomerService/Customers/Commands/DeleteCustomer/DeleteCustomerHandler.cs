@@ -6,6 +6,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CustomerService.Customers.Commands.DeleteCustomer
 {
@@ -37,7 +38,7 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.DeleteCustomer
             {
                 // update status is deleted
                 customer.Status = CustomerConst.STATUS_DELETED;
-                customer.UpdatedAt = DateTime.UtcNow;
+                customer.UpdatedAt = DateTimeHelper.UtcNow();
 
                 // update and persist to database
                 customerSqlRepository.Update(customer);

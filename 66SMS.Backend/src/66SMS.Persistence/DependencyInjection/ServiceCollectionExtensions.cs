@@ -94,6 +94,7 @@ namespace _66SMS.Persistence.DependencyInjection
             services.AddScoped<IAttendanceSqlRepository, AttendanceSqlRepository>();
             services.AddScoped<IPayrollSqlRepository, PayrollSqlRepository>();
             services.AddScoped<IPromotionSqlRepository, PromotionSqlRepository>();
+            services.AddScoped<IStaffServiceSqlRepository, StaffServiceSqlRepository>();
             return services;
         }
     }

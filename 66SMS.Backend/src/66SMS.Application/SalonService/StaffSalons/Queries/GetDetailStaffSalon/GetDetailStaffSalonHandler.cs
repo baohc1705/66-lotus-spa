@@ -1,10 +1,10 @@
-using _66SMS.Application.DTOs.StaffSalons;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.SalonService.StaffSalons.Queries.GetDetailStaffSalon
 {
@@ -28,12 +28,13 @@ namespace _66SMS.Application.SalonService.StaffSalons.Queries.GetDetailStaffSalo
                     SalonName = x.Salon!.Name,
                     StaffId = x.StaffId,
                     StaffName = x.Staff!.FullName,
+                    StaffCode = x.Staff!.Code,
                     IsManager = x.IsManager,
                     Status = x.Status,
-                    StartDate = x.StartDate.ToString(),
-                    EndDate = x.EndDate.ToString(),
-                    CreatedAt = x.CreatedAt.ToString(),
-                    UpdatedAt = x.UpdatedAt.ToString(),
+                    StartDate = x.StartDate,
+                    EndDate = x.EndDate,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

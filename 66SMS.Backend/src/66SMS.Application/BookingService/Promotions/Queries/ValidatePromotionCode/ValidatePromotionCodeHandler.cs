@@ -5,6 +5,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Promotions.Queries.ValidatePromotionCode
 {
@@ -35,7 +36,7 @@ namespace _66SMS.Application.BookingService.Promotions.Queries.ValidatePromotion
                 return Result<PromotionValidationDto>.BadRequest(PromotionConst.MSG_PROMOTION_INACTIVE, ErrorCodes.ERR_PROMOTION_INACTIVE);
             }
 
-            var now = DateTime.UtcNow;
+            var now = DateTimeHelper.UtcNow();
             if (promo.StartDate > now || promo.EndDate < now)
             {
                 return Result<PromotionValidationDto>.BadRequest(PromotionConst.MSG_PROMOTION_EXPIRED, ErrorCodes.ERR_PROMOTION_EXPIRED);

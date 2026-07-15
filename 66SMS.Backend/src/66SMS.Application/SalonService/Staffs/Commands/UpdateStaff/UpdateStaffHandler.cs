@@ -11,6 +11,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
 {
@@ -104,7 +105,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
                         {
                             UserId = staff.UserId,
                             RoleId = roleId,
-                            AssignedAt = DateTimeOffset.UtcNow,
+                            AssignedAt = DateTimeHelper.UtcNow(),
                             AssignedBy = request.UpdatedBy ?? 1,
                         });
                     }
@@ -125,7 +126,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
                     foreach (var assignment in staff.StaffSalons.Where(x => x.Status == (int)StatusActiveEnum.ACTIVED))
                     {
                         assignment.IsManager = isManagerRole;
-                        assignment.UpdatedAt = DateTimeOffset.UtcNow;
+                        assignment.UpdatedAt = DateTimeHelper.UtcNow();
                     }
                 }
 
@@ -138,7 +139,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
                     }
 
                     staff.User.Email = request.Email;
-                    staff.User.UpdatedAt = DateTimeOffset.UtcNow;
+                    staff.User.UpdatedAt = DateTimeHelper.UtcNow();
                     staff.User.UpdatedBy = request.UpdatedBy;
                 }
 
@@ -205,15 +206,15 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
             if (current != null)
             {
                 current.IsManager = isManager;
-                current.UpdatedAt = DateTimeOffset.UtcNow;
+                current.UpdatedAt = DateTimeHelper.UtcNow();
                 return;
             }
 
             foreach (var assignment in activeAssignments)
             {
                 assignment.Status = (int)StatusActiveEnum.IACTIVED;
-                assignment.EndDate = DateOnly.FromDateTime(DateTime.UtcNow);
-                assignment.UpdatedAt = DateTimeOffset.UtcNow;
+                assignment.EndDate = DateTimeHelper.UtcNow().ToDateOnly();
+                assignment.UpdatedAt = DateTimeHelper.UtcNow();
                 assignment.IsManager = false;
             }
 
@@ -222,9 +223,9 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
                 StaffId = staff.Id,
                 SalonId = salonId,
                 IsManager = isManager,
-                StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                StartDate = DateTimeHelper.UtcNow().ToDateOnly(),
                 Status = (int)StatusActiveEnum.ACTIVED,
-                CreatedAt = DateTimeOffset.UtcNow,
+                CreatedAt = DateTimeHelper.UtcNow(),
             });
         }
     }

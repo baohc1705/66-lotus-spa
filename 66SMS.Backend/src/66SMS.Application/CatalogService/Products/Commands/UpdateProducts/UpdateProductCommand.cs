@@ -2,6 +2,7 @@ using _66SMS.Application.DTOs.ProductImages;
 using _66SMS.Contracts.Shared;
 using MediatR;
 using System.Text.Json.Serialization;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CatalogService.Products.Commands.UpdateProducts
 {
@@ -21,6 +22,6 @@ namespace _66SMS.Application.CatalogService.Products.Commands.UpdateProducts
         public int? Status { get; set; }
         public List<ProductImageDto>? Images { get; set; }
         [JsonIgnore]
-        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeHelper.UtcNow();
     }
 }

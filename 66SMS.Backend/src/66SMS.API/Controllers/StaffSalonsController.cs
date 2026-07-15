@@ -29,7 +29,6 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("staffs", "create")]
         public async Task<IActionResult> Create([FromBody] CreateStaffSalonCommand command)
         {
-            command.CreatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -39,7 +38,6 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] UpdateStaffSalonCommand command)
         {
             command.Id = id;
-            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -49,7 +47,6 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             DeleteStaffSalonCommand command = new DeleteStaffSalonCommand { Id = id };
-            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }

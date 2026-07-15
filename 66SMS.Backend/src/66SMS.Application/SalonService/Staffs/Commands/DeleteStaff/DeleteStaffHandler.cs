@@ -9,6 +9,7 @@ using _66SMS.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.SalonService.Staffs.Commands.DeleteStaff
 {
@@ -42,7 +43,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.DeleteStaff
 
             staff.Status = StaffConst.STATUS_DELETED;
             staff.User!.Status = (int)StatusActiveEnum.DELETED;
-            staff.User.UpdatedAt = DateTimeOffset.UtcNow;
+            staff.User.UpdatedAt = DateTimeHelper.UtcNow();
             staff.User.UpdatedBy = request.UpdatedBy;
 
             var salonIds = staff.StaffSalons?

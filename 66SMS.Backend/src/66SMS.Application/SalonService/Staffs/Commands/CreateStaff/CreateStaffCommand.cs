@@ -3,6 +3,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Enums;
 using MediatR;
 using System.Text.Json.Serialization;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
 {
@@ -29,7 +30,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
         public string? Role { get; set; }
         [JsonIgnore]
         public int? CreatedBy { get; set; }
-        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeHelper.UtcNow();
 
         public string? Email { get; set; }
     }

@@ -2,6 +2,7 @@ using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Constants;
 using MediatR;
 using System.Text.Json.Serialization;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CustomerService.Customers.Commands.UpdateCustomer
 {
@@ -31,6 +32,6 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.UpdateCustomer
         public string? FullAddress { get; set; }
         public int? UpdatedBy { get; set; }
         [JsonIgnore]
-        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeHelper.UtcNow();
     }
 }

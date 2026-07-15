@@ -11,6 +11,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
 {
@@ -51,7 +52,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
             }
 
             mapper.Map(request, service);
-            service.UpdatedAt = DateTimeOffset.UtcNow;
+            service.UpdatedAt = DateTimeHelper.UtcNow();
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
@@ -106,7 +107,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
                 .ToListAsync(cancellationToken);
 
             var desiredProductIds = desired.Select(x => x.ProductId!.Value).ToHashSet();
-            var now = DateTimeOffset.UtcNow;
+            var now = DateTimeHelper.UtcNow();
 
             var toRemove = existing.Where(x => !desiredProductIds.Contains(x.ProductId)).ToList();
             if (toRemove.Count > 0)

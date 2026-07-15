@@ -35,11 +35,12 @@ namespace _66SMS.Application.Abstractions
         /// <param name="serviceId">ID dịch vụ để lấy thời lượng tính toán số lượng Slot liên tiếp bị chiếm.</param>
         /// <param name="staffId">ID nhân viên được chọn (Truyền null nếu khách chọn "Bất kỳ nhân viên nào").</param>
         /// <param name="startSlotId">ID của Slot bắt đầu mà khách hàng bấm chọn trên UI.</param>
+        /// <param name="salonId">ID chi nhánh đang chọn — chỉ resolve NV thuộc salon này (kết hợp với filter StaffService theo dịch vụ).</param>
         /// <param name="ct">Hủy tác vụ bất đồng bộ.</param>
         /// <returns>
         /// Trả về Tuple chứa StaffId thực tế được chọn và ScheduleId (Lịch làm việc của nhân viên đó hôm đó). 
         /// Nếu không còn bất kỳ nhân viên nào rảnh hoặc Slot đó đã bị người khác đặt mất, sẽ trả về null.
         /// </returns>
-        Task<(int StaffId, int? ScheduleId)?> ResolveStaffAsync(DateOnly date, int serviceId, int? staffId, int startSlotId, CancellationToken ct = default);
+        Task<(int StaffId, int? ScheduleId)?> ResolveStaffAsync(DateOnly date, int serviceId, int? staffId, int startSlotId, int? salonId = null, CancellationToken ct = default);
     }
 }

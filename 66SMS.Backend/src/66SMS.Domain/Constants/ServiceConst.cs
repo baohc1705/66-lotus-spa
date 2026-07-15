@@ -1,3 +1,5 @@
+using _66SMS.Contracts.Helpers;
+
 namespace _66SMS.Domain.Constants
 {
     public class ServiceConst
@@ -37,7 +39,7 @@ namespace _66SMS.Domain.Constants
         #region Message
         public const string MSG_SERVICE_ID_NOT_FOUND = $"{nameof(Entities.Service)} with id not found";
         public const string MSG_SERVICE_NOT_FOUND = "Service not found.";
-        public const string MSG_SERVICE_PRODUCT_NOT_FOUND = "Dịch vụ không tồn tại.";
+        public const string MSG_SERVICE_PRODUCT_NOT_FOUND = "Dá»‹ch vá»¥ khÃ´ng tá»“n táº¡i.";
         #endregion
 
         #region Image Storage
@@ -45,7 +47,7 @@ namespace _66SMS.Domain.Constants
         public const string IMAGE_FILE_PREFIX = "service";
 
         public static string GenerateImageFileName(int entityId)
-            => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmss"));
+            => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTimeHelper.UtcNowString());
         #endregion
 
         #region Cache

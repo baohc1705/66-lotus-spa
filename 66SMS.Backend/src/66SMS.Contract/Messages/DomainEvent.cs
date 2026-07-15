@@ -1,4 +1,5 @@
 using _66SMS.Contract.Abstractions;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Contract.Messages
 {
@@ -12,8 +13,8 @@ namespace _66SMS.Contract.Messages
         /// </summary>
         public Guid EventId { get; } = Guid.NewGuid();
         /// <summary>
-        /// Thời gian xảy ra event.
+        /// Thời gian xảy ra event (UTC).
         /// </summary>
-        public DateTime OccurredOn { get; } = DateTime.UtcNow;
+        public DateTimeOffset OccurredOn { get; } = DateTimeHelper.UtcNow();
     }
 }

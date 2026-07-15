@@ -1,37 +1,38 @@
-﻿using _66SMS.Domain.Constants;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Helpers
 {
     /// <summary>
-    /// Ghi nhận một lần thanh toán vào lịch sử thanh toán của lịch hẹn
+    /// Ghi nh?n m?t l?n thanh to�n v�o l?ch s? thanh to�n c?a l?ch h?n
     /// </summary>
     public static class AppointmentPaymentRecorder
     {
-        // Thêm bản ghi thanh toán vào lịch hẹn và cộng dồn số tiền đã trả
-        // Trả về false kèm thông báo lỗi nếu số tiền không hợp lệ
+        // Th�m b?n ghi thanh to�n v�o l?ch h?n v� c?ng d?n s? ti?n d� tr?
+        // Tr? v? false k�m th�ng b�o l?i n?u s? ti?n kh�ng h?p l?
         public static bool TryRecordPayment(
              Appointment appointment, int phase, decimal amount, int method, string? transactionId, string note, out string? error)
         {
             error = null;
 
-            // Không cho phép thanh toán 0 đồng hoặc âm
-            if (amount <= 0) { error = "Số tiền thanh toán không hợp lệ."; return false; }
+            // Kh�ng cho ph�p thanh to�n 0 d?ng ho?c �m
+            if (amount <= 0) { error = "S? ti?n thanh to�n kh�ng h?p l?."; return false; }
 
-            // Cộng dồn số tiền đã thanh toán vào tổng của lịch hẹn
+            // C?ng d?n s? ti?n d� thanh to�n v�o t?ng c?a l?ch h?n
             appointment.PaidAmount += amount;
 
-            // Thêm chi tiết lần thanh toán này vào danh sách (khởi tạo danh sách nếu chưa có)
+            // Th�m chi ti?t l?n thanh to�n n�y v�o danh s�ch (kh?i t?o danh s�ch n?u chua c�)
             appointment.Payments ??= new List<AppointmentPayment>();
             appointment.Payments.Add(new AppointmentPayment
             {
-                Phase = phase,           // Giai đoạn: cọc (deposit) hay thanh toán cuối (final)
+                Phase = phase,           // Giai do?n: c?c (deposit) hay thanh to�n cu?i (final)
                 Amount = amount,
-                Method = method,         // Phương thức: tiền mặt, VNPay, ví...
+                Method = method,         // Phuong th?c: ti?n m?t, VNPay, v�...
                 TransactionId = transactionId,
                 Note = note,
                 Status = AppointmentPaymentConst.STATUS_PAID,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTimeHelper.UtcNow(),
             });
             return true;
         }

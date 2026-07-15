@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using _66SMS.Contracts.Shared;
 using MediatR;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CatalogService.Services.Commands.DeleteServices
 {
@@ -11,6 +12,6 @@ namespace _66SMS.Application.CatalogService.Services.Commands.DeleteServices
     {
         public int Id { get; set; }
         [JsonIgnore]
-        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; } = DateTimeHelper.UtcNow();
     }
 }

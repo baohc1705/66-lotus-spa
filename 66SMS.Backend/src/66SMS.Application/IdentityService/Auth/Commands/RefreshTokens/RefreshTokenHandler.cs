@@ -11,6 +11,7 @@ using _66SMS.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
 {
@@ -66,7 +67,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
                 foreach (var token in allToken.Where(x => x.IsActive))
                 {
                     token.IsRevoked = true;
-                    token.RevokedAt = DateTime.UtcNow;
+                    token.RevokedAt = DateTimeHelper.UtcNow();
                     token.RevokedByIp = request.IpAddress;
                     refreshTokenSqlRepository.Update(token);
                 }
@@ -94,7 +95,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
                 return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_NOT_FOUND, ErrorCodes.ERR_USER_NOT_FOUND);
 
             stored.IsRevoked = true;
-            stored.RevokedAt = DateTime.UtcNow;
+            stored.RevokedAt = DateTimeHelper.UtcNow();
             stored.RevokedByIp = request.IpAddress;
             refreshTokenSqlRepository.Update(stored);
 
@@ -103,9 +104,9 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
             {
                 UserId = user.Id,
                 Token = newRawToken,
-                ExpiresAt = DateTime.UtcNow.AddDays(jwtOptions.Value.RefreshTokenExpiryDays),
+                ExpiresAt = DateTimeHelper.UtcNow().AddDays(jwtOptions.Value.RefreshTokenExpiryDays),
                 CreatedByIp = request.IpAddress ?? "",
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTimeHelper.UtcNow(),
             });
 
             string? role = await userRoleSqlRepository

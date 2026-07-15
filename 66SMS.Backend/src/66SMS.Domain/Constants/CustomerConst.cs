@@ -1,3 +1,5 @@
+using _66SMS.Contracts.Helpers;
+
 namespace _66SMS.Domain.Constants
 {
     public class CustomerConst
@@ -52,7 +54,7 @@ namespace _66SMS.Domain.Constants
         public const string IMAGE_FILE_PREFIX = "customer";
 
         public static string GenerateImageFileName(int entityId)
-            => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTime.Now.ToString("yyyyMMddHHmmss"));
+            => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTimeHelper.UtcNowString());
         #endregion
     }
 }

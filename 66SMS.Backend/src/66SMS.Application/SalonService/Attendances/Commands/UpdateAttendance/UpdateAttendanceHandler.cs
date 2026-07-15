@@ -6,6 +6,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using MediatR;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.SalonService.Attendances.Commands.UpdateAttendance
 {
@@ -29,9 +30,9 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.UpdateAttendance
                 return Result<int>.NotFound(AttendanceConst.MSG_NOT_FOUND, ErrorCodes.ERR_ATTENDANCE_NOT_FOUND);
 
             if (request.CheckInAt.HasValue)
-                attendance.CheckInAt = request.CheckInAt;
+                attendance.CheckInAt = request.CheckInAt.Value.ToUniversalTime();
             if (request.CheckOutAt.HasValue)
-                attendance.CheckOutAt = request.CheckOutAt;
+                attendance.CheckOutAt = request.CheckOutAt.Value.ToUniversalTime();
             if (request.Note != null)
                 attendance.Note = request.Note;
 
@@ -45,7 +46,7 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.UpdateAttendance
 
             ApplyStatusSideEffects(attendance);
 
-            attendance.UpdatedAt = DateTime.UtcNow;
+            attendance.UpdatedAt = DateTimeHelper.UtcNow();
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try

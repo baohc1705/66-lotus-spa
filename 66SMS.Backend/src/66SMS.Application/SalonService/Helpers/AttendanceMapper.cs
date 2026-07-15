@@ -1,5 +1,4 @@
 using _66SMS.Application.DTOs.Attendances;
-using _66SMS.Application.SalonService.Helpers;
 using _66SMS.Domain.Entities;
 
 namespace _66SMS.Application.SalonService.Helpers
@@ -16,15 +15,15 @@ namespace _66SMS.Application.SalonService.Helpers
                 SalonId = x.SalonId,
                 SalonName = x.Salon?.Name,
                 WorkScheduleId = x.WorkScheduleId,
-                WorkDate = x.WorkDate.ToString(),
-                CheckInAt = x.CheckInAt?.ToString(),
-                CheckOutAt = x.CheckOutAt?.ToString(),
+                WorkDate = x.WorkDate,
+                CheckInAt = x.CheckInAt,
+                CheckOutAt = x.CheckOutAt,
                 WorkedHours = x.WorkedHours,
                 Status = x.Status,
                 Note = x.Note,
                 ShiftName = x.WorkSchedule?.ShiftPeriod?.Shift?.Name,
-                CreatedAt = x.CreatedAt.ToString(),
-                UpdatedAt = x.UpdatedAt?.ToString(),
+                CreatedAt = x.CreatedAt,
+                UpdatedAt = x.UpdatedAt,
             };
             dto.WorkCredits = AttendanceWorkCreditCalculator.CalculateWorkCredit(x);
             return dto;

@@ -7,6 +7,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.CreateStaffCertificate
 {
@@ -54,7 +55,7 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.CreateSta
                 DocumentUrl = string.IsNullOrWhiteSpace(request.ImageBase64) ? request.DocumentUrl : null,
                 Note = request.Note,
                 Status = request.Status ?? StaffCertificateConst.STATUS_PENDING_VERIFICATION,
-                CreatedAt = request.CreatedAt ?? DateTime.UtcNow,
+                CreatedAt = request.CreatedAt ?? DateTimeHelper.UtcNow(),
             };
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);

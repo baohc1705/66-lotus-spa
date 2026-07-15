@@ -1,6 +1,7 @@
 using _66SMS.Contracts.Shared;
 using MediatR;
 using System.Text.Json.Serialization;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.IdentityService.Roles.Commands.CreateRole
 {
@@ -13,7 +14,7 @@ namespace _66SMS.Application.IdentityService.Roles.Commands.CreateRole
         public string Description { get; set; } = null!;
 
         [JsonIgnore]
-        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeHelper.UtcNow();
         [JsonIgnore]
         public int? CreatedBy { get; set; }
     }

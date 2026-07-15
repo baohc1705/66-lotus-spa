@@ -7,6 +7,7 @@ using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using _66SMS.Application.BookingService.Helpers;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWithWallet
 {
@@ -90,7 +91,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                     Type = WalletTransactionConst.TYPE_PAYMENT_FOR_APPOINTMENT,
                     Note = $"Thanh toán tiền cọc bằng ví cho lịch hẹn #{appointment.Id}",
                     Status = WalletTransactionConst.STATUS_SUCCESS,
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTimeHelper.UtcNow(),
                     CreatedBy = userId
                 };
                 walletTransactionSqlRepository.Add(walletTx);
@@ -110,7 +111,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
 
                 // Cập nhật trạng thái appointment
                 appointment.Status = AppointmentConst.STATUS_WAITING;
-                appointment.UpdatedAt = DateTime.UtcNow;
+                appointment.UpdatedAt = DateTimeHelper.UtcNow();
                 appointment.UpdatedBy = request.UserId;
 
                 appointmentSqlRepository.Update(appointment);

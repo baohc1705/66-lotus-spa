@@ -8,6 +8,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Cashier.Commands.PayAppointment
 {
@@ -120,7 +121,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.PayAppointment
                         Type = WalletTransactionConst.TYPE_PAYMENT_FOR_APPOINTMENT,
                         Note = $"Thu ngân trừ tiền ví thanh toán cho lịch hẹn #{appointment.Id}",
                         Status = WalletTransactionConst.STATUS_SUCCESS,
-                        CreatedAt = DateTime.UtcNow,
+                        CreatedAt = DateTimeHelper.UtcNow(),
                         CreatedBy = request.UserId!.Value
                     };
                     walletTransactionSqlRepository.Add(walletTx);
@@ -138,7 +139,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.PayAppointment
                     return Result<object>.BadRequest(error!);
                 }
 
-                appointment.UpdatedAt = DateTime.UtcNow;
+                appointment.UpdatedAt = DateTimeHelper.UtcNow();
                 appointment.UpdatedBy = request.UserId;
 
                 appointmentSqlRepository.Update(appointment);

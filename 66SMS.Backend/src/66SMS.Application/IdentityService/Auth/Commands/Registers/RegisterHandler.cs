@@ -14,6 +14,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
 {
@@ -99,7 +100,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
                     FullName = request.FullName!,
                     Phone = request.Phone!,
                     Source = SourceEnum.ONLINE.ToString(),
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTimeHelper.UtcNow(),
                     Status = request.Status ?? (int)StatusActiveEnum.ACTIVED
                 };
                 user.Customer = customer;

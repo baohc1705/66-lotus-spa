@@ -6,6 +6,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.SalonService.Attendances.Commands.CreateManualAttendance
 {
@@ -22,8 +23,25 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CreateManualAtten
 
         public async Task<Result<int>> Handle(CreateManualAttendanceCommand request, CancellationToken cancellationToken)
         {
-            var exists = await attendanceRepository.AnyAsync(
-                x => x.StaffId == request.StaffId && x.WorkDate == (request.WorkDate ?? DateOnly.FromDateTime(DateTime.UtcNow)), cancellationToken);
+            var workDate = request.WorkDate ?? DateTimeHelper.UtcNow().ToDateOnly();
+
+            // Mỗi ca (workSchedule) một bản ghi — tránh đụng các ca khác cùng ngày
+            bool exists;
+            if (request.WorkScheduleId.HasValue && request.WorkScheduleId > 0)
+            {
+                exists = await attendanceRepository.AnyAsync(
+                    x => x.StaffId == request.StaffId && x.WorkScheduleId == request.WorkScheduleId,
+                    cancellationToken);
+            }
+            else
+            {
+                exists = await attendanceRepository.AnyAsync(
+                    x => x.StaffId == request.StaffId
+                        && x.WorkDate == workDate
+                        && x.WorkScheduleId == null,
+                    cancellationToken);
+            }
+
             if (exists)
                 return Result<int>.Conflict(AttendanceConst.MSG_DUPLICATE, ErrorCodes.ERR_ATTENDANCE_DUPLICATE);
 
@@ -31,11 +49,12 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CreateManualAtten
             {
                 StaffId = request.StaffId,
                 SalonId = request.SalonId,
-                WorkDate = request.WorkDate ?? DateOnly.FromDateTime(DateTime.UtcNow),
+                WorkScheduleId = request.WorkScheduleId,
+                WorkDate = workDate,
                 Status = request.Status,
                 WorkedHours = 0,
                 Note = request.Note,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTimeHelper.UtcNow(),
             };
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);

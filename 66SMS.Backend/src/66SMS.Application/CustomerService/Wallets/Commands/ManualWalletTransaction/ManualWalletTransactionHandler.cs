@@ -6,6 +6,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CustomerService.Wallets.Commands.ManualWalletTransaction
 {
@@ -61,7 +62,7 @@ namespace _66SMS.Application.CustomerService.Wallets.Commands.ManualWalletTransa
                         ? (request.Amount > 0 ? "Nạp tiền thủ công" : "Trừ tiền thủ công") 
                         : request.Note.Trim(),
                     Status = WalletTransactionConst.STATUS_SUCCESS,
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTimeHelper.UtcNow(),
                     CreatedBy = request.UserId
                 };
 

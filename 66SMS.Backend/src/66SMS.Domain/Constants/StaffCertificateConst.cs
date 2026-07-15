@@ -1,3 +1,5 @@
+using _66SMS.Contracts.Helpers;
+
 namespace _66SMS.Domain.Constants
 {
     public class StaffCertificateConst
@@ -36,7 +38,7 @@ namespace _66SMS.Domain.Constants
         #endregion
 
         #region Message
-        public const string MSG_NOT_FOUND = "Chứng chỉ nhân viên không tồn tại.";
+        public const string MSG_NOT_FOUND = "Chá»©ng chá»‰ nhÃ¢n viÃªn khÃ´ng tá»“n táº¡i.";
         public const string MSG_ID_NOT_FOUND = $"{nameof(Entities.StaffCertificate)} with id not found";
         #endregion
         #region Image Storage
@@ -44,7 +46,7 @@ namespace _66SMS.Domain.Constants
         public const string IMAGE_FILE_PREFIX = "certificate";
 
         public static string GenerateImageFileName(int entityId)
-            => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTime.Now.ToString("yyyyMMddHHmmss"));
+            => string.Format("{0}_{1}_{2}", IMAGE_FILE_PREFIX, entityId, DateTimeHelper.UtcNowString());
         #endregion
     }
 }

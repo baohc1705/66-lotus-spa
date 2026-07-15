@@ -6,6 +6,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Shifts.Commands.CreateShiftPeriod
 {
@@ -37,7 +38,7 @@ namespace _66SMS.Application.BookingService.Shifts.Commands.CreateShiftPeriod
             }
 
             ShiftPeriod shiftPeriod = mapper.Map<ShiftPeriod>(request);
-            shiftPeriod.CreatedAt = DateTime.UtcNow;
+            shiftPeriod.CreatedAt = DateTimeHelper.UtcNow();
             shiftPeriod.CreatedBy = request.CreatedBy ?? 1;
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);

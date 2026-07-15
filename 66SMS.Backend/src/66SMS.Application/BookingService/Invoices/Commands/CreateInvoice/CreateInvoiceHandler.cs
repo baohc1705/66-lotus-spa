@@ -8,6 +8,7 @@ using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
 {
@@ -205,7 +206,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
 
                 var invoice = new Invoice
                 {
-                    InvoiceCode = $"HD-{(request.IssuedAt ?? DateTime.UtcNow):yyyyMMddHHmmssfff}",
+                    InvoiceCode = $"HD-{(request.IssuedAt ?? DateTimeHelper.UtcNow()):yyyyMMddHHmmssfff}",
                     CustomerId = request.CustomerId,
                     CustomerName = request.CustomerName ?? customer?.FullName,
                     CustomerPhone = request.CustomerPhone ?? customer?.Phone,
@@ -227,8 +228,8 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
                     TransactionId = request.TransactionId,
                     Status = status,
                     Note = request.Note,
-                    IssuedAt = request.IssuedAt ?? DateTime.UtcNow,
-                    CreatedAt = request.IssuedAt ?? DateTime.UtcNow,
+                    IssuedAt = request.IssuedAt ?? DateTimeHelper.UtcNow(),
+                    CreatedAt = request.IssuedAt ?? DateTimeHelper.UtcNow(),
                     CreatedBy = request.CreatedBy,
                     Items = items,
                 };

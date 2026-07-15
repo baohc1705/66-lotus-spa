@@ -51,7 +51,7 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateManagerStat
 
                 foreach (var em in existingManagers)
                 {
-                    em.EndDate = DateOnly.FromDateTime(DateTime.UtcNow);
+                    em.EndDate = DateTimeHelper.UtcNow().ToDateOnly();
                     em.Status = StaffSalonConst.STATUS_INACTIVE;
                     em.UpdatedAt = DateTimeHelper.UtcNow();
                     staffSalonSqlRepository.Update(em);
@@ -65,7 +65,7 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateManagerStat
                 {
                     existing.IsManager = true;
                     existing.Status = StaffSalonConst.STATUS_ACTIVE;
-                    existing.StartDate = DateOnly.FromDateTime(DateTime.UtcNow);
+                    existing.StartDate = DateTimeHelper.UtcNow().ToDateOnly();
                     existing.EndDate = null;
                     existing.UpdatedAt = DateTimeHelper.UtcNow();
                     staffSalonSqlRepository.Update(existing);
@@ -77,7 +77,7 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateManagerStat
                         StaffId = request.StaffId,
                         SalonId = request.SalonId,
                         IsManager = true,
-                        StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                        StartDate = DateTimeHelper.UtcNow().ToDateOnly(),
                         Status = StaffSalonConst.STATUS_ACTIVE,
                         CreatedAt = DateTimeHelper.UtcNow(),
                     };
@@ -97,7 +97,7 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateManagerStat
                 if (staffSalon == null)
                     return Result<object>.NotFound(StaffSalonConst.MSG_STAFF_SALON_MANAGER_NOT_FOUND, ErrorCodes.ERR_STAFF_SALON_MANAGER_NOT_FOUND);
 
-                staffSalon.EndDate = DateOnly.FromDateTime(DateTime.UtcNow);
+                staffSalon.EndDate = DateTimeHelper.UtcNow().ToDateOnly();
                 staffSalon.Status = StaffSalonConst.STATUS_INACTIVE;
                 staffSalon.UpdatedAt = DateTimeHelper.UtcNow();
                 staffSalonSqlRepository.Update(staffSalon);

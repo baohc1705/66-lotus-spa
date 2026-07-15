@@ -11,8 +11,8 @@ namespace _66SMS.Contract.Abstractions
         /// </summary>
         Guid EventId { get; }
         /// <summary>
-        /// Thời gian xảy ra event.
+        /// Thời gian xảy ra event (UTC).
         /// </summary>
-        DateTime OccurredOn { get; }
+        DateTimeOffset OccurredOn { get; }
     }
 }

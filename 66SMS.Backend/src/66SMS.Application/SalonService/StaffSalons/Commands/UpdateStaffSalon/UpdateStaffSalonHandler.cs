@@ -33,26 +33,35 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.UpdateStaffSalon
 
         public async Task<Result<object>> Handle(UpdateStaffSalonCommand request, CancellationToken cancellationToken)
         {
+            // Find the staff salon by id
+            StaffSalon? staffSalon = await staffSalonSqlRepository.FindByIdAsync((int)request.Id!);
+            if (staffSalon == null)
+                return Result<object>.NotFound(StaffSalonConst.MSG_STAFF_SALON_NOT_FOUND, ErrorCodes.ERR_STAFF_SALON_NOT_FOUND);
+
+            // Get the salon id
+            var salonId = staffSalon.SalonId;
+
+            // Map the request to the staff salon
+            mapper.Map(request, staffSalon);
+
+            // Begin the transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                StaffSalon? staffSalon = await staffSalonSqlRepository.FindByIdAsync((int)request.Id);
-                if (staffSalon == null)
-                    return Result<object>.NotFound(StaffSalonConst.MSG_STAFF_SALON_NOT_FOUND, ErrorCodes.ERR_STAFF_SALON_NOT_FOUND);
-
-                var salonId = staffSalon.SalonId;
-                mapper.Map(request, staffSalon);
-                staffSalon.UpdatedAt = DateTimeHelper.UtcNow();
-
+                // Update the staff salon
                 staffSalonSqlRepository.Update(staffSalon);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
+                // Commit the transaction
                 transaction.Commit();
+
+                // Remove the cache for the salon
                 await cacheService.RemoveAsync(StaffConst.CacheKeyBySalon(salonId), cancellationToken);
                 return Result<object>.Ok();
             }
             catch
             {
+                // Rollback the transaction
                 transaction.Rollback();
                 throw;
             }

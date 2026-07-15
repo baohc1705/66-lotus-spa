@@ -7,6 +7,7 @@ using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using _66SMS.Application.BookingService.Helpers;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Appointments.Commands.PostponeAppointment
 {
@@ -107,13 +108,13 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PostponeAppoin
                         Type = WalletTransactionConst.TYPE_REFUND_FROM_APPOINTMENT,
                         Note = $"Hoàn tiền cọc do hoãn/hủy lịch hẹn #{appointment.Id}",
                         Status = WalletTransactionConst.STATUS_SUCCESS,
-                        CreatedAt = DateTime.UtcNow,
+                        CreatedAt = DateTimeHelper.UtcNow(),
                         CreatedBy = userId
                     };
                     walletTransactionSqlRepository.Add(walletTx);
                 }
 
-                appointment.UpdatedAt = DateTime.UtcNow;
+                appointment.UpdatedAt = DateTimeHelper.UtcNow();
                 appointment.UpdatedBy = request.UserId;
 
                 appointmentSqlRepository.Update(appointment);

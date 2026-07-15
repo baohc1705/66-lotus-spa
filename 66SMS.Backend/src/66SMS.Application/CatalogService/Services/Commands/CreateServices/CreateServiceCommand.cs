@@ -2,6 +2,7 @@ using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Enums;
 using MediatR;
 using System.Text.Json.Serialization;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
 {
@@ -24,7 +25,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
         public string? ImageUrl { get; set; }
     
         [JsonIgnore]
-        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeHelper.UtcNow();
         public List<ServiceProductItems>? ServiceProducts { get; set; }
         //public List<ServiceImageItems>? ServiceImages { get; set; }
     }
@@ -37,7 +38,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
         public string? Note { get; set; }
         public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
         [JsonIgnore]
-        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeHelper.UtcNow();
         [JsonIgnore]
         public int? CreatedBy { get; set; }
     }

@@ -6,6 +6,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CatalogService.StaffCertificates.Queries.GetAllStaffCertificates
 {
@@ -55,8 +56,8 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Queries.GetAllStaf
 
             if (request.ExpiringInDays.HasValue)
             {
-                var deadline = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(request.ExpiringInDays.Value));
-                var today = DateOnly.FromDateTime(DateTime.UtcNow);
+                var deadline = DateTimeHelper.UtcNow().AddDays(request.ExpiringInDays.Value).ToDateOnly();
+                var today = DateTimeHelper.UtcNow().ToDateOnly();
                 query = query.Where(x => x.ExpiryDate != null && x.ExpiryDate >= today && x.ExpiryDate <= deadline);
             }
 

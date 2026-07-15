@@ -9,6 +9,7 @@ using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.SendEmailOtp
 {
@@ -44,7 +45,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.SendEmailOtp
                 return Result<object>.NotFound(OtpVerificationConst.MSG_OTP_EMAIL_NOT_FOUND, ErrorCodes.ERR_OTP_EMAIL_NOT_FOUND);
 
             user.OtpCode = Random.Shared.Next(100000, 999999).ToString();
-            user.UpdatedAt = DateTime.UtcNow;
+            user.UpdatedAt = DateTimeHelper.UtcNow();
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try

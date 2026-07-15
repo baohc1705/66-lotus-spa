@@ -7,6 +7,7 @@ using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
 {
@@ -47,7 +48,7 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
                     CustomerId = customer.Id,
                     Balance = 0,
                     Status = WalletConst.STATUS_ACTIVE,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTimeHelper.UtcNow()
                 };
 
                 customerSqlRepository.Add(customer);

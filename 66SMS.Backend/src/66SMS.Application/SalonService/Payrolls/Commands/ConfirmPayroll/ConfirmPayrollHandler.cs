@@ -5,6 +5,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using MediatR;
 using System.Data;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.SalonService.Payrolls.Commands.ConfirmPayroll
 {
@@ -29,7 +30,7 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.ConfirmPayroll
                 return Result<int>.BadRequest(PayrollConst.MSG_ALREADY_CONFIRMED, ErrorCodes.ERR_PAYROLL_ALREADY_CONFIRMED);
 
             payroll.Status = PayrollConst.STATUS_CONFIRMED;
-            payroll.UpdatedAt = DateTime.UtcNow;
+            payroll.UpdatedAt = DateTimeHelper.UtcNow();
             payroll.UpdatedBy = request.UpdatedBy;
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);

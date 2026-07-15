@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Enums;
 using MediatR;
+using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.BookingPositions.Commands.CreateBookingPositions
 {
@@ -14,6 +15,6 @@ namespace _66SMS.Application.BookingService.BookingPositions.Commands.CreateBook
         public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
        
         [JsonIgnore]
-        public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTimeHelper.UtcNow();
     }
 }
