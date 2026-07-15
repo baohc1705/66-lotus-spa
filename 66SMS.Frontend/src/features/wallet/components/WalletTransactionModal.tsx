@@ -1,4 +1,5 @@
 import { formatCurrency } from '@/shared/utils/currency';
+import { formatDateTimeDisplay } from '@/shared/utils/date.utils';
 import { useState } from 'react';
 import { ArrowDownLeft, ArrowUpRight, Plus, Loader2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -191,7 +192,7 @@ export function WalletTransactionModal({ walletId, customerName, isOpen, onClose
                           </div>
                           <p className="font-semibold text-adminInk text-xs mt-1">{tx.note}</p>
                           <div className="flex items-center gap-2 mt-1 text-2xs text-adminGray-600">
-                            <span>{new Date(tx.createdAt).toLocaleString('vi-VN')}</span>
+                            <span>{formatDateTimeDisplay(tx.createdAt)}</span>
                             <span className="w-1 h-1 rounded-full bg-adminGray-300" />
                             <span>Bởi: {tx.createdByName}</span>
                           </div>

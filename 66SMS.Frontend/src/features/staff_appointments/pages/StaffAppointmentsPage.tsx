@@ -13,6 +13,7 @@ import {
   type ScheduleViewMode,
   type StaffScheduleBooking,
 } from "../types";
+import { formatDisplayDate, formatDate } from "@/shared/utils/date.utils";
 
 const STAFF_COLUMN_ID = "me";
 
@@ -87,16 +88,8 @@ export function StaffAppointmentsPage() {
 
   const handleBookingClick = (booking: StaffScheduleBooking, date?: string) => {
     const dateLabel = date
-      ? new Date(date + "T12:00:00").toLocaleDateString("vi-VN", {
-          weekday: "long",
-          day: "numeric",
-          month: "long",
-        })
-      : anchorDate.toLocaleDateString("vi-VN", {
-          weekday: "long",
-          day: "numeric",
-          month: "long",
-        });
+      ? formatDisplayDate(date)
+      : formatDate(anchorDate).format("DD/MM/YYYY");
     setSelectedBooking({ booking, dateLabel });
   };
 

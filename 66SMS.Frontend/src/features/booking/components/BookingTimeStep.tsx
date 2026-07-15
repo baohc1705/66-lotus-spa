@@ -16,6 +16,7 @@ import {
   useTimeSlots,
 } from "../hooks/useBookingData";
 import { useBookingStore } from "../stores/bookingStore";
+import { formatDate } from "@/shared/utils/date.utils";
 
 export const BookingTimeStep: React.FC = () => {
   const store = useBookingStore();
@@ -109,7 +110,7 @@ export const BookingTimeStep: React.FC = () => {
         slotId: g.selectedTimeSlot!.slotId,
         staffId: g.selectedTechnician?.id ?? null,
         positionId: g.selectedPosition?.id || 0,
-        appointmentDate: g.selectedDate!.toISOString().split("T")[0],
+        appointmentDate: formatDate(g.selectedDate!).format("YYYY-MM-DD"),
         serviceId: g.selectedService!.id ?? 0,
       }));
 

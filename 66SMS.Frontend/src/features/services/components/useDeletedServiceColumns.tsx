@@ -10,7 +10,7 @@ import {
   IndexCell,
   MutedCell,
   PriceCell,
-} from "@/shared/components/DataTable/tableCells";
+} from "@/shared/components/DataTable/TableCells";
 
 import { SERVICE_COLUMN_LABELS } from "./useActiveServiceColumns";
 import { SERVICE_PERM } from "../constants/service.permissions";

@@ -29,7 +29,13 @@ import {
 } from "../hooks/useAttendances";
 import type { AttendanceDto } from "../types/attendance.types";
 import type { WorkScheduleDTO } from "@/features/schedules/types/schedule.types";
-import { formatDisplayDate } from "@/shared/utils/date.utils";
+import {
+  formatDisplayDate,
+  formatDate,
+  toLocalTimeOnly,
+  toLocalDateOnly,
+  localDateTimeToUtc,
+} from "@/shared/utils/date.utils";
 import { toast } from "sonner";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 
@@ -58,9 +64,7 @@ interface FormFields {
 }
 
 function todayIsoDate(): string {
-  const d = new Date();
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  return formatDate().format("YYYY-MM-DD");
 }
 
 export function AttendanceDailyDialog({
@@ -98,9 +102,9 @@ export function AttendanceDailyDialog({
   const checkOutEnabled = watch("checkOutEnabled");
 
   const scheduleDateStr = schedule.workDate
-    ? typeof schedule.workDate === "string"
-      ? schedule.workDate.substring(0, 10)
-      : ""
+    ? toLocalDateOnly(
+        typeof schedule.workDate === "string" ? schedule.workDate : null,
+      )
     : "";
   const isToday = scheduleDateStr === todayIsoDate();
 
@@ -130,20 +134,13 @@ export function AttendanceDailyDialog({
         const hasIn = !!attendance.checkInAt;
         const hasOut = !!attendance.checkOutAt;
 
-        const parseTime = (isoStr: string | null) => {
-          if (!isoStr) return "";
-          const d = new Date(isoStr);
-          if (isNaN(d.getTime())) return "";
-          return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-        };
-
         reset({
           mode: currentMode,
           subStatus: currentSub,
           checkInEnabled: hasIn,
-          checkInTime: hasIn ? parseTime(attendance.checkInAt) : defaultStart,
+          checkInTime: hasIn ? toLocalTimeOnly(attendance.checkInAt) : defaultStart,
           checkOutEnabled: hasOut,
-          checkOutTime: hasOut ? parseTime(attendance.checkOutAt) : defaultEnd,
+          checkOutTime: hasOut ? toLocalTimeOnly(attendance.checkOutAt) : defaultEnd,
           note: attendance.note ?? "",
         });
       } else {
@@ -160,9 +157,10 @@ export function AttendanceDailyDialog({
     }
   }, [open, attendance, schedule, reset]);
 
+  // Giờ local từ form → ISO UTC gửi BE (giống AttendanceFormDialog)
   const combineDateAndTime = (timeStr: string): string => {
     if (!scheduleDateStr) return "";
-    return `${scheduleDateStr}T${timeStr}:00`;
+    return localDateTimeToUtc(scheduleDateStr, timeStr);
   };
 
   const handleFormSubmit = (data: FormFields) => {
@@ -300,6 +298,7 @@ export function AttendanceDailyDialog({
         createManualMutation.mutate(
           {
             staffId: schedule.staffId,
+            workScheduleId: schedule.id ?? undefined,
             workDate: scheduleDateStr,
             status: targetStatus,
             note: data.note || undefined,
@@ -414,15 +413,15 @@ export function AttendanceDailyDialog({
                         <div className="bg-adminGreen-50 border border-adminGreen-600/30 p-4 rounded-2xl text-sm text-adminGreen-600 space-y-2">
                           <p className="font-semibold">Bạn đã Check-in thành công!</p>
                           <p className="text-xs opacity-80">
-                            Thời gian vào: <span className="font-mono font-bold">{new Date(attendance.checkInAt!).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}</span>
+                            Thời gian vào: <span className="font-mono font-bold">{toLocalTimeOnly(attendance.checkInAt)}</span>
                           </p>
                           <p className="text-xs opacity-85">Bấm nút "Check-out" ở dưới để kết thúc ca làm việc của bạn.</p>
                         </div>
                       ) : (
                         <div className="bg-adminGray-50 border border-adminGray-100 p-4 rounded-2xl text-sm text-adminGray-600 space-y-1.5">
                           <p className="font-bold text-adminInk">Bạn đã hoàn thành chấm công ngày hôm nay!</p>
-                          <p className="text-xs">Giờ vào: <span className="font-mono font-semibold">{new Date(attendance.checkInAt!).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}</span></p>
-                          <p className="text-xs">Giờ ra: <span className="font-mono font-semibold">{new Date(attendance.checkOutAt!).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}</span></p>
+                          <p className="text-xs">Giờ vào: <span className="font-mono font-semibold">{toLocalTimeOnly(attendance.checkInAt)}</span></p>
+                          <p className="text-xs">Giờ ra: <span className="font-mono font-semibold">{toLocalTimeOnly(attendance.checkOutAt)}</span></p>
                         </div>
                       )}
 
@@ -613,13 +612,13 @@ export function AttendanceDailyDialog({
                     <div className="flex items-center justify-between border-b border-adminGray-100 pb-2">
                       <span className="font-semibold text-adminGray-600">Giờ Check-in:</span>
                       <span className="font-mono text-adminInk font-semibold">
-                        {attendance.checkInAt ? new Date(attendance.checkInAt).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) : "—"}
+                        {attendance.checkInAt ? toLocalTimeOnly(attendance.checkInAt) : "—"}
                       </span>
                     </div>
                     <div className="flex items-center justify-between border-b border-adminGray-100 pb-2">
                       <span className="font-semibold text-adminGray-600">Giờ Check-out:</span>
                       <span className="font-mono text-adminInk font-semibold">
-                        {attendance.checkOutAt ? new Date(attendance.checkOutAt).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) : "—"}
+                        {attendance.checkOutAt ? toLocalTimeOnly(attendance.checkOutAt) : "—"}
                       </span>
                     </div>
                     <div className="flex items-center justify-between border-b border-adminGray-100 pb-2">

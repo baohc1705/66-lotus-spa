@@ -22,6 +22,10 @@ import { useCreatePromotion, useUpdatePromotion } from '../hooks/usePromotions'
 import { promotionSchema, type PromotionFormValues } from '../schemas/promotion.schema'
 import { DISCOUNT_TYPE_OPTIONS, STATUS_OPTIONS, type PromotionDto } from '../types/promotion.types'
 import { COMMON_MSG } from '@/shared/constants/common.messages'
+import {
+  toDatetimeLocalInput,
+  localDateTimeToUtc,
+} from '@/shared/utils/date.utils'
 
 interface PromotionFormDialogProps {
   open: boolean
@@ -59,8 +63,8 @@ function getDefaultValues(promotion?: PromotionDto | null): PromotionFormValues 
     buyQuantity: promotion.buyQuantity ?? undefined,
     getQuantity: promotion.getQuantity ?? undefined,
     usageLimit: promotion.usageLimit ?? undefined,
-    startDate: promotion.startDate ?? '',
-    endDate: promotion.endDate ?? '',
+    startDate: toDatetimeLocalInput(promotion.startDate),
+    endDate: toDatetimeLocalInput(promotion.endDate),
     status: promotion.status ?? 1,
   }
 }
@@ -94,13 +98,18 @@ export function PromotionFormDialog({ open, onOpenChange, promotion }: Promotion
   const isPending = createMutation.isPending || updateMutation.isPending
 
   function onSubmit(values: PromotionFormValues) {
+    const payload = {
+      ...values,
+      startDate: localDateTimeToUtc(values.startDate),
+      endDate: localDateTimeToUtc(values.endDate),
+    }
     if (isEdit && promotion?.id) {
       updateMutation.mutate(
-        { id: promotion.id, payload: values },
+        { id: promotion.id, payload },
         { onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) } }
       )
     } else {
-      createMutation.mutate(values, {
+      createMutation.mutate(payload, {
         onSuccess: (result) => { if (result.isSuccess) onOpenChange(false) },
       })
     }

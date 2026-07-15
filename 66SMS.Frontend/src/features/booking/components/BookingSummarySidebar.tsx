@@ -12,6 +12,7 @@ import {
 import React from "react";
 import { useBookingStore } from "../stores/bookingStore";
 import { PromotionCodeInput } from "./PromotionCodeInput";
+import { formatDate } from "@/shared/utils/date.utils";
 
 /** Dãy lỗ bấm bán nguyệt liên tiếp trên mép top/bottom */
 function TicketPunchRow({ edge }: { edge: "top" | "bottom" }) {
@@ -57,10 +58,6 @@ export const BookingSummarySidebar: React.FC = () => {
   const discount = appliedPromotion ? appliedPromotion.discountAmount : 0;
   const finalTotal = Math.max(0, total - discount);
   const deposit = finalTotal * 0.3;
-
-  const formatDateString = (d: Date) => {
-    return `${d.getDate().toString().padStart(2, "0")}/${(d.getMonth() + 1).toString().padStart(2, "0")}/${d.getFullYear()}`;
-  };
 
   return (
     <div className="relative">
@@ -215,7 +212,7 @@ export const BookingSummarySidebar: React.FC = () => {
                               <span className="text-warm-600">Thời gian:</span>
                               <span className="font-bold text-rose-600">
                                 {guest.selectedTimeSlot.time} ·{" "}
-                                {formatDateString(guest.selectedDate)}
+                                {formatDate(guest.selectedDate).format("DD/MM/YYYY")}
                               </span>
                             </div>
                           )}

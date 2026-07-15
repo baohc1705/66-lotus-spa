@@ -10,7 +10,7 @@ import {
   MutedCell,
   NameCell,
   TextCell,
-} from "@/shared/components/DataTable/tableCells";
+} from "@/shared/components/DataTable/TableCells";
 
 import { CATEGORY_COLUMN_LABELS } from "./useActiveCategoryColumns";
 import { PRODUCT_CATEGORY_PERM } from "../constants/productCategory.permissions";

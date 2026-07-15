@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { IndexCell } from "@/shared/components/DataTable/tableCells";
+import { IndexCell } from "@/shared/components/DataTable/TableCells";
 import { SalonStatusBadge } from "./SalonStatusBadge";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { SALON_PERM } from "../constants/salon.permissions";

@@ -1,4 +1,5 @@
 import { formatCurrency } from '@/shared/utils/currency';
+import { formatDateTimeDisplay } from '@/shared/utils/date.utils';
 import { useQuery } from '@tanstack/react-query'
 import { getMyWallet, getMyWalletTransactions } from '../../wallet/api/wallet.api'
 import type { WalletTransactionDto } from '../../wallet/types/wallet.types'
@@ -68,7 +69,7 @@ export function MyWalletPanel() {
                     <div>
                       <p className="font-medium text-lotus-deep">{tx.note || (isPositive ? 'Hoàn tiền ví' : 'Thanh toán cọc')}</p>
                       <p className="text-xs text-lotus-stone mt-0.5">
-                        {new Date(tx.createdAt || '').toLocaleString('vi-VN')}
+                        {formatDateTimeDisplay(tx.createdAt)}
                       </p>
                     </div>
                   </div>

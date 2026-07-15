@@ -38,6 +38,7 @@ import type { ServiceDto } from "@/features/services/types/service.types";
 import type { ProductDto } from "@/features/products/types/product.types";
 import type { TreatmentCourseDto } from "@/features/treatment_courses/types/treatmentCourse.types";
 import { useAuthStore } from "@/features/auth/stores/authStore";
+import { formatDate } from "@/shared/utils/date.utils";
 
 interface POSOrderItem {
   itemType: number; // 1: Service, 2: Product, 3: Course
@@ -785,16 +786,13 @@ export function CashierPOS({
               <div className="flex justify-between gap-1 text-adminGray-600">
                 <span>Ngày hóa đơn:</span>
                 <span className="font-semibold text-adminInk flex items-center gap-0.5">
-                  {new Date().toLocaleDateString("vi-VN")}
+                  {formatDate().format("DD/MM/YYYY")}
                 </span>
               </div>
               <div className="flex justify-between gap-1 text-adminGray-600">
                 <span>Giờ vào/ra:</span>
                 <span className="font-semibold text-adminInk flex items-center gap-0.5">
-                  {new Date().toLocaleTimeString("vi-VN", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {formatDate().format("HH:mm")}
                 </span>
               </div>
               <div className="flex justify-between gap-1 text-adminGray-600">

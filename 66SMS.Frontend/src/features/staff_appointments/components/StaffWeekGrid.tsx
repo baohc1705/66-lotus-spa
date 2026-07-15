@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { StaffScheduleBooking, StaffScheduleDayDto } from "../types";
+import { formatDate } from "@/shared/utils/date.utils";
 
 interface StaffWeekGridProps {
   days: StaffScheduleDayDto[];
@@ -82,7 +83,7 @@ export function StaffWeekGrid({
     return () => clearInterval(timer);
   }, []);
 
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayStr = formatDate().format("YYYY-MM-DD");
   const currentH = currentTime.getHours();
   const currentM = currentTime.getMinutes();
   const showCurrentTime = currentH >= 8 && currentH <= 22;

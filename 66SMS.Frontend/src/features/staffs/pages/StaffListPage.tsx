@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -20,6 +20,7 @@ import { containerVariants } from "@/shared/motion/pageVariants";
 
 import { StaffFormDialog } from "../components/StaffFormDialog";
 import { StaffDetailExpanded } from "../components/StaffDetailExpanded";
+import { AssignStaffServiceDialog } from "../components/AssignStaffServiceDialog";
 import { StaffStatCards } from "../components/StaffStatCards";
 import { StaffCategorySidebar } from "../components/StaffCategorySidebar";
 import { useDeleteStaffMutation, useAdminStaffs } from "../hooks/useStaffs";
@@ -74,6 +75,7 @@ export function StaffListPage() {
   });
 
   const deleteMutation = useDeleteStaffMutation();
+  const [assignTarget, setAssignTarget] = useState<StaffDto | null>(null);
 
   const paged = staffsResult?.data;
   const staffs = useMemo(() => paged?.items ?? [], [paged?.items]);
@@ -139,6 +141,7 @@ export function StaffListPage() {
     onToggleOne: toggleOne,
     onEdit: setEditTarget,
     onDelete: setDeleteTarget,
+    onAssignService: setAssignTarget,
   });
 
   const columnLabels = useMemo(() => ({ ...STAFF_COLUMN_LABELS }), []);
@@ -242,6 +245,7 @@ export function StaffListPage() {
                 <StaffDetailExpanded
                   staffId={row.original.id}
                   onEdit={setEditTarget}
+                  onAssignService={setAssignTarget}
                 />
               ) : null
             }
@@ -311,6 +315,14 @@ export function StaffListPage() {
         confirmLabel={COMMON_MSG.delete}
         loading={deleteMutation.isPending}
         variant="danger"
+      />
+
+      <AssignStaffServiceDialog
+        open={!!assignTarget}
+        onOpenChange={(open) => {
+          if (!open) setAssignTarget(null);
+        }}
+        staff={assignTarget}
       />
     </div>
   );

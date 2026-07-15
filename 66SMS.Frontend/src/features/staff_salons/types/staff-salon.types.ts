@@ -4,6 +4,8 @@ export interface StaffSalonDTO {
   id?: number;
   staffId?: number;
   staffName?: string;
+  staffCode?: string;
+  staffRole?: string;
   salonId?: number;
   salonName?: string;
   isManager?: boolean;

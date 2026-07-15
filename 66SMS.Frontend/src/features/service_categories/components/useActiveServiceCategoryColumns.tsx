@@ -19,7 +19,7 @@ import {
   IndexCell,
   MutedCell,
   TextCell,
-} from "@/shared/components/DataTable/tableCells";
+} from "@/shared/components/DataTable/TableCells";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type { Result } from "@/shared/types/common.types";

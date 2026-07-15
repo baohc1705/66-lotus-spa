@@ -1,6 +1,6 @@
 import { Clock, CalendarCheck, CheckCircle2, History } from 'lucide-react'
 import type { ShiftDTO } from '../types/shift.types'
-import { formatDate } from '@/shared/utils/date.utils'
+import { formatDisplayDate } from '@/shared/utils/date.utils'
 
 interface ShiftDetailExpandedProps {
   shift: ShiftDTO
@@ -43,8 +43,8 @@ export function ShiftDetailExpanded({ shift }: ShiftDetailExpandedProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {periods.map((period, index) => {
                 const isActive = !period.effectiveTo;
-                const fromDate = period.effectiveFrom ? formatDate(period.effectiveFrom).format('DD/MM/YYYY') : '—';
-                const toDate = period.effectiveTo ? formatDate(period.effectiveTo).format('DD/MM/YYYY') : 'Vô thời hạn';
+                const fromDate = period.effectiveFrom ? formatDisplayDate(period.effectiveFrom) : '—';
+                const toDate = period.effectiveTo ? formatDisplayDate(period.effectiveTo) : 'Vô thời hạn';
                 const startTime = period.shiftStart?.substring(0, 5) || '—';
                 const endTime = period.shiftEnd?.substring(0, 5) || '—';
 

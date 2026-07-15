@@ -6,7 +6,7 @@ import type {
   ShiftDTO,
   ShiftPeriodDTO,
 } from "@/features/shifts/types/shift.types";
-import { DateUtil, formatDate } from "@/shared/utils/date.utils";
+import { DateUtil, formatDate, toLocalTimeOnly } from "@/shared/utils/date.utils";
 import { ChevronLeft, ChevronRight, Clock, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useAttendances } from "../hooks/useAttendances";
@@ -89,21 +89,16 @@ export function AttendanceListPage() {
   );
   const weekLabel = `Tuần ${currentDate.isoWeek()} (${currentDate.format("DD/MM/YYYY")} - ${currentDate.endOf("isoWeek").format("DD/MM/YYYY")})`;
 
-  // Create mappings for fast lookups
-  const { scheduleAttendanceMap, fallbackAttendanceMap } = useMemo(() => {
-    const sMap = new Map<number, AttendanceDto>();
-    const fMap = new Map<string, AttendanceDto>();
+  // Map attendance theo workScheduleId — mỗi ca một bản ghi riêng (không fallback staffId+ngày)
+  const scheduleAttendanceMap = useMemo(() => {
+    const map = new Map<number, AttendanceDto>();
     const attendances = attendancesResult?.data?.items ?? [];
-    attendances.forEach((att) => {
+    attendances.forEach((att: AttendanceDto) => {
       if (att.workScheduleId) {
-        sMap.set(att.workScheduleId, att);
-      }
-      if (att.staffId && att.workDate) {
-        const dateStr = att.workDate.substring(0, 10);
-        fMap.set(`${att.staffId}_${dateStr}`, att);
+        map.set(att.workScheduleId, att);
       }
     });
-    return { scheduleAttendanceMap: sMap, fallbackAttendanceMap: fMap };
+    return map;
   }, [attendancesResult?.data?.items]);
 
   // Filtered schedules by staff name and attendance state
@@ -130,13 +125,9 @@ export function AttendanceListPage() {
     }
 
     // 2. Filter by checkboxes
-    return list.filter((ws) => {
-      // Find attendance
-      let att = ws.id ? scheduleAttendanceMap.get(ws.id) : null;
-      if (!att && ws.staffId && ws.workDate) {
-        const dateStr = formatDate(ws.workDate).format("YYYY-MM-DD");
-        att = fallbackAttendanceMap.get(`${ws.staffId}_${dateStr}`) || null;
-      }
+    return list.filter((ws: WorkScheduleDTO) => {
+      // Chỉ gắn attendance của đúng ca (workScheduleId)
+      const att = ws.id ? scheduleAttendanceMap.get(ws.id) : null;
 
       // Check status
       if (!att) {
@@ -168,10 +159,10 @@ export function AttendanceListPage() {
           return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
         };
         const isoTimeToMinutes = (isoStr?: string | null) => {
-          if (!isoStr) return null;
-          const d = new Date(isoStr);
-          if (isNaN(d.getTime())) return null;
-          return d.getHours() * 60 + d.getMinutes();
+          const hm = toLocalTimeOnly(isoStr);
+          if (!hm) return null;
+          const [h, m] = hm.split(":").map(Number);
+          return h * 60 + m;
         };
 
         // Find shift period
@@ -209,7 +200,6 @@ export function AttendanceListPage() {
     schedulesResult?.data?.items,
     searchQuery,
     scheduleAttendanceMap,
-    fallbackAttendanceMap,
     shiftsResult?.data?.items,
     filterOnTime,
     filterLate,
@@ -266,11 +256,7 @@ export function AttendanceListPage() {
   };
 
   const handleCardClick = (ws: WorkScheduleDTO) => {
-    let att = (ws.id ? scheduleAttendanceMap.get(ws.id) : null) ?? null;
-    if (!att && ws.staffId && ws.workDate) {
-      const dateStr = formatDate(ws.workDate).format("YYYY-MM-DD");
-      att = fallbackAttendanceMap.get(`${ws.staffId}_${dateStr}`) ?? null;
-    }
+    const att = (ws.id ? scheduleAttendanceMap.get(ws.id) : null) ?? null;
     setSelectedSchedule(ws);
     setSelectedAttendance(att);
     setDialogOpen(true);
@@ -280,11 +266,7 @@ export function AttendanceListPage() {
     ws: WorkScheduleDTO,
     period: ShiftPeriodDTO,
   ) => {
-    let att = ws.id ? scheduleAttendanceMap.get(ws.id) : null;
-    if (!att && ws.staffId && ws.workDate) {
-      const dateStr = formatDate(ws.workDate).format("YYYY-MM-DD");
-      att = fallbackAttendanceMap.get(`${ws.staffId}_${dateStr}`) || null;
-    }
+    const att = ws.id ? scheduleAttendanceMap.get(ws.id) : null;
 
     const defaultClass =
       "w-full text-left p-2.5 border rounded-xl transition-all focus:outline-none focus:ring-1 shadow-sm";
@@ -300,10 +282,7 @@ export function AttendanceListPage() {
     }
 
     const parseTime = (isoStr: string | null) => {
-      if (!isoStr) return "--:--";
-      const d = new Date(isoStr);
-      if (isNaN(d.getTime())) return "--:--";
-      return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+      return toLocalTimeOnly(isoStr) || "--:--";
     };
 
     const timeToMinutes = (timeStr?: string | null) => {
@@ -314,10 +293,10 @@ export function AttendanceListPage() {
     };
 
     const isoTimeToMinutes = (isoStr?: string | null) => {
-      if (!isoStr) return null;
-      const d = new Date(isoStr);
-      if (isNaN(d.getTime())) return null;
-      return d.getHours() * 60 + d.getMinutes();
+      const hm = toLocalTimeOnly(isoStr);
+      if (!hm) return null;
+      const [h, m] = hm.split(":").map(Number);
+      return h * 60 + m;
     };
 
     const statusVal = att.status;

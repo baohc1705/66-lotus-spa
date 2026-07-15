@@ -28,6 +28,10 @@ import {
 import type { MembershipCardDto } from "../types/membershipCard.types";
 import type { MembershipTierDto } from "../types/membershipTier.types";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
+import {
+  toDatetimeLocalInput,
+  localDateTimeToUtc,
+} from "@/shared/utils/date.utils";
 
 interface MembershipCardFormDialogProps {
   open: boolean;
@@ -83,8 +87,12 @@ export function MembershipCardFormDialog({
       const payload = {
         ...data,
         membershipTierId: data.membershipTierId ?? undefined,
-        issuedAt: data.issuedAt === "" ? undefined : data.issuedAt,
-        expiresAt: data.expiresAt === "" ? undefined : data.expiresAt,
+        issuedAt:
+          data.issuedAt === "" ? undefined : localDateTimeToUtc(data.issuedAt),
+        expiresAt:
+          data.expiresAt === ""
+            ? undefined
+            : localDateTimeToUtc(data.expiresAt),
       };
       updateMutation.mutate(
         { id: card.id, payload },
@@ -95,26 +103,6 @@ export function MembershipCardFormDialog({
         },
       );
     }
-  };
-
-  // Handle format datetime-local input correctly
-  const handleDateChange = (field: "issuedAt" | "expiresAt", value: string) => {
-    if (value) {
-      const date = new Date(value);
-      setValue(field, date.toISOString());
-    } else {
-      setValue(field, "");
-    }
-  };
-
-  const getDatetimeLocalFormat = (dateString?: string | null) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return "";
-    // Format to yyyy-MM-ddThh:mm
-    return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-      .toISOString()
-      .slice(0, 16);
   };
 
   if (!card) return null;
@@ -160,11 +148,7 @@ export function MembershipCardFormDialog({
             </FormField>
 
             <FormField label="Ngày cấp" error={errors.issuedAt?.message}>
-              <AdminInput
-                type="datetime-local"
-                value={getDatetimeLocalFormat(watch("issuedAt"))}
-                onChange={(e) => handleDateChange("issuedAt", e.target.value)}
-              />
+              <AdminInput type="datetime-local" {...register("issuedAt")} />
             </FormField>
 
             <FormField
@@ -172,11 +156,7 @@ export function MembershipCardFormDialog({
               tooltip="Để trống nếu thẻ có giá trị vĩnh viễn"
               error={errors.expiresAt?.message}
             >
-              <AdminInput
-                type="datetime-local"
-                value={getDatetimeLocalFormat(watch("expiresAt"))}
-                onChange={(e) => handleDateChange("expiresAt", e.target.value)}
-              />
+              <AdminInput type="datetime-local" {...register("expiresAt")} />
             </FormField>
 
             <div className="sm:col-span-2">
@@ -220,17 +200,6 @@ export function MembershipCardFormDialog({
   );
 }
 
-function parseVietnamDateToIso(dateStr?: string | null): string {
-  if (!dateStr) return "";
-  if (dateStr.includes("/") && dateStr.includes(" ")) {
-    const [datePart, timePart] = dateStr.split(" ");
-    const [day, month, year] = datePart.split("/");
-    const [hour, minute, second] = timePart.split(":");
-    return `${year}-${month}-${day}T${hour}:${minute}:${second ?? "00"}Z`;
-  }
-  return dateStr;
-}
-
 function getDefaultValues(
   card?: MembershipCardDto | null,
 ): MembershipCardFormValues {
@@ -238,8 +207,9 @@ function getDefaultValues(
     return {
       membershipTierId: card.membershipTierId ?? undefined,
       cardCode: card.cardCode ?? "",
-      issuedAt: parseVietnamDateToIso(card.issuedAt),
-      expiresAt: parseVietnamDateToIso(card.expiresAt),
+      // API UTC → local cho input datetime-local
+      issuedAt: toDatetimeLocalInput(card.issuedAt),
+      expiresAt: toDatetimeLocalInput(card.expiresAt),
       status: card.status,
     };
   }

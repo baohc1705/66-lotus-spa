@@ -16,7 +16,7 @@ import {
   IndexCell,
   NameCell,
   TextCell,
-} from "@/shared/components/DataTable/tableCells";
+} from "@/shared/components/DataTable/TableCells";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { BOOKING_ROOM_PERM } from "../constants/booking_room.permissions";
 import type { BookingRoomDTO, UpdateBookingRoomPayload } from "../types/booking_room.types";

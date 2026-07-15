@@ -12,7 +12,7 @@ import {
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { IndexCell, PriceCell, DateTimeCell } from "@/shared/components/DataTable/tableCells";
+import { IndexCell, PriceCell, DateTimeCell } from "@/shared/components/DataTable/TableCells";
 import { INVOICE_PERM } from "../constants/invoice.permissions";
 import { INVOICE_STATUS, PAYMENT_METHOD, type InvoiceDto } from "../types/invoice.types";
 

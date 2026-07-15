@@ -1,16 +1,162 @@
-// Tiện ích ngày giờ thống nhất cho toàn hệ thống.
-//
-// Hiển thị (từ API / string):
-//   formatDisplayDate("2026-07-05")     → "05/07/2026"
-//   formatDateTimeDisplay("2026-07-05") → "05/07/2026, 15:07"
-//   parseToDateInput("05/07/2026")      → "2026-07-05"  (cho input type="date")
-//
-// Tính toán (lịch, ca làm...):
-//   formatDate().format("DD/MM/YYYY")
-//   formatDate().startOf("isoWeek").add(1, "week")
+// ============================================================================
+// date.utils — quy ước timezone
+// ============================================================================
+//   BE UTC  →  FE LOCAL   : toLocalDateOnly / toLocalTimeOnly / formatDateTimeDisplay
+//   FE LOCAL →  BE UTC    : localDateTimeToUtc
+//   DateOnly (yyyy-MM-dd) : ngày lịch, KHÔNG đổi timezone
+// ============================================================================
 
 const LOCALE = "vi-VN";
-const EMPTY_DATE = "—";
+const EMPTY = "—";
+
+/** Chuỗi chỉ có ngày lịch (DateOnly) */
+function isDateOnlyString(val: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(val.trim());
+}
+
+/** Parse yyyy-MM-dd → Date local (tránh lệch ngày vì UTC) */
+function parseDateOnlyLocal(val: string): Date | null {
+  const [y, m, d] = val.trim().split("-").map(Number);
+  if (!y || !m || !d) return null;
+  const date = new Date(y, m - 1, d);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+/**
+ * Parse từ API → Date (local khi đọc getHours/getDate).
+ * - DateOnly "yyyy-MM-dd" → ngày local
+ * - ISO có Z / offset → JS đổi sang local
+ * - ISO không timezone → coi là UTC (thêm Z)
+ */
+function parseFromApi(val?: string | null): Date | null {
+  if (!val) return null;
+  let s = val.trim();
+
+  if (isDateOnlyString(s)) {
+    return parseDateOnlyLocal(s);
+  }
+
+  // ISO datetime không có timezone → UTC
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/.test(s)) {
+    s = `${s}Z`;
+  }
+
+  const d = new Date(s);
+  if (!Number.isNaN(d.getTime())) return d;
+
+  // DD/MM/YYYY
+  if (s.includes("/") && s.length === 10) {
+    const [day, month, year] = s.split("/");
+    return parseDateOnlyLocal(`${year}-${month}-${day}`);
+  }
+
+  return null;
+}
+
+function pad(n: number) {
+  return n.toString().padStart(2, "0");
+}
+
+function toYmd(d: Date) {
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+function toHm(d: Date) {
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+// ============================================================================
+// BE UTC → FE LOCAL
+// ============================================================================
+
+/** UTC DateTimeOffset → ngày local `yyyy-MM-dd` (DateOnly phía client) */
+export function toLocalDateOnly(val?: string | null): string {
+  const d = parseFromApi(val);
+  return d ? toYmd(d) : "";
+}
+
+/** UTC DateTimeOffset → giờ local `HH:mm` (TimeOnly phía client) */
+export function toLocalTimeOnly(val?: string | null): string {
+  const d = parseFromApi(val);
+  return d ? toHm(d) : "";
+}
+
+/** UTC DateTimeOffset → hiển thị `DD/MM/YYYY, HH:mm` (local) */
+export function formatDateTimeDisplay(
+  val?: string | null,
+  fallback = EMPTY,
+): string {
+  const d = parseFromApi(val);
+  if (!d) return val || fallback;
+  return d.toLocaleString(LOCALE, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+/**
+ * UTC DateTimeOffset → value cho input `datetime-local`.
+ * Ví dụ: "2026-07-05T08:00:00Z" → "2026-07-05T15:00" (VN UTC+7)
+ */
+export function toDatetimeLocalInput(val?: string | null): string {
+  const d = parseFromApi(val);
+  return d ? `${toYmd(d)}T${toHm(d)}` : "";
+}
+
+/**
+ * DateOnly / ngày → hiển thị `DD/MM/YYYY` (không đổi timezone).
+ * Nếu truyền DateTimeOffset thì lấy phần ngày local.
+ */
+export function formatDisplayDate(val?: string | null): string {
+  const d = parseFromApi(val);
+  if (!d) return val ? val : "";
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+}
+
+/** Alias: gán vào input type="date" (= toLocalDateOnly) */
+export function parseToDateInput(val?: string | null): string {
+  return toLocalDateOnly(val);
+}
+
+// ============================================================================
+// FE LOCAL → BE UTC
+// ============================================================================
+
+/**
+ * Giá trị local từ form → ISO UTC gửi backend.
+ *
+ *   localDateTimeToUtc("2026-07-05T15:00")           → "...Z"
+ *   localDateTimeToUtc("2026-07-05", "15:00")        → "...Z"
+ *   localDateTimeToUtc("2026-07-05")                 → nửa đêm local → UTC
+ */
+export function localDateTimeToUtc(
+  localDateTime?: string | null,
+  localTime?: string | null,
+): string {
+  if (!localDateTime) return "";
+
+  let local = localDateTime.trim();
+
+  if (localTime && isDateOnlyString(local)) {
+    local = `${local}T${localTime.trim()}`;
+  }
+
+  if (isDateOnlyString(local)) {
+    local = `${local}T00:00`;
+  }
+
+  const parsed = new Date(local);
+  if (Number.isNaN(parsed.getTime())) return "";
+  return parsed.toISOString();
+}
+
+// ============================================================================
+// Calendar helpers (lịch / ca làm — KHÔNG phải convert timezone)
+// Dùng bởi schedules, attendance, shifts...
+// ============================================================================
 
 type DateInput = Date | string | number | DateUtil;
 
@@ -21,51 +167,23 @@ export class DateUtil {
     if (input instanceof DateUtil) {
       this.date = new Date(input.toDate());
     } else if (input) {
-      this.date = new Date(input);
+      // DateOnly / ISO từ API: dùng parseFromApi để không lệch ngày
+      if (typeof input === "string") {
+        this.date = parseFromApi(input) ?? new Date(input);
+      } else {
+        this.date = new Date(input);
+      }
     } else {
       this.date = new Date();
     }
   }
 
-  /** Parse string từ API → DateUtil. Không parse được → null */
-  static fromApi(val?: string | null): DateUtil | null {
-    if (!val) return null;
-
-    let normalized = val.trim();
-    const isIsoUtcNoTz =
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/.test(normalized);
-    if (isIsoUtcNoTz) {
-      normalized = `${normalized}Z`;
-    }
-
-    const parsed = new Date(normalized);
-    if (!Number.isNaN(parsed.getTime())) {
-      return new DateUtil(parsed);
-    }
-
-    // DD/MM/YYYY
-    if (val.includes("/") && val.length === 10) {
-      const [day, month, year] = val.split("/");
-      const d = new Date(`${year}-${month}-${day}`);
-      return Number.isNaN(d.getTime()) ? null : new DateUtil(d);
-    }
-
-    // yyyy-MM-dd hoặc yyyy-MM-ddTHH:mm:ss
-    if (val.length >= 10 && val[4] === "-") {
-      const d = new Date(val.substring(0, 10));
-      return Number.isNaN(d.getTime()) ? null : new DateUtil(d);
-    }
-
-    return null;
-  }
-
   format(fmt: string) {
     const yyyy = this.date.getFullYear().toString();
-    const mm = (this.date.getMonth() + 1).toString().padStart(2, "0");
-    const dd = this.date.getDate().toString().padStart(2, "0");
-    const hh = this.date.getHours().toString().padStart(2, "0");
-    const min = this.date.getMinutes().toString().padStart(2, "0");
-
+    const mm = pad(this.date.getMonth() + 1);
+    const dd = pad(this.date.getDate());
+    const hh = pad(this.date.getHours());
+    const min = pad(this.date.getMinutes());
     return fmt
       .replace("YYYY", yyyy)
       .replace("MM", mm)
@@ -74,29 +192,11 @@ export class DateUtil {
       .replace("mm", min);
   }
 
-  /** DD/MM/YYYY */
-  toDisplayDate(): string {
-    if (Number.isNaN(this.date.getTime())) return "";
-    return this.format("DD/MM/YYYY");
-  }
-
-  /** DD/MM/YYYY, HH:mm */
-  toDisplayDateTime(): string {
-    if (Number.isNaN(this.date.getTime())) return EMPTY_DATE;
-    return this.date.toLocaleString(LOCALE, {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
-
   startOf(unit: "day" | "isoWeek") {
     const d = new Date(this.date);
     if (unit === "day") {
       d.setHours(0, 0, 0, 0);
-    } else if (unit === "isoWeek") {
+    } else {
       d.setHours(0, 0, 0, 0);
       const day = d.getDay();
       const diff = d.getDate() - day + (day === 0 ? -6 : 1);
@@ -114,11 +214,8 @@ export class DateUtil {
 
   add(amount: number, unit: "day" | "week") {
     const d = new Date(this.date);
-    if (unit === "day") {
-      d.setDate(d.getDate() + amount);
-    } else if (unit === "week") {
-      d.setDate(d.getDate() + amount * 7);
-    }
+    if (unit === "day") d.setDate(d.getDate() + amount);
+    else d.setDate(d.getDate() + amount * 7);
     return new DateUtil(d);
   }
 
@@ -151,34 +248,7 @@ export class DateUtil {
   }
 }
 
-/** Tạo DateUtil — dùng cho tính toán ngày (lịch, ca...) */
+/** Tạo DateUtil — tính toán tuần/ngày (lịch, ca), không dùng để convert timezone */
 export function formatDate(input?: DateInput) {
   return new DateUtil(input);
-}
-
-/** Hiển thị ngày: DD/MM/YYYY. Rỗng → "" */
-export function formatDisplayDate(val?: string | null): string {
-  if (!val) return "";
-  const d = DateUtil.fromApi(val);
-  if (d) return d.toDisplayDate();
-  return val;
-}
-
-/** Hiển thị ngày giờ từ API. Rỗng → "—" */
-export function formatDateTimeDisplay(
-  val?: string | null,
-  fallback = EMPTY_DATE,
-): string {
-  if (!val) return fallback;
-  const d = DateUtil.fromApi(val);
-  const out = d ? d.toDisplayDateTime() : val || fallback;
-  return out;
-}
-
-/** Chuyển sang yyyy-MM-dd cho input type="date" */
-export function parseToDateInput(val?: string | null): string {
-  if (!val) return "";
-  const d = DateUtil.fromApi(val);
-  if (d) return d.format("YYYY-MM-DD");
-  return val.substring(0, 10);
 }

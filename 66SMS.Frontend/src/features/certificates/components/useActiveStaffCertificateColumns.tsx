@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { IndexCell } from "@/shared/components/DataTable/tableCells";
+import { IndexCell } from "@/shared/components/DataTable/TableCells";
 import { CertificateStatusBadge, ExpiryBadge } from "./CertificateStatusBadge";
 import { formatDisplayDate } from "@/shared/utils/date.utils";
 import { COMMON_MSG } from "@/shared/constants/common.messages";

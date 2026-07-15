@@ -20,7 +20,7 @@ import {
   IndexCell,
   MutedCell,
   PriceCell,
-} from "@/shared/components/DataTable/tableCells";
+} from "@/shared/components/DataTable/TableCells";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type { Result } from "@/shared/types/common.types";
@@ -130,7 +130,7 @@ export function useActiveServiceColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="font-mono text-xs px-2 py-1 bg-adminGray-100 rounded text-adminGray-600">
+          <span className="text-xs px-2 py-1 bg-adminGray-100 rounded">
             {row.original.code ?? "—"}
           </span>
         ),

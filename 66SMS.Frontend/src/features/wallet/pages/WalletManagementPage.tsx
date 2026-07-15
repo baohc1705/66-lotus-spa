@@ -1,4 +1,5 @@
 import { formatCurrency } from '@/shared/utils/currency';
+import { formatDateTimeDisplay, formatDisplayDate } from '@/shared/utils/date.utils';
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getAdminWallets } from '../api/wallet.api';
@@ -119,7 +120,7 @@ export function WalletManagementPage() {
         header: "Ngày tạo ví",
         cell: ({ row }) => (
           <span className="text-adminGray-600 text-2xs">
-            {new Date(row.original.createdAt).toLocaleDateString('vi-VN')}
+            {formatDisplayDate(row.original.createdAt)}
           </span>
         ),
       },
@@ -128,7 +129,9 @@ export function WalletManagementPage() {
         header: "Cập nhật lần cuối",
         cell: ({ row }) => (
           <span className="text-adminGray-600 text-2xs">
-            {new Date(row.original.updatedAt || row.original.createdAt).toLocaleString('vi-VN')}
+            {formatDateTimeDisplay(
+              row.original.updatedAt || row.original.createdAt,
+            )}
           </span>
         ),
       },

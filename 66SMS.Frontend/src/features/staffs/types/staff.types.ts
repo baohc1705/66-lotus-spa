@@ -16,6 +16,7 @@ export interface StaffDto {
   createdAt?: string | null;
 }
 
+/** DTO đầy đủ cho expand + form sửa (GetDetail) */
 export interface StaffFullDto {
   id?: number | null;
   userId?: number | null;
@@ -44,47 +45,38 @@ export interface StaffFullDto {
   updatedAt?: string | null;
 }
 
-export interface CreateStaffPayload {
-  salonId?: number;
-  fullName: string;
-  /** Base64 ảnh mới (AvatarUrl trên backend) */
-  avatarUrl?: string;
-  dateOfBirth?: string;
-  gender?: number;
-  nationalId?: string;
-  phone: string;
-  hireDate?: string;
-  contractType?: string;
-  basicSalary?: number;
-  salaryType?: number;
-  status?: number;
-  streetAddress?: string;
-  provinceCode?: string;
-  wardCode?: string;
-  fullAddress?: string;
-  /** Role code (vd: staff, manager) */
-  role?: string;
+/** Dịch vụ được phân công cho nhân viên */
+export interface StaffServiceDto {
+  id?: number | null;
+  staffId?: number | null;
+  serviceId?: number | null;
+  status?: number | null;
+  serCode?: string | null;
+  serName?: string | null;
+  serDurationMins?: number | null;
+  serCostPrice?: number | null;
+  serCommissionRate?: number | null;
+  createdAt?: string | null;
 }
 
-export interface UpdateStaffPayload {
-  salonId?: number;
-  fullName?: string;
-  /** Base64 ảnh mới — chỉ gửi khi đổi ảnh */
-  avatarUrl?: string;
-  dateOfBirth?: string;
-  gender?: number;
-  nationalId?: string;
-  phone?: string;
-  hireDate?: string;
-  contractType?: string;
-  basicSalary?: number;
-  salaryType?: number;
+export interface CreateStaffServicePayload {
+  staffId: number;
+  serviceIds: number[];
   status?: number;
-  streetAddress?: string;
-  provinceCode?: string;
-  wardCode?: string;
-  fullAddress?: string;
-  email?: string;
-  /** Role code (vd: staff, manager) */
-  role?: string;
 }
+
+export interface UpdateStaffServicePayload {
+  staffId?: number;
+  serviceId?: number;
+  status?: number;
+}
+
+export interface DeleteStaffServicePayload {
+  ids: number[];
+}
+
+export type {
+  CreateStaffPayload,
+  UpdateStaffPayload,
+  StaffFormValues,
+} from "../schemas/staff.schema";

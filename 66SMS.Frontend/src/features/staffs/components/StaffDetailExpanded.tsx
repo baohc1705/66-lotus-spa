@@ -14,15 +14,18 @@ import type { StaffFullDto } from "../types/staff.types";
 import type { RoleDTO } from "@/features/auth/types/auth.types";
 import { formatDisplayDate } from "@/shared/utils/date.utils";
 import { GENDER_MAP } from "@/shared/constants/display.const";
+import { StaffServicesTab } from "./StaffServicesTab";
 
 interface StaffDetailExpandedProps {
   staffId: number;
   onEdit?: (staff: StaffFullDto) => void;
+  onAssignService?: (staff: StaffFullDto) => void;
 }
 
 export function StaffDetailExpanded({
   staffId,
   onEdit,
+  onAssignService,
 }: StaffDetailExpandedProps) {
   const { data: result, isLoading } = useStaffDetail(staffId);
   const staff = result?.data;
@@ -80,6 +83,12 @@ export function StaffDetailExpanded({
               className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
             >
               Thiết lập lương
+            </TabsTrigger>
+            <TabsTrigger
+              value="services"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+            >
+              Dịch vụ thực hiện
             </TabsTrigger>
             <TabsTrigger
               value="payslip"
@@ -185,6 +194,13 @@ export function StaffDetailExpanded({
           className="p-10 text-center text-adminGray-600 text-sm"
         >
           Chưa cấu hình thiết lập lương
+        </TabsContent>
+        <TabsContent value="services" className="m-0 border-none outline-none">
+          <StaffServicesTab
+            staffId={staffId}
+            staffName={staff.fullName}
+            onAssign={() => onAssignService?.(staff)}
+          />
         </TabsContent>
         <TabsContent
           value="payslip"

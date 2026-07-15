@@ -17,7 +17,10 @@ import { SalonFormDialog } from "../components/SalonFormDialog";
 import { SalonDetailExpanded } from "../components/SalonDetailExpanded";
 import { useAdminSalons, useDeleteSalonMutation } from "../hooks/useSalons";
 import { useSalonListState } from "../hooks/useSalonListState";
-import { useActiveSalonColumns, SALON_COLUMN_LABELS } from "../components/useActiveSalonColumns";
+import {
+  useActiveSalonColumns,
+  SALON_COLUMN_LABELS,
+} from "../components/useActiveSalonColumns";
 import { SALON_PERM } from "../constants/salon.permissions";
 import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
@@ -102,11 +105,12 @@ export function SalonListPage() {
             onSearchChange={handleSearchChange}
             searchPlaceholder="Tìm theo tên, mã, SĐT..."
           >
-            <DataTableViewOptions
-              table={table}
-              columnLabels={columnLabels}
-            />
-            <PermissionGate resource={perm.resource} action={perm.create} role={perm.role}>
+            <DataTableViewOptions table={table} columnLabels={columnLabels} />
+            <PermissionGate
+              resource={perm.resource}
+              action={perm.create}
+              role={perm.role}
+            >
               <Button
                 variant="admin"
                 size="sm"
@@ -148,7 +152,11 @@ export function SalonListPage() {
                   Thêm chi nhánh để bắt đầu quản lý hệ thống.
                 </p>
               </div>
-              <PermissionGate resource={perm.resource} action={perm.create} role={perm.role}>
+              <PermissionGate
+                resource={perm.resource}
+                action={perm.create}
+                role={perm.role}
+              >
                 <Button
                   variant="admin"
                   size="sm"
@@ -195,7 +203,10 @@ export function SalonListPage() {
         }}
         onConfirm={handleConfirmDelete}
         title={CONFIRM_MSG.deleteTitle(ENTITY)}
-        description={CONFIRM_MSG.deleteDescription(ENTITY, deleteTarget?.name ?? "")}
+        description={CONFIRM_MSG.deleteDescription(
+          ENTITY,
+          deleteTarget?.name ?? "",
+        )}
         confirmLabel={COMMON_MSG.delete}
         loading={deleteMutation.isPending}
         variant="danger"

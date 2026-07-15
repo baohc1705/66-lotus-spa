@@ -10,6 +10,7 @@ import {
   type BookingContactFormValues,
 } from "../schemas/booking.schema";
 import type { GuestAppointmentDto } from "../types/booking.types";
+import { formatDate } from "@/shared/utils/date.utils";
 
 export const BookingContactStep: React.FC = () => {
   const {
@@ -69,7 +70,7 @@ export const BookingContactStep: React.FC = () => {
           lockId: guest.lockId,
           staffId: guest.selectedTechnician?.id ?? null,
           slotId: guest.selectedTimeSlot!.slotId || 0,
-          appointmentDate: guest.selectedDate!.toISOString().split("T")[0],
+          appointmentDate: formatDate(guest.selectedDate!).format("YYYY-MM-DD"),
           positionId: guest.selectedPosition?.id || 0,
           salonId: selectedSalon?.id ?? null,
           note: finalNote,

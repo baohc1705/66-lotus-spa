@@ -9,7 +9,7 @@ import {
   DateTimeCell,
   IndexCell,
   PriceCell,
-} from "@/shared/components/DataTable/tableCells";
+} from "@/shared/components/DataTable/TableCells";
 
 import { TREATMENT_COURSE_COLUMN_LABELS } from "./useActiveTreatmentCourseColumns";
 import { TREATMENT_COURSE_PERM } from "../constants/treatmentCourse.permissions";

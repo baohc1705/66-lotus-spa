@@ -35,12 +35,11 @@ import type { ProvinceDto, WardDto } from "@/features/address/types/address.type
 import {
   createStaffSchema,
   updateStaffSchema,
-  type StaffFormValues,
 } from "../schemas/staff.schema";
-
 import type {
   StaffDto,
   StaffFullDto,
+  StaffFormValues,
   CreateStaffPayload,
   UpdateStaffPayload,
 } from "../types/staff.types";

@@ -17,10 +17,17 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
+import {
+  IndexCell,
+  DateTimeCell,
+  MutedSmallCell,
+} from "@/shared/components/DataTable/TableCells";
 import { StaffSalonFormDialog } from "../components/StaffSalonFormDialog";
 import { StaffSalonStatusBadge } from "../components/StaffSalonStatusBadge";
 import { useStaffSalons, useDeleteStaffSalon } from "../hooks/useStaffSalons";
 import type { StaffSalonDTO } from "../types/staff-salon.types";
+import { formatDisplayDate } from "@/shared/utils/date.utils";
+import { EMPTY_CELL } from "@/shared/constants/display.const";
 
 interface SalonStaffPageProps {
   salonId: number;
@@ -51,18 +58,20 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
       id: "index",
       header: "#",
       cell: ({ row }) => (
-        <span className="text-adminGray-400 text-sm">
-          {(pageIndex - 1) * pageSize + row.index + 1}
-        </span>
+        <IndexCell
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          rowIndex={row.index}
+        />
       ),
       size: 50,
     },
     {
-      accessorKey: "staffId",
-      header: "Mã NV",
-      cell: ({ getValue }) => (
-        <span className="font-mono text-xs bg-adminGray-100 px-1.5 py-0.5 rounded">
-          {String(getValue())}
+      accessorKey: "staffCode",
+      header: "Mã nhân viên",
+      cell: ({ row }) => (
+        <span className="text-xs bg-adminGray-100 px-1.5 py-0.5 rounded">
+          {row.original.staffCode ?? EMPTY_CELL}
         </span>
       ),
     },
@@ -70,25 +79,40 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
       accessorKey: "staffName",
       header: "Họ tên",
       cell: ({ row }) => (
-        <span className="font-mono text-xs bg-adminGray-100 px-1.5 py-0.5 rounded">
-          {row.original.staffName}
+        <span className="font-medium text-sm">
+          {row.original.staffName ?? EMPTY_CELL}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "staffRole",
+      header: "Vai trò",
+      cell: ({ row }) => (
+        <span className="text-xs">
+          {row.original.staffRole ?? EMPTY_CELL}
         </span>
       ),
     },
     {
       accessorKey: "startDate",
       header: "Ngày bắt đầu",
-      cell: ({ getValue }) => (
-        <span className="text-sm">{String(getValue() ?? "—")}</span>
+      cell: ({ row }) => (
+        <MutedSmallCell
+          value={formatDisplayDate(row.original.startDate) || EMPTY_CELL}
+        />
       ),
     },
     {
       accessorKey: "endDate",
-      header: "Ngày kết thúc",
-      cell: ({ getValue }) => (
-        <span className="text-sm text-adminGray-600">
-          {String(getValue() ?? "—")}
-        </span>
+      header: "Ngày nghỉ",
+      cell: ({ row }) => (
+        <MutedSmallCell
+          value={
+            row.original.endDate
+              ? formatDisplayDate(row.original.endDate)
+              : EMPTY_CELL
+          }
+        />
       ),
     },
     {
@@ -100,6 +124,16 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
           isManager={row.original.isManager}
         />
       ),
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Ngày tạo",
+      cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
+    },
+    {
+      accessorKey: "updatedAt",
+      header: "Cập nhật",
+      cell: ({ row }) => <DateTimeCell value={row.original.updatedAt} />,
     },
     {
       id: "actions",

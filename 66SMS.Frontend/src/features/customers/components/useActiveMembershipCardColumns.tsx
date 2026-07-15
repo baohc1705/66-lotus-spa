@@ -10,9 +10,10 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { IndexCell } from "@/shared/components/DataTable/tableCells";
+import { IndexCell } from "@/shared/components/DataTable/TableCells";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { formatDateTimeDisplay, formatDisplayDate } from "@/shared/utils/date.utils";
 import { CUSTOMER_PERM } from "../constants/customer.permissions";
 import type { MembershipCardDto } from "../types/membershipCard.types";
 
@@ -148,7 +149,7 @@ export function useActiveMembershipCardColumns({
         cell: ({ row }) => (
           <span className="text-adminInk/80 text-sm">
             {row.original.issuedAt
-              ? new Date(row.original.issuedAt).toLocaleDateString("vi-VN")
+              ? formatDisplayDate(row.original.issuedAt)
               : "—"}
           </span>
         ),
@@ -160,7 +161,7 @@ export function useActiveMembershipCardColumns({
         cell: ({ row }) => (
           <span className="text-adminInk/80 text-sm">
             {row.original.expiresAt
-              ? new Date(row.original.expiresAt).toLocaleDateString("vi-VN")
+              ? formatDisplayDate(row.original.expiresAt)
               : "Vĩnh viễn"}
           </span>
         ),
@@ -182,9 +183,7 @@ export function useActiveMembershipCardColumns({
         header: cols.createdAt,
         cell: ({ row }) => (
           <span className="text-adminInk/80 text-sm">
-            {row.original.createdAt
-              ? new Date(row.original.createdAt).toLocaleDateString("vi-VN")
-              : "—"}
+            {formatDateTimeDisplay(row.original.createdAt)}
           </span>
         ),
         size: 110,
@@ -194,9 +193,7 @@ export function useActiveMembershipCardColumns({
         header: cols.updatedAt,
         cell: ({ row }) => (
           <span className="text-adminInk/80 text-sm">
-            {row.original.updatedAt
-              ? new Date(row.original.updatedAt).toLocaleDateString("vi-VN")
-              : "—"}
+            {formatDateTimeDisplay(row.original.updatedAt)}
           </span>
         ),
         size: 110,

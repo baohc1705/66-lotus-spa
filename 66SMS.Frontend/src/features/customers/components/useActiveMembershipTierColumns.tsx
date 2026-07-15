@@ -11,7 +11,7 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { IndexCell } from "@/shared/components/DataTable/tableCells";
+import { IndexCell } from "@/shared/components/DataTable/TableCells";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { formatCurrency } from "@/shared/utils/currency";

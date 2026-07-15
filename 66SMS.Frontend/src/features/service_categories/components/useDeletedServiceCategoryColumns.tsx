@@ -9,7 +9,7 @@ import {
   IndexCell,
   MutedCell,
   TextCell,
-} from "@/shared/components/DataTable/tableCells";
+} from "@/shared/components/DataTable/TableCells";
 
 import { SERVICE_CATEGORY_COLUMN_LABELS } from "./useActiveServiceCategoryColumns";
 import { SERVICE_CATEGORY_PERM } from "../constants/serviceCategory.permissions";

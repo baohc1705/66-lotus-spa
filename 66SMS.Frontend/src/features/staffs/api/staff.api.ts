@@ -8,8 +8,12 @@ import type {
 import type {
   StaffDto,
   StaffFullDto,
+  StaffServiceDto,
   CreateStaffPayload,
   UpdateStaffPayload,
+  CreateStaffServicePayload,
+  UpdateStaffServicePayload,
+  DeleteStaffServicePayload,
 } from "../types/staff.types";
 
 const BASE = API.staffs.base;
@@ -42,4 +46,30 @@ export const staffApi = {
   /** DELETE /staffs/:id — Xóa nhân viên — quyền: staffs.delete, role: admin */
   delete: (id: number) =>
     axiosInstance.delete<Result<object>>(`${BASE}/${id}`).then((r) => r.data),
+
+  /** GET /staffs/services — Danh sách dịch vụ đã phân công — quyền: staffs.read */
+  getStaffServices: (
+    params: PageRequest & { staffId?: number | null; serviceId?: number | null },
+  ) =>
+    axiosInstance
+      .get<Result<PagedResult<StaffServiceDto>>>(`${BASE}/services`, { params })
+      .then((r) => r.data),
+
+  /** POST /staffs/services — Phân công dịch vụ cho NV — quyền: staffs.create */
+  createStaffServices: (payload: CreateStaffServicePayload) =>
+    axiosInstance
+      .post<Result<number[]>>(`${BASE}/services`, payload)
+      .then((r) => r.data),
+
+  /** PATCH /staffs/services/:id — Cập nhật phân công — quyền: staffs.update */
+  updateStaffService: (id: number, payload: UpdateStaffServicePayload) =>
+    axiosInstance
+      .patch<Result<object>>(`${BASE}/services/${id}`, payload)
+      .then((r) => r.data),
+
+  /** DELETE /staffs/services — Gỡ phân công dịch vụ — quyền: staffs.delete */
+  deleteStaffServices: (payload: DeleteStaffServicePayload) =>
+    axiosInstance
+      .delete<Result<object>>(`${BASE}/services`, { data: payload })
+      .then((r) => r.data),
 };

@@ -26,6 +26,10 @@ import {
   type AttendanceEditFormData,
 } from "../schemas/attendance.schema";
 import type { AttendanceDto } from "../types/attendance.types";
+import {
+  toDatetimeLocalInput,
+  localDateTimeToUtc,
+} from "@/shared/utils/date.utils";
 
 interface AttendanceFormDialogProps {
   open: boolean;
@@ -41,14 +45,6 @@ const STATUS_OPTIONS = [
   { value: "3", label: "Vắng / nghỉ không lương" },
   { value: "6", label: "Nghỉ không lương" },
 ];
-
-function toDateTimeLocal(val?: string | null): string {
-  if (!val) return "";
-  const d = new Date(val);
-  if (isNaN(d.getTime())) return "";
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
 
 export function AttendanceFormDialog({
   open,
@@ -82,8 +78,8 @@ export function AttendanceFormDialog({
   useEffect(() => {
     if (open) {
       reset({
-        checkInAt: toDateTimeLocal(attendance?.checkInAt),
-        checkOutAt: toDateTimeLocal(attendance?.checkOutAt),
+        checkInAt: toDatetimeLocalInput(attendance?.checkInAt),
+        checkOutAt: toDatetimeLocalInput(attendance?.checkOutAt),
         status: attendance?.status ? String(attendance.status) : "",
         note: attendance?.note ?? "",
       });
@@ -96,8 +92,12 @@ export function AttendanceFormDialog({
       {
         id: attendance.id,
         payload: {
-          checkInAt: data.checkInAt || undefined,
-          checkOutAt: data.checkOutAt || undefined,
+          checkInAt: data.checkInAt
+            ? localDateTimeToUtc(data.checkInAt)
+            : undefined,
+          checkOutAt: data.checkOutAt
+            ? localDateTimeToUtc(data.checkOutAt)
+            : undefined,
           status: data.status ? Number(data.status) : undefined,
           note: data.note || undefined,
         },

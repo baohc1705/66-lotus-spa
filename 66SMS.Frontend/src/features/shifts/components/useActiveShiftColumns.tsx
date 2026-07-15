@@ -11,9 +11,9 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { IndexCell, NameCell } from "@/shared/components/DataTable/tableCells";
+import { IndexCell, NameCell } from "@/shared/components/DataTable/TableCells";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { formatDate } from "@/shared/utils/date.utils";
+import { formatDisplayDate } from "@/shared/utils/date.utils";
 import { SHIFT_PERM } from "../constants/shift.permissions";
 import type { ShiftDTO } from "../types/shift.types";
 
@@ -98,11 +98,9 @@ export function useActiveShiftColumns({
         cell: ({ row }) => {
           const currentPeriod = row.original.shiftPeriodDTOs?.[0];
           if (!currentPeriod) return "—";
-          const from = formatDate(currentPeriod.effectiveFrom).format(
-            "DD/MM/YYYY",
-          );
+          const from = formatDisplayDate(currentPeriod.effectiveFrom) || "—";
           const to = currentPeriod.effectiveTo
-            ? formatDate(currentPeriod.effectiveTo).format("DD/MM/YYYY")
+            ? formatDisplayDate(currentPeriod.effectiveTo)
             : "Vô thời hạn";
           return (
             <span className="text-adminInk/80 text-sm">

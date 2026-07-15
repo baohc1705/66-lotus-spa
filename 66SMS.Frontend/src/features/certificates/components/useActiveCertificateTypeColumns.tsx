@@ -11,7 +11,7 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Badge } from "@/shared/components/ui/badge";
-import { IndexCell } from "@/shared/components/DataTable/tableCells";
+import { IndexCell } from "@/shared/components/DataTable/TableCells";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { CERTIFICATE_PERM } from "../constants/certificate.permissions";
 import type { CertificateTypeDTO } from "../types/certificate.types";

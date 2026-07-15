@@ -5,6 +5,7 @@ import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { useMembershipCardDetail } from "../hooks/useMembershipCards";
 import type { MembershipCardDto } from "../types/membershipCard.types";
 import { CUSTOMER_PERM } from "../constants/customer.permissions";
+import { formatDisplayDate } from "@/shared/utils/date.utils";
 
 const STATUS_MAP: Record<number, string> = {
   0: "Ngưng hoạt động",
@@ -95,18 +96,14 @@ export function MembershipCardDetailExpanded({
             icon={Calendar}
             label="Ngày cấp"
             value={
-              card.issuedAt
-                ? new Date(card.issuedAt).toLocaleDateString("vi-VN")
-                : "—"
+              card.issuedAt ? formatDisplayDate(card.issuedAt) : "—"
             }
           />
           <DetailCard
             icon={CalendarClock}
             label="Ngày hết hạn"
             value={
-              card.expiresAt
-                ? new Date(card.expiresAt).toLocaleDateString("vi-VN")
-                : "Vĩnh viễn"
+              card.expiresAt ? formatDisplayDate(card.expiresAt) : "Vĩnh viễn"
             }
           />
         </div>

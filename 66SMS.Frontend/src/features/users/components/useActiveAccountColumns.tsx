@@ -8,7 +8,7 @@ import {
   IndexCell,
   MutedCell,
   MutedSmallCell,
-} from "@/shared/components/DataTable/tableCells";
+} from "@/shared/components/DataTable/TableCells";
 import { StatusBadge } from "@/shared/components/StatusBadge";
 
 import { USER_STATUS_MAP } from "./useActiveUserColumns";

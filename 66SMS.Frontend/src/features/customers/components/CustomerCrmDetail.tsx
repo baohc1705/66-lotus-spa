@@ -6,7 +6,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/shared/components/ui/tabs";
-import { formatDisplayDate } from "@/shared/utils/date.utils";
+import { formatDisplayDate, formatDateTimeDisplay } from "@/shared/utils/date.utils";
 import { GENDER_MAP } from "@/shared/constants/display.const";
 import {
   Award,
@@ -74,7 +74,7 @@ export function CustomerCrmDetail({
 
   const code = customer.id ? `CS${String(customer.id).padStart(6, "0")}` : "—";
   const createdDate = customer.createdAt
-    ? formatDisplayDate(customer.createdAt)
+    ? formatDateTimeDisplay(customer.createdAt)
     : "—";
 
   return (

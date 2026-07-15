@@ -1,11 +1,6 @@
 import { useMemo } from "react";
 import type { ColumnDef, Row } from "@tanstack/react-table";
-import {
-  MoreHorizontal,
-  Pencil,
-  Trash2,
-  Eye,
-} from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Eye, Scissors, Award } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
@@ -17,10 +12,10 @@ import {
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { IndexCell, PriceCell } from "@/shared/components/DataTable/tableCells";
+import { IndexCell, PriceCell } from "@/shared/components/DataTable/TableCells";
+import { formatDateTimeDisplay } from "@/shared/utils/date.utils";
 import { GENDER_MAP } from "@/shared/constants/display.const";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
-import { formatDate } from "@/shared/utils/date.utils";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { STAFF_PERM } from "../constants/staff.permissions";
 import type { StaffDto } from "../types/staff.types";
@@ -43,8 +38,6 @@ export const STAFF_STATUS_MAP: StatusMap = {
   "2": { label: "Nghỉ việc", variant: "error" },
 };
 
-
-
 interface UseActiveStaffColumnsParams {
   pageIndex: number;
   pageSize: number;
@@ -57,6 +50,7 @@ interface UseActiveStaffColumnsParams {
   onToggleOne: (id: number, checked: boolean) => void;
   onEdit: (item: StaffDto) => void;
   onDelete: (item: StaffDto) => void;
+  onAssignService: (item: StaffDto) => void;
 }
 
 export function useActiveStaffColumns({
@@ -71,6 +65,7 @@ export function useActiveStaffColumns({
   onToggleOne,
   onEdit,
   onDelete,
+  onAssignService,
 }: UseActiveStaffColumnsParams) {
   const cols = STAFF_COLUMN_LABELS;
   const perm = STAFF_PERM;
@@ -128,7 +123,9 @@ export function useActiveStaffColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="text-adminGreen-600/80">{row.original.code ?? "—"}</span>
+          <span className="text-adminGreen-600/80">
+            {row.original.code ?? "—"}
+          </span>
         ),
         size: 100,
       },
@@ -172,9 +169,7 @@ export function useActiveStaffColumns({
         accessorKey: "phone",
         header: cols.phone,
         cell: ({ row }) => (
-          <span className="text-adminInk/80">
-            {row.original.phone ?? "—"}
-          </span>
+          <span className="text-adminInk/80">{row.original.phone ?? "—"}</span>
         ),
         size: 110,
       },
@@ -190,9 +185,7 @@ export function useActiveStaffColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="text-adminInk/70">
-            {row.original.email ?? "—"}
-          </span>
+          <span className="text-adminInk/70">{row.original.email ?? "—"}</span>
         ),
         size: 180,
       },
@@ -227,9 +220,7 @@ export function useActiveStaffColumns({
         header: cols.createdAt,
         cell: ({ row }) => (
           <span className="text-adminInk/70">
-            {row.original.createdAt
-              ? formatDate(row.original.createdAt).format("DD/MM/YYYY")
-              : "—"}
+            {formatDateTimeDisplay(row.original.createdAt)}
           </span>
         ),
         size: 120,
@@ -259,7 +250,7 @@ export function useActiveStaffColumns({
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="opacity-1 group-hover:opacity-100 transition-opacity"
                   >
                     <MoreHorizontal className="w-4 h-4" />
                   </Button>
@@ -273,6 +264,26 @@ export function useActiveStaffColumns({
                     <DropdownMenuItem onClick={() => onEdit(staff)}>
                       <Pencil className="w-4 h-4" />
                       {COMMON_MSG.edit}
+                    </DropdownMenuItem>
+                  </PermissionGate>
+                  <PermissionGate
+                    resource={perm.resource}
+                    action={perm.create}
+                  >
+                    <DropdownMenuItem onClick={() => onAssignService(staff)}>
+                      <Scissors className="w-4 h-4" />
+                      Phân công dịch vụ
+                    </DropdownMenuItem>
+                  </PermissionGate>
+                  <PermissionGate
+                    resource={perm.resource}
+                    action={perm.create}
+                    role={perm.role}
+                  >
+                    {/* TODO: Add view certificate action */}
+                    <DropdownMenuItem onClick={() => onDelete(staff)}>
+                      <Award className="w-4 h-4" />
+                      Xem chứng chỉ
                     </DropdownMenuItem>
                   </PermissionGate>
                   <PermissionGate
@@ -310,6 +321,7 @@ export function useActiveStaffColumns({
       onToggleOne,
       onEdit,
       onDelete,
+      onAssignService,
       cols,
       perm,
     ],

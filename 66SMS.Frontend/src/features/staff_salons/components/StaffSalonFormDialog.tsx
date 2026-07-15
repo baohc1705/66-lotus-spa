@@ -12,7 +12,6 @@ import {
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
-import { Switch } from '@/shared/components/ui/switch'
 import {
   Select,
   SelectContent,
@@ -28,6 +27,7 @@ import {
 } from '../schemas/staff-salon.schema'
 import type { StaffSalonDTO } from '../types/staff-salon.types'
 import { useStaffs } from '@/features/staffs/hooks/useStaffs'
+import { parseToDateInput } from '@/shared/utils/date.utils'
 
 interface StaffSalonFormDialogProps {
   open: boolean
@@ -61,10 +61,11 @@ export function StaffSalonFormDialog({
 
   useEffect(() => {
     if (staffSalon && isEdit) {
+      // DateOnly từ API → yyyy-MM-dd cho input type="date" (không đổi timezone)
       updateForm.reset({
         isManager: staffSalon.isManager ?? false,
-        startDate: staffSalon.startDate ?? '',
-        endDate: staffSalon.endDate ?? '',
+        startDate: parseToDateInput(staffSalon.startDate),
+        endDate: parseToDateInput(staffSalon.endDate),
         status: staffSalon.status,
       })
     } else {
@@ -107,13 +108,13 @@ export function StaffSalonFormDialog({
 
         {isEdit ? (
           <form onSubmit={updateForm.handleSubmit(onUpdateSubmit)} className="space-y-4">
-            <div className="flex items-center gap-3">
+            {/* <div className="flex items-center gap-3">
               <Label>Quản lý chi nhánh</Label>
               <Switch
                 checked={updateForm.watch('isManager') ?? false}
                 onCheckedChange={(v) => updateForm.setValue('isManager', v)}
               />
-            </div>
+            </div> */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="u-startDate">Ngày bắt đầu</Label>
@@ -167,13 +168,13 @@ export function StaffSalonFormDialog({
                 <p className="text-xs text-state-danger-text">{createForm.formState.errors.staffId.message}</p>
               )}
             </div>
-            <div className="flex items-center gap-3">
+            {/* <div className="flex items-center gap-3">
               <Label>Quản lý chi nhánh</Label>
               <Switch
                 checked={createForm.watch('isManager') ?? false}
                 onCheckedChange={(v) => createForm.setValue('isManager', v)}
               />
-            </div>
+            </div> */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="c-startDate">Ngày bắt đầu *</Label>

@@ -16,7 +16,7 @@ import {
   IndexCell,
   NameCell,
   MutedCell,
-} from "@/shared/components/DataTable/tableCells";
+} from "@/shared/components/DataTable/TableCells";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { BOOKING_POSITION_PERM } from "../constants/booking_position.permissions";
 import type { BookingPositionDTO, UpdateBookingPositionPayload } from "../types/booking_position.types";

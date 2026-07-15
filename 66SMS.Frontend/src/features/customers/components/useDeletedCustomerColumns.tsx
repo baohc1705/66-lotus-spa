@@ -8,7 +8,7 @@ import { COMMON_MSG } from "@/shared/constants/common.messages";
 import {
   DateTimeCell,
   IndexCell,
-} from "@/shared/components/DataTable/tableCells";
+} from "@/shared/components/DataTable/TableCells";
 
 import { CUSTOMER_COLUMN_LABELS } from "./useActiveCustomerColumns";
 import { CUSTOMER_PERM } from "../constants/customer.permissions";

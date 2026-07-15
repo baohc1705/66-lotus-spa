@@ -1,6 +1,7 @@
 import React from "react";
 import { CheckCircle2, Info } from "lucide-react";
 import { useBookingStore } from "../stores/bookingStore";
+import { formatDate } from "@/shared/utils/date.utils";
 
 export const BookingSuccessTicket: React.FC = () => {
   const { guests, resetBooking, selectedSalon } = useBookingStore();
@@ -15,11 +16,6 @@ export const BookingSuccessTicket: React.FC = () => {
   } = primaryGuest || {};
 
   const ticketId = React.useMemo(() => Math.floor(Math.random() * 10000), []);
-
-  const formatDateString = (d: Date | null) => {
-    if (!d) return "";
-    return `${d.getDate().toString().padStart(2, "0")}/${(d.getMonth() + 1).toString().padStart(2, "0")}/${d.getFullYear()}`;
-  };
 
   return (
     <div className="relative w-full flex flex-col items-center justify-center">
@@ -66,7 +62,7 @@ export const BookingSuccessTicket: React.FC = () => {
             <div className="flex justify-between">
               <span className="text-warm-600">Thời gian:</span>
               <span className="font-semibold text-ink">
-                {selectedTimeSlot?.time} · {formatDateString(selectedDate)}
+                {selectedTimeSlot?.time} · {selectedDate ? formatDate(selectedDate).format("DD/MM/YYYY") : ""}
               </span>
             </div>
             <div className="flex justify-between">

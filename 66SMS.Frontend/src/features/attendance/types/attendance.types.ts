@@ -1,4 +1,4 @@
-// DTO trả về từ API (các trường số/ngày để nullable theo convention backend)
+// DTO trả về từ API (JSON serialize DateTimeOffset → ISO string)
 export interface AttendanceDto {
   id: number | null;
   staffId: number | null;
@@ -15,6 +15,7 @@ export interface AttendanceDto {
   note: string | null;
   shiftName: string | null;
   createdAt: string | null;
+  updatedAt: string | null;
 }
 
 // Payload check-in
@@ -41,6 +42,7 @@ export interface UpdateAttendancePayload {
 // Payload tạo bản ghi nghỉ phép/lễ/vắng (quản lý)
 export interface CreateManualAttendancePayload {
   staffId: number;
+  workScheduleId?: number;
   workDate: string;
   status: number;
   note?: string;

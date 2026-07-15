@@ -10,7 +10,7 @@ import {
   IndexCell,
   PriceCell,
   TextCell,
-} from "@/shared/components/DataTable/tableCells";
+} from "@/shared/components/DataTable/TableCells";
 
 import { PRODUCT_COLUMN_LABELS } from "./useActiveProductColumns";
 import { PRODUCT_PERM } from "../constants/product.permissions";

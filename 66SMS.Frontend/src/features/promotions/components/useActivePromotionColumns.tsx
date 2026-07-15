@@ -12,8 +12,9 @@ import {
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { IndexCell, PriceCell } from "@/shared/components/DataTable/tableCells";
+import { IndexCell, PriceCell } from "@/shared/components/DataTable/TableCells";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { formatDateTimeDisplay } from "@/shared/utils/date.utils";
 import { PROMOTION_PERM } from "../constants/promotion.permissions";
 import type { PromotionDto } from "../types/promotion.types";
 
@@ -161,8 +162,8 @@ export function useActivePromotionColumns({
           const p = row.original;
           return (
             <div className="text-xs text-adminInk/70 leading-5">
-              <div>{p.startDate ?? "—"}</div>
-              <div>→ {p.endDate ?? "—"}</div>
+              <div>{formatDateTimeDisplay(p.startDate)}</div>
+              <div>→ {formatDateTimeDisplay(p.endDate)}</div>
             </div>
           );
         },

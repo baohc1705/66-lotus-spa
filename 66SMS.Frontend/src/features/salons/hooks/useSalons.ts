@@ -47,7 +47,7 @@ export function useCreateSalonMutation() {
     mutationFn: (payload: CreateSalonPayload) => salonApi.create(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: SALON_KEYS.lists() });
+        qc.invalidateQueries({ queryKey: SALON_KEYS.all });
         toast.success(TOAST_MSG.createSuccess(ENTITY));
       } else {
         toast.error(result.message || COMMON_MSG.error);

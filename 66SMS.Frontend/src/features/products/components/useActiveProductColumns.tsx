@@ -4,7 +4,7 @@ import { Eye, MoreHorizontal, Package, Pencil, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { MutedCell, PriceCell, TextCell } from "@/shared/components/DataTable/tableCells";
+import { MutedCell, PriceCell, TextCell } from "@/shared/components/DataTable/TableCells";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
