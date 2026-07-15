@@ -41,6 +41,14 @@ namespace _66SMS.Application.Abstractions
         /// Trả về Tuple chứa StaffId thực tế được chọn và ScheduleId (Lịch làm việc của nhân viên đó hôm đó). 
         /// Nếu không còn bất kỳ nhân viên nào rảnh hoặc Slot đó đã bị người khác đặt mất, sẽ trả về null.
         /// </returns>
-        Task<(int StaffId, int? ScheduleId)?> ResolveStaffAsync(DateOnly date, int serviceId, int? staffId, int startSlotId, int? salonId = null, CancellationToken ct = default);
+        /// <param name="excludeLockId">Bỏ qua lock đang confirm để không tự chặn chính mình trong BookedSlots.</param>
+        Task<(int StaffId, int? ScheduleId)?> ResolveStaffAsync(
+            DateOnly date,
+            int serviceId,
+            int? staffId,
+            int startSlotId,
+            int? salonId = null,
+            int? excludeLockId = null,
+            CancellationToken ct = default);
     }
 }

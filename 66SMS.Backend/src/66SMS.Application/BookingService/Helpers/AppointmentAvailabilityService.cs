@@ -21,7 +21,7 @@ namespace _66SMS.Application.BookingService.Helpers
         public async Task<IReadOnlyList<BookingTechnicianDto>> GetTechniciansAsync(DateOnly date, int serviceId, int? salonId = null, CancellationToken cancellationToken = default)
         {
             // Build context một lần, load toàn bộ dữ liệu lên RAM để tính toán không cần truy vấn thêm
-            var context = await contextProvider.BuildContextAsync(date, serviceId, cancellationToken);
+            var context = await contextProvider.BuildContextAsync(date, serviceId, cancellationToken: cancellationToken);
             if (context == null) return [];
 
             var result = new List<BookingTechnicianDto>();
@@ -79,7 +79,7 @@ namespace _66SMS.Application.BookingService.Helpers
         // "booked" chỉ khi CHÍNH ô đó bị chiếm — không khóa ô trước chỉ vì DV dài đụng ô phía sau
         public async Task<IReadOnlyList<BookingTimeSlotDto>> GetTimeSlotsAsync(DateOnly date, int serviceId, int? staffId, int? salonId = null, CancellationToken cancellationToken = default)
         {
-            var context = await contextProvider.BuildContextAsync(date, serviceId, cancellationToken);
+            var context = await contextProvider.BuildContextAsync(date, serviceId, cancellationToken: cancellationToken);
             if (context == null) return [];
 
             // Chế độ "bất kỳ": tổng hợp trạng thái slot từ nhiều nhân viên (đã đủ salon + dịch vụ)
@@ -119,12 +119,19 @@ namespace _66SMS.Application.BookingService.Helpers
 
         // Xác định nhân viên thực sự sẽ phụ trách lịch hẹn và ScheduleId tương ứng
         // Phải đủ SlotsNeeded liên tiếp trống tại startSlotId (validate lúc khóa/đặt)
-        public async Task<(int StaffId, int? ScheduleId)?> ResolveStaffAsync(DateOnly date, int serviceId, int? staffId, int startSlotId, int? salonId = null, CancellationToken ct = default)
+        public async Task<(int StaffId, int? ScheduleId)?> ResolveStaffAsync(
+            DateOnly date,
+            int serviceId,
+            int? staffId,
+            int startSlotId,
+            int? salonId = null,
+            int? excludeLockId = null,
+            CancellationToken ct = default)
         {
             if (staffId.HasValue)
             {
                 // Kiểm tra nhân viên cụ thể: phải làm được dịch vụ + thuộc salon + đủ slot liên tiếp
-                var context = await contextProvider.BuildContextAsync(date, serviceId, ct);
+                var context = await contextProvider.BuildContextAsync(date, serviceId, excludeLockId, ct);
                 if (context == null || !IsStaffEligible(context, staffId.Value, salonId))
                     return null;
                 if (!context.StaffShiftWindows.TryGetValue(staffId.Value, out var explWindows) || explWindows.Count == 0)
@@ -137,7 +144,7 @@ namespace _66SMS.Application.BookingService.Helpers
             }
 
             // Chế độ "bất kỳ": tìm tất cả ứng viên rảnh tại slot đó rồi chọn người có nhiều chỗ bắt đầu DV nhất
-            var ctx = await contextProvider.BuildContextAsync(date, serviceId, ct);
+            var ctx = await contextProvider.BuildContextAsync(date, serviceId, excludeLockId, ct);
             if (ctx == null) return null;
             var startIndex = FindSlotIndex(ctx.TimeSlots, startSlotId);
             if (startIndex < 0) return null;

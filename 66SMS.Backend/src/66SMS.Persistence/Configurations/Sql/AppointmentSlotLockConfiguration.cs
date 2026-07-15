@@ -29,6 +29,12 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.HasOne(x => x.Position).WithMany().HasForeignKey(x => x.PositionId).IsRequired(false);
             builder.HasOne(x => x.LockedByUser).WithMany().HasForeignKey(x => x.LockedByUserId).IsRequired(false);
 
+            // 1 winner: chỉ 1 lock ACTIVE / (staff, date, start slot). RELEASED/EXPIRED được trùng.
+            builder.HasIndex(x => new { x.StaffId, x.AppointmentDate, x.SlotId })
+                .IsUnique()
+                .HasFilter($"[{AppointmentSlotLockConst.FIELD_STATUS}] = {AppointmentSlotLockConst.STATUS_ACTIVE}")
+                .HasDatabaseName("UX_slot_lock_active_staff_date_slot");
+
             builder.ToTable(AppointmentSlotLockConst.TABLE_NAME);
         }
     }

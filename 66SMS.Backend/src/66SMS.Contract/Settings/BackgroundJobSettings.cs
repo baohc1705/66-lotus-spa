@@ -32,5 +32,13 @@ namespace _66SMS.Contract.Settings
         {
             IntervalMinutes = 30,
         };
+
+        /// <summary>
+        /// Đánh dấu soft lock ACTIVE hết hạn thành EXPIRED (nhả filtered unique). Mặc định: mỗi 5 phút.
+        /// </summary>
+        public JobScheduleSettings CleanupExpiredSlotLocks { get; set; } = new()
+        {
+            IntervalMinutes = 5,
+        };
     }
 }

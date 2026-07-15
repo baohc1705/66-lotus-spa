@@ -29,7 +29,11 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             this.appointmentSlotLockSqlRepository = appointmentSlotLockSqlRepository;
         }
 
-        public async Task<AppointmentAvailabilityContext?> BuildContextAsync(DateOnly date, int serviceId, CancellationToken cancellationToken = default)
+        public async Task<AppointmentAvailabilityContext?> BuildContextAsync(
+            DateOnly date,
+            int serviceId,
+            int? excludeLockId = null,
+            CancellationToken cancellationToken = default)
         {
             var service = await serviceSqlRepository
                 .AsQueryable()
@@ -122,10 +126,14 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
                 MarkConsecutiveSlots(bookedSlots, appointment.StaffId, appointment.SlotId, needed, timeSlots);
             }
 
-            var locks = await appointmentSlotLockSqlRepository
+            var locksQuery = appointmentSlotLockSqlRepository
                 .AsQueryable()
-                .Where(x => x.AppointmentDate == date && x.Status == AppointmentSlotLockConst.STATUS_ACTIVE && x.ExpiresAt > now)
-                .ToListAsync(cancellationToken);
+                .Where(x => x.AppointmentDate == date && x.Status == AppointmentSlotLockConst.STATUS_ACTIVE && x.ExpiresAt > now);
+
+            if (excludeLockId.HasValue)
+                locksQuery = locksQuery.Where(x => x.Id != excludeLockId.Value);
+
+            var locks = await locksQuery.ToListAsync(cancellationToken);
 
             var heldSlots = new Dictionary<(int StaffId, int SlotId), byte>();
             foreach (var slotLock in locks)

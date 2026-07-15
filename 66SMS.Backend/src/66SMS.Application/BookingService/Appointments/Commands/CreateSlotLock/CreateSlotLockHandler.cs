@@ -1,4 +1,5 @@
 using _66SMS.Application.Abstractions;
+using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -8,6 +9,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
 {
@@ -34,22 +36,52 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
         }
 
         /// <summary>
-        /// Xử lý logic tạo một danh sách khóa giữ chỗ (Slot Lock) tạm thời (mặc định 10 phút).
+        /// Tạo soft lock (TTL 10 phút). Serializable + filtered unique → 1 winner khi race.
         /// </summary>
         public async Task<Result<List<int>>> Handle(CreateSlotLockCommand request, CancellationToken cancellationToken)
-         {
-            using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
+        {
+            for (var attempt = 0; attempt <= BookingDbConcurrency.MaxDeadlockRetries; attempt++)
+            {
+                try
+                {
+                    return await TryCreateLocksAsync(request, cancellationToken);
+                }
+                catch (DbUpdateException ex) when (BookingDbConcurrency.IsUniqueViolation(ex))
+                {
+                    return Result<List<int>>.Conflict(
+                        AppointmentSlotLockConst.MSG_SLOT_LOCK_CONFLICT,
+                        ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
+                }
+                catch (Exception ex) when (BookingDbConcurrency.IsDeadlock(ex) && attempt < BookingDbConcurrency.MaxDeadlockRetries)
+                {
+                    await Task.Delay(40 * (attempt + 1), cancellationToken);
+                }
+            }
+
+            return Result<List<int>>.Conflict(
+                AppointmentSlotLockConst.MSG_SLOT_LOCK_CONFLICT,
+                ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
+        }
+
+        private async Task<Result<List<int>>> TryCreateLocksAsync(
+            CreateSlotLockCommand request,
+            CancellationToken cancellationToken)
+        {
+            using var transaction = await sqlUnitOfWork.BeginTransactionAsync(
+                IsolationLevel.Serializable,
+                cancellationToken);
             try
             {
-                // Lấy độ dài slot THỰC TẾ từ DB (đồng bộ với BookingContextProvider).
-                // Bug cũ: hard-code DEFAULT_SLOT_MINUTES → lệch số slot bị khóa (vd slot DB = 30' nhưng tính theo 15').
                 var timeSlots = await timeSlotSqlRepository
                     .AsQueryable()
                     .OrderBy(x => x.StartTime)
                     .ToListAsync(cancellationToken);
 
                 if (timeSlots.Count == 0)
+                {
+                    transaction.Rollback();
                     return Result<List<int>>.BadRequest(TimeSlotConst.MSG_TIME_SLOT_NOT_FOUND, ErrorCodes.ERR_TIME_SLOT_NOT_FOUND);
+                }
 
                 var slotMinutes = TimeSlotConst.ResolveSlotMinutes(
                     timeSlots[0].StartTime,
@@ -61,34 +93,46 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                     var slotId = (int)lockRequest.SlotId!;
                     var startIndex = timeSlots.FindIndex(s => s.Id == slotId);
                     if (startIndex < 0)
+                    {
+                        transaction.Rollback();
                         return Result<List<int>>.BadRequest($"Slot {slotId} không tồn tại.");
+                    }
 
+                    var service = await serviceSqlRepository.FindByIdAsync((int)lockRequest.ServiceId!);
+                    if (service == null)
+                    {
+                        transaction.Rollback();
+                        return Result<List<int>>.BadRequest(ServiceConst.MSG_SERVICE_PRODUCT_NOT_FOUND, ErrorCodes.ERR_SERVICE_NOT_FOUND);
+                    }
+
+                    var slotsNeeded = TimeSlotConst.CalcSlotsNeeded(service.DurationMins, slotMinutes);
+
+                    if (startIndex + slotsNeeded > timeSlots.Count)
+                    {
+                        transaction.Rollback();
+                        return Result<List<int>>.BadRequest(
+                            $"Không đủ khung giờ liên tiếp từ {timeSlots[startIndex].StartTime:HH\\:mm} cho dịch vụ {service.DurationMins} phút.");
+                    }
+
+                    // Re-check trong Serializable TX — nhìn thấy lock/appointment của TX thắng cuộc
                     var resolvedStaff = await bookingAvailabilityService.ResolveStaffAsync(
                         (DateOnly)lockRequest.AppointmentDate!,
                         (int)lockRequest.ServiceId!,
                         lockRequest.StaffId,
                         slotId,
                         salonId: null,
+                        excludeLockId: null,
                         cancellationToken);
-
-                    var service = await serviceSqlRepository.FindByIdAsync((int)lockRequest.ServiceId);
-                    if (service == null)
-                        return Result<List<int>>.BadRequest(ServiceConst.MSG_SERVICE_PRODUCT_NOT_FOUND, ErrorCodes.ERR_SERVICE_NOT_FOUND);
-
-                    var slotsNeeded = TimeSlotConst.CalcSlotsNeeded(service.DurationMins, slotMinutes);
-
-                    // Không đủ slot liên tiếp phía sau giờ bắt đầu
-                    if (startIndex + slotsNeeded > timeSlots.Count)
-                        return Result<List<int>>.BadRequest(
-                            $"Không đủ khung giờ liên tiếp từ {timeSlots[startIndex].StartTime:HH\\:mm} cho dịch vụ {service.DurationMins} phút.");
 
                     if (resolvedStaff == null)
                     {
+                        transaction.Rollback();
                         var startLabel = timeSlots[startIndex].StartTime.ToString(@"HH\:mm");
-                        return Result<List<int>>.BadRequest(
+                        return Result<List<int>>.Conflict(
                             slotsNeeded > 1
                                 ? $"Khung giờ {startLabel} không đủ {service.DurationMins} phút liên tiếp (có slot phía sau đã được đặt/giữ). Vui lòng chọn giờ khác."
-                                : $"Slot {startLabel} đã có người đặt, vui lòng chọn lại.");
+                                : AppointmentSlotLockConst.MSG_SLOT_LOCK_CONFLICT,
+                            ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
                     }
 
                     var slotLock = new AppointmentSlotLock
@@ -97,7 +141,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                         StaffId = resolvedStaff.Value.StaffId,
                         PositionId = (int)lockRequest.PositionId!,
                         LockedByUserId = request.LockedByUserId ?? 1,
-                        AppointmentDate = (DateOnly)lockRequest.AppointmentDate,
+                        AppointmentDate = (DateOnly)lockRequest.AppointmentDate!,
                         SlotsNeeded = slotsNeeded,
                         LockedAt = DateTimeHelper.UtcNow(),
                         ExpiresAt = DateTimeHelper.UtcNow().AddMinutes(10),
@@ -114,7 +158,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
             }
             catch
             {
-                transaction.Rollback();
+                try { transaction.Rollback(); } catch { /* already completed */ }
                 throw;
             }
         }

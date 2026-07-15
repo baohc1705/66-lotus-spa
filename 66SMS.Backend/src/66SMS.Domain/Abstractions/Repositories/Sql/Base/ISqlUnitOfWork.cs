@@ -6,5 +6,6 @@ namespace _66SMS.Domain.Abstractions.Repositories.Sql.Base
     {
         Task<int> SaveChangeAsync(CancellationToken cancellationToken = default);
         Task<IDbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
+        Task<IDbTransaction> BeginTransactionAsync(IsolationLevel isolationLevel, CancellationToken cancellationToken = default);
     }
 }

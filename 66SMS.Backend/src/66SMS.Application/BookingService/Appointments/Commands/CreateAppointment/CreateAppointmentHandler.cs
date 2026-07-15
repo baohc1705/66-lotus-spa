@@ -52,7 +52,28 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
         /// </summary>
         public async Task<Result<List<int>>> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
         {
-            using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
+            for (var attempt = 0; attempt <= BookingDbConcurrency.MaxDeadlockRetries; attempt++)
+            {
+                try
+                {
+                    return await TryCreateAppointmentsAsync(request, cancellationToken);
+                }
+                catch (Exception ex) when (BookingDbConcurrency.IsDeadlock(ex) && attempt < BookingDbConcurrency.MaxDeadlockRetries)
+                {
+                    await Task.Delay(40 * (attempt + 1), cancellationToken);
+                }
+            }
+
+            return Result<List<int>>.Conflict(AppointmentConst.MSG_APPOINTMENT_SLOT_FULL, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
+        }
+
+        private async Task<Result<List<int>>> TryCreateAppointmentsAsync(
+            CreateAppointmentCommand request,
+            CancellationToken cancellationToken)
+        {
+            using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(
+                IsolationLevel.Serializable,
+                cancellationToken);
             try
             {
                 var appointmentIds = new List<int>();
@@ -78,20 +99,40 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                     // Kiểm tra Khóa (Lock) trước tiên
                     if (guest.LockId.HasValue)
                     {
-                        validLock = await appointmentSlotLockSqlRepository.FindByIdAsync(guest.LockId.Value);
+                        validLock = await appointmentSlotLockSqlRepository.FindByIdAsync(guest.LockId.Value, asNoTracking: false);
                         if (validLock == null ||
                             validLock.Status != AppointmentSlotLockConst.STATUS_ACTIVE ||
                             validLock.ExpiresAt <= DateTimeHelper.UtcNow())
                         {
+                            transaction.Rollback();
                             return Result<List<int>>.BadRequest(AppointmentConst.MSG_APPOINTMENT_SLOT_LOCK_INVALID, ErrorCodes.ERR_APPOINTMENT_SLOT_LOCK_INVALID);
                         }
 
-                        // Nếu Lock hợp lệ -> Bỏ qua thuật toán tìm Staff, dùng luôn thông tin đã chốt trong Lock
                         staffId = validLock.StaffId;
 
-                        var schedule = await workScheduleSqlRepository.AsQueryable()
-                            .FirstOrDefaultAsync(x => x.StaffId == staffId && x.WorkDate == validLock.AppointmentDate && x.Status == WorkScheduleConst.STATUS_ACTIVED, cancellationToken);
-                        scheduleId = schedule?.Id;
+                        // Luôn re-validate availability dù đã có lock (loại trừ chính lock này khỏi BookedSlots)
+                        var resolvedStaff = await bookingAvailabilityService.ResolveStaffAsync(
+                            validLock.AppointmentDate,
+                            mainServiceId,
+                            validLock.StaffId,
+                            validLock.SlotId,
+                            salonId: guest.SalonId,
+                            excludeLockId: validLock.Id,
+                            cancellationToken);
+
+                        if (resolvedStaff == null)
+                        {
+                            transaction.Rollback();
+                            return Result<List<int>>.Conflict(AppointmentConst.MSG_APPOINTMENT_SLOT_FULL, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
+                        }
+
+                        scheduleId = resolvedStaff.Value.ScheduleId;
+                        if (!scheduleId.HasValue)
+                        {
+                            var schedule = await workScheduleSqlRepository.AsQueryable()
+                                .FirstOrDefaultAsync(x => x.StaffId == staffId && x.WorkDate == validLock.AppointmentDate && x.Status == WorkScheduleConst.STATUS_ACTIVED, cancellationToken);
+                            scheduleId = schedule?.Id;
+                        }
                     }
                     else
                     {
@@ -102,10 +143,12 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                             guest.StaffId,
                             (int)guest.SlotId!,
                             salonId: guest.SalonId,
+                            excludeLockId: null,
                             cancellationToken);
 
                         if (resolvedStaff == null)
                         {
+                            transaction.Rollback();
                             return Result<List<int>>.Conflict(AppointmentConst.MSG_APPOINTMENT_SLOT_FULL, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
                         }
                         staffId = resolvedStaff.Value.StaffId;
@@ -272,7 +315,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             }
             catch
             {
-                transaction.Rollback();
+                try { transaction.Rollback(); } catch { /* already completed */ }
                 throw;
             }
         }

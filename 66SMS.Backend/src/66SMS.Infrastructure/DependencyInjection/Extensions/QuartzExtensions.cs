@@ -23,6 +23,8 @@ namespace _66SMS.Infrastructure.DependencyInjection.Extensions
             {
                 q.AddJobWithSchedule<CleanupRevokedRefreshTokensJob>(
                     settings.CleanupRevokedRefreshTokens);
+                q.AddJobWithSchedule<CleanupExpiredSlotLocksJob>(
+                    settings.CleanupExpiredSlotLocks);
             });
 
             services.AddQuartzHostedService(options =>
