@@ -7,6 +7,7 @@ using _66SMS.Application.IdentityService.Users.Queries.GetAllUsers;
 using _66SMS.Application.IdentityService.Users.Queries.GetDetailUser;
 using _66SMS.Application.IdentityService.Users.Queries.GetMyWallet;
 using _66SMS.Application.IdentityService.Users.Queries.GetMyWalletTransactions;
+using _66SMS.Application.IdentityService.Users.Queries.GetWalletTopUpVnPayUrl;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Infrastructure.Security;
@@ -93,6 +94,20 @@ namespace _66SMS.API.Controllers
             var result = await mediator.Send(new GetMyWalletTransactionsQuery
             {
                 UserId = jwtService.GetUserId()
+            });
+            return HandleResult(result);
+        }
+
+        [HttpGet("me/wallet/top-up-vnpay-url")]
+        [Authorize]
+        public async Task<IActionResult> GetWalletTopUpVnPayUrl([FromQuery] decimal amount)
+        {
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4()?.ToString() ?? "127.0.0.1";
+            var result = await mediator.Send(new GetWalletTopUpVnPayUrlQuery
+            {
+                UserId = jwtService.GetUserId(),
+                Amount = amount,
+                IpAddress = ipAddress
             });
             return HandleResult(result);
         }

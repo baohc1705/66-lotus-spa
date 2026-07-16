@@ -8,6 +8,7 @@ namespace _66SMS.Infrastructure.Payments.VnPay
 {
     public class VnPayService : IVnPayService
     {
+        private const string PhaseTopUp = "TOPUP";
         private readonly VnPaySettings vnPaySettings;
 
         public VnPayService(IOptions<VnPaySettings> options)
@@ -23,23 +24,21 @@ namespace _66SMS.Infrastructure.Payments.VnPay
             var tick = DateTimeHelper.UtcNow().Ticks.ToString(); // Đảm bảo TxnRef luôn là duy nhất
             var phaseCode = phase == AppointmentPaymentConst.PHASE_DEPOSIT ? "DEPOSIT" : "BALANCE"; // Phân biệt loại thanh toán 
 
-            var vnpay = new VnPayLibrary();
-            vnpay.AddRequestData("vnp_Version", "2.1.0");
-            vnpay.AddRequestData("vnp_Command", "pay");
-            vnpay.AddRequestData("vnp_TmnCode", vnPaySettings.TmnCode);
-            vnpay.AddRequestData("vnp_Amount", ((long)(amount * 100)).ToString()); // Quy tắc VNPAY: Amount phải nhân 100
-            // VNPay yêu cầu chuỗi yyyyMMddHHmmss; dùng UTC thống nhất hệ thống
-            vnpay.AddRequestData("vnp_CreateDate", DateTimeHelper.UtcNowString("yyyyMMddHHmmss"));
-            vnpay.AddRequestData("vnp_CurrCode", "VND");
-            vnpay.AddRequestData("vnp_IpAddr", ipAddress);
-            vnpay.AddRequestData("vnp_Locale", "vn");
-            vnpay.AddRequestData("vnp_OrderInfo", description);
-            vnpay.AddRequestData("vnp_OrderType", "other");
-            vnpay.AddRequestData("vnp_ReturnUrl", vnPaySettings.ReturnUrl);
-            // vnp_TxnRef dùng để nhận diện lại đơn hàng khi VNPAY trả kết quả về (Gồm AppointmentID_LoạiThanhToán_Tick)
-            vnpay.AddRequestData("vnp_TxnRef", $"{appointmentId}_{phaseCode}_{tick}");
-            // Trả về URL đã được nối query và tạo chữ ký bảo mật
-            return vnpay.CreateRequestUrl(vnPaySettings.PaymentUrl, vnPaySettings.HashSecret);
+            return BuildPaymentUrl(
+                amount,
+                description,
+                ipAddress,
+                $"{appointmentId}_{phaseCode}_{tick}");
+        }
+
+        public string CreateWalletTopUpUrl(int walletId, decimal amount, string description, string ipAddress)
+        {
+            var tick = DateTimeHelper.UtcNow().Ticks.ToString();
+            return BuildPaymentUrl(
+                amount,
+                description,
+                ipAddress,
+                $"{walletId}_{PhaseTopUp}_{tick}");
         }
 
         /// <summary>
@@ -60,6 +59,7 @@ namespace _66SMS.Infrastructure.Payments.VnPay
             var vnp_SecureHash = collections.FirstOrDefault(p => p.Key == "vnp_SecureHash").Value;
             var vnp_ResponseCode = vnpay.GetResponseData("vnp_ResponseCode"); // "00" là thành công
             var vnp_OrderInfo = vnpay.GetResponseData("vnp_OrderInfo");
+            var vnp_AmountRaw = vnpay.GetResponseData("vnp_Amount");
 
             // Kiểm tra tính hợp lệ của dữ liệu bằng chữ ký
             bool checkSignature = vnpay.ValidateSignature(vnp_SecureHash, vnPaySettings.HashSecret);
@@ -68,13 +68,35 @@ namespace _66SMS.Infrastructure.Payments.VnPay
                 return new VnPayPaymentResponseModel { Success = false }; // Chữ ký sai hoặc bị giả mạo
             }
 
-            // Tách vnp_TxnRef (VD: 12_DEPOSIT_63721345) để lấy ra AppointmentId và Phase
+            decimal.TryParse(vnp_AmountRaw, out var amountHundreds);
+            var amount = amountHundreds / 100m;
+
+            // Tách vnp_TxnRef (VD: 12_DEPOSIT_63721345 hoặc 5_TOPUP_63721345)
             var parts = vnp_orderId.Split('_', StringSplitOptions.RemoveEmptyEntries);
-            int.TryParse(parts.Length > 0 ? parts[0] : "0", out var appointmentId);
+            int.TryParse(parts.Length > 0 ? parts[0] : "0", out var entityId);
+            var phaseCode = parts.Length > 1 ? parts[1] : string.Empty;
+
+            if (phaseCode == PhaseTopUp)
+            {
+                return new VnPayPaymentResponseModel
+                {
+                    Success = vnp_ResponseCode == "00",
+                    PaymentMethod = "VnPay",
+                    OrderDescription = vnp_OrderInfo,
+                    IsWalletTopUp = true,
+                    WalletId = entityId,
+                    Amount = amount,
+                    PaymentId = vnp_orderId,
+                    TransactionId = vnp_TransactionId,
+                    Token = vnp_SecureHash,
+                    VnPayResponseCode = vnp_ResponseCode,
+                };
+            }
+
             var phase = AppointmentPaymentConst.PHASE_FINAL_PAYMENT;
             if (parts.Length > 2)
             {
-                phase = parts[1] switch
+                phase = phaseCode switch
                 {
                     "DEPOSIT" => AppointmentPaymentConst.PHASE_DEPOSIT,
                     "BALANCE" => AppointmentPaymentConst.PHASE_FINAL_PAYMENT,
@@ -87,13 +109,33 @@ namespace _66SMS.Infrastructure.Payments.VnPay
                 Success = vnp_ResponseCode == "00",// Chỉ cập nhật DB nếu mã code = 00
                 PaymentMethod = "VnPay",
                 OrderDescription = vnp_OrderInfo,
-                AppointmentId = appointmentId,
+                AppointmentId = entityId,
                 Phase = phase,
+                Amount = amount,
                 PaymentId = vnp_orderId,
                 TransactionId = vnp_TransactionId,
                 Token = vnp_SecureHash,
                 VnPayResponseCode = vnp_ResponseCode,
             };
+        }
+
+        private string BuildPaymentUrl(decimal amount, string description, string ipAddress, string txnRef)
+        {
+            var vnpay = new VnPayLibrary();
+            vnpay.AddRequestData("vnp_Version", "2.1.0");
+            vnpay.AddRequestData("vnp_Command", "pay");
+            vnpay.AddRequestData("vnp_TmnCode", vnPaySettings.TmnCode);
+            vnpay.AddRequestData("vnp_Amount", ((long)(amount * 100)).ToString()); // Quy tắc VNPAY: Amount phải nhân 100
+            // VNPay yêu cầu chuỗi yyyyMMddHHmmss; dùng UTC thống nhất hệ thống
+            vnpay.AddRequestData("vnp_CreateDate", DateTimeHelper.UtcNowString("yyyyMMddHHmmss"));
+            vnpay.AddRequestData("vnp_CurrCode", "VND");
+            vnpay.AddRequestData("vnp_IpAddr", ipAddress);
+            vnpay.AddRequestData("vnp_Locale", "vn");
+            vnpay.AddRequestData("vnp_OrderInfo", description);
+            vnpay.AddRequestData("vnp_OrderType", "other");
+            vnpay.AddRequestData("vnp_ReturnUrl", vnPaySettings.ReturnUrl);
+            vnpay.AddRequestData("vnp_TxnRef", txnRef);
+            return vnpay.CreateRequestUrl(vnPaySettings.PaymentUrl, vnPaySettings.HashSecret);
         }
     }
 }

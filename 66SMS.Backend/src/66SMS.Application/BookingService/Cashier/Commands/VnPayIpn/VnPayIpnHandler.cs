@@ -6,14 +6,14 @@ using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
 {
     public sealed class VnPayIpnHandler(
         IVnPayService vnPayService,
         IAppointmentSqlRepository appointmentRepository,
+        IWalletSqlRepository walletRepository,
+        IWalletTransactionSqlRepository walletTransactionRepository,
         ILoyaltyPointService loyaltyPointService,
         ISqlUnitOfWork unitOfWork)
         : IRequestHandler<VnPayIpnCommand, VnPayIpnResponse>
@@ -21,39 +21,67 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
         public async Task<VnPayIpnResponse> Handle(VnPayIpnCommand request, CancellationToken cancellationToken)
         {
             // Bước 1: Parse dữ liệu từ URL Query String và kiểm tra chữ ký (Checksum) bằng HashSecret
-            // Hàm PaymentExecute bên trong sẽ tự động xác thực vnp_SecureHash có hợp lệ hay không.
             var result = vnPayService.PaymentExecute(request.QueryData);
 
-            // Nếu hàm PaymentExecute trả về Success = false và không có mã lỗi (VnPayResponseCode rỗng)
-            // Có nghĩa là mã checksum (chữ ký) gửi lên đã bị sai lệch (có nguy cơ bị hack/sửa đổi request)
+            // Checksum không hợp lệ
             if (!result.Success && string.IsNullOrEmpty(result.VnPayResponseCode))
             {
-                // Trả về mã 97 theo chuẩn VNPAY để báo là Checksum không hợp lệ
                 return VnPayIpnResponse.InvalidSignature();
             }
 
-            // Bước 2: Truy vấn CSDL để tìm ra lịch hẹn (Appointment) tương ứng với AppointmentId gửi lên từ VNPAY
+            // Nhánh nạp ví
+            if (result.IsWalletTopUp)
+            {
+                if (result.WalletId <= 0)
+                    return VnPayIpnResponse.OrderNotFound();
+
+                var walletExists = await walletRepository.AsQueryable(asNoTracking: true)
+                    .AnyAsync(w => w.Id == result.WalletId, cancellationToken);
+
+                if (!walletExists)
+                    return VnPayIpnResponse.OrderNotFound();
+
+                if (result.Success)
+                {
+                    var topUp = await WalletTopUpApplyService.ApplyAsync(
+                        result.WalletId,
+                        result.Amount,
+                        result.PaymentId,
+                        walletRepository,
+                        walletTransactionRepository,
+                        cancellationToken);
+
+                    if (!topUp.IsSuccess && topUp.Code == 404)
+                        return VnPayIpnResponse.OrderNotFound();
+
+                    // Đã ghi nhận trước đó (Return chạy trước IPN) → mã 02
+                    if (topUp.IsSuccess && topUp.Data is bool isNewlyCredited && !isNewlyCredited)
+                        return VnPayIpnResponse.OrderAlreadyConfirmed();
+
+                    if (topUp.IsSuccess && topUp.Data is bool newly && newly)
+                        await unitOfWork.SaveChangeAsync(cancellationToken);
+                }
+
+                return VnPayIpnResponse.Success();
+            }
+
+            // Bước 2: Truy vấn CSDL để tìm ra lịch hẹn tương ứng
             var appointment = await appointmentRepository.AsQueryable()
                 .Include(a => a.Payments)
                 .FirstOrDefaultAsync(a => a.Id == result.AppointmentId, cancellationToken);
 
-            // Nếu không tìm thấy lịch hẹn trong CSDL, trả về mã 01 báo Order Not Found
-            if (appointment == null) return VnPayIpnResponse.OrderNotFound();
+            if (appointment == null)
+                return VnPayIpnResponse.OrderNotFound();
 
-            // Bước 3: Kiểm tra xem đơn hàng này đã từng được xác nhận thanh toán trước đó chưa
-            // (Đề phòng trường hợp IPN gọi lại lần 2, hoặc Return URL trên Frontend đã chạy xong trước khi IPN tới)
-            bool isAlreadyConfirmed = false;
-            
-            // Phase_DEPOSIT: Khách hàng thanh toán tiền cọc
+            // Bước 3: Kiểm tra đơn đã xác nhận trước đó chưa
+            bool isAlreadyConfirmed;
             if (result.Phase == AppointmentPaymentConst.PHASE_DEPOSIT)
             {
                 // Nếu không còn ở trạng thái chờ cọc (PENDING) thì nghĩa là đã cọc rồi
                 isAlreadyConfirmed = !AppointmentStatusTransitions.CanPayDeposit(appointment);
             }
-            // Phase_FINAL_PAYMENT: Thu ngân thanh toán nốt phần còn lại của hóa đơn
             else
             {
-                // Nếu không còn ở trạng thái UNPAID hoặc COMPLETED thì nghĩa là hóa đơn này đã thu xong tiền
                 isAlreadyConfirmed = !AppointmentStatusTransitions.CanPayBalance(appointment.Status);
             }
 
@@ -78,8 +106,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                     return VnPayIpnResponse.OrderAlreadyConfirmed();
                 }
 
-                // Add loyalty points if it's the final payment phase and was newly paid
-                if (result.Phase == AppointmentPaymentConst.PHASE_FINAL_PAYMENT 
+                if (result.Phase == AppointmentPaymentConst.PHASE_FINAL_PAYMENT
                     && apply.Data is bool isNewlyPaid && isNewlyPaid
                     && appointment.TotalAmount > 0)
                 {
@@ -90,15 +117,10 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                         cancellationToken);
                 }
 
-                // Cập nhật trạng thái đơn hàng vào CSDL
                 appointmentRepository.Update(appointment);
-                // Lưu các thay đổi xuống database
                 await unitOfWork.SaveChangeAsync(cancellationToken);
             }
 
-            // Bước 5: Trả về kết quả cuối cùng cho VNPAY
-            // Lưu ý: Dù thẻ khách trừ tiền thành công (00) hay thất bại do hủy thẻ (24), sai OTP...
-            // Thì ở góc độ Server-to-Server, ta vẫn trả về "00" để báo cho VNPAY biết là "Tôi đã nhận được thông báo IPN này và xử lý xong".
             return VnPayIpnResponse.Success();
         }
     }
