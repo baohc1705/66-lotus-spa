@@ -1,11 +1,21 @@
-import { formatCurrency } from '@/shared/utils/currency';
-import { formatDateTimeDisplay } from '@/shared/utils/date.utils';
+import { useState } from 'react'
+import { formatCurrency } from '@/shared/utils/currency'
+import { formatDateTimeDisplay } from '@/shared/utils/date.utils'
 import { useQuery } from '@tanstack/react-query'
-import { getMyWallet, getMyWalletTransactions } from '../../wallet/api/wallet.api'
+import { getMyWallet, getMyWalletTransactions, getWalletTopUpVnPayUrl } from '../../wallet/api/wallet.api'
 import type { WalletTransactionDto } from '../../wallet/types/wallet.types'
 import { Loader2, ArrowDownLeft, ArrowUpRight, Wallet } from 'lucide-react'
+import { toast } from 'sonner'
+import type { AxiosError } from 'axios'
+import type { Result } from '@/shared/types/common.types'
+
+const MIN_TOP_UP = 10000
+const MAX_TOP_UP = 50000000
 
 export function MyWalletPanel() {
+  const [amountInput, setAmountInput] = useState('')
+  const [isToppingUp, setIsToppingUp] = useState(false)
+
   const { data: walletData, isLoading: isLoadingWallet } = useQuery({
     queryKey: ['my-wallet'],
     queryFn: getMyWallet,
@@ -27,12 +37,36 @@ export function MyWalletPanel() {
   const balance = walletData?.data?.balance ?? 0
   const transactions = transactionsData?.data ?? []
 
+  const handleTopUp = async () => {
+    const amount = Number(amountInput.replace(/\D/g, ''))
+    if (!amount || amount < MIN_TOP_UP || amount > MAX_TOP_UP) {
+      toast.error('Số tiền nạp phải từ 10.000đ đến 50.000.000đ.')
+      return
+    }
+
+    setIsToppingUp(true)
+    try {
+      const url = await getWalletTopUpVnPayUrl(amount)
+      if (url) {
+        window.location.assign(url)
+        return
+      }
+      toast.error('Không tạo được liên kết thanh toán. Vui lòng thử lại.')
+    } catch (error) {
+      const axiosError = error as AxiosError<Result<unknown>>
+      const msg = axiosError.response?.data?.message ?? 'Không thể kết nối đến máy chủ'
+      toast.error(msg)
+    } finally {
+      setIsToppingUp(false)
+    }
+  }
+
   return (
     <div className="space-y-5">
       <div>
         <h2 className="text-xl font-bold text-lotus-deep mb-1">Ví của tôi</h2>
         <p className="text-lotus-stone text-sm">
-          Quản lý số dư và lịch sử giao dịch từ việc hoàn/hủy lịch hẹn.
+          Quản lý số dư, nạp tiền qua VNPay và xem lịch sử hoàn/hủy lịch hẹn.
         </p>
       </div>
 
@@ -46,6 +80,42 @@ export function MyWalletPanel() {
           <div className="text-3xl md:text-4xl font-bold tracking-tight">
             {formatCurrency(balance)}
           </div>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-lotus-cream bg-white p-4 space-y-3">
+        <h3 className="text-base font-bold text-lotus-deep">Nạp tiền vào ví</h3>
+        <p className="text-xs text-lotus-stone">
+          Nhập số tiền (tối thiểu 10.000đ), sau đó thanh toán qua VNPay.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            type="text"
+            inputMode="numeric"
+            value={amountInput}
+            onChange={(e: { target: { value: string } }) => {
+              const digits = e.target.value.replace(/\D/g, '')
+              setAmountInput(digits)
+            }}
+            placeholder="Ví dụ: 20000"
+            className="flex-1 rounded-lg border border-lotus-cream px-3 py-2 text-sm text-lotus-deep outline-none focus:border-lotus-rose"
+            disabled={isToppingUp}
+          />
+          <button
+            type="button"
+            onClick={handleTopUp}
+            disabled={isToppingUp}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-lotus-rose px-4 py-2 text-sm font-medium text-white hover:bg-lotus-rose/90 disabled:opacity-60"
+          >
+            {isToppingUp ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Đang chuyển...
+              </>
+            ) : (
+              'Nạp qua VNPay'
+            )}
+          </button>
         </div>
       </div>
 

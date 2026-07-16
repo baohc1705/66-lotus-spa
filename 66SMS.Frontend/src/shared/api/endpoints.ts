@@ -22,6 +22,7 @@ export const API = {
     meMembershipCard: "/users/me/membership-card",
     meWallet: "/users/me/wallet",
     meWalletTx: "/users/me/wallet/transactions",
+    meWalletTopUpVnPayUrl: "/users/me/wallet/top-up-vnpay-url",
     accounts: "/users/accounts",
   },
   staffs: {

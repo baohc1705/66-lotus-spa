@@ -27,3 +27,10 @@ export const getMyWalletTransactions = async () => {
   const { data } = await axiosInstance.get<Result<WalletTransactionDto[]>>(API.users.meWalletTx)
   return data
 }
+
+export const getWalletTopUpVnPayUrl = async (amount: number): Promise<string> => {
+  const { data } = await axiosInstance.get<Result<string>>(API.users.meWalletTopUpVnPayUrl, {
+    params: { amount },
+  })
+  return data.data || ''
+}

@@ -4,6 +4,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { cashierApi } from "../api/cashier.api";
 
+type PaymentPhase = "deposit" | "balance" | "topup";
+
 export function VnPayReturnPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -12,7 +14,7 @@ export function VnPayReturnPage() {
     "loading",
   );
   const [message, setMessage] = useState("");
-  const [phase, setPhase] = useState<"deposit" | "balance">("balance");
+  const [phase, setPhase] = useState<PaymentPhase>("balance");
 
   useEffect(() => {
     const processReturn = async () => {
@@ -28,9 +30,13 @@ export function VnPayReturnPage() {
 
         if (data.isSuccess && data.data) {
           await queryClient.invalidateQueries({ queryKey: ["cashier-daily"] });
-          await queryClient.invalidateQueries({ queryKey: ["my-bookings"] }); // Cập nhật lại lịch hẹn cá nhân
+          await queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
+          await queryClient.invalidateQueries({ queryKey: ["my-wallet"] });
+          await queryClient.invalidateQueries({
+            queryKey: ["my-wallet-transactions"],
+          });
           setStatus("success");
-          setPhase(data.data.paymentPhase as "deposit" | "balance");
+          setPhase(data.data.paymentPhase as PaymentPhase);
           setMessage(data.data.message || "Thanh toán thành công!");
         } else {
           setStatus("error");
@@ -46,15 +52,22 @@ export function VnPayReturnPage() {
   }, [searchParams, queryClient]);
 
   const handleReturn = () => {
-    if (phase === "deposit") {
-      navigate("/profile");
+    if (phase === "deposit" || phase === "topup") {
+      navigate(phase === "topup" ? "/profile?tab=wallet" : "/profile");
     } else {
       navigate("/thu-ngan");
     }
   };
 
   const returnText =
-    phase === "deposit" ? "Quay lại trang cá nhân" : "Quay lại trang thu ngân";
+    phase === "topup"
+      ? "Quay lại ví của tôi"
+      : phase === "deposit"
+        ? "Quay lại trang cá nhân"
+        : "Quay lại trang thu ngân";
+
+  const successTitle =
+    phase === "topup" ? "Nạp tiền thành công!" : "Thanh toán thành công!";
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-adminGray-50">
@@ -75,7 +88,7 @@ export function VnPayReturnPage() {
               <CheckCircle2 className="w-10 h-10 text-adminGreen-600" />
             </div>
             <h2 className="text-2xl font-bold text-adminInk mb-2">
-              Thanh toán thành công!
+              {successTitle}
             </h2>
             <p className="text-adminGray-600 mb-6">{message}</p>
             <button
