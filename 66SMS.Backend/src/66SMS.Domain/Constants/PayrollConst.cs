@@ -59,6 +59,14 @@ namespace _66SMS.Domain.Constants
         public const string MSG_GENERATE_SUCCESS = "Tính lương thành công.";
         public const string MSG_CONFIRM_SUCCESS = "Chốt bảng lương thành công.";
         public const string MSG_UPDATE_SUCCESS = "Cập nhật bảng lương thành công.";
+        public const string MSG_STAFF_REQUIRED = "Vui lòng chọn nhân viên.";
+        public const string MSG_STAFF_PROFILE_REQUIRED = "Tài khoản chưa gắn hồ sơ nhân viên.";
+        public const string MSG_INVALID_DATE_RANGE = "Khoảng ngày không hợp lệ.";
+        public const string MSG_DATE_RANGE_TOO_LARGE = "Khoảng ngày không được vượt quá 62 ngày.";
+        #endregion
+
+        #region Stats
+        public const int STATS_MAX_RANGE_DAYS = 62;
         #endregion
     }
 }

@@ -4,6 +4,7 @@ using _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll;
 using _66SMS.Application.SalonService.Payrolls.Commands.UpdatePayroll;
 using _66SMS.Application.SalonService.Payrolls.Queries.GetAllPayrolls;
 using _66SMS.Application.SalonService.Payrolls.Queries.GetDetailPayroll;
+using _66SMS.Application.SalonService.Payrolls.Queries.GetPayrollCommissionStats;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
@@ -57,6 +58,34 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> AdminGetAll([FromQuery] GetAllPayrollsQuery query)
         {
             var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        /// <summary>
+        /// Thống kê hoa hồng / lịch hẹn đã thanh toán theo khoảng ngày (local).
+        /// Admin: bắt buộc staffId. Staff/Manager: luôn lấy staff từ token.
+        /// </summary>
+        [HttpGet("stats")]
+        [PermissionAuthorize("payrolls", "read")]
+        public async Task<IActionResult> GetCommissionStats(
+            [FromQuery] int? staffId,
+            [FromQuery] DateOnly from,
+            [FromQuery] DateOnly to,
+            CancellationToken cancellationToken)
+        {
+            var profile = jwtService.GetProfile();
+            var isAdmin = profile?.Roles.Any(r =>
+                string.Equals(r, "Admin", StringComparison.OrdinalIgnoreCase)) == true;
+
+            var result = await mediator.Send(new GetPayrollCommissionStatsQuery
+            {
+                StaffId = staffId,
+                FromDate = from,
+                ToDate = to,
+                UserId = jwtService.GetUserId(),
+                IsAdmin = isAdmin,
+            }, cancellationToken);
+
             return HandleResult(result);
         }
 
