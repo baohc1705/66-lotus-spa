@@ -140,10 +140,23 @@ export const MENU_GROUPS: MenuGroup[] = [
         allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
       },
       {
-        label: "Lương nhân viên",
-        path: "/admin/payroll",
+        label: "Lương",
         icon: Wallet,
-        allowedRoles: ["Admin", "Manager"],
+        allowedRoles: ["Admin", "Manager", "Staff"],
+        children: [
+          {
+            label: "Danh sách",
+            path: "/admin/payroll",
+            icon: Wallet,
+            allowedRoles: ["Admin", "Manager"],
+          },
+          {
+            label: "Thống kê lương",
+            path: "/admin/payroll/stats",
+            icon: Receipt,
+            allowedRoles: ["Admin", "Manager", "Staff"],
+          },
+        ],
       },
       {
         label: "Chứng chỉ",
@@ -351,7 +364,8 @@ export const TOP_NAV_TABS: ParentTab[] = [
         title: "CHẤM CÔNG & LƯƠNG",
         items: [
           { label: "Chấm công", path: "/admin/attendance", icon: CalendarCheck, allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"] },
-          { label: "Lương nhân viên", path: "/admin/payroll", icon: Wallet, allowedRoles: ["Admin", "Manager"] },
+          { label: "Danh sách lương", path: "/admin/payroll", icon: Wallet, allowedRoles: ["Admin", "Manager"] },
+          { label: "Thống kê lương", path: "/admin/payroll/stats", icon: Receipt, allowedRoles: ["Admin", "Manager", "Staff"] },
         ],
       },
     ],

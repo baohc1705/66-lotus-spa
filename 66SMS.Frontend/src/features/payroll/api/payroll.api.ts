@@ -5,7 +5,12 @@ import type {
   PagedResult,
   PageRequest,
 } from "@/shared/types/common.types";
-import type { PayrollDto, GeneratePayrollPayload } from "../types/payroll.types";
+import type {
+  PayrollDto,
+  GeneratePayrollPayload,
+  PayrollCommissionStatsDto,
+  PayrollCommissionStatsParams,
+} from "../types/payroll.types";
 
 const BASE = API.payrolls;
 
@@ -47,4 +52,10 @@ export const payrollApi = {
   // PUT /Payroll/:id — cập nhật bảng lương
   update: (id: number, payload: UpdatePayrollPayload) =>
     axiosInstance.put<Result<number>>(`${BASE}/${id}`, payload).then((r) => r.data),
+
+  // GET /Payroll/stats — thống kê hoa hồng theo khoảng ngày
+  getCommissionStats: (params: PayrollCommissionStatsParams) =>
+    axiosInstance
+      .get<Result<PayrollCommissionStatsDto>>(`${BASE}/stats`, { params })
+      .then((r) => r.data),
 };

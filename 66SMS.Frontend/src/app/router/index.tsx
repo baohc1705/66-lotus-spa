@@ -25,7 +25,7 @@ import { SalonListPage } from "@/features/salons";
 import { TreatmentCourseListPage } from "@/features/treatment_courses";
 import { InvoiceListPage } from "@/features/invoices";
 import { AttendanceListPage } from "@/features/attendance";
-import { PayrollListPage } from "@/features/payroll";
+import { PayrollListPage, PayrollStatsPage } from "@/features/payroll";
 import { CertificateTypesPage, StaffCertificatesPage } from "@/features/certificates";
 import { PromotionListPage } from "@/features/promotions";
 
@@ -184,6 +184,10 @@ export const router = createBrowserRouter([
           {
             path: "payroll",
             element: <PayrollListPage />,
+          },
+          {
+            path: "payroll/stats",
+            element: <PayrollStatsPage />,
           },
           {
             path: "marketing/promotions",

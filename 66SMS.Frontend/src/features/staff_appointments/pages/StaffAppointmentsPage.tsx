@@ -1,8 +1,7 @@
 import { useState, useMemo } from "react";
-import { CashierGrid } from "@/features/cashier/components/CashierGrid";
-import type { CashierBooking } from "@/features/cashier/types";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { StaffScheduleToolbar } from "../components/StaffScheduleToolbar";
+import { StaffDayGrid } from "../components/StaffDayGrid";
 import { StaffWeekGrid } from "../components/StaffWeekGrid";
 import { BookingDetailPanel } from "../components/BookingDetailPanel";
 import { getIsoWeekStart } from "../api";
@@ -14,30 +13,6 @@ import {
   type StaffScheduleBooking,
 } from "../types";
 import { formatDisplayDate, formatDate } from "@/shared/utils/date.utils";
-
-const STAFF_COLUMN_ID = "me";
-
-function toCashierBooking(
-  booking: StaffScheduleBooking,
-  staffName: string,
-): CashierBooking {
-  return {
-    id: booking.id,
-    customerName: booking.customerName,
-    customerPhone: booking.customerPhone,
-    serviceName: booking.serviceName,
-    staffId: STAFF_COLUMN_ID,
-    staffName,
-    startTime: booking.startTime,
-    endTime: booking.endTime,
-    status: booking.status as CashierBooking["status"],
-    totalAmount: booking.totalAmount,
-    paidAmount: 0,
-    depositAmount: 0,
-    remainingAmount: booking.totalAmount,
-    depositPaid: false,
-  };
-}
 
 function formatWeekLabel(weekStart: Date, weekEnd: string) {
   const end = new Date(weekEnd + "T12:00:00");
@@ -83,7 +58,7 @@ export function StaffAppointmentsPage() {
 
   const dayBookings =
     viewMode === "day" && schedule.data && "bookings" in schedule.data
-      ? schedule.data.bookings.map((b) => toCashierBooking(b, staffName))
+      ? schedule.data.bookings
       : [];
 
   const handleBookingClick = (booking: StaffScheduleBooking, date?: string) => {
@@ -167,26 +142,22 @@ export function StaffAppointmentsPage() {
             </button>
           </div>
         ) : viewMode === "day" ? (
-          <div className="flex-1 min-h-[400px] flex flex-col overflow-hidden">
-            <CashierGrid
+          <div className="flex-1 min-h-[400px] flex flex-col overflow-hidden p-2">
+            <StaffDayGrid
               date={anchorDate}
-              columns={[{ id: STAFF_COLUMN_ID, name: staffName }]}
               bookings={dayBookings}
-              onBookingClick={(b) => {
-                const raw =
-                  schedule.data && "bookings" in schedule.data
-                    ? schedule.data.bookings.find((x) => x.id === b.id)
-                    : null;
-                if (raw) handleBookingClick(raw);
-              }}
+              staffName={staffName}
+              onBookingClick={handleBookingClick}
             />
           </div>
         ) : schedule.data && "days" in schedule.data ? (
-          <StaffWeekGrid
-            days={schedule.data.days}
-            highlightDate={anchorDate}
-            onBookingClick={handleBookingClick}
-          />
+          <div className="flex-1 min-h-[400px] flex flex-col overflow-hidden p-2">
+            <StaffWeekGrid
+              days={schedule.data.days}
+              highlightDate={anchorDate}
+              onBookingClick={handleBookingClick}
+            />
+          </div>
         ) : (
           <div className="flex-1 flex items-center justify-center text-adminGray-600 font-medium min-h-[400px] bg-white">
             Không có dữ liệu lịch tuần

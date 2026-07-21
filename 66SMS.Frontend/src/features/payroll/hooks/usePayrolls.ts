@@ -4,7 +4,10 @@ import type { AxiosError } from "axios";
 import { payrollApi, type PayrollListParams, type UpdatePayrollPayload } from "../api/payroll.api";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type { Result } from "@/shared/types/common.types";
-import type { GeneratePayrollPayload } from "../types/payroll.types";
+import type {
+  GeneratePayrollPayload,
+  PayrollCommissionStatsParams,
+} from "../types/payroll.types";
 
 const PAYROLL_KEYS = {
   all: ["payrolls"] as const,
@@ -69,5 +72,16 @@ export function useUpdatePayroll() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
+  });
+}
+
+export function usePayrollCommissionStats(
+  params: PayrollCommissionStatsParams | null,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: [...PAYROLL_KEYS.all, "stats", params],
+    queryFn: () => payrollApi.getCommissionStats(params!),
+    enabled: enabled && !!params,
   });
 }
