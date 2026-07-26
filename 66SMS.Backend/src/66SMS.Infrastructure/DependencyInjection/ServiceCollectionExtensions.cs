@@ -1,6 +1,7 @@
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Settings;
 using _66SMS.Infrastructure.DependencyInjection.Extensions;
+using _66SMS.Infrastructure.Excels;
 using _66SMS.Infrastructure.Mails;
 using _66SMS.Infrastructure.Security;
 using Microsoft.Extensions.Configuration;
@@ -40,6 +41,9 @@ namespace _66SMS.Infrastructure.DependencyInjection
 
             // Background jobs (Quartz)
             services.AddBackgroundJobs(configuration);
+
+            // Excel export
+            services.AddScoped<IRevenueExcelExportService, RevenueExcelExportService>();
 
             return services;
         }
