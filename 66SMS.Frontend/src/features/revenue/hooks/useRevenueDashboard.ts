@@ -68,9 +68,14 @@ export function useNetRevenue(
   });
 }
 
-export function useTopStaff(salonId: number | null, limit: number = 5) {
+export function useTopStaff(
+  salonId: number | null,
+  from: string,
+  to: string,
+  limit: number = 5
+) {
   return useQuery({
-    queryKey: ["revenue", "top-staff", salonId, limit],
-    queryFn: () => revenueApi.getTopStaff(salonId, limit),
+    queryKey: ["revenue", "top-staff", salonId, from, to, limit],
+    queryFn: () => revenueApi.getTopStaff(salonId, from, to, limit),
   });
 }

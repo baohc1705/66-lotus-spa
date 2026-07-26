@@ -6,9 +6,14 @@ import {
   Leaf,
   Search,
 } from "lucide-react";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useServices } from "../../services/hooks/useServices";
+import type { ServiceListDto } from "@/features/services/types/service.types";
 import { useBookingStore } from "../stores/bookingStore";
+import {
+  clearPendingServiceId,
+  getPendingServiceId,
+} from "../utils/pendingBookingService";
 
 export const BookingServiceStep: React.FC = () => {
   const store = useBookingStore();
@@ -21,6 +26,22 @@ export const BookingServiceStep: React.FC = () => {
     pageSize: 100,
   });
   const services = useMemo(() => data?.data?.items || [], [data?.data?.items]);
+
+  useEffect(() => {
+    const pendingId = getPendingServiceId();
+    if (!pendingId || services.length === 0) return;
+
+    if (selectedService?.id === pendingId) {
+      clearPendingServiceId();
+      return;
+    }
+
+    const found = services.find((s: ServiceListDto) => s.id === pendingId);
+    if (found) {
+      selectService(found);
+      clearPendingServiceId();
+    }
+  }, [services, selectedService?.id, selectService]);
 
   const [searchQuery, setSearchQuery] = useState("");
 

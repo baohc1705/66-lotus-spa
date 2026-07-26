@@ -13,8 +13,8 @@ import { useCustomerTraffic } from "../hooks/useRevenueDashboard";
 type Tab = "hour" | "day" | "date";
 const TABS: { key: Tab; label: string }[] = [
   { key: "hour", label: "Theo giờ" },
-  { key: "day", label: "Theo ngày" },
-  { key: "date", label: "Theo thứ" },
+  { key: "day", label: "Theo thứ" },
+  { key: "date", label: "Theo ngày" },
 ];
 
 interface Props {

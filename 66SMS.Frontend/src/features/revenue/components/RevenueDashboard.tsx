@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { RefreshCw, CalendarRange } from "lucide-react";
+import { RefreshCw, CalendarRange, Download } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { useAuthStore } from "@/features/auth/stores/authStore";
@@ -15,6 +15,7 @@ import {
   useTodaySummary,
   useTopStaff,
 } from "../hooks/useRevenueDashboard";
+import { useExportRevenueBySalon } from "../hooks/useExportRevenueBySalon";
 
 import { RevenueKpiCards } from "./RevenueKpiCards";
 import { CashFlowTrendChart } from "./CashFlowTrendChart";
@@ -30,7 +31,9 @@ import { TopStaffTable } from "./TopStaffTable";
 export function RevenueDashboard() {
   const queryClient = useQueryClient();
   const selectedSalonId = useAuthStore((state) => state.selectedSalonId);
+  const isAdmin = useAuthStore((state) => state.hasRole("Admin"));
   const { preset, from, to, setPreset } = useRevenueFilters();
+  const exportMutation = useExportRevenueBySalon();
 
   const queryParams = useMemo(
     () => ({
@@ -49,7 +52,7 @@ export function RevenueDashboard() {
   const topServicesQuery = useTopRevenueItems(queryParams, "service", 5);
   const topProductsQuery = useTopRevenueItems(queryParams, "product", 5);
   const todayQuery = useTodaySummary(selectedSalonId);
-  const topStaffQuery = useTopStaff(selectedSalonId, 5);
+  const topStaffQuery = useTopStaff(selectedSalonId, from, to, 5);
 
   const isRefreshing =
     summaryQuery.isFetching ||
@@ -66,6 +69,10 @@ export function RevenueDashboard() {
 
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: ["revenue"] });
+  };
+
+  const handleExport = () => {
+    exportMutation.mutate({ from, to });
   };
 
   return (
@@ -99,6 +106,22 @@ export function RevenueDashboard() {
               className={`w-3.5 h-3.5 text-adminGray-400 ${isRefreshing ? "animate-spin" : ""}`}
             />
           </button>
+
+          {isAdmin && (
+            <button
+              onClick={handleExport}
+              disabled={exportMutation.isPending}
+              className={`h-9 px-3 bg-white border border-adminGray-100 rounded-admin flex items-center gap-1.5 hover:bg-adminGray-50 transition-colors text-xs font-semibold text-adminInk ${
+                exportMutation.isPending ? "opacity-50" : ""
+              }`}
+              title="Xuất Excel so sánh tất cả chi nhánh"
+            >
+              <Download
+                className={`w-3.5 h-3.5 text-adminGray-400 ${exportMutation.isPending ? "animate-pulse" : ""}`}
+              />
+              Xuất Excel
+            </button>
+          )}
         </div>
       </div>
 

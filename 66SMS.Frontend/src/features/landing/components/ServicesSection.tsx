@@ -1,68 +1,49 @@
 import { ArrowRight } from "lucide-react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
-import { SERVICE_CATEGORY_ROUTES } from "../constants/serviceCategory.routes";
+import { useNavigate } from "react-router-dom";
 import { SectionHeader } from "./SectionHeader";
+import { useServices } from "@/features/services/hooks/useServices";
+import { setPendingServiceId } from "@/features/booking/utils/pendingBookingService";
+import type { ServiceListDto } from "@/features/services/types/service.types";
 
 import aboutBgCrane from "@/assets/about_bg_crane.png";
 import aboutBg from "@/assets/backgrounds/about.webp";
-
-import iconFaceMask from "@/assets/icons/face-mask.webp";
-import iconHandCream from "@/assets/icons/hand-cream.webp";
-import iconLotus from "@/assets/icons/lotus.webp";
-import iconTowel from "@/assets/icons/towel.webp";
-
-import spaAbout from "@/assets/spa_about.png";
-import spaFacial from "@/assets/spa_facial.png";
 import spaMassage from "@/assets/spa_massage.png";
-import spaTreatment from "@/assets/spa_treatment_1780310830592.png";
 
-const SERVICE_CATEGORIES = [
-  {
-    title: "Chăm sóc toàn thân",
-    description:
-      "Body scrub, tắm thảo dược, trị liệu thư giãn toàn thân. Mang lại cảm giác thư thái, giúp cơ thể phục hồi và tái tạo năng lượng.",
-    imageSrc: spaMassage,
-    imageAlt: "Danh mục chăm sóc toàn thân",
-    iconSrc: iconTowel,
-    href: SERVICE_CATEGORY_ROUTES.body,
-  },
-  {
-    title: "Chăm sóc da mặt",
-    description:
-      "Facial sen, dưỡng ẩm sâu và phục hồi làn da nhạy cảm. Giúp da sáng khỏe, mềm mịn và cân bằng tự nhiên.",
-    imageSrc: spaFacial,
-    imageAlt: "Danh mục chăm sóc da mặt",
-    iconSrc: iconFaceMask,
-    href: SERVICE_CATEGORY_ROUTES.facial,
-  },
-  {
-    title: "Massage & thư giãn",
-    description:
-      "Massage trị liệu, ấn huyệt và thư giãn tay chân. Giải tỏa căng thẳng, hỗ trợ tuần hoàn và mang lại sự dễ chịu sâu.",
-    imageSrc: spaTreatment,
-    imageAlt: "Danh mục massage và thư giãn",
-    iconSrc: iconHandCream,
-    href: SERVICE_CATEGORY_ROUTES.relax,
-  },
-  {
-    title: "Gói dịch vụ",
-    description:
-      "Combo tiết kiệm và gói VIP dành cho khách thân thiết. Trải nghiệm đầy đủ liệu trình với ưu đãi trọn gói.",
-    imageSrc: spaAbout,
-    imageAlt: "Danh mục gói dịch vụ",
-    iconSrc: iconLotus,
-    href: SERVICE_CATEGORY_ROUTES.package,
-  },
-];
+function formatPrice(price?: number) {
+  return `${(price || 0).toLocaleString("vi-VN")}đ`;
+}
+
+function formatDuration(mins?: number) {
+  if (!mins) return "";
+  const hours = Math.floor(mins / 60);
+  const remainingMins = mins % 60;
+  if (hours > 0 && remainingMins > 0) return `${hours}h${remainingMins}'`;
+  if (hours > 0) return `${hours}h`;
+  return `${mins} phút`;
+}
 
 export const ServicesSection = () => {
+  const navigate = useNavigate();
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "8%"]);
+
+  const { data, isLoading, isError } = useServices({
+    pageIndex: 1,
+    pageSize: 12,
+  });
+  const services = data?.data?.items ?? [];
+
+  const handleBook = (service: ServiceListDto) => {
+    if (!service.id) return;
+    setPendingServiceId(service.id);
+    navigate("/dat-lich");
+  };
 
   return (
     <section
@@ -117,83 +98,94 @@ export const ServicesSection = () => {
           className="mb-10"
         />
 
-        <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:pb-0">
-          {SERVICE_CATEGORIES.map((category, i) => (
-            <motion.a
-              key={category.title}
-              href={category.href}
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.35, delay: i * 0.05 }}
-              className="landing-focus-ring group relative aspect-[5/3] w-[85%] min-w-[85%] shrink-0 snap-start overflow-hidden border border-card-border transition-all duration-300 hover:border-rose-200 sm:w-auto sm:min-w-0 sm:shrink-0"
-            >
-              <img
-                src={category.imageSrc}
-                alt={category.imageAlt}
-                loading="lazy"
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-
-              {/* Màn đen khi hover — giống card sản phẩm */}
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
               <div
-                className="absolute inset-0 bg-black/55 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100"
-                aria-hidden="true"
+                key={i}
+                className="aspect-[5/3] animate-pulse border border-card-border bg-warm-100"
               />
+            ))}
+          </div>
+        ) : isError ? (
+          <p className="py-12 text-center font-geist text-sm text-warm-600">
+            Không tải được danh sách dịch vụ. Vui lòng thử lại sau.
+          </p>
+        ) : services.length === 0 ? (
+          <p className="py-12 text-center font-geist text-sm text-warm-600">
+            Hiện chưa có dịch vụ nào.
+          </p>
+        ) : (
+          <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:pb-0 lg:grid-cols-3">
+            {services.map((service: ServiceListDto, i: number) => (
+              <motion.button
+                key={service.id}
+                type="button"
+                onClick={() => handleBook(service)}
+                initial={{ opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{ duration: 0.35, delay: i * 0.05 }}
+                className="landing-focus-ring group relative aspect-[5/3] w-[85%] min-w-[85%] shrink-0 snap-start overflow-hidden border border-card-border text-left transition-all duration-300 hover:border-rose-200 sm:w-auto sm:min-w-0 sm:shrink-0"
+              >
+                <img
+                  src={service.imageUrl || spaMassage}
+                  alt={service.name || "Dịch vụ"}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
 
-              <div className="absolute inset-x-0 bottom-0 z-10 h-[22%] border-t border-card-border bg-surface transition-all duration-300 group-hover:pointer-events-none group-hover:translate-y-full group-hover:opacity-0 group-focus-within:pointer-events-none group-focus-within:translate-y-full group-focus-within:opacity-0">
-                <div className="absolute left-4 top-0 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-rose-600 bg-surface sm:left-5 sm:h-14 sm:w-14">
-                  <span
-                    aria-hidden="true"
-                    className="h-6 w-6 bg-rose-600 sm:h-7 sm:w-7"
-                    style={{
-                      WebkitMaskImage: `url(${category.iconSrc})`,
-                      maskImage: `url(${category.iconSrc})`,
-                      WebkitMaskSize: "contain",
-                      maskSize: "contain",
-                      WebkitMaskRepeat: "no-repeat",
-                      maskRepeat: "no-repeat",
-                      WebkitMaskPosition: "center",
-                      maskPosition: "center",
-                    }}
-                  />
-                </div>
+                <div
+                  className="absolute inset-0 bg-black/55 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100"
+                  aria-hidden="true"
+                />
 
-                <div className="flex h-full items-center justify-between gap-3 pl-[4.25rem] pr-4 sm:pl-[5rem] sm:pr-5">
-                  <div className="min-w-0">
-                    <h3 className="truncate font-display text-base font-semibold leading-snug text-ink sm:text-lg">
-                      {category.title}
-                    </h3>
-                    <span
-                      className="mt-1.5 block h-0.5 w-10 bg-rose-600"
+                <div className="absolute inset-x-0 bottom-0 z-10 border-t border-card-border bg-surface px-4 py-3 transition-all duration-300 group-hover:pointer-events-none group-hover:translate-y-full group-hover:opacity-0 group-focus-within:pointer-events-none group-focus-within:translate-y-full group-focus-within:opacity-0">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <h3 className="truncate font-display text-base font-semibold leading-snug text-ink sm:text-lg">
+                        {service.name}
+                      </h3>
+                      <p className="mt-0.5 font-geist text-sm font-medium text-rose-600">
+                        {formatPrice(service.sellingPrice)}
+                        {service.durationMins
+                          ? ` · ${formatDuration(service.durationMins)}`
+                          : ""}
+                      </p>
+                    </div>
+                    <ArrowRight
+                      className="h-5 w-5 shrink-0 text-rose-600"
                       aria-hidden="true"
                     />
                   </div>
-
-                  <ArrowRight
-                    className="h-5 w-5 shrink-0 text-rose-600"
-                    aria-hidden="true"
-                  />
                 </div>
-              </div>
 
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-5 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
-                <h3 className="mb-2 font-display text-xl font-semibold leading-snug text-white sm:text-xl">
-                  {category.title}
-                </h3>
-
-                <p className="mb-4 max-w-[26rem] font-geist text-sm leading-[1.6] text-white/90">
-                  {category.description}
-                </p>
-
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-600 px-5 py-2.5 font-geist text-sm font-medium text-white transition-colors duration-300 group-hover:bg-rose-500">
-                  Xem chi tiết
-                  <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                </span>
-              </div>
-            </motion.a>
-          ))}
-        </div>
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-5 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
+                  <h3 className="mb-2 font-display text-xl font-semibold leading-snug text-white">
+                    {service.name}
+                  </h3>
+                  <p className="mb-1 font-geist text-sm text-white/90">
+                    {formatPrice(service.sellingPrice)}
+                    {service.durationMins
+                      ? ` · ${formatDuration(service.durationMins)}`
+                      : ""}
+                  </p>
+                  {service.categoryName ? (
+                    <p className="mb-4 font-geist text-xs text-white/70">
+                      {service.categoryName}
+                    </p>
+                  ) : (
+                    <div className="mb-4" />
+                  )}
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-600 px-5 py-2.5 font-geist text-sm font-medium text-white transition-colors duration-300 group-hover:bg-rose-500">
+                    Đặt lịch
+                    <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                  </span>
+                </div>
+              </motion.button>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

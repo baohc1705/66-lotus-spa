@@ -464,8 +464,13 @@ const STAFF_NAMES = [
   "Vũ Thị Mai",
 ];
 
-export const generateMockTopStaff = (salonId: number | null, limit: number = 5): TopStaffDto[] => {
-  const seed = `staff_${salonId ?? "all"}`;
+export const generateMockTopStaff = (
+  salonId: number | null,
+  from: string,
+  to: string,
+  limit: number = 5
+): TopStaffDto[] => {
+  const seed = `staff_${salonId ?? "all"}_${from}_${to}`;
   const baseRev = salonId ? 15000000 + salonId * 5000000 : 30000000;
 
   return STAFF_NAMES.slice(0, limit).map((name, i) => {

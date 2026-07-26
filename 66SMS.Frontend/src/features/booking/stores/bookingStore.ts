@@ -9,6 +9,7 @@ import type {
 } from "../types/booking.types";
 import type { ServiceDto } from "@/features/services/types/service.types";
 import type { SalonDTO } from "@/features/salons/types/salon.types";
+import { clearPendingServiceId } from "../utils/pendingBookingService";
 
 interface BookingState {
   currentStep: number;
@@ -181,5 +182,8 @@ export const useBookingStore = create<BookingState>((set) => ({
   setAppliedPromotion: (promo) => set({ appliedPromotion: promo }),
   clearPromotion: () => set({ appliedPromotion: null, promotionCode: "" }),
 
-  resetBooking: () => set(initialState),
+  resetBooking: () => {
+    clearPendingServiceId();
+    set(initialState);
+  },
 }));

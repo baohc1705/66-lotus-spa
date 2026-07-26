@@ -94,11 +94,31 @@ export const revenueApi = {
       .then((r) => r.data);
   },
 
-  getTopStaff: (salonId: number | null, limit: number = 5): Promise<Result<TopStaffDto[]>> => {
-    if (USE_MOCK) return wrapMock(generateMockTopStaff(salonId, limit));
+  getTopStaff: (
+    salonId: number | null,
+    from: string,
+    to: string,
+    limit: number = 5
+  ): Promise<Result<TopStaffDto[]>> => {
+    if (USE_MOCK) return wrapMock(generateMockTopStaff(salonId, from, to, limit));
     return axiosInstance
-      .get<Result<TopStaffDto[]>>("/admin/revenue/top-staff", { params: { salonId, limit } })
+      .get<Result<TopStaffDto[]>>("/admin/revenue/top-staff", { params: { salonId, from, to, limit } })
       .then((r) => r.data);
+  },
+
+  /** Xuất Excel so sánh chi nhánh (Admin). Trả AxiosResponse blob. */
+  exportBySalon: (params: { from: string; to: string; comparePrevious?: boolean }) => {
+    if (USE_MOCK) {
+      return Promise.reject(new Error("Xuất Excel không khả dụng khi đang dùng dữ liệu giả (mock)."));
+    }
+    return axiosInstance.get("/admin/revenue/export-by-salon", {
+      params: {
+        from: params.from,
+        to: params.to,
+        comparePrevious: params.comparePrevious ?? true,
+      },
+      responseType: "blob",
+    });
   },
 };
 

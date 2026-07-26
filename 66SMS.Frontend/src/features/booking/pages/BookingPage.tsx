@@ -1,6 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Check } from "lucide-react";
 import { useBookingStore } from "../stores/bookingStore";
+import { useServices } from "@/features/services/hooks/useServices";
+import type { ServiceListDto } from "@/features/services/types/service.types";
+import {
+  clearPendingServiceId,
+  getPendingServiceId,
+} from "../utils/pendingBookingService";
 
 import { Navbar } from "@/features/landing/components/Navbar";
 import { FooterSection } from "@/features/landing/components/FooterSection";
@@ -20,7 +26,29 @@ const STEP_CONFIG = [
 ];
 
 export const BookingPage: React.FC = () => {
-  const { currentStep } = useBookingStore();
+  const { currentStep, guests, activeGuestIndex, selectService } =
+    useBookingStore();
+  const selectedService = guests[activeGuestIndex]?.selectedService;
+
+  const { data } = useServices({ pageIndex: 1, pageSize: 100 });
+  const services = useMemo(() => data?.data?.items || [], [data?.data?.items]);
+
+  // Áp dụng dịch vụ đã chọn từ landing (sessionStorage) ngay khi vào trang
+  useEffect(() => {
+    const pendingId = getPendingServiceId();
+    if (!pendingId || services.length === 0) return;
+
+    if (selectedService?.id === pendingId) {
+      clearPendingServiceId();
+      return;
+    }
+
+    const found = services.find((s: ServiceListDto) => s.id === pendingId);
+    if (found) {
+      selectService(found);
+      clearPendingServiceId();
+    }
+  }, [services, selectedService?.id, selectService]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
