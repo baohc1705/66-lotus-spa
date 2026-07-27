@@ -7,7 +7,7 @@ namespace _66SMS.Domain.Entities
         public int? AppointmentId { get; set; }
         public int SlotId { get; set; }
         public int StaffId { get; set; }
-        public int PositionId { get; set; }
+        public int? PositionId { get; set; }
         public int LockedByUserId { get; set; }
         public DateOnly AppointmentDate { get; set; }
         public int SlotsNeeded { get; set; }

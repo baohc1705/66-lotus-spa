@@ -1,8 +1,10 @@
 using _66SMS.API.Abstractions;
+using _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentPosition;
 using _66SMS.Application.BookingService.Cashier.Commands.PayAppointment;
 using _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentStatus;
 using _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn;
 using _66SMS.Application.BookingService.Cashier.Commands.VnPayReturn;
+using _66SMS.Application.BookingService.Cashier.Queries.GetCashierPositions;
 using _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily;
 using _66SMS.Application.BookingService.Cashier.Queries.GetCashierVnPayUrl;
 using _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointments;
@@ -55,6 +57,27 @@ namespace _66SMS.API.Controllers
             var tokenSalonId = jwtService.GetSalonId();
             var finalSalonId = tokenSalonId ?? salonId;
             var query = new GetOnlineAppointmentsQuery { SalonId = finalSalonId };
+            var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        [HttpPut("appointments/{id}/position")]
+        [Authorize]
+        public async Task<IActionResult> AssignAppointmentPosition(int id, [FromBody] AssignAppointmentPositionCommand request)
+        {
+            request.AppointmentId = id;
+            request.UserId = jwtService.GetUserId();
+            var result = await mediator.Send(request);
+            return HandleResult(result);
+        }
+
+        [HttpGet("positions")]
+        [Authorize]
+        public async Task<IActionResult> GetPositions([FromQuery] int? salonId)
+        {
+            var tokenSalonId = jwtService.GetSalonId();
+            var finalSalonId = tokenSalonId ?? salonId;
+            var query = new GetCashierPositionsQuery { SalonId = finalSalonId };
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

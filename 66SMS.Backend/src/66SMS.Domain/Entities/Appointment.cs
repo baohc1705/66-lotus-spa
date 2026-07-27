@@ -8,7 +8,7 @@ namespace _66SMS.Domain.Entities
         public int CreatedByUserId { get; set; }
         public int StaffId { get; set; }
         public int SlotId { get; set; }
-        public int PositionId { get; set; }
+        public int? PositionId { get; set; }
         public int? LockId { get; set; }
         public int? SalonId { get; set; }
         public int? ScheduleId { get; set; }

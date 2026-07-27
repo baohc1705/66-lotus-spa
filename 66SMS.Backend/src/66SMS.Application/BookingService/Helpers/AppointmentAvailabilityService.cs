@@ -206,8 +206,6 @@ namespace _66SMS.Application.BookingService.Helpers
                 _ => $"Còn {maxAvailable} slot",
             };
         }
-
-        // Đếm số chỗ có thể BẮT ĐẦU dịch vụ hiện tại (đủ SlotsNeeded liên tiếp)
         private static int CountAvailableStartSlots(AppointmentAvailabilityContext context, int staffId, IReadOnlyList<ShiftWindow> windows)
         {
             var count = 0;
@@ -217,8 +215,6 @@ namespace _66SMS.Application.BookingService.Helpers
             }
             return count;
         }
-
-        // ─── Display status (GetTimeSlots): theo từng ô ───────────────────────
 
         // booked chỉ khi chính ô startIndex bị chiếm; không vì ô phía sau bị khóa
         private static string ResolveDisplaySlotStatus(
@@ -249,7 +245,6 @@ namespace _66SMS.Application.BookingService.Helpers
             if (startIndex < 0 || startIndex >= context.TimeSlots.Count) return "outside";
 
             var slot = context.TimeSlots[startIndex];
-            // Ngoài ca làm của cửa sổ này
             if (!(slot.StartTime >= window.ShiftStart && slot.EndTime <= window.ShiftEnd))
                 return "outside";
 
@@ -272,15 +267,12 @@ namespace _66SMS.Application.BookingService.Helpers
             return "outside";
         }
 
-        // ─── Start validation (ResolveStaff / CountAvailable): đủ liên tiếp ─
-
         private static bool IsSlotOccupied(AppointmentAvailabilityContext context, int staffId, int slotIndex)
         {
             if (slotIndex < 0 || slotIndex >= context.TimeSlots.Count) return true;
             return context.BookedSlots.TryGetValue((staffId, context.TimeSlots[slotIndex].Id), out _);
         }
 
-        // Có thể bắt đầu DV (SlotsNeeded liên tiếp trống + nằm trong ca)
         private static bool CanStartServiceHere(
             AppointmentAvailabilityContext context,
             int staffId,

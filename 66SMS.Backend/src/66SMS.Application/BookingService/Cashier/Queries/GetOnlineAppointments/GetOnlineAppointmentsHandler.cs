@@ -18,6 +18,8 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointment
         {
             
             var query = appointmentRepository.AsQueryable()
+                .Include(a => a.Position!)
+                    .ThenInclude(p => p!.Room)
                 .Include(a => a.CreatedByUser!)
                     .ThenInclude(u => u!.Customer!)
                 .Include(a => a.CreatedByUser!)
@@ -47,7 +49,11 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointment
                 switch(a.Status)
                 {
                     case AppointmentConst.STATUS_PENDING: statusStr = "pending"; break;
-                    case AppointmentConst.STATUS_CONFIRMED: statusStr = "waiting"; break;
+                    case AppointmentConst.STATUS_CONFIRMED: statusStr = "confirmed"; break;
+                    case AppointmentConst.STATUS_WAITING:
+                        statusStr = a.PositionId.HasValue ? "waiting" : "not-arrived";
+                        break;
+                    case AppointmentConst.STATUS_IN_SERVICE: statusStr = "in-progress"; break;
                     case AppointmentConst.STATUS_COMPLETED: 
                         statusStr = a.PaidAmount >= a.TotalAmount ? "paid" : "unpaid";
                         break;
@@ -90,7 +96,12 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointment
                     RemainingAmount = a.TotalAmount - a.PaidAmount,
                     DepositPaid = AppointmentPaymentCalculator.HasDepositPaid(a),
                     DepositDeadlineAt = a.DepositDeadlineAt,
-                    Note = a.Note
+                    Note = a.Note,
+                    PositionId = a.PositionId,
+                    PositionName = a.Position != null
+                        ? $"{a.Position.Room?.Name} — {a.Position.Name}"
+                        : null,
+                    PositionStatus = a.Position?.Status
                 };
             }).ToList();
 

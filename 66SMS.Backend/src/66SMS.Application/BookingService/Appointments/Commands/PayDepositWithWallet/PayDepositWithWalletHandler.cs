@@ -1,13 +1,16 @@
+using _66SMS.Application.BookingService.Helpers;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Messages;
+using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Enumerations;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
-using _66SMS.Contracts.Enumerations;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Application.BookingService.Helpers;
-using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWithWallet
 {
@@ -16,6 +19,9 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
         IUserSqlRepository userSqlRepository,
         IWalletSqlRepository walletSqlRepository,
         IWalletTransactionSqlRepository walletTransactionSqlRepository,
+        IInvoiceSqlRepository invoiceSqlRepository,
+        IEmailTemplateFactory emailTemplateFactory,
+        IDomainEventPublisher domainEventPublisher,
         ISqlUnitOfWork sqlUnitOfWork)
         : IRequestHandler<PayDepositWithWalletCommand, Result<object>>
     {
@@ -42,6 +48,8 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
             {
                 return Result<object>.Forbidden("Bạn không có quyền thanh toán cho lịch hẹn này.");
             }
+
+            DepositInvoiceEmailData? emailData = null;
 
             using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
@@ -75,14 +83,12 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                     return Result<object>.BadRequest(WalletConst.MSG_WALLET_INSUFFICIENT_BALANCE, ErrorCodes.ERR_WALLET_INSUFFICIENT_BALANCE);
                 }
 
-                // Trừ tiền ví
                 wallet.Balance -= depositAmount;
                 if (wallet.Id > 0)
                 {
                     walletSqlRepository.Update(wallet);
                 }
 
-                // Thêm transaction ví
                 var walletTx = new WalletTransaction
                 {
                     Wallet = wallet,
@@ -96,7 +102,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                 };
                 walletTransactionSqlRepository.Add(walletTx);
 
-                // Cập nhật Appointment
                 if (!AppointmentPaymentRecorder.TryRecordPayment(
                         appointment,
                         AppointmentPaymentConst.PHASE_DEPOSIT,
@@ -109,16 +114,20 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                     return Result<object>.BadRequest(error!);
                 }
 
-                // Cập nhật trạng thái appointment
                 appointment.Status = AppointmentConst.STATUS_WAITING;
                 appointment.UpdatedAt = DateTimeHelper.UtcNow();
                 appointment.UpdatedBy = request.UserId;
-
                 appointmentSqlRepository.Update(appointment);
-                
-                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
+                emailData = await TryPrepareDepositInvoiceAsync(appointment.Id, cancellationToken);
+
+                await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
+
+                if (emailData != null)
+                {
+                    await SendDepositInvoiceEmailAsync(emailData, cancellationToken);
+                }
 
                 return Result<object>.Success("Thanh toán tiền cọc thành công.");
             }
@@ -128,5 +137,138 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                 throw;
             }
         }
+
+        private async Task<DepositInvoiceEmailData?> TryPrepareDepositInvoiceAsync(
+            int appointmentId,
+            CancellationToken cancellationToken)
+        {
+            var appointment = await appointmentSqlRepository.AsQueryable(asNoTracking: false)
+                .Include(a => a.Payments)
+                .Include(a => a.Services!)
+                    .ThenInclude(s => s.Service)
+                .Include(a => a.TimeSlot)
+                .Include(a => a.CreatedByUser!)
+                    .ThenInclude(u => u!.Customer!)
+                        .ThenInclude(c => c!.MembershipCard!)
+                            .ThenInclude(mc => mc!.Tier)
+                .FirstOrDefaultAsync(a => a.Id == appointmentId, cancellationToken);
+
+            if (appointment == null || !AppointmentPaymentCalculator.HasDepositPaid(appointment))
+                return null;
+
+            var hasExistingInvoice = await invoiceSqlRepository.AsQueryable()
+                .AnyAsync(i => i.AppointmentId == appointment.Id && i.Status != InvoiceConst.STATUS_CANCELLED, cancellationToken);
+
+            if (hasExistingInvoice)
+                return null;
+
+            var items = new List<InvoiceItem>();
+            decimal subTotal = 0;
+
+            if (appointment.Services != null)
+            {
+                foreach (var appService in appointment.Services)
+                {
+                    var quantity = appService.Quantity;
+                    var unitPrice = appService.PriceSnapshot;
+                    var lineTotal = unitPrice * quantity;
+                    subTotal += lineTotal;
+
+                    items.Add(new InvoiceItem
+                    {
+                        ItemType = InvoiceItemConst.TYPE_SERVICE,
+                        RefId = appService.ServiceId,
+                        ItemName = appService.Service?.Name ?? "Dịch vụ",
+                        UnitPrice = unitPrice,
+                        Quantity = quantity,
+                        DiscountAmount = 0,
+                        LineTotal = lineTotal,
+                        StaffId = appointment.StaffId,
+                        Status = InvoiceItemConst.STATUS_ACTIVE,
+                    });
+                }
+            }
+
+            var customer = appointment.CreatedByUser?.Customer;
+            var (membershipDiscount, promoDiscount, membershipTierId) =
+                AppointmentInvoiceDiscountHelper.Split(subTotal, appointment.TotalAmount, appointment.Note, customer);
+
+            var invoiceCode = $"HD-COC-{DateTimeHelper.UtcNow():yyyyMMddHHmmssfff}";
+
+            invoiceSqlRepository.Add(new Invoice
+            {
+                InvoiceCode = invoiceCode,
+                CustomerId = customer?.Id,
+                CustomerName = customer?.FullName ?? appointment.CreatedByUser?.Username,
+                CustomerPhone = customer?.Phone,
+                AppointmentId = appointment.Id,
+                SalonId = appointment.SalonId,
+                SubTotal = subTotal,
+                DiscountAmount = promoDiscount,
+                MembershipTierId = membershipTierId,
+                MembershipDiscountAmount = membershipDiscount,
+                LoyaltyPointsUsed = 0,
+                LoyaltyPointsValue = 0,
+                LoyaltyPointsEarned = 0,
+                TaxAmount = 0,
+                TotalAmount = appointment.TotalAmount,
+                PaidAmount = appointment.PaidAmount,
+                ChangeAmount = 0,
+                PaymentMethod = InvoiceConst.PAYMENT_WALLET,
+                Status = InvoiceConst.STATUS_UNPAID,
+                Note = $"Hóa đơn cọc lịch hẹn #{appointment.Id}",
+                IssuedAt = DateTimeHelper.UtcNow(),
+                CreatedAt = DateTimeHelper.UtcNow(),
+                CreatedBy = appointment.CreatedByUserId,
+                Items = items
+            });
+
+            var customerEmail = appointment.CreatedByUser?.Email;
+            if (string.IsNullOrWhiteSpace(customerEmail))
+                return null;
+
+            var serviceName = appointment.Services != null && appointment.Services.Any()
+                ? string.Join(", ", appointment.Services.Where(s => s.Service != null).Select(s => s.Service!.Name))
+                : "Dịch vụ";
+
+            return new DepositInvoiceEmailData(
+                customerEmail,
+                customer?.FullName ?? appointment.CreatedByUser?.Username ?? "Quý khách",
+                serviceName,
+                appointment.AppointmentDate.ToDateTime(appointment.TimeSlot?.StartTime ?? new TimeOnly(9, 0)),
+                appointment.PaidAmount,
+                appointment.TotalAmount - appointment.PaidAmount,
+                invoiceCode);
+        }
+
+        private async Task SendDepositInvoiceEmailAsync(
+            DepositInvoiceEmailData emailData,
+            CancellationToken cancellationToken)
+        {
+            var mail = emailTemplateFactory.CreateDepositInvoiceEmail(
+                emailData.ToEmail,
+                emailData.CustomerName,
+                emailData.ServiceName,
+                emailData.AppointmentTime,
+                emailData.DepositAmount,
+                emailData.RemainingAmount,
+                emailData.InvoiceCode);
+
+            await domainEventPublisher.PublishAsync(new SendEmailEvent
+            {
+                ToEmail = mail.ToEmail,
+                Subject = mail.Subject,
+                HtmlBody = mail.HtmlBody,
+            }, cancellationToken);
+        }
+
+        private sealed record DepositInvoiceEmailData(
+            string ToEmail,
+            string CustomerName,
+            string ServiceName,
+            DateTime AppointmentTime,
+            decimal DepositAmount,
+            decimal RemainingAmount,
+            string InvoiceCode);
     }
 }

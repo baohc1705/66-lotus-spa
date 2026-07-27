@@ -132,12 +132,14 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                     walletTransactionRepository.Add(walletTx);
                 }
 
-                // Update Invoice
+                // Update Invoice — gán cashier lúc checkout (hóa đơn cọc tạo online thường chưa có cashier)
                 invoice.PaidAmount = invoice.TotalAmount;
                 invoice.ChangeAmount = change;
                 invoice.PaymentMethod = request.PaymentMethod;
                 invoice.Status = InvoiceConst.STATUS_PAID;
                 invoice.Note = request.Note;
+                if (request.CashierId.HasValue)
+                    invoice.CashierId = request.CashierId;
                 invoice.UpdatedAt = DateTimeHelper.UtcNow();
                 invoice.UpdatedBy = request.CashierId;
                 invoiceRepository.Update(invoice);

@@ -1,4 +1,5 @@
 using _66SMS.Contracts.Enumerations;
+using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
@@ -11,13 +12,16 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateMyBookingStatus
     {
         private readonly IStaffSqlRepository staffSqlRepository;
         private readonly IAppointmentSqlRepository appointmentSqlRepository;
+        private readonly IBookingPositionSqlRepository bookingPositionSqlRepository;
 
         public UpdateMyBookingStatusHandler(
             IStaffSqlRepository staffSqlRepository,
-            IAppointmentSqlRepository appointmentSqlRepository)
+            IAppointmentSqlRepository appointmentSqlRepository,
+            IBookingPositionSqlRepository bookingPositionSqlRepository)
         {
             this.staffSqlRepository = staffSqlRepository;
             this.appointmentSqlRepository = appointmentSqlRepository;
+            this.bookingPositionSqlRepository = bookingPositionSqlRepository;
         }
 
         public async Task<Result<object>> Handle(UpdateMyBookingStatusCommand request, CancellationToken cancellationToken)
@@ -38,6 +42,19 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateMyBookingStatus
             if (request.Note != null)
             {
                 appointment.Note = request.Note;
+            }
+
+            if (request.Status == AppointmentConst.STATUS_COMPLETED)
+            {
+                appointment.CompletedAt = Contracts.Helpers.DateTimeHelper.UtcNow();
+            }
+
+            if (request.Status == AppointmentConst.STATUS_COMPLETED
+                || request.Status == AppointmentConst.STATUS_CANCELLED
+                || request.Status == AppointmentConst.STATUS_NO_SHOW)
+            {
+                await BookingPositionReleaseService.ReleasePositionIfNeededAsync(
+                    appointment, bookingPositionSqlRepository, cancellationToken);
             }
 
             appointmentSqlRepository.Update(appointment);

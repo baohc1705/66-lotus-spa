@@ -11,7 +11,6 @@ namespace _66SMS.Domain.Entities
         public int? AppointmentId { get; set; }
         public int? SalonId { get; set; }
         public int? CashierId { get; set; }
-
         public decimal SubTotal { get; set; }
         public decimal DiscountAmount { get; set; }
         public int? MembershipTierId { get; set; }

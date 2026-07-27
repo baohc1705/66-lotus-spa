@@ -16,8 +16,11 @@ namespace _66SMS.Application.DTOs.Appointments
         public int? DepositPercent { get; set; }
         public DateTimeOffset? DepositDeadlineAt { get; set; }
         public string? CreatedAt { get; set; }
-
+        public decimal? ServicesSubTotal { get; set; }
+        public decimal? MembershipDiscountAmount { get; set; }
+        public decimal? PromotionDiscountAmount { get; set; }
         public string? StaffFullName { get; set; }
+        public string? SalonName { get; set; }
         public TimeOnly? TimeSlotStartTime { get; set; }
         public TimeOnly? TimeSlotEndTime { get; set; }
         public string? PositionName { get; set; }

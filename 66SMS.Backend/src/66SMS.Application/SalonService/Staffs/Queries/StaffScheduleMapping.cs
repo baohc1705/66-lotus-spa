@@ -20,18 +20,6 @@ namespace _66SMS.Application.SalonService.Staffs.Queries
             decimal totalAmount,
             string? note)
         {
-            string statusStr = status switch
-            {
-                AppointmentConst.STATUS_PENDING => "pending",
-                AppointmentConst.STATUS_CONFIRMED => "confirmed",
-                AppointmentConst.STATUS_WAITING => "waiting",
-                AppointmentConst.STATUS_IN_SERVICE => "in-progress",
-                AppointmentConst.STATUS_COMPLETED => paidAmount >= totalAmount ? "paid" : "unpaid",
-                AppointmentConst.STATUS_CANCELLED => "cancelled",
-                AppointmentConst.STATUS_NO_SHOW => "not-arrived",
-                _ => "pending",
-            };
-
             var serviceName = serviceNames.Count > 0
                 ? string.Join(", ", serviceNames)
                 : "Dịch vụ";
@@ -48,7 +36,8 @@ namespace _66SMS.Application.SalonService.Staffs.Queries
                 ServiceName = serviceName,
                 StartTime = startTs.ToString(@"HH\:mm"),
                 EndTime = endTs.ToString(@"HH\:mm"),
-                Status = statusStr,
+                Status = status,
+                PaidAmount = paidAmount,
                 TotalAmount = totalAmount,
                 Note = note,
             };

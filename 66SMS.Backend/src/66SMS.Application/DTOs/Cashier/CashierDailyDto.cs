@@ -33,6 +33,9 @@ namespace _66SMS.Application.DTOs.Cashier
         public int? InvoiceId { get; set; }
         public string? InvoiceCode { get; set; }
         public decimal DiscountAmount { get; set; }
+        public int? PositionId { get; set; }
+        public string? PositionName { get; set; }
+        public int? PositionStatus { get; set; }
     }
 
     public class CashierDailyDto

@@ -16,6 +16,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
         IUserSqlRepository userSqlRepository,
         IWalletSqlRepository walletSqlRepository,
         IWalletTransactionSqlRepository walletTransactionSqlRepository,
+        IBookingPositionSqlRepository bookingPositionSqlRepository,
         ISqlUnitOfWork sqlUnitOfWork)
         : IRequestHandler<UpdateAppointmentStatusCommand, Result<object>>
     {
@@ -84,9 +85,17 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                 {
                     appointment.ConfirmedAt = nowTime;
                 }
-                else if (request.Status == AppointmentConst.STATUS_COMPLETED)
+                else                 if (request.Status == AppointmentConst.STATUS_COMPLETED)
                 {
                     appointment.CompletedAt = nowTime;
+                }
+
+                if (request.Status == AppointmentConst.STATUS_COMPLETED
+                    || request.Status == AppointmentConst.STATUS_CANCELLED
+                    || request.Status == AppointmentConst.STATUS_NO_SHOW)
+                {
+                    await BookingPositionReleaseService.ReleasePositionIfNeededAsync(
+                        appointment, bookingPositionSqlRepository, cancellationToken);
                 }
 
                 if (request.Status == AppointmentConst.STATUS_CANCELLED && paidBeforeCancel > 0)

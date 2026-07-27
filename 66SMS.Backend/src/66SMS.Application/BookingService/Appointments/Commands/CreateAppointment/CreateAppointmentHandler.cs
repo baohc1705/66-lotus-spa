@@ -198,13 +198,13 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                     // Tạo record Appointment
                     var appointment = new Appointment
                     {
-                        AppointmentCode = $"APT-{DateTimeHelper.UtcNow():yyyyMMddHHmmss}-{new Random().Next(100, 999)}",
+                        AppointmentCode = $"LH-{DateTimeHelper.UtcNow():yyyyMMddHHmmss}{new Random().Next(100, 999)}",
                         CreatedByUserId = (int)request.CreatedByUserId!,
                         StaffId = staffId,
                         SalonId = guest.SalonId,
                         ScheduleId = scheduleId,
                         SlotId = (int)(validLock != null ? validLock.SlotId : guest.SlotId)!,
-                        PositionId = (int)(validLock != null ? validLock.PositionId : guest.PositionId)!,
+                        PositionId = validLock != null ? validLock.PositionId : guest.PositionId,
                         LockId = validLock?.Id,
                         AppointmentDate = (DateOnly)guest.AppointmentDate!,
                         Status = AppointmentConst.STATUS_PENDING,
@@ -315,7 +315,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             }
             catch
             {
-                try { transaction.Rollback(); } catch { /* already completed */ }
+                transaction.Rollback();
                 throw;
             }
         }

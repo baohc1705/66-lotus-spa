@@ -23,6 +23,21 @@ namespace _66SMS.Domain.Constants
         public const int STATUS_INACTIVED = 0;
         public const int STATUS_ACTIVED = 1;
         public const int STATUS_DELETED = 2;
+        public const int STATUS_AVAILABLE = 3;
+        public const int STATUS_IN_SERVICE = 4;
+        #endregion
+
+        #region Status Labels
+        public static string GetStatusLabel(int status) => status switch
+        {
+            STATUS_AVAILABLE => "Trống",
+            STATUS_IN_SERVICE => "Đang phục vụ",
+            STATUS_ACTIVED => "Trống",
+            _ => "Không khả dụng"
+        };
+
+        public static bool IsSelectable(int status) =>
+            status == STATUS_AVAILABLE || status == STATUS_ACTIVED;
         #endregion
 
         #region Message

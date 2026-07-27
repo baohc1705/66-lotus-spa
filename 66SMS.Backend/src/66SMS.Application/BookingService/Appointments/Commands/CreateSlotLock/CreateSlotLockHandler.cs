@@ -139,7 +139,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                     {
                         SlotId = slotId,
                         StaffId = resolvedStaff.Value.StaffId,
-                        PositionId = (int)lockRequest.PositionId!,
+                        PositionId = lockRequest.PositionId,
                         LockedByUserId = request.LockedByUserId ?? 1,
                         AppointmentDate = (DateOnly)lockRequest.AppointmentDate!,
                         SlotsNeeded = slotsNeeded,

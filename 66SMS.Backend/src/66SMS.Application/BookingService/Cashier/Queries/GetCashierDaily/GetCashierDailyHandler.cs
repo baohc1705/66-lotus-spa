@@ -60,6 +60,8 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
             // Lấy danh sách lịch hẹn trong ngày
             var appointmentsQuery = appointmentRepository.AsQueryable()
                 .Include(a => a.Staff!)
+                .Include(a => a.Position!)
+                    .ThenInclude(p => p!.Room)
                 .Include(a => a.CreatedByUser!)
                     .ThenInclude(u => u!.Customer!)
                 .Include(a => a.CreatedByUser!)
@@ -99,7 +101,9 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
                 {
                     case AppointmentConst.STATUS_PENDING: statusStr = "pending"; break;
                     case AppointmentConst.STATUS_CONFIRMED: statusStr = "confirmed"; break;
-                    case AppointmentConst.STATUS_WAITING: statusStr = "waiting"; break;
+                    case AppointmentConst.STATUS_WAITING:
+                        statusStr = a.PositionId.HasValue ? "waiting" : "not-arrived";
+                        break;
                     case AppointmentConst.STATUS_IN_SERVICE: statusStr = "in-progress"; break;
                     case AppointmentConst.STATUS_COMPLETED: 
                         statusStr = a.PaidAmount >= a.TotalAmount ? "paid" : "unpaid";
@@ -153,7 +157,12 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
                     CustomerWalletBalance = a.CreatedByUser?.Customer != null && walletBalances.TryGetValue(a.CreatedByUser.Customer.Id, out var balance) ? balance : 0m,
                     InvoiceId = invoiceInfo?.Id,
                     InvoiceCode = invoiceInfo?.InvoiceCode,
-                    DiscountAmount = discountAmt
+                    DiscountAmount = discountAmt,
+                    PositionId = a.PositionId,
+                    PositionName = a.Position != null
+                        ? $"{a.Position.Room?.Name} — {a.Position.Name}"
+                        : null,
+                    PositionStatus = a.Position?.Status
                 };
             }).ToList();
 

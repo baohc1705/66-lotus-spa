@@ -8,7 +8,9 @@ namespace _66SMS.Application.DTOs.Staffs
         public string ServiceName { get; set; } = null!;
         public string StartTime { get; set; } = null!;
         public string EndTime { get; set; } = null!;
-        public string Status { get; set; } = null!;
+        /// <summary>Trạng thái lịch hẹn (int — khớp AppointmentConst).</summary>
+        public int Status { get; set; }
+        public decimal PaidAmount { get; set; }
         public decimal TotalAmount { get; set; }
         public string? Note { get; set; }
     }

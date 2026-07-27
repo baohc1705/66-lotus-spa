@@ -3,10 +3,6 @@ using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace _66SMS.Application.CustomerService.Wallets.Queries.GetWalletTransactions
 {
@@ -27,8 +23,7 @@ namespace _66SMS.Application.CustomerService.Wallets.Queries.GetWalletTransactio
                 .Where(t => t.WalletId == request.WalletId)
                 .OrderByDescending(t => t.CreatedAt)
                 .ToListAsync(cancellationToken);
-
-            // Fetch creators (staffs/admins who created the transaction)
+            
             var userIds = transactions.Where(t => t.CreatedBy.HasValue).Select(t => t.CreatedBy).Distinct().ToList();
             var usersList = await userRepository.AsQueryable(asNoTracking: true)
                 .Include(u => u.Staff)

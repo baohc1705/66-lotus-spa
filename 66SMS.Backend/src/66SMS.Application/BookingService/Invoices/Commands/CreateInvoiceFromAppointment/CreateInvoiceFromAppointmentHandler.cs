@@ -1,3 +1,4 @@
+using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -37,7 +38,9 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
                 .Include(a => a.Services!)
                     .ThenInclude(s => s.Service)
                 .Include(a => a.CreatedByUser!)
-                    .ThenInclude(u => u.Customer)
+                    .ThenInclude(u => u.Customer!)
+                        .ThenInclude(c => c!.MembershipCard!)
+                            .ThenInclude(mc => mc!.Tier)
                 .FirstOrDefaultAsync(a => a.Id == request.AppointmentId, cancellationToken);
 
             if (appointment == null)
@@ -122,8 +125,8 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
 
                 var customer = appointment.CreatedByUser?.Customer;
 
-                var discountAmount = subTotal - appointment.TotalAmount;
-                if (discountAmount < 0) discountAmount = 0;
+                var (membershipDiscount, promoDiscount, membershipTierId) =
+                    AppointmentInvoiceDiscountHelper.Split(subTotal, appointment.TotalAmount, appointment.Note, customer);
 
                 var invoice = new Invoice
                 {
@@ -135,9 +138,9 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
                     SalonId = appointment.SalonId,
                     CashierId = request.CashierId,
                     SubTotal = subTotal,
-                    DiscountAmount = discountAmount,
-                    MembershipTierId = null,
-                    MembershipDiscountAmount = 0,
+                    DiscountAmount = promoDiscount,
+                    MembershipTierId = membershipTierId,
+                    MembershipDiscountAmount = membershipDiscount,
                     LoyaltyPointsUsed = 0,
                     LoyaltyPointsValue = 0,
                     LoyaltyPointsEarned = 0,

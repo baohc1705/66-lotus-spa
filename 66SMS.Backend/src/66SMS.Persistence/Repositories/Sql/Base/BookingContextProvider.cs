@@ -47,8 +47,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
                 .ToListAsync(cancellationToken);
             if (timeSlots.Count == 0) return null;
 
-            // Tính số slot theo độ dài slot THỰC TẾ trong DB (không hard-code 15').
-            // Bug cũ: DEFAULT=15' trong khi slot = 30' → dịch vụ 60' bị tính 4 slot (=120') → cuối mỗi ca bị "ngoài giờ".
+            
             var slotMinutes = TimeSlotConst.ResolveSlotMinutes(timeSlots[0].StartTime, timeSlots[0].EndTime);
             var slotsNeeded = TimeSlotConst.CalcSlotsNeeded(service.DurationMins, slotMinutes);
 
@@ -66,7 +65,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
                 .ToList();
             if (staffIdsOnDuty.Count == 0) return null;
 
-            // Chỉ lấy NV đang làm + đã được phân công dịch vụ này (StaffService active)
+          
             var staffWithSalons = await staffSqlRepository
                 .AsQueryable()
                 .Where(x => staffIdsOnDuty.Contains(x.Id) && x.Status == StaffConst.STATUS_ACTIVED)
@@ -103,8 +102,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
                 staffScheduleIds[ws.StaffId] = ws.Id;
             }
 
-            // Gộp ca liền kề (vd: Sáng 08-12 + Chiều 12-16 → 08-16) để dịch vụ không bị
-            // "ngoài giờ" chỉ vì nằm sát biên giữa hai ca liên tiếp.
+           
             foreach (var staffId in staffShiftWindows.Keys.ToList())
             {
                 staffShiftWindows[staffId] = MergeContiguousWindows(staffShiftWindows[staffId]);
@@ -138,8 +136,7 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var heldSlots = new Dictionary<(int StaffId, int SlotId), byte>();
             foreach (var slotLock in locks)
             {
-                // SlotsNeeded lưu lúc lock phải khớp DurationMins / độ dài slot DB (CreateSlotLock đã ResolveSlotMinutes).
-                // Không hard-code DEFAULT để tránh khóa lệch (vd chọn 8:30 khóa nhầm từ 8:00).
+                
                 var lockSlotsNeeded = slotLock.SlotsNeeded > 0 ? slotLock.SlotsNeeded : slotsNeeded;
                 MarkConsecutiveSlots(heldSlots, slotLock.StaffId, slotLock.SlotId, lockSlotsNeeded, timeSlots);
             }
@@ -176,7 +173,6 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             {
                 if (!usersById.TryGetValue(staff.UserId, out var user)) continue;
 
-                // Dùng Role.Code (không phải Name) — Name có thể là "Nhân viên" / "Staff".
                 var isStaffRole = user.UserRoles != null && user.UserRoles.Any(ur =>
                     ur.Role != null
                     && ur.Role.Status == RoleConst.STATUS_ACTIVED

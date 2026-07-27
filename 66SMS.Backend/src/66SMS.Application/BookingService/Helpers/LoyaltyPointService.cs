@@ -50,11 +50,9 @@ namespace _66SMS.Application.BookingService.Helpers
             customer.LoyaltyPoint = (customer.LoyaltyPoint ?? 0) + earnedPoints;
             customerSqlRepository.Update(customer);
 
-            // Chưa có thẻ / hạng → chỉ cộng điểm
             if (customer.MembershipCard == null || customer.MembershipCard.Tier == null)
                 return;
 
-            // min_spending trong DB là ngưỡng chi tiêu (VND); quy đổi điểm → chi tiêu tương đương
             decimal equivalentSpending = (customer.LoyaltyPoint ?? 0) * PointsToSpendingRate;
 
             var activeTiers = await membershipTierSqlRepository.AsQueryable()

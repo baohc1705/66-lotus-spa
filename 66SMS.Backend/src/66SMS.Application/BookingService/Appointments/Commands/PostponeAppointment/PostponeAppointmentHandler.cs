@@ -16,6 +16,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PostponeAppoin
         IUserSqlRepository userSqlRepository,
         IWalletSqlRepository walletSqlRepository,
         IWalletTransactionSqlRepository walletTransactionSqlRepository,
+        IBookingPositionSqlRepository bookingPositionSqlRepository,
         ISqlUnitOfWork sqlUnitOfWork)
         : IRequestHandler<PostponeAppointmentCommand, Result<object>>
     {
@@ -68,10 +69,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PostponeAppoin
 
                 if (paidAmount > 0)
                 {
-                    // Update Payment record to REFUNDED status if possible, or create a refund logic
-                    // In AppointmentPaymentRecorder, we didn't add ApplyFullRefund explicitly, 
-                    // so we manually mark payments as refunded or add a negative payment.
-                    // For simplicity, we just mark existing payments as Refunded.
                     if (appointment.Payments != null)
                     {
                         foreach (var p in appointment.Payments)
@@ -116,6 +113,9 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PostponeAppoin
 
                 appointment.UpdatedAt = DateTimeHelper.UtcNow();
                 appointment.UpdatedBy = request.UserId;
+
+                await BookingPositionReleaseService.ReleasePositionIfNeededAsync(
+                    appointment, bookingPositionSqlRepository, cancellationToken);
 
                 appointmentSqlRepository.Update(appointment);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
