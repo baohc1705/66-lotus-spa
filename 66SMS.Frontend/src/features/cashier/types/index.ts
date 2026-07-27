@@ -35,6 +35,19 @@ export interface CashierBooking {
   invoiceId?: number | null
   invoiceCode?: string | null
   discountAmount?: number
+  positionId?: number | null
+  positionName?: string | null
+  positionStatus?: number | null
+}
+
+export interface CashierPosition {
+  id: number
+  roomId: number
+  name: string
+  roomName: string
+  status: number
+  statusLabel: string
+  isSelectable: boolean
 }
 
 export interface StaffColumn {

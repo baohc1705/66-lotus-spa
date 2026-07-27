@@ -25,6 +25,7 @@ import { APPOINTMENT_STATUS } from "../constants/appointment.constants";
 import { getMyWallet } from "../../wallet/api/wallet.api";
 import { useQuery } from "@tanstack/react-query";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
+import { formatDateTimeDisplay, toLocalDateOnly } from '@/shared/utils/date.utils';
 
 export function MyBookingsPanel() {
   const queryClient = useQueryClient();
@@ -174,7 +175,7 @@ export function MyBookingsPanel() {
     setExpandedId(expandedId === id ? null : id);
   };
 
-  const getStatusBadge = (status?: number) => {
+  const getStatusBadge = (status?: number, positionId?: number | null) => {
     switch (status) {
       case 0: // Fallback
       case APPOINTMENT_STATUS.PENDING:
@@ -186,10 +187,17 @@ export function MyBookingsPanel() {
       case APPOINTMENT_STATUS.CONFIRMED:
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-status-confirmed/10 text-status-confirmed border border-status-confirmed/20 whitespace-nowrap">
-            <CheckCircle2 className="w-3.5 h-3.5" /> Đã xác nhận - Chờ đặt cọc
+            <CheckCircle2 className="w-3.5 h-3.5" /> Chờ đặt cọc
           </span>
         );
       case APPOINTMENT_STATUS.WAITING:
+        if (!positionId) {
+          return (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-status-confirmed/10 text-status-confirmed border border-status-confirmed/20 whitespace-nowrap">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Đã cọc
+            </span>
+          );
+        }
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-status-waiting/10 text-status-waiting border border-status-waiting/20 whitespace-nowrap">
             <Clock3 className="w-3.5 h-3.5" /> Chờ phục vụ
@@ -228,7 +236,6 @@ export function MyBookingsPanel() {
       <div className="flex items-center justify-between pb-3">
         <h2
           className="text-xl font-semibold text-ink"
-          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
         >
           Lịch hẹn của tôi
         </h2>
@@ -261,22 +268,20 @@ export function MyBookingsPanel() {
                     </span>
                   </span>
                   <div className="hidden md:block">
-                    {getStatusBadge(booking.status)}
+                    {getStatusBadge(booking.status, booking.positionId)}
                   </div>
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-warm-600">
                   <div className="flex items-center gap-1.5">
                     <span className="text-warm-400">Ngày đặt:</span> 
-                    <span>{booking.createdAt}</span>
+                    <span>{formatDateTimeDisplay(booking.createdAt)}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Calendar className="w-4 h-4 text-gold-600" />
                     <span>
                       {booking.appointmentDate
-                        ? new Intl.DateTimeFormat("vi-VN").format(
-                            new Date(booking.appointmentDate),
-                          )
+                        ? toLocalDateOnly(booking.appointmentDate)
                         : "Chưa xác định"}
                     </span>
                   </div>
@@ -301,7 +306,7 @@ export function MyBookingsPanel() {
 
                 {/* Mobile Badge */}
                 <div className="mt-3 md:hidden">
-                  {getStatusBadge(booking.status)}
+                  {getStatusBadge(booking.status, booking.positionId)}
                 </div>
               </div>
 
@@ -310,18 +315,10 @@ export function MyBookingsPanel() {
                 <div className="flex flex-wrap items-center gap-2 justify-end">
                   {canPayDeposit(booking) && (
                     <>
-                      {walletBalance >=
-                        ((booking.totalAmount || 0) *
-                          (booking.depositPercent || 0)) /
-                          100 && (
+                      {walletBalance >=((booking.totalAmount || 0) *(booking.depositPercent || 0)) / 100 && (
                         <button
                           onClick={(e) =>
-                            openWalletConfirm(
-                              e,
-                              booking.id!,
-                              ((booking.totalAmount || 0) *
-                                (booking.depositPercent || 0)) /
-                                100,
+                              openWalletConfirm(e,booking.id!,((booking.totalAmount || 0) *(booking.depositPercent || 0)) / 100,
                             )
                           }
                           disabled={
@@ -407,8 +404,7 @@ export function MyBookingsPanel() {
                             <span className="text-warm-600 block mb-1">
                               Dịch vụ đã chọn:
                             </span>
-                            {booking.serviceNames &&
-                            booking.serviceNames.length > 0 ? (
+                            {booking.serviceNames && booking.serviceNames.length > 0 ? (
                               <ul className="space-y-1">
                                 {booking.serviceNames.map((srv, idx) => (
                                   <li
@@ -431,13 +427,37 @@ export function MyBookingsPanel() {
                           <DollarSign className="w-4 h-4 text-warm-600" />
                           <div>
                             <span className="text-warm-600 mr-2">
-                              Tổng tiền:
+                              Tổng tiền dịch vụ:
                             </span>
-                            <span className="text-rose-600 font-semibold">
-                              {formatCurrency(booking.totalAmount)}
-                            </span>
+                            <span className="text-ink font-medium">
+                              {formatCurrency(
+                                booking.servicesSubTotal ?? booking.totalAmount,
+                              )}
+                            </span> 
                           </div>
                         </div>
+
+                        {(booking.membershipDiscountAmount ?? 0) > 0 && (
+                          <div className="flex items-center gap-3 text-sm pl-7">
+                            <span className="text-warm-600 mr-2">
+                              Giảm giá thẻ thành viên:
+                            </span>
+                            <span className="text-success-text font-medium">
+                              -{formatCurrency(booking.membershipDiscountAmount)}
+                            </span>
+                          </div>
+                        )}
+
+                        {(booking.promotionDiscountAmount ?? 0) > 0 && (
+                          <div className="flex items-center gap-3 text-sm pl-7">
+                            <span className="text-warm-600 mr-2">
+                              Giảm giá mã khuyến mãi:
+                            </span>
+                            <span className="text-success-text font-medium">
+                              -{formatCurrency(booking.promotionDiscountAmount)}
+                            </span>
+                          </div>
+                        )}
 
                         <div className="flex items-center gap-3 text-sm pl-7">
                           <span className="text-warm-600 mr-2">
@@ -491,12 +511,10 @@ export function MyBookingsPanel() {
                           <MapPin className="w-4 h-4 text-warm-600" />
                           <div>
                             <span className="text-warm-600 mr-2">
-                              Phòng/Giường:
+                              Chi nhánh:
                             </span>
                             <span className="text-ink font-medium">
-                              {booking.positionRoomName
-                                ? `${booking.positionRoomName} - ${booking.positionName}`
-                                : "Chưa xếp phòng"}
+                              {booking.salonName || "Chưa xác định"}
                             </span>
                           </div>
                         </div>

@@ -10,9 +10,14 @@ import {
   User,
 } from "lucide-react";
 import React from "react";
+import { useAuthStore } from "@/features/auth/stores/authStore";
+import {
+  useMembershipTiers,
+  useMyMembershipCard,
+} from "@/features/profile/hooks/useMembershipInfo";
+import { formatDate } from "@/shared/utils/date.utils";
 import { useBookingStore } from "../stores/bookingStore";
 import { PromotionCodeInput } from "./PromotionCodeInput";
-import { formatDate } from "@/shared/utils/date.utils";
 
 /** Dãy lỗ bấm bán nguyệt liên tiếp trên mép top/bottom */
 function TicketPunchRow({ edge }: { edge: "top" | "bottom" }) {
@@ -35,7 +40,6 @@ function TicketPunchRow({ edge }: { edge: "top" | "bottom" }) {
   );
 }
 
-
 function TicketDivider() {
   return <div className="h-px bg-warm-100" />;
 }
@@ -51,21 +55,38 @@ export const BookingSummarySidebar: React.FC = () => {
     appliedPromotion,
   } = useBookingStore();
 
-  const total = guests.reduce(
-    (sum, g) => sum + (g.selectedService?.sellingPrice || 0),
-    0
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const membershipCardQuery = useMyMembershipCard(!!accessToken);
+  const tiersQuery = useMembershipTiers();
+
+  const membershipTier = tiersQuery.data?.find(
+    (t) => t.id === membershipCardQuery.data?.membershipTierId,
   );
-  const discount = appliedPromotion ? appliedPromotion.discountAmount : 0;
-  const finalTotal = Math.max(0, total - discount);
-  const deposit = finalTotal * 0.3;
+  const membershipPercent = membershipTier?.discountPercent ?? 0;
+
+  const servicesSubTotal = guests.reduce(
+    (sum, g) => sum + (g.selectedService?.sellingPrice || 0),
+    0,
+  );
+
+  // Giống BE: trừ % thẻ thành viên trước, rồi mới trừ mã khuyến mãi
+  const membershipDiscount =
+    membershipPercent > 0 && servicesSubTotal > 0
+      ? Math.round((servicesSubTotal * membershipPercent) / 100)
+      : 0;
+
+  const promoDiscount = appliedPromotion ? appliedPromotion.discountAmount : 0;
+  const finalTotal = Math.max(
+    0,
+    servicesSubTotal - membershipDiscount - promoDiscount,
+  );
+  const deposit = Math.round(finalTotal * 0.3);
 
   return (
     <div className="relative">
-      {/* Thân vé */}
       <div className="lotus-panel relative overflow-visible">
         <TicketPunchRow edge="top" />
         <div className="flex flex-col gap-4 p-5 pt-6">
-          {/* Tiêu đề */}
           <div className="pt-1 text-center">
             <h3 className="flex items-center justify-center gap-2 font-display text-sm font-semibold uppercase tracking-[0.14em] text-rose-600">
               Chi tiết đặt chỗ
@@ -74,11 +95,9 @@ export const BookingSummarySidebar: React.FC = () => {
 
           <TicketDivider />
 
-          {/* Khách hàng */}
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <p className="text-xs font-bold uppercase tracking-wider text-ink flex items-center gap-1.5">
-                
                 Khách hàng
               </p>
               <button
@@ -141,7 +160,6 @@ export const BookingSummarySidebar: React.FC = () => {
 
                   {isGuestActive && (
                     <div className="px-2 flex flex-col gap-3 text-xs text-ink">
-                      {/* Chi nhánh */}
                       {selectedSalon ? (
                         <div className="flex items-center gap-3 rounded-sm border border-warm-100 bg-warm-50 p-3">
                           {selectedSalon.imageUrl ? (
@@ -176,7 +194,6 @@ export const BookingSummarySidebar: React.FC = () => {
                         </div>
                       )}
 
-                      {/* Dịch vụ */}
                       {guest.selectedService ? (
                         <div className="px-2">
                           <p className="text-2xs font-bold tracking-wider text-gold-600 uppercase mb-1">
@@ -201,34 +218,28 @@ export const BookingSummarySidebar: React.FC = () => {
                         </div>
                       )}
 
-                      {/* Thời gian & KTV */}
                       {(guest.selectedDate ||
                         guest.selectedTimeSlot ||
-                        guest.selectedTechnician ||
-                        guest.selectedPosition) && (
+                        guest.selectedTechnician) && (
                         <div className="px-2 flex flex-col gap-1.5">
                           {guest.selectedDate && guest.selectedTimeSlot && (
                             <div className="flex justify-between items-center">
                               <span className="text-warm-600">Thời gian:</span>
                               <span className="font-bold text-rose-600">
                                 {guest.selectedTimeSlot.time} ·{" "}
-                                {formatDate(guest.selectedDate).format("DD/MM/YYYY")}
+                                {formatDate(guest.selectedDate).format(
+                                  "DD/MM/YYYY",
+                                )}
                               </span>
                             </div>
                           )}
                           {guest.selectedTechnician && (
                             <div className="flex justify-between items-center">
-                              <span className="text-warm-600">Kỹ thuật viên:</span>
+                              <span className="text-warm-600">
+                                Kỹ thuật viên:
+                              </span>
                               <span className="font-semibold">
                                 {guest.selectedTechnician.name}
-                              </span>
-                            </div>
-                          )}
-                          {guest.selectedPosition && (
-                            <div className="flex justify-between items-center">
-                              <span className="text-warm-600">Phòng:</span>
-                              <span className="font-semibold">
-                                {guest.selectedPosition.name}
                               </span>
                             </div>
                           )}
@@ -243,31 +254,37 @@ export const BookingSummarySidebar: React.FC = () => {
 
           <TicketDivider />
 
-          {/* Mã khuyến mãi */}
           <PromotionCodeInput variant="ticket" />
 
           <TicketDivider />
 
-          {/* Tổng tiền */}
           <div className="flex flex-col gap-2">
             <div className="flex justify-between text-xs text-warm-600">
               <span>Số lượng khách:</span>
-              <span className="font-bold text-ink">
-                {guests.length} khách
-              </span>
+              <span className="font-bold text-ink">{guests.length} khách</span>
             </div>
 
             <div className="flex justify-between text-xs text-warm-600">
               <span>Tổng tiền dịch vụ:</span>
               <span className="font-bold text-ink">
-                {total.toLocaleString("vi-VN")}đ
+                {servicesSubTotal.toLocaleString("vi-VN")}đ
               </span>
             </div>
 
-            {discount > 0 && (
+            {membershipDiscount > 0 && (
               <div className="flex justify-between text-xs text-success-text font-semibold">
-                <span>Khuyến mãi:</span>
-                <span>-{discount.toLocaleString("vi-VN")}đ</span>
+                <span>
+                  Giảm giá thẻ thành viên
+                  {membershipPercent > 0 ? ` (${membershipPercent}%)` : ""}:
+                </span>
+                <span>-{membershipDiscount.toLocaleString("vi-VN")}đ</span>
+              </div>
+            )}
+
+            {promoDiscount > 0 && (
+              <div className="flex justify-between text-xs text-success-text font-semibold">
+                <span>Giảm giá mã khuyến mãi:</span>
+                <span>-{promoDiscount.toLocaleString("vi-VN")}đ</span>
               </div>
             )}
 
@@ -290,7 +307,6 @@ export const BookingSummarySidebar: React.FC = () => {
 
           <TicketDivider />
 
-          {/* Trust badges */}
           <div className="grid grid-cols-3 gap-3">
             {[
               {

@@ -12,7 +12,6 @@ export const BookingSuccessTicket: React.FC = () => {
     selectedDate,
     selectedTimeSlot,
     selectedTechnician,
-    selectedPosition,
   } = primaryGuest || {};
 
   const ticketId = React.useMemo(() => Math.floor(Math.random() * 10000), []);
@@ -71,14 +70,6 @@ export const BookingSuccessTicket: React.FC = () => {
                 {selectedTechnician?.name || "Sắp xếp tự động"}
               </span>
             </div>
-            {selectedPosition && (
-              <div className="flex justify-between mt-1 pt-1 border-t border-warm-100">
-                <span className="text-warm-600">Phòng / Vị trí:</span>
-                <span className="font-semibold text-ink text-right">
-                  {selectedPosition?.name} ({selectedPosition?.roomName})
-                </span>
-              </div>
-            )}
           </div>
         </div>
 

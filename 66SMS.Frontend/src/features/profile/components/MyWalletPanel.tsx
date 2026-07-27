@@ -4,17 +4,19 @@ import { formatDateTimeDisplay } from '@/shared/utils/date.utils'
 import { useQuery } from '@tanstack/react-query'
 import { getMyWallet, getMyWalletTransactions, getWalletTopUpVnPayUrl } from '../../wallet/api/wallet.api'
 import type { WalletTransactionDto } from '../../wallet/types/wallet.types'
-import { Loader2, ArrowDownLeft, ArrowUpRight, Wallet } from 'lucide-react'
+import { Loader2, ArrowDownLeft, ArrowUpRight, Wallet, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 import type { AxiosError } from 'axios'
 import type { Result } from '@/shared/types/common.types'
 
 const MIN_TOP_UP = 10000
 const MAX_TOP_UP = 50000000
+const TRANSACTIONS_PAGE_SIZE = 10
 
 export function MyWalletPanel() {
   const [amountInput, setAmountInput] = useState('')
   const [isToppingUp, setIsToppingUp] = useState(false)
+  const [transactionPage, setTransactionPage] = useState(1)
 
   const { data: walletData, isLoading: isLoadingWallet } = useQuery({
     queryKey: ['my-wallet'],
@@ -36,6 +38,14 @@ export function MyWalletPanel() {
 
   const balance = walletData?.data?.balance ?? 0
   const transactions = transactionsData?.data ?? []
+  const totalTransactions = transactions.length
+  const totalTransactionPages = Math.max(1, Math.ceil(totalTransactions / TRANSACTIONS_PAGE_SIZE))
+  const currentTransactionPage = Math.min(transactionPage, totalTransactionPages)
+  const transactionStartIndex = (currentTransactionPage - 1) * TRANSACTIONS_PAGE_SIZE
+  const paginatedTransactions = transactions.slice(
+    transactionStartIndex,
+    transactionStartIndex + TRANSACTIONS_PAGE_SIZE,
+  )
 
   const handleTopUp = async () => {
     const amount = Number(amountInput.replace(/\D/g, ''))
@@ -63,13 +73,6 @@ export function MyWalletPanel() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h2 className="text-xl font-bold text-lotus-deep mb-1">Ví của tôi</h2>
-        <p className="text-lotus-stone text-sm">
-          Quản lý số dư, nạp tiền qua VNPay và xem lịch sử hoàn/hủy lịch hẹn.
-        </p>
-      </div>
-
       <div className="bg-gradient-to-br from-lotus-rose to-lotus-gold rounded-xl p-5 text-white shadow-md shadow-lotus-rose/15 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-2xl -mr-16 -mt-16" />
         <div className="relative z-10">
@@ -126,8 +129,9 @@ export function MyWalletPanel() {
             <p className="text-lotus-stone text-sm">Chưa có giao dịch nào.</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {transactions.map((tx: WalletTransactionDto) => {
+          <>
+            <div className="space-y-3">
+              {paginatedTransactions.map((tx: WalletTransactionDto) => {
               const amount = Number(tx.amount) || 0
               const isPositive = amount > 0
               return (
@@ -148,8 +152,45 @@ export function MyWalletPanel() {
                   </div>
                 </div>
               )
-            })}
-          </div>
+              })}
+            </div>
+
+            {totalTransactionPages > 1 && (
+            <div className="mt-3 flex items-center justify-between rounded-xl border border-lotus-cream bg-lotus-cream/30 px-3 py-2 text-xs text-lotus-stone">
+              <span>
+                Hiển thị{' '}
+                <strong className="text-lotus-deep">
+                  {transactionStartIndex + 1}-{Math.min(transactionStartIndex + TRANSACTIONS_PAGE_SIZE, totalTransactions)}
+                </strong>{' '}
+                / <strong className="text-lotus-deep">{totalTransactions}</strong>
+              </span>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setTransactionPage((page) => Math.max(1, page - 1))}
+                  disabled={currentTransactionPage === 1}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-lotus-cream bg-white text-lotus-deep transition-colors hover:bg-lotus-cream disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label="Trang trước"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <span className="min-w-16 text-center font-medium text-lotus-deep">
+                  {currentTransactionPage} / {totalTransactionPages}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setTransactionPage((page) => Math.min(totalTransactionPages, page + 1))}
+                  disabled={currentTransactionPage === totalTransactionPages}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-lotus-cream bg-white text-lotus-deep transition-colors hover:bg-lotus-cream disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label="Trang sau"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
+          </>
         )}
       </div>
     </div>

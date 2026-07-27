@@ -4,13 +4,11 @@ import {
   Check,
   ChevronRight,
   MapPin,
-  Sofa,
   User,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
-  useBookingPositions,
   useCreateSlotLock,
   useTechnicians,
   useTimeSlots,
@@ -29,12 +27,10 @@ export const BookingTimeStep: React.FC = () => {
   const selectedTechnician = activeGuest?.selectedTechnician;
   const selectedTimeSlot = activeGuest?.selectedTimeSlot;
   const selectedService = activeGuest?.selectedService;
-  const selectedPosition = activeGuest?.selectedPosition;
 
   const selectDate = store.selectDate;
   const selectTechnician = store.selectTechnician;
   const selectTimeSlot = store.selectTimeSlot;
-  const selectPosition = store.selectPosition;
 
   const [days] = useState(() => {
     const upcomingDays = [];
@@ -80,8 +76,6 @@ export const BookingTimeStep: React.FC = () => {
     selectedTechnician?.id,
     selectedSalon?.id
   );
-  const { data: positions = [], isLoading: loadingPositions } =
-    useBookingPositions();
 
   const hasWorkingTechnicians = technicians.length > 0;
   const isStep2Valid = !!selectedDate && !!selectedTimeSlot;
@@ -111,7 +105,6 @@ export const BookingTimeStep: React.FC = () => {
       const payload = guestsToLock.map((g) => ({
         slotId: g.selectedTimeSlot!.slotId,
         staffId: g.selectedTechnician?.id ?? null,
-        positionId: g.selectedPosition?.id || 0,
         appointmentDate: formatDate(g.selectedDate!).format("YYYY-MM-DD"),
         serviceId: g.selectedService!.id ?? 0,
       }));
@@ -128,9 +121,7 @@ export const BookingTimeStep: React.FC = () => {
         });
         nextStep();
       } else {
-        toast.error(
-          res.message || "Không thể giữ khung giờ này, vui lòng chọn giờ khác."
-        );
+        toast.error("Không thể giữ khung giờ này, vui lòng chọn giờ khác.");
       }
     } catch (error) {
       toast.error(
@@ -203,66 +194,10 @@ export const BookingTimeStep: React.FC = () => {
         </div>
       </div>
 
-      {/* Chọn vị trí */}
-      <div className="flex flex-col gap-2">
-        <p className="text-xs text-gold-600 uppercase tracking-wider font-semibold">
-          2. Chọn vị trí
-        </p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {loadingPositions ? (
-            <div className="col-span-full py-4 text-center text-xs text-warm-600">
-              Đang tải danh sách vị trí...
-            </div>
-          ) : (
-            <>
-              <div
-                onClick={() => selectPosition(null)}
-                className={`relative flex cursor-pointer items-center justify-center gap-2 rounded-sm p-3 transition-all border ${
-                  !selectedPosition
-                    ? "border-rose-600 bg-rose-600 text-white"
-                    : "border-warm-100 bg-surface text-ink hover:border-rose-200"
-                }`}
-              >
-                <span className="text-xs font-bold">
-                  Không yêu cầu
-                </span>
-              </div>
-              {positions.map((pos) => {
-                const isSelected = selectedPosition?.id === pos.id;
-                return (
-                  <div
-                    key={pos.id}
-                    onClick={() => selectPosition(pos)}
-                    className={`relative flex cursor-pointer flex-col items-start gap-1 overflow-hidden rounded-sm p-3 transition-all border ${
-                      isSelected
-                        ? "border-2 border-rose-600 bg-rose-50"
-                        : "border-warm-100 bg-surface hover:border-rose-200"
-                    }`}
-                  >
-                    {isSelected && (
-                      <div className="absolute top-0 right-0 w-6 h-6 bg-rose-600 rounded-bl-sm flex items-center justify-center">
-                        <Check className="w-3.5 h-3.5 text-white" />
-                      </div>
-                    )}
-                    <div className="flex items-center gap-1.5 text-ink">
-                      <Sofa className="w-3.5 h-3.5 text-rose-400" />
-                      <h4 className="font-bold text-xs truncate">{pos.name}</h4>
-                    </div>
-                    <p className="text-xs text-warm-600 truncate ml-5">
-                      {pos.roomName}
-                    </p>
-                  </div>
-                );
-              })}
-            </>
-          )}
-        </div>
-      </div>
-
       {/* Chọn KTV */}
       <div className="flex flex-col gap-2">
         <p className="text-xs text-gold-600 uppercase tracking-wider font-semibold">
-          3. Chọn kỹ thuật viên
+          2. Chọn kỹ thuật viên
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {!serviceId ? (
@@ -336,7 +271,7 @@ export const BookingTimeStep: React.FC = () => {
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <p className="text-xs text-gold-600 uppercase tracking-wider font-semibold">
-            4. Chọn khung giờ phục vụ
+            3. Chọn khung giờ phục vụ
           </p>
           <div className="flex items-center gap-3 text-2xs text-warm-600">
             <div className="flex items-center gap-1">

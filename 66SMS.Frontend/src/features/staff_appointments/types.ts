@@ -1,14 +1,4 @@
-export type StaffBookingStatus =
-  | 'pending'
-  | 'confirmed'
-  | 'not-arrived'
-  | 'waiting'
-  | 'in-progress'
-  | 'completed'
-  | 'unpaid'
-  | 'paid'
-  | 'cancelled'
-
+/** Trạng thái lịch hẹn — khớp AppointmentConst trên backend (int). */
 export const BookingStatus = {
   Pending: 1,
   Confirmed: 2,
@@ -19,6 +9,19 @@ export const BookingStatus = {
   NoShow: 9,
 } as const
 
+export type BookingStatusValue = (typeof BookingStatus)[keyof typeof BookingStatus]
+
+/** Chỉ dùng để hiển thị nhãn UI — không dùng để so sánh logic. */
+export const BOOKING_STATUS_LABELS: Record<number, string> = {
+  [BookingStatus.Pending]: 'Chờ xác nhận',
+  [BookingStatus.Confirmed]: 'Chờ cọc',
+  [BookingStatus.Waiting]: 'Chờ phục vụ',
+  [BookingStatus.InService]: 'Đang phục vụ',
+  [BookingStatus.Completed]: 'Đã hoàn thành',
+  [BookingStatus.Cancelled]: 'Đã hủy',
+  [BookingStatus.NoShow]: 'Không đến',
+}
+
 export interface StaffScheduleBooking {
   id: string
   customerName: string
@@ -26,7 +29,9 @@ export interface StaffScheduleBooking {
   serviceName: string
   startTime: string
   endTime: string
-  status: StaffBookingStatus
+  /** Trạng thái int từ backend */
+  status: number
+  paidAmount?: number
   totalAmount: number
   note?: string
 }

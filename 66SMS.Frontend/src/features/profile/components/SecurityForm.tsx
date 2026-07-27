@@ -37,9 +37,6 @@ export function SecurityForm() {
           <Lock className="w-5 h-5 text-lotus-stone" />
           Đổi mật khẩu
         </h3>
-        <p className="text-sm text-lotus-stone">
-          Bạn nên sử dụng mật khẩu mạnh mà bạn chưa sử dụng ở nơi khác.
-        </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

@@ -3,6 +3,11 @@ import { Phone, Info, ArrowLeft, Loader2, Wallet } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { useAuthStore } from "@/features/auth/stores/authStore";
+import {
+  useMembershipTiers,
+  useMyMembershipCard,
+} from "@/features/profile/hooks/useMembershipInfo";
 import { useBookingStore } from "../stores/bookingStore";
 import { useCreateBooking } from "../hooks/useBookingData";
 import {
@@ -26,6 +31,15 @@ export const BookingContactStep: React.FC = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { mutateAsync: createBooking } = useCreateBooking();
+
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const membershipCardQuery = useMyMembershipCard(!!accessToken);
+  const tiersQuery = useMembershipTiers();
+
+  const membershipTier = tiersQuery.data?.find(
+    (t) => t.id === membershipCardQuery.data?.membershipTierId,
+  );
+  const membershipPercent = membershipTier?.discountPercent ?? 0;
 
   const {
     register,
@@ -71,7 +85,6 @@ export const BookingContactStep: React.FC = () => {
           staffId: guest.selectedTechnician?.id ?? null,
           slotId: guest.selectedTimeSlot!.slotId || 0,
           appointmentDate: formatDate(guest.selectedDate!).format("YYYY-MM-DD"),
-          positionId: guest.selectedPosition?.id || 0,
           salonId: selectedSalon?.id ?? null,
           note: finalNote,
           services: [
@@ -97,12 +110,17 @@ export const BookingContactStep: React.FC = () => {
     }
   };
 
-  const total = guests.reduce(
+  const servicesSubTotal = guests.reduce(
     (sum, g) => sum + (g.selectedService?.sellingPrice || 0),
     0
   );
-  const discount = appliedPromotion ? appliedPromotion.discountAmount : 0;
-  const depositPreview = Math.round(Math.max(0, total - discount) * 0.3);
+  const membershipDiscount =
+    membershipPercent > 0 && servicesSubTotal > 0
+      ? Math.round((servicesSubTotal * membershipPercent) / 100)
+      : 0;
+  const promoDiscount = appliedPromotion ? appliedPromotion.discountAmount : 0;
+  const finalTotal = Math.max(0, servicesSubTotal - membershipDiscount - promoDiscount);
+  const depositPreview = Math.round(finalTotal * 0.3);
 
   const inputClass = (hasError: boolean) =>
     `w-full rounded-sm border bg-surface px-4 py-3 text-sm text-ink transition-colors placeholder:text-warm-600 hover:border-warm-300 focus:outline-none focus:border-rose-600 ${

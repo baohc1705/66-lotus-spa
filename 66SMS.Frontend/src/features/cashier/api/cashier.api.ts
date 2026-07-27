@@ -1,7 +1,7 @@
 import axiosInstance from "@/shared/api/axiosInstance";
 import { API } from "@/shared/api/endpoints";
 import type { Result } from "@/shared/types/common.types";
-import type { CashierBooking, CashierDailyDto } from "../types";
+import type { CashierBooking, CashierDailyDto, CashierPosition } from "../types";
 
 function formatDate(date: Date): string {
   const y = date.getFullYear();
@@ -44,6 +44,23 @@ export const cashierApi = {
   updateBookingStatus: (id: string | number, status: number, note?: string) =>
     axiosInstance
       .put<Result<void>>(`${API.cashier.appointment}/${id}/status`, { id, status, note })
+      .then((r) => r.data),
+
+  getPositions: (salonId?: number | null) =>
+    axiosInstance
+      .get<Result<CashierPosition[]>>(API.cashier.positions, {
+        params: {
+          ...(salonId !== undefined && salonId !== null ? { salonId } : {}),
+        },
+      })
+      .then((r) => r.data),
+
+  assignPosition: (appointmentId: string | number, positionId: number) =>
+    axiosInstance
+      .put<Result<void>>(`${API.cashier.appointment}/${appointmentId}/position`, {
+        appointmentId: Number(appointmentId),
+        positionId,
+      })
       .then((r) => r.data),
 
   payBooking: (id: string | number, paymentMethod: string, note?: string) =>

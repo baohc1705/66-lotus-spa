@@ -137,7 +137,7 @@ export function ProfilePage() {
                 onTabChange={handleTabChange}
               />
 
-              <div className="flex-1 w-full bg-white rounded-xl shadow-sm">
+              <div className="flex-1 w-full min-w-0 bg-white rounded-xl shadow-sm overflow-hidden">
                 <div className="p-4 md:p-5">{renderContent()}</div>
               </div>
             </div>

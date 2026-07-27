@@ -58,6 +58,7 @@ export const API = {
     daily: "/cashier/daily",
     onlineAppointments: "/cashier/online-appointments",
     appointment: "/cashier/appointments",
+    positions: "/cashier/positions",
     vnpayCreate: "/cashier/vnpay/create-url",
     vnpayReturn: "/cashier/vnpay-return",
   },

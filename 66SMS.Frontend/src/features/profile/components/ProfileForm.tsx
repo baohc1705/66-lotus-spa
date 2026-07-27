@@ -1,42 +1,39 @@
-﻿import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  customerProfileSchema,
-  type CustomerProfileFormValues,
-} from "../schemas/profile.schemas";
-import { useUpdateProfile } from "../hooks/useUpdateProfile";
-import { Button } from "@/shared/components/ui/button";
-import { SearchableSelect } from "@/shared/components/ui/searchable-select";
-import {
-  Camera,
-  User,
-  Phone,
-  ShieldCheck,
-  Loader2,
-  Calendar,
-  Activity,
-  Star,
-  Mail,
-  Fingerprint,
-  MapPin,
-} from "lucide-react";
-import type { ProfileResponse } from "../types/profile.types";
-import { useEffect, useCallback, useState } from "react";
-import { parseToDateInput } from "@/shared/utils/date.utils";
-import { useMyMembershipCard } from "../hooks/useMembershipInfo";
-import {
-  CUSTOMER_KEYS,
-  useUpdateCustomer,
-} from "@/features/customers/hooks/useCustomers";
-import { useQueryClient } from "@tanstack/react-query";
-import type { CustomerDto } from "@/features/customers/types/customer.types";
-import { fileToBase64 } from "@/shared/lib/fileToBase64";
-import { toast } from "sonner";
-import {
+﻿import {
   useProvinces,
   useWardsByProvince,
 } from "@/features/address/hooks/useAddress";
 import type { ProvinceDto, WardDto } from "@/features/address/types/address.types";
+import {
+  CUSTOMER_KEYS,
+  useUpdateCustomer,
+} from "@/features/customers/hooks/useCustomers";
+import type { CustomerDto } from "@/features/customers/types/customer.types";
+import { Button } from "@/shared/components/ui/button";
+import { SearchableSelect } from "@/shared/components/ui/searchable-select";
+import { fileToBase64 } from "@/shared/lib/fileToBase64";
+import { parseToDateInput } from "@/shared/utils/date.utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  Calendar,
+  Camera,
+  Fingerprint,
+  Loader2,
+  Mail,
+  MapPin,
+  Phone,
+  User,
+} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { useMyMembershipCard } from "../hooks/useMembershipInfo";
+import { useUpdateProfile } from "../hooks/useUpdateProfile";
+import {
+  customerProfileSchema,
+  type CustomerProfileFormValues,
+} from "../schemas/profile.schemas";
+import type { ProfileResponse } from "../types/profile.types";
 
 interface ProfileFormProps {
   initialData?: ProfileResponse;
@@ -50,7 +47,7 @@ export function ProfileForm({
   const qc = useQueryClient();
   const updateProfile = useUpdateProfile();
   const updateCustomer = useUpdateCustomer();
-  const { data: card } = useMyMembershipCard(true);
+  useMyMembershipCard(true);
 
   const isPending = updateProfile.isPending || updateCustomer.isPending;
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
@@ -199,9 +196,9 @@ export function ProfileForm({
             />
             <div
               onClick={handleAvatarClick}
-              className="relative z-10 w-24 h-24 rounded-full p-0.5 shadow-sm mb-3 bg-white cursor-pointer group"
+              className="relative z-10 w-60 h-60 rounded-full p-0.5 shadow-sm mb-3 cursor-pointer group"
             >
-              <div className="w-full h-full rounded-full overflow-hidden bg-white relative">
+              <div className="w-full h-full rounded-full overflow-hidden relative">
                 {avatarUrl ? (
                   <img
                     src={avatarUrl}
@@ -218,37 +215,6 @@ export function ProfileForm({
                 </div>
               </div>
             </div>
-
-            <div className="text-center relative z-10 space-y-2">
-              <h3 className="font-bold text-xl text-lotus-deep font-sans">
-                {initialData?.fullName || "Người dùng"}
-              </h3>
-              <p className="text-sm font-medium text-lotus-leaf inline-flex items-center justify-center gap-1.5 bg-lotus-leaf-light px-3 py-1 rounded-md">
-                <ShieldCheck className="w-4 h-4" />
-                {card?.tierName || "Thành viên"}
-              </p>
-            </div>
-
-            <div className="w-full mt-6 pt-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-lotus-stone flex items-center gap-1">
-                  <Star className="w-4 h-4 text-lotus-gold" />
-                  Hạng thành viên:
-                </span>
-                <span className="text-sm font-semibold text-lotus-deep">
-                  {card?.tierName || "Thường"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-lotus-stone flex items-center gap-1">
-                  <Activity className="w-4 h-4 text-lotus-rose" />
-                  Điểm tích lũy:
-                </span>
-                <span className="text-sm font-semibold text-lotus-deep">
-                  {customerDetail?.loyaltyPoint || 0}
-                </span>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -260,9 +226,6 @@ export function ProfileForm({
                 <h3 className="text-xl font-bold text-lotus-deep mb-1 font-sans">
                   Thông tin cá nhân
                 </h3>
-                <p className="text-lotus-stone text-sm">
-                  Cập nhật thông tin liên hệ và địa chỉ của bạn.
-                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -398,9 +361,6 @@ export function ProfileForm({
                 <h3 className="text-xl font-bold text-lotus-deep mb-1 font-sans">
                   Tài khoản đăng nhập
                 </h3>
-                <p className="text-lotus-stone text-sm">
-                  Thông tin dùng để đăng nhập hệ thống.
-                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">

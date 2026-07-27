@@ -11,7 +11,7 @@ export interface AdminScheduleEvent {
   startTime: string;
   endTime: string;
   footerRight?: string;
-  status?: string;
+  status?: string | number;
 }
 
 export interface AdminScheduleDay {
@@ -36,46 +36,61 @@ function timeToMins(t: string) {
   return h * 60 + (m || 0);
 }
 
-function statusStyles(status?: string) {
+function statusStyles(status?: string | number) {
   switch (status) {
     case "in-progress":
+    case 4:
       return "bg-state-info-bg/80 border-state-info-border text-state-info-text font-medium";
     case "not-arrived":
+    case 9:
       return "bg-state-danger-bg/80 border-state-danger-border text-state-danger-text font-medium";
     case "waiting":
+    case 3:
       return "bg-state-warning-bg border-state-warning-border text-state-warning-text font-medium";
     case "completed":
     case "paid":
+    case 5:
       return "bg-state-success-bg border-state-success-border text-state-success-text font-medium";
     case "unpaid":
       return "bg-state-danger-bg border-state-danger-border text-state-danger-text font-medium";
     case "cancelled":
+    case 6:
       return "bg-adminGray-50/80 border-adminGray-100 text-adminGray-600 font-medium";
     case "confirmed":
+    case 2:
       return "bg-state-info-bg/80 border-state-info-border text-state-info-text font-medium";
     case "pending":
+    case 1:
     default:
       return "bg-state-success-bg border-state-success-border text-state-success-text font-medium";
   }
 }
 
-function statusDot(status?: string) {
+function statusDot(status?: string | number) {
   switch (status) {
     case "in-progress":
+    case 4:
       return "bg-status-in-progress";
     case "not-arrived":
+    case 9:
       return "bg-status-cancelled";
     case "waiting":
+    case 3:
       return "bg-status-waiting";
     case "completed":
     case "paid":
+    case 5:
       return "bg-status-completed";
     case "unpaid":
       return "bg-adminGreen-600";
     case "cancelled":
+    case 6:
       return "bg-status-cancelled";
     case "confirmed":
+    case 2:
       return "bg-status-confirmed";
+    case "pending":
+    case 1:
     default:
       return "bg-status-completed";
   }

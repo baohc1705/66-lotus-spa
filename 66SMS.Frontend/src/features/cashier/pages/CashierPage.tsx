@@ -290,6 +290,22 @@ export function CashierPage() {
             isOpen={isSidebarOpen}
             onClose={() => setIsSidebarOpen(false)}
             onPay={handlePay}
+            salonId={salonId}
+            onAssignPosition={async (bookingId, positionId) => {
+              try {
+                const res = await cashierApi.assignPosition(bookingId, positionId);
+                if (res.isSuccess) {
+                  toast.success("Đã gán vị trí và check-in thành công.");
+                  setIsSidebarOpen(false);
+                  setSelectedBooking(null);
+                  await refetch();
+                } else {
+                  toast.error(res.message || "Không thể gán vị trí.");
+                }
+              } catch {
+                toast.error("Lỗi khi kết nối đến máy chủ.");
+              }
+            }}
             onRedirectToPOS={handleRedirectToPOS}
             onRequestDeposit={async (bookingId) => {
               setIsPaying(true);

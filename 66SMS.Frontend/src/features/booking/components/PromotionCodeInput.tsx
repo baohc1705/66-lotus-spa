@@ -1,6 +1,11 @@
 import { CheckCircle2, Loader2, Sparkles, Ticket, X } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
+import { useAuthStore } from "@/features/auth/stores/authStore";
+import {
+  useMembershipTiers,
+  useMyMembershipCard,
+} from "@/features/profile/hooks/useMembershipInfo";
 import { bookingApi } from "../api/booking.api";
 import { useBookingStore } from "../stores/bookingStore";
 
@@ -25,10 +30,25 @@ export const PromotionCodeInput: React.FC<PromotionCodeInputProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const total = guests.reduce(
-    (sum, g) => sum + (g.selectedService?.sellingPrice || 0),
-    0
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const membershipCardQuery = useMyMembershipCard(!!accessToken);
+  const tiersQuery = useMembershipTiers();
+
+  const membershipTier = tiersQuery.data?.find(
+    (t) => t.id === membershipCardQuery.data?.membershipTierId,
   );
+  const membershipPercent = membershipTier?.discountPercent ?? 0;
+
+  const servicesSubTotal = guests.reduce(
+    (sum, g) => sum + (g.selectedService?.sellingPrice || 0),
+    0,
+  );
+  const membershipDiscount =
+    membershipPercent > 0 && servicesSubTotal > 0
+      ? Math.round((servicesSubTotal * membershipPercent) / 100)
+      : 0;
+  // Validate mã KM trên số tiền sau khi đã trừ thẻ thành viên (khớp BE)
+  const orderTotalForPromo = Math.max(0, servicesSubTotal - membershipDiscount);
 
   const handleApply = async (e: { preventDefault(): void }) => {
     e.preventDefault();
@@ -39,7 +59,7 @@ export const PromotionCodeInput: React.FC<PromotionCodeInputProps> = ({
       return;
     }
 
-    if (total <= 0) {
+    if (servicesSubTotal <= 0) {
       setError("Vui lòng chọn dịch vụ trước khi áp dụng mã");
       return;
     }
@@ -48,7 +68,7 @@ export const PromotionCodeInput: React.FC<PromotionCodeInputProps> = ({
       setLoading(true);
       setError("");
 
-      const result = await bookingApi.validatePromotion(code, total);
+      const result = await bookingApi.validatePromotion(code, orderTotalForPromo);
 
       setAppliedPromotion(result);
       setPromotionCode(code);

@@ -27,7 +27,7 @@ export interface BookingPositionDTO {
 export interface SlotLockDto {
   slotId: number;
   staffId: number | null;
-  positionId: number;
+  positionId?: number | null;
   appointmentDate: string;
   serviceId: number;
 }
@@ -36,7 +36,7 @@ export interface GuestAppointmentDto {
   staffId: number | null;
   slotId: number;
   appointmentDate: string;
-  positionId: number;
+  positionId?: number | null;
   salonId?: number | null;
   note?: string;
   services: { serviceId: number; quantity: number }[];
@@ -63,7 +63,6 @@ export interface GuestBooking {
   id: number;
   selectedService: ServiceDto | null;
   selectedTechnician: TechnicianDTO | null;
-  selectedPosition: BookingPositionDTO | null;
   selectedDate: Date | null;
   selectedTimeSlot: TimeSlotDTO | null;
   lockId?: number;
@@ -84,7 +83,11 @@ export interface AppointmentDto {
   depositPercent?: number;
   depositDeadlineAt?: string;
   createdAt?: string;
+  servicesSubTotal?: number;
+  membershipDiscountAmount?: number;
+  promotionDiscountAmount?: number;
   staffFullName?: string;
+  salonName?: string;
   timeSlotStartTime?: string;
   timeSlotEndTime?: string;
   positionName?: string;

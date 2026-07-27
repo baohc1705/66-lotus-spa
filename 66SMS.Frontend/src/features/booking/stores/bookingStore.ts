@@ -3,7 +3,6 @@ import type { BookingContactFormValues } from "../schemas/booking.schema";
 import type {
   TechnicianDTO,
   TimeSlotDTO,
-  BookingPositionDTO,
   GuestBooking,
   PromotionValidationDto,
 } from "../types/booking.types";
@@ -34,7 +33,6 @@ interface BookingState {
   updateActiveGuest: (updates: Partial<GuestBooking>) => void;
   selectService: (service: ServiceDto) => void;
   selectTechnician: (technician: TechnicianDTO | null) => void;
-  selectPosition: (position: BookingPositionDTO | null) => void;
   selectDate: (date: Date) => void;
   selectTimeSlot: (timeSlot: TimeSlotDTO | null) => void;
   setContactInfo: (info: BookingContactFormValues) => void;
@@ -51,7 +49,6 @@ const createNewGuest = (id: number): GuestBooking => ({
   id,
   selectedService: null,
   selectedTechnician: null,
-  selectedPosition: null,
   selectedDate: null,
   selectedTimeSlot: null,
 });
@@ -81,7 +78,6 @@ export const useBookingStore = create<BookingState>((set) => ({
         const newGuests = state.guests.map((guest) => ({
           ...guest,
           selectedTechnician: null,
-          selectedPosition: null,
           selectedDate: null,
           selectedTimeSlot: null,
           lockId: undefined,
@@ -127,7 +123,6 @@ export const useBookingStore = create<BookingState>((set) => ({
       newGuests[state.activeGuestIndex].selectedService = service;
       // Reset dependent fields when service changes
       newGuests[state.activeGuestIndex].selectedTechnician = null;
-      newGuests[state.activeGuestIndex].selectedPosition = null;
       newGuests[state.activeGuestIndex].selectedTimeSlot = null;
       newGuests[state.activeGuestIndex].lockId = undefined;
       return { guests: newGuests, appliedPromotion: null, promotionCode: "" };
@@ -137,14 +132,6 @@ export const useBookingStore = create<BookingState>((set) => ({
     set((state) => {
       const newGuests = [...state.guests];
       newGuests[state.activeGuestIndex].selectedTechnician = technician;
-      newGuests[state.activeGuestIndex].lockId = undefined;
-      return { guests: newGuests };
-    }),
-
-  selectPosition: (position) =>
-    set((state) => {
-      const newGuests = [...state.guests];
-      newGuests[state.activeGuestIndex].selectedPosition = position;
       newGuests[state.activeGuestIndex].lockId = undefined;
       return { guests: newGuests };
     }),

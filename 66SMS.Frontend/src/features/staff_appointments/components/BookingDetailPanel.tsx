@@ -1,16 +1,5 @@
 import { Loader2, X, Clock, User, Phone, Sparkles, FileText, Play, CheckCircle2 } from 'lucide-react'
-import type { StaffScheduleBooking } from '../types'
-
-const STATUS_LABELS: Record<string, string> = {
-  pending: 'Chờ thu ngân duyệt',
-  'not-arrived': 'Chưa tới',
-  waiting: 'Đã duyệt — chờ phục vụ',
-  'in-progress': 'Đang phục vụ',
-  completed: 'Đã xong',
-  unpaid: 'Chờ thanh toán',
-  paid: 'Đã thanh toán',
-  cancelled: 'Đã hủy',
-}
+import { BOOKING_STATUS_LABELS, BookingStatus, type StaffScheduleBooking } from '../types'
 
 interface BookingDetailPanelProps {
   booking: StaffScheduleBooking | null
@@ -31,10 +20,12 @@ export function BookingDetailPanel({
 }: BookingDetailPanelProps) {
   if (!booking) return null
 
-  const canStart =
-    booking.status === 'waiting' || booking.status === 'not-arrived'
-  const canComplete = booking.status === 'in-progress'
-  const isPending = booking.status === 'pending'
+  const canStart = booking.status === BookingStatus.Waiting
+  const canComplete = booking.status === BookingStatus.InService
+  const isPending = booking.status === BookingStatus.Pending
+  const isCompletedUnpaid =
+    booking.status === BookingStatus.Completed &&
+    (booking.paidAmount ?? 0) < booking.totalAmount
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -99,7 +90,7 @@ export function BookingDetailPanel({
               <div>
                 <p className="text-xs text-adminGray-600 uppercase tracking-wide">Trạng thái</p>
                 <p className="font-medium text-adminInk">
-                  {STATUS_LABELS[booking.status] ?? booking.status}
+                  {BOOKING_STATUS_LABELS[booking.status] ?? `Trạng thái #${booking.status}`}
                 </p>
                 {booking.totalAmount > 0 && (
                   <p className="text-sm text-adminGray-600 mt-1">
@@ -122,7 +113,7 @@ export function BookingDetailPanel({
               </p>
             )}
 
-            {booking.status === 'unpaid' && (
+            {isCompletedUnpaid && (
               <p className="text-sm text-state-info-text bg-state-info-bg border border-state-info-border rounded-lg p-3">
                 Dịch vụ đã hoàn tất. Khách chuyển sang quầy thu ngân để thanh toán.
               </p>

@@ -76,7 +76,7 @@ export function StaffAppointmentsPage() {
           schedule.refetch();
           setSelectedBooking((prev) =>
             prev && prev.booking.id === bookingId
-              ? { ...prev, booking: { ...prev.booking, status: "in-progress" } }
+              ? { ...prev, booking: { ...prev.booking, status: BookingStatus.InService } }
               : prev,
           );
         },
@@ -92,7 +92,7 @@ export function StaffAppointmentsPage() {
           schedule.refetch();
           setSelectedBooking((prev) =>
             prev && prev.booking.id === bookingId
-              ? { ...prev, booking: { ...prev.booking, status: "completed" } }
+              ? { ...prev, booking: { ...prev.booking, status: BookingStatus.Completed } }
               : prev,
           );
         },

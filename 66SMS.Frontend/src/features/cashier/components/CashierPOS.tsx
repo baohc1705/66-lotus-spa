@@ -57,6 +57,8 @@ interface POSOrder {
   customer: Partial<CustomerDto> | null;
   items: POSOrderItem[];
   discountAmount: number;
+  membershipDiscountAmount: number;
+  alreadyPaidAmount: number;
   useLoyaltyPoints: boolean;
   paymentMethod: number;
   note: string;
@@ -104,6 +106,8 @@ export function CashierPOS({
       customer: null,
       items: [],
       discountAmount: 0,
+      membershipDiscountAmount: 0,
+      alreadyPaidAmount: 0,
       useLoyaltyPoints: false,
       paymentMethod: PAYMENT_METHOD.CASH,
       note: "",
@@ -155,6 +159,8 @@ export function CashierPOS({
           staffName: item.staffName || undefined,
         })),
         discountAmount: checkoutInvoice.discountAmount || 0,
+        membershipDiscountAmount: checkoutInvoice.membershipDiscountAmount || 0,
+        alreadyPaidAmount: checkoutInvoice.paidAmount || 0,
         useLoyaltyPoints: (checkoutInvoice.loyaltyPointsUsed || 0) > 0,
         paymentMethod: checkoutInvoice.paymentMethod || PAYMENT_METHOD.CASH,
         note: checkoutInvoice.note || "",
@@ -241,7 +247,10 @@ export function CashierPOS({
   const pointsUsed = useMemo(() => {
     if (!activeOrder.useLoyaltyPoints || !activeOrder.customer) return 0;
     const maxPointsAllowed = Math.floor(
-      (subTotal - activeOrder.discountAmount) / POINT_VALUE_VND,
+      (subTotal -
+        activeOrder.discountAmount -
+        activeOrder.membershipDiscountAmount) /
+        POINT_VALUE_VND,
     );
     const customerPoints = activeOrder.customer.loyaltyPoint ?? 0;
     return Math.max(0, Math.min(customerPoints, maxPointsAllowed));
@@ -250,6 +259,7 @@ export function CashierPOS({
     activeOrder.customer,
     subTotal,
     activeOrder.discountAmount,
+    activeOrder.membershipDiscountAmount,
   ]);
 
   const pointsDiscountValue = pointsUsed * POINT_VALUE_VND;
@@ -257,9 +267,22 @@ export function CashierPOS({
   const totalAmount = useMemo(() => {
     return Math.max(
       0,
-      subTotal - activeOrder.discountAmount - pointsDiscountValue,
+      subTotal -
+        activeOrder.discountAmount -
+        activeOrder.membershipDiscountAmount -
+        pointsDiscountValue,
     );
-  }, [subTotal, activeOrder.discountAmount, pointsDiscountValue]);
+  }, [
+    subTotal,
+    activeOrder.discountAmount,
+    activeOrder.membershipDiscountAmount,
+    pointsDiscountValue,
+  ]);
+
+  // Đã cọc / đã thu trước → chỉ thu phần còn lại
+  const amountDue = useMemo(() => {
+    return Math.max(0, totalAmount - (activeOrder.alreadyPaidAmount || 0));
+  }, [totalAmount, activeOrder.alreadyPaidAmount]);
 
   // Methods to manipulate orders
   const handleCreateNewOrder = () => {
@@ -271,6 +294,8 @@ export function CashierPOS({
       customer: null,
       items: [],
       discountAmount: 0,
+      membershipDiscountAmount: 0,
+      alreadyPaidAmount: 0,
       useLoyaltyPoints: false,
       paymentMethod: PAYMENT_METHOD.CASH,
       note: "",
@@ -423,7 +448,7 @@ export function CashierPOS({
       loyaltyPointsUsed: pointsUsed,
       taxAmount: 0,
       paymentMethod: activeOrder.paymentMethod,
-      paidAmount: tempPaidAmount || totalAmount,
+      paidAmount: tempPaidAmount || amountDue,
       note: activeOrder.note || undefined,
       items: activeOrder.items.map((i: POSOrderItem) => ({
         itemType: i.itemType,
@@ -490,6 +515,8 @@ export function CashierPOS({
                 customer: null,
                 items: [],
                 discountAmount: 0,
+                membershipDiscountAmount: 0,
+                alreadyPaidAmount: 0,
                 useLoyaltyPoints: false,
                 paymentMethod: PAYMENT_METHOD.CASH,
                 note: "",
@@ -523,6 +550,8 @@ export function CashierPOS({
                 customer: null,
                 items: [],
                 discountAmount: 0,
+                membershipDiscountAmount: 0,
+                alreadyPaidAmount: 0,
                 useLoyaltyPoints: false,
                 paymentMethod: PAYMENT_METHOD.CASH,
                 note: "",
@@ -948,13 +977,12 @@ export function CashierPOS({
               </span>
             </div>
             <div className="flex justify-between items-center text-adminGray-600 font-medium">
-              <button className="text-state-info-text hover:underline flex items-center gap-0.5">
-                Thẻ giảm giá/voucher{" "}
-                <span className="text-2xs text-adminGray-400 font-normal">
-                  (Chọn thẻ)
-                </span>
-              </button>
-              <span className="font-bold text-adminInk">0 đ</span>
+              <span className="text-state-info-text flex items-center gap-0.5">
+                Giảm hạng TV
+              </span>
+              <span className="font-bold text-adminGreen-600">
+                -{activeOrder.membershipDiscountAmount.toLocaleString("vi-VN")} đ
+              </span>
             </div>
 
             <div className="flex justify-between items-center pt-2 border-t border-adminGray-100 text-sm font-bold text-adminInk">
@@ -977,6 +1005,23 @@ export function CashierPOS({
                 {totalAmount.toLocaleString("vi-VN")} đ
               </span>
             </div>
+
+            {activeOrder.alreadyPaidAmount > 0 && (
+              <>
+                <div className="flex justify-between items-center text-adminGray-600 font-medium">
+                  <span>Đã thu (cọc):</span>
+                  <span className="font-bold text-adminGreen-600">
+                    -{activeOrder.alreadyPaidAmount.toLocaleString("vi-VN")} đ
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-sm font-bold text-adminInk">
+                  <span>Còn lại cần thu:</span>
+                  <span className="text-lg font-bold text-adminGreen-600">
+                    {amountDue.toLocaleString("vi-VN")} đ
+                  </span>
+                </div>
+              </>
+            )}
 
             {/* Checkout / Control Buttons */}
             <div className="flex items-center justify-between gap-1.5 pt-3">
@@ -1028,7 +1073,7 @@ export function CashierPOS({
                       toast.error("Vui lòng chọn ít nhất 1 mặt hàng.");
                       return;
                     }
-                    setTempPaidAmount(totalAmount);
+                    setTempPaidAmount(amountDue);
                     setIsCheckoutModalOpen(true);
                   }}
                   disabled={createInvoiceMutation.isPending || isPayingInvoice}
@@ -1321,9 +1366,23 @@ export function CashierPOS({
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-xs font-semibold text-adminGray-600 mt-1">
+                  <span>Tổng tiền hóa đơn:</span>
+                  <span className="font-bold text-adminInk">
+                    {totalAmount.toLocaleString("vi-VN")}đ
+                  </span>
+                </div>
+                {activeOrder.alreadyPaidAmount > 0 && (
+                  <div className="flex justify-between items-center text-xs font-semibold text-adminGray-600 mt-1">
+                    <span>Đã thu (cọc):</span>
+                    <span className="font-bold text-adminGreen-600">
+                      -{activeOrder.alreadyPaidAmount.toLocaleString("vi-VN")}đ
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center text-xs font-semibold text-adminGray-600 mt-1">
                   <span>Số tiền cần thanh toán:</span>
                   <span className="font-bold text-adminGreen-600 text-sm">
-                    {totalAmount.toLocaleString("vi-VN")}đ
+                    {amountDue.toLocaleString("vi-VN")}đ
                   </span>
                 </div>
               </div>
@@ -1414,11 +1473,11 @@ export function CashierPOS({
 
               {/* Change computation if paying cash */}
               {activeOrder.paymentMethod === PAYMENT_METHOD.CASH &&
-                tempPaidAmount > totalAmount && (
+                tempPaidAmount > amountDue && (
                   <div className="flex justify-between items-center text-xs font-bold text-adminGray-600 border-t border-dashed border-adminGray-100 pt-3">
                     <span>Tiền thừa trả khách:</span>
                     <span className="text-adminGreen-600 text-sm font-bold">
-                      {(tempPaidAmount - totalAmount).toLocaleString("vi-VN")}đ
+                      {(tempPaidAmount - amountDue).toLocaleString("vi-VN")}đ
                     </span>
                   </div>
                 )}

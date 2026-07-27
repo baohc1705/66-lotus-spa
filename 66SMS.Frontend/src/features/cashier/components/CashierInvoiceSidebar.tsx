@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   X,
   Check,
@@ -7,8 +7,11 @@ import {
   QrCode,
   Plus,
   Wallet,
+  MapPin,
+  Loader2,
 } from "lucide-react";
-import type { CashierBooking } from "../types";
+import type { CashierBooking, CashierPosition } from "../types";
+import { cashierApi } from "../api/cashier.api";
 import { cn } from "@/lib/utils";
 
 interface CashierInvoiceSidebarProps {
@@ -17,6 +20,8 @@ interface CashierInvoiceSidebarProps {
   onClose: () => void;
   onPay: (bookingId: string, paymentMethod: string) => void;
   onRequestDeposit?: (bookingId: string) => void;
+  onAssignPosition?: (bookingId: string, positionId: number) => Promise<void>;
+  salonId?: number | null;
   isPaying?: boolean;
   onRedirectToPOS?: (booking: CashierBooking) => void;
 }
@@ -27,10 +32,43 @@ export function CashierInvoiceSidebar({
   onClose,
   onPay,
   onRequestDeposit,
+  onAssignPosition,
+  salonId,
   isPaying = false,
   onRedirectToPOS,
 }: CashierInvoiceSidebarProps) {
   const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [positions, setPositions] = useState<CashierPosition[]>([]);
+  const [selectedPositionId, setSelectedPositionId] = useState<number | null>(null);
+  const [loadingPositions, setLoadingPositions] = useState(false);
+  const [isAssigning, setIsAssigning] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen || !booking || booking.status !== "not-arrived") {
+      setPositions([]);
+      setSelectedPositionId(null);
+      return;
+    }
+
+    let cancelled = false;
+    setLoadingPositions(true);
+
+    cashierApi
+      .getPositions(salonId)
+      .then((res) => {
+        if (cancelled) return;
+        if (res.isSuccess && res.data) {
+          setPositions(res.data);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingPositions(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, booking, salonId]);
 
   if (!isOpen || !booking) return null;
 
@@ -81,6 +119,84 @@ export function CashierInvoiceSidebar({
             </p>
           </div>
         </div>
+
+        {booking.status === "not-arrived" && (
+          <div className="mb-6 p-4 rounded-[5px] border border-adminGold-600/30 bg-adminGold-600/5">
+            <h4 className="font-semibold text-sm text-adminInk mb-2 flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-adminGold-600" />
+              Phòng / Chỗ ngồi
+            </h4>
+            <p className="text-xs text-adminGray-600 mb-3">
+              Khách đã cọc — gán vị trí để check-in và chuyển sang chờ phục vụ.
+            </p>
+            {loadingPositions ? (
+              <div className="flex items-center gap-2 text-sm text-adminGray-600 py-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Đang tải danh sách vị trí...
+              </div>
+            ) : (
+              <select
+                value={selectedPositionId ?? ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setSelectedPositionId(value ? Number(value) : null);
+                }}
+                className="w-full text-sm border border-adminGold-600/20 bg-white rounded-[5px] p-3 focus:outline-none focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 text-adminInk"
+              >
+                <option value="">Chọn vị trí...</option>
+                {positions.map((pos: CashierPosition) => (
+                  <option
+                    key={pos.id}
+                    value={pos.id}
+                    disabled={!pos.isSelectable}
+                  >
+                    {pos.roomName} — {pos.name} — {pos.statusLabel}
+                  </option>
+                ))}
+              </select>
+            )}
+            {onAssignPosition && (
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!selectedPositionId || isAssigning) return;
+                  setIsAssigning(true);
+                  try {
+                    await onAssignPosition(booking.id, selectedPositionId);
+                  } finally {
+                    setIsAssigning(false);
+                  }
+                }}
+                disabled={!selectedPositionId || isAssigning || loadingPositions}
+                className={cn(
+                  "w-full mt-3 py-2.5 rounded-[5px] flex items-center justify-center gap-2 text-white font-semibold text-sm transition-all",
+                  !selectedPositionId || isAssigning
+                    ? "bg-adminGray-400/50 cursor-not-allowed"
+                    : "bg-adminGreen-600 hover:bg-adminGreen-600/90",
+                )}
+              >
+                {isAssigning ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Đang lưu...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4" />
+                    Lưu thông tin
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        )}
+
+        {booking.positionName && booking.status !== "not-arrived" && (
+          <div className="mb-6 p-3 rounded-[5px] border border-adminGreen-200 bg-adminGreen-50 text-sm">
+            <span className="text-adminGray-600">Vị trí: </span>
+            <span className="font-medium text-adminInk">{booking.positionName}</span>
+          </div>
+        )}
 
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
@@ -211,7 +327,7 @@ export function CashierInvoiceSidebar({
           </div>
           {(booking.discountAmount ?? 0) > 0 && (
             <div className="flex justify-between text-sm">
-              <span className="text-adminGray-600">Giảm giá (khuyến mãi):</span>
+              <span className="text-adminGray-600">Giảm giá:</span>
               <span className="font-medium text-adminGreen-600">
                 -{(booking.discountAmount ?? 0).toLocaleString("vi-VN")}đ
               </span>
@@ -266,6 +382,10 @@ export function CashierInvoiceSidebar({
             <CreditCard className="w-5 h-5" />
             <span>Thanh toán hóa đơn tại POS</span>
           </button>
+        ) : booking.status === "not-arrived" ? (
+          <p className="text-xs text-state-warning-text bg-state-warning-bg border border-state-warning-border/50 rounded-[5px] p-2.5 mb-3 text-center">
+            Gán vị trí phục vụ để hoàn tất check-in cho khách.
+          </p>
         ) : booking.status === "pending" && !booking.depositDeadlineAt && onRequestDeposit ? (
           <button
             onClick={() => onRequestDeposit(booking.id)}
