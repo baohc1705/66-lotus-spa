@@ -50,10 +50,10 @@ export function Logo({
       {isOnDark ? (
         <div className="flex flex-col leading-none justify-center">
           <span className="font-semibold text-xs tracking-wide text-white font-sans uppercase">
-            HOA SEN SPA
+            HOA SEN
           </span>
           <span className="text-3xs tracking-[0.24em] uppercase font-sans mt-0.5 text-white/60">
-            Đồng Tháp
+            SPA & SALON
           </span>
         </div>
       ) : (
@@ -61,7 +61,7 @@ export function Logo({
           <span
             className={`font-semibold tracking-tight transition-colors duration-300 font-sans ${s.text} ${c.name}`.trim()}
           >
-            Lotus <span className="font-light italic">Spa</span>
+            HOA SEN <span className="font-light italic">Spa</span>
           </span>
           {showTagline && (
             <span

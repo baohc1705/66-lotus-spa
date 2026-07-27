@@ -17,6 +17,7 @@ export interface SalonListItem {
   taxCode?: string;
   imageUrl?: string;
   sortOrder?: number;
+  isPrimary?: boolean | null;
   status?: number;
   createdAt?: string;
 }
@@ -43,6 +44,7 @@ export interface CreateSalonPayload {
   imageBase64?: string;
   description?: string;
   sortOrder?: number;
+  isPrimary?: boolean;
   status?: number;
 }
 

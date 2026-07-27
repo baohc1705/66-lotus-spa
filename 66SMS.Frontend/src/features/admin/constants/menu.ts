@@ -23,6 +23,7 @@ import {
   ShoppingCart,
   User,
   Settings,
+  PanelsTopLeft,
 } from "lucide-react";
 
 export interface SubMenuItem {
@@ -58,23 +59,6 @@ export const MENU_GROUPS: MenuGroup[] = [
         path: "/admin",
         icon: LayoutDashboard,
         allowedRoles: ["Admin", "Manager"],
-      },
-    ],
-  },
-  {
-    title: "Hệ thống",
-    items: [
-      {
-        label: "Chi nhánh",
-        path: "/admin/salons",
-        icon: Building2,
-        allowedRoles: ["Admin"],
-      },
-      {
-        label: "Phân quyền",
-        path: "/admin/roles",
-        icon: ShieldCheck,
-        allowedRoles: ["Admin"],
       },
     ],
   },
@@ -264,7 +248,25 @@ export const MENU_GROUPS: MenuGroup[] = [
         path: "/admin/accounts",
         icon: User,
         allowedRoles: ["Admin"],
-      }
+      },
+      {
+        label: "Chi nhánh",
+        path: "/admin/salons",
+        icon: Building2,
+        allowedRoles: ["Admin"],
+      },
+      {
+        label: "Banner trang chủ",
+        path: "/admin/landing-banners",
+        icon: PanelsTopLeft,
+        allowedRoles: ["Admin"],
+      },
+      {
+        label: "Phân quyền",
+        path: "/admin/roles",
+        icon: ShieldCheck,
+        allowedRoles: ["Admin"],
+      },
     ]
   }
 ];
@@ -410,6 +412,7 @@ export const TOP_NAV_TABS: ParentTab[] = [
         title: "HỆ THỐNG",
         items: [
           { label: "Chi nhánh", path: "/admin/salons", icon: Building2, allowedRoles: ["Admin"] },
+          { label: "Banner trang chủ", path: "/admin/landing-banners", icon: PanelsTopLeft, allowedRoles: ["Admin"] },
           { label: "Phân quyền", path: "/admin/roles", icon: ShieldCheck, allowedRoles: ["Admin"] },
           { label: "Tài khoản", path: "/admin/accounts", icon: User, allowedRoles: ["Admin"] },
         ],

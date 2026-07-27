@@ -10,4 +10,9 @@ export const salonPublicApi = {
     axiosInstance
       .get<Result<PagedResult<SalonListItem>>>(BASE, { params: { pageSize: 100, orderBy: "sortorder" } })
       .then((r) => r.data.data?.items || []),
+
+  getPrimary: () =>
+    axiosInstance
+      .get<Result<SalonListItem | null>>(`${BASE}/primary`)
+      .then((r) => r.data.data ?? null),
 };

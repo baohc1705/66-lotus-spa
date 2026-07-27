@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { MapPin, Phone, Clock, Send, CheckCircle, ArrowUpRight } from "lucide-react";
 import logoUrl from "@/assets/logo-home.png";
+import { usePrimarySalon } from "@/features/salons/hooks/usePrimarySalon";
 
 const NAV_LINKS = [
   { label: "Giới thiệu", href: "#about" },
@@ -12,10 +13,42 @@ const NAV_LINKS = [
   { label: "Đặt lịch", href: "/dat-lich" },
 ];
 
+const FALLBACK = {
+  name: "Hoa Sen Spa",
+  address: "123 Đường Lê Lợi, TP. Cao Lãnh, Đồng Tháp",
+  phone: "0907959395",
+  phoneDisplay: "0907 95 93 95",
+  hours: "8:00 – 21:00, Thứ 2 – Chủ nhật",
+};
+
+function formatPhoneDisplay(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 10) {
+    return `${digits.slice(0, 4)} ${digits.slice(4, 6)} ${digits.slice(6)}`;
+  }
+  return phone;
+}
+
+function resolveHours(workingDays?: string | null) {
+  if (!workingDays) return FALLBACK.hours;
+  if (/^\d+$/.test(workingDays.trim())) return FALLBACK.hours;
+  return workingDays;
+}
+
 export const FooterSection = () => {
   const currentYear = new Date().getFullYear();
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const primaryQuery = usePrimarySalon();
+  const salon = primaryQuery.data;
+
+  const name = salon?.name || FALLBACK.name;
+  const address = salon?.fullAddress || salon?.streetAddress || FALLBACK.address;
+  const phone = salon?.phone || FALLBACK.phone;
+  const phoneDisplay = salon?.phone
+    ? formatPhoneDisplay(salon.phone)
+    : FALLBACK.phoneDisplay;
+  const hours = resolveHours(salon?.workingDays);
 
   const handleNewsletter = (e: { preventDefault(): void }) => {
     e.preventDefault();
@@ -33,14 +66,14 @@ export const FooterSection = () => {
             <div className="mb-5 flex items-center gap-3">
               <img
                 src={logoUrl}
-                alt="Hoa Sen Spa"
+                alt={name}
                 loading="lazy"
                 width={40}
                 height={40}
                 className="h-10 w-auto object-contain brightness-0 invert opacity-85"
               />
               <span className="font-geist text-lg font-semibold tracking-[-0.01em]">
-                Hoa Sen Spa
+                {name}
               </span>
             </div>
             <p className="mb-8 max-w-sm font-geist text-sm leading-relaxed text-white/55">
@@ -50,20 +83,20 @@ export const FooterSection = () => {
             <div className="space-y-3">
               <div className="flex items-start gap-3 text-sm text-white/55">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold-600" aria-hidden="true" />
-                <span>123 Đường Lê Lợi, TP. Cao Lãnh, Đồng Tháp</span>
+                <span>{address}</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <Phone className="h-4 w-4 shrink-0 text-gold-600" aria-hidden="true" />
                 <a
-                  href="tel:0907959395"
+                  href={`tel:${phone}`}
                   className="landing-focus-ring text-white/55 transition-colors hover:text-gold-600"
                 >
-                  0907 95 93 95
+                  {phoneDisplay}
                 </a>
               </div>
               <div className="flex items-center gap-3 text-sm text-white/55">
                 <Clock className="h-4 w-4 shrink-0 text-gold-600" aria-hidden="true" />
-                <span>8:00 – 21:00, Thứ 2 – Chủ nhật</span>
+                <span>{hours}</span>
               </div>
             </div>
           </div>
@@ -129,7 +162,7 @@ export const FooterSection = () => {
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Facebook Hoa Sen Spa"
+                aria-label={`Facebook ${name}`}
                 className="landing-focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white/55 transition-colors hover:border-gold-600/40 hover:text-gold-600"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -140,7 +173,7 @@ export const FooterSection = () => {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Instagram Hoa Sen Spa"
+                aria-label={`Instagram ${name}`}
                 className="landing-focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white/55 transition-colors hover:border-gold-600/40 hover:text-gold-600"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -153,7 +186,7 @@ export const FooterSection = () => {
 
         <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row sm:items-center">
           <p className="font-geist text-xs text-white/40">
-            © {currentYear} Hoa Sen Spa. Mọi quyền được bảo lưu.
+            © {currentYear} {name}. Mọi quyền được bảo lưu.
           </p>
           <div className="flex gap-5">
             <a href="/privacy" className="landing-focus-ring font-geist text-xs text-white/40 hover:text-white/70">

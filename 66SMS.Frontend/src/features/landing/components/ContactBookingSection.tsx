@@ -3,8 +3,42 @@ import { MapPin, Phone, Clock, ArrowRight } from "lucide-react";
 import { BookingForm } from "./BookingForm";
 import { Button } from "./Button";
 import { SectionHeader } from "./SectionHeader";
+import { usePrimarySalon } from "@/features/salons/hooks/usePrimarySalon";
+
+const FALLBACK = {
+  name: "Chi nhánh Cao Lãnh",
+  address: "123 Đường Lê Lợi, TP. Cao Lãnh, Đồng Tháp",
+  phone: "0907959395",
+  phoneDisplay: "0907 95 93 95",
+  hours: "8:00 – 21:00, Thứ 2 – Chủ nhật",
+};
+
+function formatPhoneDisplay(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 10) {
+    return `${digits.slice(0, 4)} ${digits.slice(4, 6)} ${digits.slice(6)}`;
+  }
+  return phone;
+}
+
+function resolveHours(workingDays?: string | null) {
+  if (!workingDays) return FALLBACK.hours;
+  if (/^\d+$/.test(workingDays.trim())) return FALLBACK.hours;
+  return workingDays;
+}
 
 export const ContactBookingSection = () => {
+  const primaryQuery = usePrimarySalon();
+  const salon = primaryQuery.data;
+
+  const name = salon?.name || FALLBACK.name;
+  const address = salon?.fullAddress || salon?.streetAddress || FALLBACK.address;
+  const phone = salon?.phone || FALLBACK.phone;
+  const phoneDisplay = salon?.phone
+    ? formatPhoneDisplay(salon.phone)
+    : FALLBACK.phoneDisplay;
+  const hours = resolveHours(salon?.workingDays);
+
   return (
     <section id="booking" className="landing-section bg-page" aria-labelledby="booking-heading">
       <div className="landing-container">
@@ -66,7 +100,7 @@ export const ContactBookingSection = () => {
             aria-label="Thông tin chi nhánh"
           >
             <h3 className="mb-6 font-geist text-lg font-semibold text-ink">
-              Chi nhánh Cao Lãnh
+              {name}
             </h3>
 
             <ul className="space-y-5">
@@ -74,21 +108,19 @@ export const ContactBookingSection = () => {
                 <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" strokeWidth={1.5} aria-hidden="true" />
                 <div>
                   <span className="block font-geist text-xs font-semibold text-ink">Địa chỉ</span>
-                  <span className="font-geist text-sm text-warm-600">
-                    123 Đường Lê Lợi, TP. Cao Lãnh, Đồng Tháp
-                  </span>
+                  <span className="font-geist text-sm text-warm-600">{address}</span>
                 </div>
               </li>
 
               <li className="flex items-start gap-3">
-                <Phone className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" strokeWidth={1.5} aria-hidden="true" />
+                <Phone className="h-5 w-5 shrink-0 text-rose-600" strokeWidth={1.5} aria-hidden="true" />
                 <div>
                   <span className="block font-geist text-xs font-semibold text-ink">Điện thoại</span>
                   <a
-                    href="tel:0907959395"
+                    href={`tel:${phone}`}
                     className="landing-focus-ring font-geist text-sm text-warm-600 transition-colors hover:text-rose-600"
                   >
-                    0907 95 93 95
+                    {phoneDisplay}
                   </a>
                 </div>
               </li>
@@ -97,16 +129,14 @@ export const ContactBookingSection = () => {
                 <Clock className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" strokeWidth={1.5} aria-hidden="true" />
                 <div>
                   <span className="block font-geist text-xs font-semibold text-ink">Giờ mở cửa</span>
-                  <span className="font-geist text-sm text-warm-600">
-                    8:00 – 21:00, Thứ 2 – Chủ nhật
-                  </span>
+                  <span className="font-geist text-sm text-warm-600">{hours}</span>
                 </div>
               </li>
             </ul>
 
             <div className="mt-8 overflow-hidden border border-rose-600/10">
               <iframe
-                title="Bản đồ Hoa Sen Spa — Cao Lãnh, Đồng Tháp"
+                title={`Bản đồ ${name}`}
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3931.8!2d105.63!3d10.45!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTDCsDI3JzAwLjAiTiAxMDXCsDM3JzQ4LjAiRQ!5e0!3m2!1svi!2svn!4v1700000000000"
                 width="100%"
                 height="200"

@@ -43,6 +43,7 @@ export const API = {
   appointment: "/appointment",
   workSchedule: "/worker-schedule",
   salons: "/salons",
+  landingBanners: "/landing-banners",
   staffSalons: "/staff-salons",
   membershipTiers: "/membership-tiers",
   membershipCards: "/membership-cards",

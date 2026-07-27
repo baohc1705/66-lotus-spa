@@ -22,6 +22,7 @@ import { BookingPositionListPage } from "@/features/booking_positions";
 import { TimeSlotListPage } from "@/features/time_slots";
 import { WalletManagementPage } from "@/features/wallet";
 import { SalonListPage } from "@/features/salons";
+import { LandingBannerListPage } from "@/features/landing-banners";
 import { TreatmentCourseListPage } from "@/features/treatment_courses";
 import { InvoiceListPage } from "@/features/invoices";
 import { AttendanceListPage } from "@/features/attendance";
@@ -156,6 +157,10 @@ export const router = createBrowserRouter([
           {
             path: "salons",
             element: <SalonListPage />,
+          },
+          {
+            path: "landing-banners",
+            element: <LandingBannerListPage />,
           },
           {
             path: "roles",

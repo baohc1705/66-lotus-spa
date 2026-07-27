@@ -16,8 +16,8 @@ export const RegisterPage = () => (
         alt="Hoa Sen Spa Logo"
         className="h-16 w-auto object-contain mb-2"
       />
-      <h2 className="font-display text-2xl font-semibold tracking-[0.1em] text-rose-400 uppercase">HOA SEN SPA</h2>
-      <span className="text-xs tracking-[0.3em] text-rose-400/80 font-sans uppercase mt-1">ĐÔNG THÁP</span>
+      <h2 className="font-display text-2xl font-semibold tracking-[0.1em] text-rose-400 uppercase">HOA SEN</h2>
+      <span className="text-xs tracking-[0.3em] text-gold-600 uppercase mt-1">SPA & SALON</span>
     </div>
 
     {/* Form Card */}

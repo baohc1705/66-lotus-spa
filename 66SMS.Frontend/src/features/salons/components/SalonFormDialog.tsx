@@ -14,6 +14,7 @@ import {
 } from '@/shared/components/ui/dialog'
 import { Button } from '@/shared/components/ui/button'
 import { Label } from '@/shared/components/ui/label'
+import { Checkbox } from '@/shared/components/ui/checkbox'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/shared/components/ui/tooltip'
 import {
   Select,
@@ -69,6 +70,7 @@ export function SalonFormDialog({ open, onOpenChange, salonId = null }: SalonFor
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = form
   const statusValue = watch('status')
   const imageUrlValue = watch('imageUrl')
+  const isPrimaryValue = watch('isPrimary')
   const selectedProvince = watch('provinceCode')
   const provincesQuery = useProvinces()
   const wardsQuery = useWardsByProvince(selectedProvince)
@@ -245,6 +247,19 @@ export function SalonFormDialog({ open, onOpenChange, salonId = null }: SalonFor
                   </SelectContent>
                 </Select>
               </FormField>
+              <FormField
+                label="Trụ sở chính"
+                tooltip="Chỉ một chi nhánh được đánh dấu trụ sở chính. Dùng để hiển thị địa chỉ/SĐT trên landing page."
+                className="sm:col-span-3"
+              >
+                <label className="flex items-center gap-2 h-9 cursor-pointer">
+                  <Checkbox
+                    checked={!!isPrimaryValue}
+                    onCheckedChange={(checked) => setValue('isPrimary', checked === true)}
+                  />
+                  <span className="text-sm text-adminInk/80">Đánh dấu là trụ sở chính</span>
+                </label>
+              </FormField>
               <FormField label="Mô tả" error={errors.description?.message} className="sm:col-span-3">
                 <AdminTextarea
                   {...register('description')}
@@ -329,6 +344,7 @@ function getDefaultValues(salon?: SalonDTO | null): SalonFormValues {
       imageUrl: salon.imageUrl ?? '',
       description: salon.description ?? '',
       sortOrder: salon.sortOrder ?? 0,
+      isPrimary: salon.isPrimary === true,
       status: salon.status ?? 1,
     }
   }
@@ -345,6 +361,7 @@ function getDefaultValues(salon?: SalonDTO | null): SalonFormValues {
     imageUrl: '',
     description: '',
     sortOrder: 0,
+    isPrimary: false,
     status: 1,
   }
 }

@@ -26,6 +26,7 @@ export const SALON_COLUMN_LABELS = {
   name: "Tên chi nhánh",
   phone: "Số điện thoại",
   fullAddress: "Địa chỉ",
+  isPrimary: "Trụ sở chính",
   status: "Trạng thái",
 } as const;
 
@@ -99,6 +100,19 @@ export function useActiveSalonColumns({
           </span>
         ),
         size: 260,
+      },
+      {
+        accessorKey: "isPrimary",
+        header: cols.isPrimary,
+        cell: ({ row }) =>
+          row.original.isPrimary ? (
+            <span className="text-xs font-medium text-adminGreen-700 bg-adminGreen-50 px-1.5 py-0.5 rounded">
+              Trụ sở chính
+            </span>
+          ) : (
+            <span className="text-adminInk/40 text-xs">—</span>
+          ),
+        size: 120,
       },
       {
         accessorKey: "status",

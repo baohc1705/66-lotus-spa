@@ -14,6 +14,7 @@ const salonBaseSchema = z.object({
   imageUrl: z.string().optional().or(z.literal('')),
   description: z.string().optional().or(z.literal('')),
   sortOrder: z.coerce.number().optional(),
+  isPrimary: z.boolean().optional(),
   status: z.coerce.number().optional(),
 })
 
