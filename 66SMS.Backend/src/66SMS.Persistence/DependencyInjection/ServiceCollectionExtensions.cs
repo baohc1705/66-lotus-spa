@@ -77,6 +77,7 @@ namespace _66SMS.Persistence.DependencyInjection
             services.AddScoped<IBookingContextProvider, BookingContextProvider>();
 
             services.AddScoped<ISalonSqlRepository, SalonSqlRepository>();
+            services.AddScoped<ILandingBannerSqlRepository, LandingBannerSqlRepository>();
             services.AddScoped<IStaffSalonSqlRepository, StaffSalonSqlRepository>();
             services.AddScoped<IOtpVerificationSqlRepository, OtpVerificationSqlRepository>();
 

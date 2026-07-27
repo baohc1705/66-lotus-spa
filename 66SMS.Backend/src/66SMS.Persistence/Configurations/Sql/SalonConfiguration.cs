@@ -26,6 +26,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.ImageUrl).HasColumnName(SalonConst.FIELD_IMAGE_URL);
             builder.Property(x => x.Description).HasColumnName(SalonConst.FIELD_DESCRIPTION);
             builder.Property(x => x.SortOrder).HasColumnName(SalonConst.FIELD_SORT_ORDER);
+            builder.Property(x => x.IsPrimary).HasColumnName(SalonConst.FIELD_IS_PRIMARY);
             builder.Property(x => x.Status).HasColumnName(SalonConst.FIELD_STATUS);
             builder.Property(x => x.CreatedAt).HasColumnName(SalonConst.FIELD_CREATED_AT);
             builder.ToTable(SalonConst.TABLE_NAME);

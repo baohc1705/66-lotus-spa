@@ -22,6 +22,7 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_IMAGE_URL = "image_url";
         public const string FIELD_DESCRIPTION = "description";
         public const string FIELD_SORT_ORDER = "sort_order";
+        public const string FIELD_IS_PRIMARY = "is_primary";
         public const string FIELD_STATUS = "status";
         public const string FIELD_CREATED_AT = "created_at";
         #endregion

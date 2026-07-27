@@ -208,7 +208,11 @@ namespace _66SMS.Contracts.Enumerations
         ERR_PROMOTION_USAGE_LIMIT,
         ERR_PROMOTION_MIN_ORDER,
         ERR_BOOKING_ROOM_HAS_POSITIONS,
+        #endregion
 
+        #region LandingBanner
+        ERR_LANDING_BANNER_NOT_FOUND,
+        ERR_LANDING_BANNER_INVALID,
         #endregion
     }
 }

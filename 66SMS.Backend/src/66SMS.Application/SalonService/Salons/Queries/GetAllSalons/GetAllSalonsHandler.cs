@@ -83,6 +83,7 @@ namespace _66SMS.Application.SalonService.Salons.Queries.GetAllSalons
                     TaxCode = x.TaxCode,
                     ImageUrl = x.ImageUrl,
                     SortOrder = x.SortOrder,
+                    IsPrimary = x.IsPrimary,
                     Status = x.Status,
                     CreatedAt = x.CreatedAt
                 })

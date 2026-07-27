@@ -1,38 +1,25 @@
 using _66SMS.Application.DTOs;
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace _66SMS.Application.SalonService.Salons.Queries.GetDetailSalon
+namespace _66SMS.Application.SalonService.Salons.Queries.GetPrimarySalon
 {
-    public class GetDetailSalonHandler : IRequestHandler<GetDetailSalonQuery, Result<SalonDto>>
+    public class GetPrimarySalonHandler : IRequestHandler<GetPrimarySalonQuery, Result<SalonDto?>>
     {
         private readonly ISalonSqlRepository salonSqlRepository;
-        private readonly ICacheService cacheService;
 
-        public GetDetailSalonHandler(
-            ISalonSqlRepository salonSqlRepository,
-            ICacheService cacheService)
+        public GetPrimarySalonHandler(ISalonSqlRepository salonSqlRepository)
         {
             this.salonSqlRepository = salonSqlRepository;
-            this.cacheService = cacheService;
         }
 
-        public async Task<Result<SalonDto>> Handle(GetDetailSalonQuery request, CancellationToken cancellationToken)
+        public async Task<Result<SalonDto?>> Handle(GetPrimarySalonQuery request, CancellationToken cancellationToken)
         {
-            var cacheKey = SalonConst.CacheKeyDetail(request.Id!.Value);
-            var cached = await cacheService.GetAsync<SalonDto>(cacheKey, cancellationToken);
-            if (cached is not null)
-            {
-                return Result<SalonDto>.Success(cached);
-            }
-
             SalonDto? salon = await salonSqlRepository.AsQueryable()
-                .Where(x => x.Id == request.Id && x.Status != SalonConst.STATUS_DELETED)
+                .Where(x => x.IsPrimary == true && x.Status == SalonConst.STATUS_ACTIVE)
                 .Select(x => new SalonDto
                 {
                     Id = x.Id,
@@ -57,11 +44,7 @@ namespace _66SMS.Application.SalonService.Salons.Queries.GetDetailSalon
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (salon == null)
-                return Result<SalonDto>.NotFound(SalonConst.MSG_SALON_NOT_FOUND, ErrorCodes.ERR_SALON_NOT_FOUND);
-
-            await cacheService.SetAsync(cacheKey, salon, SalonConst.CACHE_TTL_DETAIL, cancellationToken);
-            return Result<SalonDto>.Success(salon);
+            return Result<SalonDto?>.Success(salon);
         }
     }
 }

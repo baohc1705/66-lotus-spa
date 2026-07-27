@@ -1,6 +1,5 @@
 using _66SMS.Contract.Abstractions;
 using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -8,6 +7,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace _66SMS.Application.SalonService.Salons.Commands.CreateSalon
@@ -45,9 +45,15 @@ namespace _66SMS.Application.SalonService.Salons.Commands.CreateSalon
             Salon salon = mapper.Map<Salon>(request);
             salon.Code = string.Empty;
 
+            if (request.IsPrimary != true)
+                salon.IsPrimary = null;
+
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
+                if (salon.IsPrimary == true)
+                    await ClearOtherPrimarySalonsAsync(null, cancellationToken);
+
                 salonSqlRepository.Add(salon);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
@@ -69,6 +75,19 @@ namespace _66SMS.Application.SalonService.Salons.Commands.CreateSalon
             {
                 transaction.Rollback();
                 throw;
+            }
+        }
+
+        private async Task ClearOtherPrimarySalonsAsync(int? excludeId, CancellationToken cancellationToken)
+        {
+            var others = await salonSqlRepository.AsQueryable(false)
+                .Where(x => x.IsPrimary == true && (excludeId == null || x.Id != excludeId.Value))
+                .ToListAsync(cancellationToken);
+
+            foreach (var other in others)
+            {
+                other.IsPrimary = null;
+                salonSqlRepository.Update(other);
             }
         }
     }

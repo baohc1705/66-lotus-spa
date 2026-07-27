@@ -8,6 +8,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace _66SMS.Application.SalonService.Salons.Commands.UpdateSalon
@@ -45,9 +46,15 @@ namespace _66SMS.Application.SalonService.Salons.Commands.UpdateSalon
 
             mapper.Map(request, salon);
 
+            if (request.IsPrimary == false)
+                salon.IsPrimary = null;
+
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
+                if (salon.IsPrimary == true)
+                    await ClearOtherPrimarySalonsAsync(salon.Id, cancellationToken);
+
                 if (!string.IsNullOrWhiteSpace(request.ImageBase64))
                 {
                     salon.ImageUrl = await imageUploadService.UploadAsync(request.ImageBase64, SalonConst.GenerateImageFileName(salon.Id), SalonConst.IMAGE_FOLDER, cancellationToken);
@@ -67,6 +74,19 @@ namespace _66SMS.Application.SalonService.Salons.Commands.UpdateSalon
             {
                 transaction.Rollback();
                 throw;
+            }
+        }
+
+        private async Task ClearOtherPrimarySalonsAsync(int excludeId, CancellationToken cancellationToken)
+        {
+            var others = await salonSqlRepository.AsQueryable(false)
+                .Where(x => x.IsPrimary == true && x.Id != excludeId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var other in others)
+            {
+                other.IsPrimary = null;
+                salonSqlRepository.Update(other);
             }
         }
     }
