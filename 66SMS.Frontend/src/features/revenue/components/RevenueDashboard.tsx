@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { RefreshCw, CalendarRange, Download } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import {
@@ -16,6 +17,7 @@ import {
   useTopStaff,
 } from "../hooks/useRevenueDashboard";
 import { useExportRevenueBySalon } from "../hooks/useExportRevenueBySalon";
+import { useExportBranchRevenue } from "../hooks/useExportBranchRevenue";
 
 import { RevenueKpiCards } from "./RevenueKpiCards";
 import { CashFlowTrendChart } from "./CashFlowTrendChart";
@@ -28,12 +30,40 @@ import { CustomerTrafficChart } from "./CustomerTrafficChart";
 import { NetRevenueBarChart } from "./NetRevenueBarChart";
 import { TopStaffTable } from "./TopStaffTable";
 
+const YEAR_OPTIONS = (() => {
+  const current = new Date().getFullYear();
+  const years: number[] = [];
+  for (let y = current; y >= current - 5; y--) {
+    years.push(y);
+  }
+  return years;
+})();
+
 export function RevenueDashboard() {
   const queryClient = useQueryClient();
   const selectedSalonId = useAuthStore((state) => state.selectedSalonId);
+  const getEffectiveSalonId = useAuthStore((state) => state.getEffectiveSalonId);
   const isAdmin = useAuthStore((state) => state.hasRole("Admin"));
-  const { preset, from, to, setPreset } = useRevenueFilters();
-  const exportMutation = useExportRevenueBySalon();
+  const isManager = useAuthStore((state) => state.hasRole("Manager"));
+
+  const {
+    preset,
+    from,
+    to,
+    setPreset,
+    selectedDay,
+    setSelectedDay,
+    selectedMonth,
+    setSelectedMonth,
+    selectedYear,
+    setSelectedYear,
+  } = useRevenueFilters();
+
+  const exportBySalonMutation = useExportRevenueBySalon();
+  const exportBranchMutation = useExportBranchRevenue();
+
+  const branchSalonId = isAdmin ? selectedSalonId : getEffectiveSalonId();
+  const canExportBranch = (isManager || isAdmin) && branchSalonId != null && branchSalonId > 0;
 
   const queryParams = useMemo(
     () => ({
@@ -45,7 +75,6 @@ export function RevenueDashboard() {
     [from, to, selectedSalonId],
   );
 
-  // Fetch Dashboard Data
   const summaryQuery = useRevenueSummary(queryParams);
   const trendQuery = useRevenueTrend(queryParams);
   const breakdownQuery = useRevenueBreakdown(queryParams);
@@ -66,33 +95,83 @@ export function RevenueDashboard() {
   const isLoading =
     summaryQuery.isLoading || trendQuery.isLoading || breakdownQuery.isLoading;
 
-
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: ["revenue"] });
   };
 
-  const handleExport = () => {
-    exportMutation.mutate({ from, to });
+  const handleExportBySalon = () => {
+    exportBySalonMutation.mutate({ from, to });
   };
+
+  const handleExportBranch = () => {
+    if (branchSalonId == null || branchSalonId <= 0) {
+      toast.error("Vui lòng chọn chi nhánh để xuất báo cáo.");
+      return;
+    }
+    exportBranchMutation.mutate({ from, to, salonId: branchSalonId });
+  };
+
+  const inputClass =
+    "text-xs text-adminInk font-semibold bg-transparent border-none outline-none cursor-pointer";
 
   return (
     <div className="space-y-2 pb-10">
-      {/* ─── Header ─────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <div className="flex items-center gap-2 self-start sm:self-center">
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
           <div className="flex items-center gap-1.5 bg-white border border-adminGray-100 rounded-admin h-9 px-3">
             <CalendarRange className="w-3.5 h-3.5 text-adminGray-400" />
             <select
               value={preset}
               onChange={(e) => setPreset(e.target.value as RevenuePreset)}
-              className="text-xs text-adminInk font-semibold bg-transparent border-none outline-none cursor-pointer"
+              className={inputClass}
             >
               <option value="today">Hôm nay</option>
               <option value="7days">7 ngày qua</option>
               <option value="30days">30 ngày qua</option>
               <option value="thisMonth">Tháng này</option>
+              <option value="day">Theo ngày</option>
+              <option value="month">Theo tháng</option>
+              <option value="year">Theo năm</option>
             </select>
           </div>
+
+          {preset === "day" && (
+            <div className="flex items-center bg-white border border-adminGray-100 rounded-admin h-9 px-3">
+              <input
+                type="date"
+                value={selectedDay}
+                onChange={(e) => setSelectedDay(e.target.value)}
+                className={inputClass}
+              />
+            </div>
+          )}
+
+          {preset === "month" && (
+            <div className="flex items-center bg-white border border-adminGray-100 rounded-admin h-9 px-3">
+              <input
+                type="month"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className={inputClass}
+              />
+            </div>
+          )}
+
+          {preset === "year" && (
+            <div className="flex items-center bg-white border border-adminGray-100 rounded-admin h-9 px-3">
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(Number(e.target.value))}
+                className={inputClass}
+              >
+                {YEAR_OPTIONS.map((y: number) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <button
             onClick={handleRefresh}
@@ -109,29 +188,43 @@ export function RevenueDashboard() {
 
           {isAdmin && (
             <button
-              onClick={handleExport}
-              disabled={exportMutation.isPending}
+              onClick={handleExportBySalon}
+              disabled={exportBySalonMutation.isPending}
               className={`h-9 px-3 bg-white border border-adminGray-100 rounded-admin flex items-center gap-1.5 hover:bg-adminGray-50 transition-colors text-xs font-semibold text-adminInk ${
-                exportMutation.isPending ? "opacity-50" : ""
+                exportBySalonMutation.isPending ? "opacity-50" : ""
               }`}
               title="Xuất Excel so sánh tất cả chi nhánh"
             >
               <Download
-                className={`w-3.5 h-3.5 text-adminGray-400 ${exportMutation.isPending ? "animate-pulse" : ""}`}
+                className={`w-3.5 h-3.5 text-adminGray-400 ${exportBySalonMutation.isPending ? "animate-pulse" : ""}`}
               />
               Xuất Excel
+            </button>
+          )}
+
+          {canExportBranch && (
+            <button
+              onClick={handleExportBranch}
+              disabled={exportBranchMutation.isPending}
+              className={`h-9 px-3 bg-white border border-adminGray-100 rounded-admin flex items-center gap-1.5 hover:bg-adminGray-50 transition-colors text-xs font-semibold text-adminInk ${
+                exportBranchMutation.isPending ? "opacity-50" : ""
+              }`}
+              title="Xuất Excel doanh thu chi nhánh (KTV + dịch vụ)"
+            >
+              <Download
+                className={`w-3.5 h-3.5 text-adminGray-400 ${exportBranchMutation.isPending ? "animate-pulse" : ""}`}
+              />
+              Xuất báo cáo CN
             </button>
           )}
         </div>
       </div>
 
-      {/* ─── Row 1: 6 KPI Cards ─────────────────────────────────────────── */}
       <RevenueKpiCards
         summary={summaryQuery.data?.data}
         isLoading={isLoading}
       />
 
-      {/* ─── Row 2: Today Summary (3 compact panels) ────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         <TodayAppointmentsCard
           data={todayQuery.data?.data?.appointments}
@@ -147,7 +240,6 @@ export function RevenueDashboard() {
         />
       </div>
 
-      {/* ─── Row 3: Cash Flow Trend (2/3) + Revenue Structure (1/3) ─────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
         <div className="lg:col-span-2">
           <CashFlowTrendChart
@@ -163,7 +255,6 @@ export function RevenueDashboard() {
         </div>
       </div>
 
-      {/* ─── Row 4: Customer Traffic (2/3) + Net Revenue (1/3) ─────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
         <div className="lg:col-span-2">
           <CustomerTrafficChart salonId={selectedSalonId} from={from} to={to} />
@@ -173,7 +264,6 @@ export function RevenueDashboard() {
         </div>
       </div>
 
-      {/* ─── Row 5: Top Staff (1/2) + Top Items (1/2) ───────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
         <TopStaffTable
           data={topStaffQuery.data?.data}

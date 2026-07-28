@@ -120,5 +120,20 @@ export const revenueApi = {
       responseType: "blob",
     });
   },
+
+  /** Xuất Excel doanh thu 1 chi nhánh: KTV + dịch vụ. Trả AxiosResponse blob. */
+  exportBranch: (params: { from: string; to: string; salonId: number }) => {
+    if (USE_MOCK) {
+      return Promise.reject(new Error("Xuất Excel không khả dụng khi đang dùng dữ liệu giả (mock)."));
+    }
+    return axiosInstance.get("/admin/revenue/export-branch", {
+      params: {
+        from: params.from,
+        to: params.to,
+        salonId: params.salonId,
+      },
+      responseType: "blob",
+    });
+  },
 };
 

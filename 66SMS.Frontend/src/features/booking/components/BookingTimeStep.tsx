@@ -178,8 +178,7 @@ export const BookingTimeStep: React.FC = () => {
         </p>
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
           {days.map((d) => {
-            const isSelected =
-              selectedDate?.toDateString() === d.fullDate.toDateString();
+            const isSelected = selectedDate?.toDateString() === d.fullDate.toDateString();
             return (
               <button
                 key={d.fullDate.getTime()}
