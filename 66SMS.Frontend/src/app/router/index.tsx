@@ -20,6 +20,7 @@ import { WorkSchedulePage } from "@/features/schedules";
 import { BookingRoomListPage } from "@/features/booking_rooms";
 import { BookingPositionListPage } from "@/features/booking_positions";
 import { TimeSlotListPage } from "@/features/time_slots";
+import { ConfigAppointmentListPage } from "@/features/config_appointments";
 import { WalletManagementPage } from "@/features/wallet";
 import { SalonListPage } from "@/features/salons";
 import { LandingBannerListPage } from "@/features/landing-banners";
@@ -137,6 +138,10 @@ export const router = createBrowserRouter([
           {
             path: "timeslots",
             element: <TimeSlotListPage />,
+          },
+          {
+            path: "config-appointments",
+            element: <ConfigAppointmentListPage />,
           },
           {
             path: "services/categories",

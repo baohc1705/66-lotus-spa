@@ -38,6 +38,7 @@ export const API = {
   serviceProducts: "/service-product",
   shifts: "/shift",
   timeSlots: "/time-slots",
+  configAppointments: "/config-appointments",
   bookingPositions: "/booking-positions",
   bookingRooms: "/booking-rooms",
   appointment: "/appointment",

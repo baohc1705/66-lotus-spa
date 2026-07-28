@@ -8,6 +8,7 @@ import {
   useMembershipTiers,
   useMyMembershipCard,
 } from "@/features/profile/hooks/useMembershipInfo";
+import { useConfigAppointmentBySalon } from "@/features/config_appointments/hooks/useConfigAppointments";
 import { useBookingStore } from "../stores/bookingStore";
 import { useCreateBooking } from "../hooks/useBookingData";
 import {
@@ -16,6 +17,8 @@ import {
 } from "../schemas/booking.schema";
 import type { GuestAppointmentDto } from "../types/booking.types";
 import { formatDate } from "@/shared/utils/date.utils";
+
+const DEFAULT_DEPOSIT_PERCENT = 20;
 
 export const BookingContactStep: React.FC = () => {
   const {
@@ -27,6 +30,7 @@ export const BookingContactStep: React.FC = () => {
     selectedSalon,
     promotionCode,
     appliedPromotion,
+    setCreatedBookingIds,
   } = useBookingStore();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,6 +39,10 @@ export const BookingContactStep: React.FC = () => {
   const accessToken = useAuthStore((s) => s.accessToken);
   const membershipCardQuery = useMyMembershipCard(!!accessToken);
   const tiersQuery = useMembershipTiers();
+  const configQuery = useConfigAppointmentBySalon(selectedSalon?.id);
+
+  const depositPercent =
+    configQuery.data?.data?.depositPercent ?? DEFAULT_DEPOSIT_PERCENT;
 
   const membershipTier = tiersQuery.data?.find(
     (t) => t.id === membershipCardQuery.data?.membershipTierId,
@@ -99,6 +107,7 @@ export const BookingContactStep: React.FC = () => {
       });
 
       if (result.success) {
+        setCreatedBookingIds(result.bookingIds || []);
         toast.success("Đặt lịch thành công! Cảm ơn bạn đã tin tưởng.");
         nextStep();
       }
@@ -120,7 +129,7 @@ export const BookingContactStep: React.FC = () => {
       : 0;
   const promoDiscount = appliedPromotion ? appliedPromotion.discountAmount : 0;
   const finalTotal = Math.max(0, servicesSubTotal - membershipDiscount - promoDiscount);
-  const depositPreview = Math.round(finalTotal * 0.3);
+  const depositPreview = Math.round((finalTotal * depositPercent) / 100);
 
   const inputClass = (hasError: boolean) =>
     `w-full rounded-sm border bg-surface px-4 py-3 text-sm text-ink transition-colors placeholder:text-warm-600 hover:border-warm-300 focus:outline-none focus:border-rose-600 ${
@@ -137,7 +146,9 @@ export const BookingContactStep: React.FC = () => {
       <div className="p-4 rounded-sm border border-warning-bg bg-warning-bg flex gap-3">
         <Wallet className="w-5 h-5 text-warning-text shrink-0 mt-0.5" />
         <div className="text-sm text-ink">
-          <p className="font-semibold text-ink">Đặt cọc 30% để giữ lịch</p>
+          <p className="font-semibold text-ink">
+            Đặt cọc {depositPercent}% để giữ lịch
+          </p>
           <p className="mt-1 text-warm-600">
             Sau khi xác nhận, bạn sẽ cần thanh toán cọc{" "}
             <strong className="text-rose-600">{depositPreview.toLocaleString("vi-VN")}đ</strong> cho tổng

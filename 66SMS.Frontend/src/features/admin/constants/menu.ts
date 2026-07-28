@@ -182,6 +182,7 @@ export const MENU_GROUPS: MenuGroup[] = [
             icon: Clock,
             allowedRoles: ["Admin", "Manager"],
           },
+         
         ],
       },
       {
@@ -266,6 +267,12 @@ export const MENU_GROUPS: MenuGroup[] = [
         path: "/admin/roles",
         icon: ShieldCheck,
         allowedRoles: ["Admin"],
+      },
+      {
+        label: "Cấu hình lịch hẹn",
+        path: "/admin/config-appointments",
+        icon: Settings,
+        allowedRoles: ["Admin", "Manager"],
       },
     ]
   }
@@ -359,6 +366,7 @@ export const TOP_NAV_TABS: ParentTab[] = [
           { label: "Phân ca", path: "/admin/staff/schedule", icon: Calendar, allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"] },
           { label: "Quản lý ca", path: "/admin/shifts", icon: Clock, allowedRoles: ["Admin", "Manager"] },
           { label: "Khung giờ", path: "/admin/timeslots", icon: Clock, allowedRoles: ["Admin", "Manager"] },
+          
           { label: "Lịch hẹn của tôi", path: "/admin/staff/appointments", icon: CalendarHeart, allowedRoles: ["Staff"] },
         ],
       },
@@ -414,12 +422,14 @@ export const TOP_NAV_TABS: ParentTab[] = [
           { label: "Chi nhánh", path: "/admin/salons", icon: Building2, allowedRoles: ["Admin"] },
           { label: "Banner trang chủ", path: "/admin/landing-banners", icon: PanelsTopLeft, allowedRoles: ["Admin"] },
           { label: "Phân quyền", path: "/admin/roles", icon: ShieldCheck, allowedRoles: ["Admin"] },
-          { label: "Tài khoản", path: "/admin/accounts", icon: User, allowedRoles: ["Admin"] },
+         
+          { label: "Cấu hình lịch hẹn", path: "/admin/config-appointments", icon: Settings, allowedRoles: ["Admin", "Manager"] },
         ],
       },
       {
         title: "TÀI KHOẢN",
         items: [
+          { label: "Danh sách tài khoản", path: "/admin/accounts", icon: User, allowedRoles: ["Admin"] },
           { label: "Hồ sơ cá nhân", path: "/admin/profile", icon: User, allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"] },
         ],
       },

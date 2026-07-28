@@ -59,6 +59,7 @@ export const useCreateBooking = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["booking-timeslots"] });
       queryClient.invalidateQueries({ queryKey: ["booking-technicians"] });
+      queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
     },
     onError: (error: AxiosError<Result<unknown>>) => {
       toast.error(getErrorMessage(error, "Đặt lịch thất bại"));

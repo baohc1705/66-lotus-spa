@@ -15,6 +15,7 @@ import {
   useMembershipTiers,
   useMyMembershipCard,
 } from "@/features/profile/hooks/useMembershipInfo";
+import { useConfigAppointmentBySalon } from "@/features/config_appointments/hooks/useConfigAppointments";
 import { formatDate } from "@/shared/utils/date.utils";
 import { useBookingStore } from "../stores/bookingStore";
 import { PromotionCodeInput } from "./PromotionCodeInput";
@@ -44,6 +45,8 @@ function TicketDivider() {
   return <div className="h-px bg-warm-100" />;
 }
 
+const DEFAULT_DEPOSIT_PERCENT = 20;
+
 export const BookingSummarySidebar: React.FC = () => {
   const {
     guests,
@@ -58,6 +61,10 @@ export const BookingSummarySidebar: React.FC = () => {
   const accessToken = useAuthStore((s) => s.accessToken);
   const membershipCardQuery = useMyMembershipCard(!!accessToken);
   const tiersQuery = useMembershipTiers();
+  const configQuery = useConfigAppointmentBySalon(selectedSalon?.id);
+
+  const depositPercent =
+    configQuery.data?.data?.depositPercent ?? DEFAULT_DEPOSIT_PERCENT;
 
   const membershipTier = tiersQuery.data?.find(
     (t) => t.id === membershipCardQuery.data?.membershipTierId,
@@ -80,7 +87,7 @@ export const BookingSummarySidebar: React.FC = () => {
     0,
     servicesSubTotal - membershipDiscount - promoDiscount,
   );
-  const deposit = Math.round(finalTotal * 0.3);
+  const deposit = Math.round((finalTotal * depositPercent) / 100);
 
   return (
     <div className="relative">
@@ -88,7 +95,7 @@ export const BookingSummarySidebar: React.FC = () => {
         <TicketPunchRow edge="top" />
         <div className="flex flex-col gap-4 p-5 pt-6">
           <div className="pt-1 text-center">
-            <h3 className="flex items-center justify-center gap-2 font-display text-sm font-semibold uppercase tracking-[0.14em] text-rose-600">
+            <h3 className="flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-rose-600">
               Chi tiết đặt chỗ
             </h3>
           </div>
@@ -298,7 +305,7 @@ export const BookingSummarySidebar: React.FC = () => {
             </div>
 
             <div className="flex justify-between items-center text-xs text-warm-600">
-              <span>Thanh toán cọc (30%):</span>
+              <span>Thanh toán cọc ({depositPercent}%):</span>
               <span className="font-bold text-ink">
                 {deposit.toLocaleString("vi-VN")}đ
               </span>
@@ -307,7 +314,7 @@ export const BookingSummarySidebar: React.FC = () => {
 
           <TicketDivider />
 
-          <div className="grid grid-cols-3 gap-3">
+          {/* <div className="grid grid-cols-3 gap-3">
             {[
               {
                 icon: CalendarCheck,
@@ -341,15 +348,15 @@ export const BookingSummarySidebar: React.FC = () => {
                 </span>
               </div>
             ))}
-          </div>
+          </div> */}
         </div>
 
         <TicketPunchRow edge="bottom" />
 
-        <div className="px-4 pb-5 pt-2 text-2xs text-warm-600 leading-relaxed text-center flex flex-col gap-0.5">
+        {/* <div className="px-4 pb-5 pt-2 text-2xs text-warm-600 leading-relaxed text-center flex flex-col gap-0.5">
           <span>Miễn phí hủy lịch trước 2 giờ</span>
           <span>Bảo mật thông tin tuyệt đối</span>
-        </div>
+        </div> */}
       </div>
     </div>
   );

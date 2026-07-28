@@ -9,7 +9,7 @@ export const BookingSalonStep: React.FC = () => {
 
   return (
     <div className="lotus-panel flex flex-col gap-5 p-5 sm:p-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h3 className="flex items-center gap-2 font-display text-lg font-semibold text-ink">
+      <h3 className="flex items-center gap-2 text-lg font-semibold text-ink">
         <MapPin className="h-5 w-5 text-rose-600" />
         <span>Chọn chi nhánh</span>
       </h3>

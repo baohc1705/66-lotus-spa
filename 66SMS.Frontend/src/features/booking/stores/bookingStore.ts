@@ -18,6 +18,7 @@ interface BookingState {
   contactInfo: BookingContactFormValues | null;
   appliedPromotion: PromotionValidationDto | null;
   promotionCode: string;
+  createdBookingIds: number[];
 
   // Actions
   setStep: (step: number) => void;
@@ -37,6 +38,7 @@ interface BookingState {
   selectTimeSlot: (timeSlot: TimeSlotDTO | null) => void;
   setContactInfo: (info: BookingContactFormValues) => void;
   setGuestLockId: (guestIndex: number, lockId: number) => void;
+  setCreatedBookingIds: (ids: number[]) => void;
 
   setPromotionCode: (code: string) => void;
   setAppliedPromotion: (promo: PromotionValidationDto | null) => void;
@@ -61,6 +63,7 @@ const initialState = {
   contactInfo: null,
   appliedPromotion: null as PromotionValidationDto | null,
   promotionCode: "",
+  createdBookingIds: [] as number[],
 };
 
 export const useBookingStore = create<BookingState>((set) => ({
@@ -155,6 +158,7 @@ export const useBookingStore = create<BookingState>((set) => ({
     }),
 
   setContactInfo: (info) => set({ contactInfo: info }),
+  setCreatedBookingIds: (ids) => set({ createdBookingIds: ids }),
 
   setGuestLockId: (guestIndex, lockId) =>
     set((state) => {
