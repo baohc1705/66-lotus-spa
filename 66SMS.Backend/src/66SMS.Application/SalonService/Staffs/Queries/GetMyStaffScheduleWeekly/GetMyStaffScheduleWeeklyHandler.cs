@@ -42,6 +42,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleWeekl
                 .Select(a => new
                 {
                     a.Id,
+                    a.AppointmentCode,
                     a.AppointmentDate,
                     CustomerName = a.CreatedByUser!.Customer != null
                         ? a.CreatedByUser.Customer.FullName
@@ -60,6 +61,12 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleWeekl
                     a.PaidAmount,
                     a.TotalAmount,
                     a.Note,
+                    PositionName = a.Position != null
+                        ? (a.Position.Room != null
+                            ? a.Position.Room.Name + " — " + a.Position.Name
+                            : a.Position.Name)
+                        : null,
+                    a.CompletedAt,
                 })
                 .ToListAsync(cancellationToken);
 
@@ -71,6 +78,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleWeekl
                     .Where(a => a.AppointmentDate == currentDate)
                     .Select(r => StaffScheduleMapping.ToBookingDto(
                         r.Id,
+                        r.AppointmentCode,
                         r.CustomerName,
                         r.CustomerPhone,
                         r.ServiceNames,
@@ -79,7 +87,9 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleWeekl
                         r.Status,
                         r.PaidAmount,
                         r.TotalAmount,
-                        r.Note))
+                        r.Note,
+                        r.PositionName,
+                        r.CompletedAt))
                     .ToList();
 
                 days.Add(new StaffScheduleDayDto

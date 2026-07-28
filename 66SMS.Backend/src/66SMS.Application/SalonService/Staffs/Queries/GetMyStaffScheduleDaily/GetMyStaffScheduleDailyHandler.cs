@@ -38,6 +38,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleDaily
                 .Select(a => new
                 {
                     a.Id,
+                    a.AppointmentCode,
                     CustomerName = a.CreatedByUser!.Customer != null
                         ? a.CreatedByUser.Customer.FullName
                         : null,
@@ -55,11 +56,18 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleDaily
                     a.PaidAmount,
                     a.TotalAmount,
                     a.Note,
+                    PositionName = a.Position != null
+                        ? (a.Position.Room != null
+                            ? a.Position.Room.Name + " — " + a.Position.Name
+                            : a.Position.Name)
+                        : null,
+                    a.CompletedAt,
                 })
                 .ToListAsync(cancellationToken);
 
             var bookings = rows.Select(r => StaffScheduleMapping.ToBookingDto(
                 r.Id,
+                r.AppointmentCode,
                 r.CustomerName,
                 r.CustomerPhone,
                 r.ServiceNames,
@@ -68,7 +76,9 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleDaily
                 r.Status,
                 r.PaidAmount,
                 r.TotalAmount,
-                r.Note)).ToList();
+                r.Note,
+                r.PositionName,
+                r.CompletedAt)).ToList();
 
             return Result<StaffScheduleDailyDto>.Success(new StaffScheduleDailyDto
             {

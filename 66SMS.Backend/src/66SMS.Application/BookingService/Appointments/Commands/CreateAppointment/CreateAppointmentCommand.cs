@@ -3,6 +3,9 @@ using MediatR;
 
 namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointment
 {
+    /// <summary>
+    /// Khách tự đặt lịch (self-booking). Lễ tân đặt hộ dùng CreateCashierAppointment.
+    /// </summary>
     public class CreateAppointmentCommand : IRequest<Result<List<int>>>
     {
         public int? CreatedByUserId { get; set; }

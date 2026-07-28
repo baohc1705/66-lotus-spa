@@ -173,6 +173,15 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                     var lineTotal = unitPrice * quantity;
                     subTotal += lineTotal;
 
+                    decimal? commissionRate = null;
+                    decimal commissionAmount = 0;
+
+                    if (appService.Service != null && appService.Service.CommissionRate.HasValue)
+                    {
+                        commissionRate = appService.Service.CommissionRate.Value;
+                        commissionAmount = Math.Round(lineTotal * (commissionRate.Value / 100m), 0);
+                    }
+
                     items.Add(new InvoiceItem
                     {
                         ItemType = InvoiceItemConst.TYPE_SERVICE,
@@ -184,13 +193,14 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                         LineTotal = lineTotal,
                         StaffId = appointment.StaffId,
                         Status = InvoiceItemConst.STATUS_ACTIVE,
+                        CommissionRate = commissionRate,
+                        CommissionAmount = commissionAmount,
                     });
                 }
             }
 
             var customer = appointment.CreatedByUser?.Customer;
-            var (membershipDiscount, promoDiscount, membershipTierId) =
-                AppointmentInvoiceDiscountHelper.Split(subTotal, appointment.TotalAmount, appointment.Note, customer);
+            var (membershipDiscount, promoDiscount, membershipTierId) = AppointmentInvoiceDiscountHelper.Split(subTotal, appointment.TotalAmount, appointment.Note, customer);
 
             var invoice = new Invoice
             {

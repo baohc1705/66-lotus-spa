@@ -15,6 +15,7 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
 
             RuleFor(x => x.FullName).NotNull().NotEmpty().MaximumLength(CustomerConst.FULL_NAME_MAX_LENGTH);
             RuleFor(x => x.Phone).NotNull().Matches(RegexConst.VIETNAM_PHONE_REGEX).MaximumLength(CustomerConst.PHONE_MAX_LENGTH);
+            RuleFor(x => x.Email).NotNull().NotEmpty().Matches(RegexConst.EMAIL_REGEX).MaximumLength(UserConst.EMAIL_MAX_LENGTH);
 
             RuleFor(x => x.AvatarUrl).MaximumLength(CustomerConst.AVATAR_URL_MAX_LENGTH).When(x => !string.IsNullOrEmpty(x.AvatarUrl));
             RuleFor(x => x.DateOfBirth).LessThan(DateTimeHelper.UtcNow().ToDateOnly()).When(x => x.DateOfBirth.HasValue);

@@ -18,6 +18,8 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
         public DateOnly? DateOfBirth { get; set; }
         public int? Gender { get; set; }
         public string? Phone { get; set; }
+        /// <summary>Email tài khoản User (username/password = SĐT).</summary>
+        public string? Email { get; set; }
         public int? LoyaltyPoint { get; set; }
         public DateTimeOffset? FirstPurchaseAt { get; set; }
         public DateTimeOffset? LastPurchaseAt { get; set; }

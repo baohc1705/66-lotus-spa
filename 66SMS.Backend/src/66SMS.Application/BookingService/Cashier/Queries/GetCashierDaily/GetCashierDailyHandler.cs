@@ -137,6 +137,7 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
                 return new CashierBookingDto
                 {
                     Id = a.Id.ToString(),
+                    AppointmentCode = a.AppointmentCode,
                     CustomerName = customerName,
                     CustomerPhone = a.CreatedByUser?.Customer?.Phone,
                     CustomerAvatar = a.CreatedByUser?.Customer?.AvatarUrl,

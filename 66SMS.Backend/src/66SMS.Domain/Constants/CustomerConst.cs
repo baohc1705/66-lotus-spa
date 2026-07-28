@@ -48,6 +48,10 @@ namespace _66SMS.Domain.Constants
         #region Message
         public const string MSG_CUSTOMER_ID_NOT_FOUND = $"{nameof(Entities.Customer)} with id not found";
         public const string MSG_CUSTOMER_NOT_FOUND = "Customer not found.";
+        public const string MSG_CUSTOMER_PHONE_REQUIRED = "Khách hàng cần có số điện thoại để tạo tài khoản đặt lịch.";
+        public const string MSG_CUSTOMER_EMAIL_REQUIRED = "Khách hàng cần có email để tạo tài khoản đặt lịch.";
+        public const string MSG_CUSTOMER_INACTIVE = "Khách hàng không còn hoạt động.";
+        public const string MSG_CUSTOMER_BOOK_FOR_OTHER_FORBIDDEN = "Bạn không có quyền đặt lịch hộ khách hàng.";
         #endregion
         #region Image Storage
         public const string IMAGE_FOLDER = "customers";

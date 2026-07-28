@@ -12,6 +12,7 @@ namespace _66SMS.Application.DTOs.Cashier
     public class CashierBookingDto
     {
         public string Id { get; set; } = null!;
+        public string? AppointmentCode { get; set; }
         public string CustomerName { get; set; } = null!;
         public string? CustomerPhone { get; set; }
         public string? CustomerAvatar { get; set; }

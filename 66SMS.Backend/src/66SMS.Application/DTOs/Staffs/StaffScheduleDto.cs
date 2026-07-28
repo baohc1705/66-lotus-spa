@@ -3,6 +3,7 @@ namespace _66SMS.Application.DTOs.Staffs
     public class StaffScheduleBookingDto
     {
         public string Id { get; set; } = null!;
+        public string? AppointmentCode { get; set; }
         public string CustomerName { get; set; } = null!;
         public string? CustomerPhone { get; set; }
         public string ServiceName { get; set; } = null!;
@@ -13,6 +14,8 @@ namespace _66SMS.Application.DTOs.Staffs
         public decimal PaidAmount { get; set; }
         public decimal TotalAmount { get; set; }
         public string? Note { get; set; }
+        public string? PositionName { get; set; }
+        public DateTimeOffset? CompletedAt { get; set; }
     }
 
     public class StaffScheduleDailyDto

@@ -1,5 +1,4 @@
 using _66SMS.Application.DTOs.Staffs;
-using _66SMS.Domain.Constants;
 
 namespace _66SMS.Application.SalonService.Staffs.Queries
 {
@@ -10,6 +9,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries
     {
         public static StaffScheduleBookingDto ToBookingDto(
             int id,
+            string? appointmentCode,
             string? customerName,
             string? customerPhone,
             List<string> serviceNames,
@@ -18,7 +18,9 @@ namespace _66SMS.Application.SalonService.Staffs.Queries
             int status,
             decimal paidAmount,
             decimal totalAmount,
-            string? note)
+            string? note,
+            string? positionName,
+            DateTimeOffset? completedAt)
         {
             var serviceName = serviceNames.Count > 0
                 ? string.Join(", ", serviceNames)
@@ -31,6 +33,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries
             return new StaffScheduleBookingDto
             {
                 Id = id.ToString(),
+                AppointmentCode = appointmentCode,
                 CustomerName = string.IsNullOrWhiteSpace(customerName) ? "Khách hàng" : customerName,
                 CustomerPhone = customerPhone ?? "",
                 ServiceName = serviceName,
@@ -40,6 +43,8 @@ namespace _66SMS.Application.SalonService.Staffs.Queries
                 PaidAmount = paidAmount,
                 TotalAmount = totalAmount,
                 Note = note,
+                PositionName = positionName,
+                CompletedAt = completedAt,
             };
         }
     }

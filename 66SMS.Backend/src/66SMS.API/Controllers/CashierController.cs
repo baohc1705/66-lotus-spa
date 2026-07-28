@@ -1,5 +1,6 @@
 using _66SMS.API.Abstractions;
 using _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentPosition;
+using _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppointment;
 using _66SMS.Application.BookingService.Cashier.Commands.PayAppointment;
 using _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentStatus;
 using _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn;
@@ -61,6 +62,18 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
+        /// <summary>
+        /// Lễ tân đặt lịch hộ khách — chờ phục vụ ngay, không yêu cầu cọc.
+        /// </summary>
+        [HttpPost("appointments")]
+        [Authorize]
+        public async Task<IActionResult> CreateCashierAppointment([FromBody] CreateCashierAppointmentCommand command)
+        {
+            command.ActorUserId = jwtService.GetUserId();
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
         [HttpPut("appointments/{id}/position")]
         [Authorize]
         public async Task<IActionResult> AssignAppointmentPosition(int id, [FromBody] AssignAppointmentPositionCommand request)
@@ -73,11 +86,11 @@ namespace _66SMS.API.Controllers
 
         [HttpGet("positions")]
         [Authorize]
-        public async Task<IActionResult> GetPositions([FromQuery] int? salonId)
+        public async Task<IActionResult> GetPositions([FromQuery] int? salonId, [FromQuery] DateOnly? date)
         {
             var tokenSalonId = jwtService.GetSalonId();
             var finalSalonId = tokenSalonId ?? salonId;
-            var query = new GetCashierPositionsQuery { SalonId = finalSalonId };
+            var query = new GetCashierPositionsQuery { SalonId = finalSalonId, Date = date };
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

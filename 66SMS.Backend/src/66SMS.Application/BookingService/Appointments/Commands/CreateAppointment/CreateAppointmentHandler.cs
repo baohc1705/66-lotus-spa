@@ -1,4 +1,4 @@
- using _66SMS.Application.Abstractions;
+using _66SMS.Application.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -47,9 +47,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             this.sqlUnitOfWork = sqlUnitOfWork;
         }
 
-        /// <summary>
-        /// Xử lý logic tạo mới danh sách lịch hẹn vào cơ sở dữ liệu.
-        /// </summary>
         public async Task<Result<List<int>>> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
         {
             for (var attempt = 0; attempt <= BookingDbConcurrency.MaxDeadlockRetries; attempt++)
@@ -78,25 +75,25 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             {
                 var appointmentIds = new List<int>();
                 var createdAppointments = new List<Appointment>();
+                var now = DateTimeHelper.UtcNow();
 
-                // Lấy thông tin khách hàng và thẻ thành viên để tính giảm giá chung cho các lịch hẹn
                 var customer = await customerSqlRepository.AsQueryable(asNoTracking: true)
                     .Include(c => c.MembershipCard)
                     .ThenInclude(mc => mc!.Tier)
                     .FirstOrDefaultAsync(c => c.UserId == request.CreatedByUserId, cancellationToken);
-                
+
                 int discountPercent = customer?.MembershipCard?.Tier?.DiscountPercent ?? 0;
 
                 foreach (var guest in request.Guests)
                 {
                     var mainServiceId = guest.Services?.FirstOrDefault()?.ServiceId ?? 0;
-                    if (mainServiceId == 0) return Result<List<int>>.BadRequest(AppointmentConst.MSG_APPOINTMENT_MIN_ONE_SERVICE, ErrorCodes.ERR_APPOINTMENT_MIN_ONE_SERVICE);
+                    if (mainServiceId == 0)
+                        return Result<List<int>>.BadRequest(AppointmentConst.MSG_APPOINTMENT_MIN_ONE_SERVICE, ErrorCodes.ERR_APPOINTMENT_MIN_ONE_SERVICE);
 
                     int staffId = 0;
                     int? scheduleId = null;
                     AppointmentSlotLock? validLock = null;
 
-                    // Kiểm tra Khóa (Lock) trước tiên
                     if (guest.LockId.HasValue)
                     {
                         validLock = await appointmentSlotLockSqlRepository.FindByIdAsync(guest.LockId.Value, asNoTracking: false);
@@ -110,7 +107,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
 
                         staffId = validLock.StaffId;
 
-                        // Luôn re-validate availability dù đã có lock (loại trừ chính lock này khỏi BookedSlots)
                         var resolvedStaff = await bookingAvailabilityService.ResolveStaffAsync(
                             validLock.AppointmentDate,
                             mainServiceId,
@@ -136,7 +132,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                     }
                     else
                     {
-                        // Nếu không có Lock (Flow đặt trực tiếp), chạy check rảnh rỗi realtime
                         var resolvedStaff = await bookingAvailabilityService.ResolveStaffAsync(
                             (DateOnly)guest.AppointmentDate!,
                             mainServiceId,
@@ -155,7 +150,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         scheduleId = resolvedStaff.Value.ScheduleId;
                     }
 
-                    // Validate staff thuộc đúng salon (nếu salonId được truyền)
                     if (guest.SalonId.HasValue)
                     {
                         var belongsToSalon = await staffSqlRepository.AsQueryable()
@@ -164,7 +158,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                             return Result<List<int>>.BadRequest(AppointmentConst.MSG_APPOINTMENT_STAFF_NOT_IN_SALON, ErrorCodes.ERR_APPOINTMENT_STAFF_NOT_IN_SALON);
                     }
 
-                    // Tính toán giá và tạo danh sách Service đi kèm
                     var appointmentServices = new List<AppointmentService>();
                     decimal totalAmount = 0;
 
@@ -182,23 +175,20 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                             PriceSnapshot = serviceEntity.SellingPrice,
                             DurationSnapshot = serviceEntity.DurationMins,
                             Quantity = (int)reqService.Quantity!,
-                            Status = AppointmentServiceConst.STATUS_ACTIVE, // Active
-                            CreatedAt = DateTimeHelper.UtcNow()
+                            Status = AppointmentServiceConst.STATUS_ACTIVE,
+                            CreatedAt = now
                         });
                         totalAmount += serviceEntity.SellingPrice * (int)reqService.Quantity;
                     }
 
-                    // Áp dụng giảm giá từ thẻ thành viên
                     if (discountPercent > 0 && totalAmount > 0)
                     {
-                        // Trừ trực tiếp phần trăm trên tổng bill dịch vụ
                         totalAmount -= totalAmount * discountPercent / 100m;
                     }
 
-                    // Tạo record Appointment
                     var appointment = new Appointment
                     {
-                        AppointmentCode = $"LH-{DateTimeHelper.UtcNow():yyyyMMddHHmmss}{new Random().Next(100, 999)}",
+                        AppointmentCode = $"LH-{now:yyyyMMddHHmmss}{Random.Shared.Next(100, 999)}",
                         CreatedByUserId = (int)request.CreatedByUserId!,
                         StaffId = staffId,
                         SalonId = guest.SalonId,
@@ -212,7 +202,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         TotalAmount = totalAmount,
                         PaidAmount = 0,
                         Services = appointmentServices,
-                        CreatedAt = DateTimeHelper.UtcNow(),
+                        CreatedAt = now,
                         CreatedBy = request.CreatedByUserId,
                         DepositPercent = AppointmentPaymentCalculator.DefaultDepositPercent
                     };
@@ -222,7 +212,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                     appointmentIds.Add(appointment.Id);
                     createdAppointments.Add(appointment);
 
-                    // Cập nhật trạng thái Lock thành "Released" (đã dùng thành công)
                     if (validLock != null)
                     {
                         validLock.Status = AppointmentSlotLockConst.STATUS_RELEASED;
@@ -252,7 +241,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_INACTIVE, ErrorCodes.ERR_PROMOTION_INACTIVE);
                     }
 
-                    var now = DateTimeHelper.UtcNow();
                     if (promo.StartDate > now || promo.EndDate < now)
                     {
                         transaction.Rollback();
@@ -296,7 +284,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                     {
                         var firstApp = createdAppointments.First();
                         firstApp.TotalAmount = Math.Max(0m, firstApp.TotalAmount - discount);
-                        
+
                         firstApp.Note = string.IsNullOrWhiteSpace(firstApp.Note)
                             ? $"[Đã áp dụng mã: {promo.Code} giảm {discount:N0}đ]"
                             : $"{firstApp.Note} [Đã áp dụng mã: {promo.Code} giảm {discount:N0}đ]";
