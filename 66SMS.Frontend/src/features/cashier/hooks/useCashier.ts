@@ -1,6 +1,7 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { cashierApi } from "../api/cashier.api";
+import type { CreateCashierAppointmentPayload } from "../api/cashier.api";
 import type { CashierBooking, CashierDailyDto } from "../types";
 
 function getApiError(error: unknown, fallback: string): string {
@@ -96,4 +97,17 @@ export function useCashierWeekly(startDate: Date, endDate: Date, salonId?: numbe
       : null,
     refetch: query.refetch,
   };
+}
+
+/** Lễ tân đặt lịch hộ khách — POST /cashier/appointments */
+export function useCreateCashierAppointment() {
+  return useMutation({
+    mutationFn: async (payload: CreateCashierAppointmentPayload) => {
+      const res = await cashierApi.createAppointment(payload);
+      if (!res.isSuccess) {
+        throw new Error(res.message || "Đặt lịch thất bại");
+      }
+      return res;
+    },
+  });
 }

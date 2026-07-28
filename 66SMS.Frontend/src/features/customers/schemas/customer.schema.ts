@@ -15,6 +15,11 @@ const customerBaseSchema = z.object({
     .string()
     .min(1, VALIDATION_MSG.required("SĐT"))
     .regex(VIETNAM_PHONE_REGEX, "SĐT không hợp lệ"),
+  email: z
+    .string()
+    .min(1, VALIDATION_MSG.required("Email"))
+    .email("Email không hợp lệ")
+    .max(100, VALIDATION_MSG.max(100)),
   dateOfBirth: z.string().optional(),
   gender: z.coerce.number().min(0).optional(),
   avatarUrl: z.string().max(500).optional().or(z.literal("")),
@@ -36,7 +41,14 @@ const customerBaseSchema = z.object({
 });
 
 /** Schema validation cho form cập nhật khách hàng */
-export const updateCustomerSchema = customerBaseSchema.partial();
+export const updateCustomerSchema = customerBaseSchema.partial().extend({
+  email: z
+    .string()
+    .email("Email không hợp lệ")
+    .max(100, VALIDATION_MSG.max(100))
+    .optional()
+    .or(z.literal("")),
+});
 
 /** Schema validation cho form tạo khách hàng */
 export const createCustomerSchema = customerBaseSchema;

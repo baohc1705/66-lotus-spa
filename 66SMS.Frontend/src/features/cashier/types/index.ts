@@ -14,6 +14,7 @@ export type BookingStatus =
 
 export interface CashierBooking {
   id: string
+  appointmentCode?: string | null
   customerName: string
   customerPhone?: string
   customerAvatar?: string

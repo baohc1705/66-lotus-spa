@@ -6,7 +6,7 @@ import {
   MapPin,
   User,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   useCreateSlotLock,
@@ -14,10 +14,13 @@ import {
   useTimeSlots,
 } from "../hooks/useBookingData";
 import { useBookingStore } from "../stores/bookingStore";
+import { filterSlotsAfterNow } from "../utils/timeSlot.utils";
 import { formatDate } from "@/shared/utils/date.utils";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type { AxiosError } from "axios";
 import type { Result } from "@/shared/types/common.types";
+import type { TimeSlotDTO } from "../types/booking.types";
+
 export const BookingTimeStep: React.FC = () => {
   const store = useBookingStore();
   const { nextStep, prevStep, selectedSalon } = store;
@@ -76,6 +79,22 @@ export const BookingTimeStep: React.FC = () => {
     selectedTechnician?.id,
     selectedSalon?.id
   );
+
+  const visibleTimeSlots = useMemo(
+    () => filterSlotsAfterNow(timeSlots, dateInput),
+    [timeSlots, dateInput],
+  );
+
+  useEffect(() => {
+    if (
+      selectedTimeSlot &&
+      !visibleTimeSlots.some(
+        (s: TimeSlotDTO) => s.slotId === selectedTimeSlot.slotId,
+      )
+    ) {
+      selectTimeSlot(null);
+    }
+  }, [visibleTimeSlots, selectedTimeSlot, selectTimeSlot]);
 
   const hasWorkingTechnicians = technicians.length > 0;
   const isStep2Valid = !!selectedDate && !!selectedTimeSlot;
@@ -298,8 +317,12 @@ export const BookingTimeStep: React.FC = () => {
             <div className="col-span-full py-4 text-center text-xs text-warm-600">
               Đang tải khung giờ...
             </div>
+          ) : visibleTimeSlots.length === 0 ? (
+            <div className="col-span-full py-4 text-center text-xs text-warm-600">
+              Không còn khung giờ phù hợp
+            </div>
           ) : (
-            timeSlots.map((slot) => {
+            visibleTimeSlots.map((slot) => {
               const isSelected = selectedTimeSlot?.slotId === slot.slotId;
 
               const s = slot.status?.toLowerCase() || "";

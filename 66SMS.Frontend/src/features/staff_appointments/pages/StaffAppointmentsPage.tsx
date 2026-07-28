@@ -92,7 +92,14 @@ export function StaffAppointmentsPage() {
           schedule.refetch();
           setSelectedBooking((prev) =>
             prev && prev.booking.id === bookingId
-              ? { ...prev, booking: { ...prev.booking, status: BookingStatus.Completed } }
+              ? {
+                  ...prev,
+                  booking: {
+                    ...prev.booking,
+                    status: BookingStatus.Completed,
+                    completedAt: new Date().toISOString(),
+                  },
+                }
               : prev,
           );
         },

@@ -57,7 +57,7 @@ function SelectContent({
       <SelectPrimitive.Content
         data-slot="select-content"
         position={position}
-        className={cn("relative z-50 min-w-[8rem] max-h-[--radix-select-content-available-height] origin-[--radix-select-content-transform-origin] overflow-x-hidden overflow-y-auto bg-white rounded-md shadow-md text-lotus-deep duration-150 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2", position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1 *:data-[slot=select-viewport]:h-[--radix-select-trigger-height] *:data-[slot=select-viewport]:w-full *:data-[slot=select-viewport]:min-w-[--radix-select-trigger-width]", className)}
+        className={cn("relative z-[90] min-w-[8rem] max-h-[--radix-select-content-available-height] origin-[--radix-select-content-transform-origin] overflow-x-hidden overflow-y-auto bg-white rounded-md shadow-md text-lotus-deep duration-150 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2", position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1 *:data-[slot=select-viewport]:h-[--radix-select-trigger-height] *:data-[slot=select-viewport]:w-full *:data-[slot=select-viewport]:min-w-[--radix-select-trigger-width]", className)}
         {...props}
       >
         <SelectScrollUpButton />

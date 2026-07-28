@@ -1,5 +1,4 @@
 import { useAuthStore } from "@/features/auth/stores/authStore";
-import { APPOINTMENT_STATUS } from "@/features/booking/constants/appointment.constants";
 import { invoiceApi } from "@/features/invoices/api/invoice.api";
 import type { InvoiceDto } from "@/features/invoices/types/invoice.types";
 import { Loader2 } from "lucide-react";
@@ -90,106 +89,23 @@ export function CashierPage() {
     setIsBookingModalOpen(true);
   };
 
-  const handlePay = async (bookingId: string, paymentMethod: string) => {
-    if (isPaying) return;
-
-    if (paymentMethod === "vnpay") {
-      setIsPaying(true);
-      try {
-        const response = await cashierApi.createVnPayUrl(bookingId);
-
-        if (response.isSuccess && response.data) {
-          window.location.href = response.data;
-          return;
-        }
-
-        toast.error(
-          response.message || "Có lỗi xảy ra khi tạo liên kết thanh toán VNPAY",
-        );
-      } catch (error) {
-        console.error("Error creating VNPAY URL", error);
-        toast.error("Lỗi kết nối tới máy chủ");
-      } finally {
-        setIsPaying(false);
-      }
-      return;
-    }
-
-    setIsPaying(true);
-    try {
-      let invoiceId = selectedBooking?.invoiceId;
-
-      // 1. Tạo hóa đơn nháp từ lịch hẹn (nếu chưa có)
-      if (!invoiceId) {
-        const createRes = await invoiceApi.createFromAppointment(bookingId);
-
-        if (!createRes.isSuccess || !createRes.data) {
-          toast.error(
-            createRes.message || "Không thể tạo hóa đơn từ lịch hẹn.",
-          );
-          setIsPaying(false);
-          return;
-        }
-
-        invoiceId = createRes.data;
-      }
-
-      // 2. Xác định phương thức thanh toán dạng số
-      let numericMethod = 1; // Tiền mặt mặc định
-      if (paymentMethod === "transfer") {
-        numericMethod = 2; // Chuyển khoản
-      } else if (paymentMethod === "wallet") {
-        numericMethod = 3; // Ví khách hàng
-      } else if (paymentMethod === "card") {
-        numericMethod = 1; // Thẻ/POS
-      }
-
-      const remainingAmount = selectedBooking?.remainingAmount ?? 0;
-
-      // 3. Tiến hành thanh toán hóa đơn
-      const payRes = await invoiceApi.payInvoice(
-        invoiceId,
-        numericMethod,
-        remainingAmount,
-      );
-
-      if (payRes.isSuccess) {
-        toast.success(payRes.message || "Thanh toán thành công");
-        setIsSidebarOpen(false);
-        setSelectedBooking(null);
-        await refetch();
-        return;
-      }
-
-      toast.error(payRes.message || "Thanh toán hóa đơn thất bại");
-    } catch (error) {
-      console.error("Error processing payment", error);
-      toast.error("Lỗi kết nối tới máy chủ");
-    } finally {
-      setIsPaying(false);
-    }
-  };
-
-  const handleRedirectToPOS = async (booking: CashierBooking) => {
+  const handlePayInvoice = async (booking: CashierBooking) => {
     if (isPaying) return;
     setIsPaying(true);
     try {
       let invoiceId = booking.invoiceId;
 
-      // 1. Tạo hóa đơn nháp từ lịch hẹn (nếu chưa có)
       if (!invoiceId) {
         const createRes = await invoiceApi.createFromAppointment(booking.id);
         if (!createRes.isSuccess || !createRes.data) {
           toast.error(
             createRes.message || "Không thể tạo hóa đơn từ lịch hẹn.",
           );
-          setIsPaying(false);
           return;
         }
         invoiceId = createRes.data;
       }
 
-      // 2. Tải chi tiết hóa đơn từ backend
       const detailRes = await invoiceApi.getDetail(invoiceId);
       if (detailRes.isSuccess && detailRes.data) {
         setPendingCheckoutInvoice(detailRes.data);
@@ -199,8 +115,7 @@ export function CashierPage() {
       } else {
         toast.error(detailRes.message || "Không thể tải chi tiết hóa đơn.");
       }
-    } catch (err) {
-      console.error("Lỗi khi chuyển hướng POS", err);
+    } catch {
       toast.error("Lỗi kết nối tới máy chủ.");
     } finally {
       setIsPaying(false);
@@ -284,52 +199,28 @@ export function CashierPage() {
             )}
           </div>
 
-          {/* Popup chi tiết hóa đơn — đặt ngoài vùng z-10 để không bị toolbar che */}
           <CashierInvoiceSidebar
             booking={selectedBooking}
             isOpen={isSidebarOpen}
-            onClose={() => setIsSidebarOpen(false)}
-            onPay={handlePay}
+            onClose={() => {
+              setIsSidebarOpen(false);
+              setSelectedBooking(null);
+            }}
             salonId={salonId}
-            onAssignPosition={async (bookingId, positionId) => {
-              try {
-                const res = await cashierApi.assignPosition(bookingId, positionId);
-                if (res.isSuccess) {
-                  toast.success("Đã gán vị trí và check-in thành công.");
-                  setIsSidebarOpen(false);
-                  setSelectedBooking(null);
-                  await refetch();
-                } else {
-                  toast.error(res.message || "Không thể gán vị trí.");
-                }
-              } catch {
-                toast.error("Lỗi khi kết nối đến máy chủ.");
-              }
-            }}
-            onRedirectToPOS={handleRedirectToPOS}
-            onRequestDeposit={async (bookingId) => {
-              setIsPaying(true);
-              try {
-                const res = await cashierApi.updateBookingStatus(
-                  bookingId,
-                  APPOINTMENT_STATUS.CONFIRMED,
-                  "Thu ngân xác nhận lịch — yêu cầu đặt cọc trong 24h",
-                );
-                if (res.isSuccess) {
-                  toast.success("Đã xác nhận lịch và yêu cầu khách cọc.");
-                  setIsSidebarOpen(false);
-                  setSelectedBooking(null);
-                  refetch();
-                } else {
-                  toast.error(res.message || "Không thể yêu cầu cọc.");
-                }
-              } catch {
-                toast.error("Lỗi khi kết nối đến máy chủ.");
-              } finally {
-                setIsPaying(false);
-              }
-            }}
             isPaying={isPaying}
+            onPayInvoice={handlePayInvoice}
+            onAssignPosition={async (bookingId, positionId) => {
+              const res = await cashierApi.assignPosition(bookingId, positionId);
+              if (!res.isSuccess) {
+                throw new Error(res.message || "Không thể gán vị trí");
+              }
+              toast.success(res.message || "Đã gán vị trí");
+            }}
+            onStatusUpdated={async () => {
+              setIsSidebarOpen(false);
+              setSelectedBooking(null);
+              await refetch();
+            }}
           />
 
           <CashierBookingModal

@@ -24,6 +24,7 @@ export const BOOKING_STATUS_LABELS: Record<number, string> = {
 
 export interface StaffScheduleBooking {
   id: string
+  appointmentCode?: string | null
   customerName: string
   customerPhone?: string
   serviceName: string
@@ -34,6 +35,8 @@ export interface StaffScheduleBooking {
   paidAmount?: number
   totalAmount: number
   note?: string
+  positionName?: string | null
+  completedAt?: string | null
 }
 
 export interface StaffScheduleDailyDto {

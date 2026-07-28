@@ -54,6 +54,8 @@ interface CustomerFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   customer?: CustomerDto | null;
+  /** Gọi sau khi tạo khách thành công (POS chọn khách vừa tạo). */
+  onCreated?: (customerId: number) => void;
 }
 
 const GENDER_OPTIONS = [
@@ -79,6 +81,7 @@ export function CustomerFormDialog({
   open,
   onOpenChange,
   customer,
+  onCreated,
 }: CustomerFormDialogProps) {
   const isEdit = !!customer;
   const createMutation = useCreateCustomer();
@@ -170,6 +173,7 @@ export function CustomerFormDialog({
                     err,
                   );
                 }
+                onCreated?.(customerId);
               }
               onOpenChange(false);
             }
@@ -224,6 +228,18 @@ export function CustomerFormDialog({
                 <AdminInput
                   {...register("phone")}
                   placeholder="0901234567"
+                />
+              </FormField>
+              <FormField
+                label="Email *"
+                tooltip="Email dùng làm tài khoản khách hàng"
+                error={errors.email?.message}
+              >
+                <AdminInput
+                  {...register("email")}
+                  type="email"
+                  placeholder="khach@email.com"
+                  readOnly={isEdit}
                 />
               </FormField>
               <FormField label="Ngày sinh" error={errors.dateOfBirth?.message}>
@@ -380,6 +396,7 @@ function getDefaultValues(customer?: CustomerDto | null): CustomerFormValues {
     return {
       fullName: customer.fullName ?? "",
       phone: customer.phone ?? "",
+      email: customer.email ?? "",
       dateOfBirth: parseToDateInput(customer.dateOfBirth),
       gender: customer.gender ? Number(customer.gender) : undefined,
       avatarUrl: customer.avatarUrl ?? "",
@@ -396,6 +413,7 @@ function getDefaultValues(customer?: CustomerDto | null): CustomerFormValues {
   return {
     fullName: "",
     phone: "",
+    email: "",
     dateOfBirth: "",
     gender: undefined,
     avatarUrl: "",

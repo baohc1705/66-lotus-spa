@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   Search,
@@ -94,9 +95,10 @@ export function CashierPOS({
   checkoutInvoice,
   onClearCheckoutInvoice,
 }: CashierPOSProps = {}) {
-  const qc = useAuthStore();
-  const effectiveSalonId = qc.getEffectiveSalonId();
-  const cashierName = qc.user?.username || "Thu ngân";
+  const queryClient = useQueryClient();
+  const authStore = useAuthStore();
+  const effectiveSalonId = authStore.getEffectiveSalonId();
+  const cashierName = authStore.user?.username || "Thu ngân";
 
   // State
   const [orders, setOrders] = useState<POSOrder[]>([
@@ -506,6 +508,8 @@ export function CashierPOS({
         );
         if (result.isSuccess) {
           toast.success(result.message || "Thanh toán hóa đơn thành công.");
+          await queryClient.invalidateQueries({ queryKey: ["cashier-daily"] });
+          await queryClient.invalidateQueries({ queryKey: ["cashier-weekly"] });
           setIsCheckoutModalOpen(false);
           if (orders.length === 1) {
             setOrders([
@@ -539,8 +543,10 @@ export function CashierPOS({
     }
 
     createInvoiceMutation.mutate(payload, {
-      onSuccess: (result) => {
+      onSuccess: async (result) => {
         if (result.isSuccess) {
+          await queryClient.invalidateQueries({ queryKey: ["cashier-daily"] });
+          await queryClient.invalidateQueries({ queryKey: ["cashier-weekly"] });
           setIsCheckoutModalOpen(false);
           if (orders.length === 1) {
             setOrders([
