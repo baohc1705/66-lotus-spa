@@ -114,7 +114,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                             $"Không đủ khung giờ liên tiếp từ {timeSlots[startIndex].StartTime:HH\\:mm} cho dịch vụ {service.DurationMins} phút.");
                     }
 
-                    // Re-check trong Serializable TX — nhìn thấy lock/appointment của TX thắng cuộc
                     var resolvedStaff = await bookingAvailabilityService.ResolveStaffAsync(
                         (DateOnly)lockRequest.AppointmentDate!,
                         (int)lockRequest.ServiceId!,
@@ -128,8 +127,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                     {
                         transaction.Rollback();
                         var startLabel = timeSlots[startIndex].StartTime.ToString(@"HH\:mm");
-                        return Result<List<int>>.Conflict(
-                            slotsNeeded > 1
+                        return Result<List<int>>.Conflict(slotsNeeded > 1 
                                 ? $"Khung giờ {startLabel} không đủ {service.DurationMins} phút liên tiếp (có slot phía sau đã được đặt/giữ). Vui lòng chọn giờ khác."
                                 : AppointmentSlotLockConst.MSG_SLOT_LOCK_CONFLICT,
                             ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
@@ -158,7 +156,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
             }
             catch
             {
-                try { transaction.Rollback(); } catch { /* already completed */ }
+                transaction.Rollback();
                 throw;
             }
         }

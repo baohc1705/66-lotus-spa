@@ -16,6 +16,8 @@ namespace _66SMS.Persistence.Repositories.Sql
         private const string SpTopStaff = "dbo.usp_GetTopStaff";
         private const string SpBySalon = "dbo.usp_GetRevenueBySalon";
         private const string SpBySalonDaily = "dbo.usp_GetRevenueBySalonDaily";
+        private const string SpByStaff = "dbo.usp_GetRevenueByStaff";
+        private const string SpByService = "dbo.usp_GetRevenueByService";
 
         private readonly ApplicationDbContext dbContext;
 
@@ -186,6 +188,38 @@ namespace _66SMS.Persistence.Repositories.Sql
             var rows = await dbContext.ExecuteStoredProcedureAsync<RevenueBySalonDailyRowDto>(
                 SpBySalonDaily,
                 cancellationToken,
+                fromDate,
+                toDate);
+
+            return rows.ToList();
+        }
+
+        public async Task<IReadOnlyList<RevenueByStaffRowDto>> GetByStaffAsync(
+            int salonId,
+            DateOnly fromDate,
+            DateOnly toDate,
+            CancellationToken cancellationToken = default)
+        {
+            var rows = await dbContext.ExecuteStoredProcedureAsync<RevenueByStaffRowDto>(
+                SpByStaff,
+                cancellationToken,
+                salonId,
+                fromDate,
+                toDate);
+
+            return rows.ToList();
+        }
+
+        public async Task<IReadOnlyList<RevenueByServiceRowDto>> GetByServiceAsync(
+            int salonId,
+            DateOnly fromDate,
+            DateOnly toDate,
+            CancellationToken cancellationToken = default)
+        {
+            var rows = await dbContext.ExecuteStoredProcedureAsync<RevenueByServiceRowDto>(
+                SpByService,
+                cancellationToken,
+                salonId,
                 fromDate,
                 toDate);
 

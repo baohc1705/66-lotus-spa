@@ -1,4 +1,6 @@
 using _66SMS.API.Abstractions;
+using _66SMS.Application.DTOs.Revenues;
+using _66SMS.Application.SalonService.Revenues.Queries.ExportBranchRevenue;
 using _66SMS.Application.SalonService.Revenues.Queries.ExportRevenueBySalon;
 using _66SMS.Application.SalonService.Revenues.Queries.GetCustomerTraffic;
 using _66SMS.Application.SalonService.Revenues.Queries.GetNetRevenue;
@@ -9,6 +11,8 @@ using _66SMS.Application.SalonService.Revenues.Queries.GetTodaySummary;
 using _66SMS.Application.SalonService.Revenues.Queries.GetTopRevenueItems;
 using _66SMS.Application.SalonService.Revenues.Queries.GetTopStaff;
 using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Constants;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
@@ -202,6 +206,49 @@ namespace _66SMS.API.Controllers
                 To = to,
                 ComparePrevious = comparePrevious,
                 IsAdmin = isAdmin,
+            }, cancellationToken);
+
+            if (!result.IsSuccess || result.Data == null)
+                return HandleResult(result);
+
+            return File(result.Data.Content, result.Data.ContentType, result.Data.FileName);
+        }
+
+        /// <summary>
+        /// Xuất Excel doanh thu 1 chi nhánh: theo KTV + theo dịch vụ (Manager / Admin).
+        /// </summary>
+        [HttpGet("export-branch")]
+        [PermissionAuthorize("revenue", "read")]
+        public async Task<IActionResult> ExportBranch(
+            [FromQuery] DateOnly from,
+            [FromQuery] DateOnly to,
+            [FromQuery] int? salonId,
+            CancellationToken cancellationToken = default)
+        {
+            var profile = jwtService.GetProfile();
+            var isAdmin = profile?.Roles.Any(r =>
+                string.Equals(r, "Admin", StringComparison.OrdinalIgnoreCase)) == true;
+            var tokenSalonId = jwtService.GetSalonId();
+
+            if (!isAdmin
+                && tokenSalonId is > 0
+                && salonId is > 0
+                && salonId != tokenSalonId)
+            {
+                return HandleResult(Result<RevenueExportFileDto>.Forbidden(RevenueConst.MSG_SALON_FORBIDDEN));
+            }
+
+            var finalSalonId = tokenSalonId ?? salonId;
+            if (finalSalonId is null or <= 0)
+            {
+                return HandleResult(Result<RevenueExportFileDto>.BadRequest(RevenueConst.MSG_SALON_REQUIRED));
+            }
+
+            var result = await mediator.Send(new ExportBranchRevenueQuery
+            {
+                From = from,
+                To = to,
+                SalonId = finalSalonId.Value,
             }, cancellationToken);
 
             if (!result.IsSuccess || result.Data == null)

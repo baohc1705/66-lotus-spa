@@ -22,6 +22,143 @@ namespace _66SMS.Infrastructure.Excels
             return stream.ToArray();
         }
 
+        public byte[] BuildBranchRevenueWorkbook(
+            string salonName,
+            DateOnly from,
+            DateOnly to,
+            IReadOnlyList<RevenueByStaffRowDto> staffRows,
+            IReadOnlyList<RevenueByServiceRowDto> serviceRows)
+        {
+            using var workbook = new XLWorkbook();
+
+            BuildStaffSheet(workbook, salonName, from, to, staffRows);
+            BuildServiceSheet(workbook, salonName, from, to, serviceRows);
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
+        }
+
+        private static void BuildStaffSheet(
+            XLWorkbook workbook,
+            string salonName,
+            DateOnly from,
+            DateOnly to,
+            IReadOnlyList<RevenueByStaffRowDto> staffRows)
+        {
+            var sheet = workbook.Worksheets.Add("Theo kỹ thuật viên");
+
+            sheet.Cell(1, 1).Value = "Báo cáo doanh thu theo kỹ thuật viên";
+            sheet.Cell(1, 1).Style.Font.Bold = true;
+            sheet.Range(1, 1, 1, 5).Merge();
+
+            sheet.Cell(2, 1).Value = $"Chi nhánh: {salonName}";
+            sheet.Range(2, 1, 2, 5).Merge();
+
+            sheet.Cell(3, 1).Value = $"Kỳ: {from:dd/MM/yyyy} – {to:dd/MM/yyyy}";
+            sheet.Range(3, 1, 3, 5).Merge();
+
+            var headers = new[] { "STT", "Tên kỹ thuật viên", "Số lượng", "Doanh thu", "Hoa hồng" };
+            for (var i = 0; i < headers.Length; i++)
+            {
+                var cell = sheet.Cell(5, i + 1);
+                cell.Value = headers[i];
+                cell.Style.Font.Bold = true;
+                cell.Style.Fill.BackgroundColor = XLColor.LightGray;
+            }
+
+            var row = 6;
+            var rank = 1;
+            decimal totalRevenue = 0;
+            decimal totalCommission = 0;
+            var totalQty = 0;
+
+            foreach (var item in staffRows)
+            {
+                sheet.Cell(row, 1).Value = rank;
+                sheet.Cell(row, 2).Value = item.StaffName;
+                sheet.Cell(row, 3).Value = item.Quantity;
+                sheet.Cell(row, 4).Value = item.Revenue;
+                sheet.Cell(row, 5).Value = item.Commission;
+                FormatMoney(sheet.Range(row, 4, row, 5));
+
+                totalQty += item.Quantity;
+                totalRevenue += item.Revenue;
+                totalCommission += item.Commission;
+                rank++;
+                row++;
+            }
+
+            sheet.Cell(row, 1).Value = "";
+            sheet.Cell(row, 2).Value = "Tổng";
+            sheet.Cell(row, 2).Style.Font.Bold = true;
+            sheet.Cell(row, 3).Value = totalQty;
+            sheet.Cell(row, 4).Value = totalRevenue;
+            sheet.Cell(row, 5).Value = totalCommission;
+            sheet.Range(row, 1, row, 5).Style.Font.Bold = true;
+            FormatMoney(sheet.Range(row, 4, row, 5));
+
+            sheet.Columns().AdjustToContents();
+        }
+
+        private static void BuildServiceSheet(
+            XLWorkbook workbook,
+            string salonName,
+            DateOnly from,
+            DateOnly to,
+            IReadOnlyList<RevenueByServiceRowDto> serviceRows)
+        {
+            var sheet = workbook.Worksheets.Add("Theo dịch vụ");
+
+            sheet.Cell(1, 1).Value = "Báo cáo doanh thu theo dịch vụ";
+            sheet.Cell(1, 1).Style.Font.Bold = true;
+            sheet.Range(1, 1, 1, 4).Merge();
+
+            sheet.Cell(2, 1).Value = $"Chi nhánh: {salonName}";
+            sheet.Range(2, 1, 2, 4).Merge();
+
+            sheet.Cell(3, 1).Value = $"Kỳ: {from:dd/MM/yyyy} – {to:dd/MM/yyyy}";
+            sheet.Range(3, 1, 3, 4).Merge();
+
+            var headers = new[] { "STT", "Tên dịch vụ", "Số lượng", "Doanh thu" };
+            for (var i = 0; i < headers.Length; i++)
+            {
+                var cell = sheet.Cell(5, i + 1);
+                cell.Value = headers[i];
+                cell.Style.Font.Bold = true;
+                cell.Style.Fill.BackgroundColor = XLColor.LightGray;
+            }
+
+            var row = 6;
+            var rank = 1;
+            decimal totalRevenue = 0;
+            var totalQty = 0;
+
+            foreach (var item in serviceRows)
+            {
+                sheet.Cell(row, 1).Value = rank;
+                sheet.Cell(row, 2).Value = item.ItemName;
+                sheet.Cell(row, 3).Value = item.Quantity;
+                sheet.Cell(row, 4).Value = item.Revenue;
+                FormatMoney(sheet.Cell(row, 4));
+
+                totalQty += item.Quantity;
+                totalRevenue += item.Revenue;
+                rank++;
+                row++;
+            }
+
+            sheet.Cell(row, 1).Value = "";
+            sheet.Cell(row, 2).Value = "Tổng";
+            sheet.Cell(row, 2).Style.Font.Bold = true;
+            sheet.Cell(row, 3).Value = totalQty;
+            sheet.Cell(row, 4).Value = totalRevenue;
+            sheet.Range(row, 1, row, 4).Style.Font.Bold = true;
+            FormatMoney(sheet.Cell(row, 4));
+
+            sheet.Columns().AdjustToContents();
+        }
+
         private static void BuildCompareSheet(
             XLWorkbook workbook,
             DateOnly from,

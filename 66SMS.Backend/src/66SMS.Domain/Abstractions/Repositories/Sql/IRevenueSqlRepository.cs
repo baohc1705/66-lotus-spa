@@ -67,5 +67,17 @@ namespace _66SMS.Domain.Abstractions.Repositories.Sql
             DateOnly fromDate,
             DateOnly toDate,
             CancellationToken cancellationToken = default);
+
+        Task<IReadOnlyList<RevenueByStaffRowDto>> GetByStaffAsync(
+            int salonId,
+            DateOnly fromDate,
+            DateOnly toDate,
+            CancellationToken cancellationToken = default);
+
+        Task<IReadOnlyList<RevenueByServiceRowDto>> GetByServiceAsync(
+            int salonId,
+            DateOnly fromDate,
+            DateOnly toDate,
+            CancellationToken cancellationToken = default);
     }
 }

@@ -201,7 +201,6 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             {
                 var last = merged[^1];
                 var current = ordered[i];
-                // Ca = liền kề hoặc chồng (12:00 kết thúc ca trước = 12:00 bắt đầu ca sau)
                 if (current.ShiftStart <= last.ShiftEnd)
                 {
                     var end = current.ShiftEnd > last.ShiftEnd ? current.ShiftEnd : last.ShiftEnd;
