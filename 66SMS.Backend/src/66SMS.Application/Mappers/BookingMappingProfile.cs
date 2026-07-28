@@ -1,10 +1,13 @@
 using _66SMS.Application.DTOs.Appointments;
+using _66SMS.Application.DTOs.ConfigAppointments;
 using _66SMS.Application.DTOs.Shifts;
 using _66SMS.Application.DTOs.TimeSlots;
 using _66SMS.Application.BookingService.BookingPositions.Commands.CreateBookingPositions;
 using _66SMS.Application.BookingService.BookingPositions.Commands.UpdateBookingPositions;
 using _66SMS.Application.BookingService.BookingRooms.Commands.CreateBookingRooms;
 using _66SMS.Application.BookingService.BookingRooms.Commands.UpdateBookingRooms;
+using _66SMS.Application.BookingService.ConfigAppointments.Commands.CreateConfigAppointment;
+using _66SMS.Application.BookingService.ConfigAppointments.Commands.UpdateConfigAppointment;
 using _66SMS.Application.BookingService.Shifts.Commands.CreateShift;
 using _66SMS.Application.BookingService.Shifts.Commands.CreateShiftPeriod;
 using _66SMS.Application.BookingService.Shifts.Commands.UpdateShift;
@@ -96,6 +99,16 @@ namespace _66SMS.Application.Mappers
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .IgnoreNullValueTypes();
             CreateMap<TimeSlot, TimeSlotDto>()
+                .IgnoreNullValueTypes();
+
+            // ConfigAppointment
+            CreateMap<CreateConfigAppointmentCommand, ConfigAppointment>()
+                .IgnoreNullValueTypes();
+            CreateMap<UpdateConfigAppointmentCommand, ConfigAppointment>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
+            CreateMap<ConfigAppointment, ConfigAppointmentDto>()
+                .ForMember(dest => dest.SalonName, opt => opt.MapFrom(src => src.Salon != null ? src.Salon.Name : null))
                 .IgnoreNullValueTypes();
 
             // AppointmentDto

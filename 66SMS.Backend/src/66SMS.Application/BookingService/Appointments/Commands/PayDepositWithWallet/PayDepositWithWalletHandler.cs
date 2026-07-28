@@ -20,6 +20,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
         IWalletSqlRepository walletSqlRepository,
         IWalletTransactionSqlRepository walletTransactionSqlRepository,
         IInvoiceSqlRepository invoiceSqlRepository,
+        IConfigAppointmentSqlRepository configAppointmentSqlRepository,
         IEmailTemplateFactory emailTemplateFactory,
         IDomainEventPublisher domainEventPublisher,
         ISqlUnitOfWork sqlUnitOfWork)
@@ -54,9 +55,13 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
             using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
+                var depositPercent = await AppointmentPaymentCalculator.GetEffectiveDepositPercentAsync(
+                    appointment,
+                    configAppointmentSqlRepository,
+                    cancellationToken);
                 var depositAmount = AppointmentPaymentCalculator.GetDepositAmount(
                     appointment.TotalAmount,
-                    appointment.DepositPercent ?? AppointmentPaymentCalculator.DefaultDepositPercent);
+                    depositPercent);
 
                 if (depositAmount <= 0)
                 {

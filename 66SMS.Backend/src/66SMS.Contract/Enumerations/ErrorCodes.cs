@@ -151,6 +151,12 @@ namespace _66SMS.Contracts.Enumerations
         ERR_TIME_SLOT_INVALID,
         #endregion
 
+        #region ConfigAppointment
+        ERR_CONFIG_APPOINTMENT_NOT_FOUND,
+        ERR_CONFIG_APPOINTMENT_INVALID,
+        ERR_CONFIG_APPOINTMENT_SALON_EXISTED,
+        #endregion
+
         #region Salon
         ERR_SALON_NOT_FOUND,
         ERR_SALON_INVALID,

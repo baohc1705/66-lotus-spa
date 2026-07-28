@@ -9,7 +9,8 @@ using Microsoft.EntityFrameworkCore;
 namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointments
 {
     public sealed class GetOnlineAppointmentsHandler(
-        IAppointmentSqlRepository appointmentRepository)
+        IAppointmentSqlRepository appointmentRepository,
+        IConfigAppointmentSqlRepository configAppointmentSqlRepository)
         : IRequestHandler<GetOnlineAppointmentsQuery, Result<IReadOnlyList<CashierBookingDto>>>
     {
         public async Task<Result<IReadOnlyList<CashierBookingDto>>> Handle(
@@ -43,6 +44,11 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointment
             {
                 return Result<IReadOnlyList<CashierBookingDto>>.Success(new List<CashierBookingDto>());
             }
+
+            var depositPercentBySalon = await AppointmentPaymentCalculator.LoadDepositPercentBySalonAsync(
+                configAppointmentSqlRepository,
+                appointments.Select(a => a.SalonId),
+                cancellationToken);
 
             var bookingDtos = appointments.Select(a => {
                 string statusStr = "pending";
@@ -93,9 +99,9 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointment
                     Status = statusStr,
                     TotalAmount = a.TotalAmount,
                     PaidAmount = a.PaidAmount,
-                    DepositAmount = AppointmentPaymentCalculator.GetDepositAmount(a.TotalAmount, a.DepositPercent ?? AppointmentPaymentCalculator.DefaultDepositPercent),
+                    DepositAmount = AppointmentPaymentCalculator.GetDepositAmount(a, depositPercentBySalon),
                     RemainingAmount = a.TotalAmount - a.PaidAmount,
-                    DepositPaid = AppointmentPaymentCalculator.HasDepositPaid(a),
+                    DepositPaid = AppointmentPaymentCalculator.HasDepositPaid(a, depositPercentBySalon),
                     DepositDeadlineAt = a.DepositDeadlineAt,
                     Note = a.Note,
                     PositionId = a.PositionId,

@@ -8,7 +8,11 @@ namespace _66SMS.Application.BookingService.Helpers
     // Áp dụng kết quả thanh toán VNPay thành công vào lịch hẹn (cọc hoặc thanh toán cuối)
     public static class AppointmentPaymentApplyService
     {
-        public static Result<object> ApplyVnPaySuccess(Appointment appointment, int phase, string transactionId)
+        public static Result<object> ApplyVnPaySuccess(
+            Appointment appointment,
+            int phase,
+            string transactionId,
+            int? depositPercent = null)
         {
             if (phase == AppointmentPaymentConst.PHASE_DEPOSIT)
             {
@@ -18,9 +22,12 @@ namespace _66SMS.Application.BookingService.Helpers
                 if (!AppointmentStatusTransitions.CanPayDeposit(appointment))
                     return Result<object>.BadRequest("Lỗi: Không ở trạng thái chờ cọc hoặc đã cọc.");
 
+                var percent = depositPercent
+                    ?? appointment.DepositPercent
+                    ?? AppointmentPaymentCalculator.DefaultDepositPercent;
                 var depositAmount = AppointmentPaymentCalculator.GetDepositAmount(
                     appointment.TotalAmount,
-                    appointment.DepositPercent ?? AppointmentPaymentCalculator.DefaultDepositPercent);
+                    percent);
 
                 if (!AppointmentPaymentRecorder.TryRecordPayment(
                     appointment, AppointmentPaymentConst.PHASE_DEPOSIT, depositAmount,

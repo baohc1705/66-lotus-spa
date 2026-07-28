@@ -23,6 +23,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
         private readonly ICustomerSqlRepository customerSqlRepository;
         private readonly IWorkScheduleSqlRepository workScheduleSqlRepository;
         private readonly IPromotionSqlRepository promotionSqlRepository;
+        private readonly IConfigAppointmentSqlRepository configAppointmentSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
 
         public CreateAppointmentHandler(
@@ -34,6 +35,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             ICustomerSqlRepository customerSqlRepository,
             IWorkScheduleSqlRepository workScheduleSqlRepository,
             IPromotionSqlRepository promotionSqlRepository,
+            IConfigAppointmentSqlRepository configAppointmentSqlRepository,
             ISqlUnitOfWork sqlUnitOfWork)
         {
             this.appointmentSqlRepository = appointmentSqlRepository;
@@ -44,6 +46,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             this.customerSqlRepository = customerSqlRepository;
             this.workScheduleSqlRepository = workScheduleSqlRepository;
             this.promotionSqlRepository = promotionSqlRepository;
+            this.configAppointmentSqlRepository = configAppointmentSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
         }
 
@@ -186,6 +189,11 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         totalAmount -= totalAmount * discountPercent / 100m;
                     }
 
+                    var depositPercent = await AppointmentPaymentCalculator.ResolveDepositPercentAsync(
+                        configAppointmentSqlRepository,
+                        guest.SalonId,
+                        cancellationToken);
+
                     var appointment = new Appointment
                     {
                         AppointmentCode = $"LH-{now:yyyyMMddHHmmss}{Random.Shared.Next(100, 999)}",
@@ -204,7 +212,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         Services = appointmentServices,
                         CreatedAt = now,
                         CreatedBy = request.CreatedByUserId,
-                        DepositPercent = AppointmentPaymentCalculator.DefaultDepositPercent
+                        DepositPercent = depositPercent
                     };
 
                     appointmentSqlRepository.Add(appointment);

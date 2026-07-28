@@ -12,27 +12,35 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetDepositVnPay
     public class GetDepositVnPayUrlHandler : IRequestHandler<GetDepositVnPayUrlQuery, Result<string>>
     {
         private readonly IAppointmentSqlRepository appointmentSqlRepository;
+        private readonly IConfigAppointmentSqlRepository configAppointmentSqlRepository;
         private readonly IVnPayService vnPayService;
-        public GetDepositVnPayUrlHandler(IAppointmentSqlRepository appointmentSqlRepository, IVnPayService vnPayService)
+
+        public GetDepositVnPayUrlHandler(
+            IAppointmentSqlRepository appointmentSqlRepository,
+            IConfigAppointmentSqlRepository configAppointmentSqlRepository,
+            IVnPayService vnPayService)
         {
             this.appointmentSqlRepository = appointmentSqlRepository;
+            this.configAppointmentSqlRepository = configAppointmentSqlRepository;
             this.vnPayService = vnPayService;
         }
 
         public async Task<Result<string>> Handle(GetDepositVnPayUrlQuery request, CancellationToken cancellationToken)
         {
-            // Kiểm tra tồn tại lịch hẹn
             var appointment = await appointmentSqlRepository.AsQueryable()
                 .Where(x => x.Id == request.AppointmentId && x.Status != AppointmentConst.STATUS_CANCELLED)
                 .FirstOrDefaultAsync(cancellationToken);
             if (appointment == null)
                 return Result<string>.NotFound(AppointmentConst.MSG_APPOINTMENT_NOT_FOUND, ErrorCodes.ERR_APPOINTMENT_NOT_FOUND);
 
-            // Validate nghiệp vụ: có được phép đặt cọc hay không
-            if (!AppointmentStatusTransitions.CanPayDeposit(appointment)) 
+            if (!AppointmentStatusTransitions.CanPayDeposit(appointment))
                 return Result<string>.BadRequest(AppointmentConst.MSG_APPOINTMENT_NOT_WAITING_DEPOSIT, ErrorCodes.ERR_APPOINTMENT_NOT_WAITING_DEPOSIT);
 
-            var depositAmount = AppointmentPaymentCalculator.GetDepositAmount(appointment.TotalAmount, appointment.DepositPercent ?? AppointmentPaymentCalculator.DefaultDepositPercent);
+            var depositPercent = await AppointmentPaymentCalculator.GetEffectiveDepositPercentAsync(
+                appointment,
+                configAppointmentSqlRepository,
+                cancellationToken);
+            var depositAmount = AppointmentPaymentCalculator.GetDepositAmount(appointment.TotalAmount, depositPercent);
 
             var url = vnPayService.CreatePaymentUrl(appointment.Id, depositAmount, $"Dat coc {appointment.Id}", request.IpAddress!, AppointmentPaymentConst.PHASE_DEPOSIT);
             return Result<string>.Success(url);

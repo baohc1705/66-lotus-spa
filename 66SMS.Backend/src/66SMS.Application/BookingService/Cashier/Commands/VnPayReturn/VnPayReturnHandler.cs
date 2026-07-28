@@ -17,6 +17,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayReturn
         IAppointmentSqlRepository appointmentRepository,
         IWalletSqlRepository walletRepository,
         IWalletTransactionSqlRepository walletTransactionRepository,
+        IConfigAppointmentSqlRepository configAppointmentSqlRepository,
         ILoyaltyPointService loyaltyPointService,
         ISqlUnitOfWork unitOfWork)
         : IRequestHandler<VnPayReturnCommand, Result<VnPayReturnDto>>
@@ -69,7 +70,18 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayReturn
                     AppointmentPaymentConst.MSG_PAYMENT_ORDER_NOT_FOUND,
                     ErrorCodes.ERR_PAYMENT_ORDER_NOT_FOUND);
 
-            var apply = AppointmentPaymentApplyService.ApplyVnPaySuccess(appointment, result.Phase, result.TransactionId);
+            var depositPercent = result.Phase == AppointmentPaymentConst.PHASE_DEPOSIT
+                ? await AppointmentPaymentCalculator.GetEffectiveDepositPercentAsync(
+                    appointment,
+                    configAppointmentSqlRepository,
+                    cancellationToken)
+                : (int?)null;
+
+            var apply = AppointmentPaymentApplyService.ApplyVnPaySuccess(
+                appointment,
+                result.Phase,
+                result.TransactionId,
+                depositPercent);
             if (!apply.IsSuccess)
                 return Result<VnPayReturnDto>.BadRequest(apply.Message);
 

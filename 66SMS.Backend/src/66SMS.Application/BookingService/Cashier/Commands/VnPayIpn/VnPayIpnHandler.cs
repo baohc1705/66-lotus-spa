@@ -19,6 +19,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
         IWalletSqlRepository walletRepository,
         IWalletTransactionSqlRepository walletTransactionRepository,
         IInvoiceSqlRepository invoiceRepository,
+        IConfigAppointmentSqlRepository configAppointmentSqlRepository,
         ILoyaltyPointService loyaltyPointService,
         IEmailTemplateFactory emailTemplateFactory,
         IDomainEventPublisher domainEventPublisher,
@@ -104,8 +105,18 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
             // Bước 4: Kiểm tra trạng thái giao dịch thẻ của khách hàng (Mã "00" là thẻ trừ tiền thành công)
             if (result.Success)
             {
-                // Gọi service để tự động tạo lịch sử thanh toán, ghi nhận thanh toán và đổi trạng thái lịch hẹn
-                var apply = AppointmentPaymentApplyService.ApplyVnPaySuccess(appointment, result.Phase, result.TransactionId);
+                var depositPercent = result.Phase == AppointmentPaymentConst.PHASE_DEPOSIT
+                    ? await AppointmentPaymentCalculator.GetEffectiveDepositPercentAsync(
+                        appointment,
+                        configAppointmentSqlRepository,
+                        cancellationToken)
+                    : (int?)null;
+
+                var apply = AppointmentPaymentApplyService.ApplyVnPaySuccess(
+                    appointment,
+                    result.Phase,
+                    result.TransactionId,
+                    depositPercent);
 
                 // Đề phòng hàm Apply tự động check thấy điều kiện không thỏa mãn (ví dụ lỗi logic)
                 if (!apply.IsSuccess)

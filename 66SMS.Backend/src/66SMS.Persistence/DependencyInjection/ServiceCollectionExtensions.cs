@@ -74,6 +74,7 @@ namespace _66SMS.Persistence.DependencyInjection
             services.AddScoped<IMembershipCardSqlRepository, MembershipCardSqlRepository>();
 
             services.AddScoped<ITimeSlotSqlRepository, TimeSlotSqlRepository>();
+            services.AddScoped<IConfigAppointmentSqlRepository, ConfigAppointmentSqlRepository>();
             services.AddScoped<IBookingContextProvider, BookingContextProvider>();
 
             services.AddScoped<ISalonSqlRepository, SalonSqlRepository>();
