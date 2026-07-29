@@ -1,73 +1,100 @@
-# React + TypeScript + Vite
+# 66SMS.Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Tổng quan
+Phần frontend của hệ thống quản lý spa 66SMS, xây dựng bằng React + TypeScript, đóng gói bằng Vite.
 
-Currently, two official plugins are available:
+## Công nghệ sử dụng
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Mục đích | Thư viện |
+| --- | --- |
+| UI framework | React 19 + TypeScript |
+| Build tool | Vite |
+| State management (client) | Zustand |
+| State management (server) | TanStack Query (React Query) |
+| Form | React Hook Form + Zod (validation) |
+| HTTP client | Axios |
+| Routing | React Router DOM v7 |
+| UI components | shadcn/ui (Radix primitives) + Tailwind CSS |
+| Animation | Framer Motion |
+| Toast | Sonner |
 
-## React Compiler
+## Cấu trúc thư mục
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Thư mục | Vai trò |
+| --- | --- |
+| src/app | Router, providers (QueryProvider, v.v.) |
+| src/features | Các module nghiệp vụ, mỗi feature một thư mục riêng |
+| src/shared | Component, hook, util, constant dùng chung toàn app |
+| src/lib | Hàm tiện ích nhỏ (cn, helper) |
+| src/styles | File CSS gốc (Tailwind, tokens, admin theme) |
 
-## Expanding the ESLint configuration
+## Tổ chức theo Feature
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Mỗi feature nằm trong src/features/[tên]/ và có cấu trúc giống nhau:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+| Thư mục con | Chứa gì |
+| --- | --- |
+| api/ | Gọi API (axios), mỗi feature một file api riêng |
+| hooks/ | Custom hook (TanStack Query mutation/query, state logic) |
+| components/ | Component UI của feature đó |
+| pages/ | Trang (page) được gắn vào router |
+| types/ | TypeScript interface/type cho DTO |
+| schemas/ | Zod schema cho form validation |
+| constants/ | Hằng số, permission key |
+| stores/ | Zustand store (nếu cần state riêng) |
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Danh sách feature chính
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+| Feature | Chức năng |
+| --- | --- |
+| auth | Đăng nhập, đăng ký, quên mật khẩu, OTP, role/permission |
+| booking | Đặt lịch khách hàng (landing), stepper multi-step |
+| cashier | Thu ngân: timeline, POS, tạo hóa đơn, thanh toán |
+| customers | Quản lý khách hàng, thẻ thành viên, ví điểm |
+| staffs | Quản lý nhân viên, phân công dịch vụ |
+| services | Dịch vụ và nhóm dịch vụ |
+| products | Sản phẩm và danh mục sản phẩm |
+| invoices | Hóa đơn |
+| attendance | Chấm công |
+| schedules | Lịch làm việc |
+| shifts | Ca làm |
+| payroll | Bảng lương |
+| revenue | Dashboard doanh thu, biểu đồ, xuất Excel |
+| salons | Chi nhánh |
+| promotions | Khuyến mãi |
+| certificates | Chứng chỉ nhân viên |
+| landing | Trang chủ công khai (giới thiệu spa) |
+| profile | Trang cá nhân (khách + admin) |
+| admin | Layout admin, sidebar, top navbar, phân quyền menu |
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Quản lý state
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Zustand: dùng cho state client (auth store, booking store)
+- TanStack Query: dùng cho mọi data từ server (tự cache, refetch, invalidate)
+- React Hook Form: state form cục bộ, kết hợp Zod để validate
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Giao tiếp API
+
+- Axios instance chung nằm ở src/shared/api/axiosInstance.ts
+- Base URL lấy từ biến môi trường VITE_API_BASE_URL
+- Endpoint tập trung ở src/shared/api/endpoints.ts
+- Mỗi feature có file api riêng, gọi axios rồi trả Result<T>
+
+## Phân quyền
+
+- PermissionGate component bọc UI theo quyền
+- usePermission hook kiểm tra quyền/role của user đang đăng nhập
+- Menu sidebar tự lọc theo role (useMenuByRole)
+
+## Cách chạy
+
+1. Cài thư viện:
+   - `npm install`
+2. Tạo file .env.local:
+   - `VITE_API_BASE_URL=https://localhost:7000/api/v1`
+3. Chạy dev server:
+   - `npm run dev`
+4. Build production:
+   - `npm run build`
+
+Dev server chạy tại http://localhost:5173
