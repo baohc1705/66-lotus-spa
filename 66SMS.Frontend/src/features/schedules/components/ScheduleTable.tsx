@@ -48,7 +48,8 @@ export function ScheduleTable({
   const [deleteScheduleId, setDeleteScheduleId] = useState<number | null>(null);
 
   const { mutate: updateWorkSchedule } = useUpdateWorkSchedule();
-  const { mutate: deleteWorkSchedule, isPending: isDeleting } = useDeleteWorkSchedule();
+  const { mutate: deleteWorkSchedule, isPending: isDeleting } =
+    useDeleteWorkSchedule();
 
   const handleDelete = (id: number) => {
     setDeleteScheduleId(id);
@@ -70,10 +71,9 @@ export function ScheduleTable({
     return names[day.day()];
   };
 
-  // Maps
-  const fullMap = new Map<string, WorkScheduleDTO>(); // Key = {shiftPeriodId}_{staffId}_{date}
-  const shiftDayMap = new Map<string, WorkScheduleDTO[]>(); // Key = {shiftPeriodId}_{date}
-  const staffDayMap = new Map<string, WorkScheduleDTO[]>(); // Key = {staffId}_{date}
+  const fullMap = new Map<string, WorkScheduleDTO>();
+  const shiftDayMap = new Map<string, WorkScheduleDTO[]>();
+  const staffDayMap = new Map<string, WorkScheduleDTO[]>();
 
   workSchedules.forEach((ws) => {
     const dateStr = formatDate(ws.workDate).format("YYYY-MM-DD");
@@ -111,7 +111,6 @@ export function ScheduleTable({
     }
   });
 
-  // Handlers for Drag and Drop (Only used in Shift View)
   const handleDragStart = (e: React.DragEvent, ws: WorkScheduleDTO) => {
     e.dataTransfer.setData("workScheduleId", ws.id?.toString() || "");
     e.dataTransfer.setData("staffId", ws.staffId?.toString() || "");
@@ -166,8 +165,6 @@ export function ScheduleTable({
       },
     );
   };
-
-  // --- RENDERS ---
 
   const renderByShift = () => {
     return (
@@ -308,9 +305,7 @@ export function ScheduleTable({
           staffList.map((staff) => (
             <tr key={staff.id}>
               <td className="py-3 px-4 border-r border-adminGray-100/50 align-top bg-adminGray-50/30">
-                <div className="font-bold text-adminInk">
-                  {staff.fullName}
-                </div>
+                <div className="font-bold text-adminInk">{staff.fullName}</div>
                 <div className="text-xs text-adminGray-600 mt-1">
                   {staff.code || "Nhân viên"}
                 </div>
@@ -408,7 +403,9 @@ export function ScheduleTable({
                 <td
                   key={i}
                   className={`py-2 px-2 border-r border-adminGray-100/50 last:border-0 align-middle text-center min-h-[100px] h-[100px] transition-colors relative group ${
-                    isWorking ? "bg-adminGray-50/20" : "hover:bg-adminGray-50/50"
+                    isWorking
+                      ? "bg-adminGray-50/20"
+                      : "hover:bg-adminGray-50/50"
                   }`}
                 >
                   {isWorking ? (
@@ -452,7 +449,7 @@ export function ScheduleTable({
                                 shiftPeriod: period,
                                 date: dateStr,
                                 defaultStaffId: selectedStaffId,
-                                existingStaffIds: [], // Not strictly needed for single view
+                                existingStaffIds: [],
                               })
                             }
                             className="flex items-center gap-1 text-xs font-semibold text-adminGreen-600 hover:text-adminInk bg-adminGray-50 hover:bg-adminGray-50/80 px-3 py-1.5 rounded-full transition-colors"

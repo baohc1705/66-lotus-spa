@@ -26,10 +26,7 @@ import {
   useActiveShiftColumns,
 } from "../components/useActiveShiftColumns";
 import { SHIFT_PERM } from "../constants/shift.permissions";
-import {
-  useAdminShifts,
-  useDeleteShift,
-} from "../hooks/useShifts";
+import { useAdminShifts, useDeleteShift } from "../hooks/useShifts";
 
 const ENTITY = "ca làm việc";
 
@@ -57,7 +54,11 @@ export function ShiftListPage() {
     filter,
   } = listState;
 
-  const { data: shiftResult, isLoading, isFetching } = useAdminShifts(queryParams);
+  const {
+    data: shiftResult,
+    isLoading,
+    isFetching,
+  } = useAdminShifts(queryParams);
   const deleteMutation = useDeleteShift();
 
   const paged = shiftResult?.data;
@@ -127,13 +128,11 @@ export function ShiftListPage() {
           table={table}
           isLoading={isLoading}
           loadingRows={DEFAULT_LOADING_ROWS}
-          renderSubComponent={({ row }) => (
+          renderSubComponent={({ row }) =>
             row.original.id ? (
-              <ShiftDetailExpanded
-                shift={row.original}
-              />
+              <ShiftDetailExpanded shift={row.original} />
             ) : null
-          )}
+          }
         />
       </div>
 
@@ -171,7 +170,10 @@ export function ShiftListPage() {
             if (!open) setDeleteTarget(null);
           }}
           title={CONFIRM_MSG.deleteTitle(ENTITY)}
-          description={CONFIRM_MSG.deleteDescription(ENTITY, deleteTarget.name ?? "")}
+          description={CONFIRM_MSG.deleteDescription(
+            ENTITY,
+            deleteTarget.name ?? "",
+          )}
           onConfirm={handleDelete}
           confirmLabel={COMMON_MSG.delete}
           loading={deleteMutation.isPending}

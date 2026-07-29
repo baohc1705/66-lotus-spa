@@ -6,7 +6,7 @@ import {
   MapPin,
   User,
 } from "lucide-react";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   useCreateSlotLock,
@@ -21,7 +21,7 @@ import type { AxiosError } from "axios";
 import type { Result } from "@/shared/types/common.types";
 import type { TimeSlotDTO } from "../types/booking.types";
 
-export const BookingTimeStep: React.FC = () => {
+export function BookingTimeStep() {
   const store = useBookingStore();
   const { nextStep, prevStep, selectedSalon } = store;
   const activeGuest = store.guests[store.activeGuestIndex];
@@ -171,7 +171,6 @@ export const BookingTimeStep: React.FC = () => {
         )}
       </div>
 
-      {/* Chọn ngày */}
       <div className="flex flex-col gap-2">
         <p className="text-xs text-gold-600 uppercase tracking-wider font-semibold">
           1. Chọn ngày phục vụ
@@ -212,7 +211,6 @@ export const BookingTimeStep: React.FC = () => {
         </div>
       </div>
 
-      {/* Chọn KTV */}
       <div className="flex flex-col gap-2">
         <p className="text-xs text-gold-600 uppercase tracking-wider font-semibold">
           2. Chọn kỹ thuật viên
@@ -285,7 +283,6 @@ export const BookingTimeStep: React.FC = () => {
         </div>
       </div>
 
-      {/* Khung giờ */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <p className="text-xs text-gold-600 uppercase tracking-wider font-semibold">
@@ -392,4 +389,4 @@ export const BookingTimeStep: React.FC = () => {
       </div>
     </div>
   );
-};
+}

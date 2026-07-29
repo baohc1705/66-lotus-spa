@@ -1,6 +1,6 @@
-﻿import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
-import { AdminInput } from '@/shared/components/forms/AdminInput';
-import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
+﻿import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
+import { AdminInput } from "@/shared/components/forms/AdminInput";
+import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import { useEffect, useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,7 +54,6 @@ interface CustomerFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   customer?: CustomerDto | null;
-  /** Gọi sau khi tạo khách thành công (POS chọn khách vừa tạo). */
   onCreated?: (customerId: number) => void;
 }
 
@@ -90,7 +89,6 @@ export function CustomerFormDialog({
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Dynamic schema & form based on create vs edit
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(
       isEdit ? updateCustomerSchema : createCustomerSchema,
@@ -112,7 +110,6 @@ export function CustomerFormDialog({
   const provincesQuery = useProvinces();
   const wardsQuery = useWardsByProvince(selectedProvince);
 
-  // Reset form when dialog opens/closes or customer changes
   useEffect(() => {
     if (open) {
       setPendingFile(null);
@@ -200,7 +197,6 @@ export function CustomerFormDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* === Section: Thông tin cá nhân === */}
           <FormSection icon={User} title="Thông tin cá nhân">
             <div className="mb-5">
               <ImageUpload
@@ -225,10 +221,7 @@ export function CustomerFormDialog({
                 tooltip="Số điện thoại phải có 10 chữ số"
                 error={errors.phone?.message}
               >
-                <AdminInput
-                  {...register("phone")}
-                  placeholder="0901234567"
-                />
+                <AdminInput {...register("phone")} placeholder="0901234567" />
               </FormField>
               <FormField
                 label="Email *"
@@ -243,10 +236,7 @@ export function CustomerFormDialog({
                 />
               </FormField>
               <FormField label="Ngày sinh" error={errors.dateOfBirth?.message}>
-                <AdminInput
-                  {...register("dateOfBirth")}
-                  type="date"
-                />
+                <AdminInput {...register("dateOfBirth")} type="date" />
               </FormField>
               <FormField label="Giới tính">
                 <Select
@@ -314,7 +304,6 @@ export function CustomerFormDialog({
             </div>
           </FormSection>
 
-          {/* === Section: Thông tin khách hàng === */}
           <FormSection icon={ShoppingBag} title="Thông tin khách hàng">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField label="Nguồn khách">
@@ -352,10 +341,7 @@ export function CustomerFormDialog({
                 </Select>
               </FormField>
               <div className="sm:col-span-2">
-                <FormField
-                  label="Ghi chú"
-                  error={errors.note?.message}
-                >
+                <FormField label="Ghi chú" error={errors.note?.message}>
                   <AdminTextarea
                     {...register("note")}
                     placeholder="Ghi chú thêm về khách hàng..."

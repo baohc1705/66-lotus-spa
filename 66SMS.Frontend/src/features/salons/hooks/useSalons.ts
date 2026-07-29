@@ -1,5 +1,5 @@
-import { createEntityQueryKeys } from '@/shared/utils/queryKeys';
-import { getErrorMessage } from '@/shared/utils/errorUtils';
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
@@ -78,7 +78,9 @@ export function useUpdateSalonMutation() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+      );
     },
   });
 }

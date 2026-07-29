@@ -4,7 +4,10 @@ import { toast } from "sonner";
 import { formatDate } from "@/shared/utils/date.utils";
 import { useStaffs } from "@/features/staffs/hooks/useStaffs";
 import { useBulkCreateWorkSchedule } from "../hooks/useSchedules";
-import type { ShiftDTO, ShiftPeriodDTO } from "@/features/shifts/types/shift.types";
+import type {
+  ShiftDTO,
+  ShiftPeriodDTO,
+} from "@/features/shifts/types/shift.types";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 
 import {
@@ -93,7 +96,9 @@ export function AddStaffDialog({
     const allFilteredIds = filteredStaffs.map((s) => s.id!);
     const allSelected = allFilteredIds.every((id) => selectedIds.includes(id));
     if (allSelected) {
-      setSelectedIds((prev) => prev.filter((id) => !allFilteredIds.includes(id)));
+      setSelectedIds((prev) =>
+        prev.filter((id) => !allFilteredIds.includes(id)),
+      );
     } else {
       setSelectedIds((prev) => [
         ...prev,
@@ -138,8 +143,7 @@ export function AddStaffDialog({
   };
 
   const utilDate = formatDate(date);
-  const dayName =
-    WEEKDAYS.find((w) => w.value === utilDate.day())?.label || "";
+  const dayName = WEEKDAYS.find((w) => w.value === utilDate.day())?.label || "";
   const subTitle = `Ca: ${shift.name} (${shiftPeriod.shiftStart?.substring(0, 5)} - ${shiftPeriod.shiftEnd?.substring(0, 5)}) | ${dayName}, ${utilDate.format("DD/MM/YYYY")}`;
 
   return (
@@ -157,7 +161,6 @@ export function AddStaffDialog({
 
         <div className="space-y-5">
           <FormSection icon={User} title="Chọn nhân viên">
-            {/* Search + select all bar */}
             <div className="flex items-center gap-2 mb-3">
               <div className="relative flex-1">
                 <Search
@@ -187,7 +190,6 @@ export function AddStaffDialog({
               </button>
             </div>
 
-            {/* Staff list */}
             <div className="border border-adminGray-100 rounded-lg overflow-hidden">
               {isLoadingStaffs ? (
                 <div className="py-8 text-center text-sm text-adminGray-400">
@@ -249,7 +251,6 @@ export function AddStaffDialog({
               )}
             </div>
 
-            {/* Selected count + validation */}
             <div className="mt-2 flex items-center justify-between min-h-[20px]">
               {selectedIds.length > 0 ? (
                 <span className="text-xs text-adminGreen-600 font-medium">
@@ -259,7 +260,9 @@ export function AddStaffDialog({
                 <span />
               )}
               {validationError && (
-                <span className="text-xs text-state-danger-text">{validationError}</span>
+                <span className="text-xs text-state-danger-text">
+                  {validationError}
+                </span>
               )}
             </div>
           </FormSection>

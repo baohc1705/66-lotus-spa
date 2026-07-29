@@ -14,7 +14,7 @@ import {
 } from "../hooks/useCustomers";
 import type { CustomerDto } from "../types/customer.types";
 
-import { CustomerCrmActivity } from "../components/CustomerCrmActivity";
+import { CustomerCrmAppointments } from "../components/CustomerCrmAppointments";
 import { CustomerCrmDetail } from "../components/CustomerCrmDetail";
 import { CustomerCrmList } from "../components/CustomerCrmList";
 
@@ -55,13 +55,10 @@ export function CustomerListPage() {
   const totalPages = paged?.totalPages ?? 1;
   const pageSize = paged?.pageSize ?? 10;
 
-  // Selected customer for CRM view
   const [selectedCustomerIdState, setSelectedCustomerId] = useState<
     number | null
   >(null);
 
-  // Derive the active selected customer ID. Fall back to the first customer if none is selected
-  // or if the selected customer is not in the current list (e.g. due to pagination or filtering).
   const selectedCustomerId = useMemo(() => {
     if (
       selectedCustomerIdState !== null &&
@@ -72,7 +69,6 @@ export function CustomerListPage() {
     return customers[0]?.id ?? null;
   }, [customers, selectedCustomerIdState]);
 
-  // Stat card calculations
   const activeCustomerCount = useMemo(
     () =>
       customers.filter((c: CustomerDto) => c.status === StatusActive.Active)
@@ -103,8 +99,7 @@ export function CustomerListPage() {
     deleteMutation.mutate(deleteTarget.id, {
       onSuccess: (result) => {
         if (result.isSuccess) {
-          setDeleteTarget(null);
-          // If we deleted the currently selected customer, reset selection
+          setDeleteTarget(null);    
           if (selectedCustomerId === deleteTarget.id) {
             setSelectedCustomerId(null);
           }
@@ -124,7 +119,6 @@ export function CustomerListPage() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden gap-2">
-      {/* Stats row */}
       <div className="shrink-0">
         <CustomerStatCards
           totalCustomers={totalCount}
@@ -135,9 +129,7 @@ export function CustomerListPage() {
         />
       </div>
 
-      {/* CRM 3-Column Grid */}
       <div className="grid grid-cols-12 gap-2 flex-1 min-h-0 overflow-hidden">
-        {/* Column 1: Customer List */}
         <div className="col-span-3 h-full overflow-hidden">
           <CustomerCrmList
             customers={customers}
@@ -161,7 +153,6 @@ export function CustomerListPage() {
           />
         </div>
 
-        {/* Column 2: Customer Detail */}
         <div className="col-span-6 h-full overflow-hidden">
           <CustomerCrmDetail
             customerId={selectedCustomerId}
@@ -170,13 +161,14 @@ export function CustomerListPage() {
           />
         </div>
 
-        {/* Column 3: CRM Activities / History */}
         <div className="col-span-3 h-full overflow-hidden">
-          <CustomerCrmActivity customerId={selectedCustomerId} />
+          <CustomerCrmAppointments
+            key={selectedCustomerId}
+            customerId={selectedCustomerId}
+          />
         </div>
       </div>
 
-      {/* Dialogs */}
       <CustomerFormDialog open={createOpen} onOpenChange={setCreateOpen} />
 
       <CustomerFormDialog

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Check } from "lucide-react";
 import { useBookingStore } from "../stores/bookingStore";
 import { useServices } from "@/features/services/hooks/useServices";
@@ -25,15 +25,14 @@ const STEP_CONFIG = [
   { s: 3, label: "Thông tin" },
 ];
 
-export const BookingPage: React.FC = () => {
+export function BookingPage() {
   const { currentStep, guests, activeGuestIndex, selectService } =
     useBookingStore();
   const selectedService = guests[activeGuestIndex]?.selectedService;
 
   const { data } = useServices({ pageIndex: 1, pageSize: 100 });
   const services = useMemo(() => data?.data?.items || [], [data?.data?.items]);
-
-  // Áp dụng dịch vụ đã chọn từ landing (sessionStorage) ngay khi vào trang
+  
   useEffect(() => {
     const pendingId = getPendingServiceId();
     if (!pendingId || services.length === 0) return;
@@ -73,15 +72,12 @@ export const BookingPage: React.FC = () => {
       <main className="flex-1 landing-container pt-28 pb-16">
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:gap-8">
           <div className="flex flex-col gap-6 lg:col-span-8">
-            {/* Stepper — cùng độ rộng + padding với section trái */}
             <nav aria-label="Các bước đặt lịch" className="w-full px-5 sm:px-6">
               <div className="relative">
-                {/* Đường nền (inactive) luôn hiện */}
                 <div
                   className="absolute left-4 right-4 top-4 h-[2px] -translate-y-1/2 bg-warm-300"
                   aria-hidden
                 />
-                {/* Đường tiến độ (active/done) */}
                 <div
                   className="absolute left-4 top-4 h-[2px] -translate-y-1/2 bg-rose-600 transition-all duration-300"
                   style={{
@@ -162,4 +158,4 @@ export const BookingPage: React.FC = () => {
       <FooterSection />
     </div>
   );
-};
+}

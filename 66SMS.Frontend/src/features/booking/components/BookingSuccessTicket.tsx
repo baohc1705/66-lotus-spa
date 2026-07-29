@@ -1,4 +1,3 @@
-import React from "react";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useBookingStore } from "../stores/bookingStore";
@@ -6,7 +5,7 @@ import { useMyBookings } from "../hooks/useMyBookings";
 import { formatDate } from "@/shared/utils/date.utils";
 import type { AppointmentDto } from "../types/booking.types";
 
-export const BookingSuccessTicket: React.FC = () => {
+export function BookingSuccessTicket() {
   const {
     guests,
     resetBooking,
@@ -191,4 +190,4 @@ export const BookingSuccessTicket: React.FC = () => {
       </div>
     </div>
   );
-};
+}

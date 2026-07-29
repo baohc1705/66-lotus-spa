@@ -8,7 +8,11 @@ interface RevenueByItemTypeChartProps {
   isLoading: boolean;
 }
 
-const COLORS = ["var(--admin-green-600)", "var(--admin-gold-600)", "var(--admin-green-200)"]; // lotus-primary, lotus-accent, lotus-secondary
+const COLORS = [
+  "var(--admin-green-600)",
+  "var(--admin-gold-600)",
+  "var(--admin-green-200)",
+];  
 
 interface CustomTooltipProps {
   active?: boolean;
@@ -29,7 +33,10 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     return (
       <div className="bg-white/95 backdrop-blur-sm border border-adminGray-100/50 p-2.5 rounded-admin shadow-lg text-xs font-sans">
         <p className="font-semibold text-adminInk flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
+          <span
+            className="w-2 h-2 rounded-full"
+            style={{ backgroundColor: color }}
+          />
           {data.label}
         </p>
         <p className="font-bold text-adminInk mt-1 ml-3.5">
@@ -41,7 +48,10 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   return null;
 };
 
-export const RevenueByItemTypeChart = memo(function RevenueByItemTypeChart({ data = [], isLoading }: RevenueByItemTypeChartProps) {
+export const RevenueByItemTypeChart = memo(function RevenueByItemTypeChart({
+  data = [],
+  isLoading,
+}: RevenueByItemTypeChartProps) {
   if (isLoading) {
     return (
       <div className="bg-white border border-adminGray-100 rounded-admin p-5 h-[300px] flex flex-col justify-between">
@@ -68,7 +78,6 @@ export const RevenueByItemTypeChart = memo(function RevenueByItemTypeChart({ dat
           </div>
         ) : (
           <>
-            {/* Chart Area */}
             <div className="w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] shrink-0">
               <ResponsiveContainer width="100%" height="100%" debounce={1}>
                 <PieChart>
@@ -84,24 +93,30 @@ export const RevenueByItemTypeChart = memo(function RevenueByItemTypeChart({ dat
                     paddingAngle={3}
                   >
                     {data.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
             </div>
 
-            {/* Custom Legend details */}
             <div className="flex-1 flex flex-col gap-3 pl-6 font-sans">
               {data.map((item, index) => (
                 <div key={item.itemType} className="flex flex-col">
                   <div className="flex items-center gap-1.5 justify-between">
                     <div className="flex items-center gap-1.5">
-                      <span 
-                        className="w-2 h-2 rounded-full shrink-0" 
-                        style={{ backgroundColor: COLORS[index % COLORS.length] }} 
+                      <span
+                        className="w-2 h-2 rounded-full shrink-0"
+                        style={{
+                          backgroundColor: COLORS[index % COLORS.length],
+                        }}
                       />
-                      <span className="font-bold text-adminInk text-xs">{item.label}</span>
+                      <span className="font-bold text-adminInk text-xs">
+                        {item.label}
+                      </span>
                     </div>
                     <span className="font-semibold text-adminGray-400 text-2xs">
                       {item.percent}%

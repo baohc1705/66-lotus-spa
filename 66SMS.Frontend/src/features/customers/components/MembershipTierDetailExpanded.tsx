@@ -49,7 +49,6 @@ export function MembershipTierDetailExpanded({
   return (
     <div className="bg-adminGray-50/30 w-full overflow-hidden p-6 border-t border-adminGray-100/50">
       <div className="flex flex-col gap-5">
-        {/* Header info */}
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-state-warning-bg flex items-center justify-center shrink-0 shadow-sm border border-state-warning-border/50">
             <Crown className="w-6 h-6 text-adminGold-600" />
@@ -62,7 +61,9 @@ export function MembershipTierDetailExpanded({
               Trạng thái:{" "}
               <span
                 className={
-                  tier.status === 1 ? "text-adminGreen-600" : "text-state-warning-text"
+                  tier.status === 1
+                    ? "text-adminGreen-600"
+                    : "text-state-warning-text"
                 }
               >
                 {STATUS_MAP[tier.status] ?? "Không rõ"}
@@ -71,7 +72,6 @@ export function MembershipTierDetailExpanded({
           </div>
         </div>
 
-        {/* Grid info */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <DetailCard
             icon={HandCoins}
@@ -98,7 +98,6 @@ export function MembershipTierDetailExpanded({
           </div>
         </div>
 
-        {/* Benefits & Actions */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mt-2 pt-4 border-t border-adminGray-100/80">
           <div className="flex-1">
             <p className="text-xs font-medium text-adminGray-600 mb-1">
@@ -143,9 +142,7 @@ function DetailCard({
         <p className="text-xs font-medium text-adminGray-600 truncate mb-0.5">
           {label}
         </p>
-        <p className="text-sm font-semibold text-adminInk truncate">
-          {value}
-        </p>
+        <p className="text-sm font-semibold text-adminInk truncate">{value}</p>
       </div>
     </div>
   );

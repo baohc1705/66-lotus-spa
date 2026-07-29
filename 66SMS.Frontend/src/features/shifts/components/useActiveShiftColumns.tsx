@@ -138,10 +138,7 @@ export function useActiveShiftColumns({
                       {COMMON_MSG.edit}
                     </DropdownMenuItem>
                   </PermissionGate>
-                  <PermissionGate
-                    resource={perm.resource}
-                    action={perm.delete}
-                  >
+                  <PermissionGate resource={perm.resource} action={perm.delete}>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       variant="destructive"

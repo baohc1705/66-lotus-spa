@@ -54,14 +54,7 @@ export const SpaceGallerySection = () => {
           className="mb-8"
         />
 
-        {/*
-          Layout 3 cột × 3 hàng:
-          [ ẢNH CHÍNH 2×2 ] [ phụ ]
-          [               ] [ phụ ]
-          [ phụ ] [ phụ ] [ phụ ]
-        */}
         <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-3 md:grid-rows-[140px_140px_140px] lg:grid-rows-[160px_160px_160px]">
-          {/* Ảnh chính nổi bật */}
           <motion.figure
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -77,7 +70,6 @@ export const SpaceGallerySection = () => {
             />
           </motion.figure>
 
-          {/* Ảnh phụ */}
           {sideImages.map((item, i) => (
             <motion.figure
               key={item.alt}

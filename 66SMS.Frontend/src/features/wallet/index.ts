@@ -1,1 +1,1 @@
-export { WalletManagementPage } from './pages/WalletManagementPage'
+export { WalletManagementPage } from "./pages/WalletManagementPage";

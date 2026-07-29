@@ -1,28 +1,23 @@
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
-import { Button } from '@/shared/components/ui/button'
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
+import { Button } from "@/shared/components/ui/button";
 
 interface DataTablePaginationProps {
-  pageIndex: number
-  pageSize: number
-  totalCount: number
-  totalPages: number
-  hasPreviousPage: boolean
-  hasNextPage: boolean
-  onPageChange: (page: number) => void
-  onPageSizeChange: (size: number) => void
-  pageSizeOptions?: number[]
+  pageIndex: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
+  pageSizeOptions?: number[];
 }
 
-/**
- * DataTablePagination - Phân trang reusable cho mọi data table
- *
- * @example
- * <DataTablePagination
- *   pageIndex={1} pageSize={10} totalCount={50} totalPages={5}
- *   hasPreviousPage={false} hasNextPage={true}
- *   onPageChange={setPage} onPageSizeChange={setPageSize}
- * />
- */
 export function DataTablePagination({
   pageIndex,
   pageSize,
@@ -34,15 +29,18 @@ export function DataTablePagination({
   onPageSizeChange,
   pageSizeOptions = [10, 20, 30, 50],
 }: DataTablePaginationProps) {
-  const startRecord = totalCount === 0 ? 0 : (pageIndex - 1) * pageSize + 1
-  const endRecord = Math.min(pageIndex * pageSize, totalCount)
+  const startRecord = totalCount === 0 ? 0 : (pageIndex - 1) * pageSize + 1;
+  const endRecord = Math.min(pageIndex * pageSize, totalCount);
 
   return (
     <div className="flex items-center justify-between gap-4 py-3 px-1">
-      {/* Left: Record count & page size */}
       <div className="flex items-center gap-3 text-xs text-lotus-stone">
         <span className="hidden sm:inline">
-          Hiển thị <strong className="text-lotus-deep">{startRecord}-{endRecord}</strong> / <strong className="text-lotus-deep">{totalCount}</strong>
+          Hiển thị{" "}
+          <strong className="text-lotus-deep">
+            {startRecord}-{endRecord}
+          </strong>{" "}
+          / <strong className="text-lotus-deep">{totalCount}</strong>
         </span>
         <span className="sm:hidden text-xs">
           <strong className="text-lotus-deep">{totalCount}</strong> kết quả
@@ -52,16 +50,18 @@ export function DataTablePagination({
           onChange={(e) => onPageSizeChange(Number(e.target.value))}
           className="h-7 rounded-lg border border-adminGray-100/50 bg-white text-xs text-lotus-deep px-1.5 outline-none focus:border-lotus-gold cursor-pointer"
         >
-          {pageSizeOptions.map(size => (
-            <option key={size} value={size}>{size} / trang</option>
+          {pageSizeOptions.map((size) => (
+            <option key={size} value={size}>
+              {size} / trang
+            </option>
           ))}
         </select>
       </div>
 
-      {/* Right: Page controls */}
       <div className="flex items-center gap-1">
         <span className="text-xs text-lotus-stone mr-2 hidden sm:inline">
-          Trang <strong className="text-lotus-deep">{pageIndex}</strong> / {totalPages}
+          Trang <strong className="text-lotus-deep">{pageIndex}</strong> /{" "}
+          {totalPages}
         </span>
         <Button
           variant="ghost"
@@ -101,5 +101,5 @@ export function DataTablePagination({
         </Button>
       </div>
     </div>
-  )
+  );
 }

@@ -3,7 +3,10 @@ import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import { revenueApi } from "../api/revenue.api";
 
-function getFileNameFromHeader(contentDisposition: string | undefined, fallback: string): string {
+function getFileNameFromHeader(
+  contentDisposition: string | undefined,
+  fallback: string,
+): string {
   if (!contentDisposition) return fallback;
   const match = /filename\*?=(?:UTF-8''|")?([^\";]+)/i.exec(contentDisposition);
   if (!match?.[1]) return fallback;

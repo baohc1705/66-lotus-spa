@@ -83,9 +83,7 @@ export function useActiveMembershipTierColumns({
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <Crown className="w-4 h-4 text-adminGold-600" />
-            <span className="font-bold text-adminInk">
-              {row.original.name}
-            </span>
+            <span className="font-bold text-adminInk">{row.original.name}</span>
           </div>
         ),
         size: 180,
@@ -186,7 +184,17 @@ export function useActiveMembershipTierColumns({
         enableResizing: false,
       },
     ],
-    [pageIndex, pageSize, orderBy, isDescending, onSort, onEdit, onDelete, cols, perm],
+    [
+      pageIndex,
+      pageSize,
+      orderBy,
+      isDescending,
+      onSort,
+      onEdit,
+      onDelete,
+      cols,
+      perm,
+    ],
   );
 }
 

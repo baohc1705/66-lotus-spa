@@ -61,10 +61,9 @@ export function SearchableSelect({
         <Popover.Content
           sideOffset={4}
           align="start"
-          className="z-50 w-[var(--radix-popover-trigger-width)] min-w-[200px] bg-white rounded-md shadow-md border border-adminGray-100 overflow-hidden animate-in fade-in-0 zoom-in-95"
+          className="z-[90] w-[var(--radix-popover-trigger-width)] min-w-[200px] bg-white rounded-md shadow-md border border-adminGray-100 overflow-hidden animate-in fade-in-0 zoom-in-95"
           onOpenAutoFocus={e => e.preventDefault()}
         >
-          {/* Search input */}
           <div className="flex items-center gap-2 px-3 py-2 border-b border-adminGray-100">
             <SearchIcon className="size-3.5 text-lotus-stone shrink-0" />
             <input
@@ -76,7 +75,6 @@ export function SearchableSelect({
             />
           </div>
 
-          {/* Options list */}
           <div
             className="max-h-52 overflow-y-auto p-1"
             onWheel={e => e.stopPropagation()}

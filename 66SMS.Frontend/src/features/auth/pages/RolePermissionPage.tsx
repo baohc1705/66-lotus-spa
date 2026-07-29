@@ -35,12 +35,10 @@ export default function RolePermissionPage() {
   const roles: RoleDTO[] = rolesQuery.data?.data ?? [];
   const allPermissions: PermissionDTO[] = permissionsQuery.data?.data ?? [];
 
-  // ── role selection ──
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
   const activeRoleId = selectedRoleId ?? roles[0]?.id ?? null;
   const selectedRole = roles.find(r => r.id === activeRoleId) ?? null;
 
-  // ── permission matrix state ──
   const baseIds = useMemo(
     () => new Set<number>((selectedRole?.rolePermissions ?? []).map(rp => rp.permissionId)),
     [selectedRole],
@@ -49,7 +47,6 @@ export default function RolePermissionPage() {
   const checkedIds: Set<number> = (activeRoleId !== null && edits[activeRoleId]) ? edits[activeRoleId] : baseIds;
   const isDirty = activeRoleId !== null && activeRoleId in edits;
 
-  // ── modal state ──
   const [roleModal, setRoleModal] = useState<RoleModal>(null);
   const [permModal, setPermModal] = useState<PermModal>(null);
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget>(null);
@@ -140,12 +137,10 @@ export default function RolePermissionPage() {
 
   return (
     <div className="min-h-screen bg-adminGray-50 px-6 py-6 font-sans">
-      {/* decorative blobs */}
       <div className="fixed top-[-15vw] left-[-10vw] w-[40vw] h-[40vw] rounded-full bg-adminGreen-50 blur-[100px] pointer-events-none z-0" />
       <div className="fixed bottom-[-15vw] right-[-10vw] w-[36vw] h-[36vw] rounded-full bg-adminGreen-600/6 blur-[90px] pointer-events-none z-0" />
 
       <div className="relative z-10 max-w-[1400px] mx-auto">
-        {/* Header */}
         <div className="mb-5">
           <h1 className="text-xl font-bold text-adminInk m-0">Phân quyền theo vai trò</h1>
           <p className="text-sm text-adminGray-600 mt-1 mb-0">Quản lý vai trò, quyền hạn và gán quyền cho từng vai trò.</p>
@@ -156,7 +151,6 @@ export default function RolePermissionPage() {
         ) : (
           <div className="flex flex-col gap-4">
             <div className="flex gap-3 items-start">
-              {/* Left: role list */}
               <RoleList
                 roles={roles}
                 activeRoleId={activeRoleId}
@@ -166,7 +160,6 @@ export default function RolePermissionPage() {
                 onDeleteRole={role => setDeleteTarget({ kind: 'role', role })}
               />
 
-              {/* Right: matrix */}
               <section className="flex-1 min-w-0">
                 {selectedRole ? (
                   <PermissionMatrix
@@ -191,7 +184,6 @@ export default function RolePermissionPage() {
               </section>
             </div>
 
-            {/* Bottom: permission management */}
             <PermissionListPanel
               permissions={allPermissions}
               onAdd={() => setPermModal({ type: 'createPerm' })}
@@ -202,7 +194,6 @@ export default function RolePermissionPage() {
         )}
       </div>
 
-      {/* Modals */}
       {roleModal && (
         <RoleFormModal
           initial={roleModal.type === 'editRole' ? { name: roleModal.role.name, description: roleModal.role.desctiption } : undefined}

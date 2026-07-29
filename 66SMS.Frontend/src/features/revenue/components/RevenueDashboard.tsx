@@ -42,7 +42,9 @@ const YEAR_OPTIONS = (() => {
 export function RevenueDashboard() {
   const queryClient = useQueryClient();
   const selectedSalonId = useAuthStore((state) => state.selectedSalonId);
-  const getEffectiveSalonId = useAuthStore((state) => state.getEffectiveSalonId);
+  const getEffectiveSalonId = useAuthStore(
+    (state) => state.getEffectiveSalonId,
+  );
   const isAdmin = useAuthStore((state) => state.hasRole("Admin"));
   const isManager = useAuthStore((state) => state.hasRole("Manager"));
 
@@ -63,7 +65,8 @@ export function RevenueDashboard() {
   const exportBranchMutation = useExportBranchRevenue();
 
   const branchSalonId = isAdmin ? selectedSalonId : getEffectiveSalonId();
-  const canExportBranch = (isManager || isAdmin) && branchSalonId != null && branchSalonId > 0;
+  const canExportBranch =
+    (isManager || isAdmin) && branchSalonId != null && branchSalonId > 0;
 
   const queryParams = useMemo(
     () => ({

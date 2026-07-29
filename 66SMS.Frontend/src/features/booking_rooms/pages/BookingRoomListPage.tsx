@@ -58,7 +58,11 @@ export function BookingRoomListPage() {
     filter,
   } = listState;
 
-  const { data: roomResult, isLoading, isFetching } = useAdminBookingRooms(queryParams);
+  const {
+    data: roomResult,
+    isLoading,
+    isFetching,
+  } = useAdminBookingRooms(queryParams);
 
   const deleteMutation = useDeleteBookingRoom();
   const updateMutation = useUpdateBookingRoom();
@@ -131,14 +135,14 @@ export function BookingRoomListPage() {
           table={table}
           isLoading={isLoading}
           loadingRows={DEFAULT_LOADING_ROWS}
-          renderSubComponent={({ row }) => (
+          renderSubComponent={({ row }) =>
             row.original.id ? (
               <BookingRoomDetailExpanded
                 roomId={row.original.id}
                 onEdit={setEditTarget}
               />
             ) : null
-          )}
+          }
         />
       </div>
 
@@ -176,7 +180,10 @@ export function BookingRoomListPage() {
             if (!open) setDeleteTarget(null);
           }}
           title={CONFIRM_MSG.deleteTitle(ENTITY)}
-          description={CONFIRM_MSG.deleteDescription(ENTITY, deleteTarget.name ?? "")}
+          description={CONFIRM_MSG.deleteDescription(
+            ENTITY,
+            deleteTarget.name ?? "",
+          )}
           onConfirm={handleDelete}
           confirmLabel={COMMON_MSG.delete}
           loading={deleteMutation.isPending}

@@ -10,7 +10,9 @@ export function useProductListState() {
   const [deleteTarget, setDeleteTarget] = useState<ProductDto | null>(null);
   const [restoreTarget, setRestoreTarget] = useState<ProductDto | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
+    null,
+  );
 
   const handleToggleView = useCallback(
     (onClearSelection: () => void) => {

@@ -15,7 +15,10 @@ import {
   useDeleteServiceProduct,
   useServiceDetail,
 } from "../hooks/useServices";
-import type { ServiceDetailDto, ServiceProductResponse } from "../types/service.types";
+import type {
+  ServiceDetailDto,
+  ServiceProductResponse,
+} from "../types/service.types";
 import { SERVICE_PERM } from "../constants/service.permissions";
 import { formatCurrency } from "@/shared/utils/currency";
 
@@ -36,9 +39,8 @@ export function ServiceDetailExpanded({
   const { data: result, isLoading } = useServiceDetail(serviceId);
   const service = result?.data;
   const deleteMutation = useDeleteServiceProduct();
-  const [deleteTarget, setDeleteTarget] = useState<ServiceProductResponse | null>(
-    null,
-  );
+  const [deleteTarget, setDeleteTarget] =
+    useState<ServiceProductResponse | null>(null);
 
   if (isLoading) {
     return (
@@ -70,7 +72,6 @@ export function ServiceDetailExpanded({
   return (
     <div className="bg-adminGray-50/30 w-full overflow-hidden max-h-[400px] overflow-y-auto custom-scrollbar">
       <Tabs defaultValue="info" className="w-full flex-col">
-        {/* Tab Headers */}
         <div className="px-4 pt-2 sticky top-0 bg-adminGray-50/95 backdrop-blur-sm z-10">
           <TabsList className="h-10 border-b border-adminGray-100/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
             <TabsTrigger
@@ -88,10 +89,8 @@ export function ServiceDetailExpanded({
           </TabsList>
         </div>
 
-        {/* Tab Content - Info */}
         <TabsContent value="info" className="p-4 m-0 border-none outline-none">
           <div className="flex flex-col gap-4">
-            {/* Header info */}
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-xl bg-adminGray-50/50 flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-adminGray-100/50">
                 {primaryImage ? (
@@ -115,7 +114,6 @@ export function ServiceDetailExpanded({
               </div>
             </div>
 
-            {/* Grid for fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0">
               <div className="flex flex-col">
                 <DetailField
@@ -145,9 +143,11 @@ export function ServiceDetailExpanded({
               </div>
             </div>
 
-            {/* Actions */}
             <div className="flex items-end justify-end mt-2 pt-4 border-t border-adminGray-100/80">
-              <PermissionGate resource={SERVICE_PERM.resource} action={SERVICE_PERM.update}>
+              <PermissionGate
+                resource={SERVICE_PERM.resource}
+                action={SERVICE_PERM.update}
+              >
                 <Button
                   variant="admin"
                   size="sm"
@@ -162,7 +162,6 @@ export function ServiceDetailExpanded({
           </div>
         </TabsContent>
 
-        {/* Tab Content - Products */}
         <TabsContent
           value="products"
           className="p-4 m-0 border-none outline-none"
@@ -208,7 +207,9 @@ export function ServiceDetailExpanded({
                         {prod.quantityUsed ?? "-"}
                       </td>
                       <td className="py-2.5 px-4 font-semibold text-adminGray-600">
-                        {formatCurrency((prod.quantityUsed ?? 0) * (prod.sellingPrice ?? 0))}
+                        {formatCurrency(
+                          (prod.quantityUsed ?? 0) * (prod.sellingPrice ?? 0),
+                        )}
                       </td>
 
                       <td className="py-2.5 px-4">

@@ -124,15 +124,13 @@ export function AdminScheduleGrid({
   const todayStr = formatDate().format("YYYY-MM-DD");
   const currentH = currentTime.getHours();
   const currentM = currentTime.getMinutes();
-  const canShowNow =
-    showCurrentTime && currentH >= 8 && currentH <= 22;
+  const canShowNow = showCurrentTime && currentH >= 8 && currentH <= 22;
   const currentTimeY =
     (currentH - 8) * HOUR_HEIGHT + (currentM / 60) * HOUR_HEIGHT;
 
   return (
     <div className="h-full flex-1 overflow-auto scrollbar-thin bg-white border border-adminGray-100/50 rounded-admin">
       <div className="flex min-w-max h-full">
-        {/* Cột giờ — label dùng top-1 để không bị cắt 08:00 */}
         <div className="w-16 flex-shrink-0 border-r border-adminGray-100/50 bg-adminGray-50/50 sticky left-0 z-20">
           <div
             className="border-b border-adminGray-100/50 sticky top-0 bg-adminGray-50/50 z-30"

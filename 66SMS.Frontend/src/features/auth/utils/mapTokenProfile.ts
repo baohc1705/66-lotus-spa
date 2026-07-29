@@ -1,7 +1,6 @@
 import type { UserDto } from '@/features/users/types/user.types';
 import type { TokenResponseDTO, TokenUserProfileDto } from '@/features/auth/types/auth.types';
 
-/** Map profile từ login/refresh → UserDto dùng trong authStore / UI. */
 export function mapTokenProfileToUser(profile: TokenUserProfileDto): UserDto {
   return {
     id: profile.userId,

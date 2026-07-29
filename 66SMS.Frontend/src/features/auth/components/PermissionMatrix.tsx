@@ -33,7 +33,6 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
 }) {
   return (
     <div className="flex flex-col gap-3">
-      {/* Role card */}
       <div className="bg-white border border-border rounded-xl overflow-hidden">
         <div className="h-1.5 bg-adminGreen-600" />
         <div className="px-4 py-3.5 flex items-center gap-3.5">
@@ -57,7 +56,6 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
         </div>
       </div>
 
-      {/* Matrix table */}
       <div className="bg-white border border-border rounded-xl overflow-hidden">
         <div className="px-4 py-3 border-b border-border">
           <div className="text-sm font-bold text-adminInk">Ma trận quyền</div>
@@ -95,7 +93,6 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
                         {resource}
                       </td>
 
-                      {/* Select-all for this resource */}
                       <td className="px-2 py-2.5 text-center border-b border-border">
                         <button
                           onClick={() => onToggleResource(resource)}
@@ -146,7 +143,6 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
         )}
       </div>
 
-      {/* Save bar */}
       <div className="flex justify-end gap-2.5">
         {isDirty && (
           <button

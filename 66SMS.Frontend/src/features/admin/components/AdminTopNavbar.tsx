@@ -34,7 +34,6 @@ export function AdminTopNavbar() {
     };
   }, []);
 
-  // Helper checking if a menu item is accessible by user's role
   const checkPermission = (allowedRoles?: string[]): boolean => {
     const isAdmin = hasRole("Admin");
     if (isAdmin) return true;
@@ -43,8 +42,7 @@ export function AdminTopNavbar() {
   };
 
   const tabs: ParentTab[] = TOP_NAV_TABS.filter((t) => checkPermission(t.allowedRoles));
-
-  // Determine if a parent tab has an active sub-item
+    
   const isParentActive = (tab: ParentTab) => {
     if (tab.path && location.pathname === tab.path) return true;
     if (tab.columns) {
@@ -118,7 +116,6 @@ export function AdminTopNavbar() {
               <span className="admin-nav-tab-underline absolute bottom-0 left-2.5 right-2.5 h-[2px] rounded-full animate-in fade-in-0 duration-300" />
             )}
 
-            {/* Dropdown / Mega Menu Card */}
             <AnimatePresence>
               {hasColumns && isTabOpen && (
                 <motion.div

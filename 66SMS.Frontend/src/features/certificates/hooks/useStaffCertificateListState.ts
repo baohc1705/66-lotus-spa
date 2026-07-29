@@ -5,11 +5,15 @@ import type { StaffCertificateDTO } from "../types/certificate.types";
 export function useStaffCertificateListState() {
   const table = useTableQueryParams();
   const [createOpen, setCreateOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<StaffCertificateDTO | null>(null);
+  const [editTarget, setEditTarget] = useState<StaffCertificateDTO | null>(
+    null,
+  );
   const [deleteTarget, setDeleteTarget] = useState<StaffCertificateDTO | null>(
     null,
   );
-  const [selectedCertificateTypeId, setSelectedCertificateTypeId] = useState<number | null>(null);
+  const [selectedCertificateTypeId, setSelectedCertificateTypeId] = useState<
+    number | null
+  >(null);
 
   const handleSelectType = useCallback(
     (id: number | null) => {
@@ -21,7 +25,9 @@ export function useStaffCertificateListState() {
 
   const queryParams = {
     ...table.queryParams,
-    ...(selectedCertificateTypeId != null ? { certificateTypeId: selectedCertificateTypeId } : {}),
+    ...(selectedCertificateTypeId != null
+      ? { certificateTypeId: selectedCertificateTypeId }
+      : {}),
   };
 
   return {

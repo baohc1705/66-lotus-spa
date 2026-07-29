@@ -1,49 +1,48 @@
-import { useState, useMemo, useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import {
-  Search,
-  Plus,
-  Trash2,
-  Printer,
-  ChevronDown,
-  Barcode,
-  DollarSign,
-  CreditCard,
-  X,
-  User as UserIcon,
-  SlidersHorizontal,
-  ArrowRight,
-  Sparkles,
-  Package,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useServices } from "@/features/services/hooks/useServices";
-import { useProducts } from "@/features/products/hooks/useProducts";
-import { useTreatmentCourses } from "@/features/treatment_courses/hooks/useTreatmentCourses";
-import { useServiceCategories } from "@/features/service_categories/hooks/useServiceCategories";
-import { useProductCategories } from "@/features/product_categories/hooks/useProductCategories";
-import { useCustomers } from "@/features/customers/hooks/useCustomers";
-import { useStaffs } from "@/features/staffs/hooks/useStaffs";
-import { useCreateInvoice } from "@/features/invoices/hooks/useInvoices";
-import { invoiceApi } from "@/features/invoices/api/invoice.api";
+import { useAuthStore } from "@/features/auth/stores/authStore";
 import { cashierApi } from "@/features/cashier/api/cashier.api";
+import { useCustomers } from "@/features/customers/hooks/useCustomers";
+import type { CustomerDto } from "@/features/customers/types/customer.types";
+import { invoiceApi } from "@/features/invoices/api/invoice.api";
+import { useCreateInvoice } from "@/features/invoices/hooks/useInvoices";
 import {
-  POINT_VALUE_VND,
   PAYMENT_METHOD,
+  POINT_VALUE_VND,
   type InvoiceDto,
 } from "@/features/invoices/types/invoice.types";
-import type { CustomerDto } from "@/features/customers/types/customer.types";
-import type { StaffDto } from "@/features/staffs/types/staff.types";
-import type { ServiceDto } from "@/features/services/types/service.types";
+import { useProductCategories } from "@/features/product_categories/hooks/useProductCategories";
+import { useProducts } from "@/features/products/hooks/useProducts";
 import type { ProductDto } from "@/features/products/types/product.types";
+import { useServiceCategories } from "@/features/service_categories/hooks/useServiceCategories";
+import { useServices } from "@/features/services/hooks/useServices";
+import type { ServiceDto } from "@/features/services/types/service.types";
+import { useStaffs } from "@/features/staffs/hooks/useStaffs";
+import type { StaffDto } from "@/features/staffs/types/staff.types";
+import { useTreatmentCourses } from "@/features/treatment_courses/hooks/useTreatmentCourses";
 import type { TreatmentCourseDto } from "@/features/treatment_courses/types/treatmentCourse.types";
-import { useAuthStore } from "@/features/auth/stores/authStore";
+import { cn } from "@/lib/utils";
 import { formatDate } from "@/shared/utils/date.utils";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  ArrowRight,
+  Barcode,
+  ChevronDown,
+  CreditCard,
+  DollarSign,
+  Package,
+  Plus,
+  Search,
+  SlidersHorizontal,
+  Sparkles,
+  Trash2,
+  User as UserIcon,
+  X,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 interface POSOrderItem {
-  itemType: number; // 1: Service, 2: Product, 3: Course
-  id: number; // refId
+  itemType: number;
+  id: number;
   name: string;
   code: string;
   price: number;
@@ -100,7 +99,6 @@ export function CashierPOS({
   const effectiveSalonId = authStore.getEffectiveSalonId();
   const cashierName = authStore.user?.username || "Thu ngân";
 
-  // State
   const [orders, setOrders] = useState<POSOrder[]>([
     {
       id: "1",
@@ -121,19 +119,16 @@ export function CashierPOS({
   >("services");
   const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
 
-  // Search states
   const [searchQuery, setSearchQuery] = useState("");
   const [customerSearch, setCustomerSearch] = useState("");
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
 
-  // Dialog and input states
   const [isDiscountModalOpen, setIsDiscountModalOpen] = useState(false);
   const [tempDiscount, setTempDiscount] = useState<number>(0);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [tempPaidAmount, setTempPaidAmount] = useState<number>(0);
   const [isPayingInvoice, setIsPayingInvoice] = useState(false);
 
-  // Listen to checkoutInvoice from appointment page
   useEffect(() => {
     if (checkoutInvoice) {
       const orderId = `appointment-${checkoutInvoice.id}`;
@@ -184,37 +179,51 @@ export function CashierPOS({
     }
   }, [checkoutInvoice, onClearCheckoutInvoice]);
 
-  // APIs and Queries
   const { data: servicesResult, isLoading: loadingServices } = useServices({
     pageIndex: 1,
     pageSize: 200,
   });
-  const services = useMemo(() => servicesResult?.data?.items ?? [], [servicesResult?.data?.items]);
+  const services = useMemo(
+    () => servicesResult?.data?.items ?? [],
+    [servicesResult?.data?.items],
+  );
 
   const { data: productsResult, isLoading: loadingProducts } = useProducts({
     pageIndex: 1,
     pageSize: 200,
   });
-  const products = useMemo(() => productsResult?.data?.items ?? [], [productsResult?.data?.items]);
+  const products = useMemo(
+    () => productsResult?.data?.items ?? [],
+    [productsResult?.data?.items],
+  );
 
   const { data: coursesResult, isLoading: loadingCourses } =
     useTreatmentCourses({
       pageIndex: 1,
       pageSize: 200,
     });
-  const courses = useMemo(() => coursesResult?.data?.items ?? [], [coursesResult?.data?.items]);
+  const courses = useMemo(
+    () => coursesResult?.data?.items ?? [],
+    [coursesResult?.data?.items],
+  );
 
   const { data: serviceCatsResult } = useServiceCategories({
     pageIndex: 1,
     pageSize: 100,
   });
-  const serviceCats = useMemo(() => serviceCatsResult?.data?.items ?? [], [serviceCatsResult?.data?.items]);
+  const serviceCats = useMemo(
+    () => serviceCatsResult?.data?.items ?? [],
+    [serviceCatsResult?.data?.items],
+  );
 
   const { data: productCatsResult } = useProductCategories({
     pageIndex: 1,
     pageSize: 500,
   });
-  const productCats = useMemo(() => productCatsResult?.data?.items ?? [], [productCatsResult?.data?.items]);
+  const productCats = useMemo(
+    () => productCatsResult?.data?.items ?? [],
+    [productCatsResult?.data?.items],
+  );
 
   const { data: staffsResult } = useStaffs({
     pageIndex: 1,
@@ -222,24 +231,27 @@ export function CashierPOS({
     salonId: effectiveSalonId ?? undefined,
     role: "staff",
   });
-  const staffs = useMemo(() => staffsResult?.data?.items ?? [], [staffsResult?.data?.items]);
+  const staffs = useMemo(
+    () => staffsResult?.data?.items ?? [],
+    [staffsResult?.data?.items],
+  );
 
-  // Live filter query for customers
   const { data: customersResult } = useCustomers({
     pageIndex: 1,
     pageSize: 100,
     filter: customerSearch || undefined,
   });
-  const customerList = useMemo(() => customersResult?.data?.items ?? [], [customersResult?.data?.items]);
+  const customerList = useMemo(
+    () => customersResult?.data?.items ?? [],
+    [customersResult?.data?.items],
+  );
 
   const createInvoiceMutation = useCreateInvoice();
 
-  // Active Order Helpers
   const activeOrder = useMemo(() => {
     return orders.find((o: POSOrder) => o.id === activeOrderId) || orders[0];
   }, [orders, activeOrderId]);
 
-  // Calculations for current active order
   const subTotal = useMemo(() => {
     return activeOrder.items.reduce((sum: number, item: POSOrderItem) => {
       return sum + item.price * item.quantity;
@@ -281,12 +293,10 @@ export function CashierPOS({
     pointsDiscountValue,
   ]);
 
-  // Đã cọc / đã thu trước → chỉ thu phần còn lại
   const amountDue = useMemo(() => {
     return Math.max(0, totalAmount - (activeOrder.alreadyPaidAmount || 0));
   }, [totalAmount, activeOrder.alreadyPaidAmount]);
 
-  // Methods to manipulate orders
   const handleCreateNewOrder = () => {
     const nextNum = orders.length + 1;
     const newId = String(nextNum);
@@ -316,7 +326,6 @@ export function CashierPOS({
     const newOrders = orders.filter((o: POSOrder) => o.id !== id);
     setOrders(newOrders);
 
-    // Set active order to neighbor
     const newActiveId = newOrders[idx - 1]?.id || newOrders[0]?.id;
     setActiveOrderId(newActiveId);
     toast.success("Đã hủy đơn hàng nháp.");
@@ -572,7 +581,6 @@ export function CashierPOS({
     });
   };
 
-  // Filter Catalog Items
   const filteredCatalogItems = useMemo(() => {
     const q = searchQuery.toLowerCase();
     if (activeTab === "services") {
@@ -604,7 +612,6 @@ export function CashierPOS({
     }
   }, [activeTab, activeCategoryId, searchQuery, services, products, courses]);
 
-  // Render sub-category tags
   const renderCategoryChips = () => {
     if (activeTab === "courses") return null;
     const cats = activeTab === "services" ? serviceCats : productCats;
@@ -641,9 +648,7 @@ export function CashierPOS({
 
   return (
     <div className="flex-1 flex flex-col min-h-0 min-w-0 w-full bg-adminGray-50 font-sans p-2 gap-2 relative z-10 overflow-hidden">
-      {/* ── SECTION 1: THANH NGANG (Top Bar) ── */}
       <div className="bg-white border border-adminGray-100 rounded-[3px] p-2 shadow-sm shrink-0 flex items-center justify-between gap-3 relative">
-        {/* Left: Customer search */}
         <div className="relative w-96 max-w-full">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
             <Search className="w-4 h-4 text-adminGray-400" />
@@ -660,7 +665,6 @@ export function CashierPOS({
             className="w-full text-xs bg-adminGray-50 border border-adminGray-300 rounded-[3px] py-2 pl-9 pr-4 text-adminInk focus:outline-none focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 transition shadow-inner"
           />
 
-          {/* Customer Dropdown Results */}
           {showCustomerDropdown && customerSearch.trim() && (
             <>
               <div
@@ -702,15 +706,7 @@ export function CashierPOS({
           )}
         </div>
 
-        {/* Right: Order list & Create Order buttons */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => toast.info("Tính năng Danh sách đơn hàng...")}
-            className="flex items-center gap-1.5 bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white px-3.5 py-1.5 rounded-[3px] text-xs font-bold transition shadow-sm"
-          >
-            <span>Danh sách đơn hàng</span>
-          </button>
-
           <button
             onClick={handleCreateNewOrder}
             className="flex items-center gap-1.5 bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white px-3.5 py-1.5 rounded-[3px] text-xs font-bold transition shadow-sm"
@@ -721,34 +717,16 @@ export function CashierPOS({
         </div>
       </div>
 
-      {/* Bottom area: Columns split 50/50 */}
       <div className="flex-1 flex min-h-0 min-w-0 w-full gap-2 relative lg:grid lg:grid-cols-12">
-        {/* ── SECTION 2: KHUNG BÊN TRÁI (Left Panel - 50%) ── */}
         <div className="lg:col-span-6 bg-white border border-adminGray-100 rounded-[3px] shadow-sm flex flex-col overflow-hidden h-full">
-          {/* Order selection header inside Left Column */}
           <div className="p-3 bg-white border-b border-adminGray-100 flex items-center justify-between shrink-0 flex-wrap gap-2">
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="font-bold text-sm text-adminGreen-600 flex items-center gap-1">
                 <span>{activeOrder.code}</span>
               </span>
-              {/* Stars rating */}
-              <div className="flex items-center gap-0.5 text-adminGray-300">
-                {[1, 2, 3, 4, 5].map((i: number) => (
-                  <span key={i} className="text-sm">
-                    ★
-                  </span>
-                ))}
-              </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs text-adminGray-600 flex items-center gap-1">
-                Chờ thanh toán
-                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-adminGreen-600 text-white text-2xs font-bold">
-                  2
-                </span>
-              </span>
-
               <div className="relative">
                 <select
                   value={activeOrderId}
@@ -768,9 +746,7 @@ export function CashierPOS({
             </div>
           </div>
 
-          {/* Customer profile card details inside Left Column */}
           <div className="p-3 border-b border-adminGray-100 bg-adminGray-50/20 shrink-0 grid grid-cols-12 gap-3 text-xs">
-            {/* Left Part: Customer Basic */}
             <div className="col-span-6 flex items-start gap-2.5 border-r border-adminGray-100 pr-2">
               <div className="w-10 h-10 rounded-full bg-adminGray-100 border border-adminGray-100 flex items-center justify-center text-adminGray-600 font-bold shrink-0 shadow-inner">
                 {activeOrder.customer?.fullName?.charAt(0) || (
@@ -798,26 +774,7 @@ export function CashierPOS({
               </div>
             </div>
 
-            {/* Right Part: Booking Metadata */}
             <div className="col-span-6 space-y-1 relative text-xs">
-              {/* Call Client Button */}
-              {activeOrder.customer && (
-                <button
-                  onClick={() =>
-                    toast.success(
-                      `Đang gọi khách hàng: ${activeOrder.customer?.phone}`,
-                    )
-                  }
-                  className="absolute top-0 right-0 bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white font-bold py-0.5 px-2 rounded-[3px] text-2xs shadow-sm"
-                >
-                  Gọi điện
-                </button>
-              )}
-
-              <div className="flex justify-between gap-1 text-adminGray-600">
-                <span>Đặt lịch từ:</span>
-                <span className="font-semibold text-adminInk">--:--</span>
-              </div>
               <div className="flex justify-between gap-1 text-adminGray-600">
                 <span>Ngày hóa đơn:</span>
                 <span className="font-semibold text-adminInk flex items-center gap-0.5">
@@ -839,7 +796,6 @@ export function CashierPOS({
             </div>
           </div>
 
-          {/* Cart Table inside Left Column */}
           <div className="flex-1 overflow-y-auto min-h-0 bg-white">
             {activeOrder.items.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-adminGray-400 p-6">
@@ -957,7 +913,6 @@ export function CashierPOS({
             )}
           </div>
 
-          {/* Calculations footer inside Left Column */}
           <div className="p-3 bg-white border-t border-adminGray-100 shrink-0 text-xs space-y-1.5">
             <div className="flex justify-between items-center text-adminGray-600 font-medium">
               <span>Thành tiền</span>
@@ -987,7 +942,8 @@ export function CashierPOS({
                 Giảm hạng TV
               </span>
               <span className="font-bold text-adminGreen-600">
-                -{activeOrder.membershipDiscountAmount.toLocaleString("vi-VN")} đ
+                -{activeOrder.membershipDiscountAmount.toLocaleString("vi-VN")}{" "}
+                đ
               </span>
             </div>
 
@@ -1029,74 +985,35 @@ export function CashierPOS({
               </>
             )}
 
-            {/* Checkout / Control Buttons */}
             <div className="flex items-center justify-between gap-1.5 pt-3">
-              <div className="flex items-center gap-1 flex-1">
-                {/* Huy Button */}
-                <button
-                  onClick={() => handleRemoveOrder(activeOrderId)}
-                  className="bg-state-warning-solid hover:bg-state-warning-solid text-white py-2 px-3 rounded-[3px] flex items-center justify-center gap-1 text-xs font-bold shadow-sm"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Hủy</span>
-                </button>
+              <button
+                onClick={() => handleRemoveOrder(activeOrderId)}
+                className="bg-state-warning-solid hover:bg-state-warning-solid text-white py-2 px-3 rounded-[3px] flex items-center justify-center gap-1 text-xs font-bold shadow-sm"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Hủy</span>
+              </button>
 
-                {/* Hoa Hong Button */}
-                <button
-                  onClick={() =>
-                    toast.info("Tính năng hoa hồng & doanh thu...")
+              <button
+                onClick={() => {
+                  if (activeOrder.items.length === 0) {
+                    toast.error("Vui lòng chọn ít nhất 1 mặt hàng.");
+                    return;
                   }
-                  className="bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white py-2 px-2.5 rounded-[3px] flex items-center justify-center gap-1 text-xs font-bold shadow-sm flex-1"
-                >
-                  <span>Hoa hồng & doanh thu</span>
-                </button>
-
-                {/* Dropdown actions */}
-                <div className="relative">
-                  <button
-                    onClick={() => toast.info("Tính năng mở rộng...")}
-                    className="bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white py-2 px-3 rounded-[3px] text-xs font-bold shadow-sm"
-                  >
-                    ... ▾
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1">
-                {/* In Hoa Don */}
-                <button
-                  onClick={() => window.print()}
-                  className="bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white py-2 px-3 rounded-[3px] flex items-center justify-center gap-1.5 text-xs font-bold shadow-sm"
-                >
-                  <Printer className="w-3.5 h-3.5" />
-                  <span>In hóa đơn ▾</span>
-                </button>
-
-                {/* Thanh toan */}
-                <button
-                  onClick={() => {
-                    if (activeOrder.items.length === 0) {
-                      toast.error("Vui lòng chọn ít nhất 1 mặt hàng.");
-                      return;
-                    }
-                    setTempPaidAmount(amountDue);
-                    setIsCheckoutModalOpen(true);
-                  }}
-                  disabled={createInvoiceMutation.isPending || isPayingInvoice}
-                  className="bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white py-2 px-4 rounded-[3px] flex items-center justify-center gap-1.5 text-xs font-bold shadow-sm disabled:opacity-50"
-                >
-                  <span>Thanh toán</span>
-                </button>
-              </div>
+                  setTempPaidAmount(amountDue);
+                  setIsCheckoutModalOpen(true);
+                }}
+                disabled={createInvoiceMutation.isPending || isPayingInvoice}
+                className="bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white py-2 px-4 rounded-[3px] flex items-center justify-center gap-1.5 text-xs font-bold shadow-sm disabled:opacity-50"
+              >
+                <span>Thanh toán</span>
+              </button>
             </div>
           </div>
         </div>
 
-        {/* ── SECTION 3: KHUNG BÊN PHẢI (Right Panel - 50%) ── */}
         <div className="lg:col-span-6 bg-white border border-adminGray-100 rounded-[3px] shadow-sm flex flex-col overflow-hidden h-full">
-          {/* Search & Tabs inside Right Column */}
           <div className="p-3 bg-white border-b border-adminGray-100 flex flex-col gap-3 shrink-0">
-            {/* Search box for catalog items */}
             <div className="relative">
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                 <Search className="w-4 h-4 text-adminGray-400" />
@@ -1112,7 +1029,6 @@ export function CashierPOS({
               />
             </div>
 
-            {/* Main Tabs */}
             <div className="flex bg-adminGray-100 p-1 rounded-md border border-adminGray-100/60 shadow-sm">
               <button
                 onClick={() => {
@@ -1168,11 +1084,9 @@ export function CashierPOS({
               </button>
             </div>
 
-            {/* Sub-category chips filter */}
             {renderCategoryChips()}
           </div>
 
-          {/* Catalog items grid inside Right Column */}
           <div className="flex-1 overflow-y-auto min-h-0 p-3 bg-adminGray-50/10">
             {loadingServices || loadingProducts || loadingCourses ? (
               <div className="grid grid-cols-2 gap-3">
@@ -1203,7 +1117,6 @@ export function CashierPOS({
                     const id = item.id!;
                     const imageUrl = getCatalogItemImageUrl(item);
 
-                    // Count current instances in cart
                     const cartQty =
                       activeOrder.items.find(
                         (i: POSOrderItem) =>
@@ -1230,14 +1143,12 @@ export function CashierPOS({
                             : "border-adminGray-100",
                         )}
                       >
-                        {/* Badge count overlay */}
                         {cartQty > 0 && (
                           <div className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-adminGreen-600 text-white flex items-center justify-center text-2xs font-bold shadow-sm z-10">
                             {cartQty}
                           </div>
                         )}
 
-                        {/* Thumbnail image */}
                         <div className="w-12 h-12 rounded-[3px] overflow-hidden bg-adminGray-100 flex items-center justify-center shrink-0 shadow-inner">
                           {imageUrl ? (
                             <img
@@ -1247,7 +1158,7 @@ export function CashierPOS({
                               onError={(
                                 e: React.SyntheticEvent<HTMLImageElement>,
                               ) => {
-                                e.currentTarget.src = ""; // Clear if broken
+                                e.currentTarget.src = "";
                                 e.currentTarget.className = "hidden";
                               }}
                             />
@@ -1277,22 +1188,12 @@ export function CashierPOS({
             )}
           </div>
 
-          {/* Footer info inside Right Column */}
-          <div className="bg-white border-t border-adminGray-100 p-2.5 text-2xs text-adminGray-600 font-medium flex items-center justify-between shrink-0">
-            <button
-              onClick={() =>
-                toast.info("Đang hiển thị danh sách thẻ khách hàng...")
-              }
-              className="text-adminGreen-600 hover:underline font-bold"
-            >
-              Danh sách khách hàng dùng thẻ
-            </button>
+          <div className="bg-white border-t border-adminGray-100 p-2.5 text-2xs text-adminGray-600 font-medium flex items-center justify-end shrink-0">
             <span>Hoa Sen Spa POS © 2026</span>
           </div>
         </div>
       </div>
 
-      {/* ── DISCOUNT MODAL DIALOG ── */}
       {isDiscountModalOpen && (
         <div className="fixed inset-0 bg-adminInk/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white border border-adminGray-100 rounded-[3px] shadow-2xl max-w-sm w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
@@ -1347,7 +1248,6 @@ export function CashierPOS({
         </div>
       )}
 
-      {/* ── CHECKOUT PAYMENT MODAL DIALOG ── */}
       {isCheckoutModalOpen && (
         <div className="fixed inset-0 bg-adminInk/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white border border-adminGray-100 rounded-[3px] shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
@@ -1393,7 +1293,6 @@ export function CashierPOS({
                 </div>
               </div>
 
-              {/* Payment Method Selector */}
               <div className="space-y-2">
                 <label className="text-2xs font-bold text-adminGray-600 uppercase tracking-wider">
                   Phương thức thanh toán
@@ -1441,7 +1340,6 @@ export function CashierPOS({
                 </div>
               </div>
 
-              {/* Amount paid by customer */}
               <div className="space-y-1">
                 <label className="text-2xs font-bold text-adminGray-600 uppercase tracking-wider">
                   Khách thanh toán (VND)
@@ -1456,7 +1354,6 @@ export function CashierPOS({
                 />
               </div>
 
-              {/* Note / Memo */}
               <div className="space-y-1">
                 <label className="text-2xs font-bold text-adminGray-600 uppercase tracking-wider">
                   Ghi chú đơn hàng
@@ -1477,7 +1374,6 @@ export function CashierPOS({
                 />
               </div>
 
-              {/* Change computation if paying cash */}
               {activeOrder.paymentMethod === PAYMENT_METHOD.CASH &&
                 tempPaidAmount > amountDue && (
                   <div className="flex justify-between items-center text-xs font-bold text-adminGray-600 border-t border-dashed border-adminGray-100 pt-3">

@@ -38,7 +38,8 @@ import type { ServiceCategoryDto } from "../types/serviceCategory.types";
 const ENTITY = "nhóm dịch vụ";
 const ENTITY_SUBJECT = "Nhóm dịch vụ";
 const DELETE_WARNING = "Các dịch vụ thuộc nhóm này có thể bị ảnh hưởng.";
-const BULK_DELETE_WARNING = "Các dịch vụ thuộc các nhóm này có thể bị ảnh hưởng.";
+const BULK_DELETE_WARNING =
+  "Các dịch vụ thuộc các nhóm này có thể bị ảnh hưởng.";
 
 export function ServiceCategoryListPage() {
   "use no memo";
@@ -76,8 +77,12 @@ export function ServiceCategoryListPage() {
   const deletedQuery = useDeletedServiceCategories(queryParams, showDeleted);
 
   const categoryResult = showDeleted ? deletedQuery.data : activeQuery.data;
-  const isLoading = showDeleted ? deletedQuery.isLoading : activeQuery.isLoading;
-  const isFetching = showDeleted ? deletedQuery.isFetching : activeQuery.isFetching;
+  const isLoading = showDeleted
+    ? deletedQuery.isLoading
+    : activeQuery.isLoading;
+  const isFetching = showDeleted
+    ? deletedQuery.isFetching
+    : activeQuery.isFetching;
 
   const paged = categoryResult?.data;
   const categories = useMemo(() => paged?.items ?? [], [paged?.items]);
@@ -158,7 +163,12 @@ export function ServiceCategoryListPage() {
         }
       },
     });
-  }, [selectedRowIds, deleteMultiplesMutation, setBulkDeleteOpen, clearSelection]);
+  }, [
+    selectedRowIds,
+    deleteMultiplesMutation,
+    setBulkDeleteOpen,
+    clearSelection,
+  ]);
 
   const handleRestore = useCallback(() => {
     if (!restoreTarget?.id) return;
@@ -169,7 +179,10 @@ export function ServiceCategoryListPage() {
     });
   }, [restoreTarget, restoreMutation, setRestoreTarget]);
 
-  const columnLabels = useMemo(() => ({ ...SERVICE_CATEGORY_COLUMN_LABELS }), []);
+  const columnLabels = useMemo(
+    () => ({ ...SERVICE_CATEGORY_COLUMN_LABELS }),
+    [],
+  );
 
   return (
     <TablePageShell isFetching={isFetching} isLoading={isLoading}>
@@ -305,7 +318,10 @@ export function ServiceCategoryListPage() {
         }
       />
 
-      <ServiceCategoryFormDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <ServiceCategoryFormDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+      />
 
       <ServiceCategoryFormDialog
         open={!!editTarget}

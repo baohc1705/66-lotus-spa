@@ -76,19 +76,20 @@ const FaqRow = ({
         aria-controls={panelId}
         className="landing-focus-ring flex w-full items-center gap-3 px-4 py-4 text-left sm:gap-4 sm:px-6 sm:py-5"
       >
-        {/* Icon tròn trái */}
         <span
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-600/12 text-rose-600 sm:h-11 sm:w-11"
           aria-hidden="true"
         >
-          <Icon className="h-4 w-4 sm:h-[1.125rem] sm:w-[1.125rem]" strokeWidth={1.75} />
+          <Icon
+            className="h-4 w-4 sm:h-[1.125rem] sm:w-[1.125rem]"
+            strokeWidth={1.75}
+          />
         </span>
 
         <span className="min-w-0 flex-1 font-geist text-base font-medium leading-snug text-ink">
           {item.question}
         </span>
 
-        {/* Nút +/- tròn phải */}
         <span
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-rose-600 text-rose-600"
           aria-hidden="true"

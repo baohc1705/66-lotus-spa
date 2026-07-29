@@ -1,20 +1,22 @@
-import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
 import { AdminInput } from '@/shared/components/forms/AdminInput';
 import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { Calendar, Clock, AlertCircle } from "lucide-react";
+import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
+import { Button } from "@/shared/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
+import { AlertCircle, Calendar, Clock } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 
 import { Label } from "@/shared/components/ui/label";
 
+import { useAuthStore } from "@/features/auth/stores/authStore";
+import type { WorkScheduleDTO } from "@/features/schedules/types/schedule.types";
 import {
   Select,
   SelectContent,
@@ -22,22 +24,20 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import {
-  useCheckIn,
-  useCheckOut,
-  useUpdateAttendance,
-  useCreateManualAttendance,
-} from "../hooks/useAttendances";
-import type { AttendanceDto } from "../types/attendance.types";
-import type { WorkScheduleDTO } from "@/features/schedules/types/schedule.types";
-import {
-  formatDisplayDate,
   formatDate,
-  toLocalTimeOnly,
-  toLocalDateOnly,
+  formatDisplayDate,
   localDateTimeToUtc,
+  toLocalDateOnly,
+  toLocalTimeOnly,
 } from "@/shared/utils/date.utils";
 import { toast } from "sonner";
-import { useAuthStore } from "@/features/auth/stores/authStore";
+import {
+  useCheckIn,
+  useCheckOut,
+  useCreateManualAttendance,
+  useUpdateAttendance,
+} from "../hooks/useAttendances";
+import type { AttendanceDto } from "../types/attendance.types";
 
 interface AttendanceDailyDialogProps {
   open: boolean;
@@ -47,10 +47,6 @@ interface AttendanceDailyDialogProps {
   onSuccess?: () => void;
 }
 
-// Map client type to backend status
-// 1 = Đang làm, 2 = Đã ra ca
-// 4 = Nghỉ phép (hưởng lương), 5 = Nghỉ lễ
-// 3 = Vắng / nghỉ không lương, 6 = Nghỉ không lương
 type ModeType = "working" | "paid_leave" | "unpaid_leave";
 
 interface FormFields {
@@ -87,7 +83,7 @@ export function AttendanceDailyDialog({
   const { register, handleSubmit, watch, setValue, reset } = useForm<FormFields>({
     defaultValues: {
       mode: "working",
-      subStatus: "4", // Nghỉ phép
+      subStatus: "4",
       checkInEnabled: true,
       checkInTime: "09:00",
       checkOutEnabled: false,
@@ -108,7 +104,6 @@ export function AttendanceDailyDialog({
     : "";
   const isToday = scheduleDateStr === todayIsoDate();
 
-  // Load defaults or existing attendance
   useEffect(() => {
     if (open) {
       setActiveTab("attendance");
@@ -157,7 +152,6 @@ export function AttendanceDailyDialog({
     }
   }, [open, attendance, schedule, reset]);
 
-  // Giờ local từ form → ISO UTC gửi BE (giống AttendanceFormDialog)
   const combineDateAndTime = (timeStr: string): string => {
     if (!scheduleDateStr) return "";
     return localDateTimeToUtc(scheduleDateStr, timeStr);
@@ -204,12 +198,12 @@ export function AttendanceDailyDialog({
       return;
     }
 
-    let targetStatus = 1; // Default CheckIn
+    let targetStatus = 1;
     if (data.mode === "working") {
       if (data.checkInEnabled && data.checkOutEnabled) {
-        targetStatus = 2; // Checked Out
+        targetStatus = 2;
       } else if (data.checkInEnabled) {
-        targetStatus = 1; // Checked In
+        targetStatus = 1;
       }
     } else if (data.mode === "paid_leave") {
       targetStatus = Number(data.subStatus);
@@ -221,7 +215,6 @@ export function AttendanceDailyDialog({
     const payloadCheckOutAt = data.checkOutEnabled ? combineDateAndTime(data.checkOutTime) : undefined;
 
     if (attendance?.id) {
-      // 1. UPDATE EXISTING ATTENDANCE RECORD
       updateMutation.mutate(
         {
           id: attendance.id,
@@ -242,14 +235,12 @@ export function AttendanceDailyDialog({
         }
       );
     } else {
-      // 2. CREATE NEW ATTENDANCE RECORD
       if (data.mode === "working") {
         if (!isToday) {
           toast.error("Hệ thống chỉ hỗ trợ ghi nhận đi làm (Check-in) cho ngày hôm nay. Đối với ngày trong quá khứ/tương lai, vui lòng chọn hình thức Nghỉ.");
           return;
         }
 
-        // Call check-in first
         checkInMutation.mutate(
           {
             staffId: schedule.staffId,
@@ -259,8 +250,7 @@ export function AttendanceDailyDialog({
           {
             onSuccess: (res) => {
               if (res.isSuccess && res.data) {
-                const newId = res.data;
-                // If user customized check-in/out times, call update immediately
+                const newId = res.data; 
                 const needsUpdate =
                   (data.checkInEnabled && data.checkInTime !== "09:00") ||
                   data.checkOutEnabled;
@@ -294,7 +284,6 @@ export function AttendanceDailyDialog({
           }
         );
       } else {
-        // Create manual leave record
         createManualMutation.mutate(
           {
             staffId: schedule.staffId,
@@ -346,7 +335,6 @@ export function AttendanceDailyDialog({
           </div>
         </DialogHeader>
 
-        {/* Info Grid */}
         <div className="p-5 pb-2 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm border-b border-adminGray-100 mt-2 bg-adminGray-50/50">
           <div className="flex items-center gap-2 text-adminGray-600">
             <Calendar size={15} className="text-adminGray-600" />
@@ -364,7 +352,6 @@ export function AttendanceDailyDialog({
           </div>
         </div>
 
-        {/* Tab Selection */}
         <div className="flex border-b border-adminGray-100 px-5 bg-white">
           <button
             type="button"
@@ -425,7 +412,6 @@ export function AttendanceDailyDialog({
                         </div>
                       )}
 
-                      {/* Note */}
                       {(!attendance || !attendance.checkOutAt) && (
                         <div className="space-y-1.5">
                           <Label className="text-xs font-bold text-adminGray-600 uppercase tracking-wider">
@@ -443,7 +429,6 @@ export function AttendanceDailyDialog({
                 </div>
               ) : (
                 <>
-                  {/* Warning for past days */}
                   {!isToday && !attendance && (
                     <div className="flex items-start gap-2.5 p-3 rounded-xl bg-state-warning-bg border border-state-warning-border text-state-warning-text text-xs leading-relaxed">
                       <AlertCircle size={16} className="shrink-0 mt-0.5 text-state-warning-text" />
@@ -453,7 +438,6 @@ export function AttendanceDailyDialog({
                     </div>
                   )}
 
-                  {/* Radio selection */}
                   <div className="space-y-2">
                     <Label className="text-xs font-bold text-adminGray-600 uppercase tracking-wider">
                       Loại chấm công
@@ -509,7 +493,6 @@ export function AttendanceDailyDialog({
                     </div>
                   </div>
 
-                  {/* Sub Options for Leave */}
                   {mode === "paid_leave" && (
                     <div className="space-y-1.5 animate-in slide-in-from-top-1 duration-200">
                       <Label className="text-xs font-semibold text-adminGray-600">Chi tiết phép</Label>
@@ -546,7 +529,6 @@ export function AttendanceDailyDialog({
                     </div>
                   )}
 
-                  {/* Check-in / Check-out Times */}
                   {mode === "working" && (
                     <div className="grid grid-cols-2 gap-4 pt-1 animate-in slide-in-from-top-1 duration-200">
                       <div className="space-y-2 border border-adminGray-100/70 p-3.5 rounded-2xl bg-white/50">
@@ -587,7 +569,6 @@ export function AttendanceDailyDialog({
                     </div>
                   )}
 
-                  {/* Note */}
                   <div className="space-y-1.5">
                     <Label className="text-xs font-bold text-adminGray-600 uppercase tracking-wider">
                       Ghi chú
@@ -601,7 +582,6 @@ export function AttendanceDailyDialog({
                 </>
               )
             ) : (
-              /* History Tab */
               <div className="space-y-3 py-2">
                 {attendance ? (
                   <div className="border border-adminGray-100/60 rounded-xl p-4 bg-adminGray-50/50 space-y-2.5 text-sm">

@@ -19,7 +19,6 @@ export function AttendanceListPage() {
   const isAdminOrManager = hasRole("Admin") || hasRole("Manager");
   const currentStaffId = user?.staffInfo?.id;
 
-  // Week selection state
   const [currentDate, setCurrentDate] = useState<DateUtil>(
     formatDate().startOf("isoWeek"),
   );
@@ -30,7 +29,6 @@ export function AttendanceListPage() {
   const [filterNoAttendance, setFilterNoAttendance] = useState(false);
   const [filterLeave, setFilterLeave] = useState(false);
 
-  // Dialog state
   const [selectedSchedule, setSelectedSchedule] =
     useState<WorkScheduleDTO | null>(null);
   const [selectedAttendance, setSelectedAttendance] =
@@ -45,13 +43,11 @@ export function AttendanceListPage() {
   const handleNextWeek = () => setCurrentDate((prev) => prev.add(1, "week"));
   const handleThisWeek = () => setCurrentDate(formatDate().startOf("isoWeek"));
 
-  // Fetch shifts
   const { data: shiftsResult, isLoading: isLoadingShifts } = useShifts({
     pageIndex: 1,
     pageSize: 100,
   });
 
-  // Fetch work schedules for this week
   const {
     data: schedulesResult,
     isLoading: isLoadingSchedules,
@@ -65,7 +61,6 @@ export function AttendanceListPage() {
     staffId: isAdminOrManager ? undefined : (currentStaffId ?? -1),
   });
 
-  // Fetch attendances for this week
   const {
     data: attendancesResult,
     isLoading: isLoadingAttendances,
@@ -89,7 +84,6 @@ export function AttendanceListPage() {
   );
   const weekLabel = `Tuần ${currentDate.isoWeek()} (${currentDate.format("DD/MM/YYYY")} - ${currentDate.endOf("isoWeek").format("DD/MM/YYYY")})`;
 
-  // Map attendance theo workScheduleId — mỗi ca một bản ghi riêng (không fallback staffId+ngày)
   const scheduleAttendanceMap = useMemo(() => {
     const map = new Map<number, AttendanceDto>();
     const attendances = attendancesResult?.data?.items ?? [];
@@ -101,18 +95,15 @@ export function AttendanceListPage() {
     return map;
   }, [attendancesResult?.data?.items]);
 
-  // Filtered schedules by staff name and attendance state
   const filteredWorkSchedules = useMemo(() => {
     const workSchedules = schedulesResult?.data?.items ?? [];
 
-    // 1. Filter by search query
     let list = workSchedules;
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       list = list.filter((ws) => ws.staffName?.toLowerCase().includes(query));
     }
 
-    // Check if any filter is active
     const hasActiveFilter =
       filterOnTime ||
       filterLate ||
@@ -124,19 +115,15 @@ export function AttendanceListPage() {
       return list;
     }
 
-    // 2. Filter by checkboxes
     return list.filter((ws: WorkScheduleDTO) => {
-      // Chỉ gắn attendance của đúng ca (workScheduleId)
       const att = ws.id ? scheduleAttendanceMap.get(ws.id) : null;
 
-      // Check status
       if (!att) {
         return filterNoAttendance;
       }
 
       const statusVal = att.status;
 
-      // Group leaves/absents (status 3, 4, 5, 6)
       if (
         statusVal === 3 ||
         statusVal === 4 ||
@@ -147,7 +134,6 @@ export function AttendanceListPage() {
       }
 
       if (statusVal === 1 || statusVal === 2) {
-        // Chấm công thiếu: status === 1 (Checked-in but no check-out)
         if (statusVal === 1) {
           if (filterMissing) return true;
         }
@@ -165,7 +151,6 @@ export function AttendanceListPage() {
           return h * 60 + m;
         };
 
-        // Find shift period
         let period: ShiftPeriodDTO | undefined;
         const shifts = shiftsResult?.data?.items ?? [];
         for (const shift of shifts) {
@@ -208,7 +193,6 @@ export function AttendanceListPage() {
     filterLeave,
   ]);
 
-  // Map shift periods active this week
   const activeShiftPeriods = useMemo(() => {
     const list: { shift: ShiftDTO; period: ShiftPeriodDTO }[] = [];
     const shifts = shiftsResult?.data?.items ?? [];
@@ -228,7 +212,6 @@ export function AttendanceListPage() {
     return list;
   }, [shiftsResult?.data?.items, startDateStr, endDateStr]);
 
-  // Map schedules into cells
   const shiftDayMap = useMemo(() => {
     const map = new Map<string, WorkScheduleDTO[]>();
     filteredWorkSchedules.forEach((ws) => {
@@ -272,7 +255,6 @@ export function AttendanceListPage() {
       "w-full text-left p-2.5 border rounded-xl transition-all focus:outline-none focus:ring-1 shadow-sm";
 
     if (!att) {
-      // 1. Chưa chấm công -> bg-amber
       return {
         className: `${defaultClass} bg-state-warning-bg border-state-warning-border hover:border-state-warning-solid focus:ring-state-warning-solid`,
         timeText: "--:--",
@@ -301,7 +283,6 @@ export function AttendanceListPage() {
 
     const statusVal = att.status;
 
-    // Check-in / Out working states
     if (statusVal === 1 || statusVal === 2) {
       const shiftStartMins = timeToMinutes(period.shiftStart);
       const shiftEndMins = timeToMinutes(period.shiftEnd);
@@ -329,7 +310,6 @@ export function AttendanceListPage() {
       const timeText = `${checkInStr} - ${checkOutStr}`;
 
       if (isLate || isEarly) {
-        // 2. Đi muộn/về sớm -> bg-danger (rose)
         const statusText = [lateText, earlyText].filter(Boolean).join(" & ");
         return {
           className: `${defaultClass} bg-state-danger-bg border-state-danger-border hover:border-state-danger-solid focus:ring-state-danger-solid`,
@@ -338,7 +318,6 @@ export function AttendanceListPage() {
           statusColorClass: "text-state-danger-text font-bold",
         };
       } else {
-        // 3. Đã chấm công bình thường -> bg-adminGreen-600 (green)
         return {
           className: `${defaultClass} bg-adminGreen-600-light border-adminGreen-600 hover:border-adminGreen-600 focus:ring-adminGreen-600`,
           timeText,
@@ -348,7 +327,6 @@ export function AttendanceListPage() {
       }
     }
 
-    // Leave states
     if (statusVal === 4 || statusVal === 5) {
       return {
         className: `${defaultClass} bg-state-info-bg border-state-info-border hover:border-state-info-border focus:ring-state-info-solid`,
@@ -357,8 +335,7 @@ export function AttendanceListPage() {
         statusColorClass: "text-state-info-text font-semibold",
       };
     }
-
-    // Unpaid leave/Absent states -> bg-danger
+      
     if (statusVal === 3 || statusVal === 6) {
       return {
         className: `${defaultClass} bg-state-danger-bg border-state-danger-border hover:border-state-danger-solid focus:ring-state-danger-solid`,
@@ -381,7 +358,6 @@ export function AttendanceListPage() {
 
   return (
     <div className="space-y-2">
-      {/* Search & Navigation header */}
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-2 rounded border border-adminGray-100/30 shadow-sm">
         <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto">
           {isAdminOrManager && (
@@ -400,7 +376,6 @@ export function AttendanceListPage() {
             </div>
           )}
 
-          {/* Simple Checkbox filters */}
           <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-adminGray-600">
             <label className="flex items-center gap-1.5 cursor-pointer select-none">
               <input
@@ -481,7 +456,6 @@ export function AttendanceListPage() {
         </div>
       </div>
 
-      {/* Board Layout */}
       {isPageLoading ? (
         <div className="flex items-center justify-center py-24 bg-white rounded border border-adminGray-100/30 shadow-sm min-h-[400px]">
           <div className="flex flex-col items-center gap-3">
@@ -535,7 +509,6 @@ export function AttendanceListPage() {
               ) : (
                 activeShiftPeriods.map(({ shift, period }, index) => (
                   <tr key={`${shift.id}_${period.id}_${index}`}>
-                    {/* Shift details column */}
                     <td className="py-4 px-4 border-r border-adminGray-100/50 align-top bg-adminGray-50/20">
                       <div className="font-extrabold text-adminInk">
                         {shift.name}
@@ -552,7 +525,6 @@ export function AttendanceListPage() {
                       </div>
                     </td>
 
-                    {/* Weekdays columns */}
                     {days.map((day, i) => {
                       const dateStr = day.format("YYYY-MM-DD");
                       const isPeriodActiveThisDay =

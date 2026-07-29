@@ -7,7 +7,6 @@ export interface PermissionDTO {
   permissionKey: string;
 }
 
-/** Profile gọn trả từ login/refresh (đồng bộ JWT claim profile). */
 export interface TokenUserProfileDto {
   userId: number;
   username: string;
@@ -17,7 +16,6 @@ export interface TokenUserProfileDto {
   phone?: string;
   roles: string[];
   permissions: string[];
-  /** customer | staff | none */
   profileType: string;
   customerProfile?: TokenCustomerProfileDto | null;
   staffProfile?: TokenStaffProfileDto | null;
@@ -61,8 +59,7 @@ export interface RolePermissionDTO {
   permissionId: number;
   name: string;
 }
-
-// Request payloads
+  
 export interface LoginRequest {
   usernameOrEmail: string;
   password: string;

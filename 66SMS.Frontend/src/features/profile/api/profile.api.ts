@@ -10,7 +10,9 @@ import type {
 
 export const profileApi = {
   getProfile: async () => {
-    const { data } = await axiosInstance.get<Result<ProfileResponse>>(API.users.me);
+    const { data } = await axiosInstance.get<Result<ProfileResponse>>(
+      API.users.me,
+    );
     return data;
   },
 
@@ -20,12 +22,17 @@ export const profileApi = {
   },
 
   changePassword: async (body: ChangePasswordRequest) => {
-    const { data } = await axiosInstance.post<Result<void>>(API.auth.changePassword, body);
+    const { data } = await axiosInstance.post<Result<void>>(
+      API.auth.changePassword,
+      body,
+    );
     return data;
   },
 
   getMyMembershipCard: async () => {
-    const { data } = await axiosInstance.get<Result<MembershipCardDto>>(API.users.meMembershipCard);
+    const { data } = await axiosInstance.get<Result<MembershipCardDto>>(
+      API.users.meMembershipCard,
+    );
     return data;
   },
 };

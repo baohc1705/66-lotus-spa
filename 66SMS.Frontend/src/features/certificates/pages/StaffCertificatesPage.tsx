@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 import {
   useReactTable,
   getCoreRowModel,
@@ -36,10 +36,17 @@ interface Props {
   staffId?: number;
 }
 
-const ENTITY = "chá»©ng chá»‰";
+const ENTITY = "chứng chỉ";
 
 export function StaffCertificatesPage({ staffId }: Props) {
   const perm = CERTIFICATE_PERM;
+  const [searchParams] = useSearchParams();
+  const staffIdFromQuery = Number(searchParams.get("staffId"));
+  const effectiveStaffId =
+    staffId ??
+    (Number.isFinite(staffIdFromQuery) && staffIdFromQuery > 0
+      ? staffIdFromQuery
+      : undefined);
   const listState = useStaffCertificateListState();
   const {
     pageIndex,
@@ -64,30 +71,46 @@ export function StaffCertificatesPage({ staffId }: Props) {
   const mergedParams = useMemo(
     () => ({
       ...queryParams,
-      staffId,
+      staffId: effectiveStaffId,
     }),
-    [queryParams, staffId],
+    [queryParams, effectiveStaffId],
   );
 
-  const { data: result, isLoading, isFetching } = useStaffCertificates(mergedParams);
+  const {
+    data: result,
+    isLoading,
+    isFetching,
+  } = useStaffCertificates(mergedParams);
   const deleteMutation = useDeleteStaffCertificate();
 
-  // Fetch all staff certificates globally or per-staff to calculate counts
-  const { data: allCertsResult, isLoading: isLoadingAll } = useStaffCertificates({
-    pageIndex: 1,
-    pageSize: 10000,
-    staffId,
-  });
+  const { data: allCertsResult, isLoading: isLoadingAll } =
+    useStaffCertificates({
+      pageIndex: 1,
+      pageSize: 10000,
+      staffId: effectiveStaffId,
+    });
 
   const paged = result?.data;
   const items = useMemo(() => paged?.items ?? [], [paged?.items]);
 
-  const allCerts = useMemo(() => allCertsResult?.data?.items ?? [], [allCertsResult]);
+  const allCerts = useMemo(
+    () => allCertsResult?.data?.items ?? [],
+    [allCertsResult],
+  );
 
   const totalCertsCount = allCerts.length;
-  const activeCertsCount = useMemo(() => allCerts.filter((c) => c.status === 1).length, [allCerts]);
-  const expiredCertsCount = useMemo(() => allCerts.filter((c) => c.status === 2).length, [allCerts]);
-  const pendingCertsCount = useMemo(() => allCerts.filter((c) => c.status === 0).length, [allCerts]);
+  const activeCertsCount = useMemo(
+    () => allCerts.filter((c) => c.status === 1).length,
+    [allCerts],
+  );
+  const expiredCertsCount = useMemo(
+    () => allCerts.filter((c) => c.status === 2).length,
+    [allCerts],
+  );
+  const pendingCertsCount = useMemo(
+    () => allCerts.filter((c) => c.status === 0).length,
+    [allCerts],
+  );
 
   const columns = useActiveStaffCertificateColumns({
     pageIndex,
@@ -118,7 +141,10 @@ export function StaffCertificatesPage({ staffId }: Props) {
     }
   };
 
-  const columnLabels = useMemo(() => ({ ...STAFF_CERTIFICATE_COLUMN_LABELS }), []);
+  const columnLabels = useMemo(
+    () => ({ ...STAFF_CERTIFICATE_COLUMN_LABELS }),
+    [],
+  );
 
   const { layoutMode } = useOutletContext<{
     layoutMode: "top-nav" | "sidebar";
@@ -127,7 +153,6 @@ export function StaffCertificatesPage({ staffId }: Props) {
 
   return (
     <div className="flex h-full overflow-hidden gap-2">
-      {/* Sidebar loáº¡i chá»©ng chá»‰ */}
       {!isSidebarMode && (
         <CertificateTypeSidebar
           selectedTypeId={selectedCertificateTypeId}
@@ -135,9 +160,7 @@ export function StaffCertificatesPage({ staffId }: Props) {
         />
       )}
 
-      {/* Right container: Stats + Table */}
       <div className="flex-1 min-w-0 flex flex-col gap-2 overflow-hidden">
-        {/* Stats row */}
         <div className="shrink-0">
           <StaffCertificateStatCards
             totalCount={totalCertsCount}
@@ -148,9 +171,7 @@ export function StaffCertificatesPage({ staffId }: Props) {
           />
         </div>
 
-        {/* Table card */}
         <div className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative">
-          {/* Fetching bar */}
           {isFetching && !isLoading && (
             <div className="lotus-admin-table-fetch-bar">
               <div className="lotus-admin-table-fetch-bar-inner" />
@@ -181,7 +202,9 @@ export function StaffCertificatesPage({ staffId }: Props) {
           <DataTable
             table={table}
             isLoading={isLoading}
-            loadingRows={pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize}
+            loadingRows={
+              pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
+            }
             onRowClick={(row) => row.toggleExpanded()}
             renderSubComponent={({ row }) => (
               <StaffCertificateDetailExpanded
@@ -230,7 +253,7 @@ export function StaffCertificatesPage({ staffId }: Props) {
       <StaffCertificateFormDialog
         open={createOpen}
         onOpenChange={setCreateOpen}
-        staffId={staffId}
+        staffId={effectiveStaffId}
       />
       <StaffCertificateFormDialog
         open={!!editTarget}
@@ -238,7 +261,7 @@ export function StaffCertificatesPage({ staffId }: Props) {
           if (!open) setEditTarget(null);
         }}
         item={editTarget}
-        staffId={staffId}
+        staffId={effectiveStaffId}
       />
 
       <ConfirmDialog
@@ -248,7 +271,10 @@ export function StaffCertificatesPage({ staffId }: Props) {
         }}
         onConfirm={handleDelete}
         title={CONFIRM_MSG.deleteTitle(ENTITY)}
-        description={CONFIRM_MSG.deleteDescription(ENTITY, deleteTarget?.certificateName ?? "")}
+        description={CONFIRM_MSG.deleteDescription(
+          ENTITY,
+          deleteTarget?.certificateName ?? "",
+        )}
         confirmLabel={COMMON_MSG.delete}
         loading={deleteMutation.isPending}
         variant="danger"

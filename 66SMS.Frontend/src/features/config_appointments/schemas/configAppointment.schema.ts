@@ -6,9 +6,11 @@ const emptyToUndefined = (v: unknown) =>
 
 const configAppointmentBaseSchema = z
   .object({
-    salonId: z.coerce.number().min(1, VALIDATION_MSG.selectRequired("chi nhánh")),
+    salonId: z.coerce
+      .number()
+      .min(1, VALIDATION_MSG.selectRequired("chi nhánh")),
     depositPercent: z.coerce
-      .number({ invalid_type_error: VALIDATION_MSG.required("Phần trăm cọc") })
+      .number({ error: VALIDATION_MSG.required("Phần trăm cọc") })
       .min(0, "Phần trăm cọc phải từ 0 đến 100")
       .max(100, "Phần trăm cọc phải từ 0 đến 100"),
     startTime: z.preprocess(emptyToUndefined, z.string().optional()),

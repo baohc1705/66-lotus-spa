@@ -1,6 +1,5 @@
 import type { PageRequest } from "@/shared/types/common.types";
 
-/** Item từ GetAllSalons — không có description (field dài). */
 export interface SalonListItem {
   id?: number;
   code?: string;
@@ -22,7 +21,6 @@ export interface SalonListItem {
   createdAt?: string;
 }
 
-/** Chi tiết đầy đủ từ GetDetailSalon — có description. */
 export interface SalonDTO extends SalonListItem {
   description?: string;
   updatedAt?: string;

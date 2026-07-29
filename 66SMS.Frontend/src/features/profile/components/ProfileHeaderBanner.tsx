@@ -97,11 +97,15 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
         </div>
 
         <div className="flex-1 flex flex-col justify-center max-w-md w-full">
-          <p className="text-xs font-bold text-ink mb-1.5">Tiến độ thăng hạng</p>
+          <p className="text-xs font-bold text-ink mb-1.5">
+            Tiến độ thăng hạng
+          </p>
           <div className="flex items-center justify-between text-xs text-warm-600 mb-1">
             <span>
               Hiện tại:{" "}
-              <span className="text-lotus-gold font-bold">{currentTierName}</span>
+              <span className="text-lotus-gold font-bold">
+                {currentTierName}
+              </span>
             </span>
             <span>
               Mục tiêu:{" "}

@@ -3,7 +3,10 @@ import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import { revenueApi } from "../api/revenue.api";
 
-function getFileNameFromHeader(contentDisposition: string | undefined, fallback: string): string {
+function getFileNameFromHeader(
+  contentDisposition: string | undefined,
+  fallback: string,
+): string {
   if (!contentDisposition) return fallback;
   const match = /filename\*?=(?:UTF-8''|")?([^\";]+)/i.exec(contentDisposition);
   if (!match?.[1]) return fallback;
@@ -33,7 +36,7 @@ export function useExportRevenueBySalon() {
       const fallback = `DoanhThu_ChiNhanh_${variables.from.replaceAll("-", "")}_${variables.to.replaceAll("-", "")}.xlsx`;
       const fileName = getFileNameFromHeader(
         response.headers["content-disposition"] as string | undefined,
-        fallback
+        fallback,
       );
       downloadBlob(response.data as Blob, fileName);
       toast.success("Đã xuất file Excel so sánh chi nhánh");

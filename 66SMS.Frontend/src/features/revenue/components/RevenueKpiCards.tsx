@@ -17,7 +17,10 @@ interface RevenueKpiCardsProps {
   isLoading: boolean;
 }
 
-export const RevenueKpiCards = memo(function RevenueKpiCards({ summary, isLoading }: RevenueKpiCardsProps) {
+export const RevenueKpiCards = memo(function RevenueKpiCards({
+  summary,
+  isLoading,
+}: RevenueKpiCardsProps) {
   if (isLoading || !summary) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2">

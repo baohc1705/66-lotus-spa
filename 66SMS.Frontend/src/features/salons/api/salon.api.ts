@@ -26,7 +26,9 @@ export const salonApi = {
     axiosInstance.get<Result<SalonDTO>>(`${BASE}/${id}`).then((r) => r.data),
 
   getPrimary: () =>
-    axiosInstance.get<Result<SalonDTO | null>>(`${BASE}/primary`).then((r) => r.data),
+    axiosInstance
+      .get<Result<SalonDTO | null>>(`${BASE}/primary`)
+      .then((r) => r.data),
 
   create: (payload: CreateSalonPayload) =>
     axiosInstance.post<Result<number>>(BASE, payload).then((r) => r.data),

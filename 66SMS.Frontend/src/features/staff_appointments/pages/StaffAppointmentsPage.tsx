@@ -76,7 +76,10 @@ export function StaffAppointmentsPage() {
           schedule.refetch();
           setSelectedBooking((prev) =>
             prev && prev.booking.id === bookingId
-              ? { ...prev, booking: { ...prev.booking, status: BookingStatus.InService } }
+              ? {
+                  ...prev,
+                  booking: { ...prev.booking, status: BookingStatus.InService },
+                }
               : prev,
           );
         },

@@ -33,14 +33,14 @@ export function AccountListPage() {
     filter,
   } = useAccountListState();
 
-  const { data: accountsResult, isLoading, isFetching } =
-    useGetAllAccounts(queryParams);
+  const {
+    data: accountsResult,
+    isLoading,
+    isFetching,
+  } = useGetAllAccounts(queryParams);
 
   const paged = accountsResult?.data;
-  const accounts = useMemo(
-    () => paged?.items ?? [],
-    [paged?.items],
-  );
+  const accounts = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
 
   const columns = useActiveAccountColumns({

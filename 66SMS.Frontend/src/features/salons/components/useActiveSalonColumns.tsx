@@ -1,11 +1,6 @@
 import { useMemo } from "react";
 import type { ColumnDef, Row } from "@tanstack/react-table";
-import {
-  MoreHorizontal,
-  Pencil,
-  Trash2,
-  Eye,
-} from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Eye } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
@@ -148,7 +143,11 @@ export function useActiveSalonColumns({
                       {COMMON_MSG.edit}
                     </DropdownMenuItem>
                   </PermissionGate>
-                  <PermissionGate resource={perm.resource} action={perm.delete} role={perm.role}>
+                  <PermissionGate
+                    resource={perm.resource}
+                    action={perm.delete}
+                    role={perm.role}
+                  >
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       variant="destructive"

@@ -49,8 +49,8 @@ export const BookingCtaSection = () => {
               </h2>
 
               <p className="mt-4 font-geist text-base leading-[1.65] text-white/80">
-                Đặt lịch hôm nay và trải nghiệm sự kết hợp tinh tế giữa truyền thống
-                Việt Nam và chăm sóc hiện đại tại Hoa Sen Spa.
+                Đặt lịch hôm nay và trải nghiệm sự kết hợp tinh tế giữa truyền
+                thống Việt Nam và chăm sóc hiện đại tại Hoa Sen Spa.
               </p>
 
               <div className="mt-8 flex flex-wrap items-center gap-3">

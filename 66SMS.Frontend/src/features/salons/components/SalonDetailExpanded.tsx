@@ -60,7 +60,6 @@ export function SalonDetailExpanded({
   return (
     <div className="bg-adminGray-50/30 w-full overflow-hidden max-h-[400px] overflow-y-auto custom-scrollbar">
       <Tabs defaultValue="info" className="w-full flex-col">
-        {/* Tab Headers */}
         <div className="px-4 pt-2 sticky top-0 bg-adminGray-50/95 backdrop-blur-sm z-10">
           <TabsList className="h-10 border-b border-adminGray-100/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
             <TabsTrigger
@@ -79,10 +78,8 @@ export function SalonDetailExpanded({
           </TabsList>
         </div>
 
-        {/* Tab: Thông tin chung */}
         <TabsContent value="info" className="p-4 m-0 border-none outline-none">
           <div className="flex flex-col gap-4">
-            {/* Header */}
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-xl bg-adminGray-50/50 flex items-center justify-center shrink-0 shadow-sm border border-adminGray-100/50 overflow-hidden">
                 {salon.imageUrl ? (
@@ -110,7 +107,6 @@ export function SalonDetailExpanded({
               </div>
             </div>
 
-            {/* Fields grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-0">
               <div className="flex flex-col">
                 <DetailField
@@ -167,7 +163,6 @@ export function SalonDetailExpanded({
               </div>
             )}
 
-            {/* Actions */}
             <div className="flex items-end justify-end mt-2 pt-4 border-t border-adminGray-100/80">
               <Button
                 variant="admin"
@@ -181,7 +176,6 @@ export function SalonDetailExpanded({
             </div>
           </div>
         </TabsContent>
-        {/* Tab: Nhân viên */}
         <TabsContent value="staff" className="p-4 m-0 border-none outline-none">
           <SalonStaffPage salonId={salonId} />
         </TabsContent>

@@ -1,11 +1,7 @@
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { UseMutationResult } from "@tanstack/react-query";
-import {
-  MoreHorizontal,
-  Pencil,
-  Trash2,
-} from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -200,10 +196,7 @@ export function useActiveCategoryColumns({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <PermissionGate
-                    resource={perm.resource}
-                    action={perm.update}
-                  >
+                  <PermissionGate resource={perm.resource} action={perm.update}>
                     <DropdownMenuItem onClick={() => onEdit(item)}>
                       <Pencil className="w-4 h-4" />
                       {COMMON_MSG.edit}

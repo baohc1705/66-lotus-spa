@@ -13,9 +13,8 @@ export default {
         mono:    ['"DM Mono"',        'ui-monospace',  'SFMono-Regular', 'monospace'],
       },
       fontSize: {
-        /* Micro labels (badges, tags, captions) — defined in theme, not arbitrary */
-        '3xs': ['0.5625rem', { lineHeight: '0.75rem' }],  /* 9px */
-        '2xs': ['0.625rem',  { lineHeight: '0.875rem' }], /* 10px */
+        '3xs': ['0.5625rem', { lineHeight: '0.75rem' }],
+        '2xs': ['0.625rem',  { lineHeight: '0.875rem' }],
       },
       borderRadius: {
         admin: 'var(--admin-radius, 10px)',
@@ -59,7 +58,6 @@ export default {
         input:        'rgb(var(--input) / <alpha-value>)',
         ring:         'rgb(var(--ring) / <alpha-value>)',
 
-        /* ── Status Tokens ── */
         'status-pending':     'rgb(var(--status-pending) / <alpha-value>)',
         'status-confirmed':   'rgb(var(--status-confirmed) / <alpha-value>)',
         'status-waiting':     'rgb(var(--status-waiting) / <alpha-value>)',
@@ -67,7 +65,6 @@ export default {
         'status-completed':   'rgb(var(--status-completed) / <alpha-value>)',
         'status-cancelled':   'rgb(var(--status-cancelled) / <alpha-value>)',
 
-        /* ── Hoa Sen Spa Brand Tokens ── */
         'lotus-primary':    'var(--lotus-primary)',
         'lotus-secondary':  'var(--lotus-secondary)',
         'lotus-background': 'var(--lotus-background)',
@@ -77,7 +74,6 @@ export default {
         'lotus-muted':      'var(--lotus-muted)',
         'lotus-surface':    'var(--lotus-surface)',
 
-        /* ── Brand Identity Tokens (landing page) ── */
         'lotus-rose':       'var(--lotus-rose)',
         'lotus-gold':       'var(--lotus-gold)',
         'lotus-leaf':       'var(--lotus-leaf)',
@@ -92,7 +88,6 @@ export default {
         'lotus-vnpay-red':  'var(--lotus-vnpay-red)',
         'lotus-rose-dark':  'var(--lotus-rose-dark)',
 
-        /* ── Hoa Sen Spa palette (color.md) ── */
         rose: {
           900: 'var(--rose-900)',
           800: 'var(--rose-800)',
@@ -134,8 +129,7 @@ export default {
           bg:      'var(--warning-bg)',
           text:    'var(--warning-text)',
         },
-
-        /* ── Admin palette (admin-color.md) ── */
+          
         adminGreen: {
           900: 'var(--admin-green-900)',
           800: 'var(--admin-green-800)',

@@ -29,7 +29,6 @@ export const bookingApi = {
   },
 
   getPositions: async (): Promise<BookingPositionDTO[]> => {
-    // Assuming BookingPositions returns a PagedResult
     const res = await axiosInstance.get<
       Result<PagedResult<BookingPositionDTO>>
     >(POSITION_BASE, { params: { pageIndex: 1, pageSize: 100 } });
@@ -88,6 +87,28 @@ export const bookingApi = {
       `${APPOINTMENT_BASE}/me`,
     );
     return res.data.data?.items || [];
+  },
+
+  getByUserId: async (
+    userId: number,
+    pageIndex = 1,
+    pageSize = 5,
+  ): Promise<PagedResult<AppointmentDto>> => {
+    const res = await axiosInstance.get<Result<PagedResult<AppointmentDto>>>(
+      APPOINTMENT_BASE,
+      { params: { userId, pageIndex, pageSize } },
+    );
+    return (
+      res.data.data ?? {
+        items: [],
+        pageIndex,
+        pageSize,
+        totalCount: 0,
+        totalPages: 0,
+        hasPreviousPage: false,
+        hasNextPage: false,
+      }
+    );
   },
 
   getDepositVnPayUrl: async (appointmentId: number): Promise<string> => {

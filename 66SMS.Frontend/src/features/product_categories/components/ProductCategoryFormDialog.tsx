@@ -116,10 +116,7 @@ export function ProductCategoryFormDialog({
                 tooltip="Vui lòng nhập vào tên danh mục sản phẩm"
                 error={errors.name?.message}
               >
-                <AdminInput
-                  {...register("name")}
-                  placeholder="Chăm sóc da"
-                />
+                <AdminInput {...register("name")} placeholder="Chăm sóc da" />
               </FormField>
 
               <FormField

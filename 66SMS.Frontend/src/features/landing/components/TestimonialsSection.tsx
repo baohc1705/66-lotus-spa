@@ -59,7 +59,6 @@ export const TestimonialsSection = () => {
     setActiveIndex((prev) => (prev + 1) % total);
   };
 
-  // Desktop: 4 cards. Mobile/tablet: carousel 1 card
   const orderedReviews = [
     ...REVIEWS.slice(activeIndex),
     ...REVIEWS.slice(0, activeIndex),
@@ -71,7 +70,6 @@ export const TestimonialsSection = () => {
       className="landing-section relative overflow-hidden bg-page"
       aria-labelledby="testimonials-heading"
     >
-      {/* Watermark sen */}
       <div
         className="pointer-events-none absolute -right-8 top-8 h-56 w-56 opacity-[0.06] sm:h-72 sm:w-72"
         aria-hidden="true"
@@ -89,7 +87,6 @@ export const TestimonialsSection = () => {
       />
 
       <div className="landing-container relative z-10">
-        {/* Badge FEEDBACK */}
         <div className="mb-5 flex justify-center">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-600/10 px-3.5 py-1.5 font-geist text-xs font-semibold uppercase tracking-[0.14em] text-rose-600">
             <span
@@ -118,7 +115,6 @@ export const TestimonialsSection = () => {
           className="mb-10"
         />
 
-        {/* Desktop: 4 cards */}
         <div className="hidden gap-5 lg:grid lg:grid-cols-4">
           {REVIEWS.map((item, i) => (
             <motion.blockquote
@@ -146,7 +142,10 @@ export const TestimonialsSection = () => {
                 {item.text}
               </p>
 
-              <div className="mb-4 h-px w-full bg-rose-600/15" aria-hidden="true" />
+              <div
+                className="mb-4 h-px w-full bg-rose-600/15"
+                aria-hidden="true"
+              />
 
               <footer className="flex items-center gap-3">
                 <span
@@ -168,7 +167,6 @@ export const TestimonialsSection = () => {
           ))}
         </div>
 
-        {/* Mobile / tablet: carousel */}
         <div className="lg:hidden">
           <AnimatePresence mode="wait">
             <motion.blockquote
@@ -192,7 +190,10 @@ export const TestimonialsSection = () => {
                 {orderedReviews[0].text}
               </p>
 
-              <div className="mb-4 h-px w-full bg-rose-600/15" aria-hidden="true" />
+              <div
+                className="mb-4 h-px w-full bg-rose-600/15"
+                aria-hidden="true"
+              />
 
               <footer className="flex items-center gap-3">
                 <span
@@ -214,7 +215,6 @@ export const TestimonialsSection = () => {
           </AnimatePresence>
         </div>
 
-        {/* Nav: arrows + dots */}
         <div className="mt-8 flex items-center justify-center gap-4">
           <button
             type="button"
@@ -225,7 +225,11 @@ export const TestimonialsSection = () => {
             <ChevronLeft className="h-5 w-5" aria-hidden="true" />
           </button>
 
-          <div className="flex items-center gap-2" role="tablist" aria-label="Chọn đánh giá">
+          <div
+            className="flex items-center gap-2"
+            role="tablist"
+            aria-label="Chọn đánh giá"
+          >
             {REVIEWS.map((item, i) => (
               <button
                 key={item.name}

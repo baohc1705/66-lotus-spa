@@ -1,12 +1,15 @@
-import type { AxiosError } from 'axios';
-import { createEntityQueryKeys } from '@/shared/utils/queryKeys';
-import { getErrorMessage } from '@/shared/utils/errorUtils';
+import type { AxiosError } from "axios";
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { invoiceApi } from "../api/invoice.api";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
-import type { CreateInvoicePayload, GetAllInvoicesQuery } from "../types/invoice.types";
+import type {
+  CreateInvoicePayload,
+  GetAllInvoicesQuery,
+} from "../types/invoice.types";
 import type { Result } from "@/shared/types/common.types";
 
 const ENTITY = "hóa đơn";
@@ -67,7 +70,9 @@ export function useCancelInvoice() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.subActionError("hủy", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.subActionError("hủy", ENTITY)),
+      );
     },
   });
 }

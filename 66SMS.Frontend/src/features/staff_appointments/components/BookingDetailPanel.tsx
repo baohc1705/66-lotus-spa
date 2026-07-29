@@ -1,27 +1,39 @@
-import { CheckCircle2, Loader2, MapPin, Phone, Play, User, X } from 'lucide-react'
+import {
+  CheckCircle2,
+  Loader2,
+  MapPin,
+  Phone,
+  Play,
+  User,
+  X,
+} from "lucide-react";
 import {
   APPOINTMENT_STATUS_DOT_CLASS,
   APPOINTMENT_STATUS_LABELS,
-} from '@/features/booking/constants/appointment.constants'
-import { FormField } from '@/shared/components/forms/FormField'
-import { formatDateTimeDisplay } from '@/shared/utils/date.utils'
-import { cn } from '@/lib/utils'
-import { BOOKING_STATUS_LABELS, BookingStatus, type StaffScheduleBooking } from '../types'
+} from "@/features/booking/constants/appointment.constants";
+import { FormField } from "@/shared/components/forms/FormField";
+import { formatDateTimeDisplay } from "@/shared/utils/date.utils";
+import { cn } from "@/lib/utils";
+import {
+  BOOKING_STATUS_LABELS,
+  BookingStatus,
+  type StaffScheduleBooking,
+} from "../types";
 
 interface BookingDetailPanelProps {
-  booking: StaffScheduleBooking | null
-  dateLabel?: string
-  onClose: () => void
-  onStartService?: (bookingId: string) => void
-  onCompleteService?: (bookingId: string) => void
-  isUpdating?: boolean
+  booking: StaffScheduleBooking | null;
+  dateLabel?: string;
+  onClose: () => void;
+  onStartService?: (bookingId: string) => void;
+  onCompleteService?: (bookingId: string) => void;
+  isUpdating?: boolean;
 }
 
 function calcDurationMins(startTime: string, endTime: string) {
-  const [sh, sm] = startTime.split(':').map(Number)
-  const [eh, em] = endTime.split(':').map(Number)
-  if ([sh, sm, eh, em].some((n) => Number.isNaN(n))) return null
-  return eh * 60 + em - (sh * 60 + sm)
+  const [sh, sm] = startTime.split(":").map(Number);
+  const [eh, em] = endTime.split(":").map(Number);
+  if ([sh, sm, eh, em].some((n) => Number.isNaN(n))) return null;
+  return eh * 60 + em - (sh * 60 + sm);
 }
 
 export function BookingDetailPanel({
@@ -32,21 +44,21 @@ export function BookingDetailPanel({
   onCompleteService,
   isUpdating = false,
 }: BookingDetailPanelProps) {
-  if (!booking) return null
+  if (!booking) return null;
 
-  const canStart = booking.status === BookingStatus.Waiting
-  const canComplete = booking.status === BookingStatus.InService
-  const code = booking.appointmentCode || booking.id
-  const durationMins = calcDurationMins(booking.startTime, booking.endTime)
+  const canStart = booking.status === BookingStatus.Waiting;
+  const canComplete = booking.status === BookingStatus.InService;
+  const code = booking.appointmentCode || booking.id;
+  const durationMins = calcDurationMins(booking.startTime, booking.endTime);
   const statusLabel =
     BOOKING_STATUS_LABELS[booking.status] ??
     APPOINTMENT_STATUS_LABELS[booking.status] ??
-    `Trạng thái #${booking.status}`
+    `Trạng thái #${booking.status}`;
   const statusDot =
-    APPOINTMENT_STATUS_DOT_CLASS[booking.status] ?? 'bg-adminGray-400'
+    APPOINTMENT_STATUS_DOT_CLASS[booking.status] ?? "bg-adminGray-400";
   const completedAtLabel = booking.completedAt
     ? formatDateTimeDisplay(booking.completedAt)
-    : '—'
+    : "—";
 
   return (
     <div
@@ -61,7 +73,9 @@ export function BookingDetailPanel({
           <div>
             <h2 className="font-semibold text-adminInk">
               Lịch hẹn
-              <span className="ml-2 font-normal text-adminGray-600">(Mã: {code})</span>
+              <span className="ml-2 font-normal text-adminGray-600">
+                (Mã: {code})
+              </span>
             </h2>
             {dateLabel && (
               <p className="text-xs text-adminGray-600 mt-0.5">{dateLabel}</p>
@@ -88,7 +102,7 @@ export function BookingDetailPanel({
               </div>
               <div className="flex items-center gap-2 text-sm text-adminGray-600">
                 <Phone className="w-4 h-4 shrink-0" />
-                <span>{booking.customerPhone || '—'}</span>
+                <span>{booking.customerPhone || "—"}</span>
               </div>
             </div>
             <div className="text-right text-xs text-adminGray-600 shrink-0">
@@ -99,7 +113,7 @@ export function BookingDetailPanel({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-[5px] border border-adminGold-600/20 bg-white">
             <FormField label="Ngày hẹn">
               <div className="h-10 px-3 flex items-center rounded-[5px] border border-adminGold-600/20 bg-adminGray-50 text-sm text-adminInk">
-                {dateLabel || '—'}
+                {dateLabel || "—"}
               </div>
             </FormField>
             <FormField label="Giờ hẹn">
@@ -109,7 +123,7 @@ export function BookingDetailPanel({
             </FormField>
             <FormField label="Thời lượng">
               <div className="h-10 px-3 flex items-center rounded-[5px] border border-adminGold-600/20 bg-adminGray-50 text-sm text-adminInk">
-                {durationMins != null ? `${durationMins} phút` : '—'}
+                {durationMins != null ? `${durationMins} phút` : "—"}
               </div>
             </FormField>
             <FormField label="Thời gian hoàn thành">
@@ -128,15 +142,19 @@ export function BookingDetailPanel({
               <span className="font-medium">{booking.serviceName}</span>
               <span className="inline-flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-adminGold-600 shrink-0" />
-                {booking.positionName || '—'}
+                {booking.positionName || "—"}
               </span>
             </div>
           </div>
 
           <div className="rounded-[5px] border border-adminGold-600/20 bg-white p-4">
-            <div className="text-sm font-semibold text-adminInk mb-2">Trạng thái</div>
+            <div className="text-sm font-semibold text-adminInk mb-2">
+              Trạng thái
+            </div>
             <div className="inline-flex items-center gap-2 text-sm text-adminInk">
-              <span className={cn('w-2.5 h-2.5 rounded-full shrink-0', statusDot)} />
+              <span
+                className={cn("w-2.5 h-2.5 rounded-full shrink-0", statusDot)}
+              />
               <span className="font-medium">{statusLabel}</span>
             </div>
           </div>
@@ -191,5 +209,5 @@ export function BookingDetailPanel({
         </div>
       </div>
     </div>
-  )
+  );
 }

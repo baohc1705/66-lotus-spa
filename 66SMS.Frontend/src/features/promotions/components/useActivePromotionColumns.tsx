@@ -34,7 +34,10 @@ const PROMOTION_STATUS_MAP: StatusMap = {
 
 const DISCOUNT_TYPE_MAP: Record<string, { label: string; color: string }> = {
   "1": { label: "Giảm %", color: "bg-state-info-bg text-state-info-text" },
-  "2": { label: "Giảm tiền", color: "bg-state-warning-bg text-state-warning-text" },
+  "2": {
+    label: "Giảm tiền",
+    color: "bg-state-warning-bg text-state-warning-text",
+  },
   "3": { label: "Mua X tặng Y", color: "bg-adminGold-100 text-adminGold-700" },
 };
 
@@ -134,7 +137,9 @@ export function useActivePromotionColumns({
         cell: ({ row }) => {
           const p = row.original;
           if (p.discountType === 1)
-            return <span className="text-adminInk">{p.discountValue ?? 0}%</span>;
+            return (
+              <span className="text-adminInk">{p.discountValue ?? 0}%</span>
+            );
           if (p.discountType === 2)
             return <PriceCell value={p.discountValue} />;
           if (p.discountType === 3)

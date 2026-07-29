@@ -1,20 +1,11 @@
-// ============================================================================
-// date.utils — quy ước timezone
-// ============================================================================
-//   BE UTC  →  FE LOCAL   : toLocalDateOnly / toLocalTimeOnly / formatDateTimeDisplay
-//   FE LOCAL →  BE UTC    : localDateTimeToUtc
-//   DateOnly (yyyy-MM-dd) : ngày lịch, KHÔNG đổi timezone
-// ============================================================================
-
 const LOCALE = "vi-VN";
 const EMPTY = "—";
 
-/** Chuỗi chỉ có ngày lịch (DateOnly) */
+/** Kiểm tra chuỗi dạng DateOnly yyyy-MM-dd */
 function isDateOnlyString(val: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(val.trim());
 }
 
-/** Parse yyyy-MM-dd → Date local (tránh lệch ngày vì UTC) */
 function parseDateOnlyLocal(val: string): Date | null {
   const [y, m, d] = val.trim().split("-").map(Number);
   if (!y || !m || !d) return null;
@@ -22,12 +13,6 @@ function parseDateOnlyLocal(val: string): Date | null {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
-/**
- * Parse từ API → Date (local khi đọc getHours/getDate).
- * - DateOnly "yyyy-MM-dd" → ngày local
- * - ISO có Z / offset → JS đổi sang local
- * - ISO không timezone → coi là UTC (thêm Z)
- */
 function parseFromApi(val?: string | null): Date | null {
   if (!val) return null;
   let s = val.trim();
@@ -36,7 +21,6 @@ function parseFromApi(val?: string | null): Date | null {
     return parseDateOnlyLocal(s);
   }
 
-  // ISO datetime không có timezone → UTC
   if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/.test(s)) {
     s = `${s}Z`;
   }
@@ -44,7 +28,6 @@ function parseFromApi(val?: string | null): Date | null {
   const d = new Date(s);
   if (!Number.isNaN(d.getTime())) return d;
 
-  // DD/MM/YYYY
   if (s.includes("/") && s.length === 10) {
     const [day, month, year] = s.split("/");
     return parseDateOnlyLocal(`${year}-${month}-${day}`);
@@ -65,23 +48,16 @@ function toHm(d: Date) {
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-// ============================================================================
-// BE UTC → FE LOCAL
-// ============================================================================
-
-/** UTC DateTimeOffset → ngày local `yyyy-MM-dd` (DateOnly phía client) */
 export function toLocalDateOnly(val?: string | null): string {
   const d = parseFromApi(val);
   return d ? toYmd(d) : "";
 }
 
-/** UTC DateTimeOffset → giờ local `HH:mm` (TimeOnly phía client) */
 export function toLocalTimeOnly(val?: string | null): string {
   const d = parseFromApi(val);
   return d ? toHm(d) : "";
 }
 
-/** UTC DateTimeOffset → hiển thị `DD/MM/YYYY, HH:mm` (local) */
 export function formatDateTimeDisplay(
   val?: string | null,
   fallback = EMPTY,
@@ -97,41 +73,21 @@ export function formatDateTimeDisplay(
   });
 }
 
-/**
- * UTC DateTimeOffset → value cho input `datetime-local`.
- * Ví dụ: "2026-07-05T08:00:00Z" → "2026-07-05T15:00" (VN UTC+7)
- */
 export function toDatetimeLocalInput(val?: string | null): string {
   const d = parseFromApi(val);
   return d ? `${toYmd(d)}T${toHm(d)}` : "";
 }
 
-/**
- * DateOnly / ngày → hiển thị `DD/MM/YYYY` (không đổi timezone).
- * Nếu truyền DateTimeOffset thì lấy phần ngày local.
- */
 export function formatDisplayDate(val?: string | null): string {
   const d = parseFromApi(val);
   if (!d) return val ? val : "";
   return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 }
 
-/** Alias: gán vào input type="date" (= toLocalDateOnly) */
 export function parseToDateInput(val?: string | null): string {
   return toLocalDateOnly(val);
 }
 
-// ============================================================================
-// FE LOCAL → BE UTC
-// ============================================================================
-
-/**
- * Giá trị local từ form → ISO UTC gửi backend.
- *
- *   localDateTimeToUtc("2026-07-05T15:00")           → "...Z"
- *   localDateTimeToUtc("2026-07-05", "15:00")        → "...Z"
- *   localDateTimeToUtc("2026-07-05")                 → nửa đêm local → UTC
- */
 export function localDateTimeToUtc(
   localDateTime?: string | null,
   localTime?: string | null,
@@ -153,11 +109,6 @@ export function localDateTimeToUtc(
   return parsed.toISOString();
 }
 
-// ============================================================================
-// Calendar helpers (lịch / ca làm — KHÔNG phải convert timezone)
-// Dùng bởi schedules, attendance, shifts...
-// ============================================================================
-
 type DateInput = Date | string | number | DateUtil;
 
 export class DateUtil {
@@ -167,7 +118,6 @@ export class DateUtil {
     if (input instanceof DateUtil) {
       this.date = new Date(input.toDate());
     } else if (input) {
-      // DateOnly / ISO từ API: dùng parseFromApi để không lệch ngày
       if (typeof input === "string") {
         this.date = parseFromApi(input) ?? new Date(input);
       } else {
@@ -248,7 +198,6 @@ export class DateUtil {
   }
 }
 
-/** Tạo DateUtil — tính toán tuần/ngày (lịch, ca), không dùng để convert timezone */
 export function formatDate(input?: DateInput) {
   return new DateUtil(input);
 }

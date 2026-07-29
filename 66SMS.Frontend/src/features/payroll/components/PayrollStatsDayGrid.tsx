@@ -53,8 +53,7 @@ export function PayrollStatsDayGrid({
   const events: AdminScheduleEvent[] = [];
 
   appointments.forEach((item) => {
-    const eventDate =
-      item.issuedLocalDate ?? item.appointmentDate ?? dateKey;
+    const eventDate = item.issuedLocalDate ?? item.appointmentDate ?? dateKey;
     if (eventDate !== dateKey) return;
 
     const event = toEvent(item, dateKey);

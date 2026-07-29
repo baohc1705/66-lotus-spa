@@ -19,7 +19,7 @@ export interface BookingPositionDTO {
   createdAt?: string;
   updatedAt?: string;
   roomName?: string;
-}
+} 
 
 export type BookingPositionListParams = PageRequest & {
   keyword?: string;

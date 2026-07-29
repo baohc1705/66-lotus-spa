@@ -1,9 +1,9 @@
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import { type UserDto } from '@/features/users/types/user.types';
-import type { StaffSalonDTO } from '@/features/staff_salons/types/staff-salon.types';
-import type { TokenResponseDTO } from '@/features/auth/types/auth.types';
-import { applyTokenResponse } from '@/features/auth/utils/mapTokenProfile';
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { type UserDto } from "@/features/users/types/user.types";
+import type { StaffSalonDTO } from "@/features/staff_salons/types/staff-salon.types";
+import type { TokenResponseDTO } from "@/features/auth/types/auth.types";
+import { applyTokenResponse } from "@/features/auth/utils/mapTokenProfile";
 
 interface AuthState {
   accessToken: string | null;
@@ -11,7 +11,6 @@ interface AuthState {
   managedSalonId: number | null;
   selectedSalonId: number | null;
   mySalon: StaffSalonDTO | null;
-  /** false cho đến khi bootstrap xong */
   isAuthReady: boolean;
   setAuthReady: (ready: boolean) => void;
   setSession: (data: TokenResponseDTO) => void;
@@ -64,13 +63,8 @@ export const useAuthStore = create<AuthState>()(
           selectedSalonId: null,
           mySalon: null,
         });
-        // Đảm bảo xóa sạch persist (tránh F5 còn profile)
-        try {
-          sessionStorage.removeItem('auth-session');
-          localStorage.removeItem('auth-storage'); // key cũ nếu còn
-        } catch {
-          /* ignore */
-        }
+        sessionStorage.removeItem("auth-session");
+        localStorage.removeItem("auth-storage");
       },
 
       setSelectedSalonId: (id) => set({ selectedSalonId: id }),
@@ -86,7 +80,7 @@ export const useAuthStore = create<AuthState>()(
         const user = get().user;
         if (!user) return false;
 
-        const hasAdmin = user.roles?.some((r) => r.toLowerCase() === 'admin');
+        const hasAdmin = user.roles?.some((r) => r.toLowerCase() === "admin");
         if (hasAdmin) return true;
 
         const permissions = user.permissions ?? [];
@@ -99,8 +93,7 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: 'auth-session',
-      // sessionStorage: sống qua F5, mất khi đóng tab — giảm gọi refresh mỗi F5
+      name: "auth-session",
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         accessToken: state.accessToken,

@@ -16,7 +16,6 @@ export interface StaffDto {
   createdAt?: string | null;
 }
 
-/** DTO đầy đủ cho expand + form sửa (GetDetail) */
 export interface StaffFullDto {
   id?: number | null;
   userId?: number | null;
@@ -45,7 +44,6 @@ export interface StaffFullDto {
   updatedAt?: string | null;
 }
 
-/** Dịch vụ được phân công cho nhân viên */
 export interface StaffServiceDto {
   id?: number | null;
   staffId?: number | null;

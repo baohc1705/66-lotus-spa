@@ -41,9 +41,13 @@ export function WorkSchedulePage() {
   // Sync state if user info loads asynchronously
   useEffect(() => {
     if (!isAdminOrManager) {
-      setViewMode("single");
+      setTimeout(() => {
+        setViewMode("single");
+      }, 0);
       if (currentStaffId) {
-        setSelectedStaffId(currentStaffId);
+        setTimeout(() => {
+          setSelectedStaffId(currentStaffId);
+        }, 0);
       }
     }
   }, [isAdminOrManager, currentStaffId]);
@@ -118,7 +122,6 @@ export function WorkSchedulePage() {
 
   return (
     <div className="space-y-4">
-      {/* Header & Controls */}
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-4 rounded-admin border border-adminGray-100/30">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full xl:w-auto">
           {isAdminOrManager && (
@@ -249,7 +252,6 @@ export function WorkSchedulePage() {
         />
       )}
 
-      {/* Content */}
       {isPageLoading ? (
         <div className="flex items-center justify-center py-20 backdrop-blur-md rounded-admin border border-adminGray-100/30 p-4 min-h-[500px]">
           <div className="flex flex-col items-center gap-3">

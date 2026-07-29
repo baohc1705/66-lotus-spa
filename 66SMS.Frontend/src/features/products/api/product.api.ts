@@ -16,7 +16,9 @@ import type {
 
 const BASE_PRODUCT = API.products;
 
-function toAdminQuery(params: PageRequest & { categoryId?: number }): GetAllProductQuery {
+function toAdminQuery(
+  params: PageRequest & { categoryId?: number },
+): GetAllProductQuery {
   return {
     pageIndex: params.pageIndex,
     pageSize: params.pageSize,

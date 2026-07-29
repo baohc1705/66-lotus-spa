@@ -14,7 +14,6 @@ interface AdminCurrencyInputProps
   onChange?: (value: number | undefined) => void;
 }
 
-/** Input giá tiền: format realtime kiểu VN (1.000). Dùng chung toàn app. */
 export function AdminCurrencyInput({
   value,
   onChange,

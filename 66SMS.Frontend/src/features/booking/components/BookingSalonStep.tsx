@@ -1,9 +1,8 @@
-import React from "react";
 import { MapPin, Phone, Clock, ChevronRight, Check } from "lucide-react";
 import { useBookingStore } from "../stores/bookingStore";
 import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
 
-export const BookingSalonStep: React.FC = () => {
+export function BookingSalonStep() {
   const { selectedSalon, selectSalon, nextStep } = useBookingStore();
   const { data: salons = [], isLoading } = useActiveSalons();
 
@@ -109,4 +108,4 @@ export const BookingSalonStep: React.FC = () => {
       </div>
     </div>
   );
-};
+}

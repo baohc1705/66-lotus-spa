@@ -19,10 +19,8 @@ export const createBookingRoomSchema = bookingRoomFieldsSchema.extend({
   salonId: z.coerce.number().min(1, VALIDATION_MSG.selectRequired("chi nhánh")),
 });
 
-/** Schema validate form edit (name bắt buộc). */
 export const updateBookingRoomFormSchema = bookingRoomFieldsSchema;
 
-/** Payload PATCH — mọi field optional (toggle status, partial update). */
 export const updateBookingRoomSchema = bookingRoomFieldsSchema.partial();
 
 export const deleteBookingRoomSchema = z.object({

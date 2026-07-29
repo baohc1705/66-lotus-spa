@@ -1,1 +1,1 @@
-export { TimeSlotListPage } from './pages/TimeSlotListPage'
+export { TimeSlotListPage } from "./pages/TimeSlotListPage";

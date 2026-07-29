@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { Check, CreditCard, Loader2, MapPin, Phone, User, X } from "lucide-react";
+import {
+  Check,
+  CreditCard,
+  Loader2,
+  MapPin,
+  Phone,
+  User,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import {
@@ -96,37 +104,63 @@ export function CashierInvoiceSidebar({
   isPaying = false,
   salonId,
 }: CashierInvoiceSidebarProps) {
-  const [selectedStatus, setSelectedStatus] = useState<number>(
-    APPOINTMENT_STATUS.PENDING,
+  if (!isOpen || !booking) return null;
+
+  return (
+    <CashierInvoiceSidebarForm
+      key={booking.id}
+      booking={booking}
+      onClose={onClose}
+      onAssignPosition={onAssignPosition}
+      onStatusUpdated={onStatusUpdated}
+      onPayInvoice={onPayInvoice}
+      isPaying={isPaying}
+      salonId={salonId}
+    />
   );
-  const [note, setNote] = useState("");
+}
+
+type FormProps = Omit<CashierInvoiceSidebarProps, "isOpen" | "booking"> & {
+  booking: CashierBooking;
+};
+
+function CashierInvoiceSidebarForm({
+  booking,
+  onClose,
+  onAssignPosition,
+  onStatusUpdated,
+  onPayInvoice,
+  isPaying = false,
+  salonId,
+}: FormProps) {
+  const [selectedStatus, setSelectedStatus] = useState(() =>
+    toBackendStatus(booking.status),
+  );
+  const [note, setNote] = useState(() => booking.note ?? "");
   const [positions, setPositions] = useState<CashierPosition[]>([]);
-  const [selectedPositionId, setSelectedPositionId] = useState<number | null>(null);
-  const [loadingPositions, setLoadingPositions] = useState(false);
+  const [selectedPositionId, setSelectedPositionId] = useState<number | null>(
+    null,
+  );
+  const [loadingPositions, setLoadingPositions] = useState(
+    () => booking.status === "not-arrived",
+  );
   const [isSaving, setIsSaving] = useState(false);
 
-  const currentBackendStatus = booking ? toBackendStatus(booking.status) : APPOINTMENT_STATUS.PENDING;
+  const currentBackendStatus = toBackendStatus(booking.status);
+  const needsPosition = booking.status === "not-arrived";
 
   useEffect(() => {
-    if (!isOpen || !booking) return;
-    setSelectedStatus(toBackendStatus(booking.status));
-    setNote(booking.note ?? "");
-    setSelectedPositionId(null);
-  }, [isOpen, booking]);
-
-  useEffect(() => {
-    if (!isOpen || !booking || booking.status !== "not-arrived") {
-      setPositions([]);
-      return;
-    }
+    if (!needsPosition) return;
 
     let cancelled = false;
-    setLoadingPositions(true);
     cashierApi
       .getPositions(salonId, booking.bookingDate)
       .then((res) => {
         if (cancelled) return;
-        if (res.isSuccess && res.data) setPositions(res.data);
+        setPositions(res.isSuccess && res.data ? res.data : []);
+      })
+      .catch(() => {
+        if (!cancelled) setPositions([]);
       })
       .finally(() => {
         if (!cancelled) setLoadingPositions(false);
@@ -135,20 +169,15 @@ export function CashierInvoiceSidebar({
     return () => {
       cancelled = true;
     };
-  }, [isOpen, booking, salonId]);
+  }, [needsPosition, booking.bookingDate, salonId]);
 
-  const durationMins = useMemo(() => {
-    if (!booking) return null;
-    return calcDurationMins(booking.startTime, booking.endTime);
-  }, [booking]);
+  const durationMins = useMemo(
+    () => calcDurationMins(booking.startTime, booking.endTime),
+    [booking.startTime, booking.endTime],
+  );
 
-  if (!isOpen || !booking) return null;
-
-  const needsPosition = booking.status === "not-arrived";
   const code = booking.appointmentCode || booking.id;
-  const isCompleted =
-    currentBackendStatus === APPOINTMENT_STATUS.COMPLETED;
-  // Backend chỉ tạo HĐ khi STATUS_COMPLETED; FE map thành unpaid/completed
+  const isCompleted = currentBackendStatus === APPOINTMENT_STATUS.COMPLETED;
   const canPayInvoice =
     !!onPayInvoice &&
     booking.remainingAmount > 0 &&
@@ -159,7 +188,8 @@ export function CashierInvoiceSidebar({
 
     const statusChanged = selectedStatus !== currentBackendStatus;
     const noteChanged = (note.trim() || "") !== (booking.note?.trim() || "");
-    const willAssign = needsPosition && !!selectedPositionId && !!onAssignPosition;
+    const willAssign =
+      needsPosition && !!selectedPositionId && !!onAssignPosition;
 
     if (!statusChanged && !willAssign && !noteChanged) {
       toast.info("Không có thay đổi để lưu");
@@ -317,7 +347,9 @@ export function CashierInvoiceSidebar({
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-[5px] border border-adminGold-600/20 bg-white text-sm">
                 <div>
-                  <div className="text-xs text-adminGray-600 mb-1">Tổng tiền</div>
+                  <div className="text-xs text-adminGray-600 mb-1">
+                    Tổng tiền
+                  </div>
                   <div className="font-semibold text-adminInk">
                     {money(booking.totalAmount)}
                   </div>
@@ -338,7 +370,9 @@ export function CashierInvoiceSidebar({
                   <div className="text-xs text-adminGray-600 mb-1">Cọc</div>
                   <div className="font-semibold text-adminInk">
                     {booking.depositPaid
-                      ? money(Math.min(booking.paidAmount, booking.depositAmount))
+                      ? money(
+                          Math.min(booking.paidAmount, booking.depositAmount),
+                        )
                       : "Chưa cọc"}
                   </div>
                 </div>
@@ -386,7 +420,10 @@ export function CashierInvoiceSidebar({
                         )}
                       </span>
                       <span
-                        className={cn("w-2 h-2 rounded-full shrink-0", opt.color)}
+                        className={cn(
+                          "w-2 h-2 rounded-full shrink-0",
+                          opt.color,
+                        )}
                       />
                       <span>{opt.label}</span>
                     </button>

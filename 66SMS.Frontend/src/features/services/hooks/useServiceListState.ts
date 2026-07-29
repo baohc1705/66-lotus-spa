@@ -8,9 +8,13 @@ export function useServiceListState() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<ServiceListDto | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ServiceListDto | null>(null);
-  const [restoreTarget, setRestoreTarget] = useState<ServiceListDto | null>(null);
+  const [restoreTarget, setRestoreTarget] = useState<ServiceListDto | null>(
+    null,
+  );
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
+    null,
+  );
 
   const handleToggleView = useCallback(
     (onClearSelection: () => void) => {

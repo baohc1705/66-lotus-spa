@@ -19,7 +19,10 @@ import {
 } from "@/shared/components/DataTable/TableCells";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { BOOKING_ROOM_PERM } from "../constants/booking_room.permissions";
-import type { BookingRoomDTO, UpdateBookingRoomPayload } from "../types/booking_room.types";
+import type {
+  BookingRoomDTO,
+  UpdateBookingRoomPayload,
+} from "../types/booking_room.types";
 
 export const BOOKING_ROOM_COLUMN_LABELS = {
   name: "Tên phòng",
@@ -36,7 +39,10 @@ interface UseActiveBookingRoomColumnsParams {
   onEdit: (item: BookingRoomDTO) => void;
   onDelete: (item: BookingRoomDTO) => void;
   updateMutation: {
-    mutate: (variables: { id: number; payload: UpdateBookingRoomPayload }) => void;
+    mutate: (variables: {
+      id: number;
+      payload: UpdateBookingRoomPayload;
+    }) => void;
     isPending: boolean;
   };
 }
@@ -146,10 +152,7 @@ export function useActiveBookingRoomColumns({
                       {COMMON_MSG.edit}
                     </DropdownMenuItem>
                   </PermissionGate>
-                  <PermissionGate
-                    resource={perm.resource}
-                    action={perm.delete}
-                  >
+                  <PermissionGate resource={perm.resource} action={perm.delete}>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       variant="destructive"

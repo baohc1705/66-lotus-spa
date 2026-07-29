@@ -64,17 +64,14 @@ export function ShiftFormDialog({
   }, [open, shift, reset]);
 
   const onSubmit = (data: CreateShiftFormValues | UpdateShiftFormValues) => {
-    // Format time to HH:mm:ss for backend TimeOnly
     const shiftStartStr =
       data.shiftStart.length === 5 ? `${data.shiftStart}:00` : data.shiftStart;
     const shiftEndStr =
       data.shiftEnd.length === 5 ? `${data.shiftEnd}:00` : data.shiftEnd;
 
     if (isEdit && shift?.id) {
-      // Find current period
       const currentPeriod = shift.shiftPeriodDTOs?.[0];
 
-      // Check if time-related fields have changed
       const currentShiftStart = currentPeriod?.shiftStart?.substring(0, 5);
       const currentShiftEnd = currentPeriod?.shiftEnd?.substring(0, 5);
       const currentEffectiveFrom = currentPeriod?.effectiveFrom;
@@ -146,7 +143,6 @@ export function ShiftFormDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* Thông tin chung */}
           <FormSection icon={Info} title="Thông tin cơ bản">
             <div className="grid grid-cols-1 gap-2">
               <FormField
@@ -154,10 +150,7 @@ export function ShiftFormDialog({
                 tooltip="Vui lòng nhập tên ca (VD: Ca Sáng)"
                 error={errors.name?.message}
               >
-                <Input
-                  {...register("name")}
-                  placeholder="Ca Sáng"
-                />
+                <Input {...register("name")} placeholder="Ca Sáng" />
               </FormField>
 
               <FormField
@@ -173,7 +166,6 @@ export function ShiftFormDialog({
             </div>
           </FormSection>
 
-          {/* Thời gian */}
           <FormSection icon={Clock} title="Thời gian làm việc">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField
@@ -181,10 +173,7 @@ export function ShiftFormDialog({
                 tooltip="Giờ bắt đầu làm việc"
                 error={errors.shiftStart?.message}
               >
-                <Input
-                  type="time"
-                  {...register("shiftStart")}
-                />
+                <Input type="time" {...register("shiftStart")} />
               </FormField>
 
               <FormField
@@ -192,10 +181,7 @@ export function ShiftFormDialog({
                 tooltip="Giờ kết thúc làm việc"
                 error={errors.shiftEnd?.message}
               >
-                <Input
-                  type="time"
-                  {...register("shiftEnd")}
-                />
+                <Input type="time" {...register("shiftEnd")} />
               </FormField>
 
               <FormField
@@ -203,10 +189,7 @@ export function ShiftFormDialog({
                 tooltip="Ngày ca làm việc này bắt đầu có hiệu lực"
                 error={errors.effectiveFrom?.message}
               >
-                <Input
-                  type="date"
-                  {...register("effectiveFrom")}
-                />
+                <Input type="date" {...register("effectiveFrom")} />
               </FormField>
 
               <FormField
@@ -214,10 +197,7 @@ export function ShiftFormDialog({
                 tooltip="Bỏ trống nếu áp dụng vô thời hạn"
                 error={errors.effectiveTo?.message}
               >
-                <Input
-                  type="date"
-                  {...register("effectiveTo")}
-                />
+                <Input type="date" {...register("effectiveTo")} />
               </FormField>
             </div>
           </FormSection>
@@ -242,10 +222,9 @@ export function ShiftFormDialog({
   );
 }
 
-// Helper function
 function getDefaultValues(shift?: ShiftDTO | null): CreateShiftFormValues {
   if (shift) {
-    const currentPeriod = shift.shiftPeriodDTOs?.[0]; // Lấy period mới nhất
+    const currentPeriod = shift.shiftPeriodDTOs?.[0];
     return {
       name: shift.name ?? "",
       description: shift.description ?? "",

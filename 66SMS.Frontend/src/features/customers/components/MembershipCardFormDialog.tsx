@@ -1,5 +1,5 @@
-﻿import { AdminInput } from '@/shared/components/forms/AdminInput';
-import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
+﻿import { AdminInput } from "@/shared/components/forms/AdminInput";
+import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import { useEffect, useMemo } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -53,7 +53,7 @@ export function MembershipCardFormDialog({
   const updateMutation = useUpdateMembershipCard();
   const isPending = updateMutation.isPending;
 
-  // Fetch tiers for select dropdown
+  // Tier cho select
   const { data: tiersResult } = useMembershipTiers({ pageSize: 100 });
   const tiers = useMemo(
     () => tiersResult?.data?.items ?? [],
@@ -120,10 +120,7 @@ export function MembershipCardFormDialog({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <FormField label="Mã thẻ *" error={errors.cardCode?.message}>
-              <AdminInput
-                {...register("cardCode")}
-                placeholder="Nhập mã thẻ"
-              />
+              <AdminInput {...register("cardCode")} placeholder="Nhập mã thẻ" />
             </FormField>
 
             <FormField
@@ -207,7 +204,7 @@ function getDefaultValues(
     return {
       membershipTierId: card.membershipTierId ?? undefined,
       cardCode: card.cardCode ?? "",
-      // API UTC → local cho input datetime-local
+      // Đổi UTC từ API sang local cho input datetime-local
       issuedAt: toDatetimeLocalInput(card.issuedAt),
       expiresAt: toDatetimeLocalInput(card.expiresAt),
       status: card.status,

@@ -1,18 +1,17 @@
-import { type Table } from '@tanstack/react-table'
-import { SlidersHorizontal } from 'lucide-react'
+import { type Table } from "@tanstack/react-table";
+import { SlidersHorizontal } from "lucide-react";
 
-import { Button } from '@/shared/components/ui/button'
+import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu'
+} from "@/shared/components/ui/dropdown-menu";
 
 interface DataTableViewOptionsProps<TData> {
-  table: Table<TData>
-  /** Mapping từ ID cột sang tên hiển thị. Ví dụ: { fullName: "Họ và tên" } */
-  columnLabels?: Record<string, string>
+  table: Table<TData>;
+  columnLabels?: Record<string, string>;
 }
 
 export function DataTableViewOptions<TData>({
@@ -36,7 +35,7 @@ export function DataTableViewOptions<TData>({
           .getAllColumns()
           .filter(
             (column) =>
-              typeof column.accessorFn !== 'undefined' && column.getCanHide()
+              typeof column.accessorFn !== "undefined" && column.getCanHide(),
           )
           .map((column) => {
             return (
@@ -48,9 +47,9 @@ export function DataTableViewOptions<TData>({
               >
                 {columnLabels[column.id] || column.id}
               </DropdownMenuCheckboxItem>
-            )
+            );
           })}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

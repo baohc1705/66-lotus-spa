@@ -1,75 +1,96 @@
-import { useState } from 'react'
-import { formatCurrency } from '@/shared/utils/currency'
-import { formatDateTimeDisplay } from '@/shared/utils/date.utils'
-import { useQuery } from '@tanstack/react-query'
-import { getMyWallet, getMyWalletTransactions, getWalletTopUpVnPayUrl } from '../../wallet/api/wallet.api'
-import type { WalletTransactionDto } from '../../wallet/types/wallet.types'
-import { Loader2, ArrowDownLeft, ArrowUpRight, Wallet, ChevronLeft, ChevronRight } from 'lucide-react'
-import { toast } from 'sonner'
-import type { AxiosError } from 'axios'
-import type { Result } from '@/shared/types/common.types'
+import { useState } from "react";
+import { formatCurrency } from "@/shared/utils/currency";
+import { formatDateTimeDisplay } from "@/shared/utils/date.utils";
+import { useQuery } from "@tanstack/react-query";
+import {
+  getMyWallet,
+  getMyWalletTransactions,
+  getWalletTopUpVnPayUrl,
+} from "../../wallet/api/wallet.api";
+import type { WalletTransactionDto } from "../../wallet/types/wallet.types";
+import {
+  Loader2,
+  ArrowDownLeft,
+  ArrowUpRight,
+  Wallet,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { toast } from "sonner";
+import type { AxiosError } from "axios";
+import type { Result } from "@/shared/types/common.types";
 
-const MIN_TOP_UP = 10000
-const MAX_TOP_UP = 50000000
-const TRANSACTIONS_PAGE_SIZE = 10
+const MIN_TOP_UP = 10000;
+const MAX_TOP_UP = 50000000;
+const TRANSACTIONS_PAGE_SIZE = 10;
 
 export function MyWalletPanel() {
-  const [amountInput, setAmountInput] = useState('')
-  const [isToppingUp, setIsToppingUp] = useState(false)
-  const [transactionPage, setTransactionPage] = useState(1)
+  const [amountInput, setAmountInput] = useState("");
+  const [isToppingUp, setIsToppingUp] = useState(false);
+  const [transactionPage, setTransactionPage] = useState(1);
 
   const { data: walletData, isLoading: isLoadingWallet } = useQuery({
-    queryKey: ['my-wallet'],
+    queryKey: ["my-wallet"],
     queryFn: getMyWallet,
-  })
+  });
 
-  const { data: transactionsData, isLoading: isLoadingTransactions } = useQuery({
-    queryKey: ['my-wallet-transactions'],
-    queryFn: getMyWalletTransactions,
-  })
+  const { data: transactionsData, isLoading: isLoadingTransactions } = useQuery(
+    {
+      queryKey: ["my-wallet-transactions"],
+      queryFn: getMyWalletTransactions,
+    },
+  );
 
   if (isLoadingWallet || isLoadingTransactions) {
     return (
       <div className="py-10 flex justify-center">
         <Loader2 className="w-7 h-7 animate-spin text-lotus-rose" />
       </div>
-    )
+    );
   }
 
-  const balance = walletData?.data?.balance ?? 0
-  const transactions = transactionsData?.data ?? []
-  const totalTransactions = transactions.length
-  const totalTransactionPages = Math.max(1, Math.ceil(totalTransactions / TRANSACTIONS_PAGE_SIZE))
-  const currentTransactionPage = Math.min(transactionPage, totalTransactionPages)
-  const transactionStartIndex = (currentTransactionPage - 1) * TRANSACTIONS_PAGE_SIZE
+  const balance = walletData?.data?.balance ?? 0;
+  const transactions = transactionsData?.data ?? [];
+  const totalTransactions = transactions.length;
+  const totalTransactionPages = Math.max(
+    1,
+    Math.ceil(totalTransactions / TRANSACTIONS_PAGE_SIZE),
+  );
+  const currentTransactionPage = Math.min(
+    transactionPage,
+    totalTransactionPages,
+  );
+  const transactionStartIndex =
+    (currentTransactionPage - 1) * TRANSACTIONS_PAGE_SIZE;
   const paginatedTransactions = transactions.slice(
     transactionStartIndex,
     transactionStartIndex + TRANSACTIONS_PAGE_SIZE,
-  )
+  );
 
   const handleTopUp = async () => {
-    const amount = Number(amountInput.replace(/\D/g, ''))
+    const amount = Number(amountInput.replace(/\D/g, ""));
     if (!amount || amount < MIN_TOP_UP || amount > MAX_TOP_UP) {
-      toast.error('Số tiền nạp phải từ 10.000đ đến 50.000.000đ.')
-      return
+      toast.error("Số tiền nạp phải từ 10.000đ đến 50.000.000đ.");
+      return;
     }
 
-    setIsToppingUp(true)
+    setIsToppingUp(true);
     try {
-      const url = await getWalletTopUpVnPayUrl(amount)
+      const url = await getWalletTopUpVnPayUrl(amount);
       if (url) {
-        window.location.assign(url)
-        return
+        window.location.assign(url);
+        return;
       }
-      toast.error('Không tạo được liên kết thanh toán. Vui lòng thử lại.')
+      toast.error("Không tạo được liên kết thanh toán. Vui lòng thử lại.");
     } catch (error) {
-      const axiosError = error as AxiosError<Result<unknown>>
-      const msg = axiosError.response?.data?.message ?? 'Không thể kết nối đến máy chủ'
-      toast.error(msg)
+      const axiosError = error as AxiosError<Result<unknown>>;
+      const msg =
+        axiosError.response?.data?.message ?? "Không thể kết nối đến máy chủ";
+      toast.error(msg);
     } finally {
-      setIsToppingUp(false)
+      setIsToppingUp(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-5">
@@ -97,8 +118,8 @@ export function MyWalletPanel() {
             inputMode="numeric"
             value={amountInput}
             onChange={(e: { target: { value: string } }) => {
-              const digits = e.target.value.replace(/\D/g, '')
-              setAmountInput(digits)
+              const digits = e.target.value.replace(/\D/g, "");
+              setAmountInput(digits);
             }}
             placeholder="Ví dụ: 20000"
             className="flex-1 rounded-lg border border-lotus-cream px-3 py-2 text-sm text-lotus-deep outline-none focus:border-lotus-rose"
@@ -116,14 +137,16 @@ export function MyWalletPanel() {
                 Đang chuyển...
               </>
             ) : (
-              'Nạp qua VNPay'
+              "Nạp qua VNPay"
             )}
           </button>
         </div>
       </div>
 
       <div>
-        <h3 className="text-base font-bold text-lotus-deep mb-3">Lịch sử giao dịch</h3>
+        <h3 className="text-base font-bold text-lotus-deep mb-3">
+          Lịch sử giao dịch
+        </h3>
         {transactions.length === 0 ? (
           <div className="text-center py-6 bg-lotus-cream/50 rounded-xl">
             <p className="text-lotus-stone text-sm">Chưa có giao dịch nào.</p>
@@ -132,67 +155,95 @@ export function MyWalletPanel() {
           <>
             <div className="space-y-3">
               {paginatedTransactions.map((tx: WalletTransactionDto) => {
-              const amount = Number(tx.amount) || 0
-              const isPositive = amount > 0
-              return (
-                <div key={tx.id} className="flex items-center justify-between p-4 rounded-xl bg-lotus-cream/50 hover:bg-lotus-cream transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isPositive ? 'bg-success-bg text-success-text' : 'bg-rose-100 text-rose-600'}`}>
-                      {isPositive ? <ArrowDownLeft className="w-5 h-5" /> : <ArrowUpRight className="w-5 h-5" />}
+                const amount = Number(tx.amount) || 0;
+                const isPositive = amount > 0;
+                return (
+                  <div
+                    key={tx.id}
+                    className="flex items-center justify-between p-4 rounded-xl bg-lotus-cream/50 hover:bg-lotus-cream transition-colors"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`w-10 h-10 rounded-full flex items-center justify-center ${isPositive ? "bg-success-bg text-success-text" : "bg-rose-100 text-rose-600"}`}
+                      >
+                        {isPositive ? (
+                          <ArrowDownLeft className="w-5 h-5" />
+                        ) : (
+                          <ArrowUpRight className="w-5 h-5" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium text-lotus-deep">
+                          {tx.note ||
+                            (isPositive ? "Hoàn tiền ví" : "Thanh toán cọc")}
+                        </p>
+                        <p className="text-xs text-lotus-stone mt-0.5">
+                          {formatDateTimeDisplay(tx.createdAt)}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-lotus-deep">{tx.note || (isPositive ? 'Hoàn tiền ví' : 'Thanh toán cọc')}</p>
-                      <p className="text-xs text-lotus-stone mt-0.5">
-                        {formatDateTimeDisplay(tx.createdAt)}
-                      </p>
+                    <div
+                      className={`font-bold ${isPositive ? "text-success-text" : "text-rose-600"}`}
+                    >
+                      {isPositive ? "+" : ""}
+                      {formatCurrency(amount)}
                     </div>
                   </div>
-                  <div className={`font-bold ${isPositive ? 'text-success-text' : 'text-rose-600'}`}>
-                    {isPositive ? '+' : ''}{formatCurrency(amount)}
-                  </div>
-                </div>
-              )
+                );
               })}
             </div>
 
             {totalTransactionPages > 1 && (
-            <div className="mt-3 flex items-center justify-between rounded-xl border border-lotus-cream bg-lotus-cream/30 px-3 py-2 text-xs text-lotus-stone">
-              <span>
-                Hiển thị{' '}
-                <strong className="text-lotus-deep">
-                  {transactionStartIndex + 1}-{Math.min(transactionStartIndex + TRANSACTIONS_PAGE_SIZE, totalTransactions)}
-                </strong>{' '}
-                / <strong className="text-lotus-deep">{totalTransactions}</strong>
-              </span>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setTransactionPage((page) => Math.max(1, page - 1))}
-                  disabled={currentTransactionPage === 1}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-lotus-cream bg-white text-lotus-deep transition-colors hover:bg-lotus-cream disabled:cursor-not-allowed disabled:opacity-50"
-                  aria-label="Trang trước"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <span className="min-w-16 text-center font-medium text-lotus-deep">
-                  {currentTransactionPage} / {totalTransactionPages}
+              <div className="mt-3 flex items-center justify-between rounded-xl border border-lotus-cream bg-lotus-cream/30 px-3 py-2 text-xs text-lotus-stone">
+                <span>
+                  Hiển thị{" "}
+                  <strong className="text-lotus-deep">
+                    {transactionStartIndex + 1}-
+                    {Math.min(
+                      transactionStartIndex + TRANSACTIONS_PAGE_SIZE,
+                      totalTransactions,
+                    )}
+                  </strong>{" "}
+                  /{" "}
+                  <strong className="text-lotus-deep">
+                    {totalTransactions}
+                  </strong>
                 </span>
-                <button
-                  type="button"
-                  onClick={() => setTransactionPage((page) => Math.min(totalTransactionPages, page + 1))}
-                  disabled={currentTransactionPage === totalTransactionPages}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-lotus-cream bg-white text-lotus-deep transition-colors hover:bg-lotus-cream disabled:cursor-not-allowed disabled:opacity-50"
-                  aria-label="Trang sau"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setTransactionPage((page) => Math.max(1, page - 1))
+                    }
+                    disabled={currentTransactionPage === 1}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-lotus-cream bg-white text-lotus-deep transition-colors hover:bg-lotus-cream disabled:cursor-not-allowed disabled:opacity-50"
+                    aria-label="Trang trước"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <span className="min-w-16 text-center font-medium text-lotus-deep">
+                    {currentTransactionPage} / {totalTransactionPages}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setTransactionPage((page) =>
+                        Math.min(totalTransactionPages, page + 1),
+                      )
+                    }
+                    disabled={currentTransactionPage === totalTransactionPages}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-lotus-cream bg-white text-lotus-deep transition-colors hover:bg-lotus-cream disabled:cursor-not-allowed disabled:opacity-50"
+                    aria-label="Trang sau"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
           </>
         )}
       </div>
     </div>
-  )
+  );
 }

@@ -37,11 +37,12 @@ export function InvoiceFilterSidebar({
 
   return (
     <aside className="w-56 shrink-0 flex flex-col h-full bg-white rounded overflow-hidden">
-      {/* Title */}
       <div className="px-4 py-3 border-b border-adminGray-100 shrink-0 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-adminGold-600" />
-          <span className="text-sm font-bold text-adminInk">Bộ lọc hóa đơn</span>
+          <span className="text-sm font-bold text-adminInk">
+            Bộ lọc hóa đơn
+          </span>
         </div>
         {hasFilter && (
           <button
@@ -55,9 +56,7 @@ export function InvoiceFilterSidebar({
         )}
       </div>
 
-      {/* Filter Options */}
       <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-5">
-        {/* Status Group */}
         <div className="space-y-2">
           <p className="text-xs font-bold text-adminGray-600 tracking-wider uppercase px-1">
             Trạng thái
@@ -83,7 +82,6 @@ export function InvoiceFilterSidebar({
           </div>
         </div>
 
-        {/* Payment Method Group */}
         <div className="space-y-2">
           <p className="text-xs font-bold text-adminGray-600 tracking-wider uppercase px-1">
             Phương thức

@@ -37,8 +37,7 @@ import type { ProductCategoryDto } from "../types/productCategory.types";
 
 const ENTITY = "danh mục";
 const ENTITY_SUBJECT = "Danh mục";
-const DELETE_WARNING =
-  "Các sản phẩm thuộc danh mục này có thể bị ảnh hưởng.";
+const DELETE_WARNING = "Các sản phẩm thuộc danh mục này có thể bị ảnh hưởng.";
 const BULK_DELETE_WARNING =
   "Các sản phẩm thuộc các danh mục này có thể bị ảnh hưởng.";
 
@@ -243,9 +242,7 @@ export function ProductCategoryListPage() {
               size="sm"
               className="lotus-admin-table-toolbar-btn"
               onClick={() => handleToggleView(clearSelection)}
-              title={
-                showDeleted ? "Quay lại danh sách" : "Danh mục đã xóa"
-              }
+              title={showDeleted ? "Quay lại danh sách" : "Danh mục đã xóa"}
             >
               {showDeleted ? (
                 <>

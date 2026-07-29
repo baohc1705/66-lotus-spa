@@ -69,7 +69,9 @@ export function useUpdatePromotion() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+      );
     },
   });
 }

@@ -9,7 +9,6 @@ export const LoginPage = () => (
       backgroundImage: `url(${loginBgUrl})`,
     }}
   >
-    {/* Logo */}
     <div className="flex flex-col items-center select-none mb-6">
       <img
         src={logoHomeUrl}
@@ -20,7 +19,6 @@ export const LoginPage = () => (
       <span className="text-xs tracking-[0.3em] text-gold-600 uppercase mt-1">SPA & SALON</span>
     </div>
 
-    {/* Form Card */}
     <div className="w-full max-w-[440px] bg-white rounded-[24px] p-8 sm:p-10 shadow-gold animate-fade-in">
       <div className="text-center mb-6">
         <h3 className="text-2xl font-bold text-ink font-sans">Đăng nhập</h3>

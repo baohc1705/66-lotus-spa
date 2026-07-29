@@ -1,5 +1,5 @@
-import { createEntityQueryKeys } from '@/shared/utils/queryKeys';
-import { getErrorMessage } from '@/shared/utils/errorUtils';
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
@@ -15,7 +15,8 @@ import type {
 
 const ENTITY = "hạng thành viên";
 
-export const TIER_KEYS = createEntityQueryKeys<MembershipTierQueryParams>("tiers");
+export const TIER_KEYS =
+  createEntityQueryKeys<MembershipTierQueryParams>("tiers");
 
 export function useMembershipTiers(params: MembershipTierQueryParams) {
   return useQuery({
@@ -70,7 +71,9 @@ export function useUpdateMembershipTier() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+      );
     },
   });
 }

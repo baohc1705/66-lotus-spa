@@ -52,4 +52,3 @@ export const staffSalonApi = {
       .post<Result<object>>(`${BASE}/remove-manager`, payload)
       .then((r) => r.data),
 };
-

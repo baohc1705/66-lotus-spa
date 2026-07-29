@@ -8,7 +8,10 @@ interface Props {
   isLoading: boolean;
 }
 
-export const TodayAppointmentsCard = memo(function TodayAppointmentsCard({ data, isLoading }: Props) {
+export const TodayAppointmentsCard = memo(function TodayAppointmentsCard({
+  data,
+  isLoading,
+}: Props) {
   if (isLoading || !data) {
     return (
       <div className="bg-white border border-adminGray-100 rounded-admin p-5 animate-pulse h-[160px]">
@@ -35,11 +38,21 @@ export const TodayAppointmentsCard = memo(function TodayAppointmentsCard({ data,
 
       <div className="flex items-end justify-between">
         <div>
-          <div className="text-4xl font-bold text-adminInk leading-none">{data.total}</div>
-          <div className={`flex items-center gap-1 mt-2 text-xs font-semibold ${isPositive ? "text-adminGreen-600" : "text-state-danger-text"}`}>
-            {isPositive ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+          <div className="text-4xl font-bold text-adminInk leading-none">
+            {data.total}
+          </div>
+          <div
+            className={`flex items-center gap-1 mt-2 text-xs font-semibold ${isPositive ? "text-adminGreen-600" : "text-state-danger-text"}`}
+          >
+            {isPositive ? (
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            ) : (
+              <ArrowDownRight className="w-3.5 h-3.5" />
+            )}
             <span>{Math.abs(data.changeVsYesterday)}%</span>
-            <span className="text-adminGray-400 font-normal ml-1">So với hôm qua</span>
+            <span className="text-adminGray-400 font-normal ml-1">
+              So với hôm qua
+            </span>
           </div>
         </div>
 
@@ -63,12 +76,15 @@ export const TodayAppointmentsCard = memo(function TodayAppointmentsCard({ data,
             </PieChart>
           </ResponsiveContainer>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-2xs font-bold text-adminInk leading-none">{data.completionRate}%</span>
-            <span className="text-2xs text-adminGray-400 leading-none mt-0.5">HT</span>
+            <span className="text-2xs font-bold text-adminInk leading-none">
+              {data.completionRate}%
+            </span>
+            <span className="text-2xs text-adminGray-400 leading-none mt-0.5">
+              HT
+            </span>
           </div>
         </div>
       </div>
     </div>
   );
 });
-

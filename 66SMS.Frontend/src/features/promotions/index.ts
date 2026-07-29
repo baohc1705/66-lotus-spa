@@ -1,1 +1,1 @@
-export { PromotionListPage } from './pages/PromotionListPage'
+export { PromotionListPage } from "./pages/PromotionListPage";

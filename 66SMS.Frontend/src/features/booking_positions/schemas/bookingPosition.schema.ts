@@ -20,11 +20,10 @@ const bookingPositionFieldsSchema = z.object({
 
 export const createBookingPositionSchema = bookingPositionFieldsSchema;
 
-/** Schema validate form edit. */
 export const updateBookingPositionFormSchema = bookingPositionFieldsSchema;
 
-/** Payload PATCH — mọi field optional. */
-export const updateBookingPositionSchema = bookingPositionFieldsSchema.partial();
+export const updateBookingPositionSchema =
+  bookingPositionFieldsSchema.partial();
 
 export const deleteBookingPositionSchema = z.object({
   id: z.number().min(1, "ID phải là số dương"),

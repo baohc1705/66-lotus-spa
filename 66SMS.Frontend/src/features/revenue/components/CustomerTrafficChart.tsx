@@ -68,8 +68,16 @@ export const CustomerTrafficChart = memo(function CustomerTrafficChart({
             >
               <defs>
                 <linearGradient id="trafficGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--admin-green-600)" stopOpacity={0.15} />
-                  <stop offset="95%" stopColor="var(--admin-green-600)" stopOpacity={0} />
+                  <stop
+                    offset="5%"
+                    stopColor="var(--admin-green-600)"
+                    stopOpacity={0.15}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--admin-green-600)"
+                    stopOpacity={0}
+                  />
                 </linearGradient>
               </defs>
               <CartesianGrid

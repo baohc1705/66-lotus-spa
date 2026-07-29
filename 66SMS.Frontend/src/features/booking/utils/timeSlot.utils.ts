@@ -1,6 +1,5 @@
 import type { TimeSlotDTO } from "../types/booking.types";
 
-/** Parse "HH:mm" hoặc "HH:mm:ss" → phút từ 00:00 */
 function timeToMinutes(time: string): number | null {
   const parts = time.trim().split(":").map(Number);
   if (parts.length < 2 || parts.some((n) => Number.isNaN(n))) return null;
@@ -15,10 +14,6 @@ function toYmdLocal(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
-/**
- * Chỉ giữ khung giờ sau thời điểm hiện tại khi chọn ngày hôm nay.
- * Ngày tương lai: giữ tất cả. Ngày quá khứ: ẩn hết.
- */
 export function filterSlotsAfterNow(
   slots: TimeSlotDTO[],
   appointmentDate: string | null | undefined,

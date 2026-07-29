@@ -25,7 +25,10 @@ import { StaffStatCards } from "../components/StaffStatCards";
 import { StaffCategorySidebar } from "../components/StaffCategorySidebar";
 import { useDeleteStaffMutation, useAdminStaffs } from "../hooks/useStaffs";
 import { useStaffListState } from "../hooks/useStaffListState";
-import { useActiveStaffColumns, STAFF_COLUMN_LABELS } from "../components/useActiveStaffColumns";
+import {
+  useActiveStaffColumns,
+  STAFF_COLUMN_LABELS,
+} from "../components/useActiveStaffColumns";
 import { useRowSelection } from "@/shared/hooks/useRowSelection";
 import { STAFF_PERM } from "../constants/staff.permissions";
 import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
@@ -80,8 +83,7 @@ export function StaffListPage() {
   const paged = staffsResult?.data;
   const staffs = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
-
-  // Stat card calculations
+  
   const activeStaffs = useMemo(
     () => staffs.filter((s: StaffDto) => s.status === 1).length,
     [staffs],
@@ -106,7 +108,9 @@ export function StaffListPage() {
 
   const pageIds = useMemo(
     () =>
-      staffs.map((e) => e.id).filter((id): id is number => id !== undefined && id !== null),
+      staffs
+        .map((e) => e.id)
+        .filter((id): id is number => id !== undefined && id !== null),
     [staffs],
   );
 
@@ -165,7 +169,6 @@ export function StaffListPage() {
 
   return (
     <div className="flex h-full overflow-hidden gap-2">
-      {/* Sidebar danh mục vai trò */}
       {!isSidebarMode && (
         <StaffCategorySidebar
           selectedRole={selectedRole}
@@ -174,9 +177,7 @@ export function StaffListPage() {
         />
       )}
 
-      {/* Right: Stats + Table */}
       <div className="flex-1 min-w-0 flex flex-col gap-2 overflow-hidden">
-        {/* Stats row */}
         <div className="shrink-0">
           <StaffStatCards
             totalStaffs={totalCount}
@@ -187,21 +188,18 @@ export function StaffListPage() {
           />
         </div>
 
-        {/* Table card */}
         <motion.div
           initial="hidden"
           animate="visible"
           variants={containerVariants}
           className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative"
         >
-          {/* Fetching bar */}
           {isFetching && !isLoading && (
             <div className="lotus-admin-table-fetch-bar">
               <div className="lotus-admin-table-fetch-bar-inner" />
             </div>
           )}
 
-          {/* Toolbar */}
           <div className="px-4 pt-3 shrink-0">
             <DataTableToolbar
               searchValue={filter}
@@ -215,12 +213,13 @@ export function StaffListPage() {
                 />
               )}
 
-              <DataTableViewOptions
-                table={table}
-                columnLabels={columnLabels}
-              />
+              <DataTableViewOptions table={table} columnLabels={columnLabels} />
 
-              <PermissionGate resource={perm.resource} action={perm.create} role={perm.role}>
+              <PermissionGate
+                resource={perm.resource}
+                action={perm.create}
+                role={perm.role}
+              >
                 <Button
                   variant="admin"
                   size="sm"
@@ -234,7 +233,6 @@ export function StaffListPage() {
             </DataTableToolbar>
           </div>
 
-          {/* Table */}
           <DataTable
             table={table}
             isLoading={isLoading}
@@ -262,7 +260,11 @@ export function StaffListPage() {
                     Thêm nhân viên mới để bắt đầu quản lý.
                   </p>
                 </div>
-                <PermissionGate resource={perm.resource} action={perm.create} role={perm.role}>
+                <PermissionGate
+                  resource={perm.resource}
+                  action={perm.create}
+                  role={perm.role}
+                >
                   <Button
                     variant="admin"
                     size="sm"
@@ -293,7 +295,6 @@ export function StaffListPage() {
         </motion.div>
       </div>
 
-      {/* Dialogs */}
       <StaffFormDialog open={createOpen} onOpenChange={setCreateOpen} />
 
       <StaffFormDialog
@@ -311,7 +312,10 @@ export function StaffListPage() {
         }}
         onConfirm={handleDelete}
         title={CONFIRM_MSG.deleteTitle(ENTITY)}
-        description={CONFIRM_MSG.deleteDescription(ENTITY, deleteTarget?.fullName ?? "")}
+        description={CONFIRM_MSG.deleteDescription(
+          ENTITY,
+          deleteTarget?.fullName ?? "",
+        )}
         confirmLabel={COMMON_MSG.delete}
         loading={deleteMutation.isPending}
         variant="danger"

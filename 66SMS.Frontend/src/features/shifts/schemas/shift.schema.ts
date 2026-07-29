@@ -7,11 +7,19 @@ export const createShiftSchema = z
     description: z.string().optional().or(z.literal("")),
     shiftStart: z
       .string()
-      .regex(/^([01]\d|2[0-3]):?([0-5]\d)$/, "Định dạng giờ không hợp lệ (HH:mm)"),
+      .regex(
+        /^([01]\d|2[0-3]):?([0-5]\d)$/,
+        "Định dạng giờ không hợp lệ (HH:mm)",
+      ),
     shiftEnd: z
       .string()
-      .regex(/^([01]\d|2[0-3]):?([0-5]\d)$/, "Định dạng giờ không hợp lệ (HH:mm)"),
-    effectiveFrom: z.string().min(1, VALIDATION_MSG.selectRequired("ngày áp dụng")),
+      .regex(
+        /^([01]\d|2[0-3]):?([0-5]\d)$/,
+        "Định dạng giờ không hợp lệ (HH:mm)",
+      ),
+    effectiveFrom: z
+      .string()
+      .min(1, VALIDATION_MSG.selectRequired("ngày áp dụng")),
     effectiveTo: z.string().optional().or(z.literal("")),
   })
   .refine(

@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Schema cho form tính lương
 export const generatePayrollSchema = z.object({
   staffId: z.coerce.number().min(1, "Vui lòng chọn nhân viên"),
   month: z.coerce.number().min(1).max(12),
@@ -10,7 +9,6 @@ export const generatePayrollSchema = z.object({
 
 export type GeneratePayrollFormData = z.infer<typeof generatePayrollSchema>;
 
-// Schema cho form chỉnh sửa bảng lương
 export const editPayrollSchema = z.object({
   baseAmount: z.coerce.number().min(0, "Lương cơ bản không được âm"),
   commissionAmount: z.coerce.number().min(0, "Hoa hồng không được âm"),

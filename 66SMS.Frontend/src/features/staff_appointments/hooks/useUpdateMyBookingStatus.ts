@@ -1,12 +1,12 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { AxiosError } from 'axios'
-import { toast } from 'sonner'
-import { getErrorMessage } from '@/shared/utils/errorUtils'
-import type { Result } from '@/shared/types/common.types'
-import { staffScheduleApi } from '../api'
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
+import { toast } from "sonner";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
+import type { Result } from "@/shared/types/common.types";
+import { staffScheduleApi } from "../api";
 
 export function useUpdateMyBookingStatus() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({
@@ -14,24 +14,24 @@ export function useUpdateMyBookingStatus() {
       status,
       note,
     }: {
-      id: string | number
-      status: number
-      note?: string
+      id: string | number;
+      status: number;
+      note?: string;
     }) => {
-      const res = await staffScheduleApi.updateBookingStatus(id, status, note)
+      const res = await staffScheduleApi.updateBookingStatus(id, status, note);
       if (!res.isSuccess) {
-        throw new Error(res.message || 'Cập nhật trạng thái thất bại')
+        throw new Error(res.message || "Cập nhật trạng thái thất bại");
       }
-      return res
+      return res;
     },
     onSuccess: (res) => {
-      toast.success(res.message || 'Cập nhật trạng thái thành công')
-      queryClient.invalidateQueries({ queryKey: ['staff-schedule-daily'] })
-      queryClient.invalidateQueries({ queryKey: ['staff-schedule-weekly'] })
-      queryClient.invalidateQueries({ queryKey: ['cashier-daily'] })
+      toast.success(res.message || "Cập nhật trạng thái thành công");
+      queryClient.invalidateQueries({ queryKey: ["staff-schedule-daily"] });
+      queryClient.invalidateQueries({ queryKey: ["staff-schedule-weekly"] });
+      queryClient.invalidateQueries({ queryKey: ["cashier-daily"] });
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, 'Cập nhật trạng thái thất bại'))
+      toast.error(getErrorMessage(error, "Cập nhật trạng thái thất bại"));
     },
-  })
+  });
 }

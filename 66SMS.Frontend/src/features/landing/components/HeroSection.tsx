@@ -163,7 +163,9 @@ export const HeroSection = () => {
   }, [slides.length]);
 
   useEffect(() => {
-    setCurrentIndex(0);
+    setTimeout(() => {
+      setCurrentIndex(0);
+    }, 0);
   }, [slides.length]);
 
   useEffect(() => {

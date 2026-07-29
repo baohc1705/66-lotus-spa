@@ -16,10 +16,8 @@ export function BranchSelector() {
   const { user, hasRole, selectedSalonId, setSelectedSalonId, managedSalonId, mySalon } = useAuthStore();
   const isAdmin = hasRole("Admin");
   
-  // 1. Fetch all salons (only for Admin)
   const { data: allSalons = [], isLoading: isLoadingAllSalons } = useActiveSalons();
 
-  // 2. Fetch assigned salons (for non-Admin: Manager, Staff, Receptionist)
   const staffId = user?.staffInfo?.id;
   const { data: staffSalonsResult, isLoading: isLoadingStaffSalons } = useQuery({
     queryKey: ["staff-salons-assigned", staffId],
@@ -27,7 +25,7 @@ export function BranchSelector() {
     enabled: !isAdmin && !!staffId,
   });
 
-  // Memoize assigned salons list for non-Admins
+  // Salon được gán (role không phải Admin)
   const assignedSalons = useMemo(() => {
     if (isAdmin) return [];
     
@@ -46,7 +44,7 @@ export function BranchSelector() {
       }
     });
     
-    // Fallback if empty but managedSalonId is set
+    // Không có gán thì dùng managedSalonId
     if (list.length === 0 && managedSalonId) {
       list.push({
         id: managedSalonId,
@@ -57,7 +55,7 @@ export function BranchSelector() {
     return list;
   }, [isAdmin, staffSalonsResult, managedSalonId, mySalon?.salonName]);
 
-  // Auto-selection logic based on roles
+  // Tự chọn salon theo role
   useEffect(() => {
     if (isAdmin) return;
 
@@ -89,7 +87,7 @@ export function BranchSelector() {
     );
   }
 
-  // Admin select logic
+  // Admin: chọn tất cả / từng chi nhánh
   if (isAdmin) {
     const value = selectedSalonId !== null ? selectedSalonId.toString() : "all";
 
@@ -129,7 +127,7 @@ export function BranchSelector() {
     );
   }
 
-  // Non-Admin (Manager, Staff, Receptionist) select logic
+  // Role khác Admin
   if (assignedSalons.length === 0) {
     return (
       <div className="flex items-center gap-1.5 px-3 py-1 bg-transparent rounded-[4px] border border-white/20 h-8 w-full text-white/60">
@@ -148,7 +146,7 @@ export function BranchSelector() {
     );
   }
 
-  // Multiple assigned salons dropdown
+  // Nhiều chi nhánh: dropdown
   const value = selectedSalonId !== null ? selectedSalonId.toString() : "";
   const handleValueChange = (val: string) => {
     setSelectedSalonId(parseInt(val, 10));

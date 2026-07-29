@@ -96,7 +96,7 @@ export function ProductListPage() {
   const products = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
 
-  // Stat card calculations
+  // Số liệu stat cards
   const activeProductCount = useMemo(
     () =>
       products.filter((p: ProductDto) => p.status === StatusActive.Active)
@@ -215,7 +215,6 @@ export function ProductListPage() {
 
   return (
     <div className="flex h-full overflow-hidden gap-2">
-      {/* Sidebar danh mục */}
       {!isSidebarMode && (
         <ProductCategorySidebar
           selectedCategoryId={selectedCategoryId}
@@ -224,9 +223,7 @@ export function ProductListPage() {
         />
       )}
 
-      {/* Right: Stats + Table */}
       <div className="flex-1 min-w-0 flex flex-col gap-2 overflow-hidden">
-        {/* Stats row */}
         <div className="shrink-0">
           <ProductStatCards
             totalProducts={totalCount}
@@ -236,21 +233,18 @@ export function ProductListPage() {
           />
         </div>
 
-        {/* Table card */}
         <motion.div
           initial="hidden"
           animate="visible"
           variants={containerVariants}
           className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative"
         >
-          {/* Fetching bar */}
           {isFetching && !isLoading && (
             <div className="lotus-admin-table-fetch-bar">
               <div className="lotus-admin-table-fetch-bar-inner" />
             </div>
           )}
 
-          {/* Toolbar */}
           <div className="px-4 pt-3 shrink-0">
             <DataTableToolbar
               searchValue={filter}
@@ -332,7 +326,6 @@ export function ProductListPage() {
             </DataTableToolbar>
           </div>
 
-          {/* Table */}
           <DataTable
             table={table}
             isLoading={isLoading}
@@ -401,7 +394,6 @@ export function ProductListPage() {
         </motion.div>
       </div>
 
-      {/* Dialogs */}
       <ProductFormDialog open={createOpen} onOpenChange={setCreateOpen} />
 
       <ProductFormDialog

@@ -5,7 +5,7 @@ export interface WorkScheduleDTO {
   shiftPeriodId?: number;
   staffId?: number;
   salonId?: number;
-  workDate?: string; // DateOnly from backend, format: YYYY-MM-DD
+  workDate?: string;  
   shift?: ShiftDTO;
   staffName?: string;
 }

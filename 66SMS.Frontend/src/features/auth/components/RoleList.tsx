@@ -67,7 +67,6 @@ export function RoleList({ roles, activeRoleId, onSelectRole, onCreateRole, onEd
         );
       })}
 
-      {/* Legend */}
       <div className="mt-1 bg-white border border-border rounded-xl p-3">
         <div className="text-2xs font-bold uppercase tracking-widest text-adminGray-600 mb-2">Chú thích</div>
         <div className="flex flex-col gap-2">

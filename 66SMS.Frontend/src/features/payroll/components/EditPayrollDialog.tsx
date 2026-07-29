@@ -1,6 +1,6 @@
-import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
-import { AdminInput } from '@/shared/components/forms/AdminInput';
-import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
+import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
+import { AdminInput } from "@/shared/components/forms/AdminInput";
+import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -61,7 +61,6 @@ export function EditPayrollDialog({
     watch,
   } = form;
 
-  // Load current values
   useEffect(() => {
     if (open && payroll) {
       reset({
@@ -91,7 +90,7 @@ export function EditPayrollDialog({
             onOpenChange(false);
           }
         },
-      }
+      },
     );
   };
 
@@ -115,7 +114,10 @@ export function EditPayrollDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <FormField label="Lương cơ bản (VND)" error={errors.baseAmount?.message}>
+          <FormField
+            label="Lương cơ bản (VND)"
+            error={errors.baseAmount?.message}
+          >
             <AdminInput
               type="number"
               placeholder="Nhập lương cơ bản..."
@@ -123,7 +125,10 @@ export function EditPayrollDialog({
             />
           </FormField>
 
-          <FormField label="Hoa hồng dịch vụ (VND)" error={errors.commissionAmount?.message}>
+          <FormField
+            label="Hoa hồng dịch vụ (VND)"
+            error={errors.commissionAmount?.message}
+          >
             <AdminInput
               type="number"
               placeholder="Nhập hoa hồng..."
@@ -202,11 +207,11 @@ function FormField({
 }) {
   return (
     <div className={`space-y-1 ${className ?? ""}`}>
-      <Label className="text-xs font-semibold text-adminInk/80">
-        {label}
-      </Label>
+      <Label className="text-xs font-semibold text-adminInk/80">{label}</Label>
       {children}
-      {error && <p className="text-xs text-state-danger-text font-medium">{error}</p>}
+      {error && (
+        <p className="text-xs text-state-danger-text font-medium">{error}</p>
+      )}
     </div>
   );
 }

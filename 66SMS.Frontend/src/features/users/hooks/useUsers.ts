@@ -8,10 +8,7 @@ import type { PageRequest, Result } from "@/shared/types/common.types";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";
 import { useAuthStore } from "@/features/auth/stores/authStore";
-import type {
-  CreateUserPayload,
-  UpdateUserPayload,
-} from "../types/user.types";
+import type { CreateUserPayload, UpdateUserPayload } from "../types/user.types";
 
 const ENTITY = "người dùng";
 

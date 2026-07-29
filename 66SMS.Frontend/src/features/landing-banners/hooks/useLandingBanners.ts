@@ -28,7 +28,7 @@ export function usePublicLandingBanners() {
 
 export function useAdminLandingBanners(
   params: LandingBannerQueryParams,
-  enabled = true
+  enabled = true,
 ) {
   return useQuery({
     queryKey: LANDING_BANNER_KEYS.adminList(params),
@@ -84,7 +84,7 @@ export function useUpdateLandingBannerMutation() {
     },
     onError: (error: AxiosError<Result<unknown>>) => {
       toast.error(
-        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY))
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
       );
     },
   });

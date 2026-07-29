@@ -28,7 +28,6 @@ export const LoginForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-      {/* Email / Username */}
       <div className="space-y-1.5">
         <div className="relative">
           <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-warm-400 pointer-events-none w-5 h-5">
@@ -51,7 +50,6 @@ export const LoginForm = () => {
         )}
       </div>
 
-      {/* Password */}
       <div className="space-y-1.5">
         <div className="relative">
           <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-warm-400 pointer-events-none w-5 h-5">
@@ -82,14 +80,12 @@ export const LoginForm = () => {
         )}
       </div>
 
-      {/* Forgot Password */}
       <div className="flex justify-end">
         <Link to="/forgot-password" className="text-xs font-normal text-rose-600 hover:text-rose-500 hover:underline transition-colors">
           Quên mật khẩu?
         </Link>
       </div>
 
-      {/* Submit Button */}
       <button
         type="submit"
         disabled={login.isPending}
@@ -105,7 +101,6 @@ export const LoginForm = () => {
         )}
       </button>
 
-      {/* Divider */}
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-warm-100" />
@@ -115,7 +110,6 @@ export const LoginForm = () => {
         </div>
       </div>
 
-      {/* Register Redirect */}
       <div className="text-center text-xs text-warm-600">
         Chưa có tài khoản?{" "}
         <Link to="/register" className="font-semibold text-rose-600 hover:text-rose-500 hover:underline transition-colors">

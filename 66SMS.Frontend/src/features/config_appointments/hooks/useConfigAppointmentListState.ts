@@ -8,8 +8,9 @@ export function useConfigAppointmentListState() {
   const [editTarget, setEditTarget] = useState<ConfigAppointmentDTO | null>(
     null,
   );
-  const [deleteTarget, setDeleteTarget] =
-    useState<ConfigAppointmentDTO | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ConfigAppointmentDTO | null>(
+    null,
+  );
 
   return {
     ...table,

@@ -1,4 +1,4 @@
-import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
+import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useSalons } from "@/features/salons/hooks/useSalons";
 import { useAdminStaffs } from "@/features/staffs/hooks/useStaffs";
@@ -7,8 +7,8 @@ import { DataTable } from "@/shared/components/DataTable/DataTable";
 import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { Button } from "@/shared/components/ui/button";
-import { DEFAULT_LOADING_ROWS } from '@/shared/constants/display.const';
-import { containerVariants } from '@/shared/motion/pageVariants';
+import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
+import { containerVariants } from "@/shared/motion/pageVariants";
 import {
   Select,
   SelectContent,
@@ -21,7 +21,7 @@ import {
   type ColumnDef,
 } from "@tanstack/react-table";
 import { Calculator, CheckCircle2, Pencil, Wallet } from "lucide-react";
-import { motion } from 'motion/react';
+import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { EditPayrollDialog } from "../components/EditPayrollDialog";
 import { GeneratePayrollDialog } from "../components/GeneratePayrollDialog";
@@ -231,7 +231,6 @@ export function PayrollListPage() {
         variants={containerVariants}
         className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative"
       >
-        {/* Toolbar */}
         <div className="p-4 flex flex-wrap items-end gap-3 border-b border-adminGray-100 shrink-0">
           <Button
             variant="admin"
@@ -252,7 +251,7 @@ export function PayrollListPage() {
                   value={localSalonId ? String(localSalonId) : "all"}
                   onValueChange={(v) => {
                     setLocalSalonId(v === "all" ? null : Number(v));
-                    setStaffId(null); // Reset selected staff when switching salons
+                    setStaffId(null);
                     setPageIndex(1);
                   }}
                 >
@@ -348,7 +347,9 @@ export function PayrollListPage() {
         <DataTable
           table={table}
           isLoading={isLoading}
-          loadingRows={pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize}
+          loadingRows={
+            pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
+          }
           emptyState={
             <div className="flex flex-col items-center gap-3">
               <div className="w-14 h-14 rounded-2xl bg-adminGray-50 flex items-center justify-center">

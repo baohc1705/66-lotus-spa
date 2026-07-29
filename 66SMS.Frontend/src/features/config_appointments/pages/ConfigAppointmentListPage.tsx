@@ -52,8 +52,11 @@ export function ConfigAppointmentListPage() {
     filter,
   } = listState;
 
-  const { data: result, isLoading, isFetching } =
-    useAdminConfigAppointments(queryParams);
+  const {
+    data: result,
+    isLoading,
+    isFetching,
+  } = useAdminConfigAppointments(queryParams);
   const deleteMutation = useDeleteConfigAppointment();
 
   const paged = result?.data;

@@ -23,14 +23,21 @@ export function useRevenueBreakdown(params: RevenueQueryParams) {
   });
 }
 
-export function useTopRevenueItems(params: RevenueQueryParams, itemType: "service" | "product", limit: number = 5) {
+export function useTopRevenueItems(
+  params: RevenueQueryParams, 
+  itemType: "service" | "product",
+  limit: number = 5,
+) {
   return useQuery({
     queryKey: ["revenue", "top-items", itemType, params, limit],
     queryFn: () => revenueApi.getTopItems(params, itemType, limit),
   });
 }
 
-export function useRecentTransactions(params: RevenueQueryParams, limit: number = 10) {
+export function useRecentTransactions(
+  params: RevenueQueryParams,
+  limit: number = 10,
+) {
   return useQuery({
     queryKey: ["revenue", "recent-transactions", params, limit],
     queryFn: () => revenueApi.getRecentTransactions(params, limit),
@@ -48,7 +55,7 @@ export function useCustomerTraffic(
   salonId: number | null,
   tab: "hour" | "day" | "date",
   from: string,
-  to: string
+  to: string,
 ) {
   return useQuery({
     queryKey: ["revenue", "customer-traffic", salonId, tab, from, to],
@@ -60,7 +67,7 @@ export function useNetRevenue(
   salonId: number | null,
   tab: "hour" | "day" | "date",
   from: string,
-  to: string
+  to: string,
 ) {
   return useQuery({
     queryKey: ["revenue", "net-revenue", salonId, tab, from, to],
@@ -72,7 +79,7 @@ export function useTopStaff(
   salonId: number | null,
   from: string,
   to: string,
-  limit: number = 5
+  limit: number = 5,
 ) {
   return useQuery({
     queryKey: ["revenue", "top-staff", salonId, from, to, limit],

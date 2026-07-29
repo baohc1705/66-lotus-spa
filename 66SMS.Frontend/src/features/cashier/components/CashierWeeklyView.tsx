@@ -9,7 +9,7 @@ interface CashierWeeklyViewProps {
   onEmptySlotClick?: () => void;
 }
 
-const HOURS = Array.from({ length: 15 }, (_, i) => i + 8); // 08:00 to 22:00
+const HOURS = Array.from({ length: 15 }, (_, i) => i + 8);
 
 function timeToMins(t: string) {
   const [h, m] = t.split(":").map(Number);
@@ -154,7 +154,6 @@ export function CashierWeeklyView({
   return (
     <div className="flex-1 min-h-0 min-w-0 w-full overflow-auto scrollbar-thin bg-white relative font-sans">
       <div className="flex min-w-max">
-        {/* Time Column (Y-Axis) */}
         <div className="w-16 flex-shrink-0 border-r border-adminGray-300/80 bg-adminGreen-600-light/20 sticky left-0 z-30">
           <div className="h-16 border-b border-adminGray-300/80 sticky top-0 left-0 bg-adminGreen-600-light/50 z-50"></div>
           <div className="relative">
@@ -168,7 +167,6 @@ export function CashierWeeklyView({
           </div>
         </div>
 
-        {/* Days Columns */}
         {daysOfWeek.map((day, colIdx) => {
           const dateStr = formatDate(day);
           const colBookings = bookings.filter((b) => b.bookingDate === dateStr);
@@ -181,7 +179,6 @@ export function CashierWeeklyView({
               key={colIdx}
               className="flex-1 min-w-[150px] border-r border-adminGray-100 relative"
             >
-              {/* Header */}
               <div className="h-16 border-b border-adminGray-300/80 sticky top-0 bg-white/95 backdrop-blur-sm z-20 flex flex-col items-center justify-center gap-0.5">
                 <div
                   className={`text-xs font-medium uppercase ${
@@ -207,13 +204,11 @@ export function CashierWeeklyView({
                 </div>
               </div>
 
-              {/* Grid Body */}
               <div
                 className="relative cursor-pointer"
                 style={{ height: HOURS.length * 80 }}
                 onClick={() => onEmptySlotClick?.()}
               >
-                {/* Background Grid Lines */}
                 {HOURS.map((hour) => (
                   <div
                     key={hour}
@@ -225,7 +220,6 @@ export function CashierWeeklyView({
                   </div>
                 ))}
 
-                {/* Current Time Indicator */}
                 {isToday && showCurrentTime && (
                   <div
                     className="absolute left-0 right-0 z-10 pointer-events-none"
@@ -236,7 +230,6 @@ export function CashierWeeklyView({
                   </div>
                 )}
 
-                {/* Bookings */}
                 {clusters.map((cluster) =>
                   cluster.bookings.map((booking) => {
                     const top = (booking.startMins - 8 * 60) * (80 / 60);

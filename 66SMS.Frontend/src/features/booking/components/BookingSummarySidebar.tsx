@@ -1,15 +1,11 @@
 import {
-  CalendarCheck,
   ChevronRight,
   Clock,
   MapPin,
   Plus,
-  RotateCcw,
-  ShieldCheck,
   Trash2,
   User,
 } from "lucide-react";
-import React from "react";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import {
   useMembershipTiers,
@@ -20,7 +16,6 @@ import { formatDate } from "@/shared/utils/date.utils";
 import { useBookingStore } from "../stores/bookingStore";
 import { PromotionCodeInput } from "./PromotionCodeInput";
 
-/** Dãy lỗ bấm bán nguyệt liên tiếp trên mép top/bottom */
 function TicketPunchRow({ edge }: { edge: "top" | "bottom" }) {
   const holeCount = 15;
 
@@ -47,7 +42,7 @@ function TicketDivider() {
 
 const DEFAULT_DEPOSIT_PERCENT = 20;
 
-export const BookingSummarySidebar: React.FC = () => {
+export function BookingSummarySidebar() {
   const {
     guests,
     activeGuestIndex,
@@ -76,7 +71,6 @@ export const BookingSummarySidebar: React.FC = () => {
     0,
   );
 
-  // Giống BE: trừ % thẻ thành viên trước, rồi mới trừ mã khuyến mãi
   const membershipDiscount =
     membershipPercent > 0 && servicesSubTotal > 0
       ? Math.round((servicesSubTotal * membershipPercent) / 100)
@@ -177,7 +171,7 @@ export const BookingSummarySidebar: React.FC = () => {
                             />
                           ) : (
                             <div className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center shrink-0 text-base">
-                              🌸
+                              SPA
                             </div>
                           )}
                           <div className="min-w-0">
@@ -360,4 +354,4 @@ export const BookingSummarySidebar: React.FC = () => {
       </div>
     </div>
   );
-};
+}

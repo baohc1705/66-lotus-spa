@@ -16,8 +16,7 @@ interface CashierGridProps {
   ) => void;
 }
 
-const HOURS = Array.from({ length: 15 }, (_, i) => i + 8); // 08:00 to 22:00
-// Mỗi slot 15 phút cao 20px (1 giờ = 80px)
+const HOURS = Array.from({ length: 15 }, (_, i) => i + 8);
 const SLOT_HEIGHT = 20;
 
 function timeToMins(t: string) {
@@ -164,16 +163,11 @@ export function CashierGrid({
     const bookingId = e.dataTransfer.getData("bookingId");
     if (!bookingId || !onBookingMove) return;
 
-    // Lấy vị trí thả
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const y = e.clientY - rect.top;
 
-    // Tính toán thời gian mới dựa trên vị trí Y
-    // Mỗi slot là 30px = 15 phút => 1px = 0.5 phút
     const minutesFrom8 = Math.floor((y / SLOT_HEIGHT) * 15);
     const newStartMins = 8 * 60 + minutesFrom8;
-
-    // Làm tròn thời gian thả (nếu cần) - ví dụ làm tròn thành các mốc 15 phút
     const roundedMins = Math.round(newStartMins / 15) * 15;
 
     const hours = Math.floor(roundedMins / 60);
@@ -186,7 +180,6 @@ export function CashierGrid({
   return (
     <div className="flex-1 min-h-0 min-w-0 w-full overflow-auto scrollbar-thin bg-white relative font-sans">
       <div className="flex min-w-max">
-        {/* Time Column (Y-Axis) - Sticky Left */}
         <div className="w-16 flex-shrink-0 border-r border-adminGray-300/80 bg-adminGreen-600-light/20 sticky left-0 z-30">
           <div className="h-11 border-b border-adminGray-300/80 sticky top-0 left-0 bg-adminGreen-600-light/50 z-50"></div>
           <div className="relative">
@@ -212,7 +205,6 @@ export function CashierGrid({
           </div>
         </div>
 
-        {/* Grid Columns (X-Axis) */}
         <div className="flex-1 flex relative">
           {showCurrentTime && (
             <div
@@ -224,14 +216,15 @@ export function CashierGrid({
           )}
 
           {columns.map((col) => {
-            const colBookings = bookings.filter((b) => b.staffId.toString() === col.id.toString());
+            const colBookings = bookings.filter(
+              (b) => b.staffId.toString() === col.id.toString(),
+            );
 
             return (
               <div
                 key={col.id}
                 className="flex-1 min-w-[150px] border-r border-adminGray-300/60 border-dashed"
               >
-                {/* Column Header */}
                 <div className="h-11 bg-adminGreen-600-light/20 border-b border-adminGray-300/80 sticky top-0 z-40 flex items-center justify-center gap-2.5 px-4">
                   {col.avatar ? (
                     <img
@@ -249,7 +242,6 @@ export function CashierGrid({
                   </span>
                 </div>
 
-                {/* Column Cells */}
                 <div
                   className="relative bg-white border-adminGray-300/60"
                   style={{ height: `${HOURS.length * 80}px` }}
@@ -315,36 +307,44 @@ export function CashierGrid({
 
                           switch (booking.status) {
                             case "in-progress":
-                              statusColor = "bg-state-info-bg border-state-info-border text-state-info-text";
+                              statusColor =
+                                "bg-state-info-bg border-state-info-border text-state-info-text";
                               statusBadge = "bg-status-in-progress";
                               break;
                             case "not-arrived":
-                              statusColor = "bg-state-danger-bg border-state-danger-border text-state-danger-text";
+                              statusColor =
+                                "bg-state-danger-bg border-state-danger-border text-state-danger-text";
                               statusBadge = "bg-status-cancelled";
                               break;
                             case "waiting":
-                              statusColor = "bg-state-warning-bg border-state-warning-border text-state-warning-text";
+                              statusColor =
+                                "bg-state-warning-bg border-state-warning-border text-state-warning-text";
                               statusBadge = "bg-status-waiting";
                               break;
                             case "pending":
-                              statusColor = "bg-state-warning-bg border-state-warning-border text-state-warning-text";
+                              statusColor =
+                                "bg-state-warning-bg border-state-warning-border text-state-warning-text";
                               statusBadge = "bg-status-pending";
                               break;
                             case "confirmed":
-                              statusColor = "bg-state-info-bg border-state-info-border text-state-info-text";
+                              statusColor =
+                                "bg-state-info-bg border-state-info-border text-state-info-text";
                               statusBadge = "bg-status-confirmed";
                               break;
                             case "unpaid":
-                              statusColor = "bg-state-danger-bg border-state-danger-border text-state-danger-text";
+                              statusColor =
+                                "bg-state-danger-bg border-state-danger-border text-state-danger-text";
                               statusBadge = "bg-adminGreen-600 animate-pulse";
                               break;
                             case "paid":
                             case "completed":
-                              statusColor = "bg-state-success-bg border-state-success-border text-state-success-text";
+                              statusColor =
+                                "bg-state-success-bg border-state-success-border text-state-success-text";
                               statusBadge = "bg-status-completed";
                               break;
                             case "cancelled":
-                              statusColor = "bg-adminGray-50 border-adminGray-100 text-adminInk";
+                              statusColor =
+                                "bg-adminGray-50 border-adminGray-100 text-adminInk";
                               statusBadge = "bg-status-cancelled";
                               break;
                           }

@@ -1,11 +1,11 @@
-import { CheckCircle2, Loader2, Sparkles, Ticket, X } from "lucide-react";
-import React, { useState } from "react";
-import { toast } from "sonner";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import {
   useMembershipTiers,
   useMyMembershipCard,
 } from "@/features/profile/hooks/useMembershipInfo";
+import { CheckCircle2, Loader2, Sparkles, Ticket, X } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { bookingApi } from "../api/booking.api";
 import { useBookingStore } from "../stores/bookingStore";
 
@@ -13,9 +13,9 @@ interface PromotionCodeInputProps {
   variant?: "default" | "ticket";
 }
 
-export const PromotionCodeInput: React.FC<PromotionCodeInputProps> = ({
+export function PromotionCodeInput({
   variant = "default",
-}) => {
+}: PromotionCodeInputProps) {
   const isTicket = variant === "ticket";
   const {
     guests,
@@ -47,7 +47,6 @@ export const PromotionCodeInput: React.FC<PromotionCodeInputProps> = ({
     membershipPercent > 0 && servicesSubTotal > 0
       ? Math.round((servicesSubTotal * membershipPercent) / 100)
       : 0;
-  // Validate mã KM trên số tiền sau khi đã trừ thẻ thành viên (khớp BE)
   const orderTotalForPromo = Math.max(0, servicesSubTotal - membershipDiscount);
 
   const handleApply = async (e: { preventDefault(): void }) => {
@@ -68,7 +67,10 @@ export const PromotionCodeInput: React.FC<PromotionCodeInputProps> = ({
       setLoading(true);
       setError("");
 
-      const result = await bookingApi.validatePromotion(code, orderTotalForPromo);
+      const result = await bookingApi.validatePromotion(
+        code,
+        orderTotalForPromo,
+      );
 
       setAppliedPromotion(result);
       setPromotionCode(code);
@@ -163,4 +165,4 @@ export const PromotionCodeInput: React.FC<PromotionCodeInputProps> = ({
       )}
     </form>
   );
-};
+}

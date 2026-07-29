@@ -17,7 +17,8 @@ const ENTITY = "chứng chỉ";
 const STAFF_CERTIFICATE_KEYS = {
   all: ["staff-certificates"] as const,
   lists: () => [...STAFF_CERTIFICATE_KEYS.all, "list"] as const,
-  list: (params: StaffCertificateQueryParams) => [...STAFF_CERTIFICATE_KEYS.lists(), params] as const,
+  list: (params: StaffCertificateQueryParams) =>
+    [...STAFF_CERTIFICATE_KEYS.lists(), params] as const,
   details: () => [...STAFF_CERTIFICATE_KEYS.all, "detail"] as const,
   detail: (id: number) => [...STAFF_CERTIFICATE_KEYS.details(), id] as const,
 };
@@ -59,8 +60,13 @@ export function useCreateStaffCertificate() {
 export function useUpdateStaffCertificate() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, payload }: { id: number; payload: UpdateStaffCertificatePayload }) =>
-      certificateApi.update(id, payload),
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: number;
+      payload: UpdateStaffCertificatePayload;
+    }) => certificateApi.update(id, payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: STAFF_CERTIFICATE_KEYS.all });
@@ -70,7 +76,9 @@ export function useUpdateStaffCertificate() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+      );
     },
   });
 }

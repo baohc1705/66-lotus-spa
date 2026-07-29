@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
-// Regex patterns matching backend RegexConst
 const VIETNAM_PHONE_REGEX = /^(0[2-9]|84[2-9])\d{8}$/;
 
 const staffBaseSchema = z.object({
@@ -15,7 +14,6 @@ const staffBaseSchema = z.object({
     .string()
     .min(1, VALIDATION_MSG.required("SĐT"))
     .regex(VIETNAM_PHONE_REGEX, "SĐT không hợp lệ"),
-  /** URL hiện tại (edit) hoặc base64 khi gửi API */
   avatarUrl: z.string().optional().or(z.literal("")),
   dateOfBirth: z.string().optional().or(z.literal("")),
   gender: z.coerce.number().min(0).optional(),

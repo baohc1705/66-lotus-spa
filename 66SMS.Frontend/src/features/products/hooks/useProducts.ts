@@ -87,7 +87,9 @@ export function useUpdateProduct() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+      );
     },
   });
 }
@@ -142,7 +144,9 @@ export function useRestoreProduct() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)),
+      );
     },
   });
 }

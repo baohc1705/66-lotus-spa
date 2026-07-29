@@ -1,8 +1,5 @@
 import { useMemo } from "react";
-import {
-  useReactTable,
-  getCoreRowModel,
-} from "@tanstack/react-table";
+import { useReactTable, getCoreRowModel } from "@tanstack/react-table";
 import { Plus } from "lucide-react";
 
 import { DataTable } from "@/shared/components/DataTable/DataTable";
@@ -24,10 +21,7 @@ import {
   useActiveTimeSlotColumns,
 } from "../components/useActiveTimeSlotColumns";
 import { TIME_SLOT_PERM } from "../constants/time_slot.permissions";
-import {
-  useAdminTimeSlots,
-  useDeleteTimeSlot,
-} from "../hooks/useTimeSlots";
+import { useAdminTimeSlots, useDeleteTimeSlot } from "../hooks/useTimeSlots";
 
 const ENTITY = "khung giá»";
 
@@ -55,7 +49,11 @@ export function TimeSlotListPage() {
     filter,
   } = listState;
 
-  const { data: timeSlotResult, isLoading, isFetching } = useAdminTimeSlots(queryParams);
+  const {
+    data: timeSlotResult,
+    isLoading,
+    isFetching,
+  } = useAdminTimeSlots(queryParams);
   const deleteMutation = useDeleteTimeSlot();
 
   const paged = timeSlotResult?.data;
@@ -118,7 +116,7 @@ export function TimeSlotListPage() {
               className="lotus-admin-table-toolbar-btn"
             >
               <Plus className="w-4 h-4" />
-              Thêm khung giờ 
+              Thêm khung giờ
             </Button>
           </PermissionGate>
         </div>
@@ -168,7 +166,7 @@ export function TimeSlotListPage() {
           title={CONFIRM_MSG.deleteTitle(ENTITY)}
           description={CONFIRM_MSG.deleteDescription(
             ENTITY,
-            `${formatDisplayTime(deleteTarget.startTime)} - ${formatDisplayTime(deleteTarget.endTime)}`
+            `${formatDisplayTime(deleteTarget.startTime)} - ${formatDisplayTime(deleteTarget.endTime)}`,
           )}
           onConfirm={handleDelete}
           confirmLabel={COMMON_MSG.delete}

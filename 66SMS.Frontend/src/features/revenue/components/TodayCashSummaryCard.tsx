@@ -9,7 +9,10 @@ interface Props {
   isLoading: boolean;
 }
 
-export const TodayCashSummaryCard = memo(function TodayCashSummaryCard({ data, isLoading }: Props) {
+export const TodayCashSummaryCard = memo(function TodayCashSummaryCard({
+  data,
+  isLoading,
+}: Props) {
   if (isLoading || !data) {
     return (
       <div className="bg-white border border-adminGray-100 rounded-admin p-5 animate-pulse h-[160px]">
@@ -42,19 +45,27 @@ export const TodayCashSummaryCard = memo(function TodayCashSummaryCard({ data, i
             <div className="flex items-center gap-1.5 text-2xs">
               <span className="w-2 h-2 rounded-full shrink-0 bg-adminGreen-600" />
               <span className="text-adminGray-600">Tổng thu</span>
-              <span className="font-bold text-adminInk ml-1">{formatCurrency(data.grossRevenue)}</span>
+              <span className="font-bold text-adminInk ml-1">
+                {formatCurrency(data.grossRevenue)}
+              </span>
             </div>
             <div className="flex items-center gap-1.5 text-2xs">
               <span className="w-2 h-2 rounded-full shrink-0 bg-state-danger-solid" />
               <span className="text-adminGray-600">Tổng chi</span>
-              <span className="font-bold text-adminInk ml-1">{formatCurrency(data.cashOut)}</span>
+              <span className="font-bold text-adminInk ml-1">
+                {formatCurrency(data.cashOut)}
+              </span>
             </div>
           </div>
         </div>
 
         <div className="w-[64px] h-[64px] shrink-0">
           <ResponsiveContainer width="100%" height="100%" debounce={1}>
-            <BarChart data={barData} barSize={20} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
+            <BarChart
+              data={barData}
+              barSize={20}
+              margin={{ top: 4, right: 0, left: 0, bottom: 0 }}
+            >
               <Bar dataKey="value" radius={[3, 3, 0, 0]}>
                 {barData.map((entry, idx) => (
                   <Cell key={idx} fill={entry.fill} />
@@ -67,4 +78,3 @@ export const TodayCashSummaryCard = memo(function TodayCashSummaryCard({ data, i
     </div>
   );
 });
-

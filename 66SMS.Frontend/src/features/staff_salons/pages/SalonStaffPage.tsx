@@ -88,9 +88,7 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
       accessorKey: "staffRole",
       header: "Vai trò",
       cell: ({ row }) => (
-        <span className="text-xs">
-          {row.original.staffRole ?? EMPTY_CELL}
-        </span>
+        <span className="text-xs">{row.original.staffRole ?? EMPTY_CELL}</span>
       ),
     },
     {

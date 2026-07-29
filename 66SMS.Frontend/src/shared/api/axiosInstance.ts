@@ -1,16 +1,13 @@
-// Axios instance dùng chung cho toàn bộ app.
-// Tự động gắn Bearer token vào header mỗi request.
-// Tự động refresh token khi nhận lỗi 401 và retry lại request gốc.
-import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
-import { useAuthStore } from '@/features/auth/stores/authStore';
-import type { Result } from '@/shared/types/common.types';
-import type { TokenResponseDTO } from '@/features/auth/types/auth.types';
+import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
+import { useAuthStore } from "@/features/auth/stores/authStore";
+import type { Result } from "@/shared/types/common.types";
+import type { TokenResponseDTO } from "@/features/auth/types/auth.types";
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:7777/api/v1',
-  withCredentials: true, // gửi HttpOnly cookie (refreshToken)
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:7777/api/v1",
+  withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -45,13 +42,16 @@ axiosInstance.interceptors.response.use(
       _retry?: boolean;
     };
 
-    if (!originalRequest || error.response?.status !== 401 || originalRequest._retry) {
+    if (
+      !originalRequest ||
+      error.response?.status !== 401 ||
+      originalRequest._retry
+    ) {
       return Promise.reject(error);
     }
 
-    // Không retry chính endpoint refresh / login
-    const url = originalRequest.url ?? '';
-    if (url.includes('/auth/refresh-token') || url.includes('/auth/login')) {
+    const url = originalRequest.url ?? "";
+    if (url.includes("/auth/refresh-token") || url.includes("/auth/login")) {
       return Promise.reject(error);
     }
 
@@ -69,12 +69,12 @@ axiosInstance.interceptors.response.use(
 
     try {
       const { data } = await axiosInstance.post<Result<TokenResponseDTO>>(
-        '/auth/refresh-token',
-        { token: '' },
+        "/auth/refresh-token",
+        { token: "" },
       );
 
       if (!data.isSuccess || !data.data?.accessToken) {
-        throw new Error(data.message || 'Refresh token failed');
+        throw new Error(data.message || "Refresh token failed");
       }
 
       useAuthStore.getState().setSession(data.data);
@@ -85,8 +85,8 @@ axiosInstance.interceptors.response.use(
     } catch (refreshError) {
       processQueue(refreshError, null);
       useAuthStore.getState().clearAuth();
-      if (!window.location.pathname.startsWith('/login')) {
-        window.location.href = '/login';
+      if (!window.location.pathname.startsWith("/login")) {
+        window.location.href = "/login";
       }
       return Promise.reject(refreshError);
     } finally {

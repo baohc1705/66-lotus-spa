@@ -58,8 +58,6 @@ interface UseActiveServiceColumnsParams {
   >;
 }
 
-
-
 export function useActiveServiceColumns({
   pageIndex,
   pageSize,
@@ -211,7 +209,9 @@ export function useActiveServiceColumns({
         header: cols.durationMins,
         cell: ({ row }) => (
           <span className="text-adminGray-600">
-            {row.original.durationMins ? `${row.original.durationMins} phút` : "—"}
+            {row.original.durationMins
+              ? `${row.original.durationMins} phút`
+              : "—"}
           </span>
         ),
         size: 100,
@@ -275,10 +275,7 @@ export function useActiveServiceColumns({
                     <Eye className="w-4 h-4" />
                     {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
                   </DropdownMenuItem>
-                  <PermissionGate
-                    resource={perm.resource}
-                    action={perm.update}
-                  >
+                  <PermissionGate resource={perm.resource} action={perm.update}>
                     <DropdownMenuItem onClick={() => onEdit(item)}>
                       <Pencil className="w-4 h-4" />
                       {COMMON_MSG.edit}

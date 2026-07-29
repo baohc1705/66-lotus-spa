@@ -35,8 +35,6 @@ export const CUSTOMER_STATUS_MAP: StatusMap = {
   "2": { label: "Tạm khóa", variant: "warning" },
 };
 
-
-
 interface UseActiveCustomerColumnsParams {
   pageIndex: number;
   pageSize: number;

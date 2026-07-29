@@ -16,9 +16,27 @@ export function ProductStatCards({
 }: ProductStatCardsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-      <AdminStatCard label="Tổng số sản phẩm" value={totalProducts} icon={Package} tone="gold" isLoading={isLoading} />
-      <AdminStatCard label="Sản phẩm đang kinh doanh" value={activeProducts} icon={TrendingUp} tone="green" isLoading={isLoading} />
-      <AdminStatCard label="Tồn kho tổng" value={totalStock} icon={Warehouse} tone="gold" isLoading={isLoading} />
+      <AdminStatCard
+        label="Tổng số sản phẩm"
+        value={totalProducts}
+        icon={Package}
+        tone="gold"
+        isLoading={isLoading}
+      />
+      <AdminStatCard
+        label="Sản phẩm đang kinh doanh"
+        value={activeProducts}
+        icon={TrendingUp}
+        tone="green"
+        isLoading={isLoading}
+      />
+      <AdminStatCard
+        label="Tồn kho tổng"
+        value={totalStock}
+        icon={Warehouse}
+        tone="gold"
+        isLoading={isLoading}
+      />
     </div>
   );
 }

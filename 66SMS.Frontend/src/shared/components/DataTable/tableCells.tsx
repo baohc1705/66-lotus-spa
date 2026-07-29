@@ -38,11 +38,7 @@ export function MutedCell({ value }: { value?: string | number | null }) {
   );
 }
 
-export function MutedSmallCell({
-  value,
-}: {
-  value?: string | number | null;
-}) {
+export function MutedSmallCell({ value }: { value?: string | number | null }) {
   return (
     <span className="lotus-admin-table-cell-muted-sm">
       {value ?? EMPTY_CELL}

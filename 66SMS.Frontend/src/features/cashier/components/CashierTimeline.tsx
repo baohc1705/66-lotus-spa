@@ -16,10 +16,10 @@ interface CashierTimelineProps {
   ) => void;
 }
 
-const HOURS = Array.from({ length: 15 }, (_, i) => i + 8); // 08:00 to 22:00
-const HOUR_WIDTH = 105; // px cho mỗi giờ trên trục ngang
-const ROW_HEIGHT = 80; // chiều cao cố định mỗi hàng nhân viên (lane)
-const STAFF_COL_WIDTH = 150; // chiều rộng cột nhân viên cố định bên trái
+const HOURS = Array.from({ length: 15 }, (_, i) => i + 8);
+const HOUR_WIDTH = 105;
+const ROW_HEIGHT = 80;
+const STAFF_COL_WIDTH = 150;
 
 function timeToMins(t: string) {
   const [h, m] = t.split(":").map(Number);
@@ -29,7 +29,7 @@ function timeToMins(t: string) {
 interface LayoutBooking extends CashierBooking {
   startMins: number;
   endMins: number;
-  rowIndex: number; // tầng dọc bên trong lane
+  rowIndex: number;
   totalRows: number;
 }
 
@@ -41,8 +41,6 @@ interface Cluster {
   totalRows: number;
 }
 
-// Gom các booking chồng giờ trong cùng 1 nhân viên thành cụm,
-// rồi xếp tầng (rowIndex) để hiển thị nhiều booking trong cùng khu vực.
 function getClusters(laneBookings: CashierBooking[]): Cluster[] {
   if (laneBookings.length === 0) return [];
 
@@ -125,32 +123,39 @@ function getStatusStyle(status: CashierBooking["status"]) {
 
   switch (status) {
     case "in-progress":
-      statusColor = "bg-state-info-bg border-state-info-border text-state-info-text";
+      statusColor =
+        "bg-state-info-bg border-state-info-border text-state-info-text";
       statusBadge = "bg-status-in-progress";
       break;
     case "not-arrived":
-      statusColor = "bg-state-danger-bg border-state-danger-border text-state-danger-text";
+      statusColor =
+        "bg-state-danger-bg border-state-danger-border text-state-danger-text";
       statusBadge = "bg-status-cancelled";
       break;
     case "waiting":
-      statusColor = "bg-state-warning-bg border-state-warning-border text-state-warning-text";
+      statusColor =
+        "bg-state-warning-bg border-state-warning-border text-state-warning-text";
       statusBadge = "bg-status-waiting";
       break;
     case "pending":
-      statusColor = "bg-state-warning-bg border-state-warning-border text-state-warning-text";
+      statusColor =
+        "bg-state-warning-bg border-state-warning-border text-state-warning-text";
       statusBadge = "bg-status-pending";
       break;
     case "confirmed":
-      statusColor = "bg-state-info-bg border-state-info-border text-state-info-text";
+      statusColor =
+        "bg-state-info-bg border-state-info-border text-state-info-text";
       statusBadge = "bg-status-confirmed";
       break;
     case "unpaid":
-      statusColor = "bg-state-danger-bg border-state-danger-border text-state-danger-text";
+      statusColor =
+        "bg-state-danger-bg border-state-danger-border text-state-danger-text";
       statusBadge = "bg-adminGreen-600 animate-pulse";
       break;
     case "paid":
     case "completed":
-      statusColor = "bg-state-success-bg border-state-success-border text-state-success-text";
+      statusColor =
+        "bg-state-success-bg border-state-success-border text-state-success-text";
       statusBadge = "bg-status-completed";
       break;
     case "cancelled":
@@ -172,7 +177,6 @@ export function CashierTimeline({
 }: CashierTimelineProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Kéo ngang bằng cách giữ chuột trái trên nền lưới
   const scrollRef = useRef<HTMLDivElement>(null);
   const panRef = useRef({ down: false, startX: 0, startLeft: 0, moved: false });
 
@@ -183,7 +187,6 @@ export function CashierTimeline({
 
   const handlePanStart = (e: React.MouseEvent) => {
     if (e.button !== 0 || !scrollRef.current) return;
-    // Bỏ qua nếu đang bấm vào card lịch (để không cản kéo-thả card)
     if ((e.target as HTMLElement).closest("[data-booking='true']")) return;
     panRef.current = {
       down: true,
@@ -204,7 +207,6 @@ export function CashierTimeline({
     panRef.current.down = false;
   };
 
-  // Tránh tạo lịch khi vừa kéo nền (phân biệt kéo với click ô trống)
   const handleSlotClick = (staffId: number, time: string) => {
     if (panRef.current.moved) return;
     onEmptySlotClick?.(staffId, time);
@@ -259,194 +261,191 @@ export function CashierTimeline({
         onMouseUp={handlePanEnd}
         onMouseLeave={handlePanEnd}
       >
-      <div
-        className="flex flex-col"
-        style={{ width: `${STAFF_COL_WIDTH + laneWidth}px` }}
-      >
-        {/* Header: thước thời gian (trục X) */}
-        <div className="flex sticky top-0 z-40 bg-white">
-          <div
-            className="flex-shrink-0 h-10 border-b border-r border-adminGray-300/80 bg-adminGreen-600-light/50 sticky left-0 z-50 flex items-center px-4"
-            style={{ width: `${STAFF_COL_WIDTH}px` }}
-          >
-            <span className="text-xs font-bold text-adminGray-600">
-              Nhân viên
-            </span>
-          </div>
-          <div
-            className="relative h-10 border-b border-adminGray-300/80 bg-adminGreen-600-light/20"
-            style={{ width: `${laneWidth}px` }}
-          >
-            {HOURS.map((hour, i) => (
-              <div
-                key={hour}
-                className="absolute top-0 h-full border-l border-adminGray-300/60 flex items-center"
-                style={{ left: `${i * HOUR_WIDTH}px`, width: `${HOUR_WIDTH}px` }}
-              >
-                <span className="text-2xs font-bold text-adminGray-600/80 pl-2">
-                  {hour.toString().padStart(2, "0")}:00
-                </span>
-              </div>
-            ))}
-            {showCurrentTime && (
-              <div
-                className="absolute top-0 z-40 -translate-x-1/2 pointer-events-none"
-                style={{ left: `${currentTimeX}px` }}
-              >
-                <div className="bg-state-danger-solid text-white text-2xs px-1 rounded-[2px] shadow-sm font-bold mt-2 border border-state-danger-solid">
-                  {currentH.toString().padStart(2, "0")}:
-                  {currentM.toString().padStart(2, "0")}
+        <div
+          className="flex flex-col"
+          style={{ width: `${STAFF_COL_WIDTH + laneWidth}px` }}
+        >
+          <div className="flex sticky top-0 z-40 bg-white">
+            <div
+              className="flex-shrink-0 h-10 border-b border-r border-adminGray-300/80 bg-adminGreen-600-light/50 sticky left-0 z-50 flex items-center px-4"
+              style={{ width: `${STAFF_COL_WIDTH}px` }}
+            >
+              <span className="text-xs font-bold text-adminGray-600">
+                Nhân viên
+              </span>
+            </div>
+            <div
+              className="relative h-10 border-b border-adminGray-300/80 bg-adminGreen-600-light/20"
+              style={{ width: `${laneWidth}px` }}
+            >
+              {HOURS.map((hour, i) => (
+                <div
+                  key={hour}
+                  className="absolute top-0 h-full border-l border-adminGray-300/60 flex items-center"
+                  style={{
+                    left: `${i * HOUR_WIDTH}px`,
+                    width: `${HOUR_WIDTH}px`,
+                  }}
+                >
+                  <span className="text-2xs font-bold text-adminGray-600/80 pl-2">
+                    {hour.toString().padStart(2, "0")}:00
+                  </span>
                 </div>
+              ))}
+              {showCurrentTime && (
+                <div
+                  className="absolute top-0 z-40 -translate-x-1/2 pointer-events-none"
+                  style={{ left: `${currentTimeX}px` }}
+                >
+                  <div className="bg-state-danger-solid text-white text-2xs px-1 rounded-[2px] shadow-sm font-bold mt-2 border border-state-danger-solid">
+                    {currentH.toString().padStart(2, "0")}:
+                    {currentM.toString().padStart(2, "0")}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-col">
+            {columns.map((col) => {
+              const laneBookings = bookings.filter(
+                (b) => b.staffId.toString() === col.id.toString(),
+              );
+
+              return (
+                <div
+                  key={col.id}
+                  className="flex border-b border-adminGray-300/60"
+                  style={{ height: `${ROW_HEIGHT}px` }}
+                >
+                  <div
+                    className="flex-shrink-0 border-r border-adminGray-300/80 bg-adminGreen-600-light/20 sticky left-0 z-30 flex items-center gap-2 px-4"
+                    style={{ width: `${STAFF_COL_WIDTH}px` }}
+                  >
+                    {col.avatar ? (
+                      <img
+                        src={col.avatar}
+                        alt={col.name}
+                        className="w-6 h-6 rounded-[3px] flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="w-6 h-6 rounded-[3px] bg-adminGold-600/10 flex items-center justify-center text-adminGold-600 font-bold text-xs flex-shrink-0">
+                        {col.name.charAt(0)}
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="font-bold text-xs text-adminInk truncate whitespace-nowrap">
+                        {col.name}
+                      </p>
+                      <p className="text-2xs text-adminGray-600">KTV</p>
+                    </div>
+                  </div>
+
+                  <div
+                    className="relative bg-white h-full"
+                    style={{ width: `${laneWidth}px` }}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, Number(col.id))}
+                  >
+                    <div className="absolute inset-0 flex">
+                      {HOURS.map((hour) => (
+                        <div
+                          key={hour}
+                          className="border-l border-adminGray-300/60 h-full flex"
+                          style={{ width: `${HOUR_WIDTH}px` }}
+                        >
+                          {[0, 15, 30, 45].map((min) => (
+                            <div
+                              key={min}
+                              className="flex-1 h-full border-l border-adminGray-300/30 border-dashed first:border-0 hover:bg-adminGreen-50 transition-colors cursor-pointer"
+                              onClick={() =>
+                                handleSlotClick(
+                                  Number(col.id),
+                                  `${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`,
+                                )
+                              }
+                            />
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+
+                    {showCurrentTime && (
+                      <div
+                        className="absolute top-0 bottom-0 border-l border-rose-500/60 border-dashed z-20 pointer-events-none"
+                        style={{ left: `${currentTimeX}px` }}
+                      />
+                    )}
+
+                    {getClusters(laneBookings).map((cluster) =>
+                      cluster.bookings.map((booking) => {
+                        const left =
+                          (booking.startMins - 8 * 60) * (HOUR_WIDTH / 60);
+                        const width =
+                          (booking.endMins - booking.startMins) *
+                          (HOUR_WIDTH / 60);
+                        const laneInnerH = ROW_HEIGHT - 6;
+                        const cardH = laneInnerH / booking.totalRows;
+                        const top = 3 + booking.rowIndex * cardH;
+                        const { statusColor, statusBadge } = getStatusStyle(
+                          booking.status,
+                        );
+
+                        return (
+                          <div
+                            key={booking.id}
+                            data-booking="true"
+                            onClick={() => onBookingClick(booking)}
+                            draggable={true}
+                            onDragStart={(e) => {
+                              e.stopPropagation();
+                              handleDragStart(e, booking.id);
+                            }}
+                            className={cn(
+                              "absolute rounded-[3px] border px-1.5 py-0.5 cursor-grab active:cursor-grabbing transition-all hover:shadow hover:z-30 overflow-hidden z-10",
+                              statusColor,
+                            )}
+                            style={{
+                              left: `${left + 1}px`,
+                              width: `${Math.max(width - 2, 24)}px`,
+                              top: `${top}px`,
+                              height: `${cardH - 2}px`,
+                            }}
+                          >
+                            <div className="flex items-center justify-between gap-1 leading-none">
+                              <span className="font-bold text-2xs truncate whitespace-nowrap text-adminInk">
+                                {booking.customerName}
+                              </span>
+                              <span
+                                className={cn(
+                                  "w-1.5 h-1.5 rounded-full flex-shrink-0",
+                                  statusBadge,
+                                )}
+                              />
+                            </div>
+                            <div className="text-2xs opacity-90 truncate whitespace-nowrap mt-0.5">
+                              {booking.serviceName}
+                            </div>
+                            <div className="text-2xs opacity-75 flex items-center gap-0.5 truncate whitespace-nowrap mt-0.5">
+                              <Clock className="w-2 h-2 flex-shrink-0" />
+                              {booking.startTime} - {booking.endTime}
+                            </div>
+                          </div>
+                        );
+                      }),
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+
+            {columns.length === 0 && (
+              <div className="flex items-center justify-center py-12 text-xs text-adminGray-600">
+                Không có nhân viên nào trong ngày này
               </div>
             )}
           </div>
         </div>
-
-        {/* Các hàng nhân viên (lane) */}
-        <div className="flex flex-col">
-        {columns.map((col) => {
-          const laneBookings = bookings.filter(
-            (b) => b.staffId.toString() === col.id.toString(),
-          );
-
-          return (
-            <div
-              key={col.id}
-              className="flex border-b border-adminGray-300/60"
-              style={{ height: `${ROW_HEIGHT}px` }}
-            >
-              {/* Cột nhân viên cố định bên trái */}
-              <div
-                className="flex-shrink-0 border-r border-adminGray-300/80 bg-adminGreen-600-light/20 sticky left-0 z-30 flex items-center gap-2 px-4"
-                style={{ width: `${STAFF_COL_WIDTH}px` }}
-              >
-                {col.avatar ? (
-                  <img
-                    src={col.avatar}
-                    alt={col.name}
-                    className="w-6 h-6 rounded-[3px] flex-shrink-0"
-                  />
-                ) : (
-                  <div className="w-6 h-6 rounded-[3px] bg-adminGold-600/10 flex items-center justify-center text-adminGold-600 font-bold text-xs flex-shrink-0">
-                    {col.name.charAt(0)}
-                  </div>
-                )}
-                <div className="min-w-0">
-                  <p className="font-bold text-xs text-adminInk truncate whitespace-nowrap">
-                    {col.name}
-                  </p>
-                  <p className="text-2xs text-adminGray-600">KTV</p>
-                </div>
-              </div>
-
-              {/* Lane: nền lưới giờ + các booking */}
-              <div
-                className="relative bg-white h-full"
-                style={{ width: `${laneWidth}px` }}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, Number(col.id))}
-              >
-                {/* Lưới giờ nền + click ô trống */}
-                <div className="absolute inset-0 flex">
-                  {HOURS.map((hour) => (
-                    <div
-                      key={hour}
-                      className="border-l border-adminGray-300/60 h-full flex"
-                      style={{ width: `${HOUR_WIDTH}px` }}
-                    >
-                      {[0, 15, 30, 45].map((min) => (
-                        <div
-                          key={min}
-                          className="flex-1 h-full border-l border-adminGray-300/30 border-dashed first:border-0 hover:bg-adminGreen-50 transition-colors cursor-pointer"
-                          onClick={() =>
-                            handleSlotClick(
-                              Number(col.id),
-                              `${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`,
-                            )
-                          }
-                        />
-                      ))}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Vạch giờ hiện tại (đường dọc) */}
-                {showCurrentTime && (
-                  <div
-                    className="absolute top-0 bottom-0 border-l border-rose-500/60 border-dashed z-20 pointer-events-none"
-                    style={{ left: `${currentTimeX}px` }}
-                  />
-                )}
-
-                {/* Booking cards */}
-                {getClusters(laneBookings).map((cluster) =>
-                  cluster.bookings.map((booking) => {
-                    const left =
-                      (booking.startMins - 8 * 60) * (HOUR_WIDTH / 60);
-                    const width =
-                      (booking.endMins - booking.startMins) * (HOUR_WIDTH / 60);
-                    const laneInnerH = ROW_HEIGHT - 6; // chừa padding 3px trên/dưới
-                    const cardH = laneInnerH / booking.totalRows;
-                    const top = 3 + booking.rowIndex * cardH;
-                    const { statusColor, statusBadge } = getStatusStyle(
-                      booking.status,
-                    );
-
-                    return (
-                      <div
-                        key={booking.id}
-                        data-booking="true"
-                        onClick={() => onBookingClick(booking)}
-                        draggable={true}
-                        onDragStart={(e) => {
-                          e.stopPropagation();
-                          handleDragStart(e, booking.id);
-                        }}
-                        className={cn(
-                          "absolute rounded-[3px] border px-1.5 py-0.5 cursor-grab active:cursor-grabbing transition-all hover:shadow hover:z-30 overflow-hidden z-10",
-                          statusColor,
-                        )}
-                        style={{
-                          left: `${left + 1}px`,
-                          width: `${Math.max(width - 2, 24)}px`,
-                          top: `${top}px`,
-                          height: `${cardH - 2}px`,
-                        }}
-                      >
-                        <div className="flex items-center justify-between gap-1 leading-none">
-                          <span className="font-bold text-2xs truncate whitespace-nowrap text-adminInk">
-                            {booking.customerName}
-                          </span>
-                          <span
-                            className={cn(
-                              "w-1.5 h-1.5 rounded-full flex-shrink-0",
-                              statusBadge,
-                            )}
-                          />
-                        </div>
-                        <div className="text-2xs opacity-90 truncate whitespace-nowrap mt-0.5">
-                          {booking.serviceName}
-                        </div>
-                        <div className="text-2xs opacity-75 flex items-center gap-0.5 truncate whitespace-nowrap mt-0.5">
-                          <Clock className="w-2 h-2 flex-shrink-0" />
-                          {booking.startTime} - {booking.endTime}
-                        </div>
-                      </div>
-                    );
-                  }),
-                )}
-              </div>
-            </div>
-          );
-        })}
-
-        {columns.length === 0 && (
-          <div className="flex items-center justify-center py-12 text-xs text-adminGray-600">
-            Không có nhân viên nào trong ngày này
-          </div>
-        )}
-        </div>
-      </div>
       </div>
     </div>
   );

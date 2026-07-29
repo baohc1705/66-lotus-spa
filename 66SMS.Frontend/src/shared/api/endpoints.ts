@@ -1,6 +1,3 @@
-// Tập trung toàn bộ URL API vào đây.
-// Khi backend thay đổi endpoint → chỉ cần sửa ở file này.
-
 export const API = {
   auth: {
     login: "/auth/login",

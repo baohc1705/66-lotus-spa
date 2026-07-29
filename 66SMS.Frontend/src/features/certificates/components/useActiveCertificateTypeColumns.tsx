@@ -68,7 +68,9 @@ export function useActiveCertificateTypeColumns({
         accessorKey: "name",
         header: cols.name,
         cell: ({ row }) => (
-          <span className="font-semibold text-adminInk">{row.original.name}</span>
+          <span className="font-semibold text-adminInk">
+            {row.original.name}
+          </span>
         ),
         size: 250,
       },
@@ -76,7 +78,9 @@ export function useActiveCertificateTypeColumns({
         accessorKey: "description",
         header: cols.description,
         cell: ({ row }) => (
-          <span className="text-adminInk/70 text-xs">{row.original.description || "—"}</span>
+          <span className="text-adminInk/70 text-xs">
+            {row.original.description || "—"}
+          </span>
         ),
         size: 280,
       },
@@ -109,20 +113,33 @@ export function useActiveCertificateTypeColumns({
             <div onClick={(e) => e.stopPropagation()}>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon-sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
                     <MoreHorizontal className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <PermissionGate resource={perm.resource} action={perm.update}>
                     <DropdownMenuItem onClick={() => onEdit(cert)}>
-                      <Pencil className="w-4 h-4 mr-2" />{COMMON_MSG.edit}
+                      <Pencil className="w-4 h-4 mr-2" />
+                      {COMMON_MSG.edit}
                     </DropdownMenuItem>
                   </PermissionGate>
-                  <PermissionGate resource={perm.resource} action={perm.delete} role={perm.role}>
+                  <PermissionGate
+                    resource={perm.resource}
+                    action={perm.delete}
+                    role={perm.role}
+                  >
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem variant="destructive" onClick={() => onDelete(cert)}>
-                      <Trash2 className="w-4 h-4 mr-2" />Xóa
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={() => onDelete(cert)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Xóa
                     </DropdownMenuItem>
                   </PermissionGate>
                 </DropdownMenuContent>
@@ -134,6 +151,6 @@ export function useActiveCertificateTypeColumns({
         enableResizing: false,
       },
     ],
-    [pageIndex, pageSize, onEdit, onDelete, cols, perm]
+    [pageIndex, pageSize, onEdit, onDelete, cols, perm],
   );
 }

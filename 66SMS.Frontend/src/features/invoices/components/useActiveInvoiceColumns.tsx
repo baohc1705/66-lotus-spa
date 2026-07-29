@@ -12,9 +12,17 @@ import {
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { IndexCell, PriceCell, DateTimeCell } from "@/shared/components/DataTable/TableCells";
+import {
+  IndexCell,
+  PriceCell,
+  DateTimeCell,
+} from "@/shared/components/DataTable/TableCells";
 import { INVOICE_PERM } from "../constants/invoice.permissions";
-import { INVOICE_STATUS, PAYMENT_METHOD, type InvoiceDto } from "../types/invoice.types";
+import {
+  INVOICE_STATUS,
+  PAYMENT_METHOD,
+  type InvoiceDto,
+} from "../types/invoice.types";
 
 export const INVOICE_COLUMN_LABELS = {
   invoiceCode: "Mã HĐ",
@@ -185,7 +193,10 @@ export function useActiveInvoiceColumns({
                     {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
                   </DropdownMenuItem>
                   {canCancel && inv.id && (
-                    <PermissionGate resource={perm.resource} action={perm.update}>
+                    <PermissionGate
+                      resource={perm.resource}
+                      action={perm.update}
+                    >
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         variant="destructive"
@@ -204,15 +215,6 @@ export function useActiveInvoiceColumns({
         enableResizing: false,
       },
     ],
-    [
-      pageIndex,
-      pageSize,
-      orderBy,
-      isDescending,
-      onSort,
-      onCancel,
-      cols,
-      perm,
-    ],
+    [pageIndex, pageSize, orderBy, isDescending, onSort, onCancel, cols, perm],
   );
 }

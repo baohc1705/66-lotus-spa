@@ -39,13 +39,11 @@ export function RepeatScheduleDialog({
   const salonId = useAuthStore((s) => s.getEffectiveSalonId());
   const currentWeekEnd = currentWeekStart.endOf("isoWeek");
 
-  // endDate: ngày bất kỳ trong tuần kết thúc (người dùng chọn)
   const [endDate, setEndDate] = useState("");
   const [skipHolidays, setSkipHolidays] = useState(true);
 
   const { mutate: bulkCreate, isPending } = useBulkCreateWorkSchedule();
 
-  // Tính tuần kết thúc từ ngày được chọn
   const endWeekStart = useMemo(() => {
     if (!endDate) return null;
     return formatDate(endDate).startOf("isoWeek");
@@ -53,7 +51,6 @@ export function RepeatScheduleDialog({
 
   const endWeekEnd = endWeekStart?.endOf("isoWeek");
 
-  // Preview: tính số tuần và số lịch sẽ tạo
   const preview = useMemo(() => {
     if (!endWeekStart) return null;
 
@@ -72,9 +69,7 @@ export function RepeatScheduleDialog({
         if (!ws.workDate || !ws.staffId || !ws.shiftPeriodId) continue;
         const original = formatDate(ws.workDate);
         const dayOfWeek = original.day();
-        // Tính ngày tương ứng trong tuần mới (isoWeek bắt đầu Thứ 2)
         const weekMon = week.startOf("isoWeek");
-        // day() 0=Sun,1=Mon,...,6=Sat; isoWeekday: 1=Mon...7=Sun
         const isoDay = dayOfWeek === 0 ? 7 : dayOfWeek;
         const newDate = weekMon.add(isoDay - 1, "day");
         if (skipHolidays && isHoliday(newDate)) continue;
@@ -98,7 +93,12 @@ export function RepeatScheduleDialog({
       return;
     }
 
-    const schedules: { staffId: number; shiftPeriodId: number; workDate: string; salonId?: number }[] = [];
+    const schedules: {
+      staffId: number;
+      shiftPeriodId: number;
+      workDate: string;
+      salonId?: number;
+    }[] = [];
 
     let w = currentWeekStart.add(1, "week");
     while (w.toDate() <= endWeekStart.toDate()) {
@@ -164,9 +164,11 @@ export function RepeatScheduleDialog({
         </DialogHeader>
 
         <div className="space-y-5">
-          {/* Thông tin tuần gốc */}
           <div className="bg-adminGray-50/40 border border-adminGreen-600/20 rounded-lg px-4 py-3 flex items-start gap-3">
-            <CalendarDays size={16} className="text-adminGreen-600 mt-0.5 flex-shrink-0" />
+            <CalendarDays
+              size={16}
+              className="text-adminGreen-600 mt-0.5 flex-shrink-0"
+            />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-adminInk">{weekLabel}</p>
               <p className="text-xs text-adminGray-600 mt-0.5">
@@ -175,7 +177,6 @@ export function RepeatScheduleDialog({
             </div>
           </div>
 
-          {/* Phạm vi lặp */}
           <FormSection icon={CalendarDays} title="Phạm vi lặp lại">
             <div className="space-y-4">
               <FormField
@@ -194,7 +195,10 @@ export function RepeatScheduleDialog({
 
               {endWeekLabel && (
                 <div className="text-xs text-adminGray-600 bg-adminGray-50 border border-adminGray-100 rounded-md px-3 py-2">
-                  Tuần kết thúc: <span className="font-semibold text-adminInk">{endWeekLabel}</span>
+                  Tuần kết thúc:{" "}
+                  <span className="font-semibold text-adminInk">
+                    {endWeekLabel}
+                  </span>
                 </div>
               )}
 
@@ -215,11 +219,13 @@ export function RepeatScheduleDialog({
             </div>
           </FormSection>
 
-          {/* Preview */}
-          {preview !== null && (
-            preview.weeks === 0 ? (
+          {preview !== null &&
+            (preview.weeks === 0 ? (
               <div className="flex items-start gap-2 bg-state-warning-bg border border-state-warning-border rounded-lg px-4 py-3">
-                <AlertCircle size={15} className="text-adminGold-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle
+                  size={15}
+                  className="text-adminGold-600 flex-shrink-0 mt-0.5"
+                />
                 <p className="text-sm text-state-warning-text">
                   Tuần kết thúc phải sau tuần hiện tại.
                 </p>
@@ -229,20 +235,27 @@ export function RepeatScheduleDialog({
                 <p className="text-sm font-semibold text-adminInk">Tổng quan</p>
                 <div className="grid grid-cols-2 gap-3 mt-2">
                   <div className="text-center p-2 bg-white rounded-md border border-adminGray-100">
-                    <p className="text-2xl font-bold text-adminGreen-600">{preview.weeks}</p>
-                    <p className="text-xs text-adminGray-600 mt-0.5">tuần sẽ lặp</p>
+                    <p className="text-2xl font-bold text-adminGreen-600">
+                      {preview.weeks}
+                    </p>
+                    <p className="text-xs text-adminGray-600 mt-0.5">
+                      tuần sẽ lặp
+                    </p>
                   </div>
                   <div className="text-center p-2 bg-white rounded-md border border-adminGray-100">
-                    <p className="text-2xl font-bold text-adminInk">{preview.schedules}</p>
-                    <p className="text-xs text-adminGray-600 mt-0.5">ca làm việc tạo mới</p>
+                    <p className="text-2xl font-bold text-adminInk">
+                      {preview.schedules}
+                    </p>
+                    <p className="text-xs text-adminGray-600 mt-0.5">
+                      ca làm việc tạo mới
+                    </p>
                   </div>
                 </div>
                 <p className="text-xs text-adminGray-400 mt-2">
                   * Lịch trùng lặp đã có sẽ tự động bỏ qua.
                 </p>
               </div>
-            )
-          )}
+            ))}
         </div>
 
         <DialogFooter>
@@ -260,7 +273,9 @@ export function RepeatScheduleDialog({
             variant="admin"
             size="sm"
             loading={isPending}
-            disabled={!endDate || preview?.weeks === 0 || preview?.schedules === 0}
+            disabled={
+              !endDate || preview?.weeks === 0 || preview?.schedules === 0
+            }
             onClick={onSubmit}
           >
             Lặp lịch

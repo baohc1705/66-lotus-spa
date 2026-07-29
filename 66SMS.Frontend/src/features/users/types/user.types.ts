@@ -8,15 +8,12 @@ export interface UserDto {
   lastLoginAt?: string;
   roles?: string[];
   permissions?: string[];
-
   fullName?: string;
   avatarUrl?: string;
   phone?: string;
   gender?: number;
   dateOfBirth?: string;
-
   profileType?: string;
-
   staffInfo?: StaffProfileDto;
   customerInfo?: CustomerProfileDto;
 }

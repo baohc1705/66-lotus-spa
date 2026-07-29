@@ -17,7 +17,6 @@ const ATTENDANCE_KEYS = {
   list: (params: AttendanceListParams) => [...ATTENDANCE_KEYS.lists(), params] as const,
 };
 
-// Danh sách chấm công
 export function useAttendances(params: AttendanceListParams) {
   return useQuery({
     queryKey: ATTENDANCE_KEYS.list(params),
@@ -25,7 +24,6 @@ export function useAttendances(params: AttendanceListParams) {
   });
 }
 
-// Check-in
 export function useCheckIn() {
   const qc = useQueryClient();
   return useMutation({
@@ -42,7 +40,6 @@ export function useCheckIn() {
   });
 }
 
-// Check-out
 export function useCheckOut() {
   const qc = useQueryClient();
   return useMutation({
@@ -58,8 +55,7 @@ export function useCheckOut() {
     onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
   });
 }
-
-// Sửa giờ tay
+  
 export function useUpdateAttendance() {
   const qc = useQueryClient();
   return useMutation({
@@ -77,7 +73,6 @@ export function useUpdateAttendance() {
   });
 }
 
-// Tạo bản ghi nghỉ phép/lễ/vắng
 export function useCreateManualAttendance() {
   const qc = useQueryClient();
   return useMutation({

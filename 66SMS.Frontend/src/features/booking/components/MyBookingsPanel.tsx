@@ -1,4 +1,4 @@
-import { formatCurrency } from '@/shared/utils/currency';
+import { formatCurrency } from "@/shared/utils/currency";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -25,7 +25,10 @@ import { APPOINTMENT_STATUS } from "../constants/appointment.constants";
 import { getMyWallet } from "../../wallet/api/wallet.api";
 import { useQuery } from "@tanstack/react-query";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { formatDateTimeDisplay, toLocalDateOnly } from '@/shared/utils/date.utils';
+import {
+  formatDateTimeDisplay,
+  toLocalDateOnly,
+} from "@/shared/utils/date.utils";
 
 export function MyBookingsPanel() {
   const queryClient = useQueryClient();
@@ -51,7 +54,6 @@ export function MyBookingsPanel() {
     if (booking.status !== APPOINTMENT_STATUS.CONFIRMED) return false;
     if (!booking.depositDeadlineAt) return false;
 
-    // Nếu đã thanh toán một phần (cọc) thì không cho cọc nữa
     if ((booking.paidAmount || 0) > 0) return false;
 
     const deadline = new Date(booking.depositDeadlineAt).getTime();
@@ -63,7 +65,6 @@ export function MyBookingsPanel() {
     return booking.status === APPOINTMENT_STATUS.WAITING;
   };
 
-  
   const handlePostpone = async (
     e: React.MouseEvent,
     appointmentId: number,
@@ -104,7 +105,7 @@ export function MyBookingsPanel() {
     try {
       const url = await bookingApi.getDepositVnPayUrl(appointmentId);
       if (url) {
-        window.location.assign(url); // Tự động chuyển hướng sang VNPAY
+        window.location.assign(url);
       }
     } catch (error) {
       console.error("Lỗi khi tạo URL thanh toán cọc", error);
@@ -114,7 +115,11 @@ export function MyBookingsPanel() {
     }
   };
 
-  const openWalletConfirm = (e: React.MouseEvent, appointmentId: number, depositAmount: number) => {
+  const openWalletConfirm = (
+    e: React.MouseEvent,
+    appointmentId: number,
+    depositAmount: number,
+  ) => {
     e.stopPropagation();
     setWalletConfirm({ open: true, appointmentId, depositAmount });
   };
@@ -123,9 +128,11 @@ export function MyBookingsPanel() {
     if (!walletConfirm.appointmentId) return;
     setIsPayingWalletId(walletConfirm.appointmentId);
     setWalletConfirm({ open: false });
-    
+
     try {
-      const isSuccess = await bookingApi.payDepositWithWallet(walletConfirm.appointmentId);
+      const isSuccess = await bookingApi.payDepositWithWallet(
+        walletConfirm.appointmentId,
+      );
       if (isSuccess) {
         toast.success("Thanh toán cọc bằng ví thành công!");
         queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
@@ -177,7 +184,7 @@ export function MyBookingsPanel() {
 
   const getStatusBadge = (status?: number, positionId?: number | null) => {
     switch (status) {
-      case 0: // Fallback
+      case 0: 
       case APPOINTMENT_STATUS.PENDING:
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-status-pending/10 text-status-pending border border-status-pending/20 whitespace-nowrap">
@@ -234,11 +241,7 @@ export function MyBookingsPanel() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between pb-3">
-        <h2
-          className="text-xl font-semibold text-ink"
-        >
-          Lịch hẹn của tôi
-        </h2>
+        <h2 className="text-xl font-semibold text-ink">Lịch hẹn của tôi</h2>
         <span className="bg-page text-rose-600 px-2.5 py-0.5 rounded-md text-sm font-medium">
           {bookings.length} lịch hẹn
         </span>
@@ -254,7 +257,6 @@ export function MyBookingsPanel() {
                 : "bg-warm-50/80 hover:bg-white shadow-sm"
             }`}
           >
-            {/* Header (Always visible) */}
             <div
               className="p-4 cursor-pointer flex flex-col md:flex-row justify-between gap-4 select-none"
               onClick={() => toggleExpand(booking.id!)}
@@ -271,10 +273,10 @@ export function MyBookingsPanel() {
                     {getStatusBadge(booking.status, booking.positionId)}
                   </div>
                 </div>
-                
+
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-warm-600">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-warm-400">Ngày đặt:</span> 
+                    <span className="text-warm-400">Ngày đặt:</span>
                     <span>{formatDateTimeDisplay(booking.createdAt)}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -297,28 +299,43 @@ export function MyBookingsPanel() {
                     <div className="flex items-center gap-1.5">
                       <DollarSign className="w-4 h-4 text-gold-600" />
                       <span className="text-ink font-medium">
-                        Cần cọc: <span className="text-rose-600">{formatCurrency(((booking.totalAmount || 0) * (booking.depositPercent || 0)) / 100)}</span>
-                        <span className="text-warm-600 font-normal ml-1">({booking.depositPercent}%)</span>
+                        Cần cọc:{" "}
+                        <span className="text-rose-600">
+                          {formatCurrency(
+                            ((booking.totalAmount || 0) *
+                              (booking.depositPercent || 0)) /
+                              100,
+                          )}
+                        </span>
+                        <span className="text-warm-600 font-normal ml-1">
+                          ({booking.depositPercent}%)
+                        </span>
                       </span>
                     </div>
                   )}
                 </div>
 
-                {/* Mobile Badge */}
                 <div className="mt-3 md:hidden">
                   {getStatusBadge(booking.status, booking.positionId)}
                 </div>
               </div>
 
-              {/* Actions Area */}
               <div className="flex items-center gap-2 md:self-center shrink-0">
                 <div className="flex flex-wrap items-center gap-2 justify-end">
                   {canPayDeposit(booking) && (
                     <>
-                      {walletBalance >=((booking.totalAmount || 0) *(booking.depositPercent || 0)) / 100 && (
+                      {walletBalance >=
+                        ((booking.totalAmount || 0) *
+                          (booking.depositPercent || 0)) /
+                          100 && (
                         <button
                           onClick={(e) =>
-                              openWalletConfirm(e,booking.id!,((booking.totalAmount || 0) *(booking.depositPercent || 0)) / 100,
+                            openWalletConfirm(
+                              e,
+                              booking.id!,
+                              ((booking.totalAmount || 0) *
+                                (booking.depositPercent || 0)) /
+                                100,
                             )
                           }
                           disabled={
@@ -369,7 +386,7 @@ export function MyBookingsPanel() {
                     </button>
                   )}
                 </div>
-                
+
                 <button className="p-1.5 hover:bg-warm-100 rounded-md transition-colors text-warm-400 ml-1">
                   {expandedId === booking.id ? (
                     <ChevronUp className="w-5 h-5" />
@@ -380,7 +397,6 @@ export function MyBookingsPanel() {
               </div>
             </div>
 
-            {/* Expanded Content */}
             <div
               className={`grid transition-all duration-300 ease-in-out ${
                 expandedId === booking.id
@@ -390,7 +406,6 @@ export function MyBookingsPanel() {
             >
               <div className="overflow-hidden">
                 <div className="p-5 border-t border-warm-100 bg-white space-y-6">
-                  {/* Grid info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <h4 className="font-medium text-ink border-b border-warm-50 pb-2">
@@ -404,7 +419,8 @@ export function MyBookingsPanel() {
                             <span className="text-warm-600 block mb-1">
                               Dịch vụ đã chọn:
                             </span>
-                            {booking.serviceNames && booking.serviceNames.length > 0 ? (
+                            {booking.serviceNames &&
+                            booking.serviceNames.length > 0 ? (
                               <ul className="space-y-1">
                                 {booking.serviceNames.map((srv, idx) => (
                                   <li
@@ -433,7 +449,7 @@ export function MyBookingsPanel() {
                               {formatCurrency(
                                 booking.servicesSubTotal ?? booking.totalAmount,
                               )}
-                            </span> 
+                            </span>
                           </div>
                         </div>
 
@@ -443,7 +459,8 @@ export function MyBookingsPanel() {
                               Giảm giá thẻ thành viên:
                             </span>
                             <span className="text-success-text font-medium">
-                              -{formatCurrency(booking.membershipDiscountAmount)}
+                              -
+                              {formatCurrency(booking.membershipDiscountAmount)}
                             </span>
                           </div>
                         )}
@@ -553,14 +570,20 @@ export function MyBookingsPanel() {
             <div className="bg-warm-50 p-3 rounded-md space-y-2 text-sm border border-warm-100">
               <div className="flex justify-between">
                 <span className="text-warm-600">Số tiền cọc:</span>
-                <span className="font-medium text-rose-600">{formatCurrency(walletConfirm.depositAmount)}</span>
+                <span className="font-medium text-rose-600">
+                  {formatCurrency(walletConfirm.depositAmount)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-warm-600">Số dư hiện tại:</span>
-                <span className="font-medium text-ink">{formatCurrency(walletBalance)}</span>
+                <span className="font-medium text-ink">
+                  {formatCurrency(walletBalance)}
+                </span>
               </div>
             </div>
-            <p className="text-xs text-warm-600 italic">Số dư ví của bạn sẽ bị trừ tương ứng sau khi xác nhận.</p>
+            <p className="text-xs text-warm-600 italic">
+              Số dư ví của bạn sẽ bị trừ tương ứng sau khi xác nhận.
+            </p>
           </div>
         }
         loading={isPayingWalletId !== null}

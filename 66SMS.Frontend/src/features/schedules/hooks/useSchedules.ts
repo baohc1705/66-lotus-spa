@@ -46,7 +46,8 @@ export function useCreateWorkSchedule() {
         toast.error(result.message || "Có lỗi xảy ra");
       }
     },
-    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
+    onError: (error: AxiosError<Result<unknown>>) =>
+      toast.error(getErrorMessage(error)),
   });
 }
 
@@ -64,7 +65,8 @@ export function useBulkCreateWorkSchedule() {
         toast.error(result.message || "Không thể phân ca làm việc");
       }
     },
-    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
+    onError: (error: AxiosError<Result<unknown>>) =>
+      toast.error(getErrorMessage(error)),
   });
 }
 
@@ -85,7 +87,8 @@ export function useUpdateWorkSchedule() {
         toast.error(result.message || "Có lỗi xảy ra");
       }
     },
-    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
+    onError: (error: AxiosError<Result<unknown>>) =>
+      toast.error(getErrorMessage(error)),
   });
 }
 
@@ -101,6 +104,7 @@ export function useDeleteWorkSchedule() {
         toast.error(result.message || "Có lỗi xảy ra");
       }
     },
-    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
+    onError: (error: AxiosError<Result<unknown>>) =>
+      toast.error(getErrorMessage(error)),
   });
 }

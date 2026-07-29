@@ -6,7 +6,9 @@ export function useMembershipTierListState() {
   const tableParams = useTableQueryParams();
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<MembershipTierDto | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<MembershipTierDto | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<MembershipTierDto | null>(
+    null,
+  );
 
   return {
     ...tableParams,

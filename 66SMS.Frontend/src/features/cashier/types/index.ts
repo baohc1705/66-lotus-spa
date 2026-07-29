@@ -22,7 +22,7 @@ export interface CashierBooking {
   serviceName: string
   staffId: string | number
   staffName: string
-  startTime: string // ISO string or HH:mm
+  startTime: string
   endTime: string
   status: BookingStatus
   totalAmount: number

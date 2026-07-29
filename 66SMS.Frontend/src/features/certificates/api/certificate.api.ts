@@ -13,7 +13,6 @@ import type {
 } from "../types/certificate.types";
 
 export const certificateApi = {
-  // CertificateType
   getAllTypes: (params: CertificateTypeQueryParams) =>
     axiosInstance
       .get<Result<PagedResult<CertificateTypeDTO>>>(API.certificateTypes, { params })
@@ -38,8 +37,7 @@ export const certificateApi = {
     axiosInstance
       .delete<Result<object>>(`${API.certificateTypes}/${id}`)
       .then((r) => r.data),
-
-  // StaffCertificate
+  
   getAll: (params: StaffCertificateQueryParams) =>
     axiosInstance
       .get<Result<PagedResult<StaffCertificateDTO>>>(API.staffCertificates, { params })

@@ -34,7 +34,7 @@ export const usersApi = {
     axiosInstance
       .delete<Result<object>>(API.users.base, { data: body })
       .then((r) => r.data),
-      
+
   getAllAccounts: (params?: PageRequest) =>
     axiosInstance
       .get<Result<PagedResult<UserAccountDto>>>(API.users.accounts, { params })

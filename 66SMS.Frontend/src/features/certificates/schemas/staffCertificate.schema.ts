@@ -2,9 +2,7 @@ import { z } from "zod";
 import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
 const staffCertificateBaseSchema = z.object({
-  staffId: z.coerce
-    .number()
-    .min(1, VALIDATION_MSG.selectRequired("nhân viên")),
+  staffId: z.coerce.number().min(1, VALIDATION_MSG.selectRequired("nhân viên")),
   certificateTypeId: z.coerce
     .number()
     .min(1, VALIDATION_MSG.selectRequired("loại chứng chỉ")),
@@ -21,17 +19,9 @@ const staffCertificateBaseSchema = z.object({
     .string()
     .min(1, VALIDATION_MSG.required("Tổ chức cấp"))
     .max(200, VALIDATION_MSG.max(200)),
-  issuedDate: z
-    .string()
-    .min(1, VALIDATION_MSG.required("Ngày cấp")),
-  expiryDate: z
-    .string()
-    .optional()
-    .or(z.literal("")),
-  documentUrl: z
-    .string()
-    .optional()
-    .or(z.literal("")),
+  issuedDate: z.string().min(1, VALIDATION_MSG.required("Ngày cấp")),
+  expiryDate: z.string().optional().or(z.literal("")),
+  documentUrl: z.string().optional().or(z.literal("")),
   note: z
     .string()
     .max(500, VALIDATION_MSG.max(500))
@@ -41,8 +31,14 @@ const staffCertificateBaseSchema = z.object({
 });
 
 export const createStaffCertificateSchema = staffCertificateBaseSchema;
-export const updateStaffCertificateSchema = staffCertificateBaseSchema.omit({ staffId: true }).partial();
+export const updateStaffCertificateSchema = staffCertificateBaseSchema
+  .omit({ staffId: true })
+  .partial();
 
-export type CreateStaffCertificatePayload = z.infer<typeof createStaffCertificateSchema>;
-export type UpdateStaffCertificatePayload = z.infer<typeof updateStaffCertificateSchema>;
+export type CreateStaffCertificatePayload = z.infer<
+  typeof createStaffCertificateSchema
+>;
+export type UpdateStaffCertificatePayload = z.infer<
+  typeof updateStaffCertificateSchema
+>;
 export type StaffCertificateFormValues = CreateStaffCertificatePayload;

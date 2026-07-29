@@ -10,7 +10,10 @@ import type {
   PayrollCommissionAppointmentDto,
   PayrollCommissionLineDto,
 } from "../types/payroll.types";
-import { formatSlotTime, resolveServiceEndTime } from "../utils/payrollStats.utils";
+import {
+  formatSlotTime,
+  resolveServiceEndTime,
+} from "../utils/payrollStats.utils";
 
 interface PayrollCommissionDetailDialogProps {
   open: boolean;

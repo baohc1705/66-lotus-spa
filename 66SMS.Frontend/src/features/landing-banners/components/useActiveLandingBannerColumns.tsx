@@ -91,7 +91,9 @@ export function useActiveLandingBannerColumns({
         accessorKey: "sortOrder",
         header: cols.sortOrder,
         cell: ({ row }) => (
-          <span className="text-adminInk/80">{row.original.sortOrder ?? 0}</span>
+          <span className="text-adminInk/80">
+            {row.original.sortOrder ?? 0}
+          </span>
         ),
         size: 80,
       },
@@ -153,6 +155,6 @@ export function useActiveLandingBannerColumns({
         enableResizing: false,
       },
     ],
-    [pageIndex, pageSize, onEdit, onDelete, cols, perm]
+    [pageIndex, pageSize, onEdit, onDelete, cols, perm],
   );
 }

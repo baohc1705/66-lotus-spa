@@ -1,8 +1,5 @@
 import { useMemo } from "react";
-import {
-  useReactTable,
-  getCoreRowModel,
-} from "@tanstack/react-table";
+import { useReactTable, getCoreRowModel } from "@tanstack/react-table";
 import { Plus } from "lucide-react";
 
 import { DataTable } from "@/shared/components/DataTable/DataTable";
@@ -24,10 +21,7 @@ import {
   useActivePromotionColumns,
 } from "../components/useActivePromotionColumns";
 import { PROMOTION_PERM } from "../constants/promotion.permissions";
-import {
-  useAdminPromotions,
-  useDeletePromotion,
-} from "../hooks/usePromotions";
+import { useAdminPromotions, useDeletePromotion } from "../hooks/usePromotions";
 
 const ENTITY = "khuyến mãi";
 
@@ -55,7 +49,11 @@ export function PromotionListPage() {
     filter,
   } = listState;
 
-  const { data: promotionsResult, isLoading, isFetching } = useAdminPromotions(queryParams);
+  const {
+    data: promotionsResult,
+    isLoading,
+    isFetching,
+  } = useAdminPromotions(queryParams);
   const deleteMutation = useDeletePromotion();
 
   const paged = promotionsResult?.data;
@@ -161,7 +159,10 @@ export function PromotionListPage() {
             if (!open) setDeleteTarget(null);
           }}
           title={CONFIRM_MSG.deleteTitle(ENTITY)}
-          description={CONFIRM_MSG.deleteDescription(ENTITY, deleteTarget.code ?? "")}
+          description={CONFIRM_MSG.deleteDescription(
+            ENTITY,
+            deleteTarget.code ?? "",
+          )}
           onConfirm={handleDelete}
           confirmLabel={COMMON_MSG.delete}
           loading={deleteMutation.isPending}

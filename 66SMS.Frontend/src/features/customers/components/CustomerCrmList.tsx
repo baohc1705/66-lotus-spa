@@ -1,4 +1,4 @@
-import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
+import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
@@ -62,7 +62,6 @@ export function CustomerCrmList({
 
   return (
     <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-sm">
-      {/* Toolbar & Search */}
       <div className="p-3 border-b border-adminGray-100 space-y-2">
         <div className="flex items-center gap-1.5">
           <div className="relative flex-1">
@@ -103,7 +102,6 @@ export function CustomerCrmList({
           </Button>
         </div>
 
-        {/* Advanced Filters Panel */}
         {showAdvancedFilter && (
           <div className="grid grid-cols-2 gap-2 pt-1 border-t border-adminGray-100 animate-in fade-in slide-in-from-top-1 duration-200">
             <div>
@@ -172,7 +170,6 @@ export function CustomerCrmList({
         </div>
       </div>
 
-      {/* Customer List Area */}
       <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-adminGray-100">
         {isLoading ? (
           <div className="p-4 text-center text-xs text-adminGray-400">
@@ -237,7 +234,6 @@ export function CustomerCrmList({
         )}
       </div>
 
-      {/* Pagination Footer */}
       {totalPages > 1 && (
         <div className="p-2 border-t border-adminGray-100 bg-adminGray-50/50 flex items-center justify-between text-xs text-adminGray-600">
           <Button

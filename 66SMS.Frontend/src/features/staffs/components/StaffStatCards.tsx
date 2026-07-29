@@ -19,9 +19,27 @@ export function StaffStatCards({
 }: StaffStatCardsProps) {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-      <AdminStatCard label="Tổng số nhân viên" value={totalStaffs} icon={Users} tone="gold" isLoading={isLoading} />
-      <AdminStatCard label="Đang làm việc" value={activeStaffs} icon={UserCheck} tone="green" isLoading={isLoading} />
-      <AdminStatCard label="Tạm nghỉ" value={inactiveStaffs} icon={UserMinus} tone="gold" isLoading={isLoading} />
+      <AdminStatCard
+        label="Tổng số nhân viên"
+        value={totalStaffs}
+        icon={Users}
+        tone="gold"
+        isLoading={isLoading}
+      />
+      <AdminStatCard
+        label="Đang làm việc"
+        value={activeStaffs}
+        icon={UserCheck}
+        tone="green"
+        isLoading={isLoading}
+      />
+      <AdminStatCard
+        label="Tạm nghỉ"
+        value={inactiveStaffs}
+        icon={UserMinus}
+        tone="gold"
+        isLoading={isLoading}
+      />
       <AdminStatCard
         label="Lương cơ bản TB"
         value={avgSalary > 0 ? formatCurrency(avgSalary) : "—"}

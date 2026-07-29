@@ -19,7 +19,10 @@ export function TablePageShell({
       variants={containerVariants}
       className="space-y-4"
     >
-      <motion.div variants={itemVariants} className="lotus-admin-table-page-card">
+      <motion.div
+        variants={itemVariants}
+        className="lotus-admin-table-page-card"
+      >
         {children}
         {isFetching && !isLoading && (
           <div className="lotus-admin-table-fetch-bar">

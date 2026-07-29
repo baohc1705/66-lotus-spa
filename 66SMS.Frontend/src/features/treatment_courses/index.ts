@@ -1,1 +1,1 @@
-export { TreatmentCourseListPage } from './pages/TreatmentCourseListPage'
+export { TreatmentCourseListPage } from "./pages/TreatmentCourseListPage";

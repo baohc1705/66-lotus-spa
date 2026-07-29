@@ -15,13 +15,21 @@ const certificateTypeBaseSchema = z.object({
     .max(500, VALIDATION_MSG.max(500))
     .optional()
     .or(z.literal("")),
-  sortOrder: z.coerce.number().min(0, VALIDATION_MSG.notNegative("Thứ tự hiển thị")).optional().default(0),
+  sortOrder: z.coerce
+    .number()
+    .min(0, VALIDATION_MSG.notNegative("Thứ tự hiển thị"))
+    .optional()
+    .default(0),
   status: z.coerce.number().min(0).optional().default(1),
 });
 
 export const createCertificateTypeSchema = certificateTypeBaseSchema;
 export const updateCertificateTypeSchema = certificateTypeBaseSchema.partial();
 
-export type CreateCertificateTypePayload = z.infer<typeof createCertificateTypeSchema>;
-export type UpdateCertificateTypePayload = z.infer<typeof updateCertificateTypeSchema>;
+export type CreateCertificateTypePayload = z.infer<
+  typeof createCertificateTypeSchema
+>;
+export type UpdateCertificateTypePayload = z.infer<
+  typeof updateCertificateTypeSchema
+>;
 export type CertificateTypeFormValues = CreateCertificateTypePayload;

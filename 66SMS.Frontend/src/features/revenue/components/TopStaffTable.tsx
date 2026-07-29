@@ -16,7 +16,6 @@ const TABS: { key: StaffTab; label: string }[] = [
   { key: "commission", label: "Hoa hồng" },
 ];
 
-// Simple avatar initials placeholder
 function StaffAvatar({ name }: { name: string }) {
   const initials = name
     .split(" ")
@@ -30,7 +29,10 @@ function StaffAvatar({ name }: { name: string }) {
   );
 }
 
-export const TopStaffTable = memo(function TopStaffTable({ data = [], isLoading }: Props) {
+export const TopStaffTable = memo(function TopStaffTable({
+  data = [],
+  isLoading,
+}: Props) {
   const [activeTab, setActiveTab] = useState<StaffTab>("revenue");
 
   const getMetric = (s: TopStaffDto): number => {
@@ -60,9 +62,10 @@ export const TopStaffTable = memo(function TopStaffTable({ data = [], isLoading 
 
   return (
     <div className="bg-white border border-adminGray-100 rounded-admin p-5 flex flex-col h-[340px]">
-      {/* Header */}
       <div className="flex items-center justify-between mb-3 shrink-0">
-        <span className="text-sm font-bold text-adminInk">Top nhân viên xuất sắc</span>
+        <span className="text-sm font-bold text-adminInk">
+          Top nhân viên xuất sắc
+        </span>
         <div className="flex items-center gap-2">
           <div className="flex bg-adminGray-100 p-0.5 rounded-[6px]">
             {TABS.map((t) => (
@@ -82,7 +85,6 @@ export const TopStaffTable = memo(function TopStaffTable({ data = [], isLoading 
         </div>
       </div>
 
-      {/* Table */}
       <div className="flex-1 overflow-auto min-h-0">
         {sorted.length === 0 ? (
           <div className="h-full flex items-center justify-center text-adminGray-400 text-xs">
@@ -95,24 +97,34 @@ export const TopStaffTable = memo(function TopStaffTable({ data = [], isLoading 
                 <th className="py-2 font-semibold w-6">#</th>
                 <th className="py-2 font-semibold">Nhân viên</th>
                 <th className="py-2 font-semibold text-right">Doanh thu</th>
-                <th className="py-2 font-semibold text-right pr-1">Tăng trưởng</th>
+                <th className="py-2 font-semibold text-right pr-1">
+                  Tăng trưởng
+                </th>
               </tr>
             </thead>
             <tbody>
               {sorted.map((s, idx) => (
-                <tr key={s.staffId} className="border-b border-adminGray-50 hover:bg-adminGray-50/50 transition-colors">
-                  <td className="py-2.5 text-adminGray-400 font-bold">{idx + 1}</td>
+                <tr
+                  key={s.staffId}
+                  className="border-b border-adminGray-50 hover:bg-adminGray-50/50 transition-colors"
+                >
+                  <td className="py-2.5 text-adminGray-400 font-bold">
+                    {idx + 1}
+                  </td>
                   <td className="py-2.5">
                     <div className="flex items-center gap-2">
                       <StaffAvatar name={s.staffName} />
-                      <span className="font-semibold text-adminInk truncate max-w-[110px]">{s.staffName}</span>
+                      <span className="font-semibold text-adminInk truncate max-w-[110px]">
+                        {s.staffName}
+                      </span>
                     </div>
                   </td>
-                  <td className="py-2.5 text-right font-bold text-adminInk">{formatMetric(s)}</td>
+                  <td className="py-2.5 text-right font-bold text-adminInk">
+                    {formatMetric(s)}
+                  </td>
                   <td className="py-2.5 text-right pr-1">
                     <span className="inline-flex items-center gap-0.5 text-adminGreen-600 font-bold text-2xs">
-                      <ArrowUpRight className="w-3 h-3" />
-                      +{s.growthPercent}%
+                      <ArrowUpRight className="w-3 h-3" />+{s.growthPercent}%
                     </span>
                   </td>
                 </tr>
@@ -122,7 +134,6 @@ export const TopStaffTable = memo(function TopStaffTable({ data = [], isLoading 
         )}
       </div>
 
-      {/* Footer link */}
       <div className="border-t border-adminGray-100 mt-2 pt-2 shrink-0">
         <Link
           to="/admin/staff"

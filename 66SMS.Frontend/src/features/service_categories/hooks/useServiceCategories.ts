@@ -15,7 +15,8 @@ import type {
 
 const ENTITY = "nhóm dịch vụ";
 
-export const SERVICE_CATEGORY_KEYS = createEntityQueryKeys<PageRequest>("service-categories");
+export const SERVICE_CATEGORY_KEYS =
+  createEntityQueryKeys<PageRequest>("service-categories");
 
 export function useServiceCategories(params: PageRequest, enabled = true) {
   return useQuery({
@@ -33,7 +34,10 @@ export function useAdminServiceCategories(params: PageRequest, enabled = true) {
   });
 }
 
-export function useDeletedServiceCategories(params: PageRequest, enabled = true) {
+export function useDeletedServiceCategories(
+  params: PageRequest,
+  enabled = true,
+) {
   return useQuery({
     queryKey: SERVICE_CATEGORY_KEYS.deletedList(params),
     queryFn: () => serviceCategoryApi.getAllDeleted(params),
@@ -68,10 +72,6 @@ export function useCreateServiceCategory() {
   });
 }
 
-export function useServiceCategoryMutations() {
-  // Provided for component reference compatibility if needed
-}
-
 export function useUpdateServiceCategory() {
   const qc = useQueryClient();
   return useMutation({
@@ -91,7 +91,9 @@ export function useUpdateServiceCategory() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+      );
     },
   });
 }
@@ -117,8 +119,7 @@ export function useDeleteServiceCategory() {
 export function useDeleteServiceCategoryMultiples() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (ids: number[]) =>
-      serviceCategoryApi.deleteMultiples({ ids }),
+    mutationFn: (ids: number[]) => serviceCategoryApi.deleteMultiples({ ids }),
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: SERVICE_CATEGORY_KEYS.all });
@@ -147,7 +148,9 @@ export function useRestoreServiceCategory() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)),
+      );
     },
   });
 }

@@ -36,9 +36,7 @@ export const NetRevenueBarChart = memo(function NetRevenueBarChart({
   return (
     <div className="bg-white border border-adminGray-100 rounded-admin p-5 flex flex-col h-[280px]">
       <div className="flex items-center justify-between mb-3 shrink-0">
-        <span className="text-sm font-bold text-adminInk">
-          Doanh thu thuần
-        </span>
+        <span className="text-sm font-bold text-adminInk">Doanh thu thuần</span>
         <div className="flex bg-adminGray-100 p-0.5 rounded-[6px]">
           {TABS.map((t) => (
             <button
@@ -86,7 +84,9 @@ export const NetRevenueBarChart = memo(function NetRevenueBarChart({
                 tick={{ fontSize: 10, fill: "var(--admin-gray-400)" }}
                 tickFormatter={(v: unknown) => {
                   const val = Number(v);
-                  return val >= 1000000 ? `${(val / 1000000).toFixed(0)}M` : `${val}`;
+                  return val >= 1000000
+                    ? `${(val / 1000000).toFixed(0)}M`
+                    : `${val}`;
                 }}
               />
               <Tooltip

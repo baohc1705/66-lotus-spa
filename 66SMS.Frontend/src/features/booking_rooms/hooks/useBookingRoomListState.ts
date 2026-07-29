@@ -13,7 +13,7 @@ export function useBookingRoomListState() {
 
   useEffect(() => {
     table.resetPage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps 
   }, [salonId]);
 
   const queryParams = useMemo(

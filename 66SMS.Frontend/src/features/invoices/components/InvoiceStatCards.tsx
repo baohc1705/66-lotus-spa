@@ -27,9 +27,27 @@ export function InvoiceStatCards({
         isLoading={isLoading}
         isCurrency
       />
-      <AdminStatCard label="Đã thanh toán" value={paidCount} icon={FileCheck} tone="green" isLoading={isLoading} />
-      <AdminStatCard label="Chưa thanh toán" value={unpaidCount} icon={Clock} tone="warning" isLoading={isLoading} />
-      <AdminStatCard label="Đã hủy" value={cancelledCount} icon={Ban} tone="danger" isLoading={isLoading} />
+      <AdminStatCard
+        label="Đã thanh toán"
+        value={paidCount}
+        icon={FileCheck}
+        tone="green"
+        isLoading={isLoading}
+      />
+      <AdminStatCard
+        label="Chưa thanh toán"
+        value={unpaidCount}
+        icon={Clock}
+        tone="warning"
+        isLoading={isLoading}
+      />
+      <AdminStatCard
+        label="Đã hủy"
+        value={cancelledCount}
+        icon={Ban}
+        tone="danger"
+        isLoading={isLoading}
+      />
     </div>
   );
 }

@@ -10,10 +10,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ═══════════════════════════════════════════════════════
-   Hoa Sen Spa — bảng màu chuẩn (color.md)
-   Dùng cho booking + landing brand
-   ═══════════════════════════════════════════════════════ */
+/* Hoa Sen Spa — bảng màu chuẩn (color.md)
+   Dùng cho booking + landing brand */
 :root {
   /* Rose — primary */
   --rose-900: #5c0b2b;

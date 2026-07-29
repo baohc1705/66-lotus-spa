@@ -130,9 +130,7 @@ export function ServiceCategoryFormDialog({
       <DialogContent className="sm:max-w-[850px]">
         <DialogHeader>
           <DialogTitle>
-            {isEdit
-              ? "Chỉnh sửa nhóm dịch vụ"
-              : "Thêm nhóm dịch vụ mới"}
+            {isEdit ? "Chỉnh sửa nhóm dịch vụ" : "Thêm nhóm dịch vụ mới"}
           </DialogTitle>
           <DialogDescription>
             {isEdit
@@ -154,7 +152,10 @@ export function ServiceCategoryFormDialog({
                 />
               </FormField>
 
-              <FormField label="Ảnh đại diện" tooltip="Ảnh lớn hiển thị nhóm dịch vụ">
+              <FormField
+                label="Ảnh đại diện"
+                tooltip="Ảnh lớn hiển thị nhóm dịch vụ"
+              >
                 <ImageUpload
                   key={`image-${open}-${serviceCategory?.id ?? "new"}`}
                   value={watch("imageUrl") || serviceCategory?.imageUrl}

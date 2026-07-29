@@ -8,7 +8,6 @@ export interface ProductImageDto {
   sortOrder?: number;
 }
 
-/** DTO nhẹ cho bảng (GetAll) */
 export interface ProductDto {
   id?: number | null;
   categoryId?: number | null;
@@ -26,7 +25,6 @@ export interface ProductDto {
   imageUrl?: string | null;
 }
 
-/** DTO đầy đủ cho expand + form sửa (GetDetail) */
 export interface ProductFullDto {
   id?: number | null;
   categoryId?: number | null;

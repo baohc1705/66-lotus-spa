@@ -1,6 +1,6 @@
-﻿import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
-import { AdminInput } from '@/shared/components/forms/AdminInput';
-import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
+﻿import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
+import { AdminInput } from "@/shared/components/forms/AdminInput";
+import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -117,10 +117,7 @@ export function MembershipTierFormDialog({
               tooltip="Để trống sẽ tự tạo từ tên (vd: common, gold)"
               error={errors.code?.message}
             >
-              <AdminInput
-                {...register("code")}
-                placeholder="gold"
-              />
+              <AdminInput {...register("code")} placeholder="gold" />
             </FormField>
 
             <FormField
@@ -128,10 +125,7 @@ export function MembershipTierFormDialog({
               tooltip="Ví dụ: Vàng, Bạc, Kim cương..."
               error={errors.name?.message}
             >
-              <AdminInput
-                {...register("name")}
-                placeholder="Vàng"
-              />
+              <AdminInput {...register("name")} placeholder="Vàng" />
             </FormField>
 
             <FormField
@@ -213,12 +207,7 @@ export function MembershipTierFormDialog({
             >
               {COMMON_MSG.cancel}
             </Button>
-            <Button
-              type="submit"
-              variant="admin"
-              size="sm"
-              loading={isPending}
-            >
+            <Button type="submit" variant="admin" size="sm" loading={isPending}>
               {isEdit ? "Cập nhật" : "Tạo loại thẻ"}
             </Button>
           </DialogFooter>

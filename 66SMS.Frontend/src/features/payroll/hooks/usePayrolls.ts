@@ -1,7 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
-import { payrollApi, type PayrollListParams, type UpdatePayrollPayload } from "../api/payroll.api";
+import {
+  payrollApi,
+  type PayrollListParams,
+  type UpdatePayrollPayload,
+} from "../api/payroll.api";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type { Result } from "@/shared/types/common.types";
 import type {
@@ -12,10 +16,10 @@ import type {
 const PAYROLL_KEYS = {
   all: ["payrolls"] as const,
   lists: () => [...PAYROLL_KEYS.all, "list"] as const,
-  list: (params: PayrollListParams) => [...PAYROLL_KEYS.lists(), params] as const,
+  list: (params: PayrollListParams) =>
+    [...PAYROLL_KEYS.lists(), params] as const,
 };
 
-// Danh sách bảng lương
 export function usePayrolls(params: PayrollListParams) {
   return useQuery({
     queryKey: PAYROLL_KEYS.list(params),
@@ -23,11 +27,11 @@ export function usePayrolls(params: PayrollListParams) {
   });
 }
 
-// Tính lương
 export function useGeneratePayroll() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (payload: GeneratePayrollPayload) => payrollApi.generate(payload),
+    mutationFn: (payload: GeneratePayrollPayload) =>
+      payrollApi.generate(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: PAYROLL_KEYS.lists() });
@@ -36,11 +40,11 @@ export function useGeneratePayroll() {
         toast.error(result.message || "Không thể tính lương");
       }
     },
-    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
+    onError: (error: AxiosError<Result<unknown>>) =>
+      toast.error(getErrorMessage(error)),
   });
 }
 
-// Chốt bảng lương
 export function useConfirmPayroll() {
   const qc = useQueryClient();
   return useMutation({
@@ -53,16 +57,21 @@ export function useConfirmPayroll() {
         toast.error(result.message || "Không thể chốt bảng lương");
       }
     },
-    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
+    onError: (error: AxiosError<Result<unknown>>) =>
+      toast.error(getErrorMessage(error)),
   });
 }
 
-// Cập nhật bảng lương
 export function useUpdatePayroll() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, payload }: { id: number; payload: UpdatePayrollPayload }) =>
-      payrollApi.update(id, payload),
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: number;
+      payload: UpdatePayrollPayload;
+    }) => payrollApi.update(id, payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: PAYROLL_KEYS.lists() });
@@ -71,7 +80,8 @@ export function useUpdatePayroll() {
         toast.error(result.message || "Không thể cập nhật bảng lương");
       }
     },
-    onError: (error: AxiosError<Result<unknown>>) => toast.error(getErrorMessage(error)),
+    onError: (error: AxiosError<Result<unknown>>) =>
+      toast.error(getErrorMessage(error)),
   });
 }
 

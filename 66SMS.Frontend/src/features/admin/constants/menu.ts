@@ -30,8 +30,6 @@ export interface SubMenuItem {
   label: string;
   path: string;
   icon?: React.ElementType;
-  /** Danh sách role được phép truy cập sub-menu này.
-   *  Nếu không khai báo → kế thừa quyền từ parent MenuItem. */
   allowedRoles?: string[];
 }
 
@@ -40,12 +38,9 @@ export interface MenuItem {
   path?: string;
   icon: React.ElementType;
   children?: SubMenuItem[];
-  /** Danh sách role được phép nhìn thấy menu này.
-   *  Nếu không khai báo → chỉ Admin mới thấy (mặc định hạn chế nhất). */
   allowedRoles?: string[];
 }
 
-/** Nhóm menu sidebar — title nhỏ phía trên các item. */
 export interface MenuGroup {
   title?: string;
   items: MenuItem[];
@@ -278,11 +273,9 @@ export const MENU_GROUPS: MenuGroup[] = [
   }
 ];
 
-/** Flat list — dùng cho breadcrumb / tìm title trang. */
 export const MENU_ITEMS: MenuItem[] = MENU_GROUPS.flatMap(
   (group: MenuGroup) => group.items,
 );
-// Top Nav Mega Menu Types & Configuration
 export interface MegaMenuItem {
   label: string;
   path: string;
@@ -304,14 +297,12 @@ export interface ParentTab {
 }
 
 export const TOP_NAV_TABS: ParentTab[] = [
-  // 1. TỔNG QUAN
   {
     label: "Tổng quan",
     path: "/admin",
     allowedRoles: ["Admin", "Manager"],
     icon: LayoutDashboard,
   },
-  // 2. DỊCH VỤ & SẢN PHẨM
   {
     label: "Dịch vụ",
     allowedRoles: ["Admin", "Manager"],
@@ -341,7 +332,6 @@ export const TOP_NAV_TABS: ParentTab[] = [
       },
     ],
   },
-  // 3. NHÂN VIÊN
   {
     label: "Nhân viên",
     allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
@@ -380,7 +370,6 @@ export const TOP_NAV_TABS: ParentTab[] = [
       },
     ],
   },
-  // 4. KHÁCH HÀNG & BÁN HÀNG
   {
     label: "Khách hàng",
     allowedRoles: ["Admin", "Manager", "Receptionist"],
@@ -410,7 +399,6 @@ export const TOP_NAV_TABS: ParentTab[] = [
       },
     ],
   },
-  // 5. THIẾT LẬP
   {
     label: "Thiết lập",
     allowedRoles: ["Admin", "Manager"],

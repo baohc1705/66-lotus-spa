@@ -16,7 +16,9 @@ import type {
 
 const BASE = API.services;
 
-function toAdminQuery(params: PageRequest & { categoryId?: number }): GetAllServiceQuery {
+function toAdminQuery(
+  params: PageRequest & { categoryId?: number },
+): GetAllServiceQuery {
   return {
     pageIndex: params.pageIndex,
     pageSize: params.pageSize,

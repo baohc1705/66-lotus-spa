@@ -1,5 +1,5 @@
-import { AdminInput } from '@/shared/components/forms/AdminInput';
-import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
+import { AdminInput } from "@/shared/components/forms/AdminInput";
+import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -66,7 +66,9 @@ export function UserFormDialog({
 
   // Form for update
   const updateForm = useForm<Omit<UpdateUserPayload, "id">>({
-    resolver: zodResolver(updateSchema) as Resolver<Omit<UpdateUserPayload, "id">>,
+    resolver: zodResolver(updateSchema) as Resolver<
+      Omit<UpdateUserPayload, "id">
+    >,
     defaultValues: {
       username: "",
       email: "",
@@ -110,7 +112,7 @@ export function UserFormDialog({
         onSuccess: (result) => {
           if (result.isSuccess) onOpenChange(false);
         },
-      }
+      },
     );
   };
 
@@ -187,7 +189,12 @@ export function UserFormDialog({
               >
                 {COMMON_MSG.cancel}
               </Button>
-              <Button type="submit" variant="admin" size="sm" loading={isPending}>
+              <Button
+                type="submit"
+                variant="admin"
+                size="sm"
+                loading={isPending}
+              >
                 Cập nhật
               </Button>
             </DialogFooter>
@@ -272,7 +279,12 @@ export function UserFormDialog({
               >
                 {COMMON_MSG.cancel}
               </Button>
-              <Button type="submit" variant="admin" size="sm" loading={isPending}>
+              <Button
+                type="submit"
+                variant="admin"
+                size="sm"
+                loading={isPending}
+              >
                 Tạo tài khoản
               </Button>
             </DialogFooter>

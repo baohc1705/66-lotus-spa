@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Schema cho form sửa giờ chấm công (quản lý)
 export const attendanceEditSchema = z.object({
   checkInAt: z.string().optional().or(z.literal("")),
   checkOutAt: z.string().optional().or(z.literal("")),
@@ -10,7 +9,6 @@ export const attendanceEditSchema = z.object({
 
 export type AttendanceEditFormData = z.infer<typeof attendanceEditSchema>;
 
-// Schema tạo bản ghi nghỉ phép/lễ/vắng
 export const manualAttendanceSchema = z.object({
   staffId: z.coerce.number().min(1, "Vui lòng chọn nhân viên"),
   workDate: z.string().min(1, "Vui lòng chọn ngày"),

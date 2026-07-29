@@ -39,10 +39,7 @@ export function StaffCategorySidebar({
 
   const { data: rolesResult, isLoading: isLoadingRoles } = useGetAllRoles();
 
-  const roles = useMemo(
-    () => rolesResult?.data ?? [],
-    [rolesResult?.data],
-  );
+  const roles = useMemo(() => rolesResult?.data ?? [], [rolesResult?.data]);
 
   const { data: countStaffsResult } = useAdminStaffs({
     pageIndex: 1,
@@ -54,7 +51,6 @@ export function StaffCategorySidebar({
     return countStaffsResult?.data?.items ?? [];
   }, [countStaffsResult]);
 
-  // Đếm theo role code
   const countMap = useMemo(() => {
     const map = new Map<string, number>();
     for (const s of countStaffs) {
@@ -107,7 +103,9 @@ export function StaffCategorySidebar({
           <div className="flex items-center gap-2 min-w-0">
             <Users
               className={`w-4 h-4 shrink-0 ${
-                selectedRole === null ? "text-adminGreen-600" : "text-adminGray-400"
+                selectedRole === null
+                  ? "text-adminGreen-600"
+                  : "text-adminGray-400"
               }`}
             />
             <span className="truncate">Tất cả vai trò</span>

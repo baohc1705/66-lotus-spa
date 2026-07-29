@@ -98,10 +98,6 @@ const getTierStyle = (tierName: string): TierStyle => {
   };
 };
 
-/* ==========================================
-   TierCarousel Component
-   ========================================== */
-
 interface TierCarouselProps {
   sortedTiers: MembershipTierDto[];
   currentTierName: string;
@@ -141,7 +137,6 @@ function TierCarousel({
   const goLeft = useCallback(() => goTo(activeIndex - 1), [activeIndex, goTo]);
   const goRight = useCallback(() => goTo(activeIndex + 1), [activeIndex, goTo]);
 
-  // Handle infinite loop snapping back
   useEffect(() => {
     if (!isTransitioning) return;
 
@@ -154,12 +149,11 @@ function TierCarousel({
         setTransitionEnabled(false);
         setActiveIndex(0);
       }
-    }, 500); // matches transition duration (500ms)
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [activeIndex, isTransitioning, sortedTiers.length, setActiveIndex]);
 
-  // Re-enable transition on the next tick
   useEffect(() => {
     if (!transitionEnabled) {
       const timer = setTimeout(() => {
@@ -169,7 +163,6 @@ function TierCarousel({
     }
   }, [transitionEnabled]);
 
-  // Touch/drag support
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     setDragStartX(e.clientX);
   }, []);
@@ -187,7 +180,6 @@ function TierCarousel({
     [dragStartX, goLeft, goRight],
   );
 
-  // Keyboard support
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") goLeft();
@@ -238,11 +230,10 @@ function TierCarousel({
     "Member"
   ).toUpperCase();
 
-  // Clone 1 card on each side to enable loop
   const extendedTiers = [
-    sortedTiers[sortedTiers.length - 1], // last card cloned on left
+    sortedTiers[sortedTiers.length - 1],
     ...sortedTiers,
-    sortedTiers[0], // first card cloned on right
+    sortedTiers[0],
   ];
 
   const visibleCount = Math.min(sortedTiers.length, 3);
@@ -256,9 +247,7 @@ function TierCarousel({
         Các hạng thẻ thành viên
       </h3>
 
-      {/* Carousel Container */}
       <div className="relative">
-        {/* Left Arrow */}
         <button
           onClick={goLeft}
           className="absolute left-1 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-warm-100 shadow-lg flex items-center justify-center hover:bg-white hover:shadow-xl hover:scale-110 transition-all duration-200"
@@ -267,7 +256,6 @@ function TierCarousel({
           <ChevronLeft className="w-5 h-5 text-lotus-deep" />
         </button>
 
-        {/* Right Arrow */}
         <button
           onClick={goRight}
           className="absolute right-1 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-warm-100 shadow-lg flex items-center justify-center hover:bg-white hover:shadow-xl hover:scale-110 transition-all duration-200"
@@ -276,7 +264,6 @@ function TierCarousel({
           <ChevronRight className="w-5 h-5 text-lotus-deep" />
         </button>
 
-        {/* Cards Viewport */}
         <div
           ref={carouselRef}
           className="overflow-hidden py-8 px-8"
@@ -310,7 +297,6 @@ function TierCarousel({
               const isLocked = originalIdx > currentTierIndex;
               const style = getTierStyle(tier.name);
 
-              // Scale: active is larger (1.12), adjacent is smaller (0.88), further is 0.72
               const scale = isActive ? 1.12 : distance === 1 ? 0.88 : 0.72;
 
               return (
@@ -339,13 +325,11 @@ function TierCarousel({
                       aspectRatio: "1.7 / 1",
                     }}
                   >
-                    {/* Decorative glow */}
                     <div
                       className="absolute -right-10 -top-10 w-36 h-36 rounded-full blur-3xl pointer-events-none"
                       style={{ background: style.cardAccent, opacity: 0.15 }}
                     />
 
-                    {/* Corner Lock/Unlock Badge */}
                     <div
                       className="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm z-[2] transition-all duration-300"
                       style={{
@@ -363,7 +347,6 @@ function TierCarousel({
                       )}
                     </div>
 
-                    {/* Top: Brand + Tier Badge */}
                     <div className="flex justify-between items-start mb-3 relative z-[1] pr-8">
                       <p
                         className="text-2xs font-extrabold tracking-widest uppercase"
@@ -382,7 +365,6 @@ function TierCarousel({
                       </span>
                     </div>
 
-                    {/* Middle: Member Info */}
                     <div className="relative z-[1] mt-2">
                       <div className="flex items-center gap-2 mb-2">
                         <div
@@ -417,7 +399,6 @@ function TierCarousel({
                       </p>
                     </div>
 
-                    {/* Bottom: Status hint / Upgrade condition */}
                     <div
                       className="mt-auto pt-3 relative z-[1]"
                       style={{ borderTop: `1px solid ${style.cardBorder}20` }}
@@ -452,7 +433,6 @@ function TierCarousel({
           </div>
         </div>
 
-        {/* Dot Indicators */}
         <div className="flex justify-center gap-2 mt-2">
           {sortedTiers.map((tier, idx) => {
             let displayActiveIdx = activeIndex;
@@ -516,7 +496,6 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
     }
   }
 
-  // Get selected tier details from API
   const selectedTier =
     sortedTiers[activeIndex] ||
     (sortedTiers.length > 0 ? sortedTiers[0] : null);
@@ -535,11 +514,8 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
     );
   }
 
-
-
   return (
     <div className="space-y-5">
-      {/* SECTION 1: Progress Tracker Timeline */}
       {sortedTiers.length > 0 && (
         <div className="relative overflow-hidden">
           <h3 className="text-base font-bold text-lotus-deep mb-4 font-sans flex items-center gap-2">
@@ -548,10 +524,8 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
           </h3>
 
           <div className="relative pt-4 pb-8 px-4 md:px-8">
-            {/* Horizontal Line background */}
             <div className="absolute top-[28px] left-[32px] right-[32px] h-[3px] bg-warm-100 -translate-y-1/2 z-0" />
 
-            {/* Filled Progress Line */}
             {currentTierIndex !== -1 && sortedTiers.length > 1 && (
               <div
                 className="absolute top-[28px] left-[32px] h-[3px] bg-gradient-to-r from-lotus-rose to-lotus-gold -translate-y-1/2 z-0 transition-all duration-700"
@@ -562,7 +536,6 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
               />
             )}
 
-            {/* Timeline Nodes */}
             <div className="relative z-10 flex justify-between items-center">
               {sortedTiers.map((tier, idx) => {
                 const isCurrent =
@@ -574,7 +547,6 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
                     key={tier.id}
                     className="flex flex-col items-center text-center group"
                   >
-                    {/* Node Dot */}
                     <div
                       className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 ${
                         isCurrent
@@ -593,7 +565,6 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
                       )}
                     </div>
 
-                    {/* Node Labels */}
                     <div className="mt-3">
                       <p
                         className={`text-xs font-bold ${isCurrent ? "text-lotus-gold" : "text-lotus-deep"}`}
@@ -614,7 +585,6 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
         </div>
       )}
 
-      {/* SECTION 2: Tiers Cards Carousel */}
       <TierCarousel
         sortedTiers={sortedTiers}
         currentTierName={currentTierName}
@@ -626,7 +596,6 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
         setActiveIndex={setActiveIndex}
       />
 
-      {/* SECTION 3: Selected Tier Details */}
       <div className="bg-white rounded-xl p-5 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 w-48 h-48 bg-lotus-rose-light/10 rounded-full blur-3xl -mr-24 -mt-24 pointer-events-none" />
 

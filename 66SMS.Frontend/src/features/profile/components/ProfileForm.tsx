@@ -2,7 +2,10 @@
   useProvinces,
   useWardsByProvince,
 } from "@/features/address/hooks/useAddress";
-import type { ProvinceDto, WardDto } from "@/features/address/types/address.types";
+import type {
+  ProvinceDto,
+  WardDto,
+} from "@/features/address/types/address.types";
 import {
   CUSTOMER_KEYS,
   useUpdateCustomer,
@@ -40,10 +43,7 @@ interface ProfileFormProps {
   customerDetail?: CustomerDto | null;
 }
 
-export function ProfileForm({
-  initialData,
-  customerDetail,
-}: ProfileFormProps) {
+export function ProfileForm({ initialData, customerDetail }: ProfileFormProps) {
   const qc = useQueryClient();
   const updateProfile = useUpdateProfile();
   const updateCustomer = useUpdateCustomer();
@@ -51,7 +51,9 @@ export function ProfileForm({
 
   const isPending = updateProfile.isPending || updateCustomer.isPending;
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
-  const [localAvatarPreview, setLocalAvatarPreview] = useState<string | null>(null);
+  const [localAvatarPreview, setLocalAvatarPreview] = useState<string | null>(
+    null,
+  );
 
   const getInitialFormValues = useCallback((): CustomerProfileFormValues => {
     const fromCustomer = customerDetail;
@@ -60,8 +62,7 @@ export function ProfileForm({
     return {
       fullName: fromCustomer?.fullName ?? initialData?.fullName ?? "",
       phoneNumber: fromCustomer?.phone ?? initialData?.phone ?? "",
-      profilePhotoUrl:
-        fromCustomer?.avatarUrl ?? initialData?.avatarUrl ?? "",
+      profilePhotoUrl: fromCustomer?.avatarUrl ?? initialData?.avatarUrl ?? "",
       gender:
         fromCustomer?.gender !== null && fromCustomer?.gender !== undefined
           ? Number(fromCustomer.gender)
@@ -69,12 +70,12 @@ export function ProfileForm({
             ? Number(initialData.gender)
             : null,
       dateOfBirth:
-        parseToDateInput(fromCustomer?.dateOfBirth ?? initialData?.dateOfBirth) ??
-        "",
+        parseToDateInput(
+          fromCustomer?.dateOfBirth ?? initialData?.dateOfBirth,
+        ) ?? "",
       streetAddress:
         fromCustomer?.streetAddress ?? fromInfo?.streetAddress ?? "",
-      provinceCode:
-        fromCustomer?.provinceCode ?? fromInfo?.provinceCode ?? "",
+      provinceCode: fromCustomer?.provinceCode ?? fromInfo?.provinceCode ?? "",
       wardCode: fromCustomer?.wardCode ?? fromInfo?.wardCode ?? "",
       username: initialData?.username ?? "",
       email: initialData?.email ?? "",
@@ -220,7 +221,6 @@ export function ProfileForm({
 
         <div className="w-full lg:w-[65%]">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-            {/* Section A — Cá nhân + địa chỉ */}
             <div>
               <div className="mb-4">
                 <h3 className="text-xl font-bold text-lotus-deep mb-1 font-sans">
@@ -355,7 +355,6 @@ export function ProfileForm({
               </div>
             </div>
 
-            {/* Section B — Tài khoản */}
             <div>
               <div className="mb-4">
                 <h3 className="text-xl font-bold text-lotus-deep mb-1 font-sans">

@@ -1,9 +1,8 @@
-import type { PageRequest } from '@/shared/types/common.types'
+import type { PageRequest } from "@/shared/types/common.types";
 import type { InvoiceFormValues as FormValues } from "../schemas/invoice.schema";
 
 export type InvoiceFormValues = FormValues;
 
-// ====== Hằng số trạng thái / loại (khớp backend InvoiceConst, InvoiceItemConst) ======
 export const INVOICE_STATUS = {
   DRAFT: 0,
   UNPAID: 1,
@@ -25,10 +24,8 @@ export const INVOICE_ITEM_TYPE = {
   TREATMENT_COURSE: 3,
 } as const;
 
-// 1 điểm = 1000đ (khớp InvoiceConst.POINT_VALUE_VND)
 export const POINT_VALUE_VND = 1000;
 
-// ====== DTO trả về từ API ======
 export interface InvoiceItemDto {
   id: number | null;
   invoiceId: number | null;
@@ -78,7 +75,6 @@ export interface InvoiceDto {
   items: InvoiceItemDto[] | null;
 }
 
-// ====== Payload gửi lên khi tạo hóa đơn ======
 export interface CreateInvoiceItemPayload {
   itemType: number;
   refId: number;
@@ -105,7 +101,6 @@ export interface CreateInvoicePayload {
   items: CreateInvoiceItemPayload[];
 }
 
-// ====== Query lọc danh sách ======
 export interface GetAllInvoicesQuery extends PageRequest {
   status?: number;
   customerId?: number;

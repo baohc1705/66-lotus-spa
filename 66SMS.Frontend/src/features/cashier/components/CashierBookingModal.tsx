@@ -60,7 +60,6 @@ function todayInputValue() {
   return formatDate(new Date()).format("YYYY-MM-DD");
 }
 
-/** Form nội dung — remount mỗi lần mở modal để reset state, tránh setState trong useEffect. */
 function CashierBookingForm({ onClose }: { onClose: () => void }) {
   const getEffectiveSalonId = useAuthStore((s) => s.getEffectiveSalonId);
   const defaultSalonId = getEffectiveSalonId();
@@ -146,7 +145,6 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
     return timeSlots.find((s: TimeSlotDTO) => s.slotId === slotId) ?? null;
   }, [timeSlots, slotId]);
 
-  // Slot đã chọn bị lọc (quá giờ) → coi như chưa chọn
   const effectiveSlotId = selectedTimeSlot?.slotId ?? null;
 
   const handleSelectCustomer = (c: CustomerDto) => {
@@ -331,10 +329,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
               <div className="space-y-5 max-w-3xl mx-auto">
                 <FormSection icon={User} title="Khách hàng">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <FormField
-                      label="Tìm khách hàng"
-                      className="sm:col-span-2"
-                    >
+                    <FormField label="Tìm khách hàng" className="sm:col-span-2">
                       <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-adminGray-400" />
                         <AdminInput
@@ -633,9 +628,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
 
                     <FormField label="Phòng / vị trí" className="sm:col-span-2">
                       <Select
-                        value={
-                          positionId != null ? String(positionId) : "none"
-                        }
+                        value={positionId != null ? String(positionId) : "none"}
                         onValueChange={(v) =>
                           setPositionId(v === "none" ? null : Number(v))
                         }
@@ -739,8 +732,7 @@ export function CashierBookingModal({
 }: CashierBookingModalProps) {
   const [formKey, setFormKey] = useState(0);
   const [wasOpen, setWasOpen] = useState(false);
-
-  // Remount form mỗi lần mở — reset state mà không dùng useEffect setState
+  
   if (isOpen && !wasOpen) {
     setWasOpen(true);
     setFormKey((k) => k + 1);

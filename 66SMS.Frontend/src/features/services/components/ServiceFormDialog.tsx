@@ -1,4 +1,9 @@
-﻿import { useForm, useFieldArray, Controller, type Resolver } from "react-hook-form";
+﻿import {
+  useForm,
+  useFieldArray,
+  Controller,
+  type Resolver,
+} from "react-hook-form";
 import {
   useCreateService,
   useUpdateService,
@@ -98,9 +103,7 @@ export function ServiceFormDialog({
   );
 
   const form = useForm<ServiceFormValues>({
-    resolver: zodResolver(
-      createServiceSchema,
-    ) as Resolver<ServiceFormValues>,
+    resolver: zodResolver(createServiceSchema) as Resolver<ServiceFormValues>,
     defaultValues: getDefaultValues(null),
   });
 
@@ -141,7 +144,9 @@ export function ServiceFormDialog({
     let productsCost = 0;
     if (watchProducts && watchProducts.length > 0) {
       for (const p of watchProducts) {
-        const prod = products.find((prodItem: ProductDto) => prodItem.id === p.productId);
+        const prod = products.find(
+          (prodItem: ProductDto) => prodItem.id === p.productId,
+        );
         if (prod && prod.costPrice) {
           productsCost += prod.costPrice * (p.quantityUsed || 0);
         }
@@ -275,7 +280,9 @@ export function ServiceFormDialog({
                     }
                   >
                     <AdminInput
-                      value={isEdit ? (formSource?.code ?? service?.code ?? "") : ""}
+                      value={
+                        isEdit ? (formSource?.code ?? service?.code ?? "") : ""
+                      }
                       placeholder={isEdit ? "" : "Tự động tạo"}
                       disabled
                       readOnly

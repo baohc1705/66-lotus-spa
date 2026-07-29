@@ -1,7 +1,5 @@
-/* ═══════════════════════════════════════════════════════
-   Admin Dashboard — bảng màu admin-color.md
-   Sửa giao diện admin chỉ tại file này + shell components.
-   ═══════════════════════════════════════════════════════ */
+/* Admin Dashboard — bảng màu admin-color.md
+   Sửa giao diện admin chỉ tại file này + shell components. */
 
 @layer base {
   :root {
@@ -130,7 +128,7 @@
   --input: 199 203 209;
   --ring: 47 107 79;
 
-  /* Remap lotus-* aliases → admin palette (các page CRUD dùng lotus-*) */
+  /* Remap lotus-* sang admin palette (page CRUD vẫn dùng lotus-*) */
   --lotus-primary: var(--admin-green-600);
   --lotus-secondary: var(--admin-green-200);
   --lotus-background: var(--admin-bg-page);
@@ -340,7 +338,7 @@
   .admin-nav-tab-underline {
     background: var(--admin-gold-600);
   }
-  /* Logo mark → admin gold (same as nav icons) */
+  /* Logo mark dùng admin gold (giống nav icons) */
   .logo-icon-gold {
     filter: brightness(0) saturate(100%) invert(52%) sepia(72%) saturate(650%)
       hue-rotate(8deg) brightness(95%) contrast(92%);

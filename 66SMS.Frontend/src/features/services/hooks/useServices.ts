@@ -15,9 +15,14 @@ import type {
 
 const ENTITY = "dịch vụ";
 
-export const SERVICE_KEYS = createEntityQueryKeys<PageRequest & { categoryId?: number }>("services");
+export const SERVICE_KEYS = createEntityQueryKeys<
+  PageRequest & { categoryId?: number }
+>("services");
 
-export function useServices(params: PageRequest & { categoryId?: number }, enabled = true) {
+export function useServices(
+  params: PageRequest & { categoryId?: number },
+  enabled = true,
+) {
   return useQuery({
     queryKey: SERVICE_KEYS.list(params),
     queryFn: () => serviceApi.getAll(params),
@@ -92,7 +97,9 @@ export function useUpdateService() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+      );
     },
   });
 }
@@ -147,7 +154,9 @@ export function useRestoreService() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)),
+      );
     },
   });
 }

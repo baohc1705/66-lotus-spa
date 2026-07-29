@@ -73,7 +73,10 @@ export function MembershipCardListPage() {
     onColumnVisibilityChange: setColumnVisibility,
   });
 
-  const columnLabels = useMemo(() => ({ ...MEMBERSHIP_CARD_COLUMN_LABELS }), []);
+  const columnLabels = useMemo(
+    () => ({ ...MEMBERSHIP_CARD_COLUMN_LABELS }),
+    [],
+  );
 
   return (
     <TablePageShell isFetching={isFetching} isLoading={isLoading}>

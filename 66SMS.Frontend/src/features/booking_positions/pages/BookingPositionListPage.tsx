@@ -60,10 +60,8 @@ export function BookingPositionListPage() {
     filter,
   } = listState;
 
-  // Active paginated query
   const { data: positionResult, isLoading, isFetching } = useAdminBookingPositions(queryParams);
 
-  // Global query for stat cards calculations
   const { data: allPositionsResult } = useAdminBookingPositions({
     pageIndex: 1,
     pageSize: 10000,

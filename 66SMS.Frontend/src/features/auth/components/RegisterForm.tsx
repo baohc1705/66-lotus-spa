@@ -88,13 +88,11 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-      {/* Header inside Form card */}
       <div className="text-center mb-6">
         <h3 className="text-2xl font-bold text-ink font-sans">Đăng ký</h3>
         <div className="w-12 h-[2px] bg-rose-600 mx-auto mt-2" />
       </div>
 
-      {/* Họ và tên */}
       <div className="space-y-1.5">
         <div className="relative">
           <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-warm-400 pointer-events-none w-5 h-5">
@@ -112,7 +110,6 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
         {errors.fullName && <FieldError message={errors.fullName.message} />}
       </div>
 
-      {/* Số điện thoại */}
       <div className="space-y-1.5">
         <div className="relative">
           <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-warm-400 pointer-events-none w-5 h-5">
@@ -130,7 +127,6 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
         {errors.phone && <FieldError message={errors.phone.message} />}
       </div>
 
-      {/* Tên đăng nhập */}
       <div className="space-y-1.5">
         <div className="relative">
           <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-warm-400 pointer-events-none w-5 h-5">
@@ -149,7 +145,6 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
         {errors.userName && <FieldError message={errors.userName.message} />}
       </div>
 
-      {/* Email */}
       <div className="space-y-1.5">
         <div className="relative">
           <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-warm-400 pointer-events-none w-5 h-5">
@@ -168,7 +163,6 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
         {errors.email && <FieldError message={errors.email.message} />}
       </div>
 
-      {/* Mật khẩu */}
       <div className="space-y-1.5">
         <PasswordField
           id="password"
@@ -182,7 +176,6 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
         {errors.password && <FieldError message={errors.password.message} />}
       </div>
 
-      {/* Xác nhận mật khẩu */}
       <div className="space-y-1.5">
         <PasswordField
           id="confirmPassword"
@@ -204,7 +197,6 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
         pendingLabel="Đang xử lý..."
       />
 
-      {/* Divider */}
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-warm-100" />
@@ -214,7 +206,6 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
         </div>
       </div>
 
-      {/* Login Link */}
       <div className="text-center text-xs text-warm-600">
         Đã có tài khoản?{" "}
         <Link to="/login" className="font-semibold text-rose-600 hover:text-rose-500 hover:underline transition-colors">
@@ -226,7 +217,6 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
 };
 
 
-// ─── Step 2: OTP verification ─────────────────────────────────────────────────
 
 interface OtpStepProps {
   email: string;
@@ -332,7 +322,6 @@ const OtpStep = ({ email }: OtpStepProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in" noValidate>
-      {/* Header inside Form card */}
       <div className="text-center mb-6">
         <h3 className="text-2xl font-bold text-ink font-sans">Xác thực OTP</h3>
         <div className="w-12 h-[2px] bg-rose-600 mx-auto mt-2" />
@@ -347,7 +336,6 @@ const OtpStep = ({ email }: OtpStepProps) => {
         </p>
       </div>
 
-      {/* OTP boxes */}
       <div className="flex justify-center gap-2.5" onPaste={handlePaste}>
         {otp.map((digit, i) => (
           <input
@@ -378,7 +366,6 @@ const OtpStep = ({ email }: OtpStepProps) => {
         pendingLabel="Đang xác minh..."
       />
 
-      {/* Resend */}
       <div className="text-center text-xs text-warm-600">
         {countdown > 0 ? (
           <span>
@@ -407,7 +394,6 @@ const OtpStep = ({ email }: OtpStepProps) => {
   );
 };
 
-// ─── Shared sub-components ───────────────────────────────────────────────────
 
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;

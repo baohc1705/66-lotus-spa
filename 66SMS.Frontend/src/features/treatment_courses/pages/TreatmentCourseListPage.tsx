@@ -1,5 +1,9 @@
 import { useCallback, useMemo } from "react";
-import { useReactTable, getCoreRowModel, getExpandedRowModel } from "@tanstack/react-table";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getExpandedRowModel,
+} from "@tanstack/react-table";
 import { Plus, Trash2, ArrowLeft, History } from "lucide-react";
 
 import { DataTable } from "@/shared/components/DataTable/DataTable";
@@ -74,8 +78,12 @@ export function TreatmentCourseListPage() {
   const deletedQuery = useDeletedTreatmentCourses(queryParams, showDeleted);
 
   const courseResult = showDeleted ? deletedQuery.data : activeQuery.data;
-  const isLoading = showDeleted ? deletedQuery.isLoading : activeQuery.isLoading;
-  const isFetching = showDeleted ? deletedQuery.isFetching : activeQuery.isFetching;
+  const isLoading = showDeleted
+    ? deletedQuery.isLoading
+    : activeQuery.isLoading;
+  const isFetching = showDeleted
+    ? deletedQuery.isFetching
+    : activeQuery.isFetching;
 
   const paged = courseResult?.data;
   const courses = useMemo(() => paged?.items ?? [], [paged?.items]);
@@ -160,7 +168,12 @@ export function TreatmentCourseListPage() {
         }
       },
     });
-  }, [selectedRowIds, deleteMultiplesMutation, setBulkDeleteOpen, clearSelection]);
+  }, [
+    selectedRowIds,
+    deleteMultiplesMutation,
+    setBulkDeleteOpen,
+    clearSelection,
+  ]);
 
   const handleRestore = useCallback(() => {
     if (!restoreTarget?.id) return;
@@ -171,7 +184,10 @@ export function TreatmentCourseListPage() {
     });
   }, [restoreTarget, restoreMutation, setRestoreTarget]);
 
-  const columnLabels = useMemo(() => ({ ...TREATMENT_COURSE_COLUMN_LABELS }), []);
+  const columnLabels = useMemo(
+    () => ({ ...TREATMENT_COURSE_COLUMN_LABELS }),
+    [],
+  );
 
   return (
     <TablePageShell isFetching={isFetching} isLoading={isLoading}>
@@ -319,7 +335,10 @@ export function TreatmentCourseListPage() {
         }
       />
 
-      <TreatmentCourseFormDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <TreatmentCourseFormDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+      />
 
       <TreatmentCourseFormDialog
         open={!!editTarget}

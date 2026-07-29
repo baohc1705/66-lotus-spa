@@ -106,7 +106,9 @@ export function useDeletedServiceColumns({
         header: cols.durationMins,
         cell: ({ row }) => (
           <span className="text-adminGray-600">
-            {row.original.durationMins ? `${row.original.durationMins} phút` : "—"}
+            {row.original.durationMins
+              ? `${row.original.durationMins} phút`
+              : "—"}
           </span>
         ),
         size: 100,

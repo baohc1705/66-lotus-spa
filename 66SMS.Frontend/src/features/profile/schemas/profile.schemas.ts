@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-/** Schema hồ sơ staff (admin) — chỉ thông tin cá nhân */
 export const profileSchema = z.object({
   fullName: z.string().min(1, "Họ tên không được để trống"),
   phoneNumber: z
@@ -14,7 +13,6 @@ export const profileSchema = z.object({
 
 export type ProfileFormValues = z.infer<typeof profileSchema>;
 
-/** Schema hồ sơ khách (landing) — cá nhân + địa chỉ + tài khoản đăng nhập */
 export const customerProfileSchema = z.object({
   fullName: z.string().min(1, "Họ tên không được để trống"),
   phoneNumber: z

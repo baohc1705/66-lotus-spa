@@ -69,7 +69,6 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
   const updateMutation = useUpdateStaffCertificate()
   const isPending = createMutation.isPending || updateMutation.isPending
 
-  // Ảnh scan chứng chỉ: lưu file đang chờ upload + ảnh xem trước
   const [pendingFile, setPendingFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string>('')
   const [isUploading, setIsUploading] = useState(false)
@@ -77,7 +76,6 @@ export function StaffCertificateFormDialog({ open, onOpenChange, item, staffId }
   const typesQuery = useCertificateTypes({ pageIndex: 1, pageSize: 100 })
   const types = typesQuery.data?.data?.items ?? []
 
-  // Chỉ cần chọn nhân viên khi thêm mới và không bị khóa staffId từ trang chi tiết nhân viên
   const showStaffSelect = !isEdit && !staffId
   const staffsQuery = useStaffs({ pageIndex: 1, pageSize: 100 })
   const staffs = staffsQuery.data?.data?.items ?? []

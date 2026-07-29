@@ -1,4 +1,11 @@
-import { Pencil, CreditCard, User, Crown, Calendar, CalendarClock } from "lucide-react";
+import {
+  Pencil,
+  CreditCard,
+  User,
+  Crown,
+  Calendar,
+  CalendarClock,
+} from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
@@ -51,7 +58,6 @@ export function MembershipCardDetailExpanded({
   return (
     <div className="bg-adminGray-50/30 w-full overflow-hidden p-6 border-t border-adminGray-100/50">
       <div className="flex flex-col gap-5">
-        {/* Header info */}
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-adminGold-100 flex items-center justify-center shrink-0 shadow-sm border border-adminGold-600/30">
             <CreditCard className="w-6 h-6 text-adminGold-600" />
@@ -64,7 +70,9 @@ export function MembershipCardDetailExpanded({
               Trạng thái:{" "}
               <span
                 className={
-                  card.status === 1 ? "text-adminGreen-600" : "text-state-warning-text"
+                  card.status === 1
+                    ? "text-adminGreen-600"
+                    : "text-state-warning-text"
                 }
               >
                 {STATUS_MAP[card.status] ?? "Không rõ"}
@@ -84,20 +92,21 @@ export function MembershipCardDetailExpanded({
           </PermissionGate>
         </div>
 
-        {/* Grid info */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <DetailCard
             icon={User}
             label="Khách hàng"
             value={card.customerName ?? "—"}
           />
-          <DetailCard icon={Crown} label="Loại thẻ" value={card.tierName ?? "—"} />
+          <DetailCard
+            icon={Crown}
+            label="Loại thẻ"
+            value={card.tierName ?? "—"}
+          />
           <DetailCard
             icon={Calendar}
             label="Ngày cấp"
-            value={
-              card.issuedAt ? formatDisplayDate(card.issuedAt) : "—"
-            }
+            value={card.issuedAt ? formatDisplayDate(card.issuedAt) : "—"}
           />
           <DetailCard
             icon={CalendarClock}
@@ -130,9 +139,7 @@ function DetailCard({
         <p className="text-xs font-medium text-adminGray-600 truncate mb-0.5">
           {label}
         </p>
-        <p className="text-sm font-semibold text-adminInk truncate">
-          {value}
-        </p>
+        <p className="text-sm font-semibold text-adminInk truncate">{value}</p>
       </div>
     </div>
   );

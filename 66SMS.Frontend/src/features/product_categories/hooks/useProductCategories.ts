@@ -15,7 +15,8 @@ import type {
 
 const ENTITY = "danh mục";
 
-export const PRODUCT_CATEGORY_KEYS = createEntityQueryKeys<PageRequest>("product-categories");
+export const PRODUCT_CATEGORY_KEYS =
+  createEntityQueryKeys<PageRequest>("product-categories");
 
 export function useProductCategories(params: PageRequest, enabled = true) {
   return useQuery({
@@ -71,7 +72,9 @@ export function useUpdateProductCategory() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+      );
     },
   });
 }
@@ -97,8 +100,7 @@ export function useDeleteProductCategory() {
 export function useDeleteProductCategoryMultiples() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (ids: number[]) =>
-      productCategoryApi.deleteMultiples({ ids }),
+    mutationFn: (ids: number[]) => productCategoryApi.deleteMultiples({ ids }),
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: PRODUCT_CATEGORY_KEYS.all });
@@ -138,7 +140,9 @@ export function useRestoreProductCategory() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)),
+      );
     },
   });
 }

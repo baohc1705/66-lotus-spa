@@ -1,4 +1,3 @@
-// DTO bảng lương trả về từ API
 export interface PayrollDto {
   id: number | null;
   staffId: number | null;
@@ -20,7 +19,6 @@ export interface PayrollDto {
   createdAt: string | null;
 }
 
-// Payload tính lương
 export interface GeneratePayrollPayload {
   staffId: number;
   month: number;

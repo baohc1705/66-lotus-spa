@@ -13,7 +13,10 @@ import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColu
 import { IndexCell } from "@/shared/components/DataTable/TableCells";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { formatDateTimeDisplay, formatDisplayDate } from "@/shared/utils/date.utils";
+import {
+  formatDateTimeDisplay,
+  formatDisplayDate,
+} from "@/shared/utils/date.utils";
 import { CUSTOMER_PERM } from "../constants/customer.permissions";
 import type { MembershipCardDto } from "../types/membershipCard.types";
 
@@ -188,16 +191,16 @@ export function useActiveMembershipCardColumns({
         ),
         size: 110,
       },
-      {
-        accessorKey: "updatedAt",
-        header: cols.updatedAt,
-        cell: ({ row }) => (
-          <span className="text-adminInk/80 text-sm">
-            {formatDateTimeDisplay(row.original.updatedAt)}
-          </span>
-        ),
-        size: 110,
-      },
+      // {
+      //   accessorKey: "updatedAt",
+      //   header: cols.updatedAt,
+      //   cell: ({ row }) => (
+      //     <span className="text-adminInk/80 text-sm">
+      //       {formatDateTimeDisplay(row.original.)}
+      //     </span>
+      //   ),
+      //   size: 110,
+      // },
       {
         id: "actions",
         header: "",

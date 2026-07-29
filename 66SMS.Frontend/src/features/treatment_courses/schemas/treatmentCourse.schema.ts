@@ -5,7 +5,11 @@ const itemSchema = z.object({
   serviceId: z.coerce.number().min(1, VALIDATION_MSG.selectRequired("dịch vụ")),
   sessionNumber: z.coerce.number().min(1, VALIDATION_MSG.min(1)),
   quantity: z.coerce.number().min(1, VALIDATION_MSG.min(1)),
-  note: z.string().max(500, VALIDATION_MSG.max(500)).optional().or(z.literal("")),
+  note: z
+    .string()
+    .max(500, VALIDATION_MSG.max(500))
+    .optional()
+    .or(z.literal("")),
   status: z.coerce.number().optional(),
 });
 
@@ -25,7 +29,9 @@ export const treatmentCourseSchema = z.object({
     .or(z.literal("")),
   content: z.string().optional().or(z.literal("")),
   categoryId: z.coerce.number().optional(),
-  originalPrice: z.coerce.number().min(0, VALIDATION_MSG.notNegative("Giá gốc")),
+  originalPrice: z.coerce
+    .number()
+    .min(0, VALIDATION_MSG.notNegative("Giá gốc")),
   sellingPrice: z.coerce.number().min(0, VALIDATION_MSG.notNegative("Giá bán")),
   imageUrl: z
     .string()

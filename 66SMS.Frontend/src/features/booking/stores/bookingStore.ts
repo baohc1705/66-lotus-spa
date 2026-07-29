@@ -20,7 +20,6 @@ interface BookingState {
   promotionCode: string;
   createdBookingIds: number[];
 
-  // Actions
   setStep: (step: number) => void;
   nextStep: () => void;
   prevStep: () => void;
@@ -30,7 +29,6 @@ interface BookingState {
   removeGuest: (index: number) => void;
   setActiveGuest: (index: number) => void;
 
-  // Update active guest
   updateActiveGuest: (updates: Partial<GuestBooking>) => void;
   selectService: (service: ServiceDto) => void;
   selectTechnician: (technician: TechnicianDTO | null) => void;
@@ -85,7 +83,12 @@ export const useBookingStore = create<BookingState>((set) => ({
           selectedTimeSlot: null,
           lockId: undefined,
         }));
-        return { selectedSalon: salon, guests: newGuests, appliedPromotion: null, promotionCode: "" };
+        return {
+          selectedSalon: salon,
+          guests: newGuests,
+          appliedPromotion: null,
+          promotionCode: "",
+        };
       }
       return { selectedSalon: salon };
     }),
@@ -94,18 +97,28 @@ export const useBookingStore = create<BookingState>((set) => ({
     set((state) => {
       const nextId = Math.max(0, ...state.guests.map((g) => g.id)) + 1;
       const newGuests = [...state.guests, createNewGuest(nextId)];
-      return { guests: newGuests, activeGuestIndex: newGuests.length - 1, appliedPromotion: null, promotionCode: "" };
+      return {
+        guests: newGuests,
+        activeGuestIndex: newGuests.length - 1,
+        appliedPromotion: null,
+        promotionCode: "",
+      };
     }),
 
   removeGuest: (index) =>
     set((state) => {
-      if (state.guests.length <= 1) return state; // Must have at least 1
+      if (state.guests.length <= 1) return state;
       const newGuests = state.guests.filter((_, i) => i !== index);
       let newActiveIndex = state.activeGuestIndex;
       if (newActiveIndex >= newGuests.length) {
         newActiveIndex = newGuests.length - 1;
       }
-      return { guests: newGuests, activeGuestIndex: newActiveIndex, appliedPromotion: null, promotionCode: "" };
+      return {
+        guests: newGuests,
+        activeGuestIndex: newActiveIndex,
+        appliedPromotion: null,
+        promotionCode: "",
+      };
     }),
 
   setActiveGuest: (index) => set({ activeGuestIndex: index }),
@@ -124,7 +137,6 @@ export const useBookingStore = create<BookingState>((set) => ({
     set((state) => {
       const newGuests = [...state.guests];
       newGuests[state.activeGuestIndex].selectedService = service;
-      // Reset dependent fields when service changes
       newGuests[state.activeGuestIndex].selectedTechnician = null;
       newGuests[state.activeGuestIndex].selectedTimeSlot = null;
       newGuests[state.activeGuestIndex].lockId = undefined;
@@ -143,7 +155,6 @@ export const useBookingStore = create<BookingState>((set) => ({
     set((state) => {
       const newGuests = [...state.guests];
       newGuests[state.activeGuestIndex].selectedDate = date;
-      // Reset timeslot when date changes
       newGuests[state.activeGuestIndex].selectedTimeSlot = null;
       newGuests[state.activeGuestIndex].lockId = undefined;
       return { guests: newGuests };

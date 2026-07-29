@@ -17,7 +17,8 @@ const ENTITY = "loại chứng chỉ";
 const CERTIFICATE_TYPE_KEYS = {
   all: ["certificate-types"] as const,
   lists: () => [...CERTIFICATE_TYPE_KEYS.all, "list"] as const,
-  list: (params: CertificateTypeQueryParams) => [...CERTIFICATE_TYPE_KEYS.lists(), params] as const,
+  list: (params: CertificateTypeQueryParams) =>
+    [...CERTIFICATE_TYPE_KEYS.lists(), params] as const,
   details: () => [...CERTIFICATE_TYPE_KEYS.all, "detail"] as const,
   detail: (id: number) => [...CERTIFICATE_TYPE_KEYS.details(), id] as const,
 };
@@ -59,8 +60,13 @@ export function useCreateCertificateType() {
 export function useUpdateCertificateType() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, payload }: { id: number; payload: UpdateCertificateTypePayload }) =>
-      certificateApi.updateType(id, payload),
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: number;
+      payload: UpdateCertificateTypePayload;
+    }) => certificateApi.updateType(id, payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: CERTIFICATE_TYPE_KEYS.all });
@@ -70,7 +76,9 @@ export function useUpdateCertificateType() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+      );
     },
   });
 }

@@ -17,7 +17,6 @@ export function StaffCertificateDetailExpanded({ cert, onEdit }: Props) {
   return (
     <div className="p-4 bg-adminGreen-600-light/20">
       <div className="flex flex-col lg:flex-row gap-5">
-        {/* Ảnh scan chứng chỉ */}
         <div className="w-full lg:w-[220px] shrink-0">
           {cert.documentUrl ? (
             <a
@@ -50,7 +49,6 @@ export function StaffCertificateDetailExpanded({ cert, onEdit }: Props) {
           )}
         </div>
 
-        {/* Thông tin chi tiết */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-3 mb-3">
             <div>

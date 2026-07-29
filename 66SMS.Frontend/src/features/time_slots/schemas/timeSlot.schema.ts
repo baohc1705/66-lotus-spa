@@ -3,7 +3,9 @@ import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
 const timeSlotBaseSchema = z
   .object({
-    startTime: z.string().nonempty(VALIDATION_MSG.required("Thời gian bắt đầu")),
+    startTime: z
+      .string()
+      .nonempty(VALIDATION_MSG.required("Thời gian bắt đầu")),
     endTime: z.string().nonempty(VALIDATION_MSG.required("Thời gian kết thúc")),
   })
   .refine(

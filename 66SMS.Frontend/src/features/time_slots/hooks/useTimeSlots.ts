@@ -1,6 +1,6 @@
-import type { AxiosError } from 'axios';
-import { createEntityQueryKeys } from '@/shared/utils/queryKeys';
-import { getErrorMessage } from '@/shared/utils/errorUtils';
+import type { AxiosError } from "axios";
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { timeSlotApi } from "@/features/time_slots/api/timeSlot.api";
 import type { PageRequest, Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -42,8 +42,7 @@ export function useTimeSlotDetail(id: number | null) {
 export function useCreateTimeSlot() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreateTimeSlotPayload) =>
-      timeSlotApi.create(payload),
+    mutationFn: (payload: CreateTimeSlotPayload) => timeSlotApi.create(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: TIME_SLOT_KEYS.all });
@@ -77,7 +76,9 @@ export function useUpdateTimeSlot() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+      );
     },
   });
 }

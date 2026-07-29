@@ -37,13 +37,11 @@ export function getRangeForView(
   return { from: toDateKey(start), to: toDateKey(end) };
 }
 
-/** "08:00:00" | "08:00" → "08:00" */
 export function formatSlotTime(value: string | null | undefined): string {
   if (!value) return "--:--";
   return value.slice(0, 5);
 }
 
-/** End time = Start + duration (giống lịch hẹn), fallback slotEndTime */
 export function resolveServiceEndTime(
   startTime: string | null | undefined,
   endTime: string | null | undefined,

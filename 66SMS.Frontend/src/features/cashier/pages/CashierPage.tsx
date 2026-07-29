@@ -50,7 +50,6 @@ export function CashierPage() {
 
   const salonId = getEffectiveSalonId();
 
-  // Calculate week range
   const weekStart = new Date(currentDate);
   const day = weekStart.getDay();
   const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
@@ -63,10 +62,9 @@ export function CashierPage() {
 
   const { data, isLoading, isError, error, refetch } =
     timeRange === "daily" ? dailyQuery : weeklyQuery;
-  const moveBooking = timeRange === "daily" ? dailyQuery.moveBooking : () => {}; // Weekly view might not support D&D initially
+  const moveBooking = timeRange === "daily" ? dailyQuery.moveBooking : () => {};
 
   useEffect(() => {
-    // Only admin and receptionist can access cashier page
     if (!isAdmin && !isReceptionist) {
       window.location.href = "/";
     }
@@ -124,11 +122,9 @@ export function CashierPage() {
 
   return (
     <div className="admin-dashboard-container h-screen w-full flex flex-col bg-adminGray-50 overflow-hidden font-sans text-adminInk relative">
-      {/* Decorative Background Elements for Luxury Feel */}
       <div className="absolute top-0 left-0 w-[50vw] h-[50vw] rounded-full bg-adminGreen-600/5 blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2 z-0" />
       <div className="absolute bottom-0 right-0 w-[40vw] h-[40vw] rounded-full bg-adminGold-600/5 blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3 z-0" />
 
-      {/* Standalone POS Header */}
       <CashierHeader activeTab={activeTab} onTabChange={setActiveTab} />
 
       {activeTab === "invoices" ? (
@@ -138,7 +134,6 @@ export function CashierPage() {
         />
       ) : (
         <>
-          {/* Top Toolbar */}
           <CashierToolbar
             currentDate={currentDate}
             onDateChange={setCurrentDate}
@@ -149,7 +144,6 @@ export function CashierPage() {
             onTimeRangeChange={setTimeRange}
           />
 
-          {/* Main Content Area */}
           <div className="flex-1 flex min-h-0 min-w-0 w-full overflow-hidden relative z-10 border-t border-adminGray-100">
             {isLoading ? (
               <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-sm">
@@ -210,7 +204,10 @@ export function CashierPage() {
             isPaying={isPaying}
             onPayInvoice={handlePayInvoice}
             onAssignPosition={async (bookingId, positionId) => {
-              const res = await cashierApi.assignPosition(bookingId, positionId);
+              const res = await cashierApi.assignPosition(
+                bookingId,
+                positionId,
+              );
               if (!res.isSuccess) {
                 throw new Error(res.message || "Không thể gán vị trí");
               }

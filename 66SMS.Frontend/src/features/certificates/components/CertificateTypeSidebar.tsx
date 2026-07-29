@@ -23,8 +23,7 @@ export function CertificateTypeSidebar({
     () => typesResult?.data?.items ?? [],
     [typesResult?.data?.items],
   );
-
-  // Fetch all certificates without type filter for counting
+  
   const { data: allCertsResult } = useStaffCertificates({
     pageIndex: 1,
     pageSize: 10000,
@@ -55,7 +54,6 @@ export function CertificateTypeSidebar({
 
   return (
     <aside className="w-56 shrink-0 flex flex-col h-full bg-white rounded border border-adminGray-100/60 overflow-hidden">
-      {/* Search */}
       <div className="px-3 pt-3 pb-2 shrink-0">
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-adminGray-400 pointer-events-none" />
@@ -69,9 +67,7 @@ export function CertificateTypeSidebar({
         </div>
       </div>
 
-      {/* Type list */}
       <nav className="flex-1 flex-col h-full overflow-y-auto custom-scrollbar px-2 pb-2 space-y-0.5">
-        {/* Tất cả loại */}
         <button
           type="button"
           onClick={() => onSelectType(null)}
@@ -84,7 +80,9 @@ export function CertificateTypeSidebar({
           <div className="flex items-center gap-2 min-w-0">
             <Award
               className={`w-4 h-4 shrink-0 ${
-                selectedTypeId === null ? "text-adminGreen-600" : "text-adminGray-400"
+                selectedTypeId === null
+                  ? "text-adminGreen-600"
+                  : "text-adminGray-400"
               }`}
             />
             <span className="truncate">Tất cả loại</span>
@@ -103,7 +101,10 @@ export function CertificateTypeSidebar({
         {isLoadingTypes ? (
           <div className="space-y-1 px-1 mt-1">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-7 bg-adminGray-100/50 rounded animate-pulse" />
+              <div
+                key={i}
+                className="h-7 bg-adminGray-100/50 rounded animate-pulse"
+              />
             ))}
           </div>
         ) : (

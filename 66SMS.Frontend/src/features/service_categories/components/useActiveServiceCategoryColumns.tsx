@@ -237,10 +237,7 @@ export function useActiveServiceCategoryColumns({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <PermissionGate
-                    resource={perm.resource}
-                    action={perm.update}
-                  >
+                  <PermissionGate resource={perm.resource} action={perm.update}>
                     <DropdownMenuItem onClick={() => onEdit(item)}>
                       <Pencil className="w-4 h-4" />
                       {COMMON_MSG.edit}

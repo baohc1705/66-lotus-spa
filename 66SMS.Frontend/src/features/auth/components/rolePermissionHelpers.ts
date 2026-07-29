@@ -20,7 +20,6 @@ export function getSortedActions(permissions: PermissionDTO[]): string[] {
   });
 }
 
-// dùng CSS var để inline style không bị Tailwind purge
 export const ROLE_COLORS = [
   { bg: 'var(--admin-green-600)', light: 'var(--admin-green-50)' },
   { bg: 'var(--admin-gold-700)', light: 'var(--admin-gold-100)' },

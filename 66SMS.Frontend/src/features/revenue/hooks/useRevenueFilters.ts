@@ -30,7 +30,8 @@ export function useRevenueFilters() {
   const [preset, setPreset] = useState<RevenuePreset>("7days");
   const [selectedDay, setSelectedDay] = useState(() => toYmd(today));
   const [selectedMonth, setSelectedMonth] = useState(
-    () => `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`,
+    () =>
+      `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`,
   );
   const [selectedYear, setSelectedYear] = useState(() => today.getFullYear());
 

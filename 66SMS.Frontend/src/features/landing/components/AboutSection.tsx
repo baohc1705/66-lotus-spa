@@ -40,7 +40,6 @@ export const AboutSection = () => {
       aria-labelledby="about-heading"
     >
       <div className="grid w-full lg:grid-cols-2">
-        {/* Trái: nội dung */}
         <motion.div
           className="relative flex min-h-[420px] flex-col justify-center bg-rose-600 px-8 py-12 sm:px-12 sm:py-14 lg:min-h-[560px] lg:px-16 lg:py-20 xl:px-24"
           initial={{ opacity: 0, y: 14 }}
@@ -112,7 +111,6 @@ export const AboutSection = () => {
           </div>
         </motion.div>
 
-        {/* Phải: ảnh — chỉ motion khi load */}
         <motion.div
           className="relative min-h-[320px] lg:min-h-[560px]"
           initial={{ opacity: 0, y: 14 }}

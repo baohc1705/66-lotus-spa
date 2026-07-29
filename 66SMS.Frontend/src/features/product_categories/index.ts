@@ -1,1 +1,1 @@
-export { ProductCategoryListPage } from './pages/ProductCategoryListPage'
+export { ProductCategoryListPage } from "./pages/ProductCategoryListPage";

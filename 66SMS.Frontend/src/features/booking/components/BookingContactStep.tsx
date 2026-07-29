@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Phone, Info, ArrowLeft, Loader2, Wallet } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,7 +20,7 @@ import { formatDate } from "@/shared/utils/date.utils";
 
 const DEFAULT_DEPOSIT_PERCENT = 20;
 
-export const BookingContactStep: React.FC = () => {
+export function BookingContactStep() {
   const {
     guests,
     contactInfo,
@@ -266,4 +266,4 @@ export const BookingContactStep: React.FC = () => {
       </form>
     </div>
   );
-};
+}

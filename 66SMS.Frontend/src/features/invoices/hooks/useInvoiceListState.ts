@@ -6,9 +6,10 @@ export function useInvoiceListState(salonId: number | null) {
   const [createOpen, setCreateOpen] = useState(false);
   const [cancelTarget, setCancelTarget] = useState<number | null>(null);
 
-  // Filter Sidebar State
   const [selectedStatus, setSelectedStatus] = useState<number | null>(null);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<number | null>(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
+    number | null
+  >(null);
 
   const prevSalonId = useRef(salonId);
   useEffect(() => {

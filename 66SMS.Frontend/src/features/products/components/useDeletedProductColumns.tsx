@@ -22,8 +22,6 @@ interface UseDeletedProductColumnsParams {
   onRestore: (item: ProductDto) => void;
 }
 
-
-
 export function useDeletedProductColumns({
   pageIndex,
   pageSize,

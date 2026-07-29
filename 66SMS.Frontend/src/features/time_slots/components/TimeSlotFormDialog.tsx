@@ -1,9 +1,6 @@
-﻿import { AdminInput } from '@/shared/components/forms/AdminInput';
+﻿import { AdminInput } from "@/shared/components/forms/AdminInput";
 import { useForm, type Resolver } from "react-hook-form";
-import {
-  useCreateTimeSlot,
-  useUpdateTimeSlot,
-} from "../hooks/useTimeSlots";
+import { useCreateTimeSlot, useUpdateTimeSlot } from "../hooks/useTimeSlots";
 import type { TimeSlotDTO } from "../types/time_slot.types";
 import {
   createTimeSlotSchema,
@@ -121,10 +118,7 @@ export function TimeSlotFormDialog({
                 tooltip="Chọn thời gian bắt đầu khung giờ"
                 error={errors.startTime?.message}
               >
-                <AdminInput
-                  {...register("startTime")}
-                  type="time"
-                />
+                <AdminInput {...register("startTime")} type="time" />
               </FormField>
 
               <FormField
@@ -132,10 +126,7 @@ export function TimeSlotFormDialog({
                 tooltip="Chọn thời gian kết thúc khung giờ"
                 error={errors.endTime?.message}
               >
-                <AdminInput
-                  {...register("endTime")}
-                  type="time"
-                />
+                <AdminInput {...register("endTime")} type="time" />
               </FormField>
             </div>
           </FormSection>
@@ -160,14 +151,12 @@ export function TimeSlotFormDialog({
   );
 }
 
-function getDefaultValues(
-  timeSlot?: TimeSlotDTO | null,
-): TimeSlotFormValues {
+function getDefaultValues(timeSlot?: TimeSlotDTO | null): TimeSlotFormValues {
   const sliceTime = (t?: string) => {
     if (!t) return "";
     const parts = t.split(":");
     if (parts.length >= 2) {
-      return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+      return `${parts[0].padStart(2, "0")}:${parts[1].padStart(2, "0")}`;
     }
     return t;
   };

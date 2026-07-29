@@ -1,4 +1,12 @@
-import { User, Wallet, Bell, LogOut, Calendar, Award, Lock } from "lucide-react";
+import {
+  User,
+  Wallet,
+  Bell,
+  LogOut,
+  Calendar,
+  Award,
+  Lock,
+} from "lucide-react";
 import { useLogout } from "@/features/auth/hooks/useLogout";
 
 interface ProfileSidebarProps {

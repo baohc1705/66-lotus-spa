@@ -1,12 +1,7 @@
-// Hook lọc menu sidebar theo role của user đang đăng nhập.
-// Admin luôn thấy tất cả menu, các role khác chỉ thấy menu có allowedRoles chứa role của mình.
-// Children không khai báo allowedRoles riêng sẽ kế thừa quyền từ parent.
-
 import { useMemo } from "react";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { MENU_GROUPS, type MenuGroup, type MenuItem } from "../constants/menu";
 
-/** Kiểm tra user có ít nhất 1 role nằm trong danh sách allowedRoles hay không (case-insensitive). */
 function matchesRole(userRoles: string[], allowedRoles: string[]): boolean {
   return allowedRoles.some((allowed: string) =>
     userRoles.some((r: string) => r.toLowerCase() === allowed.toLowerCase()),

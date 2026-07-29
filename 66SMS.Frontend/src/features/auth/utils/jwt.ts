@@ -21,7 +21,6 @@ export function parseJwt(token: string): Record<string, unknown> | null {
   }
 }
 
-/** Token còn hạn không (trừ buffer giây để tránh edge case sắp hết hạn). */
 export function isAccessTokenValid(token: string, bufferSeconds = 60): boolean {
   const decoded = parseJwt(token);
   if (!decoded || typeof decoded.exp !== 'number') return false;

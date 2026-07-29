@@ -15,7 +15,8 @@ import type {
 
 const ENTITY = "liệu trình";
 
-export const TREATMENT_COURSE_KEYS = createEntityQueryKeys<PageRequest>("treatment-courses");
+export const TREATMENT_COURSE_KEYS =
+  createEntityQueryKeys<PageRequest>("treatment-courses");
 
 export function useTreatmentCourses(params: PageRequest, enabled = true) {
   return useQuery({
@@ -33,7 +34,10 @@ export function useAdminTreatmentCourses(params: PageRequest, enabled = true) {
   });
 }
 
-export function useDeletedTreatmentCourses(params: PageRequest, enabled = true) {
+export function useDeletedTreatmentCourses(
+  params: PageRequest,
+  enabled = true,
+) {
   return useQuery({
     queryKey: TREATMENT_COURSE_KEYS.deletedList(params),
     queryFn: () => treatmentCourseApi.getAllDeleted(params),
@@ -87,7 +91,9 @@ export function useUpdateTreatmentCourse() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+      );
     },
   });
 }
@@ -142,7 +148,9 @@ export function useRestoreTreatmentCourse() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)),
+      );
     },
   });
 }

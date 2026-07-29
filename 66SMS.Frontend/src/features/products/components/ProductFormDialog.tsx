@@ -1,5 +1,10 @@
 ﻿import { useEffect, useState } from "react";
-import { useForm, useFieldArray, Controller, type Resolver } from "react-hook-form";
+import {
+  useForm,
+  useFieldArray,
+  Controller,
+  type Resolver,
+} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
@@ -87,9 +92,7 @@ export function ProductFormDialog({
   const categories = categoriesResult?.data?.items ?? [];
 
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(
-      createProductSchema,
-    ) as Resolver<ProductFormValues>,
+    resolver: zodResolver(createProductSchema) as Resolver<ProductFormValues>,
     defaultValues: getDefaultValues(null),
   });
 
@@ -207,9 +210,7 @@ export function ProductFormDialog({
                 >
                   <AdminInput
                     value={
-                      isEdit
-                        ? (formSource?.code ?? product?.code ?? "")
-                        : ""
+                      isEdit ? (formSource?.code ?? product?.code ?? "") : ""
                     }
                     placeholder={isEdit ? "" : "Tự động tạo"}
                     disabled
@@ -222,7 +223,10 @@ export function ProductFormDialog({
                     placeholder="Tên sản phẩm..."
                   />
                 </FormField>
-                <FormField label="Danh mục *" error={errors.categoryId?.message}>
+                <FormField
+                  label="Danh mục *"
+                  error={errors.categoryId?.message}
+                >
                   <Select
                     value={watch("categoryId")?.toString() ?? ""}
                     onValueChange={(v) => setValue("categoryId", Number(v))}
@@ -506,9 +510,7 @@ function getDefaultValues(product?: ProductFullDto | null): ProductFormValues {
       stockQuantity: product.stockQuantity ?? 0,
       minStock: product.minStock ?? 0,
       status:
-        product.status != null
-          ? Number(product.status)
-          : StatusActive.Active,
+        product.status != null ? Number(product.status) : StatusActive.Active,
       images:
         product.images?.map((img) => ({
           id: img.id,

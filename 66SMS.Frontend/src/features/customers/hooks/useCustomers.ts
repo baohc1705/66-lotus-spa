@@ -1,5 +1,5 @@
-import { createEntityQueryKeys } from '@/shared/utils/queryKeys';
-import { getErrorMessage } from '@/shared/utils/errorUtils';
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
@@ -17,7 +17,6 @@ const ENTITY = "khách hàng";
 
 export const CUSTOMER_KEYS = createEntityQueryKeys<PageRequest>("customers");
 
-/** Hook lấy danh sách khách hàng (phân trang, search, sort) */
 export function useCustomers(params: PageRequest) {
   return useQuery({
     queryKey: CUSTOMER_KEYS.list(params),
@@ -25,7 +24,6 @@ export function useCustomers(params: PageRequest) {
   });
 }
 
-/** Hook lấy chi tiết khách hàng */
 export function useCustomerDetail(id: number | null) {
   return useQuery({
     queryKey: CUSTOMER_KEYS.detail(id!),
@@ -34,7 +32,6 @@ export function useCustomerDetail(id: number | null) {
   });
 }
 
-/** Hook tạo khách hàng mới */
 export function useCreateCustomer() {
   const qc = useQueryClient();
   return useMutation({
@@ -53,7 +50,6 @@ export function useCreateCustomer() {
   });
 }
 
-/** Hook cập nhật khách hàng */
 export function useUpdateCustomer() {
   const qc = useQueryClient();
   return useMutation({
@@ -73,12 +69,13 @@ export function useUpdateCustomer() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+      );
     },
   });
 }
 
-/** Hook xóa khách hàng */
 export function useDeleteCustomer() {
   const qc = useQueryClient();
   return useMutation({
@@ -97,7 +94,6 @@ export function useDeleteCustomer() {
   });
 }
 
-/** Hook khôi phục khách hàng */
 export function useRestoreCustomer() {
   const qc = useQueryClient();
   return useMutation({
@@ -112,7 +108,9 @@ export function useRestoreCustomer() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("khôi phục", ENTITY)),
+      );
     },
   });
 }

@@ -17,7 +17,10 @@ import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
 const ENTITY = "nhân viên";
 const STAFF_SERVICE_ENTITY = "phân công dịch vụ";
 
-type StaffParams = PageRequest & { salonId?: number | null; role?: string | null };
+type StaffParams = PageRequest & {
+  salonId?: number | null;
+  role?: string | null;
+};
 type StaffServiceParams = PageRequest & {
   staffId?: number | null;
   serviceId?: number | null;
@@ -32,10 +35,7 @@ export const STAFF_SERVICE_KEYS = {
     [...STAFF_SERVICE_KEYS.lists(), params] as const,
 };
 
-export function useStaffs(
-  params: StaffParams,
-  enabled = true
-) {
+export function useStaffs(params: StaffParams, enabled = true) {
   return useQuery({
     queryKey: STAFF_KEYS.list(params),
     queryFn: () => staffApi.getAll(params),
@@ -43,10 +43,7 @@ export function useStaffs(
   });
 }
 
-export function useAdminStaffs(
-  params: StaffParams,
-  enabled = true
-) {
+export function useAdminStaffs(params: StaffParams, enabled = true) {
   return useQuery({
     queryKey: STAFF_KEYS.adminList(params),
     queryFn: () => staffApi.adminGetAll(params),
@@ -68,7 +65,7 @@ export function useCreateStaffMutation() {
     mutationFn: (payload: CreateStaffPayload) => staffApi.create(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: STAFF_KEYS.all});
+        qc.invalidateQueries({ queryKey: STAFF_KEYS.all });
         toast.success(TOAST_MSG.createSuccess(ENTITY));
       } else {
         toast.error(result.message || COMMON_MSG.error);
@@ -83,8 +80,13 @@ export function useCreateStaffMutation() {
 export function useUpdateStaffMutation() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, payload }: { id: number; payload: UpdateStaffPayload }) =>
-      staffApi.update(id, payload),
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: number;
+      payload: UpdateStaffPayload;
+    }) => staffApi.update(id, payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: STAFF_KEYS.all });
@@ -94,7 +96,9 @@ export function useUpdateStaffMutation() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)));
+      toast.error(
+        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+      );
     },
   });
 }
@@ -117,10 +121,7 @@ export function useDeleteStaffMutation() {
   });
 }
 
-export function useStaffServices(
-  params: StaffServiceParams,
-  enabled = true,
-) {
+export function useStaffServices(params: StaffServiceParams, enabled = true) {
   return useQuery({
     queryKey: STAFF_SERVICE_KEYS.list(params),
     queryFn: () => staffApi.getStaffServices(params),
@@ -143,7 +144,10 @@ export function useCreateStaffServicesMutation() {
     },
     onError: (error: AxiosError<Result<unknown>>) => {
       toast.error(
-        getErrorMessage(error, TOAST_MSG.actionError("phân công", STAFF_SERVICE_ENTITY)),
+        getErrorMessage(
+          error,
+          TOAST_MSG.actionError("phân công", STAFF_SERVICE_ENTITY),
+        ),
       );
     },
   });
@@ -169,7 +173,10 @@ export function useUpdateStaffServiceMutation() {
     },
     onError: (error: AxiosError<Result<unknown>>) => {
       toast.error(
-        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", STAFF_SERVICE_ENTITY)),
+        getErrorMessage(
+          error,
+          TOAST_MSG.actionError("cập nhật", STAFF_SERVICE_ENTITY),
+        ),
       );
     },
   });
@@ -189,7 +196,10 @@ export function useDeleteStaffServicesMutation() {
     },
     onError: (error: AxiosError<Result<unknown>>) => {
       toast.error(
-        getErrorMessage(error, TOAST_MSG.actionError("gỡ", STAFF_SERVICE_ENTITY)),
+        getErrorMessage(
+          error,
+          TOAST_MSG.actionError("gỡ", STAFF_SERVICE_ENTITY),
+        ),
       );
     },
   });

@@ -58,7 +58,10 @@ export const ServicesSection = () => {
       >
         <div className="absolute inset-0 bg-gradient-to-br from-page via-rose-50/40 to-gold-100/30" />
 
-        <motion.div style={{ y: bgY }} className="absolute inset-0 opacity-[0.07]">
+        <motion.div
+          style={{ y: bgY }}
+          className="absolute inset-0 opacity-[0.07]"
+        >
           <div
             className="h-full w-full"
             style={{

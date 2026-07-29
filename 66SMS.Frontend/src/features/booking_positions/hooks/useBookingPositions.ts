@@ -51,7 +51,6 @@ export function useCreateBookingPosition() {
       bookingPositionApi.create(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        // Phải dùng `.all` — list page dùng adminList, không khớp với lists().
         qc.invalidateQueries({ queryKey: BOOKING_POSITION_KEYS.all });
         qc.invalidateQueries({ queryKey: ["booking-rooms"] });
         toast.success(TOAST_MSG.createSuccess(ENTITY));

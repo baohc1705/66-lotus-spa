@@ -1,1 +1,1 @@
-export { ShiftListPage } from './pages/ShiftListPage'
+export { ShiftListPage } from "./pages/ShiftListPage";

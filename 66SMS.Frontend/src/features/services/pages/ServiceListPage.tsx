@@ -91,7 +91,9 @@ export function ServiceListPage() {
   );
 
   const serviceResult = showDeleted ? deletedQuery.data : activeQuery.data;
-  const isLoading = showDeleted ? deletedQuery.isLoading : activeQuery.isLoading;
+  const isLoading = showDeleted
+    ? deletedQuery.isLoading
+    : activeQuery.isLoading;
   const isFetching = showDeleted
     ? deletedQuery.isFetching
     : activeQuery.isFetching;
@@ -100,7 +102,6 @@ export function ServiceListPage() {
   const services = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
 
-  // Stat card calculations
   const activeServiceCount = useMemo(
     () =>
       services.filter((s: ServiceDto) => s.status === StatusActive.Active)
@@ -109,8 +110,7 @@ export function ServiceListPage() {
   );
 
   const servicesWithImage = useMemo(
-    () =>
-      services.filter((s: ServiceDto) => !!s.imageUrl).length,
+    () => services.filter((s: ServiceDto) => !!s.imageUrl).length,
     [services],
   );
 
@@ -231,7 +231,6 @@ export function ServiceListPage() {
 
   return (
     <div className="flex h-full overflow-hidden gap-2">
-      {/* Sidebar danh mục */}
       {!isSidebarMode && (
         <ServiceCategorySidebar
           selectedCategoryId={selectedCategoryId}
@@ -240,9 +239,7 @@ export function ServiceListPage() {
         />
       )}
 
-      {/* Right: Stats + Table */}
       <div className="flex-1 min-w-0 flex flex-col gap-2 overflow-hidden">
-        {/* Stats row */}
         <div className="shrink-0">
           <ServiceStatCards
             totalServices={totalCount}
@@ -253,21 +250,18 @@ export function ServiceListPage() {
           />
         </div>
 
-        {/* Table card */}
         <motion.div
           initial="hidden"
           animate="visible"
           variants={containerVariants}
           className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative"
         >
-          {/* Fetching bar */}
           {isFetching && !isLoading && (
             <div className="lotus-admin-table-fetch-bar">
               <div className="lotus-admin-table-fetch-bar-inner" />
             </div>
           )}
 
-          {/* Toolbar */}
           <div className="px-4 pt-3 shrink-0">
             <DataTableToolbar
               searchValue={filter}
@@ -349,7 +343,6 @@ export function ServiceListPage() {
             </DataTableToolbar>
           </div>
 
-          {/* Table */}
           <DataTable
             table={table}
             isLoading={isLoading}
@@ -418,7 +411,6 @@ export function ServiceListPage() {
         </motion.div>
       </div>
 
-      {/* Dialogs */}
       <ServiceFormDialog open={createOpen} onOpenChange={setCreateOpen} />
 
       <ServiceFormDialog

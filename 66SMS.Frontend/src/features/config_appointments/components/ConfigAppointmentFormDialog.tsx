@@ -173,10 +173,7 @@ export function ConfigAppointmentFormDialog({
               )}
 
               {isEdit && (
-                <FormField
-                  label="Chi nhánh"
-                  className="sm:col-span-2"
-                >
+                <FormField label="Chi nhánh" className="sm:col-span-2">
                   <AdminInput
                     value={configAppointment?.salonName ?? ""}
                     disabled

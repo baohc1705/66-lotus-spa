@@ -1,4 +1,3 @@
-/** Khớp AppointmentConst trên backend. */
 export const APPOINTMENT_STATUS = {
   PENDING: 1,
   CONFIRMED: 2,
@@ -8,8 +7,7 @@ export const APPOINTMENT_STATUS = {
   CANCELLED: 6,
   NO_SHOW: 9,
 } as const;
-
-/** Nhãn hiển thị — khớp trạng thái Appointment đang dùng trong app. */
+  
 export const APPOINTMENT_STATUS_LABELS: Record<number, string> = {
   [APPOINTMENT_STATUS.PENDING]: "Chờ xác nhận",
   [APPOINTMENT_STATUS.CONFIRMED]: "Chờ cọc",
@@ -20,7 +18,6 @@ export const APPOINTMENT_STATUS_LABELS: Record<number, string> = {
   [APPOINTMENT_STATUS.NO_SHOW]: "Không đến",
 };
 
-/** Class màu chấm trạng thái (token status-* của app). */
 export const APPOINTMENT_STATUS_DOT_CLASS: Record<number, string> = {
   [APPOINTMENT_STATUS.PENDING]: "bg-status-pending",
   [APPOINTMENT_STATUS.CONFIRMED]: "bg-status-confirmed",

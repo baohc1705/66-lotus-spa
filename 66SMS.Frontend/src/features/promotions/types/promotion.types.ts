@@ -8,7 +8,6 @@ export type CreatePromotionPayload = CreatePayload;
 export type UpdatePromotionPayload = UpdatePayload;
 export type PromotionFormValues = FormValues;
 
-// DTO trả về từ API (match backend PromotionDto.cs)
 export interface PromotionDto {
   id: number | null;
   code: string | null;

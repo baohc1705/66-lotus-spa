@@ -11,7 +11,6 @@ export function useCustomerListState() {
   const [deleteTarget, setDeleteTarget] = useState<CustomerDto | null>(null);
   const [restoreTarget, setRestoreTarget] = useState<CustomerDto | null>(null);
 
-  // Filter Sidebar states
   const [selectedGender, setSelectedGender] = useState<number | null>(null);
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
 
@@ -52,4 +51,3 @@ export function useCustomerListState() {
     setSelectedSource,
   };
 }
-

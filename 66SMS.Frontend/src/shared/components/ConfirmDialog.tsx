@@ -21,20 +21,6 @@ interface ConfirmDialogProps {
   variant?: 'danger' | 'warning' | 'default'
 }
 
-/**
- * ConfirmDialog - Dialog xác nhận reusable cho delete/destructive operations
- *
- * @example
- * <ConfirmDialog
- *   open={deleteOpen}
- *   onOpenChange={setDeleteOpen}
- *   onConfirm={() => deleteMutation.mutate(id)}
- *   title="Xóa nhân viên"
- *   description="Bạn có chắc muốn xóa nhân viên này? Hành động không thể hoàn tác."
- *   loading={deleteMutation.isPending}
- *   variant="danger"
- * />
- */
 export function ConfirmDialog({
   open,
   onOpenChange,

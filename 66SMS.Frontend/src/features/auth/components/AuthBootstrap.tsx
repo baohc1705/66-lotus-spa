@@ -3,12 +3,6 @@ import { authApi } from '@/features/auth/api/authApi';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import { isAccessTokenValid } from '@/features/auth/utils/jwt';
 
-/**
- * Bootstrap phiên đăng nhập:
- * 1. Token còn hạn trong sessionStorage → dùng luôn, KHÔNG gọi API
- * 2. Token hết hạn / không có → gọi refresh 1 lần (cookie)
- * 3. Refresh fail → clearAuth (khách)
- */
 export function AuthBootstrap({ children }: { children: React.ReactNode }) {
   const setSession = useAuthStore((s) => s.setSession);
   const clearAuth = useAuthStore((s) => s.clearAuth);
@@ -19,7 +13,6 @@ export function AuthBootstrap({ children }: { children: React.ReactNode }) {
     let cancelled = false;
 
     async function bootstrap() {
-      // Đợi zustand đọc xong sessionStorage
       await useAuthStore.persist.rehydrate();
       if (cancelled) return;
 
@@ -29,7 +22,6 @@ export function AuthBootstrap({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Token hết hạn hoặc chưa có → thử refresh 1 lần
       try {
         const result = await authApi.refreshToken('');
         if (cancelled) return;

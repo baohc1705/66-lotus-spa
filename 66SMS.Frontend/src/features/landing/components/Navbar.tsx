@@ -42,7 +42,6 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "nav--scrolled h-[68px]" : alwaysDark ? "nav--scrolled h-[68px]" : "bg-transparent h-[80px]"}`}
       >
         <div className="landing-container h-full flex items-center justify-between">
-          {/* Logo */}
           <a
             href="/"
             className="flex items-center gap-3 select-none group cursor-pointer"
@@ -69,7 +68,6 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
             </div>
           </a>
 
-          {/* Desktop Nav — tab style per color.md */}
           <div className="hidden lg:flex items-center gap-8">
             {NAV_ITEMS.map((item) => (
               <a
@@ -85,7 +83,6 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
             ))}
           </div>
 
-          {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3">
             <a
               href="tel:0337779999"
@@ -140,7 +137,6 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
             </Button>
           </div>
 
-          {/* Mobile Hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className={`lg:hidden p-2 transition-colors ${isDark ? "text-ink" : "text-white"}`}
@@ -155,7 +151,6 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
         </div>
       </nav>
 
-      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div

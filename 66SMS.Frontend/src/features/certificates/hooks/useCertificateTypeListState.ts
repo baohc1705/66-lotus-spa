@@ -20,4 +20,6 @@ export function useCertificateTypeListState() {
     setDeleteTarget,
   };
 }
-export type CertificateTypeListState = ReturnType<typeof useCertificateTypeListState>;
+export type CertificateTypeListState = ReturnType<
+  typeof useCertificateTypeListState
+>;

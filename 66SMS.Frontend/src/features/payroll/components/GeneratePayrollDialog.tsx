@@ -1,4 +1,4 @@
-import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
+import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,14 +35,23 @@ interface GeneratePayrollDialogProps {
 
 const now = new Date();
 
-export function GeneratePayrollDialog({ open, onOpenChange }: GeneratePayrollDialogProps) {
+export function GeneratePayrollDialog({
+  open,
+  onOpenChange,
+}: GeneratePayrollDialogProps) {
   const generateMutation = useGeneratePayroll();
   const salonId = useAuthStore((s) => s.getEffectiveSalonId());
-  const { data: staffsResult } = useAdminStaffs({ pageIndex: 1, pageSize: 200, salonId });
+  const { data: staffsResult } = useAdminStaffs({
+    pageIndex: 1,
+    pageSize: 200,
+    salonId,
+  });
   const staffs = staffsResult?.data?.items ?? [];
 
   const form = useForm<GeneratePayrollFormData>({
-    resolver: zodResolver(generatePayrollSchema) as Resolver<GeneratePayrollFormData>,
+    resolver: zodResolver(
+      generatePayrollSchema,
+    ) as Resolver<GeneratePayrollFormData>,
     defaultValues: {
       staffId: 0,
       month: now.getMonth() + 1,
@@ -61,7 +70,12 @@ export function GeneratePayrollDialog({ open, onOpenChange }: GeneratePayrollDia
 
   useEffect(() => {
     if (open) {
-      reset({ staffId: 0, month: now.getMonth() + 1, year: now.getFullYear(), excludeSaturday: true });
+      reset({
+        staffId: 0,
+        month: now.getMonth() + 1,
+        year: now.getFullYear(),
+        excludeSaturday: true,
+      });
     }
   }, [open, reset]);
 
@@ -146,7 +160,9 @@ export function GeneratePayrollDialog({ open, onOpenChange }: GeneratePayrollDia
             <Checkbox
               id="excludeSaturday"
               checked={watch("excludeSaturday") ?? true}
-              onCheckedChange={(checked) => setValue("excludeSaturday", checked === true)}
+              onCheckedChange={(checked) =>
+                setValue("excludeSaturday", checked === true)
+              }
             />
             <Label htmlFor="excludeSaturday" className="text-sm cursor-pointer">
               Trừ cả Thứ 7 khi tính ngày công chuẩn (chỉ giữ T2–T6)
@@ -163,7 +179,12 @@ export function GeneratePayrollDialog({ open, onOpenChange }: GeneratePayrollDia
             >
               Hủy
             </Button>
-            <Button type="submit" variant="admin" size="sm" loading={generateMutation.isPending}>
+            <Button
+              type="submit"
+              variant="admin"
+              size="sm"
+              loading={generateMutation.isPending}
+            >
               Tính lương
             </Button>
           </DialogFooter>
@@ -188,7 +209,9 @@ function FormField({
     <div className={`space-y-1 ${className ?? ""}`}>
       <Label className="text-xs font-semibold text-adminInk/80">{label}</Label>
       {children}
-      {error && <p className="text-xs text-state-danger-text font-medium">{error}</p>}
+      {error && (
+        <p className="text-xs text-state-danger-text font-medium">{error}</p>
+      )}
     </div>
   );
 }

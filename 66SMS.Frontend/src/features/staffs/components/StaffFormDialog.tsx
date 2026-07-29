@@ -24,18 +24,22 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { SearchableSelect } from "@/shared/components/ui/searchable-select";
-import { useCreateStaffMutation, useUpdateStaffMutation, useStaffDetail } from "../hooks/useStaffs";
+import {
+  useCreateStaffMutation,
+  useUpdateStaffMutation,
+  useStaffDetail,
+} from "../hooks/useStaffs";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { ImageUpload } from "@/shared/components/ImageUpload";
 import {
   useProvinces,
   useWardsByProvince,
 } from "@/features/address/hooks/useAddress";
-import type { ProvinceDto, WardDto } from "@/features/address/types/address.types";
-import {
-  createStaffSchema,
-  updateStaffSchema,
-} from "../schemas/staff.schema";
+import type {
+  ProvinceDto,
+  WardDto,
+} from "@/features/address/types/address.types";
+import { createStaffSchema, updateStaffSchema } from "../schemas/staff.schema";
 import type {
   StaffDto,
   StaffFullDto,
@@ -52,7 +56,6 @@ import { useSalons } from "@/features/salons/hooks/useSalons";
 interface StaffFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** List hoặc detail — form sẽ load GetDetail khi sửa */
   staff?: StaffDto | StaffFullDto | null;
 }
 
@@ -145,9 +148,8 @@ export function StaffFormDialog({
           (p: ProvinceDto) => p.code === data.provinceCode,
         )?.name ?? "";
       const wardName =
-        wardsQuery.data?.data?.find(
-          (w: WardDto) => w.code === data.wardCode,
-        )?.name ?? "";
+        wardsQuery.data?.data?.find((w: WardDto) => w.code === data.wardCode)
+          ?.name ?? "";
       const parts = [data.streetAddress, wardName, provinceName].filter(
         Boolean,
       );
@@ -171,7 +173,6 @@ export function StaffFormDialog({
         role: data.role,
       };
 
-      // AvatarUrl trên API = base64 khi có ảnh mới
       if (avatarBase64) {
         payload.avatarUrl = avatarBase64;
       }
@@ -216,287 +217,278 @@ export function StaffFormDialog({
             Đang tải thông tin nhân viên...
           </div>
         ) : (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* === Section: Thông tin cá nhân === */}
-          <FormSection icon={User} title="Thông tin cá nhân">
-            <div className="mb-5">
-              <ImageUpload
-                value={avatarUrl || staff?.avatarUrl}
-                onFileChange={setPendingFile}
-                label="Đổi ảnh đại diện"
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <FormField
-                label="Họ tên *"
-                tooltip="Vui lòng nhập họ và tên đầy đủ của nhân viên"
-                error={errors.fullName?.message}
-              >
-                <AdminInput
-                  {...register("fullName")}
-                  placeholder="Nguyễn Văn A"
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <FormSection icon={User} title="Thông tin cá nhân">
+              <div className="mb-5">
+                <ImageUpload
+                  value={avatarUrl || staff?.avatarUrl}
+                  onFileChange={setPendingFile}
+                  label="Đổi ảnh đại diện"
                 />
-              </FormField>
-              <FormField
-                label="Số điện thoại *"
-                tooltip="Số điện thoại phải có 10 chữ số"
-                error={errors.phone?.message}
-              >
-                <AdminInput
-                  {...register("phone")}
-                  placeholder="0901234567"
-                />
-              </FormField>
-              <FormField label="Ngày sinh" error={errors.dateOfBirth?.message}>
-                <AdminInput
-                  {...register("dateOfBirth")}
-                  type="date"
-                />
-              </FormField>
-              <FormField label="Giới tính">
-                <Select
-                  value={watch("gender")?.toString() ?? ""}
-                  onValueChange={(v) => setValue("gender", Number(v))}
-                >
-                  <AdminSelectTrigger>
-                    <SelectValue placeholder="Chọn giới tính" />
-                  </AdminSelectTrigger>
-                  <SelectContent>
-                    {GENDER_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-              <FormField label="CMND/CCCD" error={errors.nationalId?.message}>
-                <AdminInput
-                  {...register("nationalId")}
-                  placeholder="012345678901"
-                />
-              </FormField>
-              <FormField
-                label="Tỉnh/Thành phố"
-                error={errors.provinceCode?.message}
-              >
-                <SearchableSelect
-                  value={watch("provinceCode") ?? ""}
-                  onValueChange={(v) => {
-                    setValue("provinceCode", v);
-                    setValue("wardCode", "");
-                  }}
-                  options={(provincesQuery.data?.data ?? []).map((p) => ({
-                    value: p.code ?? "",
-                    label: p.name ?? "",
-                  }))}
-                  placeholder="Chọn tỉnh/thành phố"
-                  searchPlaceholder="Tìm tỉnh/thành phố..."
-                />
-              </FormField>
-              <FormField label="Phường/Xã" error={errors.wardCode?.message}>
-                <SearchableSelect
-                  value={watch("wardCode") ?? ""}
-                  onValueChange={(v) => setValue("wardCode", v)}
-                  options={(wardsQuery.data?.data ?? []).map((w) => ({
-                    value: w.code ?? "",
-                    label: w.name ?? "",
-                  }))}
-                  placeholder="Chọn phường/xã"
-                  searchPlaceholder="Tìm phường/xã..."
-                  disabled={!watch("provinceCode") || wardsQuery.isLoading}
-                />
-              </FormField>
-              <FormField
-                label="Số nhà, tên đường"
-                error={errors.streetAddress?.message}
-                className="sm:col-span-2"
-              >
-                <AdminInput
-                  {...register("streetAddress")}
-                  placeholder="123 Đường ABC"
-                />
-              </FormField>
-            </div>
-          </FormSection>
-
-          {/* === Section: Thông tin công việc === */}
-          <FormSection icon={Briefcase} title="Thông tin công việc">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <FormField
-                label="Chi nhánh *"
-                tooltip="Chọn chi nhánh mà nhân viên này thuộc về"
-                error={
-                  (errors as Record<string, { message?: string }>).salonId
-                    ?.message
-                }
-              >
-                <Select
-                  value={watch("salonId")?.toString() ?? ""}
-                  onValueChange={(v) => setValue("salonId", Number(v))}
-                  disabled={salonsResult === undefined}
-                >
-                  <AdminSelectTrigger>
-                    <SelectValue
-                      placeholder={
-                        salonsResult === undefined
-                          ? "Đang tải chi nhánh..."
-                          : salons.length === 0
-                            ? "Không có chi nhánh"
-                            : "Chọn chi nhánh..."
-                      }
-                    />
-                  </AdminSelectTrigger>
-                  <SelectContent>
-                    {salons.map((s) => (
-                      <SelectItem key={s.id} value={String(s.id)}>
-                        {s.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-              <FormField label="Ngày vào làm" error={errors.hireDate?.message}>
-                <AdminInput
-                  {...register("hireDate")}
-                  type="date"
-                />
-              </FormField>
-              <FormField label="Loại hợp đồng">
-                <Select
-                  value={watch("contractType") ?? ""}
-                  onValueChange={(v) => setValue("contractType", v)}
-                >
-                  <AdminSelectTrigger>
-                    <SelectValue placeholder="Chọn loại HĐ" />
-                  </AdminSelectTrigger>
-                  <SelectContent>
-                    {CONTRACT_TYPE_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-              <FormField label="Loại lương">
-                <Select
-                  value={watch("salaryType")?.toString() ?? "2"}
-                  onValueChange={(v) => setValue("salaryType", Number(v))}
-                >
-                  <AdminSelectTrigger>
-                    <SelectValue placeholder="Chọn loại lương" />
-                  </AdminSelectTrigger>
-                  <SelectContent>
-                    {SALARY_TYPE_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-              <FormField
-                label="Đơn giá (theo giờ/ngày tùy loại lương)"
-                error={errors.basicSalary?.message}
-              >
-                <AdminInput
-                  {...register("basicSalary")}
-                  type="number"
-                  placeholder="10000000"
-                />
-              </FormField>
-              <FormField label="Trạng thái">
-                <Select
-                  value={watch("status")?.toString() ?? "1"}
-                  onValueChange={(v) => setValue("status", Number(v))}
-                >
-                  <AdminSelectTrigger>
-                    <SelectValue placeholder="Chọn trạng thái" />
-                  </AdminSelectTrigger>
-                  <SelectContent>
-                    {STATUS_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-              <FormField label="Vai trò *" error={errors.role?.message}>
-                <Select
-                  value={watch("role") ?? ""}
-                  onValueChange={(v) => setValue("role", v)}
-                  disabled={rolesResult === undefined}
-                >
-                  <AdminSelectTrigger>
-                    <SelectValue
-                      placeholder={
-                        rolesResult === undefined
-                          ? "Đang tải vai trò..."
-                          : roles.length === 0
-                            ? "Không có vai trò"
-                            : "Chọn vai trò..."
-                      }
-                    />
-                  </AdminSelectTrigger>
-                  <SelectContent>
-                    {roles.map((r) => (
-                      <SelectItem key={r.id} value={r.code || r.name}>
-                        {r.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-            </div>
-          </FormSection>
-
-          {/* KPI section removed */}
-
-          {!isEdit && (
-            <div className="p-3.5 bg-adminGreen-50 border border-adminGreen-600/10 rounded-lg text-adminInk/80 text-xs flex items-start gap-2.5">
-              <KeyRound className="w-4 h-4 text-adminGreen-600 mt-0.5 shrink-0" />
-              <div>
-                <p className="font-semibold text-adminInk">
-                  Tài khoản đăng nhập tự động
-                </p>
-                <p className="text-adminGray-600 mt-0.5">
-                  Tài khoản (Tên đăng nhập & Mật khẩu mặc định) sẽ được hệ thống
-                  tạo tự động dựa trên mã nhân viên sau khi bạn nhấn nút tạo
-                  mới.
-                </p>
               </div>
-            </div>
-          )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <FormField
+                  label="Họ tên *"
+                  tooltip="Vui lòng nhập họ và tên đầy đủ của nhân viên"
+                  error={errors.fullName?.message}
+                >
+                  <AdminInput
+                    {...register("fullName")}
+                    placeholder="Nguyễn Văn A"
+                  />
+                </FormField>
+                <FormField
+                  label="Số điện thoại *"
+                  tooltip="Số điện thoại phải có 10 chữ số"
+                  error={errors.phone?.message}
+                >
+                  <AdminInput {...register("phone")} placeholder="0901234567" />
+                </FormField>
+                <FormField
+                  label="Ngày sinh"
+                  error={errors.dateOfBirth?.message}
+                >
+                  <AdminInput {...register("dateOfBirth")} type="date" />
+                </FormField>
+                <FormField label="Giới tính">
+                  <Select
+                    value={watch("gender")?.toString() ?? ""}
+                    onValueChange={(v) => setValue("gender", Number(v))}
+                  >
+                    <AdminSelectTrigger>
+                      <SelectValue placeholder="Chọn giới tính" />
+                    </AdminSelectTrigger>
+                    <SelectContent>
+                      {GENDER_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+                <FormField label="CMND/CCCD" error={errors.nationalId?.message}>
+                  <AdminInput
+                    {...register("nationalId")}
+                    placeholder="012345678901"
+                  />
+                </FormField>
+                <FormField
+                  label="Tỉnh/Thành phố"
+                  error={errors.provinceCode?.message}
+                >
+                  <SearchableSelect
+                    value={watch("provinceCode") ?? ""}
+                    onValueChange={(v) => {
+                      setValue("provinceCode", v);
+                      setValue("wardCode", "");
+                    }}
+                    options={(provincesQuery.data?.data ?? []).map((p) => ({
+                      value: p.code ?? "",
+                      label: p.name ?? "",
+                    }))}
+                    placeholder="Chọn tỉnh/thành phố"
+                    searchPlaceholder="Tìm tỉnh/thành phố..."
+                  />
+                </FormField>
+                <FormField label="Phường/Xã" error={errors.wardCode?.message}>
+                  <SearchableSelect
+                    value={watch("wardCode") ?? ""}
+                    onValueChange={(v) => setValue("wardCode", v)}
+                    options={(wardsQuery.data?.data ?? []).map((w) => ({
+                      value: w.code ?? "",
+                      label: w.name ?? "",
+                    }))}
+                    placeholder="Chọn phường/xã"
+                    searchPlaceholder="Tìm phường/xã..."
+                    disabled={!watch("provinceCode") || wardsQuery.isLoading}
+                  />
+                </FormField>
+                <FormField
+                  label="Số nhà, tên đường"
+                  error={errors.streetAddress?.message}
+                  className="sm:col-span-2"
+                >
+                  <AdminInput
+                    {...register("streetAddress")}
+                    placeholder="123 Đường ABC"
+                  />
+                </FormField>
+              </div>
+            </FormSection>
 
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
-            >
-              Hủy
-            </Button>
-            <Button
-              type="submit"
-              variant="admin"
-              size="sm"
-              loading={isPending || isUploading}
-            >
-              {isEdit ? "Cập nhật" : "Tạo nhân viên"}
-            </Button>
-          </DialogFooter>
-        </form>
+            <FormSection icon={Briefcase} title="Thông tin công việc">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <FormField
+                  label="Chi nhánh *"
+                  tooltip="Chọn chi nhánh mà nhân viên này thuộc về"
+                  error={
+                    (errors as Record<string, { message?: string }>).salonId
+                      ?.message
+                  }
+                >
+                  <Select
+                    value={watch("salonId")?.toString() ?? ""}
+                    onValueChange={(v) => setValue("salonId", Number(v))}
+                    disabled={salonsResult === undefined}
+                  >
+                    <AdminSelectTrigger>
+                      <SelectValue
+                        placeholder={
+                          salonsResult === undefined
+                            ? "Đang tải chi nhánh..."
+                            : salons.length === 0
+                              ? "Không có chi nhánh"
+                              : "Chọn chi nhánh..."
+                        }
+                      />
+                    </AdminSelectTrigger>
+                    <SelectContent>
+                      {salons.map((s) => (
+                        <SelectItem key={s.id} value={String(s.id)}>
+                          {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+                <FormField
+                  label="Ngày vào làm"
+                  error={errors.hireDate?.message}
+                >
+                  <AdminInput {...register("hireDate")} type="date" />
+                </FormField>
+                <FormField label="Loại hợp đồng">
+                  <Select
+                    value={watch("contractType") ?? ""}
+                    onValueChange={(v) => setValue("contractType", v)}
+                  >
+                    <AdminSelectTrigger>
+                      <SelectValue placeholder="Chọn loại HĐ" />
+                    </AdminSelectTrigger>
+                    <SelectContent>
+                      {CONTRACT_TYPE_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+                <FormField label="Loại lương">
+                  <Select
+                    value={watch("salaryType")?.toString() ?? "2"}
+                    onValueChange={(v) => setValue("salaryType", Number(v))}
+                  >
+                    <AdminSelectTrigger>
+                      <SelectValue placeholder="Chọn loại lương" />
+                    </AdminSelectTrigger>
+                    <SelectContent>
+                      {SALARY_TYPE_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+                <FormField
+                  label="Đơn giá (theo giờ/ngày tùy loại lương)"
+                  error={errors.basicSalary?.message}
+                >
+                  <AdminInput
+                    {...register("basicSalary")}
+                    type="number"
+                    placeholder="10000000"
+                  />
+                </FormField>
+                <FormField label="Trạng thái">
+                  <Select
+                    value={watch("status")?.toString() ?? "1"}
+                    onValueChange={(v) => setValue("status", Number(v))}
+                  >
+                    <AdminSelectTrigger>
+                      <SelectValue placeholder="Chọn trạng thái" />
+                    </AdminSelectTrigger>
+                    <SelectContent>
+                      {STATUS_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+                <FormField label="Vai trò *" error={errors.role?.message}>
+                  <Select
+                    value={watch("role") ?? ""}
+                    onValueChange={(v) => setValue("role", v)}
+                    disabled={rolesResult === undefined}
+                  >
+                    <AdminSelectTrigger>
+                      <SelectValue
+                        placeholder={
+                          rolesResult === undefined
+                            ? "Đang tải vai trò..."
+                            : roles.length === 0
+                              ? "Không có vai trò"
+                              : "Chọn vai trò..."
+                        }
+                      />
+                    </AdminSelectTrigger>
+                    <SelectContent>
+                      {roles.map((r) => (
+                        <SelectItem key={r.id} value={r.code || r.name}>
+                          {r.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+              </div>
+            </FormSection>
+
+            {!isEdit && (
+              <div className="p-3.5 bg-adminGreen-50 border border-adminGreen-600/10 rounded-lg text-adminInk/80 text-xs flex items-start gap-2.5">
+                <KeyRound className="w-4 h-4 text-adminGreen-600 mt-0.5 shrink-0" />
+                <div>
+                  <p className="font-semibold text-adminInk">
+                    Tài khoản đăng nhập tự động
+                  </p>
+                  <p className="text-adminGray-600 mt-0.5">
+                    Tài khoản (Tên đăng nhập & Mật khẩu mặc định) sẽ được hệ
+                    thống tạo tự động dựa trên mã nhân viên sau khi bạn nhấn nút
+                    tạo mới.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => onOpenChange(false)}
+                disabled={isPending}
+              >
+                Hủy
+              </Button>
+              <Button
+                type="submit"
+                variant="admin"
+                size="sm"
+                loading={isPending || isUploading}
+              >
+                {isEdit ? "Cập nhật" : "Tạo nhân viên"}
+              </Button>
+            </DialogFooter>
+          </form>
         )}
       </DialogContent>
     </Dialog>
   );
 }
-
-// ---- Helper Components ----
 
 function FormSection({
   icon: Icon,
@@ -555,12 +547,12 @@ function FormField({
           ))}
       </label>
       {children}
-      {error && <p className="text-xs text-state-danger-text font-medium">{error}</p>}
+      {error && (
+        <p className="text-xs text-state-danger-text font-medium">{error}</p>
+      )}
     </div>
   );
 }
-
-// ---- Default Values ----
 
 function getDefaultValues(
   staff?: StaffFullDto | null,

@@ -8,9 +8,16 @@ interface Props {
   isLoading: boolean;
 }
 
-const DONUT_COLORS = ["var(--admin-green-600)", "var(--admin-gold-600)", "var(--admin-green-200)"];
+const DONUT_COLORS = [
+  "var(--admin-green-600)",
+  "var(--admin-gold-600)",
+  "var(--admin-green-200)",
+];
 
-export const TodayCustomersCard = memo(function TodayCustomersCard({ data, isLoading }: Props) {
+export const TodayCustomersCard = memo(function TodayCustomersCard({
+  data,
+  isLoading,
+}: Props) {
   if (isLoading || !data) {
     return (
       <div className="bg-white border border-adminGray-100 rounded-admin p-5 animate-pulse h-[160px]">
@@ -29,7 +36,11 @@ export const TodayCustomersCard = memo(function TodayCustomersCard({ data, isLoa
 
   const rows: { label: string; value: number; color: string }[] = [
     { label: "Khách mới", value: data.newCustomers, color: DONUT_COLORS[0] },
-    { label: "Khách quen quay lại", value: data.returning, color: DONUT_COLORS[1] },
+    {
+      label: "Khách quen quay lại",
+      value: data.returning,
+      color: DONUT_COLORS[1],
+    },
     { label: "Khách lâu", value: data.lapsed, color: DONUT_COLORS[2] },
   ];
 
@@ -42,13 +53,20 @@ export const TodayCustomersCard = memo(function TodayCustomersCard({ data, isLoa
 
       <div className="flex items-start justify-between gap-2">
         <div>
-          <div className="text-4xl font-bold text-adminInk leading-none">{data.total}</div>
+          <div className="text-4xl font-bold text-adminInk leading-none">
+            {data.total}
+          </div>
           <div className="mt-2 space-y-1">
             {rows.map((r) => (
               <div key={r.label} className="flex items-center gap-1.5 text-2xs">
-                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: r.color }} />
+                <span
+                  className="w-2 h-2 rounded-full shrink-0"
+                  style={{ backgroundColor: r.color }}
+                />
                 <span className="text-adminGray-600">{r.label}</span>
-                <span className="font-bold text-adminInk ml-auto">{r.value}</span>
+                <span className="font-bold text-adminInk ml-auto">
+                  {r.value}
+                </span>
               </div>
             ))}
           </div>
@@ -67,7 +85,10 @@ export const TodayCustomersCard = memo(function TodayCustomersCard({ data, isLoa
                 strokeWidth={0}
               >
                 {donutData.map((_, idx) => (
-                  <Cell key={idx} fill={DONUT_COLORS[idx % DONUT_COLORS.length]} />
+                  <Cell
+                    key={idx}
+                    fill={DONUT_COLORS[idx % DONUT_COLORS.length]}
+                  />
                 ))}
               </Pie>
             </PieChart>
@@ -77,4 +98,3 @@ export const TodayCustomersCard = memo(function TodayCustomersCard({ data, isLoa
     </div>
   );
 });
-

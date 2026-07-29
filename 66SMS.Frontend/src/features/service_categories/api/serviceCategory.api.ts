@@ -15,47 +15,41 @@ import type {
 const BASE = API.serviceCategories;
 
 export const serviceCategoryApi = {
-  // Get All
   getAll: (params: PageRequest) =>
     axiosInstance
       .get<Result<PagedResult<ServiceCategoryDto>>>(BASE, { params })
       .then((r) => r.data),
 
-  // Admin Get All
   adminGetAll: (params: PageRequest) =>
     axiosInstance
       .get<Result<PagedResult<ServiceCategoryDto>>>(`${BASE}/admin`, { params })
       .then((r) => r.data),
 
-  // Get Detail
   getDetail: (id: number) =>
     axiosInstance
       .get<Result<ServiceCategoryDto>>(`${BASE}/${id}`)
       .then((r) => r.data),
 
-  // Create Category
   create: (payload: CreateServiceCategoryPayload) =>
     axiosInstance.post<Result<object>>(BASE, payload).then((r) => r.data),
 
-  // Update category
   update: (id: number, payload: UpdateServiceCategoryPayload) =>
     axiosInstance
       .patch<Result<object>>(`${BASE}/${id}`, payload)
       .then((r) => r.data),
 
-  // Delete category
   delete: (id: number) =>
     axiosInstance.delete<Result<object>>(`${BASE}/${id}`).then((r) => r.data),
 
-  // Delete multiple categories
   deleteMultiples: (payload: DeleteServiceCategoryMultiplesPayload) =>
     axiosInstance
       .delete<Result<object>>(`${BASE}/bulk`, { data: payload })
       .then((r) => r.data),
 
-  // Get All Deleted
   getAllDeleted: (params: PageRequest) =>
     axiosInstance
-      .get<Result<PagedResult<ServiceCategoryDto>>>(`${BASE}/deleted`, { params })
+      .get<
+        Result<PagedResult<ServiceCategoryDto>>
+      >(`${BASE}/deleted`, { params })
       .then((r) => r.data),
 };

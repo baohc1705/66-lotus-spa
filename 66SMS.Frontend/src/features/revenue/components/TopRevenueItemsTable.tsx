@@ -37,9 +37,10 @@ export const TopRevenueItemsTable = memo(function TopRevenueItemsTable({
 
   return (
     <div className="bg-white border border-adminGray-100 rounded-admin p-5 flex flex-col h-[340px]">
-      {/* Header */}
       <div className="flex items-center justify-between mb-3 shrink-0">
-        <span className="text-sm font-bold text-adminInk">Top 5 hàng hoá bán chạy</span>
+        <span className="text-sm font-bold text-adminInk">
+          Top 5 hàng hoá bán chạy
+        </span>
         <div className="flex bg-adminGray-100 p-0.5 rounded-[6px]">
           {TABS.map((t) => (
             <button
@@ -57,7 +58,6 @@ export const TopRevenueItemsTable = memo(function TopRevenueItemsTable({
         </div>
       </div>
 
-      {/* Table */}
       <div className="flex-1 overflow-auto min-h-0">
         {items.length === 0 ? (
           <div className="w-full h-full flex items-center justify-center text-adminGray-400 text-xs">
@@ -70,7 +70,9 @@ export const TopRevenueItemsTable = memo(function TopRevenueItemsTable({
                 <th className="py-2 font-semibold w-6">#</th>
                 <th className="py-2 font-semibold">Tên</th>
                 <th className="py-2 text-right font-semibold w-12">SL</th>
-                <th className="py-2 text-right font-semibold w-28">Doanh thu</th>
+                <th className="py-2 text-right font-semibold w-28">
+                  Doanh thu
+                </th>
                 <th className="py-2 text-right font-semibold w-10 pr-1">%</th>
               </tr>
             </thead>
@@ -80,11 +82,21 @@ export const TopRevenueItemsTable = memo(function TopRevenueItemsTable({
                   key={item.itemId}
                   className="border-b border-adminGray-50 hover:bg-adminGray-50/50 transition-colors"
                 >
-                  <td className="py-2.5 text-adminGray-400 font-bold">{idx + 1}</td>
-                  <td className="py-2.5 font-semibold text-adminInk max-w-[150px] truncate">{item.itemName}</td>
-                  <td className="py-2.5 text-right text-adminGray-600">{item.quantity.toLocaleString("vi-VN")}</td>
-                  <td className="py-2.5 text-right font-bold text-adminInk">{formatCurrency(item.revenue)}</td>
-                  <td className="py-2.5 text-right text-adminGray-400 pr-1 text-2xs">{item.percent}%</td>
+                  <td className="py-2.5 text-adminGray-400 font-bold">
+                    {idx + 1}
+                  </td>
+                  <td className="py-2.5 font-semibold text-adminInk max-w-[150px] truncate">
+                    {item.itemName}
+                  </td>
+                  <td className="py-2.5 text-right text-adminGray-600">
+                    {item.quantity.toLocaleString("vi-VN")}
+                  </td>
+                  <td className="py-2.5 text-right font-bold text-adminInk">
+                    {formatCurrency(item.revenue)}
+                  </td>
+                  <td className="py-2.5 text-right text-adminGray-400 pr-1 text-2xs">
+                    {item.percent}%
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -92,7 +104,6 @@ export const TopRevenueItemsTable = memo(function TopRevenueItemsTable({
         )}
       </div>
 
-      {/* Footer link */}
       <div className="border-t border-adminGray-100 mt-2 pt-2 shrink-0">
         <Link
           to="/admin/services"

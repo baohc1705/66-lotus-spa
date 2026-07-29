@@ -3,7 +3,6 @@ import { LotusDivider } from "./LotusDivider";
 
 interface SectionHeaderProps {
   title: string;
-  /** Small script word above the serif title (lotus variant), e.g. "Về" */
   scriptLabel?: string;
   label?: string;
   description?: string;
@@ -92,7 +91,9 @@ export const SectionHeader = ({
             {title}
           </h2>
         </div>
-        <p className={`max-w-md font-geist text-sm leading-[1.65] ${descColor}`}>
+        <p
+          className={`max-w-md font-geist text-sm leading-[1.65] ${descColor}`}
+        >
           {description}
         </p>
       </motion.header>
@@ -122,7 +123,9 @@ export const SectionHeader = ({
           {title}
         </h2>
         {description && (
-          <p className={`mt-3 max-w-prose font-geist text-sm leading-[1.65] ${descColor}`}>
+          <p
+            className={`mt-3 max-w-prose font-geist text-sm leading-[1.65] ${descColor}`}
+          >
             {description}
           </p>
         )}

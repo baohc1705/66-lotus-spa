@@ -7,7 +7,6 @@ interface ShiftDetailExpandedProps {
 }
 
 export function ShiftDetailExpanded({ shift }: ShiftDetailExpandedProps) {
-  // Sort periods by effectiveFrom descending
   const periods = [...(shift.shiftPeriodDTOs || [])].sort((a, b) => {
     const dateA = a.effectiveFrom ? new Date(a.effectiveFrom).getTime() : 0;
     const dateB = b.effectiveFrom ? new Date(b.effectiveFrom).getTime() : 0;
@@ -17,7 +16,6 @@ export function ShiftDetailExpanded({ shift }: ShiftDetailExpandedProps) {
   return (
     <div className="bg-adminGray-50/30 w-full overflow-hidden p-6 border-b border-adminGray-100/50">
       <div className="flex flex-col gap-6">
-        {/* Header Info */}
         <div className="flex items-center gap-4 border-b border-adminGray-100/50 pb-4">
           <div className="w-12 h-12 rounded-full bg-adminGreen-100 flex items-center justify-center shrink-0">
             <Clock className="w-6 h-6 text-adminGreen-600" />
@@ -30,7 +28,6 @@ export function ShiftDetailExpanded({ shift }: ShiftDetailExpandedProps) {
           </div>
         </div>
 
-        {/* Periods History */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-2">
             <History className="w-4 h-4 text-adminGray-600" />
@@ -53,7 +50,6 @@ export function ShiftDetailExpanded({ shift }: ShiftDetailExpandedProps) {
                     key={period.id ?? index} 
                     className={`relative p-4 rounded-xl border ${isActive ? 'border-adminGreen-600/40 bg-adminGreen-50 shadow-sm' : 'border-adminGray-100/60 bg-white'}`}
                   >
-                    {/* Active Badge */}
                     {isActive && (
                       <div className="absolute -top-2.5 -right-2.5">
                         <span className="flex items-center gap-1 bg-adminGreen-600 text-white text-2xs font-medium px-2 py-1 rounded-full shadow-sm">

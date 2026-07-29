@@ -1,1 +1,1 @@
-export { ServiceCategoryListPage } from './pages/ServiceCategoryListPage'
+export { ServiceCategoryListPage } from "./pages/ServiceCategoryListPage";

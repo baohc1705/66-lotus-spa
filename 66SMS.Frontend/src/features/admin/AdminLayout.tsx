@@ -42,7 +42,7 @@ export function AdminLayout() {
     }
   }, [hasAccess, navigate]);
 
-  // Staff / Receptionist không có Dashboard → redirect về "Lịch hẹn của tôi"
+  // Staff / Receptionist không có Dashboard, redirect về "Lịch hẹn của tôi"
   const isStaffOrReceptionist =
     (hasRole("Staff") || hasRole("Receptionist")) &&
     !hasRole("Admin") &&
@@ -84,7 +84,6 @@ export function AdminLayout() {
 
   return (
     <div className="admin-dashboard-container min-h-screen font-sans overflow-clip flex">
-      {/* Soft green atmosphere */}
       <div className="fixed top-0 left-0 w-[50vw] h-[50vw] rounded-full bg-adminGreen-100/40 blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
       <div className="fixed bottom-0 right-0 w-[40vw] h-[40vw] rounded-full bg-adminGold-100/30 blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3" />
 

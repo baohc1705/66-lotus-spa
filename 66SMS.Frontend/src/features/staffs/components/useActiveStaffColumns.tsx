@@ -1,6 +1,14 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import type { ColumnDef, Row } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Trash2, Eye, Scissors, Award } from "lucide-react";
+import {
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  Eye,
+  Scissors,
+  Award,
+} from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
@@ -69,6 +77,7 @@ export function useActiveStaffColumns({
 }: UseActiveStaffColumnsParams) {
   const cols = STAFF_COLUMN_LABELS;
   const perm = STAFF_PERM;
+  const navigate = useNavigate();
 
   return useMemo<ColumnDef<StaffDto>[]>(
     () => [
@@ -266,10 +275,7 @@ export function useActiveStaffColumns({
                       {COMMON_MSG.edit}
                     </DropdownMenuItem>
                   </PermissionGate>
-                  <PermissionGate
-                    resource={perm.resource}
-                    action={perm.create}
-                  >
+                  <PermissionGate resource={perm.resource} action={perm.create}>
                     <DropdownMenuItem onClick={() => onAssignService(staff)}>
                       <Scissors className="w-4 h-4" />
                       Phân công dịch vụ
@@ -280,8 +286,13 @@ export function useActiveStaffColumns({
                     action={perm.create}
                     role={perm.role}
                   >
-                    {/* TODO: Add view certificate action */}
-                    <DropdownMenuItem onClick={() => onDelete(staff)}>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        navigate(
+                          `/admin/staff-certificates?staffId=${staff.id}`,
+                        )
+                      }
+                    >
                       <Award className="w-4 h-4" />
                       Xem chứng chỉ
                     </DropdownMenuItem>
@@ -322,6 +333,7 @@ export function useActiveStaffColumns({
       onEdit,
       onDelete,
       onAssignService,
+      navigate,
       cols,
       perm,
     ],

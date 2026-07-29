@@ -11,7 +11,6 @@ export interface ServiceProductResponse {
   status?: number;
 }
 
-/** DTO nhẹ cho bảng (GetAll) */
 export interface ServiceListDto {
   id?: number;
   categoryId?: number;
@@ -27,7 +26,6 @@ export interface ServiceListDto {
   updatedAt?: string;
 }
 
-/** DTO đầy đủ cho expand + form sửa (GetDetail) */
 export interface ServiceDetailDto {
   id?: number;
   categoryId?: number;
@@ -48,7 +46,6 @@ export interface ServiceDetailDto {
   serviceProducts?: ServiceProductResponse[];
 }
 
-/** Alias giữ tương thích chỗ còn dùng tên cũ (ưu tiên list) */
 export type ServiceDto = ServiceListDto;
 
 export interface ServiceProductPayload {

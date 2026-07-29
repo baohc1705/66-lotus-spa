@@ -29,10 +29,7 @@ import {
 } from "../components/useActiveInvoiceColumns";
 import { INVOICE_PERM } from "../constants/invoice.permissions";
 import { useInvoiceListState } from "../hooks/useInvoiceListState";
-import {
-  useAdminInvoices,
-  useCancelInvoice,
-} from "../hooks/useInvoices";
+import { useAdminInvoices, useCancelInvoice } from "../hooks/useInvoices";
 import { INVOICE_STATUS } from "../types/invoice.types";
 
 export function InvoiceListPage() {
@@ -63,10 +60,8 @@ export function InvoiceListPage() {
     filter,
   } = listState;
 
-  // Active paginated query
   const { data: result, isLoading, isFetching } = useAdminInvoices(queryParams);
 
-  // Global query for calculations
   const { data: allInvoicesResult } = useAdminInvoices({
     pageIndex: 1,
     pageSize: 10000,
@@ -79,7 +74,10 @@ export function InvoiceListPage() {
   const invoices = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
 
-  const allInvoices = useMemo(() => allInvoicesResult?.data?.items ?? [], [allInvoicesResult]);
+  const allInvoices = useMemo(
+    () => allInvoicesResult?.data?.items ?? [],
+    [allInvoicesResult],
+  );
 
   const paidRevenue = useMemo(
     () =>
@@ -90,17 +88,21 @@ export function InvoiceListPage() {
   );
 
   const paidCount = useMemo(
-    () => allInvoices.filter((inv) => inv.status === INVOICE_STATUS.PAID).length,
+    () =>
+      allInvoices.filter((inv) => inv.status === INVOICE_STATUS.PAID).length,
     [allInvoices],
   );
 
   const unpaidCount = useMemo(
-    () => allInvoices.filter((inv) => inv.status === INVOICE_STATUS.UNPAID).length,
+    () =>
+      allInvoices.filter((inv) => inv.status === INVOICE_STATUS.UNPAID).length,
     [allInvoices],
   );
 
   const cancelledCount = useMemo(
-    () => allInvoices.filter((inv) => inv.status === INVOICE_STATUS.CANCELLED).length,
+    () =>
+      allInvoices.filter((inv) => inv.status === INVOICE_STATUS.CANCELLED)
+        .length,
     [allInvoices],
   );
 
@@ -146,7 +148,6 @@ export function InvoiceListPage() {
 
   return (
     <div className="flex h-full overflow-hidden gap-2">
-      {/* Sidebar bộ lọc */}
       {!isSidebarMode && (
         <InvoiceFilterSidebar
           selectedStatus={selectedStatus}
@@ -157,7 +158,6 @@ export function InvoiceListPage() {
         />
       )}
 
-      {/* Right: Stats + Table */}
       <div className="flex-1 min-w-0 flex flex-col gap-2 overflow-hidden">
         <div className="shrink-0">
           <InvoiceStatCards
@@ -206,7 +206,9 @@ export function InvoiceListPage() {
           <DataTable
             table={table}
             isLoading={isLoading}
-            loadingRows={pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize}
+            loadingRows={
+              pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
+            }
             renderSubComponent={({ row }) =>
               row.original.id ? (
                 <InvoiceDetailExpanded

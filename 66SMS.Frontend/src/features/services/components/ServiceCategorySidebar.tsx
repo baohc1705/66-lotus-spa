@@ -49,7 +49,6 @@ export function ServiceCategorySidebar({
     [categoriesResult?.data?.items],
   );
 
-  // Fetch all active/deleted services without category filter for counting
   const { data: activeServicesResult } = useAdminServices(
     { pageIndex: 1, pageSize: 10000 },
     !showDeleted,
@@ -87,7 +86,6 @@ export function ServiceCategorySidebar({
   return (
     <>
       <aside className="w-2/12 shrink-0 flex flex-col h-full bg-white rounded overflow-hidden">
-        {/* Search */}
         <div className="px-3 pt-3 pb-2 shrink-0">
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-adminGray-400 pointer-events-none" />
@@ -101,9 +99,7 @@ export function ServiceCategorySidebar({
           </div>
         </div>
 
-        {/* Category list */}
         <nav className="flex-1 flex-col h-full overflow-y-auto custom-scrollbar px-2 pb-2 space-y-0.5">
-          {/* Tất cả dịch vụ */}
           <button
             type="button"
             onClick={() => onSelectCategory(null)}
@@ -184,7 +180,6 @@ export function ServiceCategorySidebar({
           )}
         </nav>
 
-        {/* Footer: Tạo danh mục */}
         <div className="px-3 py-2 shrink-0 mt-auto">
           <Button
             variant="admin"

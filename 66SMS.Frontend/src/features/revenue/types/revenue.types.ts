@@ -1,7 +1,7 @@
 export interface RevenueQueryParams {
-  from: string;          // ISO date format (YYYY-MM-DD)
-  to: string;            // ISO date format (YYYY-MM-DD)
-  salonId?: number | null; // null = all
+  from: string;
+  to: string;
+  salonId?: number | null;
   comparePrevious?: boolean;
 }
 
@@ -19,7 +19,7 @@ export interface RevenueSummaryDto extends RevenueSummaryPeriodDto {
 }
 
 export interface CashFlowTrendPointDto {
-  date: string; // YYYY-MM-DD
+  date: string;
   cashIn: number;
   cashOut: number;
 }
@@ -58,7 +58,7 @@ export interface RevenueBreakdownDto {
 export interface TopRevenueItemDto {
   itemId: number;
   itemName: string;
-  itemType: number; // 1 = Service, 2 = Product, 3 = TreatmentCourse (from INVOICE_ITEM_TYPE)
+  itemType: number;
   quantity: number;
   revenue: number;
   percent: number;
@@ -70,18 +70,16 @@ export interface RecentTransactionDto {
   customerName: string;
   salonName: string;
   amount: number;
-  paymentMethod: number; // from PAYMENT_METHOD enums
-  issuedAt: string; // ISO string
+  paymentMethod: number;
+  issuedAt: string;
 }
-
-// --- New types for redesigned dashboard ---
 
 export interface TodaySummaryDto {
   appointments: {
     total: number;
     completed: number;
-    completionRate: number; // 0-100
-    changeVsYesterday: number; // percent
+    completionRate: number;
+    changeVsYesterday: number;
   };
   customers: {
     total: number;
@@ -97,7 +95,7 @@ export interface TodaySummaryDto {
 }
 
 export interface TrafficDataPointDto {
-  label: string; // e.g. "08:00", "T2", "01/07"
+  label: string;
   value: number;
 }
 
@@ -112,6 +110,5 @@ export interface TopStaffDto {
   revenue: number;
   quantity: number;
   commission: number;
-  growthPercent: number; // vs previous period
+  growthPercent: number;
 }
-

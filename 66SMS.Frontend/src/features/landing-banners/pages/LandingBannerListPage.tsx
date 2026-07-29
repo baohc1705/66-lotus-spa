@@ -1,8 +1,5 @@
 import { useMemo } from "react";
-import {
-  useReactTable,
-  getCoreRowModel,
-} from "@tanstack/react-table";
+import { useReactTable, getCoreRowModel } from "@tanstack/react-table";
 import { Plus, ImageIcon } from "lucide-react";
 import { DataTable } from "@/shared/components/DataTable/DataTable";
 import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
@@ -166,10 +163,7 @@ export function LandingBannerListPage() {
         />
       </div>
 
-      <LandingBannerFormDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-      />
+      <LandingBannerFormDialog open={createOpen} onOpenChange={setCreateOpen} />
       <LandingBannerFormDialog
         open={editBannerId != null}
         onOpenChange={(open) => {
@@ -187,7 +181,7 @@ export function LandingBannerListPage() {
         title={CONFIRM_MSG.deleteTitle(ENTITY)}
         description={CONFIRM_MSG.deleteDescription(
           ENTITY,
-          deleteTarget?.title ?? ""
+          deleteTarget?.title ?? "",
         )}
         confirmLabel={COMMON_MSG.delete}
         loading={deleteMutation.isPending}

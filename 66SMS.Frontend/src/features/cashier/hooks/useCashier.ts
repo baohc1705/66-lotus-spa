@@ -99,7 +99,6 @@ export function useCashierWeekly(startDate: Date, endDate: Date, salonId?: numbe
   };
 }
 
-/** Lễ tân đặt lịch hộ khách — POST /cashier/appointments */
 export function useCreateCashierAppointment() {
   return useMutation({
     mutationFn: async (payload: CreateCashierAppointmentPayload) => {

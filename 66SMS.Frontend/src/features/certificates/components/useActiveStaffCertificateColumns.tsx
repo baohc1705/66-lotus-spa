@@ -61,7 +61,9 @@ export function useActiveStaffCertificateColumns({
         accessorKey: "staffName",
         header: cols.staffName,
         cell: ({ row }) => (
-          <span className="font-semibold text-adminInk">{row.original.staffName}</span>
+          <span className="font-semibold text-adminInk">
+            {row.original.staffName}
+          </span>
         ),
         size: 160,
       },
@@ -70,8 +72,12 @@ export function useActiveStaffCertificateColumns({
         header: cols.certificateName,
         cell: ({ row }) => (
           <div>
-            <p className="text-sm font-medium text-adminInk">{row.original.certificateName}</p>
-            <p className="text-xs text-adminGray-600">{row.original.typeName}</p>
+            <p className="text-sm font-medium text-adminInk">
+              {row.original.certificateName}
+            </p>
+            <p className="text-xs text-adminGray-600">
+              {row.original.typeName}
+            </p>
           </div>
         ),
         size: 220,
@@ -80,7 +86,9 @@ export function useActiveStaffCertificateColumns({
         accessorKey: "issuingOrganization",
         header: cols.issuingOrganization,
         cell: ({ row }) => (
-          <span className="text-xs text-adminInk/80">{row.original.issuingOrganization}</span>
+          <span className="text-xs text-adminInk/80">
+            {row.original.issuingOrganization}
+          </span>
         ),
         size: 180,
       },
@@ -88,20 +96,26 @@ export function useActiveStaffCertificateColumns({
         accessorKey: "issuedDate",
         header: cols.issuedDate,
         cell: ({ row }) => (
-          <span className="text-xs text-adminInk/70">{formatDisplayDate(row.original.issuedDate)}</span>
+          <span className="text-xs text-adminInk/70">
+            {formatDisplayDate(row.original.issuedDate)}
+          </span>
         ),
         size: 110,
       },
       {
         accessorKey: "expiryDate",
         header: cols.expiryDate,
-        cell: ({ row }) => <ExpiryBadge expiryDate={row.original.expiryDate ?? undefined} />,
+        cell: ({ row }) => (
+          <ExpiryBadge expiryDate={row.original.expiryDate ?? undefined} />
+        ),
         size: 160,
       },
       {
         accessorKey: "status",
         header: cols.status,
-        cell: ({ row }) => <CertificateStatusBadge status={row.original.status} />,
+        cell: ({ row }) => (
+          <CertificateStatusBadge status={row.original.status} />
+        ),
         size: 130,
       },
       {
@@ -113,23 +127,37 @@ export function useActiveStaffCertificateColumns({
             <div onClick={(e) => e.stopPropagation()}>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon-sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
                     <MoreHorizontal className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => row.toggleExpanded()}>
-                    <Eye className="w-4 h-4 mr-2" />{row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
+                    <Eye className="w-4 h-4 mr-2" />
+                    {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
                   </DropdownMenuItem>
                   <PermissionGate resource={perm.resource} action={perm.update}>
                     <DropdownMenuItem onClick={() => onEdit(cert)}>
-                      <Pencil className="w-4 h-4 mr-2" />{COMMON_MSG.edit}
+                      <Pencil className="w-4 h-4 mr-2" />
+                      {COMMON_MSG.edit}
                     </DropdownMenuItem>
                   </PermissionGate>
-                  <PermissionGate resource={perm.resource} action={perm.delete} role={perm.role}>
+                  <PermissionGate
+                    resource={perm.resource}
+                    action={perm.delete}
+                    role={perm.role}
+                  >
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem variant="destructive" onClick={() => onDelete(cert)}>
-                      <Trash2 className="w-4 h-4 mr-2" />Xóa
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={() => onDelete(cert)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Xóa
                     </DropdownMenuItem>
                   </PermissionGate>
                 </DropdownMenuContent>
@@ -141,6 +169,6 @@ export function useActiveStaffCertificateColumns({
         enableResizing: false,
       },
     ],
-    [pageIndex, pageSize, onEdit, onDelete, cols, perm]
+    [pageIndex, pageSize, onEdit, onDelete, cols, perm],
   );
 }

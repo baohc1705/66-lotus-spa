@@ -6,7 +6,7 @@ import {
   Leaf,
   Search,
 } from "lucide-react";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServices } from "../../services/hooks/useServices";
 import type { ServiceListDto } from "@/features/services/types/service.types";
 import { useBookingStore } from "../stores/bookingStore";
@@ -15,7 +15,7 @@ import {
   getPendingServiceId,
 } from "../utils/pendingBookingService";
 
-export const BookingServiceStep: React.FC = () => {
+export function BookingServiceStep() {
   const store = useBookingStore();
   const activeGuest = store.guests[store.activeGuestIndex];
   const selectedService = activeGuest?.selectedService;
@@ -46,9 +46,9 @@ export const BookingServiceStep: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredServices = services.filter((s) => {
-    const matchesSearch =
-      (s.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (s.description || "").toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = (s.name || "")
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
 
@@ -145,7 +145,8 @@ export const BookingServiceStep: React.FC = () => {
                             </span>
                             <span>·</span>
                             <span className="font-semibold text-rose-600">
-                              Giá: {(s.sellingPrice || 0).toLocaleString("vi-VN")}đ
+                              Giá:{" "}
+                              {(s.sellingPrice || 0).toLocaleString("vi-VN")}đ
                             </span>
                           </div>
                         </div>
@@ -194,4 +195,4 @@ export const BookingServiceStep: React.FC = () => {
       </div>
     </div>
   );
-};
+}

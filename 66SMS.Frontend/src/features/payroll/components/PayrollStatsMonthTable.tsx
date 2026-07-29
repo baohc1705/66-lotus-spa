@@ -49,13 +49,13 @@ export function PayrollStatsMonthTable({
         <tbody>
           {appointments.map((item: PayrollCommissionAppointmentDto) => {
             const date = item.issuedLocalDate ?? item.appointmentDate ?? "—";
-              const start = formatSlotTime(item.slotStartTime);
-              const end = resolveServiceEndTime(
-                item.slotStartTime,
-                item.slotEndTime,
-                item.durationMins,
-              );
-              const timeLabel = start === "--:--" ? "—" : `${start}–${end}`;
+            const start = formatSlotTime(item.slotStartTime);
+            const end = resolveServiceEndTime(
+              item.slotStartTime,
+              item.slotEndTime,
+              item.durationMins,
+            );
+            const timeLabel = start === "--:--" ? "—" : `${start}–${end}`;
 
             return (
               <tr

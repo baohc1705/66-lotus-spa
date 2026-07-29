@@ -198,12 +198,10 @@ export function AdminProfilePage() {
         variants={containerVariants}
         className="flex flex-col lg:flex-row gap-2"
       >
-        {/* Left Column: Avatar Card & Menu Card */}
         <motion.div
           variants={itemVariants}
           className="w-full lg:w-[260px] shrink-0 flex flex-col gap-2"
         >
-          {/* Avatar Card */}
           <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-sm p-6 flex flex-col items-center">
             <input
               id="admin-avatar-upload-input"
@@ -228,7 +226,6 @@ export function AdminProfilePage() {
                     <User className="w-16 h-16" />
                   </div>
                 )}
-                {/* Upload overlay */}
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full duration-300">
                   <Camera className="w-6 h-6 text-white" />
                 </div>
@@ -239,7 +236,6 @@ export function AdminProfilePage() {
             </h3>
           </div>
 
-          {/* Menu Card */}
           <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-sm overflow-hidden">
             <div className="px-4 py-2.5 border-b border-adminGray-100/30 bg-adminGray-50/50">
               <span className="text-xs font-bold text-adminGray-600 uppercase tracking-wider block">
@@ -279,11 +275,9 @@ export function AdminProfilePage() {
           </div>
         </motion.div>
 
-        {/* Right Column: Tab Content */}
         <motion.div variants={itemVariants} className="flex-grow">
           {activeTab === "profile" ? (
             <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-sm overflow-hidden min-h-[500px]">
-              {/* Card Header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-adminGray-100/30 bg-adminGray-50/50">
                 <span className="font-bold text-sm md:text-base text-adminInk">
                   Thông tin tài khoản
@@ -302,16 +296,13 @@ export function AdminProfilePage() {
                 </Button>
               </div>
 
-              {/* Card Body */}
               <div className="p-6 md:p-8">
-                {/* Profile Form fields */}
                 <form
                   id="profile-form"
                   onSubmit={handleSubmitProfile(onSubmitProfile)}
                   className="space-y-6"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {/* Email đăng nhập */}
                     <FormField label="Email đăng nhập">
                       <AdminInput
                         type="text"
@@ -321,7 +312,6 @@ export function AdminProfilePage() {
                       />
                     </FormField>
 
-                    {/* Họ tên */}
                     <FormField
                       label="Họ tên *"
                       error={errorsProfile.fullName?.message}
@@ -332,7 +322,6 @@ export function AdminProfilePage() {
                       />
                     </FormField>
 
-                    {/* Email liên lạc */}
                     <FormField label="Email liên lạc">
                       <AdminInput
                         type="text"
@@ -342,7 +331,6 @@ export function AdminProfilePage() {
                       />
                     </FormField>
 
-                    {/* Điện thoại */}
                     <FormField
                       label="Điện thoại *"
                       error={errorsProfile.phoneNumber?.message}
@@ -353,7 +341,6 @@ export function AdminProfilePage() {
                       />
                     </FormField>
 
-                    {/* Giới tính */}
                     <FormField
                       label="Giới tính"
                       error={errorsProfile.gender?.message}
@@ -384,7 +371,6 @@ export function AdminProfilePage() {
                       </Select>
                     </FormField>
 
-                    {/* Ngày sinh */}
                     <FormField
                       label="Ngày sinh"
                       error={errorsProfile.dateOfBirth?.message}
@@ -397,7 +383,6 @@ export function AdminProfilePage() {
                   </div>
                 </form>
 
-                {/* Additional metadata row (Chi nhánh / Quyền hạn / Staff metadata) */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 mt-8 border-t border-adminGray-100/30 text-left">
                   <div>
                     <span className="text-2xs font-semibold text-adminGray-600 uppercase tracking-wider block mb-1">
@@ -443,7 +428,6 @@ export function AdminProfilePage() {
             </div>
           ) : (
             <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-sm overflow-hidden min-h-[500px]">
-              {/* Card Header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-adminGray-100/30 bg-adminGray-50/50">
                 <span className="font-bold text-sm md:text-base text-adminInk">
                   Đổi mật khẩu
@@ -462,14 +446,12 @@ export function AdminProfilePage() {
                 </Button>
               </div>
 
-              {/* Card Body */}
               <div className="p-6 md:p-8 text-left">
                 <form
                   id="security-form"
                   onSubmit={handleSubmitSecurity(onSubmitSecurity)}
                   className="space-y-5 max-w-xl"
                 >
-                  {/* Mật khẩu hiện tại */}
                   <FormField
                     label="Mật khẩu hiện tại *"
                     error={errorsSecurity.currentPassword?.message}
@@ -481,7 +463,6 @@ export function AdminProfilePage() {
                   </FormField>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {/* Mật khẩu mới */}
                     <FormField
                       label="Mật khẩu mới *"
                       error={errorsSecurity.newPassword?.message}
@@ -492,7 +473,6 @@ export function AdminProfilePage() {
                       />
                     </FormField>
 
-                    {/* Xác nhận mật khẩu */}
                     <FormField
                       label="Xác nhận mật khẩu *"
                       error={errorsSecurity.confirmPassword?.message}

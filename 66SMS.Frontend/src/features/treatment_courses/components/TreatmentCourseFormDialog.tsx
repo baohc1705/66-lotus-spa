@@ -33,7 +33,11 @@ import {
   useUpdateTreatmentCourse,
 } from "../hooks/useTreatmentCourses";
 import { useServices } from "@/features/services/hooks/useServices";
-import type { TreatmentCourseDto, TreatmentCourseItemDto, TreatmentCourseItemPayload } from "../types/treatmentCourse.types";
+import type {
+  TreatmentCourseDto,
+  TreatmentCourseItemDto,
+  TreatmentCourseItemPayload,
+} from "../types/treatmentCourse.types";
 import type { ServiceDto } from "@/features/services/types/service.types";
 import type { ServiceCategoryDto } from "@/features/service_categories/types/serviceCategory.types";
 import type {
@@ -171,14 +175,10 @@ export function TreatmentCourseFormDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* Thông tin liệu trình */}
           <FormSection icon={Leaf} title="Thông tin liệu trình">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <FormField label="Mã liệu trình *" error={errors.code?.message}>
-                <AdminInput
-                  {...register("code")}
-                  placeholder="LT001"
-                />
+                <AdminInput {...register("code")} placeholder="LT001" />
               </FormField>
               <FormField label="Tên liệu trình *" error={errors.name?.message}>
                 <AdminInput
@@ -236,9 +236,7 @@ export function TreatmentCourseFormDialog({
                   </SelectContent>
                 </Select>
               </FormField>
-              <FormField
-                label="Thứ tự sắp xếp"
-              >
+              <FormField label="Thứ tự sắp xếp">
                 <AdminInput
                   {...register("sortOrder")}
                   type="number"
@@ -246,10 +244,7 @@ export function TreatmentCourseFormDialog({
                 />
               </FormField>
               <div className="sm:col-span-2">
-                <FormField
-                  label="Mô tả"
-                  error={errors.description?.message}
-                >
+                <FormField label="Mô tả" error={errors.description?.message}>
                   <AdminTextarea
                     {...register("description")}
                     placeholder="Mô tả ngắn về liệu trình..."
@@ -260,7 +255,6 @@ export function TreatmentCourseFormDialog({
             </div>
           </FormSection>
 
-          {/* Danh sách buổi */}
           <FormSection icon={ListOrdered} title="Danh sách buổi dịch vụ">
             {errors.items?.root?.message && (
               <p className="text-xs text-state-danger-text font-medium mb-2">
@@ -278,9 +272,9 @@ export function TreatmentCourseFormDialog({
                   key={field.id}
                   className="grid grid-cols-12 gap-2 items-start p-3 bg-adminGray-50 rounded-lg border border-adminGray-100"
                 >
-                    <p className="text-xs font-semibold text-adminGray-600">
-                      #{index + 1}
-                    </p>
+                  <p className="text-xs font-semibold text-adminGray-600">
+                    #{index + 1}
+                  </p>
                   <div className="col-span-4">
                     <p className="lotus-admin-form-label mb-1">Dịch vụ *</p>
                     <SearchableSelect
@@ -383,8 +377,6 @@ export function TreatmentCourseFormDialog({
     </Dialog>
   );
 }
-
-// ---- Default Values ----
 
 function getDefaultValues(
   course?: TreatmentCourseDto | null,
