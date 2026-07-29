@@ -44,7 +44,7 @@ namespace _66SMS.Infrastructure.Messagings
                 return null;
             }
 
-            // Bỏ extension cũ (nếu có) — chỉ tin extension phát hiện từ nội dung
+            // Bỏ extension cũ — chỉ tin extension phát hiện từ nội dung
             var baseName = Path.GetFileNameWithoutExtension(fileName);
             if (string.IsNullOrWhiteSpace(baseName))
                 baseName = "image";

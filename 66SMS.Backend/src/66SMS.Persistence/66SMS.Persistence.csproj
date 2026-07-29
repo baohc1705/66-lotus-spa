@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Repositories\Mongo\**" />
+    <EmbeddedResource Remove="Repositories\Mongo\**" />
+    <None Remove="Repositories\Mongo\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.10" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.27" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.27" />
@@ -26,10 +32,6 @@
   <ItemGroup>
     <ProjectReference Include="..\66SMS.Application\66SMS.Application.csproj" />
     <ProjectReference Include="..\66SMS.Domain\66SMS.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Repositories\Mongo\Base\" />
   </ItemGroup>
 
 </Project>

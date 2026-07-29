@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace _66SMS.Application.BookingService.Helpers
 {
     /// <summary>
-    /// Cộng tiền vào ví khi VNPay nạp thành công (idempotent theo TxnRef).
+    /// Cộng tiền vào ví khi VNPay nạp thành công 
     /// </summary>
     public static class WalletTopUpApplyService
     {

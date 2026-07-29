@@ -6,9 +6,6 @@ using _66SMS.Domain.Entities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace _66SMS.Application.BookingService.TimeSlots.Queries.GetAllTimeSlot
 {

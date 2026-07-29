@@ -8,7 +8,7 @@ namespace _66SMS.Infrastructure.Storage.Cloudinary
 {
     /// <summary>
     /// Triển khai <see cref="IFileStorageService"/> bằng Cloudinary.
-    /// Đảm nhận validate file (định dạng/dung lượng) và upload ảnh, trả về secure_url.
+    /// Đảm nhận validate file và upload ảnh, trả về secure_url.
     /// </summary>
     public class CloudinaryFileStorageService : IFileStorageService
     {
@@ -30,7 +30,7 @@ namespace _66SMS.Infrastructure.Storage.Cloudinary
         /// </summary>
         public async Task<FileUploadResult> UploadImageAsync(FileUploadRequest request, CancellationToken cancellationToken = default)
         {
-            // 1. Kiểm tra định dạng (extension) có nằm trong danh sách cho phép không
+            // Kiểm tra định dạng (extension) có nằm trong danh sách cho phép không
             var extension = Path.GetExtension(request.FileName).ToLowerInvariant();
             if (string.IsNullOrEmpty(extension) || !settings.AllowedExtensions.Contains(extension))
             {
@@ -41,7 +41,7 @@ namespace _66SMS.Infrastructure.Storage.Cloudinary
                 };
             }
 
-            // 2. Kiểm tra dung lượng (nếu stream hỗ trợ đọc Length)
+            // Kiểm tra dung lượng (nếu stream hỗ trợ đọc Length)
             if (request.Content.CanSeek && request.Content.Length > settings.MaxFileSizeBytes)
             {
                 var maxMb = settings.MaxFileSizeBytes / (1024d * 1024d);
@@ -52,7 +52,7 @@ namespace _66SMS.Infrastructure.Storage.Cloudinary
                 };
             }
 
-            // 3. Chuẩn bị tham số upload và gửi lên Cloudinary
+            // Chuẩn bị tham số upload và gửi lên Cloudinary
             var uploadParams = new ImageUploadParams
             {
                 File = new FileDescription(request.FileName, request.Content),

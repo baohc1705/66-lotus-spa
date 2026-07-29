@@ -5,8 +5,6 @@ using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace _66SMS.Application.BookingService.Invoices.Queries.GetInvoicePreviewFromAppointment
 {

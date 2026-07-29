@@ -7,17 +7,14 @@ using Microsoft.Extensions.Options;
 
 namespace _66SMS.API.Filters
 {
-    /// <summary>
-    /// Rate limit theo Redis. Policy: login | otp | forgot | register.
-    /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class RedisRateLimitAttribute : Attribute, IAsyncActionFilter
     {
-        private readonly string _policy;
+        private readonly string policy;
 
         public RedisRateLimitAttribute(string policy)
         {
-            _policy = policy;
+            this.policy = policy;
         }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -25,13 +22,13 @@ namespace _66SMS.API.Filters
             var rateLimit = context.HttpContext.RequestServices.GetRequiredService<IRateLimitService>();
             var settings = context.HttpContext.RequestServices.GetRequiredService<IOptions<RedisSettings>>().Value;
 
-            var (limit, keyPrefix) = _policy.ToLowerInvariant() switch
+            var (limit, keyPrefix) = policy.ToLowerInvariant() switch
             {
                 "login" => (settings.LoginLimitPerMinute, "login"),
                 "otp" => (settings.OtpLimitPerMinute, "otp"),
                 "forgot" => (settings.ForgotPasswordLimitPerMinute, "forgot"),
                 "register" => (settings.RegisterLimitPerMinute, "register"),
-                _ => (10, _policy),
+                _ => (10, policy),
             };
 
             var ip = context.HttpContext.Request.Headers.TryGetValue("X-Forwarded-For", out var forwarded)

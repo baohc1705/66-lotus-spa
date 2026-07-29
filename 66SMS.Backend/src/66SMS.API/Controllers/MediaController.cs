@@ -20,7 +20,6 @@ namespace _66SMS.API.Controllers
             this.mediator = mediator;
         }
 
-        /// <summary>Upload một ảnh lên Cloudinary, trả về URL.</summary>
         [HttpPost("image")]
         public async Task<IActionResult> UploadImage(IFormFile file, [FromQuery] string? folder)
         {
@@ -39,7 +38,6 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-        /// <summary>Upload nhiều ảnh lên Cloudinary, trả về danh sách URL.</summary>
         [HttpPost("images")]
         public async Task<IActionResult> UploadImages(List<IFormFile> files, [FromQuery] string? folder)
         {

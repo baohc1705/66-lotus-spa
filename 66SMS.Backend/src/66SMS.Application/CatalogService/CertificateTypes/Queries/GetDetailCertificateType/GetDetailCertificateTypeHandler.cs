@@ -29,11 +29,7 @@ namespace _66SMS.Application.CatalogService.CertificateTypes.Queries.GetDetailCe
                     Name = x.Name,
                     Description = x.Description,
                     SortOrder = x.SortOrder,
-                    Status = x.Status,
-                    CreatedAt = null,
-                    CreatedBy = null,
-                    UpdatedAt = null,
-                    UpdatedBy = null,
+                    Status = x.Status
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

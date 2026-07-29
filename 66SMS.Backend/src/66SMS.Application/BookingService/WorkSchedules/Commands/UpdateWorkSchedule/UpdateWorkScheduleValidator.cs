@@ -1,5 +1,4 @@
 using _66SMS.Contracts.Helpers;
-using _66SMS.Domain.Entities;
 using FluentValidation;
 
 namespace _66SMS.Application.BookingService.WorkSchedules.Commands.UpdateWorkSchedule

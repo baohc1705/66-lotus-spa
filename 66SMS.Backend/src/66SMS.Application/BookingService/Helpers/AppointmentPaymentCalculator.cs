@@ -4,10 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.BookingService.Helpers
 {
-    /// <summary>
-    /// Tính toán các con số liên quan đến tiền cọc và thanh toán lịch hẹn.
-    /// % cọc ưu tiên: appointment.DepositPercent → config_appointments theo salon → DefaultDepositPercent.
-    /// </summary>
+  
     public static class AppointmentPaymentCalculator
     {
         // Fallback cuối nếu chi nhánh chưa có cấu hình

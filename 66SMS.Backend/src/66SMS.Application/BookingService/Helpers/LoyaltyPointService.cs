@@ -11,7 +11,7 @@ namespace _66SMS.Application.BookingService.Helpers
         private readonly IMembershipTierSqlRepository membershipTierSqlRepository;
         private readonly IMembershipCardSqlRepository membershipCardSqlRepository;
 
-        // 1 điểm ≈ 10.000 VND (khớp công thức cộng điểm và UI tiến độ thăng hạng)
+        // 1 điểm = 10.000 VND (khớp công thức cộng điểm và UI tiến độ thăng hạng)
         private const decimal PointsToSpendingRate = 10000m;
 
         public LoyaltyPointService(

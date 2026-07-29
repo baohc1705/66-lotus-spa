@@ -1,7 +1,6 @@
-using _66SMS.Contracts.Shared;
-using _66SMS.Domain.Enums;
-using MediatR;
 using _66SMS.Application.DTOs;
+using _66SMS.Contracts.Shared;
+using MediatR;
 
 namespace _66SMS.Application.CatalogService.ProductCategories.Queries.GetAllProductCategories
 {

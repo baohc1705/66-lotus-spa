@@ -1,10 +1,10 @@
 using _66SMS.Application.Abstractions;
 using _66SMS.Application.BookingService.Helpers;
+using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
-using _66SMS.Contracts.Enumerations;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
@@ -35,9 +35,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
             this.sqlUnitOfWork = sqlUnitOfWork;
         }
 
-        /// <summary>
-        /// Tạo soft lock (TTL 10 phút). Serializable + filtered unique → 1 winner khi race.
-        /// </summary>
+      
         public async Task<Result<List<int>>> Handle(CreateSlotLockCommand request, CancellationToken cancellationToken)
         {
             for (var attempt = 0; attempt <= BookingDbConcurrency.MaxDeadlockRetries; attempt++)

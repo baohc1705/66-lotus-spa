@@ -61,10 +61,6 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-        /// <summary>
-        /// Thống kê hoa hồng / lịch hẹn đã thanh toán theo khoảng ngày (local).
-        /// Admin: bắt buộc staffId. Staff/Manager: luôn lấy staff từ token.
-        /// </summary>
         [HttpGet("stats")]
         [PermissionAuthorize("payrolls", "read")]
         public async Task<IActionResult> GetCommissionStats(

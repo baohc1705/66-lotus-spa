@@ -62,9 +62,7 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-        /// <summary>
-        /// Lễ tân đặt lịch hộ khách — chờ phục vụ ngay, không yêu cầu cọc.
-        /// </summary>
+      
         [HttpPost("appointments")]
         [Authorize]
         public async Task<IActionResult> CreateCashierAppointment([FromBody] CreateCashierAppointmentCommand command)
@@ -140,9 +138,6 @@ namespace _66SMS.API.Controllers
                 QueryData = collections 
             };
             var result = await mediator.Send(command);
-            
-            // Redirect or return JSON based on requirement. 
-            // Often VNPAY callback returns HTML or redirects. If JSON API:
             return HandleResult(result);
         }
 
@@ -154,22 +149,13 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> VnPayIpn()
         {
-            // Lấy toàn bộ các tham số (query string) mà VNPAY gắn lên URL và chuyển thành Dictionary
             var collections = HttpContext.Request.Query.ToDictionary(k => k.Key, v => v.Value.ToString());
-            
-            // Đóng gói dữ liệu vào Command để đưa xuống Handler xử lý logic
+           
             var command = new VnPayIpnCommand 
             { 
                 QueryData = collections 
             };
-            
-            // Gửi qua thư viện MediatR để chạy VnPayIpnHandler.cs
             var result = await mediator.Send(command);
-            
-            // ĐIỂM ĐẶC BIỆT LƯU Ý KHI LÀM IPN:
-            // Hàm trả về (return) tuyệt đối không dùng HandleResult() vì HandleResult sẽ bọc data trong object { "success": true, "data": ... }
-            // VNPAY chỉ đọc được định dạng JSON thuần khiết của nó: { "RspCode": "00", "Message": "Confirm Success" }.
-            // Do đó phải dùng Ok(result) để serialize trực tiếp object VnPayIpnResponse ra JSON.
             return Ok(result);
         }
     }

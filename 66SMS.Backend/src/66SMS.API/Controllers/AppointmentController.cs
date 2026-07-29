@@ -29,7 +29,7 @@ namespace _66SMS.API.Controllers
         }
 
         /// <summary>
-        /// Lấy danh sách nhân viên (thợ) khả dụng cho một dịch vụ vào một ngày cụ thể.
+        /// Lấy danh sách nhân viên  khả dụng cho một dịch vụ vào một ngày cụ thể.
         /// </summary>
         /// <param name="date">Ngày muốn đặt lịch (YYYY-MM-DD).</param>
         /// <param name="serviceId">ID của dịch vụ muốn đặt.</param>

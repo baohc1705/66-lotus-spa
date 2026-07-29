@@ -1,6 +1,5 @@
 using _66SMS.Contracts.Shared;
 using MediatR;
-using System;
 
 namespace _66SMS.Application.BookingService.TimeSlots.Commands.CreateTimeSlot
 {

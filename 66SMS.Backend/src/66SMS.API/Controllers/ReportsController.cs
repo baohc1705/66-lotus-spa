@@ -18,10 +18,6 @@ namespace _66SMS.API.Controllers
             _mediator = mediator;
         }
 
-        /// <summary>
-        /// Gọi stored procedure theo key cấu hình (StoredProcedureSettings).
-        /// Query string được map sang params SP theo Source query:xxx.
-        /// </summary>
         [HttpGet("{procedureKey}")]
         [Authorize]
         public async Task<IActionResult> Execute(string procedureKey, CancellationToken cancellationToken)

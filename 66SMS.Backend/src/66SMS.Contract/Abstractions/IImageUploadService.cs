@@ -1,7 +1,7 @@
 namespace _66SMS.Contract.Abstractions
 {
     /// <summary>
-    /// Upload ảnh qua message bus (publish request → consumer Cloudinary → trả URL).
+    /// Upload ảnh qua message bus 
     /// Handler chỉ nhận URL, không phụ thuộc MassTransit/IRequestClient.
     /// </summary>
     public interface IImageUploadService

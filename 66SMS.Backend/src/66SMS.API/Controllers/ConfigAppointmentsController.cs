@@ -31,7 +31,6 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-        // Public: khách đặt lịch cần biết % cọc theo chi nhánh
         [HttpGet("by-salon/{salonId:int}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetBySalon(int salonId)

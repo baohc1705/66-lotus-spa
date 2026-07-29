@@ -144,9 +144,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.PayAppointment
 
                 appointmentSqlRepository.Update(appointment);
                 
-                // Gọi service để cộng điểm và kiểm tra tự động nâng hạng thẻ thành viên
-                // Tính điểm dựa trên TỔNG tiền dịch vụ (TotalAmount) — bao gồm cả phần cọc đã thanh toán trước
-                // Việc lưu các thay đổi của thẻ và lịch sử sẽ được thực thi chung trong SaveChangeAsync dưới đây
+               
                 if (appointment.TotalAmount > 0)
                 {
                     await loyaltyPointService.AddPointsAndCheckUpgradeAsync(

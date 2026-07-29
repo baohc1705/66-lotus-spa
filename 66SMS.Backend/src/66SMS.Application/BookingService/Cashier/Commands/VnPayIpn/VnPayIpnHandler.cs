@@ -28,16 +28,11 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
     {
         public async Task<VnPayIpnResponse> Handle(VnPayIpnCommand request, CancellationToken cancellationToken)
         {
-            // Bước 1: Parse dữ liệu từ URL Query String và kiểm tra chữ ký (Checksum) bằng HashSecret
             var result = vnPayService.PaymentExecute(request.QueryData);
-
-            // Checksum không hợp lệ
             if (!result.Success && string.IsNullOrEmpty(result.VnPayResponseCode))
             {
                 return VnPayIpnResponse.InvalidSignature();
             }
-
-            // Nhánh nạp ví
             if (result.IsWalletTopUp)
             {
                 if (result.WalletId <= 0)
@@ -62,7 +57,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                     if (!topUp.IsSuccess && topUp.Code == 404)
                         return VnPayIpnResponse.OrderNotFound();
 
-                    // Đã ghi nhận trước đó (Return chạy trước IPN) → mã 02
                     if (topUp.IsSuccess && topUp.Data is bool isNewlyCredited && !isNewlyCredited)
                         return VnPayIpnResponse.OrderAlreadyConfirmed();
 
@@ -73,7 +67,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                 return VnPayIpnResponse.Success();
             }
 
-            // Bước 2: Truy vấn CSDL để tìm ra lịch hẹn tương ứng
+           
             var appointment = await appointmentRepository.AsQueryable()
                 .Include(a => a.Payments)
                 .FirstOrDefaultAsync(a => a.Id == result.AppointmentId, cancellationToken);
@@ -81,28 +75,22 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
             if (appointment == null)
                 return VnPayIpnResponse.OrderNotFound();
 
-            // Bước 3: Kiểm tra đơn đã xác nhận trước đó chưa
+      
             bool isAlreadyConfirmed;
             if (result.Phase == AppointmentPaymentConst.PHASE_DEPOSIT)
             {
-                // Nếu không còn ở trạng thái chờ cọc (PENDING) thì nghĩa là đã cọc rồi
+               
                 isAlreadyConfirmed = !AppointmentStatusTransitions.CanPayDeposit(appointment);
             }
             else
             {
                 isAlreadyConfirmed = !AppointmentStatusTransitions.CanPayBalance(appointment.Status);
             }
-
-            // Nếu phát hiện đơn hàng đã được cập nhật thanh toán thành công từ trước rồi
+            
             if (isAlreadyConfirmed)
             {
-                // Trả về mã 02 để báo cho VNPAY biết hệ thống đã ghi nhận đơn này rồi, không cần gọi lại nữa
                 return VnPayIpnResponse.OrderAlreadyConfirmed();
             }
-
-            // Có thể bổ sung kiểm tra số tiền khớp nhau (vnp_Amount) ở đây, nếu lệch thì trả về InvalidAmount() (Mã 04)
-
-            // Bước 4: Kiểm tra trạng thái giao dịch thẻ của khách hàng (Mã "00" là thẻ trừ tiền thành công)
             if (result.Success)
             {
                 var depositPercent = result.Phase == AppointmentPaymentConst.PHASE_DEPOSIT
@@ -118,7 +106,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                     result.TransactionId,
                     depositPercent);
 
-                // Đề phòng hàm Apply tự động check thấy điều kiện không thỏa mãn (ví dụ lỗi logic)
+              
                 if (!apply.IsSuccess)
                 {
                     return VnPayIpnResponse.OrderAlreadyConfirmed();
@@ -138,7 +126,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                 appointmentRepository.Update(appointment);
                 await unitOfWork.SaveChangeAsync(cancellationToken);
 
-                // Sau khi cọc thành công: tạo hóa đơn cọc + gửi email
+              
                 if (result.Phase == AppointmentPaymentConst.PHASE_DEPOSIT)
                 {
                     await CreateDepositInvoiceAndSendEmailAsync(appointment.Id, cancellationToken);

@@ -5,8 +5,6 @@ using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace _66SMS.Application.BookingService.TimeSlots.Commands.DeleteTimeSlot
 {

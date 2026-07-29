@@ -12,7 +12,7 @@ namespace _66SMS.API.Controllers
 {
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/admin/wallets")]
-    [Authorize] // Requires auth, optionally restrict to Admin/Staff roles
+    [Authorize]
     public class AdminWalletController : ApiController<AdminWalletController>
     {
         private readonly IMediator mediator;

@@ -1,8 +1,8 @@
+using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Helpers
 {
@@ -11,8 +11,6 @@ namespace _66SMS.Application.BookingService.Helpers
     /// </summary>
     public class WalletManager
     {
-        // Lấy ví của user, tự tạo Customer và Wallet nếu chưa tồn tại
-        // Lưu ý: sau khi gọi method này phải gọi SaveChangesAsync() bên ngoài để lưu vào DB
         public static async Task<Wallet> GetOrCreateWalletAsync(
             int userId,
             IUserSqlRepository userSqlRepository,
@@ -67,14 +65,13 @@ namespace _66SMS.Application.BookingService.Helpers
                     CreatedAt = DateTimeHelper.UtcNow()
                 };
 
-                // Gán CustomerId trực tiếp nếu Customer đã có Id (tránh trùng khi EF track navigation)
+                
                 if (customer.Id > 0)
                 {
                     wallet.CustomerId = customer.Id;
                 }
 
                 walletSqlRepository.Add(wallet);
-                // Chưa SaveChanges ở đây — caller phải tự gọi unit of work để lưu cùng 1 transaction
             }
 
             return wallet;

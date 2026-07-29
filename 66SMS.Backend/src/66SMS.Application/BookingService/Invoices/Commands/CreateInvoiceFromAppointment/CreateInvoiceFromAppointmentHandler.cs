@@ -1,5 +1,6 @@
 using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Contracts.Enumerations;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -7,10 +8,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromAppointment
 {
@@ -32,7 +30,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
 
         public async Task<Result<int>> Handle(CreateInvoiceFromAppointmentCommand request, CancellationToken cancellationToken)
         {
-            // 1. Load appointment with services, user customer, and payments details
+            
             var appointment = await appointmentRepository.AsQueryable(asNoTracking: false)
                 .Include(a => a.Payments)
                 .Include(a => a.Services!)
@@ -48,7 +46,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
                 return Result<int>.NotFound(AppointmentConst.MSG_APPOINTMENT_NOT_FOUND, ErrorCodes.ERR_APPOINTMENT_NOT_FOUND);
             }
 
-            // 2. Validate status and existing invoices
+            
             if (appointment.Status != AppointmentConst.STATUS_COMPLETED)
             {
                 return Result<int>.BadRequest("Lịch hẹn chưa hoàn thành phục vụ để tạo hóa đơn.", ErrorCodes.ERR_APPOINTMENT_ALREADY_THIS_STATUS);
@@ -146,7 +144,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
                     LoyaltyPointsEarned = 0,
                     TaxAmount = 0,
                     TotalAmount = appointment.TotalAmount,
-                    PaidAmount = appointment.PaidAmount, // Include any deposit already paid
+                    PaidAmount = appointment.PaidAmount, 
                     ChangeAmount = 0,
                     PaymentMethod = paymentMethod,
                     Status = status,

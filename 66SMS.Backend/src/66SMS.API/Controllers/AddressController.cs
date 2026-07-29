@@ -11,18 +11,18 @@ namespace _66SMS.API.Controllers
     [ApiVersion("1.0")]
     public class AddressController : ApiController<AddressController>
     {
-        private readonly IMediator _mediator;
+        private readonly IMediator mediator;
 
         public AddressController(IMediator mediator)
         {
-            _mediator = mediator;
+            this.mediator = mediator;
         }
 
         [HttpGet("provinces")]
         [AllowAnonymous]
         public async Task<IActionResult> GetProvinces(CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(new GetAllProvincesQuery(), cancellationToken);
+            var result = await mediator.Send(new GetAllProvincesQuery(), cancellationToken);
             return HandleResult(result);
         }
 
@@ -30,7 +30,7 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetWards([FromQuery] string provinceCode, CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(new GetAllWardsByProvinceQuery { ProvinceCode = provinceCode }, cancellationToken);
+            var result = await mediator.Send(new GetAllWardsByProvinceQuery { ProvinceCode = provinceCode }, cancellationToken);
             return HandleResult(result);
         }
     }

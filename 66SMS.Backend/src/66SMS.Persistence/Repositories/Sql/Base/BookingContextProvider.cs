@@ -111,7 +111,10 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
             var now = DateTimeHelper.UtcNow();
             var appointments = await appointmentSqlRepository
                 .AsQueryable()
-                .Where(x => x.AppointmentDate == date && x.Status != AppointmentConst.STATUS_CANCELLED)
+                .Where(x => x.AppointmentDate == date
+                    && x.Status != AppointmentConst.STATUS_CANCELLED
+                    && x.Status != AppointmentConst.STATUS_COMPLETED
+                    && x.Status != AppointmentConst.STATUS_NO_SHOW)
                 .Include(x => x.Services)
                 .Include(x => x.TimeSlot)
                 .ToListAsync(cancellationToken);

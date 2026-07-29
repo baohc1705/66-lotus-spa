@@ -36,7 +36,6 @@ namespace _66SMS.Application.BookingService.Helpers
 
             var phone = customer.Phone.Trim();
 
-            // Đã có User trùng SĐT → gắn lại
             var existingByPhone = await userSqlRepository.AsQueryable(true)
                 .Where(u => u.Username == phone)
                 .Select(u => u.Id)

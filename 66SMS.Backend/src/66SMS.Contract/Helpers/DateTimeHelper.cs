@@ -8,7 +8,7 @@
     {
         private const string DefaultDateOnly = "dd/MM/yyyy";
 
-        // ── DateTimeOffset (chuẩn chính) ───────────────────────────────────
+       
         public static DateTimeOffset UtcNow() => DateTimeOffset.UtcNow;
 
         public static string UtcNowString(string format = "yyyyMMddHHmmss") => UtcNow().ToString(format);
@@ -46,7 +46,7 @@
             };
         }
 
-        // ── DateOnly ──────────────────────────────────────────────────────
+    
         public static DateOnly UtcToday() => DateOnly.FromDateTime(UtcNow().UtcDateTime);
 
         public static string ToDateOnlyString(this DateOnly date, string? format = DefaultDateOnly) => date.ToString(format);

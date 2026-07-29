@@ -8,35 +8,16 @@ using StackExchange.Redis;
 
 namespace _66SMS.Infrastructure.Caching
 {
-    /// <summary>
-    /// Cache phân tán (Redis). Chỉ cache Data DTO, không cache Result&lt;T&gt;.
-    /// </summary>
     public class RedisCacheService : ICacheService
     {
-        /// <summary>
-        /// Options cho JsonSerializer.
-        /// </summary>
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             PropertyNameCaseInsensitive = true,
         };
-
-        /// <summary>
-        /// Cache phân tán (Redis).
-        /// </summary>
         private readonly IDistributedCache cache;
-        /// <summary>
-        /// ConnectionMultiplexer để lấy Server.
-        /// </summary>
         private readonly IConnectionMultiplexer mux;
-        /// <summary>
-        /// Settings cho Redis.
-        /// </summary>
         private readonly RedisSettings settings;
-        /// <summary>
-        /// Logger.
-        /// </summary>
         private readonly ILogger<RedisCacheService> logger;
 
         public RedisCacheService(

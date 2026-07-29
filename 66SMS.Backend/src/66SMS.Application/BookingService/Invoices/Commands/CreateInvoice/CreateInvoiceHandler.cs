@@ -1,5 +1,6 @@
 using _66SMS.Application.Abstractions;
 using _66SMS.Contracts.Enumerations;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -8,7 +9,6 @@ using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
 {
@@ -124,7 +124,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
                     });
                 }
 
-                // Load khách hàng (nếu có) để áp dụng membership + loyalty
+                // Load khách hàng  để áp dụng membership + loyalty
                 Customer? customer = null;
                 if (request.CustomerId.HasValue)
                 {

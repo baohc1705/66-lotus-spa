@@ -91,7 +91,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
             using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Wallet Payment Processing
+              
                 if (request.PaymentMethod == InvoiceConst.PAYMENT_WALLET)
                 {
                     int? walletUserId = appointment?.CreatedByUserId ?? customer?.UserId;
@@ -132,7 +132,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                     walletTransactionRepository.Add(walletTx);
                 }
 
-                // Update Invoice — gán cashier lúc checkout (hóa đơn cọc tạo online thường chưa có cashier)
+             
                 invoice.PaidAmount = invoice.TotalAmount;
                 invoice.ChangeAmount = change;
                 invoice.PaymentMethod = request.PaymentMethod;
@@ -144,7 +144,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                 invoice.UpdatedBy = request.CashierId;
                 invoiceRepository.Update(invoice);
 
-                // Update Appointment if exists
+         
                 if (appointment != null)
                 {
                     int appointmentMethod = request.PaymentMethod switch
@@ -182,7 +182,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                     appointmentRepository.Update(appointment);
                 }
 
-                // Loyalty Points Calculation and Awarding
+        
                 int earnedPoints = 0;
                 if (customer != null)
                 {

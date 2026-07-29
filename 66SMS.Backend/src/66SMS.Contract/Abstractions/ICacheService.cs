@@ -1,7 +1,7 @@
 namespace _66SMS.Contracts.Abstractions
 {
     /// <summary>
-    /// Cache phân tán (Redis). Chỉ cache Data DTO, không cache Result&lt;T&gt;.
+    /// Cache phân tán (Redis). Chỉ cache Data DTO, không cache Result
     /// </summary>
     public interface ICacheService
     {

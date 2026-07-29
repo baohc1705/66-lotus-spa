@@ -1,6 +1,5 @@
 using _66SMS.Contracts.Shared;
 using MediatR;
-using System;
 using System.Text.Json.Serialization;
 
 namespace _66SMS.Application.BookingService.TimeSlots.Commands.UpdateTimeSlot

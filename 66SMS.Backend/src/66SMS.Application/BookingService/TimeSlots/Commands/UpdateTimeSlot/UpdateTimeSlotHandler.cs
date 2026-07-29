@@ -6,8 +6,6 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace _66SMS.Application.BookingService.TimeSlots.Commands.UpdateTimeSlot
 {

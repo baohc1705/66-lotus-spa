@@ -1,15 +1,11 @@
-using _66SMS.Application.BookingService.WorkSchedules.Commands.CreateWorkSchedule;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
-using System.Collections.Generic;
 using System.Data;
-using System.Threading;
-using System.Threading.Tasks;
-using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.WorkSchedules.Commands.BulkCreateWorkSchedule
 {

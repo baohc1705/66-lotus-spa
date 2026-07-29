@@ -24,13 +24,4 @@
 # End of https://www.toptal.com/developers/gitignore/api/visua
 **.zip
 .env
-fe
-sourcev1
-sourcev2
-srcbev3
-.agent
-claude.md
-.claude
-
-implement-vnpay.md
-GEMINI.md
+.vscode

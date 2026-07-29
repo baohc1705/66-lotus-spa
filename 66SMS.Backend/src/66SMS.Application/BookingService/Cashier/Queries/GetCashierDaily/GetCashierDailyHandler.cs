@@ -60,7 +60,7 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
                 Avatar = s.AvatarUrl
             }).ToList();
 
-            // Lấy danh sách lịch hẹn trong ngày
+           
             var appointmentsQuery = appointmentRepository.AsQueryable()
                 .Include(a => a.Staff!)
                 .Include(a => a.Position!)
