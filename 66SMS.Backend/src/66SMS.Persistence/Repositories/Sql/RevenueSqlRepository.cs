@@ -1,24 +1,13 @@
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
+using _66SMS.Domain.Entities;
 using _66SMS.Persistence.Repositories.Sql.Base;
 
 namespace _66SMS.Persistence.Repositories.Sql
 {
     public class RevenueSqlRepository : IRevenueSqlRepository
     {
-        private const string SpSummary = "dbo.usp_GetRevenueSummary";
-        private const string SpTrend = "dbo.usp_GetRevenueTrend";
-        private const string SpBreakdown = "dbo.usp_GetRevenueBreakdown";
-        private const string SpTopItems = "dbo.usp_GetTopRevenueItems";
-        private const string SpToday = "dbo.usp_GetTodaySummary";
-        private const string SpTraffic = "dbo.usp_GetCustomerTraffic";
-        private const string SpNetRevenue = "dbo.usp_GetNetRevenue";
-        private const string SpTopStaff = "dbo.usp_GetTopStaff";
-        private const string SpBySalon = "dbo.usp_GetRevenueBySalon";
-        private const string SpBySalonDaily = "dbo.usp_GetRevenueBySalonDaily";
-        private const string SpByStaff = "dbo.usp_GetRevenueByStaff";
-        private const string SpByService = "dbo.usp_GetRevenueByService";
-
         private readonly ApplicationDbContext dbContext;
 
         public RevenueSqlRepository(ApplicationDbContext dbContext)
@@ -34,7 +23,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             CancellationToken cancellationToken = default)
         {
             var rows = await dbContext.ExecuteStoredProcedureAsync<RevenueSummaryRowDto>(
-                SpSummary,
+                RevenueConst.SpSummary,
                 cancellationToken,
                 salonId,
                 fromDate,
@@ -51,7 +40,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             CancellationToken cancellationToken = default)
         {
             var rows = await dbContext.ExecuteStoredProcedureAsync<RevenueTrendRowDto>(
-                SpTrend,
+                RevenueConst.SpTrend,
                 cancellationToken,
                 salonId,
                 fromDate,
@@ -67,7 +56,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             CancellationToken cancellationToken = default)
         {
             var rows = await dbContext.ExecuteStoredProcedureAsync<RevenueBreakdownRowDto>(
-                SpBreakdown,
+                RevenueConst.SpBreakdown,
                 cancellationToken,
                 salonId,
                 fromDate,
@@ -85,7 +74,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             CancellationToken cancellationToken = default)
         {
             var rows = await dbContext.ExecuteStoredProcedureAsync<TopRevenueItemRowDto>(
-                SpTopItems,
+                RevenueConst.SpTopItems,
                 cancellationToken,
                 salonId,
                 fromDate,
@@ -102,7 +91,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             CancellationToken cancellationToken = default)
         {
             var rows = await dbContext.ExecuteStoredProcedureAsync<TodaySummaryRowDto>(
-                SpToday,
+                RevenueConst.SpToday,
                 cancellationToken,
                 salonId,
                 today);
@@ -118,7 +107,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             CancellationToken cancellationToken = default)
         {
             var rows = await dbContext.ExecuteStoredProcedureAsync<LabelValueRowDto>(
-                SpTraffic,
+                RevenueConst.SpTraffic,
                 cancellationToken,
                 salonId,
                 fromDate,
@@ -136,7 +125,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             CancellationToken cancellationToken = default)
         {
             var rows = await dbContext.ExecuteStoredProcedureAsync<LabelValueRowDto>(
-                SpNetRevenue,
+                RevenueConst.SpNetRevenue,
                 cancellationToken,
                 salonId,
                 fromDate,
@@ -154,7 +143,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             CancellationToken cancellationToken = default)
         {
             var rows = await dbContext.ExecuteStoredProcedureAsync<TopStaffRowDto>(
-                SpTopStaff,
+                RevenueConst.SpTopStaff,
                 cancellationToken,
                 salonId,
                 fromDate,
@@ -171,7 +160,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             CancellationToken cancellationToken = default)
         {
             var rows = await dbContext.ExecuteStoredProcedureAsync<RevenueBySalonRowDto>(
-                SpBySalon,
+                RevenueConst.SpBySalon,
                 cancellationToken,
                 fromDate,
                 toDate,
@@ -186,7 +175,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             CancellationToken cancellationToken = default)
         {
             var rows = await dbContext.ExecuteStoredProcedureAsync<RevenueBySalonDailyRowDto>(
-                SpBySalonDaily,
+                RevenueConst.SpBySalonDaily,
                 cancellationToken,
                 fromDate,
                 toDate);
@@ -201,7 +190,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             CancellationToken cancellationToken = default)
         {
             var rows = await dbContext.ExecuteStoredProcedureAsync<RevenueByStaffRowDto>(
-                SpByStaff,
+                RevenueConst.SpByStaff,
                 cancellationToken,
                 salonId,
                 fromDate,
@@ -217,11 +206,77 @@ namespace _66SMS.Persistence.Repositories.Sql
             CancellationToken cancellationToken = default)
         {
             var rows = await dbContext.ExecuteStoredProcedureAsync<RevenueByServiceRowDto>(
-                SpByService,
+                RevenueConst.SpByService,
                 cancellationToken,
                 salonId,
                 fromDate,
                 toDate);
+
+            return rows.ToList();
+        }
+
+        public async Task<IReadOnlyList<ReportRevenueByPeriodRowDto>> GetReportByPeriodAsync(
+            int? salonId, 
+            DateOnly fromDate, 
+            DateOnly toDate, 
+            string grain, 
+            CancellationToken cancellationToken = default)
+        {
+            var rows = await dbContext.ExecuteStoredProcedureAsync<ReportRevenueByPeriodRowDto>(
+                RevenueConst.SpReportByPeriod,
+                cancellationToken,
+                salonId,
+                fromDate,
+                toDate,
+                grain);
+
+            return rows.ToList();
+        }
+
+        public async Task<IReadOnlyList<ReportRevenueBySalonRowDto>> GetReportBySalonAsync(
+            DateOnly fromDate, 
+            DateOnly toDate, 
+            CancellationToken cancellationToken = default)
+        {
+            var rows = await dbContext.ExecuteStoredProcedureAsync<ReportRevenueBySalonRowDto>(
+                RevenueConst.SpReportBySalon,
+                cancellationToken,
+                fromDate,
+                toDate);
+
+            return rows.ToList();
+        }
+
+        public async Task<IReadOnlyList<ReportRevenueByStaffRowDto>> GetReportByStaffAsync(
+            int? salonId, 
+            DateOnly fromDate, 
+            DateOnly toDate, 
+            CancellationToken cancellationToken = default)
+        {
+            var rows = await dbContext.ExecuteStoredProcedureAsync<ReportRevenueByStaffRowDto>(
+               RevenueConst.SpReportByStaff,
+               cancellationToken,
+               salonId,
+               fromDate,
+               toDate);
+
+            return rows.ToList();
+        }
+
+        public async Task<IReadOnlyList<ReportRevenueByServiceRowDto>> GetReportByServiceAsync(
+            int? salonId, 
+            int? categoryId, 
+            DateOnly fromDate, 
+            DateOnly toDate, 
+            CancellationToken cancellationToken = default)
+        {
+            var rows = await dbContext.ExecuteStoredProcedureAsync<ReportRevenueByServiceRowDto>(
+               RevenueConst.SpReportByService,
+               cancellationToken,
+               salonId,
+               categoryId,
+               fromDate,
+               toDate);
 
             return rows.ToList();
         }

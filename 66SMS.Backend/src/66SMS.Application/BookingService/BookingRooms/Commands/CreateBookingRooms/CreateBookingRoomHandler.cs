@@ -1,5 +1,4 @@
 using System.Data;
-using _66SMS.Contract.Abstractions;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;

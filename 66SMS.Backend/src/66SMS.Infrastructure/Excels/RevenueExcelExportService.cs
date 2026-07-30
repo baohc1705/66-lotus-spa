@@ -325,6 +325,247 @@ namespace _66SMS.Infrastructure.Excels
             sheet.Columns().AdjustToContents();
         }
 
+
+
+        public byte[] BuildReportByPeriodWorkbook(DateOnly from, DateOnly to, string grain, IReadOnlyList<ReportRevenueByPeriodRowDto> rows)
+        {
+            using var workbook = new XLWorkbook();
+            var sheet = workbook.Worksheets.Add("Theo thời gian");
+
+            sheet.Cell(1, 1).Value = "Báo cáo doanh thu theo thời gian";
+            sheet.Cell(1, 1).Style.Font.Bold = true;
+            sheet.Range(1, 1, 1, 6).Merge();
+
+            sheet.Cell(2, 1).Value = $"Kỳ: {from:dd/MM/yyyy} – {to:dd/MM/yyyy} | Grain: {grain}";
+            sheet.Range(2, 1, 2, 6).Merge();
+
+            var headers = new[] { "STT", "Thời gian", "Số đơn", "Tổng tiền hóa đơn", "Tổng hoa hồng", "Tổng doanh thu" };
+            for (var i = 0; i < headers.Length; i++)
+            {
+                var cell = sheet.Cell(4, i + 1);
+                cell.Value = headers[i];
+                cell.Style.Font.Bold = true;
+                cell.Style.Fill.BackgroundColor = XLColor.LightGray;
+            }
+
+            var row = 5;
+            var stt = 1;
+            decimal sumInvoice = 0, sumCommission = 0, sumNet = 0;
+            var sumOrder = 0;
+
+            foreach (var item in rows)
+            {
+                sheet.Cell(row, 1).Value = stt++;
+                sheet.Cell(row, 2).Value = item.PeriodKey;
+                sheet.Cell(row, 3).Value = item.OrderCount;
+                sheet.Cell(row, 4).Value = item.InvoiceTotal;
+                sheet.Cell(row, 5).Value = item.CommissionTotal;
+                sheet.Cell(row, 6).Value = item.TotalRevenue;
+                FormatMoney(sheet.Range(row, 4, row, 6));
+
+                sumOrder += item.OrderCount;
+                sumInvoice += item.InvoiceTotal;
+                sumCommission += item.CommissionTotal;
+                sumNet += item.TotalRevenue;
+                row++;
+            }
+
+            // Dòng tổng
+            sheet.Cell(row, 2).Value = "Tổng";
+            sheet.Cell(row, 2).Style.Font.Bold = true;
+            sheet.Cell(row, 3).Value = sumOrder;
+            sheet.Cell(row, 4).Value = sumInvoice;
+            sheet.Cell(row, 5).Value = sumCommission;
+            sheet.Cell(row, 6).Value = sumNet;
+            sheet.Range(row, 1, row, 6).Style.Font.Bold = true;
+            FormatMoney(sheet.Range(row, 4, row, 6));
+
+            sheet.Columns().AdjustToContents();
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
+        }
+
+        public byte[] BuildReportBySalonWorkbook(DateOnly from, DateOnly to, IReadOnlyList<ReportRevenueBySalonRowDto> rows)
+        {
+            using var workbook = new XLWorkbook();
+            var sheet = workbook.Worksheets.Add("Theo chi nhánh");
+
+            sheet.Cell(1, 1).Value = "Báo cáo doanh thu theo chi nhánh";
+            sheet.Cell(1, 1).Style.Font.Bold = true;
+            sheet.Range(1, 1, 1, 7).Merge();
+            sheet.Cell(2, 1).Value = $"Kỳ: {from:dd/MM/yyyy} – {to:dd/MM/yyyy}";
+            sheet.Range(2, 1, 2, 7).Merge();
+
+            var headers = new[] { "STT", "Chi nhánh", "Số nhân viên", "Số đơn", "Tổng thu", "Tổng chi", "Tổng doanh thu" };
+            for (var i = 0; i < headers.Length; i++)
+            {
+                var cell = sheet.Cell(4, i + 1);
+                cell.Value = headers[i];
+                cell.Style.Font.Bold = true;
+                cell.Style.Fill.BackgroundColor = XLColor.LightGray;
+            }
+
+            var row = 5;
+            var stt = 1;
+            decimal sumCashIn = 0, sumComm = 0, sumGross = 0;
+            var sumStaff = 0;
+            var sumOrder = 0;
+
+            foreach (var item in rows)
+            {
+                sheet.Cell(row, 1).Value = stt++;
+                sheet.Cell(row, 2).Value = item.SalonName;
+                sheet.Cell(row, 3).Value = item.StaffCount;
+                sheet.Cell(row, 4).Value = item.OrderCount;
+                sheet.Cell(row, 5).Value = item.CashIn;
+                sheet.Cell(row, 6).Value = item.CommissionOut;
+                sheet.Cell(row, 7).Value = item.TotalRevenue;
+                FormatMoney(sheet.Range(row, 5, row, 7));
+
+                sumStaff += item.StaffCount;
+                sumOrder += item.OrderCount;
+                sumCashIn += item.CashIn;
+                sumComm += item.CommissionOut;
+                sumGross += item.TotalRevenue;
+                row++;
+            }
+
+            sheet.Cell(row, 2).Value = "Tổng";
+            sheet.Cell(row, 2).Style.Font.Bold = true;
+            sheet.Cell(row, 3).Value = sumStaff;
+            sheet.Cell(row, 4).Value = sumOrder;
+            sheet.Cell(row, 5).Value = sumCashIn;
+            sheet.Cell(row, 6).Value = sumComm;
+            sheet.Cell(row, 7).Value = sumGross;
+            sheet.Range(row, 1, row, 7).Style.Font.Bold = true;
+            FormatMoney(sheet.Range(row, 5, row, 7));
+
+            sheet.Columns().AdjustToContents();
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
+        }
+
+        public byte[] BuildReportByStaffWorkbook(DateOnly from, DateOnly to, string? salonLabel, IReadOnlyList<ReportRevenueByStaffRowDto> rows)
+        {
+            using var workbook = new XLWorkbook();
+            var sheet = workbook.Worksheets.Add("Theo nhân viên");
+
+            sheet.Cell(1, 1).Value = "Báo cáo doanh thu theo nhân viên";
+            sheet.Cell(1, 1).Style.Font.Bold = true;
+            sheet.Range(1, 1, 1, 6).Merge();
+            sheet.Cell(2, 1).Value = $"Chi nhánh: {salonLabel ?? "Tất cả"}";
+            sheet.Range(2, 1, 2, 6).Merge();
+            sheet.Cell(3, 1).Value = $"Kỳ: {from:dd/MM/yyyy} – {to:dd/MM/yyyy}";
+            sheet.Range(3, 1, 3, 6).Merge();
+
+            var headers = new[] { "STT", "Nhân viên", "Số lần phục vụ", "Tổng tiền dịch vụ", "Hoa hồng", "Tổng doanh thu" };
+            for (var i = 0; i < headers.Length; i++)
+            {
+                var cell = sheet.Cell(5, i + 1);
+                cell.Value = headers[i];
+                cell.Style.Font.Bold = true;
+                cell.Style.Fill.BackgroundColor = XLColor.LightGray;
+            }
+
+            var row = 6;
+            var stt = 1;
+            var sumService = 0;
+            decimal sumServiceRev = 0, sumComm = 0, sumTotal = 0;
+
+            foreach (var item in rows)
+            {
+                sheet.Cell(row, 1).Value = stt++;
+                sheet.Cell(row, 2).Value = item.StaffName;
+                sheet.Cell(row, 3).Value = item.ServiceCount;
+                sheet.Cell(row, 4).Value = item.ServiceRevenue;
+                sheet.Cell(row, 5).Value = item.Commission;
+                sheet.Cell(row, 6).Value = item.TotalRevenue;
+                FormatMoney(sheet.Range(row, 4, row, 6));
+
+                sumService += item.ServiceCount;
+                sumServiceRev += item.ServiceRevenue;
+                sumComm += item.Commission;
+                sumTotal += item.TotalRevenue;
+                row++;
+            }
+
+            sheet.Cell(row, 2).Value = "Tổng";
+            sheet.Cell(row, 2).Style.Font.Bold = true;
+            sheet.Cell(row, 3).Value = sumService;
+            sheet.Cell(row, 4).Value = sumServiceRev;
+            sheet.Cell(row, 5).Value = sumComm;
+            sheet.Cell(row, 6).Value = sumTotal;
+            sheet.Range(row, 1, row, 6).Style.Font.Bold = true;
+            FormatMoney(sheet.Range(row, 4, row, 6));
+
+            sheet.Columns().AdjustToContents();
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
+        }
+
+        public byte[] BuildReportByServiceWorkbook(DateOnly from, DateOnly to, string? salonLabel, IReadOnlyList<ReportRevenueByServiceRowDto> rows)
+        {
+            using var workbook = new XLWorkbook();
+            var sheet = workbook.Worksheets.Add("Theo dịch vụ");
+
+            sheet.Cell(1, 1).Value = "Báo cáo doanh thu theo dịch vụ";
+            sheet.Cell(1, 1).Style.Font.Bold = true;
+            sheet.Range(1, 1, 1, 7).Merge();
+            sheet.Cell(2, 1).Value = $"Chi nhánh: {salonLabel ?? "Tất cả"}";
+            sheet.Range(2, 1, 2, 7).Merge();
+            sheet.Cell(3, 1).Value = $"Kỳ: {from:dd/MM/yyyy} – {to:dd/MM/yyyy}";
+            sheet.Range(3, 1, 3, 7).Merge();
+
+            var headers = new[] { "STT", "Tên DV", "SL", "% HH", "Doanh thu", "Hoa hồng", "Thực nhận" };
+            for (var i = 0; i < headers.Length; i++)
+            {
+                var cell = sheet.Cell(5, i + 1);
+                cell.Value = headers[i];
+                cell.Style.Font.Bold = true;
+                cell.Style.Fill.BackgroundColor = XLColor.LightGray;
+            }
+
+            var row = 6;
+            var stt = 1;
+            var sumQty = 0;
+            decimal sumRev = 0, sumComm = 0, sumNet = 0;
+
+            foreach (var item in rows)
+            {
+                sheet.Cell(row, 1).Value = stt++;
+                sheet.Cell(row, 2).Value = item.ItemName;
+                sheet.Cell(row, 3).Value = item.Quantity;
+                sheet.Cell(row, 4).Value = item.AvgCommissionRate;
+                sheet.Cell(row, 5).Value = item.Revenue;
+                sheet.Cell(row, 6).Value = item.Commission;
+                sheet.Cell(row, 7).Value = item.TotalRevenue;
+                FormatMoney(sheet.Range(row, 5, row, 7));
+
+                sumQty += item.Quantity;
+                sumRev += item.Revenue;
+                sumComm += item.Commission;
+                sumNet += item.TotalRevenue;
+                row++;
+            }
+
+            sheet.Cell(row, 2).Value = "Tổng";
+            sheet.Cell(row, 2).Style.Font.Bold = true;
+            sheet.Cell(row, 3).Value = sumQty;
+            sheet.Cell(row, 5).Value = sumRev;
+            sheet.Cell(row, 6).Value = sumComm;
+            sheet.Cell(row, 7).Value = sumNet;
+            sheet.Range(row, 1, row, 7).Style.Font.Bold = true;
+            FormatMoney(sheet.Range(row, 5, row, 7));
+
+            sheet.Columns().AdjustToContents();
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
+        }
+
         private static void FormatMoney(IXLRange range)
         {
             range.Style.NumberFormat.Format = "#,##0";

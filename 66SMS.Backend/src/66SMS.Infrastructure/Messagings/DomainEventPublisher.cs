@@ -1,4 +1,4 @@
-using _66SMS.Contract.Abstractions;
+using _66SMS.Contracts.Abstractions;
 using MassTransit;
 
 namespace _66SMS.Infrastructure.Messagings;

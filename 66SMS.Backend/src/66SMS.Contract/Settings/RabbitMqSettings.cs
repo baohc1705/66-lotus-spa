@@ -1,4 +1,4 @@
-namespace _66SMS.Contract.Settings
+namespace _66SMS.Contracts.Settings
 {
     /// <summary>
     /// Cấu hình RabbitMQ.

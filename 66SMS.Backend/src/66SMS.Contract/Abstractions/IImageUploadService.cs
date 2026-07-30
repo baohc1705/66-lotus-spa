@@ -1,4 +1,4 @@
-namespace _66SMS.Contract.Abstractions
+namespace _66SMS.Contracts.Abstractions
 {
     /// <summary>
     /// Upload ảnh qua message bus 

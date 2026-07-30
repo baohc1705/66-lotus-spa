@@ -22,4 +22,8 @@
   <ItemGroup>
     <ProjectReference Include="..\66SMS.Contract\66SMS.Contract.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DTOs\" />
+  </ItemGroup>
 </Project>

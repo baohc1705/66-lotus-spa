@@ -24,6 +24,9 @@ import {
   User,
   Settings,
   PanelsTopLeft,
+  BarChart,
+  Calendar1Icon,
+  Home,
 } from "lucide-react";
 
 export interface SubMenuItem {
@@ -58,6 +61,39 @@ export const MENU_GROUPS: MenuGroup[] = [
     ],
   },
   {
+    title: "Báo cáo",
+    items: [
+      {
+        label: "Doanh thu",
+        path: "/admin",
+        icon: BarChart,
+        allowedRoles: ["Admin", "Manager"],
+        children: [
+          {
+            label: "Theo ngày",
+            path: "/admin/products/list",
+            icon: Calendar1Icon,
+          },
+          {
+            label: "Theo chi nhánh",
+            path: "/admin/products/categories",
+            icon: Home,
+          },
+          {
+            label: "Theo nhân viên",
+            path: "/admin/products/categories",
+            icon: Users,
+          },
+          {
+            label: "Theo dịch vụ",
+            path: "/admin/products/categories",
+            icon: Leaf,
+          },
+        ],
+      }
+    ],
+  },
+  {
     title: "Dịch vụ",
     items: [
       {
@@ -66,7 +102,11 @@ export const MENU_GROUPS: MenuGroup[] = [
         allowedRoles: ["Admin", "Manager"],
         children: [
           { label: "Phòng dịch vụ", path: "/admin/rooms/list", icon: Armchair },
-          { label: "Vị trí dịch vụ", path: "/admin/rooms/positions", icon: MapPin },
+          {
+            label: "Vị trí dịch vụ",
+            path: "/admin/rooms/positions",
+            icon: MapPin,
+          },
         ],
       },
       {
@@ -75,7 +115,11 @@ export const MENU_GROUPS: MenuGroup[] = [
         allowedRoles: ["Admin", "Manager"],
         children: [
           { label: "Dịch vụ", path: "/admin/services", icon: Leaf },
-          { label: "Nhóm dịch vụ", path: "/admin/services/categories", icon: Box },
+          {
+            label: "Nhóm dịch vụ",
+            path: "/admin/services/categories",
+            icon: Box,
+          },
         ],
       },
       {
@@ -177,7 +221,6 @@ export const MENU_GROUPS: MenuGroup[] = [
             icon: Clock,
             allowedRoles: ["Admin", "Manager"],
           },
-         
         ],
       },
       {
@@ -269,8 +312,8 @@ export const MENU_GROUPS: MenuGroup[] = [
         icon: Settings,
         allowedRoles: ["Admin", "Manager"],
       },
-    ]
-  }
+    ],
+  },
 ];
 
 export const MENU_ITEMS: MenuItem[] = MENU_GROUPS.flatMap(
@@ -311,23 +354,58 @@ export const TOP_NAV_TABS: ParentTab[] = [
       {
         title: "DỊCH VỤ",
         items: [
-          { label: "Dịch vụ", path: "/admin/services", icon: Leaf, allowedRoles: ["Admin", "Manager"] },
-          { label: "Nhóm dịch vụ", path: "/admin/services/categories", icon: Box, allowedRoles: ["Admin", "Manager"] },
-          { label: "Liệu trình", path: "/admin/treatments", icon: History, allowedRoles: ["Admin", "Manager"] },
+          {
+            label: "Dịch vụ",
+            path: "/admin/services",
+            icon: Leaf,
+            allowedRoles: ["Admin", "Manager"],
+          },
+          {
+            label: "Nhóm dịch vụ",
+            path: "/admin/services/categories",
+            icon: Box,
+            allowedRoles: ["Admin", "Manager"],
+          },
+          {
+            label: "Liệu trình",
+            path: "/admin/treatments",
+            icon: History,
+            allowedRoles: ["Admin", "Manager"],
+          },
         ],
       },
       {
         title: "SẢN PHẨM",
         items: [
-          { label: "Sản phẩm", path: "/admin/products/list", icon: SoapDispenserDroplet, allowedRoles: ["Admin", "Manager"] },
-          { label: "Nhóm sản phẩm", path: "/admin/products/categories", icon: Box, allowedRoles: ["Admin", "Manager"] },
+          {
+            label: "Sản phẩm",
+            path: "/admin/products/list",
+            icon: SoapDispenserDroplet,
+            allowedRoles: ["Admin", "Manager"],
+          },
+          {
+            label: "Nhóm sản phẩm",
+            path: "/admin/products/categories",
+            icon: Box,
+            allowedRoles: ["Admin", "Manager"],
+          },
         ],
       },
       {
         title: "CƠ SỞ VẬT CHẤT",
         items: [
-          { label: "Phòng dịch vụ", path: "/admin/rooms/list", icon: Armchair, allowedRoles: ["Admin", "Manager"] },
-          { label: "Vị trí dịch vụ", path: "/admin/rooms/positions", icon: MapPin, allowedRoles: ["Admin", "Manager"] },
+          {
+            label: "Phòng dịch vụ",
+            path: "/admin/rooms/list",
+            icon: Armchair,
+            allowedRoles: ["Admin", "Manager"],
+          },
+          {
+            label: "Vị trí dịch vụ",
+            path: "/admin/rooms/positions",
+            icon: MapPin,
+            allowedRoles: ["Admin", "Manager"],
+          },
         ],
       },
     ],
@@ -340,32 +418,82 @@ export const TOP_NAV_TABS: ParentTab[] = [
       {
         title: "QUẢN LÝ NHÂN SỰ",
         items: [
-          { label: "Danh sách nhân viên", path: "/admin/staff/list", icon: User, allowedRoles: ["Admin", "Manager"] },
+          {
+            label: "Danh sách nhân viên",
+            path: "/admin/staff/list",
+            icon: User,
+            allowedRoles: ["Admin", "Manager"],
+          },
         ],
       },
       {
         title: "CHỨNG CHỈ",
         items: [
-          { label: "Chứng chỉ nhân viên", path: "/admin/staff-certificates", icon: ShieldCheck, allowedRoles: ["Admin", "Manager"] },
-          { label: "Loại chứng chỉ", path: "/admin/certificate-types", icon: Award, allowedRoles: ["Admin", "Manager"] },
+          {
+            label: "Chứng chỉ nhân viên",
+            path: "/admin/staff-certificates",
+            icon: ShieldCheck,
+            allowedRoles: ["Admin", "Manager"],
+          },
+          {
+            label: "Loại chứng chỉ",
+            path: "/admin/certificate-types",
+            icon: Award,
+            allowedRoles: ["Admin", "Manager"],
+          },
         ],
       },
       {
         title: "LỊCH LÀM VIỆC",
         items: [
-          { label: "Phân ca", path: "/admin/staff/schedule", icon: Calendar, allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"] },
-          { label: "Quản lý ca", path: "/admin/shifts", icon: Clock, allowedRoles: ["Admin", "Manager"] },
-          { label: "Khung giờ", path: "/admin/timeslots", icon: Clock, allowedRoles: ["Admin", "Manager"] },
-          
-          { label: "Lịch hẹn của tôi", path: "/admin/staff/appointments", icon: CalendarHeart, allowedRoles: ["Staff"] },
+          {
+            label: "Phân ca",
+            path: "/admin/staff/schedule",
+            icon: Calendar,
+            allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
+          },
+          {
+            label: "Quản lý ca",
+            path: "/admin/shifts",
+            icon: Clock,
+            allowedRoles: ["Admin", "Manager"],
+          },
+          {
+            label: "Khung giờ",
+            path: "/admin/timeslots",
+            icon: Clock,
+            allowedRoles: ["Admin", "Manager"],
+          },
+
+          {
+            label: "Lịch hẹn của tôi",
+            path: "/admin/staff/appointments",
+            icon: CalendarHeart,
+            allowedRoles: ["Staff"],
+          },
         ],
       },
       {
         title: "CHẤM CÔNG & LƯƠNG",
         items: [
-          { label: "Chấm công", path: "/admin/attendance", icon: CalendarCheck, allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"] },
-          { label: "Danh sách lương", path: "/admin/payroll", icon: Wallet, allowedRoles: ["Admin", "Manager"] },
-          { label: "Thống kê lương", path: "/admin/payroll/stats", icon: Receipt, allowedRoles: ["Admin", "Manager", "Staff"] },
+          {
+            label: "Chấm công",
+            path: "/admin/attendance",
+            icon: CalendarCheck,
+            allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
+          },
+          {
+            label: "Danh sách lương",
+            path: "/admin/payroll",
+            icon: Wallet,
+            allowedRoles: ["Admin", "Manager"],
+          },
+          {
+            label: "Thống kê lương",
+            path: "/admin/payroll/stats",
+            icon: Receipt,
+            allowedRoles: ["Admin", "Manager", "Staff"],
+          },
         ],
       },
     ],
@@ -378,23 +506,58 @@ export const TOP_NAV_TABS: ParentTab[] = [
       {
         title: "KHÁCH HÀNG",
         items: [
-          { label: "Danh sách khách hàng", path: "/admin/customers/list", icon: Users, allowedRoles: ["Admin", "Manager", "Receptionist"] },
-          { label: "Ví khách hàng", path: "/admin/customers/wallets", icon: Wallet, allowedRoles: ["Admin"] },
+          {
+            label: "Danh sách khách hàng",
+            path: "/admin/customers/list",
+            icon: Users,
+            allowedRoles: ["Admin", "Manager", "Receptionist"],
+          },
+          {
+            label: "Ví khách hàng",
+            path: "/admin/customers/wallets",
+            icon: Wallet,
+            allowedRoles: ["Admin"],
+          },
         ],
       },
       {
         title: "THẺ THÀNH VIÊN",
         items: [
-          { label: "Thẻ thành viên", path: "/admin/customers/membership-cards", icon: CreditCard, allowedRoles: ["Admin", "Manager", "Receptionist"] },
-          { label: "Loại thẻ", path: "/admin/customers/membership-tiers", icon: Crown, allowedRoles: ["Admin"] },
+          {
+            label: "Thẻ thành viên",
+            path: "/admin/customers/membership-cards",
+            icon: CreditCard,
+            allowedRoles: ["Admin", "Manager", "Receptionist"],
+          },
+          {
+            label: "Loại thẻ",
+            path: "/admin/customers/membership-tiers",
+            icon: Crown,
+            allowedRoles: ["Admin"],
+          },
         ],
       },
       {
         title: "GIAO DỊCH & MARKETING",
         items: [
-          { label: "Hóa đơn", path: "/admin/invoices", icon: Receipt, allowedRoles: ["Admin", "Manager", "Receptionist"] },
-          { label: "Khuyến mãi", path: "/admin/marketing/promotions", icon: Tag, allowedRoles: ["Admin", "Manager"] },
-          { label: "Thu ngân", path: "/thu-ngan", icon: ShoppingCart, allowedRoles: ["Admin", "Receptionist"] },
+          {
+            label: "Hóa đơn",
+            path: "/admin/invoices",
+            icon: Receipt,
+            allowedRoles: ["Admin", "Manager", "Receptionist"],
+          },
+          {
+            label: "Khuyến mãi",
+            path: "/admin/marketing/promotions",
+            icon: Tag,
+            allowedRoles: ["Admin", "Manager"],
+          },
+          {
+            label: "Thu ngân",
+            path: "/thu-ngan",
+            icon: ShoppingCart,
+            allowedRoles: ["Admin", "Receptionist"],
+          },
         ],
       },
     ],
@@ -407,18 +570,48 @@ export const TOP_NAV_TABS: ParentTab[] = [
       {
         title: "HỆ THỐNG",
         items: [
-          { label: "Chi nhánh", path: "/admin/salons", icon: Building2, allowedRoles: ["Admin"] },
-          { label: "Banner trang chủ", path: "/admin/landing-banners", icon: PanelsTopLeft, allowedRoles: ["Admin"] },
-          { label: "Phân quyền", path: "/admin/roles", icon: ShieldCheck, allowedRoles: ["Admin"] },
-         
-          { label: "Cấu hình lịch hẹn", path: "/admin/config-appointments", icon: Settings, allowedRoles: ["Admin", "Manager"] },
+          {
+            label: "Chi nhánh",
+            path: "/admin/salons",
+            icon: Building2,
+            allowedRoles: ["Admin"],
+          },
+          {
+            label: "Banner trang chủ",
+            path: "/admin/landing-banners",
+            icon: PanelsTopLeft,
+            allowedRoles: ["Admin"],
+          },
+          {
+            label: "Phân quyền",
+            path: "/admin/roles",
+            icon: ShieldCheck,
+            allowedRoles: ["Admin"],
+          },
+
+          {
+            label: "Cấu hình lịch hẹn",
+            path: "/admin/config-appointments",
+            icon: Settings,
+            allowedRoles: ["Admin", "Manager"],
+          },
         ],
       },
       {
         title: "TÀI KHOẢN",
         items: [
-          { label: "Danh sách tài khoản", path: "/admin/accounts", icon: User, allowedRoles: ["Admin"] },
-          { label: "Hồ sơ cá nhân", path: "/admin/profile", icon: User, allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"] },
+          {
+            label: "Danh sách tài khoản",
+            path: "/admin/accounts",
+            icon: User,
+            allowedRoles: ["Admin"],
+          },
+          {
+            label: "Hồ sơ cá nhân",
+            path: "/admin/profile",
+            icon: User,
+            allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
+          },
         ],
       },
     ],

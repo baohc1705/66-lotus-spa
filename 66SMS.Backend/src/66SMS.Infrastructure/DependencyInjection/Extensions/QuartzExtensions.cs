@@ -1,4 +1,4 @@
-using _66SMS.Contract.Settings;
+using _66SMS.Contracts.Settings;
 using _66SMS.Infrastructure.BackgroundJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

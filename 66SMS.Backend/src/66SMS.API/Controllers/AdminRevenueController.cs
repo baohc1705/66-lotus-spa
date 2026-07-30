@@ -1,9 +1,17 @@
 using _66SMS.API.Abstractions;
 using _66SMS.Application.DTOs.Revenues;
 using _66SMS.Application.SalonService.Revenues.Queries.ExportBranchRevenue;
+using _66SMS.Application.SalonService.Revenues.Queries.ExportReportRevenueByPeriod;
+using _66SMS.Application.SalonService.Revenues.Queries.ExportReportRevenueBySalon;
+using _66SMS.Application.SalonService.Revenues.Queries.ExportReportRevenueByService;
+using _66SMS.Application.SalonService.Revenues.Queries.ExportReportRevenueByStaff;
 using _66SMS.Application.SalonService.Revenues.Queries.ExportRevenueBySalon;
 using _66SMS.Application.SalonService.Revenues.Queries.GetCustomerTraffic;
 using _66SMS.Application.SalonService.Revenues.Queries.GetNetRevenue;
+using _66SMS.Application.SalonService.Revenues.Queries.GetReportRevenueByPeriod;
+using _66SMS.Application.SalonService.Revenues.Queries.GetReportRevenueBySalon;
+using _66SMS.Application.SalonService.Revenues.Queries.GetReportRevenueByService;
+using _66SMS.Application.SalonService.Revenues.Queries.GetReportRevenueByStaff;
 using _66SMS.Application.SalonService.Revenues.Queries.GetRevenueBreakdown;
 using _66SMS.Application.SalonService.Revenues.Queries.GetRevenueSummary;
 using _66SMS.Application.SalonService.Revenues.Queries.GetRevenueTrend;
@@ -249,6 +257,162 @@ namespace _66SMS.API.Controllers
                 From = from,
                 To = to,
                 SalonId = finalSalonId.Value,
+            }, cancellationToken);
+
+            if (!result.IsSuccess || result.Data == null)
+                return HandleResult(result);
+
+            return File(result.Data.Content, result.Data.ContentType, result.Data.FileName);
+        }
+
+        [HttpGet("report/by-period")]
+        [PermissionAuthorize("revenue", "read")]
+        public async Task<IActionResult> GetReportByPeriod(
+            [FromQuery] DateOnly from,
+            [FromQuery] DateOnly to,
+            [FromQuery] int? salonId,
+            [FromQuery] string grain = "day",
+            CancellationToken cancellationToken = default)
+        {
+            var result = await mediator.Send(new GetReportRevenueByPeriodQuery
+            {
+                From = from,
+                To = to,
+                SalonId = salonId,
+                Grain = grain,
+            }, cancellationToken);
+            return HandleResult(result);
+        }
+
+        [HttpGet("report/by-salon")]
+        [PermissionAuthorize("revenue", "read")]
+        public async Task<IActionResult> GetReportBySalon(
+            [FromQuery] DateOnly from,
+            [FromQuery] DateOnly to,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await mediator.Send(new GetReportRevenueBySalonQuery
+            {
+                From = from,
+                To = to,
+            }, cancellationToken);
+            return HandleResult(result);
+        }
+
+        [HttpGet("report/by-staff")]
+        [PermissionAuthorize("revenue", "read")]
+        public async Task<IActionResult> GetReportByStaff(
+            [FromQuery] DateOnly from,
+            [FromQuery] DateOnly to,
+            [FromQuery] int? salonId,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await mediator.Send(new GetReportRevenueByStaffQuery
+            {
+                From = from,
+                To = to,
+                SalonId = salonId,
+            }, cancellationToken);
+            return HandleResult(result);
+        }
+
+        [HttpGet("report/by-service")]
+        [PermissionAuthorize("revenue", "read")]
+        public async Task<IActionResult> GetReportByService(
+            [FromQuery] DateOnly from,
+            [FromQuery] DateOnly to,
+            [FromQuery] int? salonId,
+            [FromQuery] int? categoryId,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await mediator.Send(new GetReportRevenueByServiceQuery
+            {
+                From = from,
+                To = to,
+                SalonId = salonId,
+                CategoryId = categoryId,
+            }, cancellationToken);
+            return HandleResult(result);
+        }
+
+        [HttpGet("report/export-by-period")]
+        [PermissionAuthorize("revenue", "read")]
+        public async Task<IActionResult> ExportReportByPeriod(
+            [FromQuery] DateOnly from,
+            [FromQuery] DateOnly to,
+            [FromQuery] int? salonId,
+            [FromQuery] string grain = "day",
+            CancellationToken cancellationToken = default)
+        {
+            var result = await mediator.Send(new ExportReportRevenueByPeriodQuery
+            {
+                From = from,
+                To = to,
+                SalonId = salonId,
+                Grain = grain,
+            }, cancellationToken);
+
+            if (!result.IsSuccess || result.Data == null)
+                return HandleResult(result);
+
+            return File(result.Data.Content, result.Data.ContentType, result.Data.FileName);
+        }
+
+        [HttpGet("report/export-by-salon")]
+        [PermissionAuthorize("revenue", "read")]
+        public async Task<IActionResult> ExportReportBySalon(
+            [FromQuery] DateOnly from,
+            [FromQuery] DateOnly to,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await mediator.Send(new ExportReportRevenueBySalonQuery
+            {
+                From = from,
+                To = to,
+            }, cancellationToken);
+
+            if (!result.IsSuccess || result.Data == null)
+                return HandleResult(result);
+
+            return File(result.Data.Content, result.Data.ContentType, result.Data.FileName);
+        }
+
+        [HttpGet("report/export-by-staff")]
+        [PermissionAuthorize("revenue", "read")]
+        public async Task<IActionResult> ExportReportByStaff(
+            [FromQuery] DateOnly from,
+            [FromQuery] DateOnly to,
+            [FromQuery] int? salonId,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await mediator.Send(new ExportReportRevenueByStaffQuery
+            {
+                From = from,
+                To = to,
+                SalonId = salonId,
+            }, cancellationToken);
+
+            if (!result.IsSuccess || result.Data == null)
+                return HandleResult(result);
+
+            return File(result.Data.Content, result.Data.ContentType, result.Data.FileName);
+        }
+
+        [HttpGet("report/export-by-service")]
+        [PermissionAuthorize("revenue", "read")]
+        public async Task<IActionResult> ExportReportByService(
+            [FromQuery] DateOnly from,
+            [FromQuery] DateOnly to,
+            [FromQuery] int? salonId,
+            [FromQuery] int? categoryId,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await mediator.Send(new ExportReportRevenueByServiceQuery
+            {
+                From = from,
+                To = to,
+                SalonId = salonId,
+                CategoryId = categoryId,
             }, cancellationToken);
 
             if (!result.IsSuccess || result.Data == null)

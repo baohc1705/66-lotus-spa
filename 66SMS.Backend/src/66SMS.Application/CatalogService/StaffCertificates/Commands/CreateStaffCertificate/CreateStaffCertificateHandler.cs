@@ -1,4 +1,3 @@
-using _66SMS.Contract.Abstractions;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -8,6 +7,7 @@ using _66SMS.Domain.Entities;
 using MediatR;
 using System.Data;
 using _66SMS.Contracts.Helpers;
+using _66SMS.Contracts.Abstractions;
 
 namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.CreateStaffCertificate
 {

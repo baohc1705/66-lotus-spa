@@ -1,4 +1,4 @@
-using _66SMS.Contract.Messages;
+using _66SMS.Contracts.Messages;
 namespace _66SMS.Domain.Messages
 {
     /// <summary>

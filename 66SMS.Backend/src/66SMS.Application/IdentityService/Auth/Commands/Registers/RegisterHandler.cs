@@ -1,8 +1,7 @@
-using _66SMS.Application.DTOs.Auth;
-using _66SMS.Contract.Abstractions;
-using _66SMS.Contract.Messages;
 using _66SMS.Contracts.Abstractions;
 using _66SMS.Contracts.Enumerations;
+using _66SMS.Contracts.Helpers;
+using _66SMS.Contracts.Messages;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -14,7 +13,6 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
 {

@@ -79,5 +79,29 @@ namespace _66SMS.Domain.Abstractions.Repositories.Sql
             DateOnly fromDate,
             DateOnly toDate,
             CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<ReportRevenueByPeriodRowDto>> GetReportByPeriodAsync(
+            int? salonId,
+            DateOnly fromDate,
+            DateOnly toDate,
+            string grain,
+            CancellationToken cancellationToken = default);
+
+        Task<IReadOnlyList<ReportRevenueBySalonRowDto>> GetReportBySalonAsync(
+            DateOnly fromDate,
+            DateOnly toDate,
+            CancellationToken cancellationToken = default);
+
+        Task<IReadOnlyList<ReportRevenueByStaffRowDto>> GetReportByStaffAsync(
+            int? salonId,
+            DateOnly fromDate,
+            DateOnly toDate,
+            CancellationToken cancellationToken = default);
+
+        Task<IReadOnlyList<ReportRevenueByServiceRowDto>> GetReportByServiceAsync(
+            int? salonId,
+            int? categoryId,
+            DateOnly fromDate,
+            DateOnly toDate,
+            CancellationToken cancellationToken = default);
     }
 }
