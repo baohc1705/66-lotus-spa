@@ -11,6 +11,11 @@ import type {
   TrafficDataPointDto,
   NetRevenueDataPointDto,
   TopStaffDto,
+  RevenueReportGrain,
+  ReportRevenueByPeriodDto,
+  ReportRevenueBySalonDto,
+  ReportRevenueByStaffItemDto,
+  ReportRevenueByServiceItemDto,
 } from "../types/revenue.types";
 
 export const revenueApi = {
@@ -135,6 +140,89 @@ export const revenueApi = {
         to: params.to,
         salonId: params.salonId,
       },
+      responseType: "blob",
+    });
+  },
+
+  getReportByPeriod: (params: {
+    from: string;
+    to: string;
+    salonId?: number | null;
+    grain: RevenueReportGrain;
+  }): Promise<Result<ReportRevenueByPeriodDto>> => {
+    return axiosInstance
+      .get("/admin/revenue/report/by-period", { params })
+      .then((r) => r.data);
+  },
+
+  getReportBySalon: (params: {
+    from: string;
+    to: string;
+  }): Promise<Result<ReportRevenueBySalonDto>> => {
+    return axiosInstance
+      .get("/admin/revenue/report/by-salon", { params })
+      .then((r) => r.data);
+  },
+
+  getReportByStaff: (params: {
+    from: string;
+    to: string;
+    salonId?: number | null;
+  }): Promise<Result<ReportRevenueByStaffItemDto[]>> => {
+    return axiosInstance
+      .get("/admin/revenue/report/by-staff", { params })
+      .then((r) => r.data);
+  },
+
+  getReportByService: (params: {
+    from: string;
+    to: string;
+    salonId?: number | null;
+    categoryId?: number | null;
+  }): Promise<Result<ReportRevenueByServiceItemDto[]>> => {
+    return axiosInstance
+      .get("/admin/revenue/report/by-service", { params })
+      .then((r) => r.data);
+  },
+
+  exportReportByPeriod: (params: {
+    from: string;
+    to: string;
+    salonId?: number | null;
+    grain: RevenueReportGrain;
+  }) => {
+    return axiosInstance.get("/admin/revenue/report/export-by-period", {
+      params,
+      responseType: "blob",
+    });
+  },
+
+  exportReportBySalon: (params: { from: string; to: string }) => {
+    return axiosInstance.get("/admin/revenue/report/export-by-salon", {
+      params,
+      responseType: "blob",
+    });
+  },
+
+  exportReportByStaff: (params: {
+    from: string;
+    to: string;
+    salonId?: number | null;
+  }) => {
+    return axiosInstance.get("/admin/revenue/report/export-by-staff", {
+      params,
+      responseType: "blob",
+    });
+  },
+
+  exportReportByService: (params: {
+    from: string;
+    to: string;
+    salonId?: number | null;
+    categoryId?: number | null;
+  }) => {
+    return axiosInstance.get("/admin/revenue/report/export-by-service", {
+      params,
       responseType: "blob",
     });
   },

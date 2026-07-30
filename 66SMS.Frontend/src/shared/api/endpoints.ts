@@ -71,4 +71,14 @@ export const API = {
     image: "/media/image",
     images: "/media/images",
   },
+  revenue: {
+    reportByPeriod: "/admin/revenue/report/by-period",
+    reportBySalon: "/admin/revenue/report/by-salon",
+    reportByStaff: "/admin/revenue/report/by-staff",
+    reportByService: "/admin/revenue/report/by-service",
+    exportByPeriod: "/admin/revenue/report/export-by-period",
+    exportBySalon: "/admin/revenue/report/export-by-salon",
+    exportByStaff: "/admin/revenue/report/export-by-staff",
+    exportByService: "/admin/revenue/report/export-by-service",
+  },
 } as const;

@@ -2,15 +2,28 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { HomePage } from "@/features/landing/pages/HomePage";
 import { ProfilePage } from "@/features/profile";
 import { ProtectedRoute } from "./ProtectedRoute";
-import { AdminLayout, AdminDashboard, AdminProfilePage } from "@/features/admin";
-import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage } from "@/features/auth";
+import {
+  AdminLayout,
+  AdminDashboard,
+  AdminProfilePage,
+} from "@/features/admin";
+import {
+  LoginPage,
+  RegisterPage,
+  ForgotPasswordPage,
+  ResetPasswordPage,
+} from "@/features/auth";
 import RolePermissionPage from "@/features/auth/pages/RolePermissionPage";
 import { BookingPage } from "@/features/booking";
 import { CashierPage, VnPayReturnPage } from "@/features/cashier";
 import { AccountListPage, UsersPage } from "@/features/users";
 import { StaffListPage } from "@/features/staffs";
 import { StaffAppointmentsPage } from "@/features/staff_appointments";
-import { CustomerListPage, MembershipCardListPage, MembershipTierListPage } from "@/features/customers";
+import {
+  CustomerListPage,
+  MembershipCardListPage,
+  MembershipTierListPage,
+} from "@/features/customers";
 import { ProductListPage } from "@/features/products";
 import { ProductCategoryListPage } from "@/features/product_categories";
 import { ServiceListPage } from "@/features/services";
@@ -28,8 +41,12 @@ import { TreatmentCourseListPage } from "@/features/treatment_courses";
 import { InvoiceListPage } from "@/features/invoices";
 import { AttendanceListPage } from "@/features/attendance";
 import { PayrollListPage, PayrollStatsPage } from "@/features/payroll";
-import { CertificateTypesPage, StaffCertificatesPage } from "@/features/certificates";
+import {
+  CertificateTypesPage,
+  StaffCertificatesPage,
+} from "@/features/certificates";
 import { PromotionListPage } from "@/features/promotions";
+import { RevenueByDayPage, RevenueBySalonPage, RevenueByServicePage, RevenueByStaffPage } from "@/features/revenue";
 
 export const router = createBrowserRouter([
   {
@@ -206,6 +223,22 @@ export const router = createBrowserRouter([
           {
             path: "accounts",
             element: <AccountListPage />,
+          },
+          {
+            path: "reports/revenue/by-day",
+            element: <RevenueByDayPage />,
+          },
+          {
+            path: "reports/revenue/by-salon",
+            element: <RevenueBySalonPage />,
+          },
+          {
+            path: "reports/revenue/by-staff",
+            element: <RevenueByStaffPage />,
+          },
+          {
+            path: "reports/revenue/by-service",
+            element: <RevenueByServicePage />,
           },
         ],
       },

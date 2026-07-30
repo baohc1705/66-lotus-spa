@@ -112,3 +112,66 @@ export interface TopStaffDto {
   commission: number;
   growthPercent: number;
 }
+
+export type RevenueReportGrain = "day" | "week" | "month" | "quarter" | "year";
+
+export interface ReportPeriodStatsDto {
+  totalRevenue: number;
+  totalExpense: number;
+  orderCount: number;
+  profit: number;
+}
+
+export interface ReportRevenueByPeriodItemDto {
+  periodKey: string;
+  orderCount: number;
+  invoiceTotal: number;
+  commissionTotal: number;
+  totalRevenue: number;
+}
+
+export interface ReportRevenueByPeriodDto {
+  stats: ReportPeriodStatsDto;
+  rows: ReportRevenueByPeriodItemDto[];
+}
+
+export interface ReportSalonStatsDto {
+  totalRevenue: number;
+  totalCollected: number;
+  totalCommission: number;
+  profit: number;
+}
+
+export interface ReportRevenueBySalonItemDto {
+  salonId: number;
+  salonName: string;
+  staffCount: number;
+  orderCount: number;
+  cashIn: number;
+  commissionOut: number;
+  totalRevenue: number;
+}
+
+export interface ReportRevenueBySalonDto {
+  stats: ReportSalonStatsDto;
+  rows: ReportRevenueBySalonItemDto[];
+}
+
+export interface ReportRevenueByStaffItemDto {
+  staffId: number;
+  staffName: string;
+  serviceCount: number;
+  serviceRevenue: number;
+  commission: number;
+  totalRevenue: number;
+}
+
+export interface ReportRevenueByServiceItemDto {
+  itemId: number;
+  itemName: string;
+  quantity: number;
+  avgCommissionRate: number;
+  revenue: number;
+  commission: number;
+  totalRevenue: number;
+}

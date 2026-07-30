@@ -71,23 +71,27 @@ export const MENU_GROUPS: MenuGroup[] = [
         children: [
           {
             label: "Theo ngày",
-            path: "/admin/products/list",
+            path: "/admin/reports/revenue/by-day",
             icon: Calendar1Icon,
+            allowedRoles: ["Admin", "Manager"],
           },
           {
             label: "Theo chi nhánh",
-            path: "/admin/products/categories",
+            path: "/admin/reports/revenue/by-salon",
             icon: Home,
+            allowedRoles: ["Admin"],
           },
           {
             label: "Theo nhân viên",
-            path: "/admin/products/categories",
+            path: "/admin/reports/revenue/by-staff",
             icon: Users,
+            allowedRoles: ["Admin", "Manager"],
           },
           {
             label: "Theo dịch vụ",
-            path: "/admin/products/categories",
+            path: "/admin/reports/revenue/by-service",
             icon: Leaf,
+            allowedRoles: ["Admin", "Manager"],
           },
         ],
       }
