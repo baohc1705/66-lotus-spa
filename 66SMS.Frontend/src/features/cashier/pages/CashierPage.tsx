@@ -211,7 +211,12 @@ export function CashierPage() {
               if (!res.isSuccess) {
                 throw new Error(res.message || "Không thể gán vị trí");
               }
-              toast.success(res.message || "Đã gán vị trí");
+            }}
+            onAssignStaff={async (bookingId, staffId) => {
+              const res = await cashierApi.assignStaff(bookingId, staffId);
+              if (!res.isSuccess) {
+                throw new Error(res.message || "Không thể đổi nhân viên");
+              }
             }}
             onStatusUpdated={async () => {
               setIsSidebarOpen(false);

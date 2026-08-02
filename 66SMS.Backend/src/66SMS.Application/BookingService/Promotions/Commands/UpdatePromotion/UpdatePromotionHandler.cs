@@ -40,6 +40,11 @@ namespace _66SMS.Application.BookingService.Promotions.Commands.UpdatePromotion
 
             mapper.Map(request, promotion);
 
+            if (promotion.UsageLimit <= 0)
+                promotion.UsageLimit = null;
+            if (promotion.MaxDiscountAmount <= 0)
+                promotion.MaxDiscountAmount = null;
+
             promotionSqlRepository.Update(promotion);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 

@@ -41,8 +41,8 @@ namespace _66SMS.Domain.Constants
         public const string CACHE_PREFIX = "booking_rooms:";
         public static readonly TimeSpan CACHE_TTL_LIST = TimeSpan.FromMinutes(20);
         public static readonly TimeSpan CACHE_TTL_DETAIL = TimeSpan.FromMinutes(45);
-        public static string CacheKeyDetail(int id) => $"booking_room:v2:{id}";
-        public static string CacheKeyList(string filterHash) => $"booking_rooms:{filterHash}";
+        public static string CacheKeyDetail(int id) => $"booking_room:v3:{id}";
+        public static string CacheKeyList(string filterHash) => $"booking_rooms:v3:{filterHash}";
         #endregion
     }
 }

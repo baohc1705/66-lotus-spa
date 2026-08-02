@@ -64,10 +64,19 @@ namespace _66SMS.Application.BookingService.BookingRooms.Queries.GetAllBookingRo
                 .Select(x => new BookingRoomDto
                 {
                     Id = x.Id,
+                    SalonId = x.SalonId,
+                    SalonName = x.Salon != null ? x.Salon.Name : null,
                     Name = x.Name,
                     ImageUrl = x.ImageUrl,
                     Note = x.Note,
-                    Status = x.Status
+                    Status = x.Status,
+                    AvailableCount = x.Positions!
+                        .Count(p => p.Status == BookingPositionConst.STATUS_AVAILABLE
+                            || p.Status == BookingPositionConst.STATUS_ACTIVED),
+                    InServiceCount = x.Positions!
+                        .Count(p => p.Status == BookingPositionConst.STATUS_IN_SERVICE),
+                    TotalPositionCount = x.Positions!
+                        .Count(p => p.Status != BookingPositionConst.STATUS_DELETED),
                 })
                 .ToPagedAsync(request, cancellationToken);
 

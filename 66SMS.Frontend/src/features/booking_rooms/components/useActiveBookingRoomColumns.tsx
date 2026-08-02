@@ -11,6 +11,7 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Switch } from "@/shared/components/ui/switch";
+import { Badge } from "@/shared/components/ui/badge";
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
 import {
   IndexCell,
@@ -26,8 +27,10 @@ import type {
 
 export const BOOKING_ROOM_COLUMN_LABELS = {
   name: "Tên phòng",
+  salonName: "Chi nhánh",
   note: "Ghi chú",
-  status: "Trạng thái",
+  occupancy: "Vị trí",
+  status: "Hoạt động",
 } as const;
 
 interface UseActiveBookingRoomColumnsParams {
@@ -87,13 +90,42 @@ export function useActiveBookingRoomColumns({
           />
         ),
         cell: ({ row }) => <NameCell value={row.original.name} />,
-        size: 200,
+        size: 180,
+      },
+      {
+        accessorKey: "salonName",
+        header: cols.salonName,
+        cell: ({ row }) => <TextCell value={row.original.salonName} />,
+        size: 180,
       },
       {
         accessorKey: "note",
         header: cols.note,
         cell: ({ row }) => <TextCell value={row.original.note} />,
-        size: 300,
+        size: 220,
+      },
+      {
+        id: "occupancy",
+        header: cols.occupancy,
+        cell: ({ row }) => {
+          const available = row.original.availableCount ?? 0;
+          const inService = row.original.inServiceCount ?? 0;
+          return (
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Badge variant="success" size="sm" dot>
+                Trống {available}
+              </Badge>
+              <Badge
+                variant={inService > 0 ? "warning" : "neutral"}
+                size="sm"
+                dot
+              >
+                Đang phục vụ {inService}
+              </Badge>
+            </div>
+          );
+        },
+        size: 220,
       },
       {
         accessorKey: "status",
@@ -122,7 +154,7 @@ export function useActiveBookingRoomColumns({
             </div>
           );
         },
-        size: 120,
+        size: 100,
       },
       {
         id: "actions",

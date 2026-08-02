@@ -11,5 +11,11 @@ namespace _66SMS.Domain.Abstractions.Repositories.Sql
             DateOnly fromDate,
             DateOnly toDate,
             CancellationToken cancellationToken = default);
+
+        Task<IReadOnlyList<PayrollCommissionDailyRowDto>> GetCommissionDailyStatsAsync(
+            int staffId,
+            DateOnly fromDate,
+            DateOnly toDate,
+            CancellationToken cancellationToken = default);
     }
 }

@@ -15,19 +15,24 @@ import {
   APPOINTMENT_STATUS_DOT_CLASS,
   APPOINTMENT_STATUS_LABELS,
 } from "@/features/booking/constants/appointment.constants";
+import { useTechnicians } from "@/features/booking/hooks/useBookingData";
+import type { TechnicianDTO } from "@/features/booking/types/booking.types";
 import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
 import { FormField } from "@/shared/components/forms/FormField";
+import { SearchableSelect } from "@/shared/components/ui/searchable-select";
 import type { Result } from "@/shared/types/common.types";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { cn } from "@/lib/utils";
 import { cashierApi } from "../api/cashier.api";
 import type { BookingStatus, CashierBooking, CashierPosition } from "../types";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 
 interface CashierInvoiceSidebarProps {
   booking: CashierBooking | null;
   isOpen: boolean;
   onClose: () => void;
   onAssignPosition?: (bookingId: string, positionId: number) => Promise<void>;
+  onAssignStaff?: (bookingId: string, staffId: number) => Promise<void>;
   onStatusUpdated?: () => void;
   onPayInvoice?: (booking: CashierBooking) => void;
   isPaying?: boolean;
@@ -99,6 +104,7 @@ export function CashierInvoiceSidebar({
   isOpen,
   onClose,
   onAssignPosition,
+  onAssignStaff,
   onStatusUpdated,
   onPayInvoice,
   isPaying = false,
@@ -112,6 +118,7 @@ export function CashierInvoiceSidebar({
       booking={booking}
       onClose={onClose}
       onAssignPosition={onAssignPosition}
+      onAssignStaff={onAssignStaff}
       onStatusUpdated={onStatusUpdated}
       onPayInvoice={onPayInvoice}
       isPaying={isPaying}
@@ -128,6 +135,7 @@ function CashierInvoiceSidebarForm({
   booking,
   onClose,
   onAssignPosition,
+  onAssignStaff,
   onStatusUpdated,
   onPayInvoice,
   isPaying = false,
@@ -139,20 +147,29 @@ function CashierInvoiceSidebarForm({
   const [note, setNote] = useState(() => booking.note ?? "");
   const [positions, setPositions] = useState<CashierPosition[]>([]);
   const [selectedPositionId, setSelectedPositionId] = useState<number | null>(
-    null,
+    () => booking.positionId ?? null,
   );
-  const [loadingPositions, setLoadingPositions] = useState(
-    () => booking.status === "not-arrived",
+  const [selectedStaffId, setSelectedStaffId] = useState(
+    () => String(booking.staffId ?? ""),
   );
+  const [loadingPositions, setLoadingPositions] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const currentBackendStatus = toBackendStatus(booking.status);
-  const needsPosition = booking.status === "not-arrived";
+  const canEditAssignment =
+    booking.status === "not-arrived" || booking.status === "waiting";
+
+  const techniciansQuery = useTechnicians(
+    canEditAssignment ? (booking.bookingDate ?? null) : null,
+    booking.serviceId ?? undefined,
+    salonId ?? undefined,
+  );
 
   useEffect(() => {
-    if (!needsPosition) return;
+    if (!canEditAssignment) return;
 
     let cancelled = false;
+    setLoadingPositions(true);
     cashierApi
       .getPositions(salonId, booking.bookingDate)
       .then((res) => {
@@ -169,7 +186,48 @@ function CashierInvoiceSidebarForm({
     return () => {
       cancelled = true;
     };
-  }, [needsPosition, booking.bookingDate, salonId]);
+  }, [canEditAssignment, booking.bookingDate, salonId]);
+
+  const staffOptions = useMemo(() => {
+    const options: { value: string; label: string; disabled?: boolean }[] = [];
+    const seen = new Set<string>();
+
+    const currentId = String(booking.staffId ?? "");
+    if (currentId) {
+      options.push({
+        value: currentId,
+        label: booking.staffName || `NV #${currentId}`,
+      });
+      seen.add(currentId);
+    }
+
+    const techs = techniciansQuery.data ?? [];
+    techs.forEach((tech: TechnicianDTO) => {
+      if (tech.isAny || tech.id == null) return;
+      const value = String(tech.id);
+      if (seen.has(value)) return;
+      seen.add(value);
+      const slotsLeft = tech.slotsLeft ?? 0;
+      options.push({
+        value,
+        label: `${tech.name || "KTV"}${slotsLeft > 0 ? ` · còn ${slotsLeft} slot` : " · hết slot"}`,
+        disabled: slotsLeft <= 0,
+      });
+    });
+
+    return options;
+  }, [booking.staffId, booking.staffName, techniciansQuery.data]);
+
+  const positionOptions = useMemo(() => {
+    return positions.map((pos: CashierPosition) => {
+      const isCurrent = pos.id === booking.positionId;
+      return {
+        value: String(pos.id),
+        label: `${pos.roomName} — ${pos.name} — ${pos.statusLabel}`,
+        disabled: !pos.isSelectable && !isCurrent,
+      };
+    });
+  }, [positions, booking.positionId]);
 
   const durationMins = useMemo(
     () => calcDurationMins(booking.startTime, booking.endTime),
@@ -188,22 +246,34 @@ function CashierInvoiceSidebarForm({
 
     const statusChanged = selectedStatus !== currentBackendStatus;
     const noteChanged = (note.trim() || "") !== (booking.note?.trim() || "");
-    const willAssign =
-      needsPosition && !!selectedPositionId && !!onAssignPosition;
+    const staffChanged =
+      canEditAssignment &&
+      !!onAssignStaff &&
+      !!selectedStaffId &&
+      selectedStaffId !== String(booking.staffId ?? "");
+    const positionChanged =
+      canEditAssignment &&
+      !!onAssignPosition &&
+      selectedPositionId != null &&
+      selectedPositionId !== (booking.positionId ?? null);
 
-    if (!statusChanged && !willAssign && !noteChanged) {
+    if (!statusChanged && !staffChanged && !positionChanged && !noteChanged) {
       toast.info("Không có thay đổi để lưu");
       return;
     }
 
-    if (noteChanged && !statusChanged && !willAssign) {
+    if (noteChanged && !statusChanged && !staffChanged && !positionChanged) {
       toast.info("Ghi chú được lưu kèm khi cập nhật trạng thái");
       return;
     }
 
     setIsSaving(true);
     try {
-      if (willAssign && selectedPositionId) {
+      if (staffChanged) {
+        await onAssignStaff!(booking.id, Number(selectedStaffId));
+      }
+
+      if (positionChanged && selectedPositionId != null) {
         await onAssignPosition!(booking.id, selectedPositionId);
       }
 
@@ -218,6 +288,8 @@ function CashierInvoiceSidebarForm({
           return;
         }
         toast.success(res.message || "Đã cập nhật trạng thái");
+      } else if (staffChanged || positionChanged) {
+        toast.success("Đã lưu thông tin lịch hẹn");
       }
 
       await onStatusUpdated?.();
@@ -262,8 +334,13 @@ function CashierInvoiceSidebarForm({
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-5">
             <div className="space-y-5">
               <div className="flex items-start gap-4 p-4 rounded-[5px] border border-adminGold-600/20 bg-white">
-                <div className="w-14 h-14 rounded-full bg-adminGold-600/15 flex items-center justify-center text-adminGold-600 font-bold text-xl shrink-0">
-                  {booking.customerName.charAt(0).toUpperCase()}
+                <div className="w-14 h-14 rounded-full bg-adminGold-600/15 flex items-center justify-center shrink-0 overflow-hidden">
+                  <FallbackImage
+                    kind="customer"
+                    src={booking.customerAvatar}
+                    alt={booking.customerName}
+                    className="w-14 h-14 object-cover"
+                  />
                 </div>
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex items-center gap-2 text-adminInk font-semibold">
@@ -306,34 +383,51 @@ function CashierInvoiceSidebarForm({
                 </div>
                 <div className="grid grid-cols-[1.2fr_1fr_1fr] gap-2 px-4 py-3 text-sm text-adminInk items-start">
                   <span className="font-medium">{booking.serviceName}</span>
-                  <span>{booking.staffName}</span>
+
                   <div>
-                    {needsPosition ? (
+                    {canEditAssignment ? (
+                      techniciansQuery.isLoading ? (
+                        <span className="inline-flex items-center gap-1.5 text-adminGray-600">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          Đang tải...
+                        </span>
+                      ) : (
+                        <SearchableSelect
+                          value={selectedStaffId}
+                          onValueChange={setSelectedStaffId}
+                          options={staffOptions}
+                          placeholder="Chọn nhân viên"
+                          searchPlaceholder="Tìm nhân viên..."
+                          className="h-9 w-full"
+                        />
+                      )
+                    ) : (
+                      <span>{booking.staffName}</span>
+                    )}
+                  </div>
+
+                  <div>
+                    {canEditAssignment ? (
                       loadingPositions ? (
                         <span className="inline-flex items-center gap-1.5 text-adminGray-600">
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
                           Đang tải...
                         </span>
                       ) : (
-                        <select
-                          value={selectedPositionId ?? ""}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            setSelectedPositionId(value ? Number(value) : null);
-                          }}
-                          className="w-full text-sm border border-adminGold-600/20 bg-white rounded-[5px] px-2.5 py-2 focus:outline-none focus:border-adminGreen-600"
-                        >
-                          <option value="">Chọn vị trí...</option>
-                          {positions.map((pos: CashierPosition) => (
-                            <option
-                              key={pos.id}
-                              value={pos.id}
-                              disabled={!pos.isSelectable}
-                            >
-                              {pos.roomName} — {pos.name} — {pos.statusLabel}
-                            </option>
-                          ))}
-                        </select>
+                        <SearchableSelect
+                          value={
+                            selectedPositionId != null
+                              ? String(selectedPositionId)
+                              : ""
+                          }
+                          onValueChange={(v) =>
+                            setSelectedPositionId(v ? Number(v) : null)
+                          }
+                          options={positionOptions}
+                          placeholder="Chọn vị trí..."
+                          searchPlaceholder="Tìm phòng / vị trí..."
+                          className="h-9 w-full"
+                        />
                       )
                     ) : (
                       <span className="inline-flex items-center gap-1.5">

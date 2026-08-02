@@ -116,7 +116,6 @@ namespace _66SMS.Application.SalonService.Payrolls.Queries.GetPayrollCommissionS
                         .Where(n => !string.IsNullOrWhiteSpace(n))
                         .Distinct());
 
-                    // Giống StaffScheduleMapping: End = Start + DurationMins (không dùng SlotEndTime 30p)
                     var durationMins = first.DurationMins is > 0 ? first.DurationMins.Value : 15;
                     var startTime = first.SlotStartTime;
                     var endTime = startTime.HasValue

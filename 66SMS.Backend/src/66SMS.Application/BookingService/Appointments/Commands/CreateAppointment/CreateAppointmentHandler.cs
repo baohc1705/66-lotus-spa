@@ -255,7 +255,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_EXPIRED, ErrorCodes.ERR_PROMOTION_EXPIRED);
                     }
 
-                    if (promo.UsageLimit.HasValue && promo.UsedCount >= promo.UsageLimit.Value)
+                    if (promo.UsageLimit > 0 && promo.UsedCount >= promo.UsageLimit.Value)
                     {
                         transaction.Rollback();
                         return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_USAGE_LIMIT, ErrorCodes.ERR_PROMOTION_USAGE_LIMIT);
@@ -274,7 +274,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                     {
                         var percent = promo.DiscountValue ?? 0m;
                         discount = Math.Round(grandTotal * percent / 100m, 0, MidpointRounding.AwayFromZero);
-                        if (promo.MaxDiscountAmount.HasValue && discount > promo.MaxDiscountAmount.Value)
+                        if (promo.MaxDiscountAmount > 0 && discount > promo.MaxDiscountAmount.Value)
                         {
                             discount = promo.MaxDiscountAmount.Value;
                         }

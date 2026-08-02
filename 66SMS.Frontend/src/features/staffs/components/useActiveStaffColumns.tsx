@@ -21,6 +21,7 @@ import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
 import { IndexCell, PriceCell } from "@/shared/components/DataTable/TableCells";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import { formatDateTimeDisplay } from "@/shared/utils/date.utils";
 import { GENDER_MAP } from "@/shared/constants/display.const";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
@@ -154,17 +155,12 @@ export function useActiveStaffColumns({
           return (
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-adminGreen-100 flex items-center justify-center shrink-0 overflow-hidden">
-                {staff.avatarUrl ? (
-                  <img
-                    src={staff.avatarUrl}
-                    alt=""
-                    className="w-8 h-8 object-cover"
-                  />
-                ) : (
-                  <span className="text-xs font-bold text-adminGreen-600">
-                    {(staff.fullName ?? "?").charAt(0).toUpperCase()}
-                  </span>
-                )}
+                <FallbackImage
+                  kind="ktv"
+                  src={staff.avatarUrl}
+                  alt=""
+                  className="w-8 h-8 object-cover"
+                />
               </div>
               <span className="text-sm font-semibold text-adminInk truncate max-w-[140px]">
                 {staff.fullName ?? "—"}

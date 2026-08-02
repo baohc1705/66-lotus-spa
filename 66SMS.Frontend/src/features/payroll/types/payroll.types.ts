@@ -81,6 +81,21 @@ export interface PayrollCommissionSummaryDto {
   estimatedTotal: number;
 }
 
+export interface PayrollCommissionDailyDto {
+  workDate: string;
+  orderCount: number;
+  serviceHours: number;
+  totalCommission: number;
+}
+
+export interface PayrollCommissionDailySummaryDto {
+  totalOrders: number;
+  totalServiceHours: number;
+  totalCommission: number;
+  basicSalary: number | null;
+  estimatedTotal: number;
+}
+
 export interface PayrollCommissionStatsDto {
   staffId: number;
   staffName: string | null;
@@ -90,6 +105,17 @@ export interface PayrollCommissionStatsDto {
   toDate: string | null;
   summary: PayrollCommissionSummaryDto;
   appointments: PayrollCommissionAppointmentDto[];
+}
+
+export interface PayrollCommissionDailyStatsDto {
+  staffId: number;
+  staffName: string | null;
+  basicSalary: number | null;
+  salaryType: number | null;
+  fromDate: string | null;
+  toDate: string | null;
+  summary: PayrollCommissionDailySummaryDto;
+  items: PayrollCommissionDailyDto[];
 }
 
 export interface PayrollCommissionStatsParams {

@@ -83,6 +83,14 @@ export const cashierApi = {
       )
       .then((r) => r.data),
 
+  assignStaff: (appointmentId: string | number, staffId: number) =>
+    axiosInstance
+      .put<Result<void>>(`${API.cashier.appointment}/${appointmentId}/staff`, {
+        appointmentId: Number(appointmentId),
+        staffId,
+      })
+      .then((r) => r.data),
+
   payBooking: (id: string | number, paymentMethod: string, note?: string) =>
     axiosInstance
       .post<

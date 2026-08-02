@@ -1,5 +1,6 @@
 using _66SMS.API.Abstractions;
 using _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentPosition;
+using _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentStaff;
 using _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppointment;
 using _66SMS.Application.BookingService.Cashier.Commands.PayAppointment;
 using _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentStatus;
@@ -75,6 +76,16 @@ namespace _66SMS.API.Controllers
         [HttpPut("appointments/{id}/position")]
         [Authorize]
         public async Task<IActionResult> AssignAppointmentPosition(int id, [FromBody] AssignAppointmentPositionCommand request)
+        {
+            request.AppointmentId = id;
+            request.UserId = jwtService.GetUserId();
+            var result = await mediator.Send(request);
+            return HandleResult(result);
+        }
+
+        [HttpPut("appointments/{id}/staff")]
+        [Authorize]
+        public async Task<IActionResult> AssignAppointmentStaff(int id, [FromBody] AssignAppointmentStaffCommand request)
         {
             request.AppointmentId = id;
             request.UserId = jwtService.GetUserId();

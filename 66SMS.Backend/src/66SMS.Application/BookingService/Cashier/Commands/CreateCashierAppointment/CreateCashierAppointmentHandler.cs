@@ -365,7 +365,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
             if (promo.StartDate > now || promo.EndDate < now)
                 return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_EXPIRED, ErrorCodes.ERR_PROMOTION_EXPIRED);
 
-            if (promo.UsageLimit.HasValue && promo.UsedCount >= promo.UsageLimit.Value)
+            if (promo.UsageLimit > 0 && promo.UsedCount >= promo.UsageLimit.Value)
                 return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_USAGE_LIMIT, ErrorCodes.ERR_PROMOTION_USAGE_LIMIT);
 
             decimal grandTotal = createdAppointments.Sum(a => a.TotalAmount);
@@ -378,7 +378,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
             {
                 var percent = promo.DiscountValue ?? 0m;
                 discount = Math.Round(grandTotal * percent / 100m, 0, MidpointRounding.AwayFromZero);
-                if (promo.MaxDiscountAmount.HasValue && discount > promo.MaxDiscountAmount.Value)
+                if (promo.MaxDiscountAmount > 0 && discount > promo.MaxDiscountAmount.Value)
                     discount = promo.MaxDiscountAmount.Value;
             }
             else if (promo.DiscountType == PromotionConst.DISCOUNT_TYPE_FIXED)

@@ -4,6 +4,7 @@ using _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock;
 using _66SMS.Application.BookingService.Appointments.Commands.PayDepositWithWallet;
 using _66SMS.Application.BookingService.Appointments.Commands.PostponeAppointment;
 using _66SMS.Application.BookingService.Appointments.Queries.GetAllAppointment;
+using _66SMS.Application.BookingService.Appointments.Queries.GetAvailableBookingDays;
 using _66SMS.Application.BookingService.Appointments.Queries.GetDepositVnPayUrl;
 using _66SMS.Application.BookingService.Appointments.Queries.GetTechnicians;
 using _66SMS.Application.BookingService.Appointments.Queries.GetTimeSlots;
@@ -26,6 +27,20 @@ namespace _66SMS.API.Controllers
         {
             this.mediator = mediator;
             this.jwtService = jwtService;
+        }
+
+        /// <summary>
+        /// Lấy danh sách ngày có thể đặt lịch (hôm nay theo giờ VN + các ngày tiếp theo).
+        /// </summary>
+        [HttpGet("available-days")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAvailableBookingDays([FromQuery] int days = 7)
+        {
+            var result = await mediator.Send(new GetAvailableBookingDaysQuery
+            {
+                Days = days,
+            });
+            return HandleResult(result);
         }
 
         /// <summary>

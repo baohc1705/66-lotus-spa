@@ -20,6 +20,7 @@ export interface CashierBooking {
   customerAvatar?: string
   bookingDate?: string
   serviceName: string
+  serviceId?: number | null
   staffId: string | number
   staffName: string
   startTime: string

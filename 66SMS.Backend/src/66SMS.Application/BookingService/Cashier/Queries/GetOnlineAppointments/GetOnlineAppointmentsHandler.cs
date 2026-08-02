@@ -92,6 +92,7 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointment
                     CustomerAvatar = a.CreatedByUser?.Customer?.AvatarUrl,
                     BookingDate = a.AppointmentDate.ToString("yyyy-MM-dd"),
                     ServiceName = serviceName,
+                    ServiceId = a.Services?.FirstOrDefault()?.ServiceId,
                     StaffId = a.StaffId,
                     StaffName = "Chưa xếp nhân viên",
                     StartTime = startTs.ToString("HH:mm"),

@@ -13,6 +13,7 @@ import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
 import { IndexCell } from "@/shared/components/DataTable/TableCells";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { GENDER_MAP } from "@/shared/constants/display.const";
@@ -122,17 +123,12 @@ export function useActiveCustomerColumns({
           return (
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-adminGold-600/10 flex items-center justify-center shrink-0 overflow-hidden">
-                {cust.avatarUrl ? (
-                  <img
-                    src={cust.avatarUrl}
-                    alt=""
-                    className="w-8 h-8 object-cover"
-                  />
-                ) : (
-                  <span className="text-xs font-bold text-state-warning-text">
-                    {(cust.fullName ?? "?").charAt(0).toUpperCase()}
-                  </span>
-                )}
+                <FallbackImage
+                  kind="customer"
+                  src={cust.avatarUrl}
+                  alt=""
+                  className="w-8 h-8 object-cover"
+                />
               </div>
               <span className="text-sm font-semibold text-adminInk truncate max-w-[140px]">
                 {cust.fullName ?? "—"}

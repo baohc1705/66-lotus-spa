@@ -9,6 +9,7 @@ import type {
   PayrollDto,
   GeneratePayrollPayload,
   PayrollCommissionStatsDto,
+  PayrollCommissionDailyStatsDto,
   PayrollCommissionStatsParams,
 } from "../types/payroll.types";
 
@@ -56,5 +57,12 @@ export const payrollApi = {
   getCommissionStats: (params: PayrollCommissionStatsParams) =>
     axiosInstance
       .get<Result<PayrollCommissionStatsDto>>(`${BASE}/stats`, { params })
+      .then((r) => r.data),
+
+  getCommissionDailyStats: (params: PayrollCommissionStatsParams) =>
+    axiosInstance
+      .get<Result<PayrollCommissionDailyStatsDto>>(`${BASE}/stats/daily`, {
+        params,
+      })
       .then((r) => r.data),
 };

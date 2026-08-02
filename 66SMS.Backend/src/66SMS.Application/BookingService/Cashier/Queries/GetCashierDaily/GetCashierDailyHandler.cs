@@ -151,6 +151,7 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
                     CustomerAvatar = a.CreatedByUser?.Customer?.AvatarUrl,
                     BookingDate = a.AppointmentDate.ToString("yyyy-MM-dd"),
                     ServiceName = serviceName,
+                    ServiceId = a.Services?.FirstOrDefault()?.ServiceId,
                     StaffId = a.StaffId,
                     StaffName = a.Staff?.FullName ?? "N/A",
                     StartTime = startTs.ToString("HH:mm"),

@@ -13,7 +13,9 @@ import {
 } from "@/features/profile/hooks/useMembershipInfo";
 import { useConfigAppointmentBySalon } from "@/features/config_appointments/hooks/useConfigAppointments";
 import { formatDate } from "@/shared/utils/date.utils";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import { useBookingStore } from "../stores/bookingStore";
+import { ActivePromotionList } from "./ActivePromotionList";
 import { PromotionCodeInput } from "./PromotionCodeInput";
 
 function TicketPunchRow({ edge }: { edge: "top" | "bottom" }) {
@@ -163,17 +165,12 @@ export function BookingSummarySidebar() {
                     <div className="px-2 flex flex-col gap-3 text-xs text-ink">
                       {selectedSalon ? (
                         <div className="flex items-center gap-3 rounded-sm border border-warm-100 bg-warm-50 p-3">
-                          {selectedSalon.imageUrl ? (
-                            <img
-                              src={selectedSalon.imageUrl}
-                              alt={selectedSalon.name}
-                              className="w-10 h-10 rounded-full object-cover shrink-0"
-                            />
-                          ) : (
-                            <div className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center shrink-0 text-base">
-                              SPA
-                            </div>
-                          )}
+                          <FallbackImage
+                            kind="salon"
+                            src={selectedSalon.imageUrl}
+                            alt={selectedSalon.name}
+                            className="w-10 h-10 rounded-full object-cover shrink-0"
+                          />
                           <div className="min-w-0">
                             <p className="text-2xs font-bold uppercase tracking-wider text-gold-600 mb-0.5">
                               Chi nhánh
@@ -306,7 +303,7 @@ export function BookingSummarySidebar() {
             </div>
           </div>
 
-          <TicketDivider />
+          <ActivePromotionList />
 
           {/* <div className="grid grid-cols-3 gap-3">
             {[

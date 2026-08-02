@@ -20,6 +20,7 @@ import type { StaffDto } from "@/features/staffs/types/staff.types";
 import { useTreatmentCourses } from "@/features/treatment_courses/hooks/useTreatmentCourses";
 import type { TreatmentCourseDto } from "@/features/treatment_courses/types/treatmentCourse.types";
 import { cn } from "@/lib/utils";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import { formatDate } from "@/shared/utils/date.utils";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -1150,23 +1151,12 @@ export function CashierPOS({
                         )}
 
                         <div className="w-12 h-12 rounded-[3px] overflow-hidden bg-adminGray-100 flex items-center justify-center shrink-0 shadow-inner">
-                          {imageUrl ? (
-                            <img
-                              src={imageUrl}
-                              alt={item.name ?? undefined}
-                              className="w-full h-full object-cover"
-                              onError={(
-                                e: React.SyntheticEvent<HTMLImageElement>,
-                              ) => {
-                                e.currentTarget.src = "";
-                                e.currentTarget.className = "hidden";
-                              }}
-                            />
-                          ) : (
-                            <span className="text-2xs text-adminGray-400 font-bold uppercase tracking-wider text-center">
-                              IMAGE
-                            </span>
-                          )}
+                          <FallbackImage
+                            kind={itemType === 2 ? "product" : "service"}
+                            src={imageUrl}
+                            alt={item.name ?? undefined}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
 
                         <div className="flex-1 min-w-0 space-y-0.5">

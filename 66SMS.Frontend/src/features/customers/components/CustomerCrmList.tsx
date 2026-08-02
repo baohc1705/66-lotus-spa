@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import type { CustomerDto } from "../types/customer.types";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 
 interface CustomerCrmListProps {
   customers: CustomerDto[];
@@ -196,17 +197,12 @@ export function CustomerCrmList({
                 }`}
               >
                 <div className="w-10 h-10 rounded-full bg-adminGray-100 flex items-center justify-center shrink-0 overflow-hidden shadow-inner border border-adminGray-100">
-                  {cust.avatarUrl ? (
-                    <img
-                      src={cust.avatarUrl}
-                      alt=""
-                      className="w-10 h-10 object-cover"
-                    />
-                  ) : (
-                    <span className="text-sm font-bold text-adminGray-600">
-                      {(cust.fullName ?? "?").charAt(0).toUpperCase()}
-                    </span>
-                  )}
+                  <FallbackImage
+                    kind="customer"
+                    src={cust.avatarUrl}
+                    alt=""
+                    className="w-10 h-10 object-cover"
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">

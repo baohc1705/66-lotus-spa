@@ -2,6 +2,7 @@ using _66SMS.API.Abstractions;
 using _66SMS.Application.BookingService.Promotions.Commands.CreatePromotion;
 using _66SMS.Application.BookingService.Promotions.Commands.DeletePromotion;
 using _66SMS.Application.BookingService.Promotions.Commands.UpdatePromotion;
+using _66SMS.Application.BookingService.Promotions.Queries.GetActivePromotions;
 using _66SMS.Application.BookingService.Promotions.Queries.GetAllPromotions;
 using _66SMS.Application.BookingService.Promotions.Queries.GetDetailPromotion;
 using _66SMS.Application.BookingService.Promotions.Queries.ValidatePromotionCode;
@@ -59,6 +60,17 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> ValidateCode([FromQuery] ValidatePromotionCodeQuery query)
         {
             var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        /// <summary>
+        /// Danh sách khuyến mãi đang hoạt động (còn hiệu lực) — dùng cho màn đặt lịch.
+        /// </summary>
+        [HttpGet("active")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetActive()
+        {
+            var result = await mediator.Send(new GetActivePromotionsQuery());
             return HandleResult(result);
         }
 

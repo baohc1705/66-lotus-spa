@@ -17,6 +17,14 @@ export interface TimeSlotDTO {
   status: string;
 }
 
+export interface BookingDayDto {
+  date: string;
+  dayName: string;
+  dayNum: number;
+  isToday: boolean;
+  isBookedOut: boolean;
+}
+
 export interface BookingPositionDTO {
   id: number;
   roomId?: number;
@@ -49,6 +57,19 @@ export interface PromotionValidationDto {
   discountType: number | null;
   discountAmount: number;
   finalAmount: number;
+}
+
+export interface ActivePromotionDto {
+  id: number;
+  code: string;
+  name: string;
+  description?: string | null;
+  discountType: number;
+  discountTypeName: string;
+  discountValue?: number | null;
+  maxDiscountAmount?: number | null;
+  minOrderValue?: number | null;
+  endDate?: string | null;
 }
 
 export interface CreateBookingPayload {

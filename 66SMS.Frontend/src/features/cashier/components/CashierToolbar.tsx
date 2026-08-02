@@ -9,6 +9,7 @@ import {
   Columns3,
 } from "lucide-react";
 import type { CashierViewMode, CashierTimeRange } from "../types";
+import { Button } from "@/shared/components/ui/button";
 
 interface CashierToolbarProps {
   currentDate: Date;
@@ -81,6 +82,20 @@ export function CashierToolbar({
         <button className="w-7 h-7 flex items-center justify-center rounded-[3px] border border-adminGray-100 bg-white hover:bg-adminGray-50 text-adminInk transition-colors">
           <Filter className="w-3.5 h-3.5" />
         </button>
+        <Button
+        variant="outline"
+        size="sm"
+        >
+          Nhân viên
+
+        </Button>
+        <Button
+        variant="outline"
+        size="sm"
+        >
+          Vị trí
+
+        </Button>
       </div>
 
       <div className="flex items-center gap-3">

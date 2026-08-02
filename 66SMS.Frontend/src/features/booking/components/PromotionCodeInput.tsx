@@ -3,6 +3,8 @@ import {
   useMembershipTiers,
   useMyMembershipCard,
 } from "@/features/profile/hooks/useMembershipInfo";
+import type { Result } from "@/shared/types/common.types";
+import type { AxiosError } from "axios";
 import { CheckCircle2, Loader2, Sparkles, Ticket, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -77,7 +79,10 @@ export function PromotionCodeInput({
       setInputCode("");
       toast.success("Áp dụng mã khuyến mãi thành công!");
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Mã không hợp lệ";
+      const axiosErr = err as AxiosError<Result<unknown>>;
+      const msg =
+        axiosErr.response?.data?.message ??
+        (err instanceof Error ? err.message : "Mã không hợp lệ");
       setError(msg);
       clearPromotion();
     } finally {

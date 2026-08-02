@@ -12,10 +12,15 @@ export type BookingRoomFormValues = FormValues;
 
 export interface BookingRoomDTO {
   id?: number;
+  salonId?: number | null;
+  salonName?: string | null;
   name?: string;
   imageUrl?: string;
   note?: string;
   status?: number;
+  availableCount?: number;
+  inServiceCount?: number;
+  totalPositionCount?: number;
   positions?: BookingPositionDTO[];
 }
 

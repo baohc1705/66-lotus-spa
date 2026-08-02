@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Activity, Pencil, Box, Trash2 } from "lucide-react";
+import { Pencil, Box, Trash2 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import {
   Tabs,
@@ -11,6 +11,7 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import {
   useDeleteServiceProduct,
   useServiceDetail,
@@ -93,15 +94,12 @@ export function ServiceDetailExpanded({
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-xl bg-adminGray-50/50 flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-adminGray-100/50">
-                {primaryImage ? (
-                  <img
-                    src={primaryImage}
-                    alt={service.name ?? ""}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <Activity className="w-7 h-7 text-adminGray-600" />
-                )}
+                <FallbackImage
+                  kind="service"
+                  src={primaryImage}
+                  alt={service.name ?? ""}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-bold text-adminInk truncate">
