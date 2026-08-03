@@ -1,22 +1,21 @@
+import type { CreateBookingPayload } from "@/features/booking/types/booking.types";
 import axiosInstance from "@/shared/api/axiosInstance";
 import { API } from "@/shared/api/endpoints";
 import type { Result } from "@/shared/types/common.types";
-import type { CreateBookingPayload } from "@/features/booking/types/booking.types";
-import type {
-  CashierBooking,
-  CashierDailyDto,
-  CashierPosition,
+import { formatDate } from "@/shared/utils/date.utils";
+import {
+  type StaffAvailabilityDto,
+  type CashierBooking,
+  type CashierDailyDto,
+  type CashierPosition,
 } from "../types";
 
 export type CreateCashierAppointmentPayload = CreateBookingPayload & {
   customerId: number;
 };
 
-function formatDate(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+function toDateOnly(date: Date): string {
+  return formatDate(date).format("YYYY-MM-DD");
 }
 
 export const cashierApi = {
@@ -24,7 +23,7 @@ export const cashierApi = {
     axiosInstance
       .get<Result<CashierDailyDto>>(API.cashier.daily, {
         params: {
-          date: formatDate(date),
+          date: toDateOnly(date),
           ...(salonId !== undefined && salonId !== null ? { salonId } : {}),
         },
       })
@@ -34,8 +33,8 @@ export const cashierApi = {
     axiosInstance
       .get<Result<CashierDailyDto>>("/cashier/weekly", {
         params: {
-          startDate: formatDate(startDate),
-          endDate: formatDate(endDate),
+          startDate: toDateOnly(startDate),
+          endDate: toDateOnly(endDate),
           ...(salonId !== undefined && salonId !== null ? { salonId } : {}),
         },
       })
@@ -110,5 +109,20 @@ export const cashierApi = {
       >(`${API.cashier.vnpayReturn}?${queryString}`)
       .then((r) => r.data),
 
-  formatDate,
+  getStaffAvailability: (
+    date: Date,
+    slotId: number,
+    serviceId: number,
+    salonId?: number | null,
+  ) =>
+    axiosInstance
+      .get<Result<StaffAvailabilityDto[]>>(API.cashier.staffAvailability, {
+        params: {
+          date: toDateOnly(date),
+          slotId,
+          serviceId,
+          ...(salonId !== undefined && salonId !== null ? { salonId } : {}),
+        },
+      })
+      .then((r) => r.data),
 };

@@ -1,17 +1,8 @@
-using System.Collections.Generic;
-
-namespace _66SMS.Application.DTOs.Cashier
+namespace _66SMS.Contracts.Shared
 {
-    public class StaffColumnDto
+    public class CashierDailyBookingRowDto
     {
-        public string Id { get; set; } = null!;
-        public string Name { get; set; } = null!;
-        public string? Avatar { get; set; }
-    }
-
-    public class CashierBookingDto
-    {
-        public string Id { get; set; } = null!;
+        public int Id { get; set; }
         public string? AppointmentCode { get; set; }
         public string CustomerName { get; set; } = null!;
         public string? CustomerPhone { get; set; }
@@ -39,11 +30,5 @@ namespace _66SMS.Application.DTOs.Cashier
         public int? PositionId { get; set; }
         public string? PositionName { get; set; }
         public int? PositionStatus { get; set; }
-    }
-
-    public class CashierDailyDto
-    {
-        public List<StaffColumnDto> Columns { get; set; } = new();
-        public List<CashierBookingDto> Bookings { get; set; } = new();
     }
 }

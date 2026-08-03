@@ -23,6 +23,7 @@ namespace _66SMS.Domain.Entities
         public DateTimeOffset? DepositRequestedAt { get; set; }
         public DateTimeOffset? ConfirmedAt { get; set; }
         public DateTimeOffset? CompletedAt { get; set; }
+        public DateTimeOffset? TimeStartService { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
         public int? CreatedBy { get; set; }

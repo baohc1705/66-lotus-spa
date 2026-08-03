@@ -6,10 +6,11 @@ using _66SMS.Application.BookingService.Cashier.Commands.PayAppointment;
 using _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentStatus;
 using _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn;
 using _66SMS.Application.BookingService.Cashier.Commands.VnPayReturn;
-using _66SMS.Application.BookingService.Cashier.Queries.GetCashierPositions;
 using _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily;
+using _66SMS.Application.BookingService.Cashier.Queries.GetCashierPositions;
 using _66SMS.Application.BookingService.Cashier.Queries.GetCashierVnPayUrl;
 using _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointments;
+using _66SMS.Application.BookingService.Cashier.Queries.GetStaffAvailability;
 using _66SMS.Contracts.Abstractions;
 using Asp.Versioning;
 using MediatR;
@@ -168,6 +169,27 @@ namespace _66SMS.API.Controllers
             };
             var result = await mediator.Send(command);
             return Ok(result);
+        }
+
+        [HttpGet("staff-availability")]
+        [Authorize]
+        public async Task<IActionResult> GetStaffAvailability(
+            [FromQuery] DateOnly date,
+            [FromQuery] int slotId,
+            [FromQuery] int serviceId,
+            [FromQuery] int? salonId)
+        {
+            var tokenSalonId = jwtService.GetSalonId();
+            var finalSalonId = tokenSalonId ?? salonId;
+            var query = new GetStaffAvailabilityQuery
+            {
+                Date = date,
+                SlotId = slotId,
+                ServiceId = serviceId,
+                SalonId = finalSalonId,
+            };
+            var result = await mediator.Send(query);
+            return HandleResult(result);
         }
     }
 }

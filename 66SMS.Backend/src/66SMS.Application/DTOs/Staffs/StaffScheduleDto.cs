@@ -15,6 +15,7 @@ namespace _66SMS.Application.DTOs.Staffs
         public decimal TotalAmount { get; set; }
         public string? Note { get; set; }
         public string? PositionName { get; set; }
+        public DateTimeOffset? TimeStartService { get; set; }
         public DateTimeOffset? CompletedAt { get; set; }
     }
 

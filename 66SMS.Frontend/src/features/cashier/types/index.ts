@@ -23,6 +23,7 @@ export interface CashierBooking {
   serviceId?: number | null
   staffId: string | number
   staffName: string
+  slotId?: number | null
   startTime: string
   endTime: string
   status: BookingStatus
@@ -61,4 +62,17 @@ export interface StaffColumn {
 export interface CashierDailyDto {
   columns: StaffColumn[]
   bookings: CashierBooking[]
+}
+
+export type StaffAvailabilityStatus = "available" | "busy" | "off";
+
+export interface StaffAvailabilityDto {
+  staffId: number;
+  staffName: string;
+  avatar?: string | null;
+  status: StaffAvailabilityStatus;
+  reason?: string | null;
+  scheduleId?: number | null;
+  busyCustomerName?: string | null;
+  busyTimeRange?: string | null;
 }

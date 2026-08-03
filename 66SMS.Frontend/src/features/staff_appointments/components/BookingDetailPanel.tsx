@@ -59,6 +59,9 @@ export function BookingDetailPanel({
   const completedAtLabel = booking.completedAt
     ? formatDateTimeDisplay(booking.completedAt)
     : "—";
+  const timeStartServiceLabel = booking.timeStartService
+    ? formatDateTimeDisplay(booking.timeStartService)
+    : "—";
 
   return (
     <div
@@ -124,6 +127,11 @@ export function BookingDetailPanel({
             <FormField label="Thời lượng">
               <div className="h-10 px-3 flex items-center rounded-[5px] border border-adminGold-600/20 bg-adminGray-50 text-sm text-adminInk">
                 {durationMins != null ? `${durationMins} phút` : "—"}
+              </div>
+            </FormField>
+            <FormField label="Thời gian bắt đầu phục vụ">
+              <div className="h-10 px-3 flex items-center rounded-[5px] border border-adminGold-600/20 bg-adminGray-50 text-sm text-adminInk">
+                {timeStartServiceLabel}
               </div>
             </FormField>
             <FormField label="Thời gian hoàn thành">

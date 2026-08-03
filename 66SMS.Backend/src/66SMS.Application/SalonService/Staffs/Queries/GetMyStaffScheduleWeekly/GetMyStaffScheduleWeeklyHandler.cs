@@ -66,6 +66,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleWeekl
                             ? a.Position.Room.Name + " — " + a.Position.Name
                             : a.Position.Name)
                         : null,
+                    a.TimeStartService,
                     a.CompletedAt,
                 })
                 .ToListAsync(cancellationToken);
@@ -89,6 +90,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleWeekl
                         r.TotalAmount,
                         r.Note,
                         r.PositionName,
+                        r.TimeStartService,
                         r.CompletedAt))
                     .ToList();
 

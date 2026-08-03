@@ -32,6 +32,7 @@ export interface StaffScheduleBooking {
   totalAmount: number;
   note?: string;
   positionName?: string | null;
+  timeStartService?: string | null;
   completedAt?: string | null;
 }
 

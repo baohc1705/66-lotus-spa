@@ -19,6 +19,8 @@ interface CashierToolbarProps {
   onViewModeChange: (mode: CashierViewMode) => void;
   timeRange: CashierTimeRange;
   onTimeRangeChange: (range: CashierTimeRange) => void;
+  onOpenStaffAvailability?: () => void;
+  onOpenPositionAvailability?: () => void;
 }
 
 export function CashierToolbar({
@@ -29,6 +31,8 @@ export function CashierToolbar({
   onViewModeChange,
   timeRange,
   onTimeRangeChange,
+  onOpenStaffAvailability,
+  onOpenPositionAvailability,
 }: CashierToolbarProps) {
   const handlePrevDay = () => {
     const prev = new Date(currentDate);
@@ -83,18 +87,20 @@ export function CashierToolbar({
           <Filter className="w-3.5 h-3.5" />
         </button>
         <Button
-        variant="outline"
-        size="sm"
+          variant="outline"
+          size="sm"
+          type="button"
+          onClick={onOpenStaffAvailability}
         >
           Nhân viên
-
         </Button>
         <Button
-        variant="outline"
-        size="sm"
+          variant="outline"
+          size="sm"
+          type="button"
+          onClick={onOpenPositionAvailability}
         >
           Vị trí
-
         </Button>
       </div>
 

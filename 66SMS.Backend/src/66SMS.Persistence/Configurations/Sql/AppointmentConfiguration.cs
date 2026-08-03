@@ -30,6 +30,7 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.DepositRequestedAt).HasColumnName(AppointmentConst.FIELD_DEPOSIT_REQUESTED_AT);
             builder.Property(x => x.ConfirmedAt).HasColumnName(AppointmentConst.FIELD_CONFIRMED_AT);
             builder.Property(x => x.CompletedAt).HasColumnName(AppointmentConst.FIELD_COMPLETED_AT);
+            builder.Property(x => x.TimeStartService).HasColumnName(AppointmentConst.FIELD_TIME_START_SERVICE);
             builder.Property(x => x.CreatedAt).HasColumnName(AppointmentConst.FIELD_CREATED_AT);
             builder.Property(x => x.CreatedBy).HasColumnName(AppointmentConst.FIELD_CREATED_BY);
             builder.Property(x => x.UpdatedAt).HasColumnName(AppointmentConst.FIELD_UPDATED_AT);

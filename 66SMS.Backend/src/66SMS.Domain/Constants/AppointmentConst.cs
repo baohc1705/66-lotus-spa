@@ -25,10 +25,15 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_DEPOSIT_REQUESTED_AT = "deposit_requested_at";
         public const string FIELD_CONFIRMED_AT = "confirmed_at";
         public const string FIELD_COMPLETED_AT = "completed_at";
+        public const string FIELD_TIME_START_SERVICE = "time_start_service";
         public const string FIELD_CREATED_AT = "created_at";
         public const string FIELD_CREATED_BY = "created_by";
         public const string FIELD_UPDATED_AT = "updated_at";
         public const string FIELD_UPDATED_BY = "updated_by";
+
+        public const string SP_GET_STAFF_AVAILABILITY = "dbo.usp_GetStaffAvailability";
+        public const string SP_GET_CASHIER_STAFF_COLUMNS = "dbo.usp_GetCashierStaffColumns";
+        public const string SP_GET_CASHIER_DAILY_BOOKINGS = "dbo.usp_GetCashierDailyBookings";
         #endregion
 
         #region Constraint
@@ -69,6 +74,9 @@ namespace _66SMS.Domain.Constants
         public const string MSG_APPOINTMENT_POSTPONE_REFUND_SUCCESS = "Hoãn lịch và hoàn tiền cọc vào ví thành công.";
         public const string MSG_APPOINTMENT_PAY_DEPOSIT_SUCCESS = "Thanh toán tiền cọc thành công.";
         public const string MSG_APPOINTMENT_PAY_SUCCESS = "Thanh toán thành công.";
+        
+        public const string MSG_STAFF_AVAILABILITY_SLOT_REQUIRED = "Vui lòng chọn khung giờ.";
+        public const string MSG_STAFF_AVAILABILITY_SERVICE_REQUIRED = "Vui lòng chọn dịch vụ.";
         #endregion
     }
 }

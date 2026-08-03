@@ -15,16 +15,24 @@ import {
   APPOINTMENT_STATUS_DOT_CLASS,
   APPOINTMENT_STATUS_LABELS,
 } from "@/features/booking/constants/appointment.constants";
-import { useTechnicians } from "@/features/booking/hooks/useBookingData";
-import type { TechnicianDTO } from "@/features/booking/types/booking.types";
 import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
 import { FormField } from "@/shared/components/forms/FormField";
 import { SearchableSelect } from "@/shared/components/ui/searchable-select";
 import type { Result } from "@/shared/types/common.types";
+import { formatCurrency } from "@/shared/utils/currency";
+import { formatDisplayDate } from "@/shared/utils/date.utils";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { cn } from "@/lib/utils";
+import { useTimeSlots } from "@/features/booking/hooks/useBookingData";
+import type { TimeSlotDTO } from "@/features/booking/types/booking.types";
 import { cashierApi } from "../api/cashier.api";
-import type { BookingStatus, CashierBooking, CashierPosition } from "../types";
+import { useStaffAvailability } from "../hooks/useStaffAvailability";
+import type {
+  BookingStatus,
+  CashierBooking,
+  CashierPosition,
+  StaffAvailabilityDto,
+} from "../types";
 import { FallbackImage } from "@/shared/components/FallbackImage";
 
 interface CashierInvoiceSidebarProps {
@@ -81,22 +89,11 @@ function toBackendStatus(status: BookingStatus): number {
   }
 }
 
-function formatDateLabel(date?: string) {
-  if (!date) return "—";
-  const [y, m, d] = date.split("-");
-  if (!y || !m || !d) return date;
-  return `${d}/${m}/${y}`;
-}
-
 function calcDurationMins(startTime: string, endTime: string) {
   const [sh, sm] = startTime.split(":").map(Number);
   const [eh, em] = endTime.split(":").map(Number);
   if ([sh, sm, eh, em].some((n) => Number.isNaN(n))) return null;
   return eh * 60 + em - (sh * 60 + sm);
-}
-
-function money(value: number) {
-  return `${value.toLocaleString("vi-VN")}đ`;
 }
 
 export function CashierInvoiceSidebar({
@@ -149,8 +146,8 @@ function CashierInvoiceSidebarForm({
   const [selectedPositionId, setSelectedPositionId] = useState<number | null>(
     () => booking.positionId ?? null,
   );
-  const [selectedStaffId, setSelectedStaffId] = useState(
-    () => String(booking.staffId ?? ""),
+  const [selectedStaffId, setSelectedStaffId] = useState(() =>
+    String(booking.staffId ?? ""),
   );
   const [loadingPositions, setLoadingPositions] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -159,10 +156,35 @@ function CashierInvoiceSidebarForm({
   const canEditAssignment =
     booking.status === "not-arrived" || booking.status === "waiting";
 
-  const techniciansQuery = useTechnicians(
-    canEditAssignment ? (booking.bookingDate ?? null) : null,
+  const bookingDateObj = useMemo(() => {
+    if (!booking.bookingDate) return new Date();
+    const [y, m, d] = booking.bookingDate.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }, [booking.bookingDate]);
+
+  const timeSlotsQuery = useTimeSlots(
+    canEditAssignment && !booking.slotId ? (booking.bookingDate ?? null) : null,
     booking.serviceId ?? undefined,
+    undefined,
     salonId ?? undefined,
+  );
+
+  const resolvedSlotId = useMemo(() => {
+    if (booking.slotId) return booking.slotId;
+    const slots = timeSlotsQuery.data ?? [];
+    const match = slots.find(
+      (s: TimeSlotDTO) =>
+        s.time === booking.startTime || s.time.startsWith(booking.startTime),
+    );
+    return match?.slotId ?? null;
+  }, [booking.slotId, booking.startTime, timeSlotsQuery.data]);
+
+  const availabilityQuery = useStaffAvailability(
+    canEditAssignment,
+    bookingDateObj,
+    resolvedSlotId,
+    booking.serviceId ?? null,
+    salonId,
   );
 
   useEffect(() => {
@@ -196,27 +218,25 @@ function CashierInvoiceSidebarForm({
     if (currentId) {
       options.push({
         value: currentId,
-        label: booking.staffName || `NV #${currentId}`,
+        label: `${booking.staffName || `NV #${currentId}`}`,
       });
       seen.add(currentId);
     }
 
-    const techs = techniciansQuery.data ?? [];
-    techs.forEach((tech: TechnicianDTO) => {
-      if (tech.isAny || tech.id == null) return;
-      const value = String(tech.id);
+    const rows = availabilityQuery.data?.data ?? [];
+    rows.forEach((row: StaffAvailabilityDto) => {
+      if (row.status !== "available") return;
+      const value = String(row.staffId);
       if (seen.has(value)) return;
       seen.add(value);
-      const slotsLeft = tech.slotsLeft ?? 0;
       options.push({
         value,
-        label: `${tech.name || "KTV"}${slotsLeft > 0 ? ` · còn ${slotsLeft} slot` : " · hết slot"}`,
-        disabled: slotsLeft <= 0,
+        label: `${row.staffName}`,
       });
     });
 
     return options;
-  }, [booking.staffId, booking.staffName, techniciansQuery.data]);
+  }, [booking.staffId, booking.staffName, availabilityQuery.data?.data]);
 
   const positionOptions = useMemo(() => {
     return positions.map((pos: CashierPosition) => {
@@ -360,7 +380,7 @@ function CashierInvoiceSidebarForm({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-[5px] border border-adminGold-600/20 bg-white">
                 <FormField label="Ngày hẹn">
                   <div className="h-10 px-3 flex items-center rounded-[5px] border border-adminGold-600/20 bg-adminGray-50 text-sm text-adminInk">
-                    {formatDateLabel(booking.bookingDate)}
+                    {formatDisplayDate(booking.bookingDate) || "—"}
                   </div>
                 </FormField>
                 <FormField label="Giờ hẹn">
@@ -386,17 +406,22 @@ function CashierInvoiceSidebarForm({
 
                   <div>
                     {canEditAssignment ? (
-                      techniciansQuery.isLoading ? (
+                      availabilityQuery.isLoading ||
+                      (!booking.slotId && timeSlotsQuery.isLoading) ? (
                         <span className="inline-flex items-center gap-1.5 text-adminGray-600">
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          Đang tải...
+                          Đang tải NV rảnh...
+                        </span>
+                      ) : !resolvedSlotId || !booking.serviceId ? (
+                        <span className="text-xs text-adminGray-600">
+                          Thiếu slot/dịch vụ để lọc NV rảnh
                         </span>
                       ) : (
                         <SearchableSelect
                           value={selectedStaffId}
                           onValueChange={setSelectedStaffId}
                           options={staffOptions}
-                          placeholder="Chọn nhân viên"
+                          placeholder="Chọn NV đang rảnh"
                           searchPlaceholder="Tìm nhân viên..."
                           className="h-9 w-full"
                         />
@@ -445,26 +470,26 @@ function CashierInvoiceSidebarForm({
                     Tổng tiền
                   </div>
                   <div className="font-semibold text-adminInk">
-                    {money(booking.totalAmount)}
+                    {formatCurrency(booking.totalAmount)}
                   </div>
                 </div>
                 <div>
                   <div className="text-xs text-adminGray-600 mb-1">Đã thu</div>
                   <div className="font-semibold text-adminGreen-600">
-                    {money(booking.paidAmount)}
+                    {formatCurrency(booking.paidAmount)}
                   </div>
                 </div>
                 <div>
                   <div className="text-xs text-adminGray-600 mb-1">Còn lại</div>
                   <div className="font-semibold text-adminInk">
-                    {money(booking.remainingAmount)}
+                    {formatCurrency(booking.remainingAmount)}
                   </div>
                 </div>
                 <div>
                   <div className="text-xs text-adminGray-600 mb-1">Cọc</div>
                   <div className="font-semibold text-adminInk">
                     {booking.depositPaid
-                      ? money(
+                      ? formatCurrency(
                           Math.min(booking.paidAmount, booking.depositAmount),
                         )
                       : "Chưa cọc"}

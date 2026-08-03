@@ -20,6 +20,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries
             decimal totalAmount,
             string? note,
             string? positionName,
+            DateTimeOffset? timeStartService,
             DateTimeOffset? completedAt)
         {
             var serviceName = serviceNames.Count > 0
@@ -44,6 +45,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries
                 TotalAmount = totalAmount,
                 Note = note,
                 PositionName = positionName,
+                TimeStartService = timeStartService,
                 CompletedAt = completedAt,
             };
         }

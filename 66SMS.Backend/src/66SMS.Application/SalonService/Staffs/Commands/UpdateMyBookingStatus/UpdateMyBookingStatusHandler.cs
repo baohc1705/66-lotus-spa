@@ -38,6 +38,13 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateMyBookingStatus
             if (appointment == null)
                 return Result<object>.NotFound(StaffConst.MSG_STAFF_BOOKING_NOT_FOUND, ErrorCodes.ERR_STAFF_BOOKING_NOT_FOUND);
 
+            if (request.Status == AppointmentConst.STATUS_IN_SERVICE
+                && appointment.Status == AppointmentConst.STATUS_WAITING
+                && appointment.TimeStartService == null)
+            {
+                appointment.TimeStartService = Contracts.Helpers.DateTimeHelper.UtcNow();
+            }
+
             appointment.Status = request.Status;
             if (request.Note != null)
             {

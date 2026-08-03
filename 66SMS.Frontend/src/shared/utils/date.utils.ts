@@ -196,6 +196,10 @@ export class DateUtil {
   toDate() {
     return this.date;
   }
+
+  toISOString() {
+    return this.date.toISOString();
+  }
 }
 
 export function formatDate(input?: DateInput) {

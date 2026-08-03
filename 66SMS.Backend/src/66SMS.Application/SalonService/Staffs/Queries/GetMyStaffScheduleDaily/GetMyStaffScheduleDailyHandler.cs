@@ -61,6 +61,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleDaily
                             ? a.Position.Room.Name + " — " + a.Position.Name
                             : a.Position.Name)
                         : null,
+                    a.TimeStartService,
                     a.CompletedAt,
                 })
                 .ToListAsync(cancellationToken);
@@ -78,6 +79,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleDaily
                 r.TotalAmount,
                 r.Note,
                 r.PositionName,
+                r.TimeStartService,
                 r.CompletedAt)).ToList();
 
             return Result<StaffScheduleDailyDto>.Success(new StaffScheduleDailyDto

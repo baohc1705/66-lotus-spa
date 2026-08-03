@@ -13,6 +13,8 @@ import { CashierPOS } from "../components/CashierPOS";
 import { CashierTimeline } from "../components/CashierTimeline";
 import { CashierToolbar } from "../components/CashierToolbar";
 import { CashierWeeklyView } from "../components/CashierWeeklyView";
+import { PositionAvailabilityDialog } from "../components/PositionAvailabilityDialog";
+import { StaffAvailabilityDialog } from "../components/StaffAvailabilityDialog";
 import { useCashierData, useCashierWeekly } from "../hooks/useCashier";
 import type {
   CashierBooking,
@@ -31,6 +33,8 @@ export function CashierPage() {
   );
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [staffAvailOpen, setStaffAvailOpen] = useState(false);
+  const [positionAvailOpen, setPositionAvailOpen] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
   const [pendingCheckoutInvoice, setPendingCheckoutInvoice] =
     useState<InvoiceDto | null>(null);
@@ -57,8 +61,17 @@ export function CashierPage() {
   const weekEnd = new Date(weekStart);
   weekEnd.setDate(weekStart.getDate() + 6);
 
-  const dailyQuery = useCashierData(currentDate, salonId);
-  const weeklyQuery = useCashierWeekly(weekStart, weekEnd, salonId);
+  const dailyQuery = useCashierData(
+    currentDate,
+    salonId,
+    timeRange === "daily",
+  );
+  const weeklyQuery = useCashierWeekly(
+    weekStart,
+    weekEnd,
+    salonId,
+    timeRange === "weekly",
+  );
 
   const { data, isLoading, isError, error, refetch } =
     timeRange === "daily" ? dailyQuery : weeklyQuery;
@@ -142,6 +155,8 @@ export function CashierPage() {
             onViewModeChange={setViewMode}
             timeRange={timeRange}
             onTimeRangeChange={setTimeRange}
+            onOpenStaffAvailability={() => setStaffAvailOpen(true)}
+            onOpenPositionAvailability={() => setPositionAvailOpen(true)}
           />
 
           <div className="flex-1 flex min-h-0 min-w-0 w-full overflow-hidden relative z-10 border-t border-adminGray-100">
@@ -231,6 +246,20 @@ export function CashierPage() {
               setIsBookingModalOpen(false);
               refetch();
             }}
+          />
+
+          <StaffAvailabilityDialog
+            open={staffAvailOpen}
+            onOpenChange={setStaffAvailOpen}
+            currentDate={currentDate}
+            salonId={salonId}
+          />
+
+          <PositionAvailabilityDialog
+            open={positionAvailOpen}
+            onOpenChange={setPositionAvailOpen}
+            currentDate={currentDate}
+            salonId={salonId}
           />
         </>
       )}
