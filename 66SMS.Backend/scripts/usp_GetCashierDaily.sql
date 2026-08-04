@@ -49,31 +49,33 @@ BEGIN
     SET NOCOUNT ON;
 
     CREATE TABLE #Appt (
-        AppointmentId   INT            NOT NULL PRIMARY KEY,
-        AppointmentCode NVARCHAR(50)   NULL,
-        AppointmentDate DATE           NOT NULL,
-        StaffId         INT            NOT NULL,
-        StaffName       NVARCHAR(100)  NOT NULL,
-        SlotId          INT            NOT NULL,
-        StartTime       TIME(7)        NULL,
-        PositionId      INT            NULL,
-        PositionName    NVARCHAR(300)  NULL,
-        PositionStatus  INT            NULL,
-        StatusCode      INT            NOT NULL,
-        Note            NVARCHAR(1000) NULL,
-        TotalAmount     DECIMAL(18, 0) NOT NULL,
-        PaidAmount      DECIMAL(18, 0) NOT NULL,
-        DepositPercent  INT            NULL,
-        DepositDeadline DATETIMEOFFSET(7) NULL,
-        SalonId         INT            NULL,
-        CreatedByUserId INT            NOT NULL
+        AppointmentId    INT            NOT NULL PRIMARY KEY,
+        AppointmentCode  NVARCHAR(50)   NULL,
+        AppointmentDate  DATE           NOT NULL,
+        StaffId          INT            NOT NULL,
+        StaffName        NVARCHAR(100)  NOT NULL,
+        SlotId           INT            NOT NULL,
+        StartTime        TIME(7)        NULL,
+        PositionId       INT            NULL,
+        PositionName     NVARCHAR(300)  NULL,
+        PositionStatus   INT            NULL,
+        StatusCode       INT            NOT NULL,
+        Note             NVARCHAR(1000) NULL,
+        TotalAmount      DECIMAL(18, 0) NOT NULL,
+        PaidAmount       DECIMAL(18, 0) NOT NULL,
+        DepositPercent   INT            NULL,
+        DepositDeadline  DATETIMEOFFSET(7) NULL,
+        TimeStartService DATETIMEOFFSET(7) NULL,
+        CompletedAt      DATETIMEOFFSET(7) NULL,
+        SalonId          INT            NULL,
+        CreatedByUserId  INT            NOT NULL
     );
 
     INSERT INTO #Appt (
         AppointmentId, AppointmentCode, AppointmentDate, StaffId, StaffName,
         SlotId, StartTime, PositionId, PositionName, PositionStatus,
         StatusCode, Note, TotalAmount, PaidAmount, DepositPercent,
-        DepositDeadline, SalonId, CreatedByUserId
+        DepositDeadline, TimeStartService, CompletedAt, SalonId, CreatedByUserId
     )
     SELECT
         a.id,
@@ -95,6 +97,8 @@ BEGIN
         a.paid_amount,
         ISNULL(a.deposit_percent, ISNULL(cfg.deposit_percent, 20)),
         a.deposit_deadline_at,
+        a.time_start_service,
+        a.completed_at,
         a.salon_id,
         a.created_by_user_id
     FROM dbo.appointments a
@@ -193,9 +197,9 @@ BEGIN
             ELSE N'pending'
         END AS Status,
         a.TotalAmount,
-        a.PaidAmount,
+        CASE WHEN a.PaidAmount > a.TotalAmount THEN a.TotalAmount ELSE a.PaidAmount END AS PaidAmount,
         CAST(ROUND(a.TotalAmount * a.DepositPercent / 100.0, 0) AS DECIMAL(18, 0)) AS DepositAmount,
-        a.TotalAmount - a.PaidAmount AS RemainingAmount,
+        CASE WHEN a.TotalAmount - a.PaidAmount < 0 THEN 0 ELSE a.TotalAmount - a.PaidAmount END AS RemainingAmount,
         CAST(CASE
             WHEN a.PaidAmount >= ROUND(a.TotalAmount * a.DepositPercent / 100.0, 0) THEN 1
             ELSE 0
@@ -212,7 +216,9 @@ BEGIN
         END AS DiscountAmount,
         a.PositionId,
         a.PositionName,
-        a.PositionStatus
+        a.PositionStatus,
+        a.TimeStartService,
+        a.CompletedAt
     FROM #Appt a
     INNER JOIN dbo.users u
         ON u.id = a.CreatedByUserId

@@ -30,5 +30,7 @@ namespace _66SMS.Contracts.Shared
         public int? PositionId { get; set; }
         public string? PositionName { get; set; }
         public int? PositionStatus { get; set; }
+        public DateTimeOffset? TimeStartService { get; set; }
+        public DateTimeOffset? CompletedAt { get; set; }
     }
 }

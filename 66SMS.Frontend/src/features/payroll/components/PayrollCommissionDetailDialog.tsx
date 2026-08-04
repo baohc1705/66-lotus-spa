@@ -3,9 +3,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/shared/components/ui/dialog";
 import { formatCurrency } from "@/shared/utils/currency";
+import { formatDisplayDate } from "@/shared/utils/date.utils";
 import type {
   PayrollCommissionAppointmentDto,
   PayrollCommissionLineDto,
@@ -35,85 +35,104 @@ export function PayrollCommissionDetailDialog({
     appointment.durationMins,
   );
   const timeLabel = start === "--:--" ? "—" : `${start} – ${end}`;
+  const dateLabel =
+    formatDisplayDate(appointment.issuedLocalDate) ||
+    appointment.issuedLocalDate ||
+    "—";
+  const titleCode =
+    appointment.appointmentCode ?? appointment.invoiceCode ?? "chi tiết";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[720px] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            Chi tiết {appointment.appointmentCode ?? appointment.invoiceCode}
-          </DialogTitle>
-          <DialogDescription>
-            Thông tin lịch hẹn, hóa đơn và hoa hồng từng dòng dịch vụ.
-          </DialogDescription>
+          <DialogTitle>Chi tiết {titleCode}</DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm mb-3">
-          <InfoRow label="Khách" value={appointment.customerName} />
-          <InfoRow label="SĐT" value={appointment.customerPhone} />
-          <InfoRow
-            label="Ngày HĐ (local)"
-            value={appointment.issuedLocalDate}
-          />
-          <InfoRow label="Giờ phục vụ" value={timeLabel} />
-          <InfoRow label="Mã hóa đơn" value={appointment.invoiceCode} />
-          <InfoRow
-            label="Tổng HĐ"
-            value={formatCurrency(appointment.invoiceTotalAmount)}
-          />
-          <InfoRow
-            label="Hoa hồng tổng"
-            value={formatCurrency(appointment.totalCommission)}
-          />
-          <InfoRow label="Ghi chú LH" value={appointment.appointmentNote} />
-        </div>
+        <div className="space-y-4">
+          <div className="rounded-[5px] border border-adminGray-100 bg-adminGray-50/40 p-3 space-y-2 text-sm">
+            <InfoRow
+              label="Khách"
+              value={
+                appointment.customerPhone
+                  ? `${appointment.customerName ?? "—"} · ${appointment.customerPhone}`
+                  : (appointment.customerName ?? "—")
+              }
+            />
+            <InfoRow label="Ngày HĐ" value={dateLabel} />
+            <InfoRow label="Giờ phục vụ" value={timeLabel} />
+            {appointment.invoiceCode && (
+              <InfoRow label="Mã hóa đơn" value={appointment.invoiceCode} />
+            )}
+            {appointment.appointmentNote && (
+              <InfoRow label="Ghi chú" value={appointment.appointmentNote} />
+            )}
+          </div>
 
-        <div className="border border-adminGray-100 overflow-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-adminGray-50 border-b border-adminGray-100">
-              <tr className="text-left text-xs text-adminGray-600">
-                <th className="px-3 py-2 font-semibold">Dịch vụ</th>
-                <th className="px-3 py-2 font-semibold text-right">SL</th>
-                <th className="px-3 py-2 font-semibold text-right">Đơn giá</th>
-                <th className="px-3 py-2 font-semibold text-right">
-                  Thành tiền
-                </th>
-                <th className="px-3 py-2 font-semibold text-right">% HH</th>
-                <th className="px-3 py-2 font-semibold text-right">Hoa hồng</th>
-              </tr>
-            </thead>
-            <tbody>
-              {appointment.lines.map((line: PayrollCommissionLineDto) => (
-                <tr
-                  key={
-                    line.invoiceItemId ?? `${line.itemName}-${line.lineTotal}`
-                  }
-                  className="border-b border-adminGray-100"
-                >
-                  <td className="px-3 py-2 text-adminInk">
-                    {line.itemName ?? "—"}
+          <div className="border border-adminGray-100 overflow-auto rounded-[5px]">
+            <table className="w-full text-sm">
+              <thead className="bg-adminGray-50 border-b border-adminGray-100">
+                <tr className="text-left text-xs text-adminGray-600">
+                  <th className="px-3 py-2 font-semibold">Dịch vụ</th>
+                  <th className="px-3 py-2 font-semibold text-right">SL</th>
+                  <th className="px-3 py-2 font-semibold text-right">Đơn giá</th>
+                  <th className="px-3 py-2 font-semibold text-right">
+                    Thành tiền
+                  </th>
+                  <th className="px-3 py-2 font-semibold text-right">% HH</th>
+                  <th className="px-3 py-2 font-semibold text-right">Hoa hồng</th>
+                </tr>
+              </thead>
+              <tbody>
+                {appointment.lines.map((line: PayrollCommissionLineDto) => (
+                  <tr
+                    key={
+                      line.invoiceItemId ?? `${line.itemName}-${line.lineTotal}`
+                    }
+                    className="border-b border-adminGray-100"
+                  >
+                    <td className="px-3 py-2 text-adminInk">
+                      {line.itemName ?? "—"}
+                    </td>
+                    <td className="px-3 py-2 text-right text-adminGray-600">
+                      {line.quantity ?? 0}
+                    </td>
+                    <td className="px-3 py-2 text-right text-adminGray-600">
+                      {formatCurrency(line.unitPrice)}
+                    </td>
+                    <td className="px-3 py-2 text-right text-adminInk">
+                      {formatCurrency(line.lineTotal)}
+                    </td>
+                    <td className="px-3 py-2 text-right text-adminGray-600">
+                      {line.commissionRate != null
+                        ? `${line.commissionRate}%`
+                        : "—"}
+                    </td>
+                    <td className="px-3 py-2 text-right font-semibold text-primary">
+                      {formatCurrency(line.commissionAmount)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr className="bg-adminGray-50/80 border-t border-adminGray-100 text-sm">
+                  <td
+                    colSpan={3}
+                    className="px-3 py-2.5 text-adminGray-600 font-medium"
+                  >
+                    Tổng
                   </td>
-                  <td className="px-3 py-2 text-right text-adminGray-600">
-                    {line.quantity ?? 0}
+                  <td className="px-3 py-2.5 text-right font-semibold text-adminInk">
+                    {formatCurrency(appointment.invoiceTotalAmount)}
                   </td>
-                  <td className="px-3 py-2 text-right text-adminGray-600">
-                    {formatCurrency(line.unitPrice)}
-                  </td>
-                  <td className="px-3 py-2 text-right text-adminInk">
-                    {formatCurrency(line.lineTotal)}
-                  </td>
-                  <td className="px-3 py-2 text-right text-adminGray-600">
-                    {line.commissionRate != null
-                      ? `${line.commissionRate}%`
-                      : "—"}
-                  </td>
-                  <td className="px-3 py-2 text-right font-semibold text-primary">
-                    {formatCurrency(line.commissionAmount)}
+                  <td className="px-3 py-2.5" />
+                  <td className="px-3 py-2.5 text-right font-semibold text-primary">
+                    {formatCurrency(appointment.totalCommission)}
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </tfoot>
+            </table>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
@@ -125,14 +144,12 @@ function InfoRow({
   value,
 }: {
   label: string;
-  value?: string | number | null;
+  value: string;
 }) {
   return (
-    <div className="border border-adminGray-100 bg-adminGray-50/40 px-3 py-2">
-      <p className="text-xs text-adminGray-600 font-semibold">{label}</p>
-      <p className="text-sm text-adminInk font-medium mt-0.5">
-        {value == null || value === "" ? "—" : String(value)}
-      </p>
+    <div className="flex justify-between gap-3">
+      <span className="text-adminGray-600 shrink-0">{label}</span>
+      <span className="font-medium text-adminInk text-right">{value}</span>
     </div>
   );
 }

@@ -11,6 +11,7 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierVnPayUrl
 {
     public sealed class GetCashierVnPayUrlHandler(
         IAppointmentSqlRepository appointmentRepository,
+        IInvoiceSqlRepository invoiceRepository,
         IVnPayService vnPayService)
         : IRequestHandler<GetCashierVnPayUrlQuery, Result<string>>
     {
@@ -27,15 +28,18 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierVnPayUrl
                 return Result<string>.BadRequest(AppointmentConst.MSG_APPOINTMENT_ALREADY_PAID, ErrorCodes.ERR_APPOINTMENT_ALREADY_PAID);
 
             if (!AppointmentStatusTransitions.CanPayBalance(appointment.Status))
-            {
-                return Result<string>.BadRequest(
-                    "Chỉ thanh toán khi dịch vụ đã hoàn tất và lịch ở trạng thái chờ thanh toán.");
-            }
+                return Result<string>.BadRequest("Chỉ thanh toán khi dịch vụ đã hoàn tất và lịch ở trạng thái chờ thanh toán.");
 
             if (!AppointmentPaymentCalculator.HasDepositPaid(appointment))
                 return Result<string>.BadRequest(AppointmentConst.MSG_APPOINTMENT_NOT_DEPOSITED_YET, ErrorCodes.ERR_APPOINTMENT_NOT_DEPOSITED_YET);
 
-            var amount = AppointmentPaymentCalculator.GetRemainingAmount(appointment);
+            var invoice = await invoiceRepository.AsQueryable(asNoTracking: true)
+                .Where(i => i.AppointmentId == appointment.Id && (i.Status == InvoiceConst.STATUS_UNPAID || i.Status == InvoiceConst.STATUS_DRAFT))
+                .OrderByDescending(i => i.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            var amount = invoice != null ? Math.Max(0m, invoice.TotalAmount - invoice.PaidAmount) : AppointmentPaymentCalculator.GetRemainingAmount(appointment);
+
             if (amount <= 0)
                 return Result<string>.BadRequest(AppointmentConst.MSG_APPOINTMENT_NO_REMAINING_AMOUNT, ErrorCodes.ERR_APPOINTMENT_NO_REMAINING_AMOUNT);
 

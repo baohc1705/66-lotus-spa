@@ -155,21 +155,16 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                         _ => AppointmentPaymentConst.METHOD_CASH
                     };
 
-                    string paymentNote = $"Thanh toán hóa đơn #{invoice.InvoiceCode}";
-                    if (!string.IsNullOrWhiteSpace(request.Note))
-                    {
-                        paymentNote += $": {request.Note.Trim()}";
-                    }
-
-                    if (remainingAmount > 0)
+                    var appointmentRemaining = AppointmentPaymentCalculator.GetRemainingAmount(appointment);
+                    if (appointmentRemaining > 0)
                     {
                         if (!AppointmentPaymentRecorder.TryRecordPayment(
                                 appointment,
                                 AppointmentPaymentConst.PHASE_FINAL_PAYMENT,
-                                remainingAmount,
+                                appointmentRemaining,
                                 appointmentMethod,
                                 null,
-                                paymentNote,
+                                null,
                                 out var error))
                         {
                             transaction.Rollback();

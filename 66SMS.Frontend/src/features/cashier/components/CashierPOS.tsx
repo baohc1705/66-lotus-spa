@@ -1,5 +1,6 @@
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { cashierApi } from "@/features/cashier/api/cashier.api";
+import { CashierPromotionModal } from "@/features/cashier/components/CashierPromotionModal";
 import { useCustomers } from "@/features/customers/hooks/useCustomers";
 import type { CustomerDto } from "@/features/customers/types/customer.types";
 import { invoiceApi } from "@/features/invoices/api/invoice.api";
@@ -63,8 +64,36 @@ interface POSOrder {
   useLoyaltyPoints: boolean;
   paymentMethod: number;
   note: string;
+  promotionCode?: string | null;
   appointmentId?: number | null;
   invoiceId?: number | null;
+}
+
+function createEmptyOrder(id: string, code: string): POSOrder {
+  return {
+    id,
+    code,
+    customer: null,
+    items: [],
+    discountAmount: 0,
+    membershipDiscountAmount: 0,
+    alreadyPaidAmount: 0,
+    useLoyaltyPoints: false,
+    paymentMethod: PAYMENT_METHOD.CASH,
+    note: "",
+    promotionCode: null,
+  };
+}
+
+function buildInvoiceNote(order: POSOrder): string | undefined {
+  const parts: string[] = [];
+  if (order.note.trim()) parts.push(order.note.trim());
+  if (order.promotionCode) {
+    parts.push(
+      `[Đã áp dụng mã: ${order.promotionCode} giảm ${order.discountAmount.toLocaleString("vi-VN")}đ]`,
+    );
+  }
+  return parts.length > 0 ? parts.join(" ") : undefined;
 }
 
 function getCatalogItemImageUrl(
@@ -101,18 +130,7 @@ export function CashierPOS({
   const cashierName = authStore.user?.username || "Thu ngân";
 
   const [orders, setOrders] = useState<POSOrder[]>([
-    {
-      id: "1",
-      code: "Đơn Hàng #26070001",
-      customer: null,
-      items: [],
-      discountAmount: 0,
-      membershipDiscountAmount: 0,
-      alreadyPaidAmount: 0,
-      useLoyaltyPoints: false,
-      paymentMethod: PAYMENT_METHOD.CASH,
-      note: "",
-    },
+    createEmptyOrder("1", "Đơn Hàng #26070001"),
   ]);
   const [activeOrderId, setActiveOrderId] = useState<string>("1");
   const [activeTab, setActiveTab] = useState<
@@ -125,7 +143,6 @@ export function CashierPOS({
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
 
   const [isDiscountModalOpen, setIsDiscountModalOpen] = useState(false);
-  const [tempDiscount, setTempDiscount] = useState<number>(0);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [tempPaidAmount, setTempPaidAmount] = useState<number>(0);
   const [isPayingInvoice, setIsPayingInvoice] = useState(false);
@@ -162,6 +179,7 @@ export function CashierPOS({
         useLoyaltyPoints: (checkoutInvoice.loyaltyPointsUsed || 0) > 0,
         paymentMethod: checkoutInvoice.paymentMethod || PAYMENT_METHOD.CASH,
         note: checkoutInvoice.note || "",
+        promotionCode: null,
         appointmentId: checkoutInvoice.appointmentId,
         invoiceId: checkoutInvoice.id,
       };
@@ -301,18 +319,10 @@ export function CashierPOS({
   const handleCreateNewOrder = () => {
     const nextNum = orders.length + 1;
     const newId = String(nextNum);
-    const newOrder: POSOrder = {
-      id: newId,
-      code: `Đơn Hàng #2607${String(nextNum).padStart(4, "0")}`,
-      customer: null,
-      items: [],
-      discountAmount: 0,
-      membershipDiscountAmount: 0,
-      alreadyPaidAmount: 0,
-      useLoyaltyPoints: false,
-      paymentMethod: PAYMENT_METHOD.CASH,
-      note: "",
-    };
+    const newOrder = createEmptyOrder(
+      newId,
+      `Đơn Hàng #2607${String(nextNum).padStart(4, "0")}`,
+    );
     setOrders((prev: POSOrder[]) => [...prev, newOrder]);
     setActiveOrderId(newId);
     toast.success(`Đã tạo ${newOrder.code}`);
@@ -435,7 +445,29 @@ export function CashierPOS({
     setOrders((prev: POSOrder[]) => {
       return prev.map((o: POSOrder) => {
         if (o.id !== activeOrderId) return o;
-        return { ...o, discountAmount: val };
+        return { ...o, discountAmount: val, promotionCode: null };
+      });
+    });
+  };
+
+  const applyPromotion = (code: string, discountAmount: number) => {
+    setOrders((prev: POSOrder[]) => {
+      return prev.map((o: POSOrder) => {
+        if (o.id !== activeOrderId) return o;
+        return {
+          ...o,
+          discountAmount,
+          promotionCode: code,
+        };
+      });
+    });
+  };
+
+  const clearDiscount = () => {
+    setOrders((prev: POSOrder[]) => {
+      return prev.map((o: POSOrder) => {
+        if (o.id !== activeOrderId) return o;
+        return { ...o, discountAmount: 0, promotionCode: null };
       });
     });
   };
@@ -461,7 +493,7 @@ export function CashierPOS({
       taxAmount: 0,
       paymentMethod: activeOrder.paymentMethod,
       paidAmount: tempPaidAmount || amountDue,
-      note: activeOrder.note || undefined,
+      note: buildInvoiceNote(activeOrder),
       items: activeOrder.items.map((i: POSOrderItem) => ({
         itemType: i.itemType,
         refId: i.id,
@@ -478,10 +510,30 @@ export function CashierPOS({
       return;
     }
 
+    const syncInvoiceItems = async (invoiceId: number) => {
+      const syncResult = await invoiceApi.updateItems(invoiceId, {
+        items: payload.items,
+        discountAmount: payload.discountAmount,
+        applyMembershipDiscount: payload.applyMembershipDiscount,
+        note: payload.note,
+      });
+      if (!syncResult.isSuccess) {
+        toast.error(
+          syncResult.message || "Không thể cập nhật mặt hàng hóa đơn.",
+        );
+        return false;
+      }
+      return true;
+    };
+
     if (activeOrder.paymentMethod === PAYMENT_METHOD.VNPAY) {
       if (activeOrder.appointmentId) {
         setIsPayingInvoice(true);
         try {
+          if (activeOrder.invoiceId) {
+            const synced = await syncInvoiceItems(activeOrder.invoiceId);
+            if (!synced) return;
+          }
           const response = await cashierApi.createVnPayUrl(
             activeOrder.appointmentId,
           );
@@ -510,6 +562,9 @@ export function CashierPOS({
     if (activeOrder.invoiceId) {
       setIsPayingInvoice(true);
       try {
+        const synced = await syncInvoiceItems(activeOrder.invoiceId);
+        if (!synced) return;
+
         const result = await invoiceApi.payInvoice(
           activeOrder.invoiceId,
           activeOrder.paymentMethod,
@@ -522,20 +577,7 @@ export function CashierPOS({
           await queryClient.invalidateQueries({ queryKey: ["cashier-weekly"] });
           setIsCheckoutModalOpen(false);
           if (orders.length === 1) {
-            setOrders([
-              {
-                id: "1",
-                code: "Đơn Hàng #26070001",
-                customer: null,
-                items: [],
-                discountAmount: 0,
-                membershipDiscountAmount: 0,
-                alreadyPaidAmount: 0,
-                useLoyaltyPoints: false,
-                paymentMethod: PAYMENT_METHOD.CASH,
-                note: "",
-              },
-            ]);
+            setOrders([createEmptyOrder("1", "Đơn Hàng #26070001")]);
             setActiveOrderId("1");
           } else {
             handleRemoveOrder(activeOrderId);
@@ -559,20 +601,7 @@ export function CashierPOS({
           await queryClient.invalidateQueries({ queryKey: ["cashier-weekly"] });
           setIsCheckoutModalOpen(false);
           if (orders.length === 1) {
-            setOrders([
-              {
-                id: "1",
-                code: "Đơn Hàng #26070001",
-                customer: null,
-                items: [],
-                discountAmount: 0,
-                membershipDiscountAmount: 0,
-                alreadyPaidAmount: 0,
-                useLoyaltyPoints: false,
-                paymentMethod: PAYMENT_METHOD.CASH,
-                note: "",
-              },
-            ]);
+            setOrders([createEmptyOrder("1", "Đơn Hàng #26070001")]);
             setActiveOrderId("1");
           } else {
             handleRemoveOrder(activeOrderId);
@@ -721,30 +750,28 @@ export function CashierPOS({
       <div className="flex-1 flex min-h-0 min-w-0 w-full gap-2 relative lg:grid lg:grid-cols-12">
         <div className="lg:col-span-6 bg-white border border-adminGray-100 rounded-[3px] shadow-sm flex flex-col overflow-hidden h-full">
           <div className="p-3 bg-white border-b border-adminGray-100 flex items-center justify-between shrink-0 flex-wrap gap-2">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="font-bold text-sm text-adminGreen-600 flex items-center gap-1">
-                <span>{activeOrder.code}</span>
-              </span>
-            </div>
+            <span className="font-bold text-sm text-adminGreen-600">
+              {activeOrder.code}
+            </span>
 
-            <div className="flex items-center gap-2">
+            {orders.length > 1 && (
               <div className="relative">
                 <select
                   value={activeOrderId}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                     setActiveOrderId(e.target.value)
                   }
-                  className="appearance-none bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white rounded-[3px] py-1 pl-2.5 pr-8 text-xs font-bold shadow-sm focus:outline-none cursor-pointer"
+                  className="appearance-none bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white rounded-[3px] py-1 pl-2.5 pr-8 text-xs font-bold shadow-sm focus:outline-none cursor-pointer max-w-[220px]"
                 >
                   {orders.map((o: POSOrder) => (
                     <option key={o.id} value={o.id}>
-                      {o.code} - {o.customer?.fullName || "Khách vãng lai"}
+                      {o.customer?.fullName || "Khách vãng lai"}
                     </option>
                   ))}
                 </select>
                 <ChevronDown className="w-3.5 h-3.5 text-white absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
-            </div>
+            )}
           </div>
 
           <div className="p-3 border-b border-adminGray-100 bg-adminGray-50/20 shrink-0 grid grid-cols-12 gap-3 text-xs">
@@ -755,41 +782,31 @@ export function CashierPOS({
                 )}
               </div>
               <div className="space-y-0.5 min-w-0">
-                <div className="font-bold text-adminGreen-600 flex items-center gap-1">
-                  <span className="truncate">
-                    {activeOrder.customer?.fullName || "Khách vãng lai"}
-                  </span>
+                <div className="font-bold text-adminGreen-600 truncate">
+                  {activeOrder.customer?.fullName || "Khách vãng lai"}
                 </div>
-                <div className="text-xs text-adminGray-600 font-medium">
-                  {activeOrder.customer?.phone || "Chưa có SĐT"}
-                </div>
-                <div className="text-xs text-adminGray-600">
-                  Mã:{" "}
-                  <span className="font-medium">
-                    CS{String(activeOrder.customer?.id || 0).padStart(6, "0")}
-                  </span>
-                </div>
-                <div className="text-xs text-state-danger-text font-bold flex items-center gap-1">
-                  Điểm: {activeOrder.customer?.loyaltyPoint ?? 0} điểm
-                </div>
+                {activeOrder.customer?.phone && (
+                  <div className="text-xs text-adminGray-600 font-medium">
+                    {activeOrder.customer.phone}
+                  </div>
+                )}
+                {activeOrder.customer != null && (
+                  <div className="text-xs text-state-danger-text font-bold">
+                    Điểm: {activeOrder.customer.loyaltyPoint ?? 0} điểm
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="col-span-6 space-y-1 relative text-xs">
+            <div className="col-span-6 space-y-1 text-xs">
               <div className="flex justify-between gap-1 text-adminGray-600">
-                <span>Ngày hóa đơn:</span>
-                <span className="font-semibold text-adminInk flex items-center gap-0.5">
-                  {formatDate().format("DD/MM/YYYY")}
+                <span>Ngày:</span>
+                <span className="font-semibold text-adminInk">
+                  {formatDate().format("DD/MM/YYYY HH:mm")}
                 </span>
               </div>
               <div className="flex justify-between gap-1 text-adminGray-600">
-                <span>Giờ vào/ra:</span>
-                <span className="font-semibold text-adminInk flex items-center gap-0.5">
-                  {formatDate().format("HH:mm")}
-                </span>
-              </div>
-              <div className="flex justify-between gap-1 text-adminGray-600">
-                <span>N.viên thu ngân:</span>
+                <span>Thu ngân:</span>
                 <span className="font-semibold text-adminInk truncate">
                   {cashierName}
                 </span>
@@ -923,15 +940,15 @@ export function CashierPOS({
             </div>
             <div className="flex justify-between items-center text-adminGray-600 font-medium">
               <button
-                onClick={() => {
-                  setTempDiscount(activeOrder.discountAmount);
-                  setIsDiscountModalOpen(true);
-                }}
+                type="button"
+                onClick={() => setIsDiscountModalOpen(true)}
                 className="text-state-danger-text hover:underline flex items-center gap-0.5"
               >
-                Giảm giá{" "}
+                {activeOrder.promotionCode
+                  ? `KM: ${activeOrder.promotionCode}`
+                  : "Giảm giá"}
                 <span className="text-2xs text-adminGray-400 font-normal">
-                  (Thêm giảm giá)
+                  ({activeOrder.discountAmount > 0 ? "Đổi" : "Chọn KM"})
                 </span>
               </button>
               <span className="font-bold text-state-danger-text">
@@ -1184,59 +1201,19 @@ export function CashierPOS({
         </div>
       </div>
 
-      {isDiscountModalOpen && (
-        <div className="fixed inset-0 bg-adminInk/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-adminGray-100 rounded-[3px] shadow-2xl max-w-sm w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-4 bg-adminGray-50 border-b border-adminGray-100 flex items-center justify-between">
-              <span className="font-bold text-xs text-adminInk uppercase tracking-wider">
-                Áp dụng giảm giá
-              </span>
-              <button
-                onClick={() => setIsDiscountModalOpen(false)}
-                className="text-adminGray-400 hover:text-adminGray-600 transition"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="p-4 space-y-4">
-              <div className="space-y-1">
-                <label className="text-2xs font-bold text-adminGray-600 uppercase tracking-wider">
-                  Số tiền giảm (VND)
-                </label>
-                <input
-                  type="number"
-                  value={tempDiscount}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setTempDiscount(Number(e.target.value))
-                  }
-                  placeholder="Nhập số tiền..."
-                  className="w-full text-sm border border-adminGray-300 rounded-[3px] p-2 text-adminInk focus:outline-none focus:border-adminGreen-600"
-                />
-              </div>
-            </div>
-
-            <div className="p-3 bg-adminGray-50 border-t border-adminGray-100 flex justify-end gap-2">
-              <button
-                onClick={() => setIsDiscountModalOpen(false)}
-                className="px-4 py-2 border border-adminGray-100 rounded-[3px] text-xs font-bold text-adminGray-600 hover:bg-adminGray-100 transition"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={() => {
-                  setDiscountAmount(tempDiscount);
-                  setIsDiscountModalOpen(false);
-                  toast.success("Đã áp dụng giảm giá!");
-                }}
-                className="px-4 py-2 bg-adminGreen-600 text-white rounded-[3px] text-xs font-bold hover:bg-adminGreen-600/90 transition"
-              >
-                Xác nhận
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CashierPromotionModal
+        open={isDiscountModalOpen}
+        onClose={() => setIsDiscountModalOpen(false)}
+        orderTotal={Math.max(
+          0,
+          subTotal - activeOrder.membershipDiscountAmount,
+        )}
+        currentDiscount={activeOrder.discountAmount}
+        currentPromotionCode={activeOrder.promotionCode}
+        onApplyManual={setDiscountAmount}
+        onApplyPromotion={applyPromotion}
+        onClear={clearDiscount}
+      />
 
       {isCheckoutModalOpen && (
         <div className="fixed inset-0 bg-adminInk/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">

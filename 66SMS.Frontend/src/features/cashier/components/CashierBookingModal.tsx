@@ -313,8 +313,8 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-      <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 sm:p-6">
-        <div className="relative w-full max-w-4xl max-h-[90vh] bg-adminGray-50 rounded-[24px] shadow-[0_32px_64px_rgba(42,31,26,0.15)] flex flex-col overflow-hidden border border-adminGold-600/20">
+      <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-sm p-2 sm:p-2">
+        <div className="relative w-full max-w-4xl max-h-[90vh] bg-adminGray-50 shadow-[0_32px_64px_rgba(42,31,26,0.15)] flex flex-col overflow-hidden border border-adminGold-600/20">
           <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-adminGold-600/10 bg-adminGray-50/80 z-10">
             <h2 className="text-xl font-bold text-adminInk">
               Thêm Lịch Khách Hàng Mới

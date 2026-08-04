@@ -59,9 +59,9 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
                         EndTime = b.EndTime,
                         Status = b.Status,
                         TotalAmount = b.TotalAmount,
-                        PaidAmount = b.PaidAmount,
+                        PaidAmount = Math.Min(b.PaidAmount, b.TotalAmount),
                         DepositAmount = b.DepositAmount,
-                        RemainingAmount = b.RemainingAmount,
+                        RemainingAmount = Math.Max(0m, b.TotalAmount - b.PaidAmount),
                         DepositPaid = b.DepositPaid,
                         DepositDeadlineAt = b.DepositDeadlineAt,
                         Note = b.Note,
@@ -72,6 +72,8 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
                         PositionId = b.PositionId,
                         PositionName = b.PositionName,
                         PositionStatus = b.PositionStatus,
+                        TimeStartService = b.TimeStartService,
+                        CompletedAt = b.CompletedAt,
                     })
                     .ToList(),
             };

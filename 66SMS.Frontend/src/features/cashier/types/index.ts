@@ -41,6 +41,8 @@ export interface CashierBooking {
   positionId?: number | null
   positionName?: string | null
   positionStatus?: number | null
+  timeStartService?: string | null
+  completedAt?: string | null
 }
 
 export interface CashierPosition {

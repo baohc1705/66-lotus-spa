@@ -7,8 +7,8 @@ export function calcSuggestedMinPrice(
   totalCost: number,
   commissionRate: number,
 ): number {
-  const rate = commissionRate || 0;
-  if (rate <= 0 || rate >= 100) {
+  const rate = Math.min(Math.max(commissionRate || 0, 0), 99.99);
+  if (rate <= 0) {
     return roundVnd(totalCost);
   }
   return roundVnd(totalCost / (1 - rate / 100));
@@ -19,21 +19,22 @@ export function calcSuggestedSellPrice(
   commissionRate: number,
   desiredProfitPercent: number,
 ): number {
-  const commission = commissionRate || 0;
-  const profit = desiredProfitPercent || 0;
-  const denom = 1 - commission / 100 - profit / 100;
+  const commission = Math.min(Math.max(commissionRate || 0, 0), 99.99);
+  const profit = Math.max(desiredProfitPercent || 0, 0);
+  const afterCommission = 1 - commission / 100;
 
-  if (denom <= 0) {
-    return calcSuggestedMinPrice(totalCost, commission);
+  if (afterCommission <= 0) {
+    return roundVnd(totalCost);
   }
-  return roundVnd(totalCost / denom);
+
+  return roundVnd((totalCost * (1 + profit / 100)) / afterCommission);
 }
 
 export function calcCommissionAmount(
   sellingPrice: number,
   commissionRate: number,
 ): number {
-  return roundVnd(sellingPrice * (commissionRate || 0) / 100);
+  return roundVnd((sellingPrice * (commissionRate || 0)) / 100);
 }
 
 export function calcGrossProfit(
@@ -44,17 +45,35 @@ export function calcGrossProfit(
   return roundVnd(sellingPrice - totalCost - commissionAmount);
 }
 
+const MAX_PERCENT_DISPLAY = 999;
+
+function toDisplayPercent(value: number): number | null {
+  if (!Number.isFinite(value)) return null;
+  if (Math.abs(value) > MAX_PERCENT_DISPLAY) return null;
+  return Math.round(value * 100) / 100;
+}
+
 export function calcGrossMarginPercent(
   sellingPrice: number,
   grossProfit: number,
 ): number | null {
-  if (!sellingPrice) return null;
-  return Math.round((grossProfit / sellingPrice) * 10000) / 100;
+  if (!sellingPrice || sellingPrice <= 0) return null;
+  return toDisplayPercent((grossProfit / sellingPrice) * 100);
+}
+
+export function calcMarkupOnCostPercent(
+  totalCost: number,
+  grossProfit: number,
+): number | null {
+  if (!totalCost || totalCost <= 0) return null;
+  return toDisplayPercent((grossProfit / totalCost) * 100);
 }
 
 export type ProfitTone = "profit" | "breakEven" | "loss";
 
-export function getProfitTone(grossProfit: number | null | undefined): ProfitTone {
+export function getProfitTone(
+  grossProfit: number | null | undefined,
+): ProfitTone {
   if (grossProfit == null) return "breakEven";
   if (grossProfit > 0) return "profit";
   if (grossProfit < 0) return "loss";

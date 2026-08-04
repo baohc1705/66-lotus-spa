@@ -4,6 +4,7 @@ import type { Result, PagedResult } from "@/shared/types/common.types";
 import type {
   InvoiceDto,
   CreateInvoicePayload,
+  UpdateInvoiceItemsPayload,
   GetAllInvoicesQuery,
 } from "../types/invoice.types";
 
@@ -29,6 +30,11 @@ export const invoiceApi = {
   createFromAppointment: (appointmentId: number | string) =>
     axiosInstance
       .post<Result<number>>(`${BASE}/from-appointment/${appointmentId}`)
+      .then((r) => r.data),
+
+  updateItems: (id: number | string, payload: UpdateInvoiceItemsPayload) =>
+    axiosInstance
+      .put<Result<object>>(`${BASE}/${id}/items`, payload)
       .then((r) => r.data),
 
   payInvoice: (

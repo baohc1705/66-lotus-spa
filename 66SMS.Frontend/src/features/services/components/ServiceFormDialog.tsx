@@ -23,6 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
+import { SearchableSelect } from "@/shared/components/ui/searchable-select";
 import {
   Select,
   SelectContent,
@@ -67,6 +68,7 @@ import {
   calcCommissionAmount,
   calcGrossMarginPercent,
   calcGrossProfit,
+  calcMarkupOnCostPercent,
   calcSuggestedMinPrice,
   calcSuggestedSellPrice,
   getProfitBadgeClass,
@@ -117,6 +119,14 @@ export function ServiceFormDialog({
   const products = useMemo(
     () => productsResult?.data?.items ?? [],
     [productsResult],
+  );
+  const productOptions = useMemo(
+    () =>
+      products.map((p: ProductDto) => ({
+        value: String(p.id ?? ""),
+        label: `${p.name ?? ""} - ${formatCurrency(p.costPrice)}`,
+      })),
+    [products],
   );
 
   const form = useForm<ServiceFormValues>({
@@ -199,6 +209,7 @@ export function ServiceFormDialog({
     watchSellingPrice,
     grossProfit,
   );
+  const markupOnCostPercent = calcMarkupOnCostPercent(totalCost, grossProfit);
   const profitTone = getProfitTone(grossProfit);
   const belowMin =
     watchSellingPrice > 0 && watchSellingPrice < suggestedMinPrice;
@@ -470,7 +481,7 @@ export function ServiceFormDialog({
                         className="grid grid-cols-12 gap-3 items-start border p-3 rounded-lg bg-adminGray-50/50"
                       >
                         <div className="col-span-4">
-                          <Select
+                          <SearchableSelect
                             value={productId?.toString() || ""}
                             onValueChange={(val) => {
                               const id = parseInt(val);
@@ -486,21 +497,11 @@ export function ServiceFormDialog({
                                 prod?.costPrice ?? 0,
                               );
                             }}
-                          >
-                            <AdminSelectTrigger>
-                              <SelectValue placeholder="Chọn sản phẩm" />
-                            </AdminSelectTrigger>
-                            <SelectContent>
-                              {products.map((p: ProductDto) => (
-                                <SelectItem
-                                  key={p.id}
-                                  value={p.id?.toString() || ""}
-                                >
-                                  {p.name} - {formatCurrency(p.costPrice)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                            options={productOptions}
+                            placeholder="Chọn sản phẩm"
+                            searchPlaceholder="Tìm sản phẩm..."
+                            className="h-9"
+                          />
                           {errorObj?.productId && (
                             <span className="text-state-danger-text text-xs mt-1 block">
                               {errorObj.productId.message}
@@ -637,7 +638,7 @@ export function ServiceFormDialog({
 
                       <FormField
                         label="% lãi mong muốn"
-                        tooltip="Biên lãi mục tiêu sau hoa hồng. Gợi ý giá bán sẽ nhắm tới mức này."
+                        tooltip="% lãi trên giá vốn (sau hoa hồng). VD: 100% = lãi bằng giá vốn."
                         error={errors.desiredProfitPercent?.message}
                       >
                         <AdminInput
@@ -692,7 +693,7 @@ export function ServiceFormDialog({
 
                       <FormField
                         label="Giá bán *"
-                        tooltip="Gợi ý để biên lãi ≈ % lãi mong muốn (sau hoa hồng)."
+                        tooltip="Gợi ý = giá vốn × (1 + % lãi) ÷ (1 − % hoa hồng)."
                         error={errors.sellingPrice?.message}
                       >
                         <Controller
@@ -709,7 +710,7 @@ export function ServiceFormDialog({
                         />
                         <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-adminGray-600">
                           <span>
-                            Gợi ý biên lãi {watchDesiredProfit}%:{" "}
+                            Gợi ý lãi {watchDesiredProfit}% trên giá vốn:{" "}
                             <span className="font-semibold text-adminInk">
                               {formatCurrency(suggestedSellPrice)}
                             </span>
@@ -759,7 +760,17 @@ export function ServiceFormDialog({
                         </span>
                       </span>
                       <span>
-                        Biên lãi:{" "}
+                        % lãi / giá vốn:{" "}
+                        <span
+                          className={`font-semibold ${getProfitTextClass(profitTone)}`}
+                        >
+                          {markupOnCostPercent != null
+                            ? `${markupOnCostPercent}%`
+                            : "—"}
+                        </span>
+                      </span>
+                      <span>
+                        Biên lãi / giá bán:{" "}
                         <span
                           className={`font-semibold ${getProfitTextClass(profitTone)}`}
                         >

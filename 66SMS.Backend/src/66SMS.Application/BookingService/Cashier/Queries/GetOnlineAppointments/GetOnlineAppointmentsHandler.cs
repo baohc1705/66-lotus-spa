@@ -99,9 +99,9 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointment
                     EndTime = endTs.ToString("HH:mm"),
                     Status = statusStr,
                     TotalAmount = a.TotalAmount,
-                    PaidAmount = a.PaidAmount,
+                    PaidAmount = Math.Min(a.PaidAmount, a.TotalAmount),
                     DepositAmount = AppointmentPaymentCalculator.GetDepositAmount(a, depositPercentBySalon),
-                    RemainingAmount = a.TotalAmount - a.PaidAmount,
+                    RemainingAmount = Math.Max(0m, a.TotalAmount - a.PaidAmount),
                     DepositPaid = AppointmentPaymentCalculator.HasDepositPaid(a, depositPercentBySalon),
                     DepositDeadlineAt = a.DepositDeadlineAt,
                     Note = a.Note,
@@ -109,7 +109,9 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointment
                     PositionName = a.Position != null
                         ? $"{a.Position.Room?.Name} — {a.Position.Name}"
                         : null,
-                    PositionStatus = a.Position?.Status
+                    PositionStatus = a.Position?.Status,
+                    TimeStartService = a.TimeStartService,
+                    CompletedAt = a.CompletedAt,
                 };
             }).ToList();
 

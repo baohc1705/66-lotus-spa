@@ -122,6 +122,28 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                         cancellationToken);
                 }
 
+                if (result.Phase == AppointmentPaymentConst.PHASE_FINAL_PAYMENT && apply.IsSuccess)
+                {
+                    var invoice = await invoiceRepository.AsQueryable(asNoTracking: false)
+                        .Where(i => i.AppointmentId == appointment.Id
+                            && i.Status != InvoiceConst.STATUS_CANCELLED)
+                        .OrderByDescending(i => i.Id)
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    if (invoice != null
+                        && (invoice.Status == InvoiceConst.STATUS_UNPAID
+                            || invoice.Status == InvoiceConst.STATUS_DRAFT))
+                    {
+                        invoice.PaidAmount = invoice.TotalAmount;
+                        invoice.ChangeAmount = 0;
+                        invoice.PaymentMethod = InvoiceConst.PAYMENT_VNPAY;
+                        invoice.TransactionId = result.TransactionId;
+                        invoice.Status = InvoiceConst.STATUS_PAID;
+                        invoice.UpdatedAt = DateTimeHelper.UtcNow();
+                        invoiceRepository.Update(invoice);
+                    }
+                }
+
                 appointmentRepository.Update(appointment);
                 await unitOfWork.SaveChangeAsync(cancellationToken);
 

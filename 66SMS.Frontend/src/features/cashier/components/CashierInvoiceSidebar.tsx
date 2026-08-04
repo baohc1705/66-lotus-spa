@@ -20,7 +20,7 @@ import { FormField } from "@/shared/components/forms/FormField";
 import { SearchableSelect } from "@/shared/components/ui/searchable-select";
 import type { Result } from "@/shared/types/common.types";
 import { formatCurrency } from "@/shared/utils/currency";
-import { formatDisplayDate } from "@/shared/utils/date.utils";
+import { formatDateTimeDisplay, formatDisplayDate } from "@/shared/utils/date.utils";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { cn } from "@/lib/utils";
 import { useTimeSlots } from "@/features/booking/hooks/useBookingData";
@@ -393,6 +393,20 @@ function CashierInvoiceSidebarForm({
                     {durationMins != null ? `${durationMins} phút` : "—"}
                   </div>
                 </FormField>
+                {booking.timeStartService && (
+                  <FormField label="Thời gian bắt đầu phục vụ">
+                    <div className="h-10 px-3 flex items-center rounded-[5px] border border-adminGold-600/20 bg-adminGray-50 text-sm text-adminInk">
+                      {formatDateTimeDisplay(booking.timeStartService)}
+                    </div>
+                  </FormField>
+                )}
+                {booking.completedAt && (
+                  <FormField label="Thời gian hoàn thành">
+                    <div className="h-10 px-3 flex items-center rounded-[5px] border border-adminGold-600/20 bg-adminGray-50 text-sm text-adminInk">
+                      {formatDateTimeDisplay(booking.completedAt)}
+                    </div>
+                  </FormField>
+                )}
               </div>
 
               <div className="rounded-[5px] border border-adminGold-600/20 bg-white overflow-hidden">

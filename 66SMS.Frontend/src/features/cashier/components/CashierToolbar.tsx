@@ -92,7 +92,7 @@ export function CashierToolbar({
           type="button"
           onClick={onOpenStaffAvailability}
         >
-          Nhân viên
+          Tra cứu nhân viên
         </Button>
         <Button
           variant="outline"
@@ -100,7 +100,7 @@ export function CashierToolbar({
           type="button"
           onClick={onOpenPositionAvailability}
         >
-          Vị trí
+          Tra cứu vị trí
         </Button>
       </div>
 

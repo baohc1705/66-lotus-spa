@@ -3,6 +3,7 @@ using _66SMS.Application.BookingService.Invoices.Commands.CancelInvoice;
 using _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice;
 using _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromAppointment;
 using _66SMS.Application.BookingService.Invoices.Commands.PayInvoice;
+using _66SMS.Application.BookingService.Invoices.Commands.UpdateInvoiceItems;
 using _66SMS.Application.BookingService.Invoices.Queries.GetAllInvoices;
 using _66SMS.Application.BookingService.Invoices.Queries.GetDetailInvoice;
 using _66SMS.Application.BookingService.Invoices.Queries.GetInvoicePreviewFromAppointment;
@@ -70,6 +71,16 @@ namespace _66SMS.API.Controllers
                 CashierId = jwtService.GetUserId(),
                 CreatedBy = jwtService.GetUserId()
             };
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpPut("{id}/items")]
+        [PermissionAuthorize("invoices", "update")]
+        public async Task<IActionResult> UpdateInvoiceItems(int id, [FromBody] UpdateInvoiceItemsCommand command)
+        {
+            command.Id = id;
+            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }

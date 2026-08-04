@@ -39,6 +39,8 @@ namespace _66SMS.Application.DTOs.Cashier
         public int? PositionId { get; set; }
         public string? PositionName { get; set; }
         public int? PositionStatus { get; set; }
+        public DateTimeOffset? TimeStartService { get; set; }
+        public DateTimeOffset? CompletedAt { get; set; }
     }
 
     public class CashierDailyDto
