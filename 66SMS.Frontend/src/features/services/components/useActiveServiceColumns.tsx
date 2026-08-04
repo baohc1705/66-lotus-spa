@@ -34,7 +34,6 @@ export const SERVICE_COLUMN_LABELS = {
   code: "Mã DV",
   name: "Tên dịch vụ",
   categoryName: "Nhóm dịch vụ",
-  costPrice: "Giá cơ bản",
   sellingPrice: "Giá bán",
   durationMins: "Thời gian",
   status: "Trạng thái",
@@ -171,20 +170,6 @@ export function useActiveServiceColumns({
         header: cols.categoryName,
         cell: ({ row }) => <MutedCell value={row.original.categoryName} />,
         size: 150,
-      },
-      {
-        accessorKey: "costPrice",
-        header: () => (
-          <SortableColumnHeader
-            label={cols.costPrice}
-            column="costPrice"
-            orderBy={orderBy}
-            isDescending={isDescending}
-            onSort={onSort}
-          />
-        ),
-        cell: ({ row }) => <PriceCell value={row.original.costPrice} />,
-        size: 110,
       },
       {
         accessorKey: "sellingPrice",

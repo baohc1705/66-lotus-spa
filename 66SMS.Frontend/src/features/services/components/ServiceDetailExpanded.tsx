@@ -22,6 +22,12 @@ import type {
 } from "../types/service.types";
 import { SERVICE_PERM } from "../constants/service.permissions";
 import { formatCurrency } from "@/shared/utils/currency";
+import {
+  getProfitBadgeClass,
+  getProfitLabel,
+  getProfitTextClass,
+  getProfitTone,
+} from "../utils/servicePricing";
 
 interface ServiceDetailExpandedProps {
   serviceId: number;
@@ -69,6 +75,7 @@ export function ServiceDetailExpanded({
 
   const products = service.serviceProducts || [];
   const primaryImage = service.imageUrl;
+  const profitTone = getProfitTone(service.grossProfit);
 
   return (
     <div className="bg-adminGray-50/30 w-full overflow-hidden max-h-[400px] overflow-y-auto custom-scrollbar">
@@ -102,9 +109,16 @@ export function ServiceDetailExpanded({
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-bold text-adminInk truncate">
-                  {service.name ?? "—"}
-                </h3>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-sm font-bold text-adminInk truncate">
+                    {service.name ?? "—"}
+                  </h3>
+                  <span
+                    className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${getProfitBadgeClass(profitTone)}`}
+                  >
+                    {getProfitLabel(profitTone)}
+                  </span>
+                </div>
                 <p className="text-xs text-adminGray-600 mt-0.5">
                   Mã: {service.code || "—"} · Thời gian:{" "}
                   {service.durationMins || 0} phút
@@ -123,6 +137,14 @@ export function ServiceDetailExpanded({
                   label="Giá cơ bản"
                   value={formatCurrency(service.costPrice)}
                 />
+                <DetailField
+                  label="Chi phí tiêu hao"
+                  value={formatCurrency(service.productCost)}
+                />
+                <DetailField
+                  label="Tổng giá vốn"
+                  value={formatCurrency(service.totalCost)}
+                />
               </div>
               <div className="flex flex-col">
                 <DetailField
@@ -133,13 +155,38 @@ export function ServiceDetailExpanded({
                       : "—"
                   }
                 />
-                <DetailField label="Nội dung" value={service.content} />
+                <DetailField
+                  label="Tiền hoa hồng"
+                  value={formatCurrency(service.commissionAmount)}
+                />
+                <DetailField
+                  label="Giá bán tối thiểu"
+                  value={formatCurrency(service.minSellingPrice)}
+                />
                 <DetailField
                   label="Giá bán"
                   value={formatCurrency(service.sellingPrice)}
                 />
+                <DetailField
+                  label="Lãi gộp"
+                  value={formatCurrency(service.grossProfit)}
+                  valueClassName={getProfitTextClass(profitTone)}
+                />
+                <DetailField
+                  label="Biên lãi %"
+                  value={
+                    service.grossMarginPercent != null
+                      ? `${service.grossMarginPercent}%`
+                      : "—"
+                  }
+                  valueClassName={getProfitTextClass(profitTone)}
+                />
               </div>
             </div>
+
+            {service.content ? (
+              <DetailField label="Nội dung" value={service.content} />
+            ) : null}
 
             <div className="flex items-end justify-end mt-2 pt-4 border-t border-adminGray-100/80">
               <PermissionGate
@@ -174,7 +221,7 @@ export function ServiceDetailExpanded({
                 <thead className="bg-adminGray-50 border-b border-adminGray-100 text-adminGray-600">
                   <tr>
                     <th className="py-2.5 px-4 font-semibold">Tên sản phẩm</th>
-                    <th className="py-2.5 px-4 font-semibold">Giá bán</th>
+                    <th className="py-2.5 px-4 font-semibold">Giá gốc</th>
                     <th className="py-2.5 px-4 font-semibold text-center w-24">
                       Số lượng
                     </th>
@@ -199,14 +246,14 @@ export function ServiceDetailExpanded({
                         </div>
                       </td>
                       <td className="py-2.5 px-4 font-semibold text-adminGray-600">
-                        {formatCurrency(prod.sellingPrice)}
+                        {formatCurrency(prod.unitCost)}
                       </td>
                       <td className="py-2.5 px-4 font-semibold text-adminGray-600 text-center">
                         {prod.quantityUsed ?? "-"}
                       </td>
                       <td className="py-2.5 px-4 font-semibold text-adminGray-600">
                         {formatCurrency(
-                          (prod.quantityUsed ?? 0) * (prod.sellingPrice ?? 0),
+                          (prod.quantityUsed ?? 0) * (prod.unitCost ?? 0),
                         )}
                       </td>
 
@@ -281,14 +328,18 @@ export function ServiceDetailExpanded({
 function DetailField({
   label,
   value,
+  valueClassName,
 }: {
   label: string;
   value: string | null | undefined;
+  valueClassName?: string;
 }) {
   return (
     <div className="py-3.5 border-b border-adminGray-100/80 last:border-b-0 group">
       <p className="text-xs text-adminGray-600 mb-1">{label}</p>
-      <p className="text-sm font-medium text-adminInk truncate">
+      <p
+        className={`text-sm font-medium truncate ${valueClassName ?? "text-adminInk"}`}
+      >
         {value || "—"}
       </p>
     </div>

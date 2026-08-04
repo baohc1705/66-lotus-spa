@@ -86,12 +86,6 @@ export function useDeletedServiceColumns({
         size: 150,
       },
       {
-        accessorKey: "costPrice",
-        header: cols.costPrice,
-        cell: ({ row }) => <PriceCell value={row.original.costPrice} />,
-        size: 110,
-      },
-      {
         accessorKey: "sellingPrice",
         header: cols.sellingPrice,
         cell: ({ row }) => <PriceCell value={row.original.sellingPrice} />,

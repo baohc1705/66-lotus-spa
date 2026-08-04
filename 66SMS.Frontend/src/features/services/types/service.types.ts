@@ -5,7 +5,7 @@ export interface ServiceProductResponse {
   id?: number;
   productId?: number;
   productName?: string;
-  sellingPrice?: number;
+  unitCost?: number;
   quantityUsed?: number;
   note?: string;
   status?: number;
@@ -18,7 +18,6 @@ export interface ServiceListDto {
   code?: string;
   name?: string;
   durationMins?: number;
-  costPrice?: number;
   sellingPrice?: number;
   status?: number;
   imageUrl?: string;
@@ -37,6 +36,7 @@ export interface ServiceDetailDto {
   durationMins?: number;
   costPrice?: number;
   sellingPrice?: number;
+  minSellingPrice?: number;
   commissionRate?: number;
   sortOrder?: number;
   status?: number;
@@ -44,6 +44,11 @@ export interface ServiceDetailDto {
   createdAt?: string;
   updatedAt?: string;
   serviceProducts?: ServiceProductResponse[];
+  productCost?: number;
+  totalCost?: number;
+  commissionAmount?: number;
+  grossProfit?: number;
+  grossMarginPercent?: number;
 }
 
 export type ServiceDto = ServiceListDto;
@@ -51,6 +56,7 @@ export type ServiceDto = ServiceListDto;
 export interface ServiceProductPayload {
   productId?: number;
   quantityUsed?: number;
+  unitCost?: number;
   note?: string;
 }
 

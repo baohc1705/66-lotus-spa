@@ -9,7 +9,7 @@ export const serviceProductSchema = z.object({
     .min(1, VALIDATION_MSG.selectRequired("sản phẩm")),
   quantityUsed: z.coerce.number().min(1, "Số lượng phải lớn hơn 0"),
   note: z.string().optional(),
-  costPrice: z.coerce.number().optional(),
+  unitCost: z.coerce.number().optional(),
 });
 
 const durationValues = [...SERVICE_DURATION_OPTIONS] as number[];
@@ -33,10 +33,13 @@ const serviceBaseSchema = z.object({
     .number()
     .refine((v) => durationValues.includes(v), "Chọn thời gian hợp lệ"),
   costPrice: z.coerce.number().min(0, VALIDATION_MSG.notNegative("Giá cơ bản")),
+  minSellingPrice: z.coerce
+    .number()
+    .min(0, VALIDATION_MSG.notNegative("Giá bán tối thiểu"))
+    .optional(),
   sellingPrice: z.coerce
     .number()
-    .min(0, VALIDATION_MSG.notNegative("Giá bán"))
-    .optional(),
+    .min(0, VALIDATION_MSG.notNegative("Giá bán")),
   commissionRate: z.coerce
     .number()
     .min(0, VALIDATION_MSG.min(0))
@@ -48,14 +51,21 @@ const serviceBaseSchema = z.object({
   serviceProducts: z.array(serviceProductSchema).optional(),
 });
 
-export const createServiceSchema = serviceBaseSchema;
+export const serviceFormSchema = serviceBaseSchema.extend({
+  desiredProfitPercent: z.coerce
+    .number()
+    .min(0, VALIDATION_MSG.notNegative("% lãi mong muốn"))
+    .default(20),
+});
+
+export const createServiceSchema = serviceFormSchema;
 export const updateServiceSchema = serviceBaseSchema.partial();
 
 export const deleteServiceSchema = z.object({
   id: z.number().min(1, "ID phải là số dương"),
 });
 
-export type CreateServicePayload = z.infer<typeof createServiceSchema>;
+export type CreateServicePayload = z.infer<typeof serviceBaseSchema>;
 export type UpdateServicePayload = z.infer<typeof updateServiceSchema>;
 export type DeleteServicePayload = z.infer<typeof deleteServiceSchema>;
-export type ServiceFormValues = CreateServicePayload;
+export type ServiceFormValues = z.infer<typeof serviceFormSchema>;

@@ -10,7 +10,7 @@ using MediatR;
 
 namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
 {
-    public class GetAllServicesHandler : IRequestHandler<GetAllServicesQuery, Result<PagedResult<ServiceListDto>>>
+    public class GetAllServicesHandler : IRequestHandler<GetAllServicesQuery, Result<PagedResult<ServiceDto>>>
     {
         private readonly IServiceSqlRepository serviceSqlRepository;
         private readonly ICacheService cacheService;
@@ -23,7 +23,7 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
             this.cacheService = cacheService;
         }
 
-        public async Task<Result<PagedResult<ServiceListDto>>> Handle(GetAllServicesQuery request, CancellationToken cancellationToken)
+        public async Task<Result<PagedResult<ServiceDto>>> Handle(GetAllServicesQuery request, CancellationToken cancellationToken)
         {
             // Generate cache key.
             var filterHash = CacheKeyHash.FromObject(new
@@ -42,10 +42,10 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
             var cacheKey = ServiceConst.CacheKeyList(filterHash);
 
             // Get cached data.
-            var cached = await cacheService.GetAsync<PagedResult<ServiceListDto>>(cacheKey, cancellationToken);
+            var cached = await cacheService.GetAsync<PagedResult<ServiceDto>>(cacheKey, cancellationToken);
             if (cached is not null)
             {
-                return Result<PagedResult<ServiceListDto>>.Success(cached);
+                return Result<PagedResult<ServiceDto>>.Success(cached);
             }
 
             // Get data from database.
@@ -96,8 +96,8 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
             };
 
             // Get paged result.
-            PagedResult<ServiceListDto> pagedResult = await query
-                .Select(x => new ServiceListDto
+            PagedResult<ServiceDto> pagedResult = await query
+                .Select(x => new ServiceDto
                 {
                     Id = x.Id,
                     CategoryId = x.CategoryId,
@@ -105,18 +105,17 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
                     Code = x.Code,
                     Name = x.Name,
                     DurationMins = x.DurationMins,
-                    CostPrice = x.CostPrice,
                     SellingPrice = x.SellingPrice,
                     Status = x.Status,
+                    ImageUrl = x.ImageUrl,
                     CreatedAt = x.CreatedAt,
-                    UpdatedAt = x.UpdatedAt,
-                    ImageUrl = x.ImageUrl
+                    UpdatedAt = x.UpdatedAt
                 })
                 .ToPagedAsync(request, cancellationToken);
 
             // Set cached data.
             await cacheService.SetAsync(cacheKey, pagedResult, ServiceConst.CACHE_TTL_LIST, cancellationToken);
-            return Result<PagedResult<ServiceListDto>>.Success(pagedResult);
+            return Result<PagedResult<ServiceDto>>.Success(pagedResult);
         }
     }
 }

@@ -20,14 +20,11 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
         public int? DurationMins { get; set; }
         public decimal? CostPrice { get; set; }
         public decimal? SellingPrice { get; set; }
+        public decimal? MinSellingPrice { get; set; }
         public decimal? CommissionRate { get; set; }
         public int? SortOrder { get; set; }
         public int? Status { get; set; }
         public string? ImageUrl { get; set; }
-        /// <summary>
-        /// Khi gửi (kể cả rỗng): xóa sản phẩm cũ và thêm lại danh sách mới.
-        /// Null = không đụng tới sản phẩm đi kèm.
-        /// </summary>
         public List<ServiceProductItems>? ServiceProducts { get; set; }
         [JsonIgnore]
         public DateTimeOffset? UpdatedAt { get; set; } = DateTimeHelper.UtcNow();
