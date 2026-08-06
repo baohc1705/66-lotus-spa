@@ -54,7 +54,15 @@ export function toLocalDateOnly(val?: string | null): string {
 }
 
 export function toLocalTimeOnly(val?: string | null): string {
-  const d = parseFromApi(val);
+  if (!val) return "";
+  const s = val.trim();
+
+  if (/^\d{1,2}:\d{2}(:\d{2}(\.\d+)?)?$/.test(s)) {
+    const [h, m] = s.split(":");
+    return `${pad(Number(h))}:${pad(Number(m))}`;
+  }
+
+  const d = parseFromApi(s);
   return d ? toHm(d) : "";
 }
 
@@ -195,6 +203,10 @@ export class DateUtil {
 
   toDate() {
     return this.date;
+  }
+
+  toISOString() {
+    return this.date.toISOString();
   }
 }
 

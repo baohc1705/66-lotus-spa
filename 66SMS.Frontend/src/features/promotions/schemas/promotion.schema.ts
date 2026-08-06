@@ -1,6 +1,27 @@
 import { z } from "zod";
 import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
+const emptyToUndefined = (v: unknown) =>
+  v === "" || v === null || v === undefined ? undefined : v;
+const optionalUsageLimit = z.preprocess((v) => {
+  if (v === "" || v === null || v === undefined) return undefined;
+  const n = Number(v);
+  if (Number.isNaN(n) || n <= 0) return undefined;
+  return n;
+}, z.number().optional());
+
+const optionalPositiveMoney = z.preprocess((v) => {
+  if (v === "" || v === null || v === undefined) return undefined;
+  const n = Number(v);
+  if (Number.isNaN(n) || n <= 0) return undefined;
+  return n;
+}, z.number().optional());
+
+const optionalNumber = z.preprocess(
+  emptyToUndefined,
+  z.coerce.number().optional(),
+);
+
 export const promotionSchema = z
   .object({
     code: z
@@ -17,12 +38,12 @@ export const promotionSchema = z
       .optional()
       .or(z.literal("")),
     discountType: z.coerce.number().min(1).max(3),
-    discountValue: z.coerce.number().optional(),
-    maxDiscountAmount: z.coerce.number().optional(),
-    minOrderValue: z.coerce.number().optional(),
-    buyQuantity: z.coerce.number().optional(),
-    getQuantity: z.coerce.number().optional(),
-    usageLimit: z.coerce.number().optional(),
+    discountValue: optionalNumber,
+    maxDiscountAmount: optionalPositiveMoney,
+    minOrderValue: optionalNumber,
+    buyQuantity: optionalNumber,
+    getQuantity: optionalNumber,
+    usageLimit: optionalUsageLimit,
     startDate: z.string().min(1, VALIDATION_MSG.required("Ngày bắt đầu")),
     endDate: z.string().min(1, VALIDATION_MSG.required("Ngày kết thúc")),
     status: z.coerce.number().optional(),

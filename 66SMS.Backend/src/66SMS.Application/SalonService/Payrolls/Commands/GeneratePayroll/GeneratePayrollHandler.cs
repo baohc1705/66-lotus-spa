@@ -48,8 +48,6 @@ namespace _66SMS.Application.SalonService.Payrolls.Commands.GeneratePayroll
 
             var attendances = await attendanceRepository
                 .AsQueryable(asNoTracking: false)
-                .Include(x => x.WorkSchedule!)
-                .ThenInclude(w => w.ShiftPeriod)
                 .Where(x => x.StaffId == request.StaffId
                     && x.WorkDate.Month == request.Month
                     && x.WorkDate.Year == request.Year)

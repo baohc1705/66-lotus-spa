@@ -10,6 +10,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- Chi tiet tung dong (view ngay / tuan)
     SELECT
         st.id                    AS StaffId,
         st.full_name             AS StaffName,
@@ -62,8 +63,8 @@ BEGIN
         ap.paid_amount           AS AppointmentPaidAmount,
         ap.deposit_percent       AS DepositPercent,
         ap.completed_at          AS CompletedAt,
-        ts.start_time            AS SlotStartTime,
-        ts.end_time              AS SlotEndTime,
+        COALESCE(ap.time_appt_start, ts.start_time) AS SlotStartTime,
+        COALESCE(ap.time_appt_end, ts.end_time)     AS SlotEndTime,
         (
             SELECT ISNULL(SUM(aps.duration_snapshot), 0)
             FROM dbo.appointment_services AS aps
@@ -80,9 +81,9 @@ BEGIN
     LEFT JOIN dbo.time_slots AS ts
         ON ts.id = ap.slot_id
     WHERE ii.staff_id = @StaffId
-      AND ii.status = 1           
-      AND inv.status = 2             
+      AND ii.status = 1
+      AND inv.status = 2
       AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
-    ORDER BY IssuedLocalDate, ts.start_time, inv.id, ii.id;
+    ORDER BY IssuedLocalDate, COALESCE(ap.time_appt_start, ts.start_time), inv.id, ii.id;
 END
 GO

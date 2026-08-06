@@ -5,6 +5,7 @@ using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Application.DTOs.Cashier;
 using _66SMS.Contracts.Enumerations;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayReturn
         IAppointmentSqlRepository appointmentRepository,
         IWalletSqlRepository walletRepository,
         IWalletTransactionSqlRepository walletTransactionRepository,
+        IInvoiceSqlRepository invoiceRepository,
         IConfigAppointmentSqlRepository configAppointmentSqlRepository,
         ILoyaltyPointService loyaltyPointService,
         ISqlUnitOfWork unitOfWork)
@@ -96,6 +98,28 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayReturn
                     appointment.TotalAmount,
                     appointment.CreatedByUserId,
                     cancellationToken);
+            }
+
+            if (result.Phase == AppointmentPaymentConst.PHASE_FINAL_PAYMENT && apply.IsSuccess)
+            {
+                var invoice = await invoiceRepository.AsQueryable(asNoTracking: false)
+                    .Where(i => i.AppointmentId == appointment.Id
+                        && i.Status != InvoiceConst.STATUS_CANCELLED)
+                    .OrderByDescending(i => i.Id)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (invoice != null
+                    && (invoice.Status == InvoiceConst.STATUS_UNPAID
+                        || invoice.Status == InvoiceConst.STATUS_DRAFT))
+                {
+                    invoice.PaidAmount = invoice.TotalAmount;
+                    invoice.ChangeAmount = 0;
+                    invoice.PaymentMethod = InvoiceConst.PAYMENT_VNPAY;
+                    invoice.TransactionId = result.TransactionId;
+                    invoice.Status = InvoiceConst.STATUS_PAID;
+                    invoice.UpdatedAt = DateTimeHelper.UtcNow();
+                    invoiceRepository.Update(invoice);
+                }
             }
 
             await unitOfWork.SaveChangeAsync(cancellationToken);

@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
@@ -13,6 +14,19 @@ interface PayrollStatsToolbarProps {
   staffPicker?: ReactNode;
 }
 
+function toDateInputValue(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function toMonthInputValue(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  return `${y}-${m}`;
+}
+
 export function PayrollStatsToolbar({
   viewMode,
   onViewModeChange,
@@ -21,6 +35,8 @@ export function PayrollStatsToolbar({
   periodLabel,
   staffPicker,
 }: PayrollStatsToolbarProps) {
+  const pickerRef = useRef<HTMLInputElement>(null);
+
   const handleToday = () => onAnchorDateChange(new Date());
 
   const handlePrev = () => {
@@ -37,6 +53,27 @@ export function PayrollStatsToolbar({
     else if (viewMode === "week") next.setDate(next.getDate() + 7);
     else next.setMonth(next.getMonth() + 1);
     onAnchorDateChange(next);
+  };
+
+  const openPicker = () => {
+    const el = pickerRef.current;
+    if (!el) return;
+    if (typeof el.showPicker === "function") {
+      el.showPicker();
+    } else {
+      el.focus();
+      el.click();
+    }
+  };
+
+  const handlePickerChange = (value: string) => {
+    if (!value) return;
+    if (viewMode === "month") {
+      const [y, m] = value.split("-").map(Number);
+      onAnchorDateChange(new Date(y, m - 1, 1));
+      return;
+    }
+    onAnchorDateChange(new Date(`${value}T12:00:00`));
   };
 
   const isToday =
@@ -82,25 +119,48 @@ export function PayrollStatsToolbar({
           Hôm nay
         </Button>
 
-        <div className="flex items-center bg-adminGray-50 border border-adminGray-100 h-9">
+        <div className="relative flex items-center bg-adminGray-50 border border-adminGray-100 h-9">
           <button
             type="button"
             onClick={handlePrev}
             className="px-2 h-full text-adminGray-600 hover:text-adminInk hover:bg-white transition-colors"
+            aria-label="Kỳ trước"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <div className="flex items-center gap-1.5 px-2 text-xs font-semibold text-adminInk min-w-[170px] justify-center">
+
+          <button
+            type="button"
+            onClick={openPicker}
+            className="flex items-center gap-1.5 px-2 text-xs font-semibold text-adminInk min-w-[170px] justify-center h-full hover:bg-white transition-colors"
+            title="Chọn ngày"
+          >
             <Calendar className="w-3.5 h-3.5 text-adminGray-600 shrink-0" />
             <span className="truncate">{periodLabel}</span>
-          </div>
+          </button>
+
           <button
             type="button"
             onClick={handleNext}
             className="px-2 h-full text-adminGray-600 hover:text-adminInk hover:bg-white transition-colors"
+            aria-label="Kỳ sau"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
+
+          <input
+            ref={pickerRef}
+            type={viewMode === "month" ? "month" : "date"}
+            value={
+              viewMode === "month"
+                ? toMonthInputValue(anchorDate)
+                : toDateInputValue(anchorDate)
+            }
+            onChange={(e) => handlePickerChange(e.target.value)}
+            className="absolute opacity-0 pointer-events-none w-0 h-0"
+            tabIndex={-1}
+            aria-hidden
+          />
         </div>
       </div>
     </div>

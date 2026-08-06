@@ -1,4 +1,4 @@
-import { DoorOpen, Pencil, MapPin } from "lucide-react";
+import { Pencil, MapPin } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import {
   Tabs,
@@ -9,6 +9,7 @@ import {
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import { useBookingRoomDetail } from "../hooks/useBookingRooms";
 import { BOOKING_ROOM_PERM } from "../constants/booking_room.permissions";
 import type { BookingRoomDTO } from "../types/booking_room.types";
@@ -21,7 +22,9 @@ interface BookingRoomDetailExpandedProps {
 
 const POSITION_STATUS_MAP: StatusMap = {
   "0": { label: "Bảo trì", variant: "error" },
-  "1": { label: "Khả dụng", variant: "success", dot: true },
+  "1": { label: "Trống", variant: "success", dot: true },
+  "3": { label: "Trống", variant: "success", dot: true },
+  "4": { label: "Đang phục vụ", variant: "warning", dot: true },
 };
 
 export function BookingRoomDetailExpanded({
@@ -80,21 +83,19 @@ export function BookingRoomDetailExpanded({
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-xl bg-adminGray-50/50 flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-adminGray-100/50">
-                {room.imageUrl ? (
-                  <img
-                    src={room.imageUrl}
-                    alt={room.name ?? ""}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <DoorOpen className="w-7 h-7 text-adminGray-600" />
-                )}
+                <FallbackImage
+                  kind="position"
+                  src={room.imageUrl}
+                  alt={room.name ?? ""}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-base font-bold text-adminInk truncate">
                   {room.name ?? "—"}
                 </h3>
                 <p className="text-xs text-adminGray-600 mt-0.5">
+                  {room.salonName ? `${room.salonName} · ` : ""}
                   Trạng thái:{" "}
                   {room.status === 1 ? "Hoạt động" : "Ngưng hoạt động"}
                 </p>
@@ -106,6 +107,21 @@ export function BookingRoomDetailExpanded({
                 <DetailField label="Tên phòng" value={room.name} />
               </div>
               <div className="flex flex-col">
+                <DetailField label="Chi nhánh" value={room.salonName} />
+              </div>
+              <div className="flex flex-col">
+                <DetailField
+                  label="Vị trí trống"
+                  value={`${room.availableCount ?? 0}`}
+                />
+              </div>
+              <div className="flex flex-col">
+                <DetailField
+                  label="Đang phục vụ"
+                  value={`${room.inServiceCount ?? 0}`}
+                />
+              </div>
+              <div className="flex flex-col md:col-span-2">
                 <DetailField label="Ghi chú" value={room.note} />
               </div>
             </div>

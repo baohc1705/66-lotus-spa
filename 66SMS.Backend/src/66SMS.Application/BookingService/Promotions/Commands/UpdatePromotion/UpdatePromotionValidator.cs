@@ -38,7 +38,7 @@ namespace _66SMS.Application.BookingService.Promotions.Commands.UpdatePromotion
             });
 
             RuleFor(x => x.MinOrderValue).GreaterThanOrEqualTo(0).When(x => x.MinOrderValue.HasValue);
-            RuleFor(x => x.UsageLimit).GreaterThanOrEqualTo(0).When(x => x.UsageLimit.HasValue);
+            RuleFor(x => x.UsageLimit).GreaterThan(0).When(x => x.UsageLimit.HasValue && x.UsageLimit.Value != 0);
         }
     }
 }

@@ -21,6 +21,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
     {
         private readonly IServiceSqlRepository serviceSqlRepository;
         private readonly IServiceProductSqlRepository serviceProductSqlRepository;
+        private readonly IProductSqlRepository productSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
         private readonly IImageUploadService imageUploadService;
@@ -29,6 +30,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
         public UpdateServiceHandler(
             IServiceSqlRepository serviceSqlRepository,
             IServiceProductSqlRepository serviceProductSqlRepository,
+            IProductSqlRepository productSqlRepository,
             ISqlUnitOfWork sqlUnitOfWork,
             IMapper mapper,
             IImageUploadService imageUploadService,
@@ -36,6 +38,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
         {
             this.serviceSqlRepository = serviceSqlRepository;
             this.serviceProductSqlRepository = serviceProductSqlRepository;
+            this.productSqlRepository = productSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
             this.imageUploadService = imageUploadService;
@@ -100,15 +103,24 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
                 .Select(g => g.Last())
                 .ToList();
 
+            var productIds = desired.Select(x => x.ProductId!.Value).ToList();
+
+            var products = await productSqlRepository
+                .AsQueryable(true)
+                .Where(p => productIds.Contains(p.Id))
+                .Select(p => new { p.Id, p.CostPrice })
+                .ToListAsync(cancellationToken);
+
             var existing = await serviceProductSqlRepository
                 .AsQueryable(false)
                 .Where(x => x.ServiceId == serviceId)
                 .ToListAsync(cancellationToken);
 
-            var desiredProductIds = desired.Select(x => x.ProductId!.Value).ToHashSet();
             var now = DateTimeHelper.UtcNow();
 
-            var toRemove = existing.Where(x => !desiredProductIds.Contains(x.ProductId)).ToList();
+            var toRemove = existing
+                .Where(x => !productIds.Contains(x.ProductId))
+                .ToList();
             if (toRemove.Count > 0)
             {
                 serviceProductSqlRepository.RemoveRange(toRemove);
@@ -117,10 +129,14 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
             foreach (var item in desired)
             {
                 var productId = item.ProductId!.Value;
+                var unitCost = item.UnitCost
+                    ?? products.FirstOrDefault(p => p.Id == productId)?.CostPrice;
+
                 var found = existing.FirstOrDefault(x => x.ProductId == productId);
                 if (found != null)
                 {
                     found.QuantityUsed = item.QuantityUsed ?? 1;
+                    found.UnitCost = unitCost;
                     found.Note = item.Note;
                     found.Status = item.Status ?? (int)StatusActiveEnum.ACTIVED;
                     found.UpdatedAt = now;
@@ -133,6 +149,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
                         ServiceId = serviceId,
                         ProductId = productId,
                         QuantityUsed = item.QuantityUsed ?? 1,
+                        UnitCost = unitCost,
                         Note = item.Note,
                         Status = item.Status ?? (int)StatusActiveEnum.ACTIVED,
                         CreatedAt = now,

@@ -9,7 +9,7 @@ import type { ServiceListDto } from "@/features/services/types/service.types";
 
 import aboutBgCrane from "@/assets/about_bg_crane.png";
 import aboutBg from "@/assets/backgrounds/about.webp";
-import spaMassage from "@/assets/spa_massage.png";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 
 function formatPrice(price?: number) {
   return `${(price || 0).toLocaleString("vi-VN")}đ`;
@@ -131,8 +131,9 @@ export const ServicesSection = () => {
                 transition={{ duration: 0.35, delay: i * 0.05 }}
                 className="landing-focus-ring group relative aspect-[5/3] w-[85%] min-w-[85%] shrink-0 snap-start overflow-hidden border border-card-border text-left transition-all duration-300 hover:border-rose-200 sm:w-auto sm:min-w-0 sm:shrink-0"
               >
-                <img
-                  src={service.imageUrl || spaMassage}
+                <FallbackImage
+                  kind="service"
+                  src={service.imageUrl}
                   alt={service.name || "Dịch vụ"}
                   loading="lazy"
                   className="absolute inset-0 h-full w-full object-cover"

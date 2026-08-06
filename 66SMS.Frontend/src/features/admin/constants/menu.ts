@@ -65,7 +65,6 @@ export const MENU_GROUPS: MenuGroup[] = [
     items: [
       {
         label: "Doanh thu",
-        path: "/admin",
         icon: BarChart,
         allowedRoles: ["Admin", "Manager"],
         children: [

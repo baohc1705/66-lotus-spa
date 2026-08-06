@@ -23,8 +23,6 @@ export function AttendanceListPage() {
     formatDate().startOf("isoWeek"),
   );
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterOnTime, setFilterOnTime] = useState(false);
-  const [filterLate, setFilterLate] = useState(false);
   const [filterMissing, setFilterMissing] = useState(false);
   const [filterNoAttendance, setFilterNoAttendance] = useState(false);
   const [filterLeave, setFilterLeave] = useState(false);
@@ -105,11 +103,7 @@ export function AttendanceListPage() {
     }
 
     const hasActiveFilter =
-      filterOnTime ||
-      filterLate ||
-      filterMissing ||
-      filterNoAttendance ||
-      filterLeave;
+      filterMissing || filterNoAttendance || filterLeave;
 
     if (!hasActiveFilter) {
       return list;
@@ -134,49 +128,8 @@ export function AttendanceListPage() {
       }
 
       if (statusVal === 1 || statusVal === 2) {
-        if (statusVal === 1) {
-          if (filterMissing) return true;
-        }
-
-        const timeToMinutes = (timeStr?: string | null) => {
-          if (!timeStr) return 0;
-          const parts = timeStr.substring(0, 5).split(":");
-          if (parts.length < 2) return 0;
-          return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
-        };
-        const isoTimeToMinutes = (isoStr?: string | null) => {
-          const hm = toLocalTimeOnly(isoStr);
-          if (!hm) return null;
-          const [h, m] = hm.split(":").map(Number);
-          return h * 60 + m;
-        };
-
-        let period: ShiftPeriodDTO | undefined;
-        const shifts = shiftsResult?.data?.items ?? [];
-        for (const shift of shifts) {
-          if (shift.shiftPeriodDTOs) {
-            period = shift.shiftPeriodDTOs.find(
-              (p) => p.id === ws.shiftPeriodId,
-            );
-            if (period) break;
-          }
-        }
-
-        if (period) {
-          const shiftStartMins = timeToMinutes(period.shiftStart);
-          const shiftEndMins = timeToMinutes(period.shiftEnd);
-          const actualInMins = isoTimeToMinutes(att.checkInAt);
-          const actualOutMins = isoTimeToMinutes(att.checkOutAt);
-
-          const isLate = actualInMins !== null && actualInMins > shiftStartMins;
-          const isEarly =
-            actualOutMins !== null && actualOutMins < shiftEndMins;
-
-          if (isLate || isEarly) {
-            return filterLate;
-          }
-        }
-        return filterOnTime;
+        if (!att.checkOutAt && filterMissing) return true;
+        return false;
       }
 
       return false;
@@ -185,9 +138,6 @@ export function AttendanceListPage() {
     schedulesResult?.data?.items,
     searchQuery,
     scheduleAttendanceMap,
-    shiftsResult?.data?.items,
-    filterOnTime,
-    filterLate,
     filterMissing,
     filterNoAttendance,
     filterLeave,
@@ -245,10 +195,7 @@ export function AttendanceListPage() {
     setDialogOpen(true);
   };
 
-  const getAttendanceCardDetails = (
-    ws: WorkScheduleDTO,
-    period: ShiftPeriodDTO,
-  ) => {
+  const getAttendanceCardDetails = (ws: WorkScheduleDTO) => {
     const att = ws.id ? scheduleAttendanceMap.get(ws.id) : null;
 
     const defaultClass =
@@ -267,64 +214,20 @@ export function AttendanceListPage() {
       return toLocalTimeOnly(isoStr) || "--:--";
     };
 
-    const timeToMinutes = (timeStr?: string | null) => {
-      if (!timeStr) return 0;
-      const parts = timeStr.substring(0, 5).split(":");
-      if (parts.length < 2) return 0;
-      return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
-    };
-
-    const isoTimeToMinutes = (isoStr?: string | null) => {
-      const hm = toLocalTimeOnly(isoStr);
-      if (!hm) return null;
-      const [h, m] = hm.split(":").map(Number);
-      return h * 60 + m;
-    };
-
     const statusVal = att.status;
 
     if (statusVal === 1 || statusVal === 2) {
-      const shiftStartMins = timeToMinutes(period.shiftStart);
-      const shiftEndMins = timeToMinutes(period.shiftEnd);
-      const actualInMins = isoTimeToMinutes(att.checkInAt);
-      const actualOutMins = isoTimeToMinutes(att.checkOutAt);
-
-      let isLate = false;
-      let isEarly = false;
-      let lateText = "";
-      let earlyText = "";
-
-      if (actualInMins !== null && actualInMins > shiftStartMins) {
-        isLate = true;
-        const diff = actualInMins - shiftStartMins;
-        lateText = `Đi muộn ${diff}p`;
-      }
-      if (actualOutMins !== null && actualOutMins < shiftEndMins) {
-        isEarly = true;
-        const diff = shiftEndMins - actualOutMins;
-        earlyText = `Về sớm ${diff}p`;
-      }
-
+      const hasCheckedOut = !!att.checkOutAt;
       const checkInStr = parseTime(att.checkInAt);
-      const checkOutStr = statusVal === 2 ? parseTime(att.checkOutAt) : "--:--";
+      const checkOutStr = hasCheckedOut ? parseTime(att.checkOutAt) : "--:--";
       const timeText = `${checkInStr} - ${checkOutStr}`;
 
-      if (isLate || isEarly) {
-        const statusText = [lateText, earlyText].filter(Boolean).join(" & ");
-        return {
-          className: `${defaultClass} bg-state-danger-bg border-state-danger-border hover:border-state-danger-solid focus:ring-state-danger-solid`,
-          timeText,
-          statusText,
-          statusColorClass: "text-state-danger-text font-bold",
-        };
-      } else {
-        return {
-          className: `${defaultClass} bg-adminGreen-600-light border-adminGreen-600 hover:border-adminGreen-600 focus:ring-adminGreen-600`,
-          timeText,
-          statusText: statusVal === 2 ? "Đã ra ca" : "Đang làm",
-          statusColorClass: "text-adminGreen-600 font-bold",
-        };
-      }
+      return {
+        className: `${defaultClass} bg-adminGreen-600-light border-adminGreen-600 hover:border-adminGreen-600 focus:ring-adminGreen-600`,
+        timeText,
+        statusText: hasCheckedOut ? "Đã ra ca" : "Đang làm",
+        statusColorClass: "text-adminGreen-600 font-bold",
+      };
     }
 
     if (statusVal === 4 || statusVal === 5) {
@@ -377,24 +280,6 @@ export function AttendanceListPage() {
           )}
 
           <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-adminGray-600">
-            <label className="flex items-center gap-1.5 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={filterOnTime}
-                onChange={(e) => setFilterOnTime(e.target.checked)}
-                className="rounded-full border-adminGreen-600/40 text-adminGreen-600 focus:ring-adminGreen-600 w-3.5 h-3.5"
-              />
-              <span className="text-adminGray-600 hover:text-adminInk">Đúng giờ</span>
-            </label>
-            <label className="flex items-center gap-1.5 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={filterLate}
-                onChange={(e) => setFilterLate(e.target.checked)}
-                className="rounded-full border-rose-300 text-state-danger-text focus:ring-rose-450 w-3.5 h-3.5"
-              />
-              <span className="text-adminGray-600 hover:text-adminInk">Đi muộn / Về sớm</span>
-            </label>
             <label className="flex items-center gap-1.5 cursor-pointer select-none">
               <input
                 type="checkbox"
@@ -560,10 +445,7 @@ export function AttendanceListPage() {
                               </div>
                             ) : (
                               cellSchedules.map((ws) => {
-                                const card = getAttendanceCardDetails(
-                                  ws,
-                                  period,
-                                );
+                                const card = getAttendanceCardDetails(ws);
                                 return (
                                   <button
                                     type="button"

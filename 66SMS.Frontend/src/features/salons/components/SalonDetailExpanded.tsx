@@ -7,8 +7,9 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/shared/components/ui/tabs";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import {
-  Building2,
   Calendar,
   FileText,
   Hash,
@@ -82,15 +83,12 @@ export function SalonDetailExpanded({
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-xl bg-adminGray-50/50 flex items-center justify-center shrink-0 shadow-sm border border-adminGray-100/50 overflow-hidden">
-                {salon.imageUrl ? (
-                  <img
-                    src={salon.imageUrl}
-                    alt={salon.name ?? ""}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <Building2 className="w-7 h-7 text-adminGray-600" />
-                )}
+                <FallbackImage
+                  kind="salon"
+                  src={salon.imageUrl}
+                  alt={salon.name ?? ""}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">

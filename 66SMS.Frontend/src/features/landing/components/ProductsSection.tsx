@@ -3,8 +3,7 @@ import { Eye } from "lucide-react";
 import { SectionHeader } from "./SectionHeader";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import type { ProductDto } from "@/features/products/types/product.types";
-
-import spaProducts from "@/assets/spa_products.png";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 
 function formatPrice(price?: number | null) {
   return `${(price || 0).toLocaleString("vi-VN")}đ`;
@@ -60,8 +59,9 @@ export const ProductsSection = () => {
                 className="group flex flex-col overflow-hidden border border-card-border bg-surface transition-all duration-300 hover:border-rose-200 hover:shadow-[0_8px_28px_rgba(157,23,77,0.14)]"
               >
                 <div className="relative aspect-[5/4] overflow-hidden bg-rose-50">
-                  <img
-                    src={product.imageUrl || spaProducts}
+                  <FallbackImage
+                    kind="product"
+                    src={product.imageUrl}
                     alt={product.name || "Sản phẩm"}
                     loading="lazy"
                     className="h-full w-full object-cover"

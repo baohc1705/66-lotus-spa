@@ -250,7 +250,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                 customerEmail,
                 customer?.FullName ?? appointment.CreatedByUser?.Username ?? "Quý khách",
                 serviceName,
-                appointment.AppointmentDate.ToDateTime(appointment.TimeSlot?.StartTime ?? new TimeOnly(9, 0)),
+                appointment.AppointmentDate.ToDateTime(appointment.TimeApptStart ?? appointment.TimeSlot?.StartTime ?? new TimeOnly(9, 0)),
                 appointment.PaidAmount,
                 appointment.TotalAmount - appointment.PaidAmount,
                 invoiceCode);

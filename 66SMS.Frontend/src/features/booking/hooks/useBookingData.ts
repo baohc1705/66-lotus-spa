@@ -6,6 +6,21 @@ import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type { Result } from "@/shared/types/common.types";
 import type { SlotLockDto, CreateBookingPayload } from "../types/booking.types";
 
+export const useAvailableBookingDays = (days = 7) => {
+  return useQuery({
+    queryKey: ["booking-available-days", days],
+    queryFn: () => bookingApi.getAvailableDays(days),
+  });
+};
+
+export const useActivePromotions = () => {
+  return useQuery({
+    queryKey: ["booking-active-promotions"],
+    queryFn: () => bookingApi.getActivePromotions(),
+    staleTime: 60_000,
+  });
+};
+
 export const useTechnicians = (date: string | null, serviceId?: number, salonId?: number) => {
   return useQuery({
     queryKey: ["booking-technicians", date, serviceId, salonId],

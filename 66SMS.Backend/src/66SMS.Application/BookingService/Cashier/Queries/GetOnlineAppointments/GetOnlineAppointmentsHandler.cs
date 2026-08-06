@@ -37,7 +37,7 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointment
 
             var appointments = await query
                 .OrderBy(a => a.AppointmentDate)
-                .ThenBy(a => a.TimeSlot != null ? a.TimeSlot.StartTime : default)
+                .ThenBy(a => a.TimeApptStart ?? (a.TimeSlot != null ? a.TimeSlot.StartTime : default))
                 .ToListAsync(cancellationToken);
 
             if (appointments.Count == 0)
@@ -80,8 +80,8 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointment
 
                 var durationMins = a.Services?.Sum(s => s.Service?.DurationMins ?? 0) ?? 0;
                 if (durationMins == 0) durationMins = 15;
-                var startTs = a.TimeSlot?.StartTime ?? new TimeOnly(0, 0);
-                var endTs = startTs.AddMinutes(durationMins);
+                var startTs = a.TimeApptStart ?? a.TimeSlot?.StartTime ?? new TimeOnly(0, 0);
+                var endTs = a.TimeApptEnd ?? startTs.AddMinutes(durationMins);
 
                 return new CashierBookingDto
                 {
@@ -92,15 +92,16 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointment
                     CustomerAvatar = a.CreatedByUser?.Customer?.AvatarUrl,
                     BookingDate = a.AppointmentDate.ToString("yyyy-MM-dd"),
                     ServiceName = serviceName,
+                    ServiceId = a.Services?.FirstOrDefault()?.ServiceId,
                     StaffId = a.StaffId,
                     StaffName = "Chưa xếp nhân viên",
                     StartTime = startTs.ToString("HH:mm"),
                     EndTime = endTs.ToString("HH:mm"),
                     Status = statusStr,
                     TotalAmount = a.TotalAmount,
-                    PaidAmount = a.PaidAmount,
+                    PaidAmount = Math.Min(a.PaidAmount, a.TotalAmount),
                     DepositAmount = AppointmentPaymentCalculator.GetDepositAmount(a, depositPercentBySalon),
-                    RemainingAmount = a.TotalAmount - a.PaidAmount,
+                    RemainingAmount = Math.Max(0m, a.TotalAmount - a.PaidAmount),
                     DepositPaid = AppointmentPaymentCalculator.HasDepositPaid(a, depositPercentBySalon),
                     DepositDeadlineAt = a.DepositDeadlineAt,
                     Note = a.Note,
@@ -108,7 +109,9 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointment
                     PositionName = a.Position != null
                         ? $"{a.Position.Room?.Name} — {a.Position.Name}"
                         : null,
-                    PositionStatus = a.Position?.Status
+                    PositionStatus = a.Position?.Status,
+                    TimeStartService = a.TimeStartService,
+                    CompletedAt = a.CompletedAt,
                 };
             }).ToList();
 

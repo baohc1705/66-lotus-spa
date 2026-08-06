@@ -9,5 +9,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateMyBookingStatus
         public int Id { get; set; }
         public int Status { get; set; }
         public string? Note { get; set; }
+        public int? ServiceId { get; set; }
+        public int? AppointmentId { get; set; }
     }
 }

@@ -18,8 +18,10 @@ namespace _66SMS.Application.DTOs.Cashier
         public string? CustomerAvatar { get; set; }
         public string? BookingDate { get; set; }
         public string ServiceName { get; set; } = null!;
+        public int? ServiceId { get; set; }
         public int StaffId { get; set; }
         public string StaffName { get; set; } = null!;
+        public int SlotId { get; set; }
         public string StartTime { get; set; } = null!;
         public string EndTime { get; set; } = null!;
         public string Status { get; set; } = null!;
@@ -37,6 +39,8 @@ namespace _66SMS.Application.DTOs.Cashier
         public int? PositionId { get; set; }
         public string? PositionName { get; set; }
         public int? PositionStatus { get; set; }
+        public DateTimeOffset? TimeStartService { get; set; }
+        public DateTimeOffset? CompletedAt { get; set; }
     }
 
     public class CashierDailyDto

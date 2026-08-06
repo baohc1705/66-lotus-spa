@@ -33,17 +33,12 @@ import type { SalonListItem } from "@/features/salons/types/salon.types";
 import { useServices } from "@/features/services/hooks/useServices";
 import type { ServiceDto } from "@/features/services/types/service.types";
 import { AdminInput } from "@/shared/components/forms/AdminInput";
-import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
 import { FormField } from "@/shared/components/forms/FormField";
 import { FormSection } from "@/shared/components/forms/FormSection";
 import { Button } from "@/shared/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/shared/components/ui/select";
+import { SearchableSelect } from "@/shared/components/ui/searchable-select";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import type { Result } from "@/shared/types/common.types";
 import { formatDate } from "@/shared/utils/date.utils";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
@@ -136,6 +131,43 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
     enabled: !!salonId && !!appointmentDate,
   });
   const positions = positionsQuery.data ?? [];
+
+  const salonOptions = useMemo(
+    () =>
+      salonItems
+        .filter((s: SalonListItem) => s.id != null)
+        .map((s: SalonListItem) => ({
+          value: String(s.id),
+          label: s.name ?? "",
+        })),
+    [salonItems],
+  );
+
+  const serviceOptions = useMemo(
+    () =>
+      serviceItems
+        .filter((s: ServiceDto) => s.id != null)
+        .map((s: ServiceDto) => {
+          const parts = [s.name ?? ""];
+          if (s.durationMins) parts.push(`${s.durationMins} phút`);
+          if (s.sellingPrice != null)
+            parts.push(`${s.sellingPrice.toLocaleString("vi-VN")}đ`);
+          return { value: String(s.id), label: parts.join(" · ") };
+        }),
+    [serviceItems],
+  );
+
+  const positionOptions = useMemo(
+    () => [
+      { value: "none", label: "Không chọn" },
+      ...positions.map((p: CashierPosition) => ({
+        value: String(p.id),
+        label: `${p.name} · ${p.roomName} — ${p.statusLabel}`,
+        disabled: !p.isSelectable,
+      })),
+    ],
+    [positions],
+  );
 
   const selectedSalon = useMemo(() => {
     return salonItems.find((s: SalonListItem) => s.id === salonId) ?? null;
@@ -281,8 +313,8 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-      <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 sm:p-6">
-        <div className="relative w-full max-w-4xl max-h-[90vh] bg-adminGray-50 rounded-[24px] shadow-[0_32px_64px_rgba(42,31,26,0.15)] flex flex-col overflow-hidden border border-adminGold-600/20">
+      <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-sm p-2 sm:p-2">
+        <div className="relative w-full max-w-4xl max-h-[90vh] bg-adminGray-50 shadow-[0_32px_64px_rgba(42,31,26,0.15)] flex flex-col overflow-hidden border border-adminGold-600/20">
           <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-adminGold-600/10 bg-adminGray-50/80 z-10">
             <h2 className="text-xl font-bold text-adminInk">
               Thêm Lịch Khách Hàng Mới
@@ -402,25 +434,14 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                 <FormSection icon={Calendar} title="Thông tin lịch hẹn">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <FormField label="Chi nhánh *">
-                      <Select
-                        value={salonId ? String(salonId) : undefined}
+                      <SearchableSelect
+                        value={salonId ? String(salonId) : ""}
                         onValueChange={handleSalonChange}
-                      >
-                        <AdminSelectTrigger>
-                          <SelectValue placeholder="Chọn chi nhánh" />
-                        </AdminSelectTrigger>
-                        <SelectContent>
-                          {salonItems.map((s: SalonListItem) => (
-                            <SelectItem
-                              key={s.id}
-                              value={String(s.id)}
-                              disabled={!s.id}
-                            >
-                              {s.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        options={salonOptions}
+                        placeholder="Chọn chi nhánh"
+                        searchPlaceholder="Tìm chi nhánh..."
+                        className="h-9 w-full"
+                      />
                     </FormField>
 
                     <FormField label="Ngày hẹn *">
@@ -432,31 +453,14 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                     </FormField>
 
                     <FormField label="Dịch vụ *" className="sm:col-span-2">
-                      <Select
-                        value={serviceId ? String(serviceId) : undefined}
+                      <SearchableSelect
+                        value={serviceId ? String(serviceId) : ""}
                         onValueChange={handleServiceChange}
-                      >
-                        <AdminSelectTrigger>
-                          <SelectValue placeholder="Chọn dịch vụ" />
-                        </AdminSelectTrigger>
-                        <SelectContent>
-                          {serviceItems.map((s: ServiceDto) => (
-                            <SelectItem
-                              key={s.id}
-                              value={String(s.id)}
-                              disabled={!s.id}
-                            >
-                              {s.name}
-                              {s.durationMins
-                                ? ` · ${s.durationMins} phút`
-                                : ""}
-                              {s.sellingPrice != null
-                                ? ` · ${s.sellingPrice.toLocaleString("vi-VN")}đ`
-                                : ""}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        options={serviceOptions}
+                        placeholder="Chọn dịch vụ"
+                        searchPlaceholder="Tìm dịch vụ..."
+                        className="h-9 w-full"
+                      />
                     </FormField>
 
                     <div className="sm:col-span-2 space-y-2">
@@ -507,17 +511,12 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                                     <Check className="w-3 h-3 text-white" />
                                   </div>
                                 )}
-                                {tech.avatar ? (
-                                  <img
-                                    src={tech.avatar}
-                                    alt={tech.name}
-                                    className="w-10 h-10 rounded-full object-cover shrink-0"
-                                  />
-                                ) : (
-                                  <div className="w-10 h-10 rounded-full bg-adminGreen-100 text-adminGreen-700 flex items-center justify-center shrink-0">
-                                    <User className="w-5 h-5" />
-                                  </div>
-                                )}
+                                <FallbackImage
+                                  kind="ktv"
+                                  src={tech.avatar}
+                                  alt={tech.name}
+                                  className="w-10 h-10 rounded-full object-cover shrink-0"
+                                />
                                 <div className="min-w-0 flex-1">
                                   <p className="text-sm font-semibold text-adminInk truncate">
                                     {tech.name || "Kỹ thuật viên"}
@@ -627,29 +626,17 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                     </div>
 
                     <FormField label="Phòng / vị trí" className="sm:col-span-2">
-                      <Select
+                      <SearchableSelect
                         value={positionId != null ? String(positionId) : "none"}
                         onValueChange={(v) =>
                           setPositionId(v === "none" ? null : Number(v))
                         }
+                        options={positionOptions}
+                        placeholder="Không chọn"
+                        searchPlaceholder="Tìm phòng / vị trí..."
                         disabled={!salonId}
-                      >
-                        <AdminSelectTrigger>
-                          <SelectValue placeholder="Không chọn" />
-                        </AdminSelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Không chọn</SelectItem>
-                          {positions.map((p: CashierPosition) => (
-                            <SelectItem
-                              key={p.id}
-                              value={String(p.id)}
-                              disabled={!p.isSelectable}
-                            >
-                              {p.name} · {p.roomName} — {p.statusLabel}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        className="h-9 w-full"
+                      />
                       {positionsQuery.isLoading && (
                         <p className="text-xs text-adminGray-500 mt-1">
                           Đang tải trạng thái vị trí...

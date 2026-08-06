@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.CatalogService.Services.Queries.GetDetailService
 {
-    public class GetDetailServicesHandler : IRequestHandler<GetDetailServicesQuery, Result<ServiceDetailDto>>
+    public class GetDetailServicesHandler : IRequestHandler<GetDetailServicesQuery, Result<ServiceDto>>
     {
         private readonly IServiceSqlRepository serviceSqlRepository;
         private readonly ICacheService cacheService;
@@ -22,19 +22,19 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetDetailService
             this.cacheService = cacheService;
         }
 
-        public async Task<Result<ServiceDetailDto>> Handle(GetDetailServicesQuery request, CancellationToken cancellationToken)
+        public async Task<Result<ServiceDto>> Handle(GetDetailServicesQuery request, CancellationToken cancellationToken)
         {
             var cacheKey = ServiceConst.CacheKeyDetail(request.Id);
-            var cached = await cacheService.GetAsync<ServiceDetailDto>(cacheKey, cancellationToken);
+            var cached = await cacheService.GetAsync<ServiceDto>(cacheKey, cancellationToken);
             if (cached is not null)
             {
-                return Result<ServiceDetailDto>.Success(cached);
+                return Result<ServiceDto>.Success(cached);
             }
 
             var entity = await serviceSqlRepository
                 .AsQueryable(true)
                 .Where(x => x.Id == request.Id)
-                .Select(x => new ServiceDetailDto
+                .Select(x => new ServiceDto
                 {
                     Id = x.Id,
                     CategoryId = x.CategoryId,
@@ -46,6 +46,7 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetDetailService
                     DurationMins = x.DurationMins,
                     CostPrice = x.CostPrice,
                     SellingPrice = x.SellingPrice,
+                    MinSellingPrice = x.MinSellingPrice,
                     CommissionRate = x.CommissionRate,
                     SortOrder = x.SortOrder,
                     Status = x.Status,
@@ -57,21 +58,21 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetDetailService
                         Id = sp.Id,
                         ProductId = sp.ProductId,
                         ProductName = sp.Product!.Name,
-                        SellingPrice = sp.Product.SellingPrice,
+                        UnitCost = sp.UnitCost,
                         QuantityUsed = sp.QuantityUsed,
                         Note = sp.Note,
-                        Status = sp.Status,
+                        Status = sp.Status
                     }).ToList()
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (entity == null)
             {
-                return Result<ServiceDetailDto>.NotFound(ServiceConst.MSG_SERVICE_NOT_FOUND, ErrorCodes.ERR_SERVICE_NOT_FOUND);
+                return Result<ServiceDto>.NotFound(ServiceConst.MSG_SERVICE_NOT_FOUND, ErrorCodes.ERR_SERVICE_NOT_FOUND);
             }
 
             await cacheService.SetAsync(cacheKey, entity, ServiceConst.CACHE_TTL_DETAIL, cancellationToken);
-            return Result<ServiceDetailDto>.Success(entity);
+            return Result<ServiceDto>.Success(entity);
         }
     }
 }

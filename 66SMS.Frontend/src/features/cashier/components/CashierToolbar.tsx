@@ -9,6 +9,7 @@ import {
   Columns3,
 } from "lucide-react";
 import type { CashierViewMode, CashierTimeRange } from "../types";
+import { Button } from "@/shared/components/ui/button";
 
 interface CashierToolbarProps {
   currentDate: Date;
@@ -18,6 +19,8 @@ interface CashierToolbarProps {
   onViewModeChange: (mode: CashierViewMode) => void;
   timeRange: CashierTimeRange;
   onTimeRangeChange: (range: CashierTimeRange) => void;
+  onOpenStaffAvailability?: () => void;
+  onOpenPositionAvailability?: () => void;
 }
 
 export function CashierToolbar({
@@ -28,6 +31,8 @@ export function CashierToolbar({
   onViewModeChange,
   timeRange,
   onTimeRangeChange,
+  onOpenStaffAvailability,
+  onOpenPositionAvailability,
 }: CashierToolbarProps) {
   const handlePrevDay = () => {
     const prev = new Date(currentDate);
@@ -81,6 +86,22 @@ export function CashierToolbar({
         <button className="w-7 h-7 flex items-center justify-center rounded-[3px] border border-adminGray-100 bg-white hover:bg-adminGray-50 text-adminInk transition-colors">
           <Filter className="w-3.5 h-3.5" />
         </button>
+        <Button
+          variant="outline"
+          size="sm"
+          type="button"
+          onClick={onOpenStaffAvailability}
+        >
+          Tra cứu nhân viên
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          type="button"
+          onClick={onOpenPositionAvailability}
+        >
+          Tra cứu vị trí
+        </Button>
       </div>
 
       <div className="flex items-center gap-3">

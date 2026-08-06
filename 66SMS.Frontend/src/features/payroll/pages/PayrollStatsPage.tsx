@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { containerVariants } from "@/shared/motion/pageVariants";
-import { usePayrollCommissionStats } from "../hooks/usePayrolls";
+import { usePayrollCommissionStats, usePayrollCommissionDailyStats } from "../hooks/usePayrolls";
 import { PayrollStatCards } from "../components/PayrollStatCards";
 import { PayrollStatsToolbar } from "../components/PayrollStatsToolbar";
 import { PayrollStatsDayGrid } from "../components/PayrollStatsDayGrid";
@@ -71,15 +71,36 @@ export function PayrollStatsPage() {
 
   const statsQuery = usePayrollCommissionStats(
     statsParams,
-    !!effectiveStaffId,
+    !!effectiveStaffId && viewMode !== "month",
+  );
+
+  const dailyQuery = usePayrollCommissionDailyStats(
+    statsParams,
+    !!effectiveStaffId && viewMode === "month",
   );
 
   const appointments = statsQuery.data?.data?.appointments ?? [];
-  const summary = statsQuery.data?.data?.summary;
+  const dailyStats = dailyQuery.data?.data?.items ?? [];
+  const summary =
+    viewMode === "month"
+      ? dailyQuery.data?.data?.summary
+      : statsQuery.data?.data?.summary;
   const staffName =
-    statsQuery.data?.data?.staffName ?? user?.fullName ?? "Nhân viên";
-  const isLoading = statsQuery.isLoading;
-  const isFetching = statsQuery.isFetching;
+    (viewMode === "month"
+      ? dailyQuery.data?.data?.staffName
+      : statsQuery.data?.data?.staffName) ??
+    user?.fullName ??
+    "Nhân viên";
+  const isLoading =
+    viewMode === "month" ? dailyQuery.isLoading : statsQuery.isLoading;
+  const isFetching =
+    viewMode === "month" ? dailyQuery.isFetching : statsQuery.isFetching;
+  const isError =
+    viewMode === "month" ? dailyQuery.isError : statsQuery.isError;
+  const refetch =
+    viewMode === "month"
+      ? () => dailyQuery.refetch()
+      : () => statsQuery.refetch();
 
   const weekDays = useMemo(() => {
     const start = getIsoWeekStart(anchorDate);
@@ -142,6 +163,7 @@ export function PayrollStatsPage() {
       <div className="shrink-0">
         <PayrollStatCards
           summary={effectiveStaffId ? summary : undefined}
+          viewMode={viewMode}
           isLoading={!!effectiveStaffId && isLoading}
         />
       </div>
@@ -213,7 +235,7 @@ export function PayrollStatsPage() {
             <div className="flex-1 flex items-center justify-center py-16">
               <div className="w-8 h-8 animate-spin rounded-full border-4 border-adminGray-100 border-t-primary" />
             </div>
-          ) : statsQuery.isError ? (
+          ) : isError ? (
             <TableEmptyState
               icon={RefreshCw}
               title="Không tải được thống kê"
@@ -223,14 +245,20 @@ export function PayrollStatsPage() {
                   variant="admin"
                   size="sm"
                   className="lotus-admin-table-toolbar-btn mt-1"
-                  onClick={() => statsQuery.refetch()}
+                  onClick={() => refetch()}
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                   Thử lại
                 </Button>
               }
             />
-          ) : appointments.length === 0 && viewMode !== "month" ? (
+          ) : viewMode === "month" && dailyStats.length === 0 ? (
+            <TableEmptyState
+              icon={CalendarHeart}
+              title="Chưa có lịch hẹn đã thanh toán"
+              hint="Không có hóa đơn paid trong tháng này."
+            />
+          ) : viewMode !== "month" && appointments.length === 0 ? (
             <TableEmptyState
               icon={CalendarHeart}
               title="Chưa có lịch hẹn đã thanh toán"
@@ -256,9 +284,12 @@ export function PayrollStatsPage() {
           ) : (
             <div className="flex-1 min-h-0 overflow-auto">
               <PayrollStatsMonthTable
-                appointments={appointments}
-                summary={summary}
-                onAppointmentClick={setSelected}
+                dailyStats={dailyStats}
+                summary={dailyQuery.data?.data?.summary}
+                onDayClick={(workDate: string) => {
+                  setAnchorDate(new Date(`${workDate}T12:00:00`));
+                  setViewMode("day");
+                }}
               />
             </div>
           )}

@@ -11,6 +11,7 @@ namespace _66SMS.Application.CatalogService.ServiceProducts.Commands.UpdateServi
         public int Id { get; set; }
         public int? ProductId { get; set; }
         public int? QuantityUsed { get; set; }
+        public decimal? UnitCost { get; set; }
         public string? Note { get; set; }
         public int? Status { get; set; }
         [JsonIgnore]

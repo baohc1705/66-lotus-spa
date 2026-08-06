@@ -3,10 +3,16 @@ import { Popover } from 'radix-ui'
 import { ChevronDownIcon, CheckIcon, SearchIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+export interface SearchableSelectOption {
+  value: string
+  label: string
+  disabled?: boolean
+}
+
 interface SearchableSelectProps {
   value: string
   onValueChange: (value: string) => void
-  options: { value: string; label: string }[]
+  options: SearchableSelectOption[]
   placeholder?: string
   searchPlaceholder?: string
   disabled?: boolean
@@ -86,13 +92,20 @@ export function SearchableSelect({
                 <button
                   key={opt.value}
                   type="button"
+                  disabled={opt.disabled}
                   onClick={() => {
+                    if (opt.disabled) return
                     onValueChange(opt.value)
                     setOpen(false)
                   }}
-                  className="relative flex w-full items-center gap-2 rounded-sm py-2 pl-3 pr-8 text-sm text-lotus-deep text-left hover:bg-adminGray-50/50 outline-none"
+                  className={cn(
+                    'relative flex w-full items-center gap-2 rounded-sm py-2 pl-3 pr-8 text-sm text-left outline-none',
+                    opt.disabled
+                      ? 'text-lotus-stone/50 cursor-not-allowed'
+                      : 'text-lotus-deep hover:bg-adminGray-50/50',
+                  )}
                 >
-                  {opt.value === value && (
+                  {opt.value === value && !opt.disabled && (
                     <span className="absolute right-2 flex size-4 items-center justify-center text-adminGreen-600">
                       <CheckIcon className="size-4" />
                     </span>

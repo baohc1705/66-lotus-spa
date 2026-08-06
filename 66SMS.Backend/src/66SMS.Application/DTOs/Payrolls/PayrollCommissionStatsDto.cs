@@ -21,6 +21,35 @@ namespace _66SMS.Application.DTOs.Payrolls
         public decimal EstimatedTotal { get; set; }
     }
 
+    public class PayrollCommissionDailyStatsDto
+    {
+        public int StaffId { get; set; }
+        public string? StaffName { get; set; }
+        public decimal? BasicSalary { get; set; }
+        public int? SalaryType { get; set; }
+        public string? FromDate { get; set; }
+        public string? ToDate { get; set; }
+        public PayrollCommissionDailySummaryDto Summary { get; set; } = new();
+        public List<PayrollCommissionDailyDto> Items { get; set; } = new();
+    }
+
+    public class PayrollCommissionDailySummaryDto
+    {
+        public int TotalOrders { get; set; }
+        public decimal TotalServiceHours { get; set; }
+        public decimal TotalCommission { get; set; }
+        public decimal? BasicSalary { get; set; }
+        public decimal EstimatedTotal { get; set; }
+    }
+
+    public class PayrollCommissionDailyDto
+    {
+        public DateOnly WorkDate { get; set; }
+        public int OrderCount { get; set; }
+        public decimal ServiceHours { get; set; }
+        public decimal TotalCommission { get; set; }
+    }
+
     public class PayrollCommissionAppointmentDto
     {
         public int? AppointmentId { get; set; }

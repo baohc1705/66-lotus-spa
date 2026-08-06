@@ -59,6 +59,7 @@ export const API = {
     positions: "/cashier/positions",
     vnpayCreate: "/cashier/vnpay/create-url",
     vnpayReturn: "/cashier/vnpay-return",
+    staffAvailability: "/cashier/staff-availability",
   },
   admin: {
     wallets: "/admin/wallets",

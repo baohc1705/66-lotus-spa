@@ -50,8 +50,8 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetAllAppointme
                         .Sum(s => s.PriceSnapshot * s.Quantity),
                     StaffFullName = x.Staff != null ? x.Staff.FullName : null,
                     SalonName = x.Salon != null ? x.Salon.Name : null,
-                    TimeSlotStartTime = x.TimeSlot != null ? x.TimeSlot.StartTime : null,
-                    TimeSlotEndTime = x.TimeSlot != null ? x.TimeSlot.EndTime : null,
+                    TimeSlotStartTime = x.TimeApptStart ?? (x.TimeSlot != null ? x.TimeSlot.StartTime : null),
+                    TimeSlotEndTime = x.TimeApptEnd ?? (x.TimeSlot != null ? x.TimeSlot.EndTime : null),
                     ServiceNames = x.Services!
                         .Where(s => s.Service != null && s.Service.Name != null)
                         .Select(s => s.Service!.Name!)

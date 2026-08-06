@@ -49,6 +49,8 @@ namespace _66SMS.Domain.Constants
         public const string MSG_PROMOTION_USAGE_LIMIT = "Mã khuyến mãi đã hết lượt sử dụng.";
         public const string MSG_PROMOTION_MIN_ORDER = "Giá trị đơn hàng chưa đạt mức tối thiểu để áp mã.";
         public const string MSG_PROMOTION_APPLY_SUCCESS = "Áp dụng mã khuyến mãi thành công.";
+        public const string MSG_PROMOTION_BUYXGETY_NOT_SUPPORTED = "Mã mua X tặng Y chưa hỗ trợ khi đặt lịch online.";
+        public const string MSG_PROMOTION_ZERO_DISCOUNT = "Mã khuyến mãi không tạo được số tiền giảm. Vui lòng kiểm tra cấu hình (giá trị giảm / trần giảm).";
         #endregion
     }
 }

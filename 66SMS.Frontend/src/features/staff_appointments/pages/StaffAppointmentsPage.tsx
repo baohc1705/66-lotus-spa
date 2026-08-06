@@ -78,7 +78,11 @@ export function StaffAppointmentsPage() {
             prev && prev.booking.id === bookingId
               ? {
                   ...prev,
-                  booking: { ...prev.booking, status: BookingStatus.InService },
+                  booking: {
+                    ...prev.booking,
+                    status: BookingStatus.InService,
+                    timeStartService: formatDate().toISOString(),
+                  },
                 }
               : prev,
           );
@@ -100,7 +104,7 @@ export function StaffAppointmentsPage() {
                   booking: {
                     ...prev.booking,
                     status: BookingStatus.Completed,
-                    completedAt: new Date().toISOString(),
+                    completedAt: formatDate().toISOString(),
                   },
                 }
               : prev,

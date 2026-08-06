@@ -31,6 +31,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
         private readonly IRoleSqlRepository roleSqlRepository;
         private readonly IWorkScheduleSqlRepository workScheduleSqlRepository;
         private readonly IPromotionSqlRepository promotionSqlRepository;
+        private readonly ITimeSlotSqlRepository timeSlotSqlRepository;
         private readonly IPasswordHash passwordHash;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
 
@@ -45,6 +46,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
             IRoleSqlRepository roleSqlRepository,
             IWorkScheduleSqlRepository workScheduleSqlRepository,
             IPromotionSqlRepository promotionSqlRepository,
+            ITimeSlotSqlRepository timeSlotSqlRepository,
             IPasswordHash passwordHash,
             ISqlUnitOfWork sqlUnitOfWork)
         {
@@ -58,6 +60,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
             this.roleSqlRepository = roleSqlRepository;
             this.workScheduleSqlRepository = workScheduleSqlRepository;
             this.promotionSqlRepository = promotionSqlRepository;
+            this.timeSlotSqlRepository = timeSlotSqlRepository;
             this.passwordHash = passwordHash;
             this.sqlUnitOfWork = sqlUnitOfWork;
         }
@@ -280,6 +283,11 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                     if (discountPercent > 0 && totalAmount > 0)
                         totalAmount -= totalAmount * discountPercent / 100m;
 
+                    var slotId = (int)(validLock != null ? validLock.SlotId : guest.SlotId)!;
+                    var timeSlot = await timeSlotSqlRepository.FindByIdAsync(slotId, true, cancellationToken);
+                    var durationMins = appointmentServices.Sum(s => s.DurationSnapshot * s.Quantity);
+                    if (durationMins <= 0) durationMins = 15;
+
                     // Lễ tân đặt: chờ phục vụ ngay, không yêu cầu cọc
                     var appointment = new Appointment
                     {
@@ -288,10 +296,14 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                         StaffId = staffId,
                         SalonId = guest.SalonId,
                         ScheduleId = scheduleId,
-                        SlotId = (int)(validLock != null ? validLock.SlotId : guest.SlotId)!,
+                        SlotId = slotId,
                         PositionId = validLock != null ? validLock.PositionId : guest.PositionId,
                         LockId = validLock?.Id,
                         AppointmentDate = (DateOnly)guest.AppointmentDate!,
+                        TimeApptStart = timeSlot?.StartTime,
+                        TimeApptEnd = timeSlot != null
+                            ? timeSlot.StartTime.AddMinutes(durationMins)
+                            : null,
                         Status = AppointmentConst.STATUS_WAITING,
                         Note = guest.Note,
                         TotalAmount = totalAmount,
@@ -365,7 +377,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
             if (promo.StartDate > now || promo.EndDate < now)
                 return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_EXPIRED, ErrorCodes.ERR_PROMOTION_EXPIRED);
 
-            if (promo.UsageLimit.HasValue && promo.UsedCount >= promo.UsageLimit.Value)
+            if (promo.UsageLimit > 0 && promo.UsedCount >= promo.UsageLimit.Value)
                 return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_USAGE_LIMIT, ErrorCodes.ERR_PROMOTION_USAGE_LIMIT);
 
             decimal grandTotal = createdAppointments.Sum(a => a.TotalAmount);
@@ -378,7 +390,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
             {
                 var percent = promo.DiscountValue ?? 0m;
                 discount = Math.Round(grandTotal * percent / 100m, 0, MidpointRounding.AwayFromZero);
-                if (promo.MaxDiscountAmount.HasValue && discount > promo.MaxDiscountAmount.Value)
+                if (promo.MaxDiscountAmount > 0 && discount > promo.MaxDiscountAmount.Value)
                     discount = promo.MaxDiscountAmount.Value;
             }
             else if (promo.DiscountType == PromotionConst.DISCOUNT_TYPE_FIXED)

@@ -3,6 +3,8 @@ import { API } from "@/shared/api/endpoints";
 import type { PagedResult, Result } from "@/shared/types/common.types";
 import type {
   AppointmentDto,
+  ActivePromotionDto,
+  BookingDayDto,
   BookingPositionDTO,
   CreateBookingPayload,
   PromotionValidationDto,
@@ -16,6 +18,14 @@ const POSITION_BASE = API.bookingPositions;
 const PROMOTION_BASE = API.promotions;
 
 export const bookingApi = {
+  getAvailableDays: async (days = 7): Promise<BookingDayDto[]> => {
+    const res = await axiosInstance.get<Result<BookingDayDto[]>>(
+      `${APPOINTMENT_BASE}/available-days`,
+      { params: { days } },
+    );
+    return res.data.data || [];
+  },
+
   getTechnicians: async (
     date: string,
     serviceId: number,
@@ -80,6 +90,13 @@ export const bookingApi = {
       throw new Error(res.data.message ?? "Mã không hợp lệ");
     }
     return res.data.data;
+  },
+
+  getActivePromotions: async (): Promise<ActivePromotionDto[]> => {
+    const res = await axiosInstance.get<Result<ActivePromotionDto[]>>(
+      `${PROMOTION_BASE}/active`,
+    );
+    return res.data.data ?? [];
   },
 
   getMyBookings: async (): Promise<AppointmentDto[]> => {

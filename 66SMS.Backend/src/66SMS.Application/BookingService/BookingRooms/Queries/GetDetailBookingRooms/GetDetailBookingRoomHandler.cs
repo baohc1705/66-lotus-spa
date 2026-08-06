@@ -38,10 +38,19 @@ namespace _66SMS.Application.BookingService.BookingRooms.Queries.GetDetailBookin
                 .Select(room => new BookingRoomDto
                 {
                     Id = room.Id,
+                    SalonId = room.SalonId,
+                    SalonName = room.Salon != null ? room.Salon.Name : null,
                     Name = room.Name,
                     ImageUrl = room.ImageUrl,
                     Note = room.Note,
                     Status = room.Status,
+                    AvailableCount = room.Positions!
+                        .Count(p => p.Status == BookingPositionConst.STATUS_AVAILABLE
+                            || p.Status == BookingPositionConst.STATUS_ACTIVED),
+                    InServiceCount = room.Positions!
+                        .Count(p => p.Status == BookingPositionConst.STATUS_IN_SERVICE),
+                    TotalPositionCount = room.Positions!
+                        .Count(p => p.Status != BookingPositionConst.STATUS_DELETED),
                     Positions = room.Positions!
                         .Where(p => p.Status != BookingPositionConst.STATUS_DELETED)
                         .OrderBy(p => p.SortOrder)

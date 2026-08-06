@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import type { CashierBooking, StaffColumn } from "../types";
 import { Clock } from "lucide-react";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 
 interface CashierTimelineProps {
   date: Date;
@@ -322,17 +323,12 @@ export function CashierTimeline({
                     className="flex-shrink-0 border-r border-adminGray-300/80 bg-adminGreen-600-light/20 sticky left-0 z-30 flex items-center gap-2 px-4"
                     style={{ width: `${STAFF_COL_WIDTH}px` }}
                   >
-                    {col.avatar ? (
-                      <img
-                        src={col.avatar}
-                        alt={col.name}
-                        className="w-6 h-6 rounded-[3px] flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="w-6 h-6 rounded-[3px] bg-adminGold-600/10 flex items-center justify-center text-adminGold-600 font-bold text-xs flex-shrink-0">
-                        {col.name.charAt(0)}
-                      </div>
-                    )}
+                    <FallbackImage
+                      kind="ktv"
+                      src={col.avatar}
+                      alt={col.name}
+                      className="w-6 h-6 rounded-[3px] flex-shrink-0 object-cover"
+                    />
                     <div className="min-w-0">
                       <p className="font-bold text-xs text-adminInk truncate whitespace-nowrap">
                         {col.name}

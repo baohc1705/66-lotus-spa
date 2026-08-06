@@ -95,3 +95,14 @@ export function usePayrollCommissionStats(
     enabled: enabled && !!params,
   });
 }
+
+export function usePayrollCommissionDailyStats(
+  params: PayrollCommissionStatsParams | null,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: [...PAYROLL_KEYS.all, "stats-daily", params],
+    queryFn: () => payrollApi.getCommissionDailyStats(params!),
+    enabled: enabled && !!params,
+  });
+}

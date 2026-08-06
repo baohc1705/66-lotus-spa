@@ -101,6 +101,13 @@ export interface CreateInvoicePayload {
   items: CreateInvoiceItemPayload[];
 }
 
+export interface UpdateInvoiceItemsPayload {
+  items: CreateInvoiceItemPayload[];
+  discountAmount?: number;
+  applyMembershipDiscount?: boolean;
+  note?: string;
+}
+
 export interface GetAllInvoicesQuery extends PageRequest {
   status?: number;
   customerId?: number;

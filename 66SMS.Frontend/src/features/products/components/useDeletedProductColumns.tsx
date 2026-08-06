@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { RotateCcw, Package } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 
 import { Button } from "@/shared/components/ui/button";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
@@ -11,6 +11,7 @@ import {
   PriceCell,
   TextCell,
 } from "@/shared/components/DataTable/TableCells";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 
 import { PRODUCT_COLUMN_LABELS } from "./useActiveProductColumns";
 import { PRODUCT_PERM } from "../constants/product.permissions";
@@ -63,15 +64,12 @@ export function useDeletedProductColumns({
           return (
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-adminGray-100 flex items-center justify-center shrink-0 overflow-hidden">
-                {prod.imageUrl ? (
-                  <img
-                    src={prod.imageUrl}
-                    alt=""
-                    className="w-8 h-8 object-cover"
-                  />
-                ) : (
-                  <Package className="w-4 h-4 text-adminGray-400" />
-                )}
+                <FallbackImage
+                  kind="product"
+                  src={prod.imageUrl}
+                  alt=""
+                  className="w-8 h-8 object-cover"
+                />
               </div>
               <span className="text-sm font-semibold text-adminInk truncate max-w-[180px]">
                 {prod.name ?? "—"}

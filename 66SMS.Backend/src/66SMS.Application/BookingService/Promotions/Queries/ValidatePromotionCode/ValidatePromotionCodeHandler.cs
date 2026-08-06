@@ -40,7 +40,7 @@ namespace _66SMS.Application.BookingService.Promotions.Queries.ValidatePromotion
                 return Result<PromotionValidationDto>.BadRequest(PromotionConst.MSG_PROMOTION_EXPIRED, ErrorCodes.ERR_PROMOTION_EXPIRED);
             }
 
-            if (promo.UsageLimit.HasValue && promo.UsedCount >= promo.UsageLimit.Value)
+            if (promo.UsageLimit > 0 && promo.UsedCount >= promo.UsageLimit.Value)
             {
                 return Result<PromotionValidationDto>.BadRequest(PromotionConst.MSG_PROMOTION_USAGE_LIMIT, ErrorCodes.ERR_PROMOTION_USAGE_LIMIT);
             }
@@ -55,7 +55,8 @@ namespace _66SMS.Application.BookingService.Promotions.Queries.ValidatePromotion
             {
                 var percent = promo.DiscountValue ?? 0m;
                 discountAmount = Math.Round(request.OrderTotal * percent / 100m, 0, MidpointRounding.AwayFromZero);
-                if (promo.MaxDiscountAmount.HasValue && discountAmount > promo.MaxDiscountAmount.Value)
+                
+                if (promo.MaxDiscountAmount > 0 && discountAmount > promo.MaxDiscountAmount.Value)
                 {
                     discountAmount = promo.MaxDiscountAmount.Value;
                 }
@@ -67,6 +68,19 @@ namespace _66SMS.Application.BookingService.Promotions.Queries.ValidatePromotion
                 {
                     discountAmount = request.OrderTotal;
                 }
+            }
+            else if (promo.DiscountType == PromotionConst.DISCOUNT_TYPE_BUYXGETY)
+            {
+                return Result<PromotionValidationDto>.BadRequest(
+                    PromotionConst.MSG_PROMOTION_BUYXGETY_NOT_SUPPORTED,
+                    ErrorCodes.ERR_PROMOTION_INVALID);
+            }
+
+            if (discountAmount <= 0)
+            {
+                return Result<PromotionValidationDto>.BadRequest(
+                    PromotionConst.MSG_PROMOTION_ZERO_DISCOUNT,
+                    ErrorCodes.ERR_PROMOTION_INVALID);
             }
 
             var finalAmount = Math.Max(0m, request.OrderTotal - discountAmount);

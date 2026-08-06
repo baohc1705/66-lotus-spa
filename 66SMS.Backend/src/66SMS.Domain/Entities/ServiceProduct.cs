@@ -8,6 +8,7 @@ namespace _66SMS.Domain.Entities
         public int ProductId { get; set; }
         public int QuantityUsed { get; set; }
         public string? Note { get; set; }
+        public decimal? UnitCost { get; set; }
         public int Status { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }

@@ -66,11 +66,17 @@ function getDefaultValues(
     description: promotion.description ?? "",
     discountType: promotion.discountType ?? 1,
     discountValue: promotion.discountValue ?? undefined,
-    maxDiscountAmount: promotion.maxDiscountAmount ?? undefined,
+    maxDiscountAmount:
+      promotion.maxDiscountAmount != null && promotion.maxDiscountAmount > 0
+        ? promotion.maxDiscountAmount
+        : undefined,
     minOrderValue: promotion.minOrderValue ?? undefined,
     buyQuantity: promotion.buyQuantity ?? undefined,
     getQuantity: promotion.getQuantity ?? undefined,
-    usageLimit: promotion.usageLimit ?? undefined,
+    usageLimit:
+      promotion.usageLimit != null && promotion.usageLimit > 0
+        ? promotion.usageLimit
+        : undefined,
     startDate: toDatetimeLocalInput(promotion.startDate),
     endDate: toDatetimeLocalInput(promotion.endDate),
     status: promotion.status ?? 1,
@@ -112,6 +118,7 @@ export function PromotionFormDialog({
   function onSubmit(values: PromotionFormValues) {
     const payload = {
       ...values,
+      usageLimit: values.usageLimit ?? undefined,
       startDate: localDateTimeToUtc(values.startDate),
       endDate: localDateTimeToUtc(values.endDate),
     };

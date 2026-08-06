@@ -12,6 +12,7 @@ namespace _66SMS.Domain.Entities
         public int DurationMins { get; set; }
         public decimal CostPrice { get; set; }
         public decimal SellingPrice { get; set; }
+        public decimal? MinSellingPrice { get; set; }
         public decimal? CommissionRate { get; set; }
         public int? SortOrder { get; set; }
         public int Status { get; set; }

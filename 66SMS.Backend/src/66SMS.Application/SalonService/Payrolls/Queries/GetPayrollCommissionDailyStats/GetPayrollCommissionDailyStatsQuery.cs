@@ -1,0 +1,15 @@
+using _66SMS.Application.DTOs.Payrolls;
+using _66SMS.Contracts.Shared;
+using MediatR;
+
+namespace _66SMS.Application.SalonService.Payrolls.Queries.GetPayrollCommissionDailyStats
+{
+    public class GetPayrollCommissionDailyStatsQuery : IRequest<Result<PayrollCommissionDailyStatsDto>>
+    {
+        public int? StaffId { get; set; }
+        public DateOnly FromDate { get; set; }
+        public DateOnly ToDate { get; set; }
+        public int UserId { get; set; }
+        public bool IsAdmin { get; set; }
+    }
+}

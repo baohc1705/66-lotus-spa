@@ -19,6 +19,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
         public int? DurationMins { get; set; }
         public decimal? CostPrice { get; set; }
         public decimal? SellingPrice { get; set; }
+        public decimal? MinSellingPrice { get; set; }
         public decimal? CommissionRate { get; set; }
         public int? SortOrder { get; set; } = 0;
         public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
@@ -35,6 +36,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
         public int? ServiceId { get; set; }
         public int? ProductId { get; set; }
         public int? QuantityUsed { get; set; }
+        public decimal? UnitCost { get; set; }
         public string? Note { get; set; }
         public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
         [JsonIgnore]

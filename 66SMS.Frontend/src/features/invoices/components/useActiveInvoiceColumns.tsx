@@ -95,7 +95,7 @@ export function useActiveInvoiceColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="font-mono text-xs text-adminGray-600">
+          <span className=" text-xs text-adminGray-600">
             {row.original.invoiceCode ?? "—"}
           </span>
         ),

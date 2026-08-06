@@ -4,17 +4,17 @@ namespace _66SMS.Application.DTOs.Staffs
     {
         public string Id { get; set; } = null!;
         public string? AppointmentCode { get; set; }
-        public string CustomerName { get; set; } = null!;
+        public string? CustomerName { get; set; }
         public string? CustomerPhone { get; set; }
-        public string ServiceName { get; set; } = null!;
-        public string StartTime { get; set; } = null!;
-        public string EndTime { get; set; } = null!;
-        /// <summary>Trạng thái lịch hẹn (int — khớp AppointmentConst).</summary>
+        public string? ServiceName { get; set; }
+        public TimeOnly? StartTime { get; set; }
+        public TimeOnly? EndTime { get; set; }
         public int Status { get; set; }
         public decimal PaidAmount { get; set; }
         public decimal TotalAmount { get; set; }
         public string? Note { get; set; }
         public string? PositionName { get; set; }
+        public DateTimeOffset? TimeStartService { get; set; }
         public DateTimeOffset? CompletedAt { get; set; }
     }
 

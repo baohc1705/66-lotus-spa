@@ -1,4 +1,5 @@
 using _66SMS.Contracts.Enumerations;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -7,7 +8,6 @@ using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Promotions.Commands.CreatePromotion
 {
@@ -35,6 +35,11 @@ namespace _66SMS.Application.BookingService.Promotions.Commands.CreatePromotion
             Promotion promotion = mapper.Map<Promotion>(request);
             promotion.UsedCount = 0;
             promotion.CreatedAt = DateTimeHelper.UtcNow();
+            
+            if (promotion.UsageLimit <= 0)
+                promotion.UsageLimit = null;
+            if (promotion.MaxDiscountAmount <= 0)
+                promotion.MaxDiscountAmount = null;
 
             promotionSqlRepository.Add(promotion);
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

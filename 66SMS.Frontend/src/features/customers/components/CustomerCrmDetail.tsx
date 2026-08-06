@@ -9,6 +9,7 @@ import {
 import { formatDisplayDate } from "@/shared/utils/date.utils";
 import { GENDER_MAP, STATUS_MAP } from "@/shared/constants/display.const";
 import { FileText, Pencil, Trash2, User } from "lucide-react";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import { useCustomerDetail } from "../hooks/useCustomers";
 import type { CustomerDto } from "../types/customer.types";
 
@@ -93,17 +94,12 @@ export function CustomerCrmDetail({
       <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
         <div className="flex items-start gap-4">
           <div className="w-16 h-16 rounded-full bg-adminGray-100 flex items-center justify-center shrink-0 overflow-hidden shadow-inner border border-adminGray-100">
-            {customer.avatarUrl ? (
-              <img
-                src={customer.avatarUrl}
-                alt={customer.fullName || ""}
-                className="w-16 h-16 object-cover"
-              />
-            ) : (
-              <span className="text-xl font-bold text-adminGray-600">
-                {(customer.fullName || "?").charAt(0).toUpperCase()}
-              </span>
-            )}
+            <FallbackImage
+              kind="customer"
+              src={customer.avatarUrl}
+              alt={customer.fullName || ""}
+              className="w-16 h-16 object-cover"
+            />
           </div>
           <div className="flex-1 min-w-0">
             <h4 className="text-lg font-bold text-adminInk truncate">

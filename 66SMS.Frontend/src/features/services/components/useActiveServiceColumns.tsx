@@ -21,6 +21,7 @@ import {
   MutedCell,
   PriceCell,
 } from "@/shared/components/DataTable/TableCells";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type { Result } from "@/shared/types/common.types";
@@ -33,7 +34,6 @@ export const SERVICE_COLUMN_LABELS = {
   code: "Mã DV",
   name: "Tên dịch vụ",
   categoryName: "Nhóm dịch vụ",
-  costPrice: "Giá cơ bản",
   sellingPrice: "Giá bán",
   durationMins: "Thời gian",
   status: "Trạng thái",
@@ -150,17 +150,12 @@ export function useActiveServiceColumns({
           return (
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-adminGold-600/10 flex items-center justify-center shrink-0 overflow-hidden">
-                {item.imageUrl ? (
-                  <img
-                    src={item.imageUrl}
-                    alt=""
-                    className="w-8 h-8 object-cover"
-                  />
-                ) : (
-                  <span className="text-xs font-bold text-state-warning-text">
-                    {(item.name ?? "?").charAt(0).toUpperCase()}
-                  </span>
-                )}
+                <FallbackImage
+                  kind="service"
+                  src={item.imageUrl}
+                  alt=""
+                  className="w-8 h-8 object-cover"
+                />
               </div>
               <span className="text-sm font-semibold text-adminInk truncate max-w-[140px]">
                 {item.name ?? "—"}
@@ -175,20 +170,6 @@ export function useActiveServiceColumns({
         header: cols.categoryName,
         cell: ({ row }) => <MutedCell value={row.original.categoryName} />,
         size: 150,
-      },
-      {
-        accessorKey: "costPrice",
-        header: () => (
-          <SortableColumnHeader
-            label={cols.costPrice}
-            column="costPrice"
-            orderBy={orderBy}
-            isDescending={isDescending}
-            onSort={onSort}
-          />
-        ),
-        cell: ({ row }) => <PriceCell value={row.original.costPrice} />,
-        size: 110,
       },
       {
         accessorKey: "sellingPrice",

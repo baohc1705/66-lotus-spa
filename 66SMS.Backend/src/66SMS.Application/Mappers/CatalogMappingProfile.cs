@@ -8,6 +8,8 @@ using _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateService
 using _66SMS.Application.CatalogService.ServiceCategories.Commands.UpdateServiceCategories;
 using _66SMS.Application.CatalogService.ServiceImages.Commands.CreateServiceImages;
 using _66SMS.Application.CatalogService.ServiceImages.Commands.UpdateServiceImages;
+using _66SMS.Application.CatalogService.ServiceProducts.Commands.CreateServiceProducts;
+using _66SMS.Application.CatalogService.ServiceProducts.Commands.UpdateServiceProducts;
 using _66SMS.Application.CatalogService.Services.Commands.CreateServices;
 using _66SMS.Application.CatalogService.Services.Commands.UpdateServices;
 using _66SMS.Application.CatalogService.TreatmentCourses.Commands.CreateTreatmentCourse;
@@ -58,13 +60,16 @@ namespace _66SMS.Application.Mappers
             CreateMap<ServiceImage, ServiceImageDto>().IgnoreNullValueTypes();
             CreateMap<ServiceProduct, ServiceProductDto>().IgnoreNullValueTypes();
             CreateMap<ServiceProduct, ServiceProductResponse>().IgnoreNullValueTypes();
-            CreateMap<Service, ServiceListDto>().IgnoreNullValueTypes();
-            CreateMap<Service, ServiceDetailDto>().IgnoreNullValueTypes();
+            // CreateMap<Service, ServiceListDto>().IgnoreNullValueTypes();
+            // CreateMap<Service, ServiceDetailDto>().IgnoreNullValueTypes();
 
             CreateMap<CreateServiceCommand, Service>().IgnoreNullValueTypes();
             CreateMap<ServiceImageItems, ServiceImage>().IgnoreNullValueTypes();
             CreateMap<ServiceProductItems, ServiceProduct>().IgnoreNullValueTypes();
-            // ServiceProducts/ImageUrl/Code xử lý riêng trong handler — không map vào navigation (tránh INSERT trùng UNIQUE)
+            CreateMap<CreateServiceProductCommand, ServiceProduct>().IgnoreNullValueTypes();
+            CreateMap<UpdateServiceProductCommand, ServiceProduct>()
+                .ForMember(d => d.Id, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
             CreateMap<UpdateServiceCommand, Service>()
                 .ForMember(d => d.ServiceProducts, opt => opt.Ignore())
                 .ForMember(d => d.ImageUrl, opt => opt.Ignore())

@@ -4,11 +4,11 @@ import {
   Check,
   ChevronRight,
   MapPin,
-  User,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
+  useAvailableBookingDays,
   useCreateSlotLock,
   useTechnicians,
   useTimeSlots,
@@ -17,9 +17,10 @@ import { useBookingStore } from "../stores/bookingStore";
 import { filterSlotsAfterNow } from "../utils/timeSlot.utils";
 import { formatDate } from "@/shared/utils/date.utils";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import type { AxiosError } from "axios";
 import type { Result } from "@/shared/types/common.types";
-import type { TimeSlotDTO } from "../types/booking.types";
+import type { BookingDayDto, TimeSlotDTO } from "../types/booking.types";
 
 export function BookingTimeStep() {
   const store = useBookingStore();
@@ -35,49 +36,29 @@ export function BookingTimeStep() {
   const selectTechnician = store.selectTechnician;
   const selectTimeSlot = store.selectTimeSlot;
 
-  const [days] = useState(() => {
-    const upcomingDays = [];
-    const vietnameseDays = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-
-    for (let i = 0; i < 7; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() + i);
-      upcomingDays.push({
-        dayName: i === 0 ? "H.Nay" : vietnameseDays[d.getDay()],
-        dayNum: d.getDate(),
-        fullDate: d,
-        isBookedOut: false,
-      });
-    }
-    return upcomingDays;
-  });
+  const { data: days = [], isLoading: loadingDays } = useAvailableBookingDays(7);
 
   useEffect(() => {
-    if (!selectedDate) {
-      selectDate(days[0].fullDate);
+    if (!selectedDate && days.length > 0) {
+      selectDate(formatDate(days[0].date).toDate());
     }
   }, [selectedDate, selectDate, days]);
 
   const serviceId = selectedService?.id;
   const dateInput = selectedDate
-    ? (() => {
-        const y = selectedDate.getFullYear();
-        const m = String(selectedDate.getMonth() + 1).padStart(2, "0");
-        const d = String(selectedDate.getDate()).padStart(2, "0");
-        return `${y}-${m}-${d}`;
-      })()
+    ? formatDate(selectedDate).format("YYYY-MM-DD")
     : null;
 
   const { data: technicians = [], isLoading: loadingTechs } = useTechnicians(
     dateInput,
     serviceId,
-    selectedSalon?.id
+    selectedSalon?.id,
   );
   const { data: timeSlots = [], isLoading: loadingSlots } = useTimeSlots(
     dateInput,
     serviceId,
     selectedTechnician?.id,
-    selectedSalon?.id
+    selectedSalon?.id,
   );
 
   const visibleTimeSlots = useMemo(
@@ -104,7 +85,7 @@ export function BookingTimeStep() {
 
   const handleNextStep = async () => {
     const validGuests = store.guests.filter(
-      (g) => g.selectedService && g.selectedDate && g.selectedTimeSlot
+      (g) => g.selectedService && g.selectedDate && g.selectedTimeSlot,
     );
 
     if (validGuests.length === 0) {
@@ -132,7 +113,7 @@ export function BookingTimeStep() {
       if (res.success && res.lockIds) {
         guestsToLock.forEach((g, idx) => {
           const originalIndex = store.guests.findIndex(
-            (storeG) => storeG.id === g.id
+            (storeG) => storeG.id === g.id,
           );
           if (originalIndex !== -1 && res.lockIds[idx]) {
             store.setGuestLockId(originalIndex, res.lockIds[idx]);
@@ -146,8 +127,8 @@ export function BookingTimeStep() {
       toast.error(
         getErrorMessage(
           error as AxiosError<Result<unknown>>,
-          "Khung giờ vừa có người đặt, vui lòng chọn lại."
-        )
+          "Khung giờ vừa có người đặt, vui lòng chọn lại.",
+        ),
       );
     } finally {
       setIsLocking(false);
@@ -176,38 +157,46 @@ export function BookingTimeStep() {
           1. Chọn ngày phục vụ
         </p>
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-          {days.map((d) => {
-            const isSelected = selectedDate?.toDateString() === d.fullDate.toDateString();
-            return (
-              <button
-                key={d.fullDate.getTime()}
-                disabled={d.isBookedOut}
-                onClick={() => {
-                  selectDate(d.fullDate);
-                  selectTimeSlot(null);
-                }}
-                className={`flex flex-col items-center justify-center p-3 rounded-sm w-14 shrink-0 transition-all relative border ${
-                  isSelected
-                    ? "border-rose-600 bg-rose-600 text-white"
-                    : d.isBookedOut
-                      ? "border-warm-100 bg-warm-50 text-warm-300 cursor-not-allowed line-through"
-                      : "border-warm-100 bg-surface text-ink hover:border-rose-200"
-                }`}
-              >
-                <span className="text-2xs font-semibold opacity-80">
-                  {d.dayName}
-                </span>
-                <span className="text-base font-extrabold mt-0.5">
-                  {d.dayNum}
-                </span>
-                {d.isBookedOut && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-error-bg text-error-text text-3xs font-bold rounded-sm px-1 scale-90 whitespace-nowrap">
-                    Hết chỗ
+          {loadingDays ? (
+            <div className="py-4 text-xs text-warm-600">Đang tải ngày...</div>
+          ) : (
+            days.map((d: BookingDayDto) => {
+              const fullDate = formatDate(d.date).toDate();
+              const isSelected =
+                selectedDate != null &&
+                formatDate(selectedDate).format("YYYY-MM-DD") === d.date;
+              return (
+                <button
+                  key={d.date}
+                  type="button"
+                  disabled={d.isBookedOut}
+                  onClick={() => {
+                    selectDate(fullDate);
+                    selectTimeSlot(null);
+                  }}
+                  className={`flex flex-col items-center justify-center p-3 rounded-sm w-14 shrink-0 transition-all relative border ${
+                    isSelected
+                      ? "border-rose-600 bg-rose-600 text-white"
+                      : d.isBookedOut
+                        ? "border-warm-100 bg-warm-50 text-warm-300 cursor-not-allowed line-through"
+                        : "border-warm-100 bg-surface text-ink hover:border-rose-200"
+                  }`}
+                >
+                  <span className="text-2xs font-semibold opacity-80">
+                    {d.dayName}
                   </span>
-                )}
-              </button>
-            );
-          })}
+                  <span className="text-base font-extrabold mt-0.5">
+                    {d.dayNum}
+                  </span>
+                  {d.isBookedOut && (
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-error-bg text-error-text text-3xs font-bold rounded-sm px-1 scale-90 whitespace-nowrap">
+                      Hết chỗ
+                    </span>
+                  )}
+                </button>
+              );
+            })
+          )}
         </div>
       </div>
 
@@ -251,17 +240,12 @@ export function BookingTimeStep() {
                     </div>
                   )}
 
-                  {tech.avatar ? (
-                    <img
-                      src={tech.avatar}
-                      alt={tech.name}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
-                      <User className="w-5 h-5" />
-                    </div>
-                  )}
+                  <FallbackImage
+                    kind="ktv"
+                    src={tech.avatar}
+                    alt={tech.name}
+                    className="w-10 h-10 rounded-full object-cover shrink-0"
+                  />
 
                   <div className="flex-1 min-w-0">
                     <h4 className="font-bold text-ink text-xs truncate">

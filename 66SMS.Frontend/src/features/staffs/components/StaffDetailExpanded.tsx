@@ -1,4 +1,4 @@
-import { User, Pencil } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import {
   Tabs,
@@ -8,6 +8,7 @@ import {
 } from "@/shared/components/ui/tabs";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import { useStaffDetail } from "../hooks/useStaffs";
 import { useGetAllRoles } from "@/features/auth/hooks/useGetAllRoles";
 import type { StaffFullDto } from "../types/staff.types";
@@ -109,15 +110,12 @@ export function StaffDetailExpanded({
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-full bg-adminGreen-100 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
-                {staff.avatarUrl ? (
-                  <img
-                    src={staff.avatarUrl}
-                    alt={staff.fullName ?? ""}
-                    className="w-14 h-14 object-cover"
-                  />
-                ) : (
-                  <User className="w-7 h-7 text-adminGreen-500" />
-                )}
+                <FallbackImage
+                  kind="ktv"
+                  src={staff.avatarUrl}
+                  alt={staff.fullName ?? ""}
+                  className="w-14 h-14 object-cover"
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-base font-bold text-adminInk truncate">

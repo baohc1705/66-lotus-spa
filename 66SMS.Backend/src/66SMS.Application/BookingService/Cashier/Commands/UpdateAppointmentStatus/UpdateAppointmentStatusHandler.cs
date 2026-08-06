@@ -73,6 +73,14 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                 }
 
                 var paidBeforeCancel = appointment.PaidAmount;
+
+                if (request.Status == AppointmentConst.STATUS_IN_SERVICE
+                    && appointment.Status == AppointmentConst.STATUS_WAITING
+                    && appointment.TimeStartService == null)
+                {
+                    appointment.TimeStartService = DateTimeHelper.UtcNow();
+                }
+
                 appointment.Status = request.Status;
 
                 var nowTime = DateTimeHelper.UtcNow();
@@ -85,7 +93,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                 {
                     appointment.ConfirmedAt = nowTime;
                 }
-                else                 if (request.Status == AppointmentConst.STATUS_COMPLETED)
+                else if (request.Status == AppointmentConst.STATUS_COMPLETED)
                 {
                     appointment.CompletedAt = nowTime;
                 }

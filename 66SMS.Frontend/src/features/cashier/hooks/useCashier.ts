@@ -12,7 +12,11 @@ function getApiError(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
 }
 
-export function useCashierData(date: Date, salonId?: number | null) {
+export function useCashierData(
+  date: Date,
+  salonId?: number | null,
+  enabled = true,
+) {
   const queryClient = useQueryClient();
 
   const query = useQuery({
@@ -24,6 +28,7 @@ export function useCashierData(date: Date, salonId?: number | null) {
       }
       return res.data;
     },
+    enabled,
     staleTime: 30_000,
   });
 
@@ -72,10 +77,19 @@ export function useCashierData(date: Date, salonId?: number | null) {
   };
 }
 
-export function useCashierWeekly(startDate: Date, endDate: Date, salonId?: number | null) {
-
+export function useCashierWeekly(
+  startDate: Date,
+  endDate: Date,
+  salonId?: number | null,
+  enabled = true,
+) {
   const query = useQuery({
-    queryKey: ["cashier-weekly", startDate.toDateString(), endDate.toDateString(), salonId],
+    queryKey: [
+      "cashier-weekly",
+      startDate.toDateString(),
+      endDate.toDateString(),
+      salonId,
+    ],
     queryFn: async () => {
       const res = await cashierApi.getWeekly(startDate, endDate, salonId);
       if (!res.isSuccess || !res.data) {
@@ -83,6 +97,7 @@ export function useCashierWeekly(startDate: Date, endDate: Date, salonId?: numbe
       }
       return res.data;
     },
+    enabled,
     staleTime: 30_000,
   });
 

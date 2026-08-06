@@ -39,13 +39,9 @@ namespace _66SMS.Domain.Constants
         #endregion
 
         #region Business
-        // Quy đổi công: >= 8h = 1 công, >= 4h = 0.5 công, < 4h = 0 công.
+        // Quy đổi công theo số giờ làm (check-in → check-out): >= 8h = 1, >= 4h = 0.5, < 4h = 0.
         public const decimal STANDARD_HOURS_PER_DAY = 8;
         public const decimal HALF_DAY_THRESHOLD = 4;
-        // Đi muộn quá số giờ này so với giờ vào ca → tối đa 0.5 công.
-        public const decimal LATE_THRESHOLD_HOURS = 1;
-        // Giờ vào ca mặc định khi không có lịch làm việc (08:00).
-        public static readonly TimeOnly DEFAULT_SHIFT_START = new(8, 0);
         // Mặc định trừ cả Thứ 7 khi tính ngày công chuẩn tháng.
         public const bool DEFAULT_EXCLUDE_SATURDAY = true;
         #endregion

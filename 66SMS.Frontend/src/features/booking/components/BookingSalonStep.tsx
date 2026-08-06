@@ -1,6 +1,7 @@
 import { MapPin, Phone, Clock, ChevronRight, Check } from "lucide-react";
-import { useBookingStore } from "../stores/bookingStore";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
+import { useBookingStore } from "../stores/bookingStore";
 
 export function BookingSalonStep() {
   const { selectedSalon, selectSalon, nextStep } = useBookingStore();
@@ -36,17 +37,12 @@ export function BookingSalonStep() {
                 }`}
               >
                 <div className="relative">
-                  {salon.imageUrl ? (
-                    <img
-                      src={salon.imageUrl}
-                      alt={salon.name}
-                      className="w-full h-36 object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-36 bg-gradient-to-br from-rose-600 to-gold-600 flex items-center justify-center">
-                      <span className="text-4xl">🌸</span>
-                    </div>
-                  )}
+                  <FallbackImage
+                    kind="salon"
+                    src={salon.imageUrl}
+                    alt={salon.name}
+                    className="w-full h-36 object-cover"
+                  />
 
                   {isSelected && (
                     <div className="absolute top-2 right-2 w-7 h-7 bg-rose-600 rounded-full flex items-center justify-center shadow-sm">

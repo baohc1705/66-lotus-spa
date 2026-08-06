@@ -9,6 +9,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useServices } from "../../services/hooks/useServices";
 import type { ServiceListDto } from "@/features/services/types/service.types";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import { useBookingStore } from "../stores/bookingStore";
 import {
   clearPendingServiceId,
@@ -124,17 +125,12 @@ export function BookingServiceStep() {
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        {s.imageUrl ? (
-                          <img
-                            src={s.imageUrl}
-                            alt={s.name}
-                            className="w-12 h-12 rounded-sm object-cover shrink-0"
-                          />
-                        ) : (
-                          <div className="w-12 h-12 rounded-sm bg-gradient-to-br from-rose-600 to-gold-600 flex items-center justify-center shrink-0 text-lg">
-                            🌸
-                          </div>
-                        )}
+                        <FallbackImage
+                          kind="service"
+                          src={s.imageUrl}
+                          alt={s.name ?? ""}
+                          className="w-12 h-12 rounded-sm object-cover shrink-0"
+                        />
                         <div>
                           <h5 className="font-bold text-ink text-sm">
                             {s.name}
