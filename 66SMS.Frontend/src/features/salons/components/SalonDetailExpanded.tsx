@@ -7,7 +7,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/shared/components/ui/tabs";
-import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { FallbackImage } from "@/shared/components/FallbackImage";
 import {
   Calendar,
