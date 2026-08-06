@@ -24,6 +24,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
         private readonly IWorkScheduleSqlRepository workScheduleSqlRepository;
         private readonly IPromotionSqlRepository promotionSqlRepository;
         private readonly IConfigAppointmentSqlRepository configAppointmentSqlRepository;
+        private readonly ITimeSlotSqlRepository timeSlotSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
 
         public CreateAppointmentHandler(
@@ -36,6 +37,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             IWorkScheduleSqlRepository workScheduleSqlRepository,
             IPromotionSqlRepository promotionSqlRepository,
             IConfigAppointmentSqlRepository configAppointmentSqlRepository,
+            ITimeSlotSqlRepository timeSlotSqlRepository,
             ISqlUnitOfWork sqlUnitOfWork)
         {
             this.appointmentSqlRepository = appointmentSqlRepository;
@@ -47,6 +49,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             this.workScheduleSqlRepository = workScheduleSqlRepository;
             this.promotionSqlRepository = promotionSqlRepository;
             this.configAppointmentSqlRepository = configAppointmentSqlRepository;
+            this.timeSlotSqlRepository = timeSlotSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
         }
 
@@ -194,6 +197,11 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         guest.SalonId,
                         cancellationToken);
 
+                    var slotId = (int)(validLock != null ? validLock.SlotId : guest.SlotId)!;
+                    var timeSlot = await timeSlotSqlRepository.FindByIdAsync(slotId, true, cancellationToken);
+                    var durationMins = appointmentServices.Sum(s => s.DurationSnapshot * s.Quantity);
+                    if (durationMins <= 0) durationMins = 15;
+
                     var appointment = new Appointment
                     {
                         AppointmentCode = $"LH-{now:yyyyMMddHHmmss}{Random.Shared.Next(100, 999)}",
@@ -201,10 +209,14 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         StaffId = staffId,
                         SalonId = guest.SalonId,
                         ScheduleId = scheduleId,
-                        SlotId = (int)(validLock != null ? validLock.SlotId : guest.SlotId)!,
+                        SlotId = slotId,
                         PositionId = validLock != null ? validLock.PositionId : guest.PositionId,
                         LockId = validLock?.Id,
                         AppointmentDate = (DateOnly)guest.AppointmentDate!,
+                        TimeApptStart = timeSlot?.StartTime,
+                        TimeApptEnd = timeSlot != null
+                            ? timeSlot.StartTime.AddMinutes(durationMins)
+                            : null,
                         Status = AppointmentConst.STATUS_PENDING,
                         Note = guest.Note,
                         TotalAmount = totalAmount,

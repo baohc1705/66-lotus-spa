@@ -37,7 +37,7 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointment
 
             var appointments = await query
                 .OrderBy(a => a.AppointmentDate)
-                .ThenBy(a => a.TimeSlot != null ? a.TimeSlot.StartTime : default)
+                .ThenBy(a => a.TimeApptStart ?? (a.TimeSlot != null ? a.TimeSlot.StartTime : default))
                 .ToListAsync(cancellationToken);
 
             if (appointments.Count == 0)
@@ -80,8 +80,8 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointment
 
                 var durationMins = a.Services?.Sum(s => s.Service?.DurationMins ?? 0) ?? 0;
                 if (durationMins == 0) durationMins = 15;
-                var startTs = a.TimeSlot?.StartTime ?? new TimeOnly(0, 0);
-                var endTs = startTs.AddMinutes(durationMins);
+                var startTs = a.TimeApptStart ?? a.TimeSlot?.StartTime ?? new TimeOnly(0, 0);
+                var endTs = a.TimeApptEnd ?? startTs.AddMinutes(durationMins);
 
                 return new CashierBookingDto
                 {

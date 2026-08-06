@@ -1,4 +1,5 @@
 import { AdminScheduleGrid } from "@/shared/components/calendar/AdminScheduleGrid";
+import { toLocalTimeOnly } from "@/shared/utils/date.utils";
 import type { StaffScheduleBooking, StaffScheduleDayDto } from "../types";
 
 interface StaffWeekGridProps {
@@ -16,10 +17,10 @@ export function StaffWeekGrid({
     day.bookings.map((booking) => ({
       id: `${day.date}-${booking.id}`,
       date: day.date,
-      title: booking.customerName,
-      subtitle: booking.serviceName,
-      startTime: booking.startTime,
-      endTime: booking.endTime,
+      title: booking.customerName || "—",
+      subtitle: booking.serviceName ?? undefined,
+      startTime: toLocalTimeOnly(booking.startTime),
+      endTime: toLocalTimeOnly(booking.endTime),
       status: booking.status,
     })),
   );

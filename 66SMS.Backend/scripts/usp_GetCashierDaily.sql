@@ -56,6 +56,7 @@ BEGIN
         StaffName        NVARCHAR(100)  NOT NULL,
         SlotId           INT            NOT NULL,
         StartTime        TIME(7)        NULL,
+        EndTime          TIME(7)        NULL,
         PositionId       INT            NULL,
         PositionName     NVARCHAR(300)  NULL,
         PositionStatus   INT            NULL,
@@ -73,7 +74,7 @@ BEGIN
 
     INSERT INTO #Appt (
         AppointmentId, AppointmentCode, AppointmentDate, StaffId, StaffName,
-        SlotId, StartTime, PositionId, PositionName, PositionStatus,
+        SlotId, StartTime, EndTime, PositionId, PositionName, PositionStatus,
         StatusCode, Note, TotalAmount, PaidAmount, DepositPercent,
         DepositDeadline, TimeStartService, CompletedAt, SalonId, CreatedByUserId
     )
@@ -84,7 +85,8 @@ BEGIN
         a.staff_id,
         ISNULL(st.full_name, N'N/A'),
         a.slot_id,
-        ts.start_time,
+        COALESCE(a.time_appt_start, ts.start_time),
+        a.time_appt_end,
         a.position_id,
         CASE
             WHEN bp.id IS NULL THEN NULL
@@ -177,10 +179,13 @@ BEGIN
         CONVERT(varchar(5), a.StartTime, 108) AS StartTime,
         CONVERT(
             varchar(5),
-            DATEADD(
-                MINUTE,
-                CASE WHEN ISNULL(svc.DurationMins, 0) > 0 THEN svc.DurationMins ELSE 15 END,
-                CAST(ISNULL(a.StartTime, CAST('00:00' AS TIME)) AS DATETIME)
+            COALESCE(
+                a.EndTime,
+                CAST(DATEADD(
+                    MINUTE,
+                    CASE WHEN ISNULL(svc.DurationMins, 0) > 0 THEN svc.DurationMins ELSE 15 END,
+                    CAST(ISNULL(a.StartTime, CAST('00:00' AS TIME)) AS DATETIME)
+                ) AS TIME)
             ),
             108
         ) AS EndTime,

@@ -63,8 +63,8 @@ BEGIN
         ap.paid_amount           AS AppointmentPaidAmount,
         ap.deposit_percent       AS DepositPercent,
         ap.completed_at          AS CompletedAt,
-        ts.start_time            AS SlotStartTime,
-        ts.end_time              AS SlotEndTime,
+        COALESCE(ap.time_appt_start, ts.start_time) AS SlotStartTime,
+        COALESCE(ap.time_appt_end, ts.end_time)     AS SlotEndTime,
         (
             SELECT ISNULL(SUM(aps.duration_snapshot), 0)
             FROM dbo.appointment_services AS aps
@@ -84,6 +84,6 @@ BEGIN
       AND ii.status = 1
       AND inv.status = 2
       AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
-    ORDER BY IssuedLocalDate, ts.start_time, inv.id, ii.id;
+    ORDER BY IssuedLocalDate, COALESCE(ap.time_appt_start, ts.start_time), inv.id, ii.id;
 END
 GO

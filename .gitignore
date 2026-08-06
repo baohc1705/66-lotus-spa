@@ -26,3 +26,5 @@
 .env
 .vscode
 .src
+.cursor
+docs

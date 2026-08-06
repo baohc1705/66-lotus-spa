@@ -31,56 +31,31 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleDaily
             if (staff == null)
                 return Result<StaffScheduleDailyDto>.NotFound(StaffConst.MSG_STAFF_NOT_FOUND, ErrorCodes.ERR_STAFF_NOT_FOUND);
 
-            // Projection — không Include / Select *
-            var rows = await appointmentSqlRepository.AsQueryable(true)
+            var bookings = await appointmentSqlRepository.AsQueryable(true)
                 .Where(a => a.StaffId == staff.Id && a.AppointmentDate == request.Date)
-                .OrderBy(a => a.TimeSlot!.StartTime)
-                .Select(a => new
+                .OrderBy(a => a.TimeApptStart ?? a.TimeSlot!.StartTime)
+                .Select(a => new StaffScheduleBookingDto
                 {
-                    a.Id,
-                    a.AppointmentCode,
-                    CustomerName = a.CreatedByUser!.Customer != null
-                        ? a.CreatedByUser.Customer.FullName
-                        : null,
-                    CustomerPhone = a.CreatedByUser!.Customer != null
-                        ? a.CreatedByUser.Customer.Phone
-                        : null,
-                    ServiceNames = a.Services!
-                        .Where(s => s.Service != null && s.Service.Name != null)
-                        .Select(s => s.Service!.Name!)
-                        .ToList(),
-                    DurationMins = a.Services!
-                        .Sum(s => s.Service != null ? s.Service.DurationMins : 0),
-                    StartTime = a.TimeSlot != null ? (TimeOnly?)a.TimeSlot.StartTime : null,
-                    a.Status,
-                    a.PaidAmount,
-                    a.TotalAmount,
-                    a.Note,
+                    Id = a.Id.ToString(),
+                    AppointmentCode = a.AppointmentCode,
+                    CustomerName = a.CreatedByUser!.Customer!.FullName,
+                    CustomerPhone = a.CreatedByUser!.Customer!.Phone,
+                    ServiceName = string.Join(", ", a.Services!
+                        .Where(s => s.Service != null)
+                        .Select(s => s.Service!.Name)),
+                    StartTime = a.TimeApptStart ?? a.TimeSlot!.StartTime,
+                    EndTime = a.TimeApptEnd ?? a.TimeSlot!.EndTime,
+                    Status = a.Status,
+                    PaidAmount = a.PaidAmount,
+                    TotalAmount = a.TotalAmount,
+                    Note = a.Note,
                     PositionName = a.Position != null
-                        ? (a.Position.Room != null
-                            ? a.Position.Room.Name + " — " + a.Position.Name
-                            : a.Position.Name)
+                        ? a.Position.Room!.Name + " — " + a.Position.Name
                         : null,
-                    a.TimeStartService,
-                    a.CompletedAt,
+                    TimeStartService = a.TimeStartService,
+                    CompletedAt = a.CompletedAt,
                 })
                 .ToListAsync(cancellationToken);
-
-            var bookings = rows.Select(r => StaffScheduleMapping.ToBookingDto(
-                r.Id,
-                r.AppointmentCode,
-                r.CustomerName,
-                r.CustomerPhone,
-                r.ServiceNames,
-                r.DurationMins,
-                r.StartTime,
-                r.Status,
-                r.PaidAmount,
-                r.TotalAmount,
-                r.Note,
-                r.PositionName,
-                r.TimeStartService,
-                r.CompletedAt)).ToList();
 
             return Result<StaffScheduleDailyDto>.Success(new StaffScheduleDailyDto
             {

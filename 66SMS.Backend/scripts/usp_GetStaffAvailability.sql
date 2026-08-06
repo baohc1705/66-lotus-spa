@@ -125,11 +125,14 @@ BEGIN
         a.staff_id,
         MIN(COALESCE(c.full_name, stf.full_name, u.username, N'Khách')),
         MIN(
-            CONVERT(varchar(5), ts.start_time, 108)
+            CONVERT(varchar(5), COALESCE(a.time_appt_start, ts.start_time), 108)
             + N'-'
             + CONVERT(
                 varchar(5),
-                DATEADD(MINUTE, ISNULL(d.TotalMins, 30), CAST(ts.start_time AS DATETIME)),
+                COALESCE(
+                    CAST(a.time_appt_end AS DATETIME),
+                    DATEADD(MINUTE, ISNULL(d.TotalMins, 30), CAST(COALESCE(a.time_appt_start, ts.start_time) AS DATETIME))
+                ),
                 108
             )
         )
@@ -149,8 +152,11 @@ BEGIN
     WHERE a.appointment_date = @WorkDate
       AND a.status NOT IN (5, 6, 9)
       AND (@SalonId IS NULL OR a.salon_id = @SalonId)
-      AND ts.start_time < @WindowEndT
-      AND DATEADD(MINUTE, ISNULL(d.TotalMins, 30), CAST(ts.start_time AS DATETIME)) > @WindowStartDt
+      AND COALESCE(a.time_appt_start, ts.start_time) < @WindowEndT
+      AND COALESCE(
+            CAST(a.time_appt_end AS DATETIME),
+            DATEADD(MINUTE, ISNULL(d.TotalMins, 30), CAST(COALESCE(a.time_appt_start, ts.start_time) AS DATETIME))
+          ) > @WindowStartDt
     GROUP BY a.staff_id;
 
     UPDATE r

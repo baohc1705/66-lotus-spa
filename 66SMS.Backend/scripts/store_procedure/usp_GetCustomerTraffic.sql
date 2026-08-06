@@ -14,15 +14,15 @@ BEGIN
     IF @Tab = 1
     BEGIN
         SELECT
-            RIGHT('0' + CAST(DATEPART(HOUR, ts.start_time) AS VARCHAR(2)), 2) + N':00' AS Label,
+            RIGHT('0' + CAST(DATEPART(HOUR, COALESCE(a.time_appt_start, ts.start_time)) AS VARCHAR(2)), 2) + N':00' AS Label,
             CAST(COUNT(1) AS DECIMAL(18, 0)) AS Value
         FROM dbo.appointments a
         INNER JOIN dbo.time_slots ts ON ts.id = a.slot_id
         WHERE a.appointment_date BETWEEN @FromDate AND @ToDate
           AND a.status <> 6
           AND (@SalonId IS NULL OR a.salon_id = @SalonId)
-        GROUP BY DATEPART(HOUR, ts.start_time)
-        ORDER BY DATEPART(HOUR, ts.start_time);
+        GROUP BY DATEPART(HOUR, COALESCE(a.time_appt_start, ts.start_time))
+        ORDER BY DATEPART(HOUR, COALESCE(a.time_appt_start, ts.start_time));
     END
     ELSE IF @Tab = 2
     BEGIN

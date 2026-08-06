@@ -15,6 +15,8 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_LOCK_ID = "lock_id";
         public const string FIELD_SCHEDULE_ID = "schedule_id";
         public const string FIELD_APPOINTMENT_DATE = "appointment_date";
+        public const string FIELD_TIME_APPT_START = "time_appt_start";
+        public const string FIELD_TIME_APPT_END = "time_appt_end";
         public const string FIELD_SOURCE = "source";
         public const string FIELD_STATUS = "status";
         public const string FIELD_NOTE = "note";

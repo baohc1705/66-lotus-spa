@@ -57,6 +57,10 @@ namespace _66SMS.Domain.Constants
         public const string MSG_STAFF_ID_NOT_FOUND = $"{nameof(Entities.Staff)} with id not found";
         public const string MSG_STAFF_NOT_FOUND = "KhÃ´ng tÃ¬m tháº¥y nhÃ¢n viÃªn.";
         public const string MSG_STAFF_BOOKING_NOT_FOUND = "Lá»‹ch háº¹n khÃ´ng tá»“n táº¡i hoáº·c khÃ´ng thuá»™c vá» nhÃ¢n viÃªn nÃ y.";
+        public const string MSG_STAFF_START_SERVICE_OUTSIDE_APPT_WINDOW =
+            "Chỉ được bắt đầu phục vụ trong khoảng giờ hẹn.";
+        public const string MSG_STAFF_COMPLETE_BEFORE_APPT_END =
+            "Chưa đủ thời lượng dịch vụ kể từ lúc bắt đầu phục vụ, không thể hoàn thành sớm.";
         public const string MSG_STAFF_UPDATE_STATUS_SUCCESS = "Cáº­p nháº­t tráº¡ng thÃ¡i thÃ nh cÃ´ng.";
         public const string MSG_KPI_INCOMPLETE = "Náº¿u cáº¥u hÃ¬nh KPI thÃ¬ pháº£i nháº­p cáº£ sá»‘ lÆ°á»£ng má»¥c tiÃªu vÃ  tiá»n thÆ°á»Ÿng.";
         #endregion

@@ -22,9 +22,9 @@ export const BOOKING_STATUS_LABELS: Record<number, string> = {
 export interface StaffScheduleBooking {
   id: string;
   appointmentCode?: string | null;
-  customerName: string;
-  customerPhone?: string;
-  serviceName: string;
+  customerName?: string | null;
+  customerPhone?: string | null;
+  serviceName?: string | null;
   startTime: string;
   endTime: string;
   status: number;

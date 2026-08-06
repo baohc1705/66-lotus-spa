@@ -13,6 +13,8 @@ namespace _66SMS.Domain.Entities
         public int? SalonId { get; set; }
         public int? ScheduleId { get; set; }
         public DateOnly AppointmentDate { get; set; }
+        public TimeOnly? TimeApptStart { get; set; }
+        public TimeOnly? TimeApptEnd { get; set; }
         public int? Source { get; set; }
         public int Status { get; set; }
         public string? Note { get; set; }

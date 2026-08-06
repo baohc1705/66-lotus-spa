@@ -31,6 +31,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
         private readonly IRoleSqlRepository roleSqlRepository;
         private readonly IWorkScheduleSqlRepository workScheduleSqlRepository;
         private readonly IPromotionSqlRepository promotionSqlRepository;
+        private readonly ITimeSlotSqlRepository timeSlotSqlRepository;
         private readonly IPasswordHash passwordHash;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
 
@@ -45,6 +46,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
             IRoleSqlRepository roleSqlRepository,
             IWorkScheduleSqlRepository workScheduleSqlRepository,
             IPromotionSqlRepository promotionSqlRepository,
+            ITimeSlotSqlRepository timeSlotSqlRepository,
             IPasswordHash passwordHash,
             ISqlUnitOfWork sqlUnitOfWork)
         {
@@ -58,6 +60,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
             this.roleSqlRepository = roleSqlRepository;
             this.workScheduleSqlRepository = workScheduleSqlRepository;
             this.promotionSqlRepository = promotionSqlRepository;
+            this.timeSlotSqlRepository = timeSlotSqlRepository;
             this.passwordHash = passwordHash;
             this.sqlUnitOfWork = sqlUnitOfWork;
         }
@@ -280,6 +283,11 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                     if (discountPercent > 0 && totalAmount > 0)
                         totalAmount -= totalAmount * discountPercent / 100m;
 
+                    var slotId = (int)(validLock != null ? validLock.SlotId : guest.SlotId)!;
+                    var timeSlot = await timeSlotSqlRepository.FindByIdAsync(slotId, true, cancellationToken);
+                    var durationMins = appointmentServices.Sum(s => s.DurationSnapshot * s.Quantity);
+                    if (durationMins <= 0) durationMins = 15;
+
                     // Lễ tân đặt: chờ phục vụ ngay, không yêu cầu cọc
                     var appointment = new Appointment
                     {
@@ -288,10 +296,14 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                         StaffId = staffId,
                         SalonId = guest.SalonId,
                         ScheduleId = scheduleId,
-                        SlotId = (int)(validLock != null ? validLock.SlotId : guest.SlotId)!,
+                        SlotId = slotId,
                         PositionId = validLock != null ? validLock.PositionId : guest.PositionId,
                         LockId = validLock?.Id,
                         AppointmentDate = (DateOnly)guest.AppointmentDate!,
+                        TimeApptStart = timeSlot?.StartTime,
+                        TimeApptEnd = timeSlot != null
+                            ? timeSlot.StartTime.AddMinutes(durationMins)
+                            : null,
                         Status = AppointmentConst.STATUS_WAITING,
                         Note = guest.Note,
                         TotalAmount = totalAmount,

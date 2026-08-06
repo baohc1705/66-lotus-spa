@@ -262,7 +262,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                 : "Dịch vụ";
 
             var appointmentTime = appointment.AppointmentDate.ToDateTime(
-                appointment.TimeSlot?.StartTime ?? new TimeOnly(9, 0));
+                appointment.TimeApptStart ?? appointment.TimeSlot?.StartTime ?? new TimeOnly(9, 0));
 
             var mail = emailTemplateFactory.CreateDepositInvoiceEmail(
                 customerEmail,

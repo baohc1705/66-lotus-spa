@@ -1,5 +1,5 @@
 import { AdminScheduleGrid } from "@/shared/components/calendar/AdminScheduleGrid";
-import { formatDate } from "@/shared/utils/date.utils";
+import { formatDate, toLocalTimeOnly } from "@/shared/utils/date.utils";
 import type { StaffScheduleBooking } from "../types";
 
 interface StaffDayGridProps {
@@ -23,10 +23,10 @@ export function StaffDayGrid({
     return {
       id: booking.id,
       date: dateKey,
-      title: booking.customerName,
-      subtitle: booking.serviceName,
-      startTime: booking.startTime,
-      endTime: booking.endTime,
+      title: booking.customerName || "—",
+      subtitle: booking.serviceName ?? undefined,
+      startTime: toLocalTimeOnly(booking.startTime),
+      endTime: toLocalTimeOnly(booking.endTime),
       status: booking.status,
     };
   });

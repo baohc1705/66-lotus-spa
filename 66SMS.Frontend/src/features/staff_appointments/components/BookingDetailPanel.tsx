@@ -12,7 +12,10 @@ import {
   APPOINTMENT_STATUS_LABELS,
 } from "@/features/booking/constants/appointment.constants";
 import { FormField } from "@/shared/components/forms/FormField";
-import { formatDateTimeDisplay } from "@/shared/utils/date.utils";
+import {
+  formatDateTimeDisplay,
+  toLocalTimeOnly,
+} from "@/shared/utils/date.utils";
 import { cn } from "@/lib/utils";
 import {
   BOOKING_STATUS_LABELS,
@@ -30,8 +33,10 @@ interface BookingDetailPanelProps {
 }
 
 function calcDurationMins(startTime: string, endTime: string) {
-  const [sh, sm] = startTime.split(":").map(Number);
-  const [eh, em] = endTime.split(":").map(Number);
+  const start = toLocalTimeOnly(startTime);
+  const end = toLocalTimeOnly(endTime);
+  const [sh, sm] = start.split(":").map(Number);
+  const [eh, em] = end.split(":").map(Number);
   if ([sh, sm, eh, em].some((n) => Number.isNaN(n))) return null;
   return eh * 60 + em - (sh * 60 + sm);
 }
@@ -96,12 +101,12 @@ export function BookingDetailPanel({
         <div className="flex-1 overflow-y-auto p-5 space-y-5">
           <div className="flex items-start gap-4 p-4 rounded-[5px] border border-adminGold-600/20 bg-white">
             <div className="w-14 h-14 rounded-full bg-adminGold-600/15 flex items-center justify-center text-adminGold-600 font-bold text-xl shrink-0">
-              {booking.customerName.charAt(0).toUpperCase()}
+              {booking.customerName?.charAt(0).toUpperCase() ?? "?"}
             </div>
             <div className="min-w-0 flex-1 space-y-1">
               <div className="flex items-center gap-2 text-adminInk font-semibold">
                 <User className="w-4 h-4 text-adminGray-600 shrink-0" />
-                <span className="truncate">{booking.customerName}</span>
+                <span className="truncate">{booking.customerName || "—"}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-adminGray-600">
                 <Phone className="w-4 h-4 shrink-0" />
@@ -121,7 +126,8 @@ export function BookingDetailPanel({
             </FormField>
             <FormField label="Giờ hẹn">
               <div className="h-10 px-3 flex items-center rounded-[5px] border border-adminGold-600/20 bg-adminGray-50 text-sm text-adminInk">
-                {booking.startTime} – {booking.endTime}
+                {toLocalTimeOnly(booking.startTime)} –{" "}
+                {toLocalTimeOnly(booking.endTime)}
               </div>
             </FormField>
             <FormField label="Thời lượng">
@@ -147,7 +153,7 @@ export function BookingDetailPanel({
               <span>Phòng / Chỗ ngồi</span>
             </div>
             <div className="grid grid-cols-[1.4fr_1fr] gap-2 px-4 py-3 text-sm text-adminInk items-start">
-              <span className="font-medium">{booking.serviceName}</span>
+              <span className="font-medium">{booking.serviceName || "—"}</span>
               <span className="inline-flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-adminGold-600 shrink-0" />
                 {booking.positionName || "—"}

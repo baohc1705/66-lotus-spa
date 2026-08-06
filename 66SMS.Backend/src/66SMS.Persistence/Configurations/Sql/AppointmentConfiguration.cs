@@ -20,6 +20,8 @@ namespace _66SMS.Persistence.Configurations.Sql
             builder.Property(x => x.LockId).HasColumnName(AppointmentConst.FIELD_LOCK_ID);
             builder.Property(x => x.ScheduleId).HasColumnName(AppointmentConst.FIELD_SCHEDULE_ID);
             builder.Property(x => x.AppointmentDate).HasColumnName(AppointmentConst.FIELD_APPOINTMENT_DATE);
+            builder.Property(x => x.TimeApptStart).HasColumnName(AppointmentConst.FIELD_TIME_APPT_START);
+            builder.Property(x => x.TimeApptEnd).HasColumnName(AppointmentConst.FIELD_TIME_APPT_END);
             builder.Property(x => x.Source).HasColumnName(AppointmentConst.FIELD_SOURCE);
             builder.Property(x => x.Status).HasColumnName(AppointmentConst.FIELD_STATUS);
             builder.Property(x => x.Note).HasColumnName(AppointmentConst.FIELD_NOTE).HasMaxLength(AppointmentConst.NOTE_MAX_LENGTH);
