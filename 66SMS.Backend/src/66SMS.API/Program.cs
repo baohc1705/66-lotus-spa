@@ -37,18 +37,20 @@ builder.Services.AddSwaggerWithJwt(apiConfig);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPersistence(builder.Configuration);
-
 builder.Services.AddCorsPolicy(builder.Configuration);
 
 var app = builder.Build();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
+{
     app.UseSwaggerWithUi();
+    app.UseHttpsRedirection();
+}
 
-app.UseHttpsRedirection();
 app.UseCors(CorsExtensions.PolicyName);
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapGet("/health", () => Results.Ok(new { status = "Healthy" }));
 app.MapControllers();
 app.Run();
