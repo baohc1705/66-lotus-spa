@@ -181,8 +181,8 @@ export function CashierGrid({
   return (
     <div className="flex-1 min-h-0 min-w-0 w-full overflow-auto scrollbar-thin bg-white relative font-sans">
       <div className="flex min-w-max">
-        <div className="w-16 flex-shrink-0 border-r border-adminGray-300/80 bg-adminGreen-600-light/20 sticky left-0 z-30">
-          <div className="h-11 border-b border-adminGray-300/80 sticky top-0 left-0 bg-adminGreen-600-light/50 z-50"></div>
+        <div className="w-16 flex-shrink-0 border-r border-adminGray-300/80 bg-adminGreen-50/20 sticky left-0 z-30">
+          <div className="h-11 border-b border-adminGray-300/80 sticky top-0 left-0 bg-adminGreen-50/50 z-50"></div>
           <div className="relative">
             {HOURS.map((hour) => (
               <div key={hour} className="h-[80px] relative">
@@ -226,7 +226,7 @@ export function CashierGrid({
                 key={col.id}
                 className="flex-1 min-w-[150px] border-r border-adminGray-300/60 border-dashed"
               >
-                <div className="h-11 bg-adminGreen-600-light/20 border-b border-adminGray-300/80 sticky top-0 z-40 flex items-center justify-center gap-2.5 px-4">
+                <div className="h-11 bg-adminGreen-50/20 border-b border-adminGray-300/80 sticky top-0 z-40 flex items-center justify-center gap-2.5 px-4">
                   <FallbackImage
                     kind="ktv"
                     src={col.avatar}

@@ -268,7 +268,7 @@ export function CashierTimeline({
         >
           <div className="flex sticky top-0 z-40 bg-white">
             <div
-              className="flex-shrink-0 h-10 border-b border-r border-adminGray-300/80 bg-adminGreen-600-light/50 sticky left-0 z-50 flex items-center px-4"
+              className="flex-shrink-0 h-10 border-b border-r border-adminGray-300/80 bg-adminGreen-50/50 sticky left-0 z-50 flex items-center px-4"
               style={{ width: `${STAFF_COL_WIDTH}px` }}
             >
               <span className="text-xs font-bold text-adminGray-600">
@@ -276,7 +276,7 @@ export function CashierTimeline({
               </span>
             </div>
             <div
-              className="relative h-10 border-b border-adminGray-300/80 bg-adminGreen-600-light/20"
+              className="relative h-10 border-b border-adminGray-300/80 bg-adminGreen-50/20"
               style={{ width: `${laneWidth}px` }}
             >
               {HOURS.map((hour, i) => (
@@ -320,7 +320,7 @@ export function CashierTimeline({
                   style={{ height: `${ROW_HEIGHT}px` }}
                 >
                   <div
-                    className="flex-shrink-0 border-r border-adminGray-300/80 bg-adminGreen-600-light/20 sticky left-0 z-30 flex items-center gap-2 px-4"
+                    className="flex-shrink-0 border-r border-adminGray-300/80 bg-adminGreen-50/20 sticky left-0 z-30 flex items-center gap-2 px-4"
                     style={{ width: `${STAFF_COL_WIDTH}px` }}
                   >
                     <FallbackImage

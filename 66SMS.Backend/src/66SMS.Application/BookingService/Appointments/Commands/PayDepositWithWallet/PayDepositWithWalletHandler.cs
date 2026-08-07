@@ -1,5 +1,6 @@
 using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Constants;
 using _66SMS.Contracts.Enumerations;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Messages;
@@ -133,6 +134,8 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                     await SendDepositInvoiceEmailAsync(emailData, cancellationToken);
                 }
 
+                await PublishDepositPaidAsync(appointment, cancellationToken);
+
                 return Result<object>.Success("Thanh toán tiền cọc thành công.");
             }
             catch
@@ -140,6 +143,39 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                 transaction.Rollback();
                 throw;
             }
+        }
+
+        private async Task PublishDepositPaidAsync(
+            Appointment appointment,
+            CancellationToken cancellationToken)
+        {
+            var staff = await appointmentSqlRepository.AsQueryable(asNoTracking: true)
+                .Where(a => a.Id == appointment.Id)
+                .Select(a => new
+                {
+                    StaffUserId = a.Staff!.UserId,
+                    CustomerName = a.CreatedByUser!.Customer!.FullName,
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            await domainEventPublisher.PublishAsync(new SendNotificationEvent<BookingNotificationPayload>
+            {
+                Domain = NotificationConst.DOMAIN_BOOKING,
+                EventType = NotificationConst.EVENT_DEPOSIT_PAID,
+                Title = "Đã thanh toán cọc",
+                Message = $"Khách đã thanh toán cọc cho lịch hẹn #{appointment.Id}.",
+                SalonId = appointment.SalonId,
+                CustomerUserId = appointment.CreatedByUserId,
+                StaffUserId = staff?.StaffUserId,
+                Payload = new BookingNotificationPayload
+                {
+                    AppointmentId = appointment.Id,
+                    StaffId = appointment.StaffId,
+                    Status = appointment.Status,
+                    CustomerName = staff?.CustomerName,
+                    AppointmentDate = appointment.AppointmentDate,
+                },
+            }, cancellationToken);
         }
 
         private async Task<DepositInvoiceEmailData?> TryPrepareDepositInvoiceAsync(

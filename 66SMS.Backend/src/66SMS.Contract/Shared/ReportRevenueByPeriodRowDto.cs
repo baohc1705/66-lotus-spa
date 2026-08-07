@@ -2,7 +2,7 @@
 {
     public class ReportRevenueByPeriodRowDto
     {
-        public string PeriodKey { get; set; }
+        public string PeriodKey { get; set; } = null!;
         public int OrderCount { get; set; }
         public decimal InvoiceTotal { get; set; }
         public decimal CommissionTotal { get; set; }

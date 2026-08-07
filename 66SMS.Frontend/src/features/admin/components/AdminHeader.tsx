@@ -3,7 +3,8 @@ import { useAuthStore } from "@/features/auth/stores/authStore";
 import { cn } from "@/lib/utils";
 import { BranchSelector } from "@/shared/components/BranchSelector";
 import { Logo } from "@/shared/components/Logo";
-import { Bell, LogOut, Menu, PanelLeft, PanelTop, Settings, ShoppingCart, User } from "lucide-react";
+import { NotificationBell } from "@/features/notifications";
+import { LogOut, Menu, PanelLeft, PanelTop, Settings, ShoppingCart, User } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -119,10 +120,7 @@ export function AdminHeader({
             )}
           </button>
 
-          <button className="w-8 h-8 rounded-[4px] bg-white/10 text-white border border-white/10 flex items-center justify-center hover:border-white/25 hover:bg-adminGreen-700 transition-all duration-300 relative group">
-            <Bell className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-            <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-adminGold-600 border border-adminGreen-800" />
-          </button>
+          <NotificationBell />
 
           <div className="relative">
             <button

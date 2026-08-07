@@ -17,6 +17,7 @@ import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useLogout } from "@/features/auth/hooks/useLogout";
 import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
 import { BranchSelector } from "@/shared/components/BranchSelector";
+import { NotificationBell } from "@/features/notifications";
 
 interface CashierHeaderProps {
   activeTab?: "calendar" | "invoices";
@@ -63,8 +64,8 @@ export function CashierHeader({
             className={cn(
               "flex items-center gap-1.5 h-full px-2.5 text-xs font-semibold transition-colors border-b-2 whitespace-nowrap",
               activeTab === "calendar"
-                ? "border-adminGreen-600 bg-white/10 text-white"
-                : "border-transparent hover:bg-white/5 text-white/70 hover:text-white",
+                ? "border-adminGold-600 bg-white/15 text-white"
+                : "border-transparent hover:bg-white/10 text-white/80 hover:text-white",
             )}
           >
             <CalendarIcon className="w-3.5 h-3.5" />
@@ -76,13 +77,13 @@ export function CashierHeader({
             className={cn(
               "flex items-center gap-1.5 h-full px-2.5 text-xs font-semibold transition-colors border-b-2 whitespace-nowrap",
               activeTab === "invoices"
-                ? "border-adminGreen-600 bg-white/10 text-white"
-                : "border-transparent hover:bg-white/5 text-white/70 hover:text-white",
+                ? "border-adminGold-600 bg-white/15 text-white"
+                : "border-transparent hover:bg-white/10 text-white/80 hover:text-white",
             )}
           >
             <ReceiptText className="w-3.5 h-3.5" />
             Hóa đơn
-            <div className="ml-0.5 w-4 h-4 rounded-[3px] bg-adminGold-600 text-white flex items-center justify-center transition-colors shadow-sm">
+            <div className="ml-0.5 w-4 h-4 rounded-[3px] bg-adminGold-600 text-adminGreen-950 flex items-center justify-center shadow-sm">
               <Plus className="w-2.5 h-2.5 font-bold" />
             </div>
           </button>
@@ -95,11 +96,15 @@ export function CashierHeader({
             <BranchSelector />
           </div>
         ) : (
-          <div className="flex items-center gap-1 text-white/80 border-l border-white/20 pl-2.5 text-xs whitespace-nowrap">
-            <MapPin className="w-3.5 h-3.5" />
+          <div className="flex items-center gap-1 text-white/90 border-l border-white/20 pl-2.5 text-xs whitespace-nowrap">
+            <MapPin className="w-3.5 h-3.5 text-adminGold-100" />
             <span className="hidden lg:inline">{salonLabel}</span>
           </div>
         )}
+
+        <div className="border-l border-white/20 pl-2.5">
+          <NotificationBell />
+        </div>
 
         <div className="border-l border-white/20 pl-2.5 flex items-center gap-2 relative">
           <button
@@ -107,7 +112,7 @@ export function CashierHeader({
             className="flex items-center gap-2 text-left hover:opacity-90 transition-opacity focus:outline-none"
           >
             <div className="text-right hidden sm:block">
-              <div className="text-2xs text-white/60 font-bold uppercase tracking-wider">
+              <div className="text-2xs text-adminGold-100 font-bold uppercase tracking-wider">
                 Thu ngân
               </div>
               <div className="leading-none text-white font-bold text-xs whitespace-nowrap">
@@ -125,7 +130,7 @@ export function CashierHeader({
                 className="fixed inset-0 z-40"
                 onClick={() => setIsProfileOpen(false)}
               />
-              <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-[3px] shadow-lg py-1.5 z-50 border border-adminGray-100 text-adminInk animate-in fade-in zoom-in-95 duration-100">
+              <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-[3px] shadow-lg py-1.5 z-50 border border-adminGray-100 text-adminInk">
                 <div className="px-4 py-2 border-b border-adminGray-100 mb-1.5">
                   <p className="text-xs font-bold text-adminInk truncate">
                     {user?.username || "Tài khoản"}

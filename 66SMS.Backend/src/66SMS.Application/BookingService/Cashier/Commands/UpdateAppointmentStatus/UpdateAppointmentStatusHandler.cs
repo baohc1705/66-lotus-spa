@@ -1,7 +1,10 @@
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Constants;
 using _66SMS.Contracts.Enumerations;
+using _66SMS.Contracts.Messages;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
@@ -13,10 +16,12 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
 {
     public sealed class UpdateAppointmentStatusHandler(
         IAppointmentSqlRepository appointmentSqlRepository,
+        IStaffSqlRepository staffSqlRepository,
         IUserSqlRepository userSqlRepository,
         IWalletSqlRepository walletSqlRepository,
         IWalletTransactionSqlRepository walletTransactionSqlRepository,
         IBookingPositionSqlRepository bookingPositionSqlRepository,
+        IDomainEventPublisher domainEventPublisher,
         ISqlUnitOfWork sqlUnitOfWork)
         : IRequestHandler<UpdateAppointmentStatusCommand, Result<object>>
     {
@@ -26,6 +31,8 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
         {
             var appointment = await appointmentSqlRepository.AsQueryable()
                 .Include(a => a.Payments)
+                .Include(a => a.CreatedByUser!)
+                    .ThenInclude(u => u!.Customer)
                 .FirstOrDefaultAsync(a => a.Id == request.Id, cancellationToken);
 
             if (appointment == null)
@@ -68,8 +75,9 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                     await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                     transaction.Commit();
 
-                    return Result<object>.Success(
-                        "Đã xác nhận lịch. Khách có 24 giờ để đặt cọc qua VNPAY.");
+                    await PublishStatusChangedAsync(appointment, "Lịch hẹn đã được xác nhận. Vui lòng đặt cọc trong 24 giờ.", cancellationToken);
+
+                    return Result<object>.Success("Đã xác nhận lịch. Khách có 24 giờ để đặt cọc qua VNPAY.");
                 }
 
                 var paidBeforeCancel = appointment.PaidAmount;
@@ -150,7 +158,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 transaction.Commit();
-
+                await PublishStatusChangedAsync(appointment, "Trạng thái lịch hẹn đã được cập nhật.", cancellationToken);
                 return Result<object>.Success("Cập nhật trạng thái thành công.");
             }
             catch
@@ -158,6 +166,39 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                 transaction.Rollback();
                 throw;
             }
+        }
+
+        private async Task PublishStatusChangedAsync(
+            Appointment appointment,
+            string message,
+            CancellationToken cancellationToken)
+        {
+            var staffUserId = await staffSqlRepository.AsQueryable(asNoTracking: true)
+                .Where(s => s.Id == appointment.StaffId)
+                .Select(s => (int?)s.UserId)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            var customerName = appointment.CreatedByUser?.Customer?.FullName
+                ?? appointment.CreatedByUser?.Username;
+
+            await domainEventPublisher.PublishAsync(new SendNotificationEvent<BookingNotificationPayload>
+            {
+                Domain = NotificationConst.DOMAIN_BOOKING,
+                EventType = NotificationConst.EVENT_APPOINTMENT_STATUS_CHANGED,
+                Title = "Cập nhật lịch hẹn",
+                Message = message,
+                SalonId = appointment.SalonId,
+                CustomerUserId = appointment.CreatedByUserId,
+                StaffUserId = staffUserId,
+                Payload = new BookingNotificationPayload
+                {
+                    AppointmentId = appointment.Id,
+                    StaffId = appointment.StaffId,
+                    Status = appointment.Status,
+                    CustomerName = customerName,
+                    AppointmentDate = appointment.AppointmentDate,
+                },
+            }, cancellationToken);
         }
     }
 }

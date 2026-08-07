@@ -1,6 +1,7 @@
 using _66SMS.Application.Abstractions;
 using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Constants;
 using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Messages;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -147,14 +148,47 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                 appointmentRepository.Update(appointment);
                 await unitOfWork.SaveChangeAsync(cancellationToken);
 
-              
                 if (result.Phase == AppointmentPaymentConst.PHASE_DEPOSIT)
                 {
                     await CreateDepositInvoiceAndSendEmailAsync(appointment.Id, cancellationToken);
+                    await PublishDepositPaidAsync(appointment, cancellationToken);
                 }
             }
 
             return VnPayIpnResponse.Success();
+        }
+
+        private async Task PublishDepositPaidAsync(
+            Appointment appointment,
+            CancellationToken cancellationToken)
+        {
+            var info = await appointmentRepository.AsQueryable(asNoTracking: true)
+                .Where(a => a.Id == appointment.Id)
+                .Select(a => new
+                {
+                    StaffUserId = a.Staff!.UserId,
+                    CustomerName = a.CreatedByUser!.Customer!.FullName,
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            await domainEventPublisher.PublishAsync(new SendNotificationEvent<BookingNotificationPayload>
+            {
+                Domain = NotificationConst.DOMAIN_BOOKING,
+                EventType = NotificationConst.EVENT_DEPOSIT_PAID,
+                Title = "Đã thanh toán cọc",
+                Message = $"Khách đã thanh toán cọc cho lịch hẹn #{appointment.Id}.",
+                SalonId = appointment.SalonId,
+                CustomerUserId = appointment.CreatedByUserId,
+                StaffUserId = info?.StaffUserId,
+                Payload = new BookingNotificationPayload
+                {
+                    AppointmentId = appointment.Id,
+                    StaffId = appointment.StaffId,
+                    Status = appointment.Status,
+                    CustomerName = info?.CustomerName,
+                    AppointmentDate = appointment.AppointmentDate,
+                },
+            }, cancellationToken);
         }
 
         private async Task CreateDepositInvoiceAndSendEmailAsync(
