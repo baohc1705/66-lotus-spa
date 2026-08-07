@@ -1,5 +1,11 @@
 using _66SMS.Application.Abstractions;
+using _66SMS.Application.BookingService.Helpers;
+using _66SMS.Application.DTOs.Appointments;
+using _66SMS.Contracts.Abstractions;
+using _66SMS.Contracts.Constants;
 using _66SMS.Contracts.Enumerations;
+using _66SMS.Contracts.Helpers;
+using _66SMS.Contracts.Messages;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -7,9 +13,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Application.BookingService.Helpers;
 using System.Data;
-using _66SMS.Contracts.Helpers;
 
 namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointment
 {
@@ -26,6 +30,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
         private readonly IConfigAppointmentSqlRepository configAppointmentSqlRepository;
         private readonly ITimeSlotSqlRepository timeSlotSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
+        private readonly IDomainEventPublisher domainEventPublisher;
 
         public CreateAppointmentHandler(
             IAppointmentSqlRepository appointmentSqlRepository,
@@ -38,7 +43,8 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             IPromotionSqlRepository promotionSqlRepository,
             IConfigAppointmentSqlRepository configAppointmentSqlRepository,
             ITimeSlotSqlRepository timeSlotSqlRepository,
-            ISqlUnitOfWork sqlUnitOfWork)
+            ISqlUnitOfWork sqlUnitOfWork,
+            IDomainEventPublisher domainEventPublisher)
         {
             this.appointmentSqlRepository = appointmentSqlRepository;
             this.serviceSqlRepository = serviceSqlRepository;
@@ -51,6 +57,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             this.configAppointmentSqlRepository = configAppointmentSqlRepository;
             this.timeSlotSqlRepository = timeSlotSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
+            this.domainEventPublisher = domainEventPublisher;
         }
 
         public async Task<Result<List<int>>> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
@@ -319,6 +326,38 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                 }
 
                 transaction.Commit();
+
+                var customerName = customer?.FullName ?? "Khách hàng";
+                var staffIds = createdAppointments.Select(a => a.StaffId).Distinct().ToList();
+                var staffUserByStaffId = await staffSqlRepository.AsQueryable(asNoTracking: true)
+                    .Where(s => staffIds.Contains(s.Id))
+                    .Select(s => new { s.Id, s.UserId })
+                    .ToDictionaryAsync(s => s.Id, s => s.UserId, cancellationToken);
+
+                var bookedAt = DateTimeHelper.UtcNow().ToOffset(TimeSpan.FromHours(7)).ToString("HH:mm dd/MM/yyyy");
+                foreach (var created in createdAppointments)
+                {
+                    staffUserByStaffId.TryGetValue(created.StaffId, out var staffUserId);
+
+                    await domainEventPublisher.PublishAsync(new SendNotificationEvent<BookingNotificationPayload>
+                    {
+                        Domain = NotificationConst.DOMAIN_BOOKING,
+                        EventType = NotificationConst.EVENT_APPOINTMENT_CREATED,
+                        Title = "Lịch hẹn mới",
+                        Message = $"Khách hàng {customerName} vừa đặt lịch hẹn #{created.Id} vào lúc {bookedAt}",
+                        SalonId = created.SalonId,
+                        StaffUserId = staffUserId,
+                        Payload = new BookingNotificationPayload
+                        {
+                            AppointmentId = created.Id,
+                            StaffId = created.StaffId,
+                            Status = created.Status,
+                            CustomerName = customerName,
+                            AppointmentDate = created.AppointmentDate,
+                        },
+                    }, cancellationToken);
+                }
+
                 return Result<List<int>>.Created(appointmentIds);
             }
             catch

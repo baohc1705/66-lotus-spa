@@ -45,6 +45,9 @@ namespace _66SMS.Infrastructure.DependencyInjection
             // Excel export
             services.AddScoped<IRevenueExcelExportService, RevenueExcelExportService>();
 
+            // SignalR
+            services.AddSignalRExtensions();
+
             return services;
         }
     }

@@ -192,7 +192,7 @@ export function CustomerCrmList({
                 onClick={() => cust.id && onSelect(cust.id)}
                 className={`flex items-center gap-3 p-3 cursor-pointer transition-all duration-150 border-l-[3px] ${
                   isSelected
-                    ? "bg-adminGreen-600-light border-l-[3px] border-l-lotus-leaf font-medium "
+                    ? "bg-adminGreen-50 border-l-[3px] border-l-lotus-leaf font-medium "
                     : "hover:bg-adminGray-50 border-l-transparent"
                 }`}
               >

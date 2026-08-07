@@ -60,6 +60,12 @@ namespace _66SMS.Persistence.Repositories.Sql.Base
         {
             context.Entry(entity).State = EntityState.Modified;
         }
+
+        public void UpdateRange(List<TEntity> entities)
+        {
+            Entities.UpdateRange(entities);
+        }
+
         public void Remove(TEntity entity)
         {
             Entities.Remove(entity);

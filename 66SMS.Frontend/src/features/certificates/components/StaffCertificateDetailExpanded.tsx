@@ -15,7 +15,7 @@ export function StaffCertificateDetailExpanded({ cert, onEdit }: Props) {
   const perm = CERTIFICATE_PERM;
 
   return (
-    <div className="p-4 bg-adminGreen-600-light/20">
+    <div className="p-4 bg-adminGreen-50/20">
       <div className="flex flex-col lg:flex-row gap-5">
         <div className="w-full lg:w-[220px] shrink-0">
           {cert.documentUrl ? (

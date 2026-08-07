@@ -1231,7 +1231,7 @@ export function CashierPOS({
             </div>
 
             <div className="p-4 space-y-4">
-              <div className="p-3 bg-adminGreen-600-light rounded-[3px] border border-adminGreen-600/10">
+              <div className="p-3 bg-adminGreen-50 rounded-[3px] border border-adminGreen-600/10">
                 <div className="flex justify-between items-center text-xs font-semibold text-adminGray-600">
                   <span>Khách hàng:</span>
                   <span className="font-bold text-adminInk">
@@ -1296,7 +1296,7 @@ export function CashierPOS({
                       className={cn(
                         "flex items-center gap-2 p-2.5 border rounded-[3px] text-xs font-bold transition duration-200",
                         activeOrder.paymentMethod === item.method
-                          ? "border-adminGreen-600 bg-adminGreen-600-light/40 text-adminGreen-600"
+                          ? "border-adminGreen-600 bg-adminGreen-50/40 text-adminGreen-600"
                           : "border-adminGray-100 bg-white text-adminGray-600 hover:bg-adminGray-50",
                       )}
                     >

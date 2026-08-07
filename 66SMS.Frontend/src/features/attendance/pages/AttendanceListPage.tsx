@@ -223,7 +223,7 @@ export function AttendanceListPage() {
       const timeText = `${checkInStr} - ${checkOutStr}`;
 
       return {
-        className: `${defaultClass} bg-adminGreen-600-light border-adminGreen-600 hover:border-adminGreen-600 focus:ring-adminGreen-600`,
+        className: `${defaultClass} bg-adminGreen-50 border-adminGreen-600 hover:border-adminGreen-600 focus:ring-adminGreen-600`,
         timeText,
         statusText: hasCheckedOut ? "Đã ra ca" : "Đang làm",
         statusColorClass: "text-adminGreen-600 font-bold",

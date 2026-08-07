@@ -34,8 +34,4 @@
     <ProjectReference Include="..\66SMS.Domain\66SMS.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Consumers\" />
-  </ItemGroup>
-
 </Project>

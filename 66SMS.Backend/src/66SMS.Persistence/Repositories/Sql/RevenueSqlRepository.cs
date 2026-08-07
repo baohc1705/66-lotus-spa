@@ -25,7 +25,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             var rows = await dbContext.ExecuteStoredProcedureAsync<RevenueSummaryRowDto>(
                 RevenueConst.SpSummary,
                 cancellationToken,
-                salonId,
+                salonId!,
                 fromDate,
                 toDate,
                 comparePrevious);
@@ -42,7 +42,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             var rows = await dbContext.ExecuteStoredProcedureAsync<RevenueTrendRowDto>(
                 RevenueConst.SpTrend,
                 cancellationToken,
-                salonId,
+                salonId!,
                 fromDate,
                 toDate);
 
@@ -58,7 +58,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             var rows = await dbContext.ExecuteStoredProcedureAsync<RevenueBreakdownRowDto>(
                 RevenueConst.SpBreakdown,
                 cancellationToken,
-                salonId,
+                salonId!,
                 fromDate,
                 toDate);
 
@@ -76,7 +76,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             var rows = await dbContext.ExecuteStoredProcedureAsync<TopRevenueItemRowDto>(
                 RevenueConst.SpTopItems,
                 cancellationToken,
-                salonId,
+                salonId!,
                 fromDate,
                 toDate,
                 itemType,
@@ -93,7 +93,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             var rows = await dbContext.ExecuteStoredProcedureAsync<TodaySummaryRowDto>(
                 RevenueConst.SpToday,
                 cancellationToken,
-                salonId,
+                salonId!,
                 today);
 
             return rows.FirstOrDefault();
@@ -109,7 +109,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             var rows = await dbContext.ExecuteStoredProcedureAsync<LabelValueRowDto>(
                 RevenueConst.SpTraffic,
                 cancellationToken,
-                salonId,
+                salonId!,
                 fromDate,
                 toDate,
                 tab);
@@ -127,7 +127,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             var rows = await dbContext.ExecuteStoredProcedureAsync<LabelValueRowDto>(
                 RevenueConst.SpNetRevenue,
                 cancellationToken,
-                salonId,
+                salonId!,
                 fromDate,
                 toDate,
                 tab);
@@ -145,7 +145,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             var rows = await dbContext.ExecuteStoredProcedureAsync<TopStaffRowDto>(
                 RevenueConst.SpTopStaff,
                 cancellationToken,
-                salonId,
+                salonId!,
                 fromDate,
                 toDate,
                 limit);
@@ -225,7 +225,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             var rows = await dbContext.ExecuteStoredProcedureAsync<ReportRevenueByPeriodRowDto>(
                 RevenueConst.SpReportByPeriod,
                 cancellationToken,
-                salonId,
+                salonId!,
                 fromDate,
                 toDate,
                 grain);
@@ -256,7 +256,7 @@ namespace _66SMS.Persistence.Repositories.Sql
             var rows = await dbContext.ExecuteStoredProcedureAsync<ReportRevenueByStaffRowDto>(
                RevenueConst.SpReportByStaff,
                cancellationToken,
-               salonId,
+               salonId!,
                fromDate,
                toDate);
 
@@ -273,8 +273,8 @@ namespace _66SMS.Persistence.Repositories.Sql
             var rows = await dbContext.ExecuteStoredProcedureAsync<ReportRevenueByServiceRowDto>(
                RevenueConst.SpReportByService,
                cancellationToken,
-               salonId,
-               categoryId,
+               salonId!, 
+               categoryId!,
                fromDate,
                toDate);
 

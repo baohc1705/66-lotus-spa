@@ -51,6 +51,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors(CorsExtensions.PolicyName);
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapGet("/health", () => Results.Ok(new { status = "Healthy" }));
+app.MapHealthEndpoint();
+app.MapNotificationHubs();
 app.MapControllers();
 app.Run();
