@@ -1,3 +1,4 @@
+using System.Security.Authentication;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -26,10 +27,18 @@ public static class MassTransitExtensions
 
             x.UsingRabbitMq((context, cfg) =>
             {
-                cfg.Host(rabbit.Host, h =>
+                cfg.Host(rabbit.Host, (ushort)rabbit.Port, rabbit.VirtualHost, h =>
                 {
                     h.Username(rabbit.Username);
                     h.Password(rabbit.Password);
+
+                    if (rabbit.UseSsl)
+                    {
+                        h.UseSsl(s =>
+                        {
+                            s.Protocol = SslProtocols.Tls12;
+                        });
+                    }
                 });
                 cfg.ConfigureEndpoints(context);
             });
