@@ -6,6 +6,7 @@
         public string EventType { get; set; } = null!;
         public string Title { get; set; } = null!;
         public string Message { get; set; } = null!;
+        public string? CustomerMessage { get; set; }
 
         public int? SalonId { get; set; }
         public int? CustomerUserId { get; set; }

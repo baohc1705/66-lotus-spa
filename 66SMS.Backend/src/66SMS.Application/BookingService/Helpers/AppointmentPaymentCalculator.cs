@@ -7,7 +7,7 @@ namespace _66SMS.Application.BookingService.Helpers
   
     public static class AppointmentPaymentCalculator
     {
-        // Fallback cuối nếu chi nhánh chưa có cấu hình
+       
         public const int DefaultDepositPercent = 20;
 
         public static async Task<int> ResolveDepositPercentAsync(

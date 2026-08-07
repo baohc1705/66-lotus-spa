@@ -1,25 +1,13 @@
 import { useState } from "react";
 import { Bell } from "lucide-react";
+import { toast } from "sonner";
+import type { AxiosError } from "axios";
 import { cn } from "@/lib/utils";
 import { toLocalTimeOnly } from "@/shared/utils/date.utils";
+import type { Result } from "@/shared/types/common.types";
+import { notificationApi } from "../api/notification.api";
 import { useNotificationUiStore } from "../stores/notificationUiStore";
-
-function eventLabel(eventType: string): string {
-  if (eventType === "AppointmentCreated") return "Đặt online";
-  if (eventType === "AppointmentStatusChanged") return "Cập nhật";
-  if (eventType === "DepositPaid") return "Đã cọc";
-  return eventType;
-}
-
-function eventBadgeClass(eventType: string): string {
-  if (eventType === "AppointmentCreated") {
-    return "bg-adminGold-100 text-adminGold-700";
-  }
-  if (eventType === "DepositPaid") {
-    return "bg-adminGreen-100 text-adminGreen-700";
-  }
-  return "bg-adminGray-100 text-adminGray-600";
-}
+import { eventBadgeClass, eventLabel } from "../utils/notificationEvent";
 
 type Props = {
   className?: string;
@@ -29,15 +17,31 @@ export function NotificationBell({ className }: Props) {
   const [open, setOpen] = useState(false);
   const unreadCount = useNotificationUiStore((s) => s.unreadCount);
   const items = useNotificationUiStore((s) => s.items);
-  const markAllRead = useNotificationUiStore((s) => s.markAllRead);
-  const clear = useNotificationUiStore((s) => s.clear);
+  const markAllReadLocal = useNotificationUiStore((s) => s.markAllRead);
+  const clearLocal = useNotificationUiStore((s) => s.clear);
 
   const handleOpen = () => {
     const next = !open;
     setOpen(next);
-    if (next) {
-      markAllRead();
+    if (next && unreadCount > 0) {
+      markAllReadLocal();
+      notificationApi.markAllRead().catch((error: AxiosError<Result<unknown>>) => {
+        const msg = error.response?.data?.message ?? "Không đánh dấu đã đọc được";
+        toast.error(msg);
+      });
     }
+  };
+
+  const handleClear = () => {
+    notificationApi
+      .clearAll()
+      .then(() => {
+        clearLocal();
+      })
+      .catch((error: AxiosError<Result<unknown>>) => {
+        const msg = error.response?.data?.message ?? "Không xóa thông báo được";
+        toast.error(msg);
+      });
   };
 
   return (
@@ -45,7 +49,7 @@ export function NotificationBell({ className }: Props) {
       <button
         type="button"
         onClick={handleOpen}
-        title="Thông báo lịch hẹn"
+        title="Thông báo"
         className="w-8 h-8 rounded-[4px] bg-white/10 text-white border border-white/20 flex items-center justify-center hover:bg-white/20 transition-all relative"
       >
         <Bell className="w-4 h-4" />
@@ -61,13 +65,11 @@ export function NotificationBell({ className }: Props) {
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div className="absolute right-0 top-full mt-1.5 w-80 max-h-96 bg-white rounded-[4px] shadow-lg border border-adminGray-100 z-50 flex flex-col overflow-hidden text-adminInk">
             <div className="px-3 py-2.5 border-b border-adminGray-100 flex items-center justify-between bg-adminGreen-50">
-              <p className="text-xs font-bold text-adminGreen-800">
-                Thông báo lịch hẹn
-              </p>
+              <p className="text-xs font-bold text-adminGreen-800">Thông báo</p>
               {items.length > 0 && (
                 <button
                   type="button"
-                  onClick={clear}
+                  onClick={handleClear}
                   className="text-2xs font-medium text-adminGray-600 hover:text-adminGreen-600"
                 >
                   Xóa tất cả
@@ -99,9 +101,7 @@ export function NotificationBell({ className }: Props) {
                         {toLocalTimeOnly(item.createdAt)}
                       </span>
                     </div>
-                    <p className="text-xs text-adminInk leading-snug">
-                      {item.message}
-                    </p>
+                    <p className="text-xs text-adminInk leading-snug">{item.message}</p>
                     {item.customerName && (
                       <p className="text-2xs text-adminGreen-700 mt-1 font-medium">
                         #{item.appointmentId} · {item.customerName}

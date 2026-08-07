@@ -158,12 +158,16 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 
+            var customerName = staff?.CustomerName ?? "Khách hàng";
+            var at = DateTimeHelper.UtcNow().ToOffset(TimeSpan.FromHours(7)).ToString("HH:mm dd/MM/yyyy");
+
             await domainEventPublisher.PublishAsync(new SendNotificationEvent<BookingNotificationPayload>
             {
                 Domain = NotificationConst.DOMAIN_BOOKING,
                 EventType = NotificationConst.EVENT_DEPOSIT_PAID,
                 Title = "Đã thanh toán cọc",
-                Message = $"Khách đã thanh toán cọc cho lịch hẹn #{appointment.Id}.",
+                Message = $"Khách hàng {customerName} vừa thanh toán cọc cho lịch hẹn #{appointment.Id} vào lúc {at}.",
+                CustomerMessage = $"Bạn đã thanh toán cọc cho lịch hẹn #{appointment.Id} vào lúc {at}.",
                 SalonId = appointment.SalonId,
                 CustomerUserId = appointment.CreatedByUserId,
                 StaffUserId = staff?.StaffUserId,

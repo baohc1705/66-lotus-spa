@@ -30,7 +30,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
         private readonly IConfigAppointmentSqlRepository configAppointmentSqlRepository;
         private readonly ITimeSlotSqlRepository timeSlotSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
-        private readonly INotificationService notificationService;
+        private readonly IDomainEventPublisher domainEventPublisher;
 
         public CreateAppointmentHandler(
             IAppointmentSqlRepository appointmentSqlRepository,
@@ -44,7 +44,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             IConfigAppointmentSqlRepository configAppointmentSqlRepository,
             ITimeSlotSqlRepository timeSlotSqlRepository,
             ISqlUnitOfWork sqlUnitOfWork,
-            INotificationService notificationService)
+            IDomainEventPublisher domainEventPublisher)
         {
             this.appointmentSqlRepository = appointmentSqlRepository;
             this.serviceSqlRepository = serviceSqlRepository;
@@ -57,7 +57,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             this.configAppointmentSqlRepository = configAppointmentSqlRepository;
             this.timeSlotSqlRepository = timeSlotSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
-            this.notificationService = notificationService;
+            this.domainEventPublisher = domainEventPublisher;
         }
 
         public async Task<Result<List<int>>> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
@@ -339,12 +339,12 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                 {
                     staffUserByStaffId.TryGetValue(created.StaffId, out var staffUserId);
 
-                    await notificationService.NofifyAsync(new SendNotificationEvent<BookingNotificationPayload>
+                    await domainEventPublisher.PublishAsync(new SendNotificationEvent<BookingNotificationPayload>
                     {
                         Domain = NotificationConst.DOMAIN_BOOKING,
                         EventType = NotificationConst.EVENT_APPOINTMENT_CREATED,
                         Title = "Lịch hẹn mới",
-                        Message = $"Khách hàng {customerName} vừa đặt lịch hẹn vào lúc {bookedAt}",
+                        Message = $"Khách hàng {customerName} vừa đặt lịch hẹn #{created.Id} vào lúc {bookedAt}",
                         SalonId = created.SalonId,
                         StaffUserId = staffUserId,
                         Payload = new BookingNotificationPayload

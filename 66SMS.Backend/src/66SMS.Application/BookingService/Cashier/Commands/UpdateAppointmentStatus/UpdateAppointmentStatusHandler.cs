@@ -75,7 +75,11 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                     await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                     transaction.Commit();
 
-                    await PublishStatusChangedAsync(appointment, "Lịch hẹn đã được xác nhận. Vui lòng đặt cọc trong 24 giờ.", cancellationToken);
+                    await PublishStatusChangedAsync(
+                        appointment,
+                        request.UserId,
+                        confirmedWaitingDeposit: true,
+                        cancellationToken);
 
                     return Result<object>.Success("Đã xác nhận lịch. Khách có 24 giờ để đặt cọc qua VNPAY.");
                 }
@@ -158,7 +162,11 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 transaction.Commit();
-                await PublishStatusChangedAsync(appointment, "Trạng thái lịch hẹn đã được cập nhật.", cancellationToken);
+                await PublishStatusChangedAsync(
+                    appointment,
+                    request.UserId,
+                    confirmedWaitingDeposit: false,
+                    cancellationToken);
                 return Result<object>.Success("Cập nhật trạng thái thành công.");
             }
             catch
@@ -170,7 +178,8 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
 
         private async Task PublishStatusChangedAsync(
             Appointment appointment,
-            string message,
+            int? actorUserId,
+            bool confirmedWaitingDeposit,
             CancellationToken cancellationToken)
         {
             var staffUserId = await staffSqlRepository.AsQueryable(asNoTracking: true)
@@ -179,14 +188,38 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                 .FirstOrDefaultAsync(cancellationToken);
 
             var customerName = appointment.CreatedByUser?.Customer?.FullName
-                ?? appointment.CreatedByUser?.Username;
+                ?? appointment.CreatedByUser?.Username
+                ?? "khách";
+
+            var actorName = "Thu ngân";
+            if (actorUserId is int uid)
+            {
+                var actor = await userSqlRepository.AsQueryable(asNoTracking: true)
+                    .Where(u => u.Id == uid)
+                    .Select(u => u.Staff != null
+                        ? u.Staff.FullName
+                        : (u.Customer != null ? u.Customer.FullName : u.Username))
+                    .FirstOrDefaultAsync(cancellationToken);
+                if (!string.IsNullOrWhiteSpace(actor))
+                    actorName = actor;
+            }
+
+            var at = DateTimeHelper.UtcNow().ToOffset(TimeSpan.FromHours(7)).ToString("HH:mm dd/MM/yyyy");
+            var statusLabel = StatusLabel(appointment.Status);
+            var staffMessage = confirmedWaitingDeposit
+                ? $"{actorName} vừa xác nhận lịch hẹn #{appointment.Id} của khách {customerName} vào lúc {at}."
+                : $"{actorName} vừa cập nhật lịch hẹn #{appointment.Id} của khách {customerName} sang \"{statusLabel}\" vào lúc {at}.";
+            var customerMessage = confirmedWaitingDeposit
+                ? $"{actorName} vừa xác nhận lịch hẹn #{appointment.Id} của bạn vào lúc {at}. Vui lòng đặt cọc trong 24 giờ."
+                : $"{actorName} vừa cập nhật lịch hẹn #{appointment.Id} của bạn sang \"{statusLabel}\" vào lúc {at}.";
 
             await domainEventPublisher.PublishAsync(new SendNotificationEvent<BookingNotificationPayload>
             {
                 Domain = NotificationConst.DOMAIN_BOOKING,
                 EventType = NotificationConst.EVENT_APPOINTMENT_STATUS_CHANGED,
                 Title = "Cập nhật lịch hẹn",
-                Message = message,
+                Message = staffMessage,
+                CustomerMessage = customerMessage,
                 SalonId = appointment.SalonId,
                 CustomerUserId = appointment.CreatedByUserId,
                 StaffUserId = staffUserId,
@@ -200,5 +233,17 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                 },
             }, cancellationToken);
         }
+
+        private static string StatusLabel(int status) => status switch
+        {
+            AppointmentConst.STATUS_PENDING => "chờ xác nhận",
+            AppointmentConst.STATUS_CONFIRMED => "đã xác nhận",
+            AppointmentConst.STATUS_WAITING => "chờ phục vụ",
+            AppointmentConst.STATUS_IN_SERVICE => "đang phục vụ",
+            AppointmentConst.STATUS_COMPLETED => "hoàn thành",
+            AppointmentConst.STATUS_CANCELLED => "đã hủy",
+            AppointmentConst.STATUS_NO_SHOW => "khách không đến",
+            _ => $"trạng thái {status}",
+        };
     }
 }

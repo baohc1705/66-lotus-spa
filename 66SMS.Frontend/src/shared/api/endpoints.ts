@@ -72,6 +72,10 @@ export const API = {
     image: "/media/image",
     images: "/media/images",
   },
+  notifications: {
+    base: "/notifications",
+    markAllRead: "/notifications/mark-all-read",
+  },
   revenue: {
     reportByPeriod: "/admin/revenue/report/by-period",
     reportBySalon: "/admin/revenue/report/by-salon",

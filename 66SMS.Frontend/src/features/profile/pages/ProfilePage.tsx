@@ -11,6 +11,7 @@ import { useAuthStore } from "@/features/auth/stores/authStore";
 import { Navbar } from "@/features/landing/components/Navbar";
 import { FooterSection } from "@/features/landing/components/FooterSection";
 import { MyWalletPanel } from "../components/MyWalletPanel";
+import { MyNotificationsPanel } from "@/features/notifications";
 import { Loader2 } from "lucide-react";
 
 const VALID_TABS = [
@@ -109,13 +110,7 @@ export function ProfilePage() {
         )}
         {activeTab === "change-password" && <SecurityForm />}
         {activeTab === "wallet" && <MyWalletPanel />}
-        {activeTab === "notifications" && (
-          <div className="text-center py-10">
-            <p className="text-lotus-stone">
-              Tính năng thông báo đang được phát triển...
-            </p>
-          </div>
-        )}
+        {activeTab === "notifications" && <MyNotificationsPanel />}
       </>
     );
   };

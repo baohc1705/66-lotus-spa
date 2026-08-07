@@ -8,17 +8,22 @@ import {
   joinSalon,
   leaveSalon,
 } from "../api/notificationHub";
+import { useMyNotifications } from "./useMyNotifications";
 import { useNotificationUiStore } from "../stores/notificationUiStore";
 import type { BookingNotificationMessage, NotificationMessage } from "../types/notification.types";
 
-function handleBookingNotification(msg: BookingNotificationMessage, queryClient: ReturnType<typeof useQueryClient>) {
-  toast.info(msg.title || "Thông báo lịch hẹn", { description: msg.message });
+function handleNotification(msg: NotificationMessage, queryClient: ReturnType<typeof useQueryClient>) {
+  toast.info(msg.title || "Thông báo", { description: msg.message });
   useNotificationUiStore.getState().add(msg);
-  queryClient.invalidateQueries({ queryKey: ["cashier-daily"] });
-  queryClient.invalidateQueries({ queryKey: ["cashier-weekly"] });
-  queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
-  queryClient.invalidateQueries({ queryKey: ["staff-schedule-daily"] });
-  queryClient.invalidateQueries({ queryKey: ["staff-schedule-weekly"] });
+  queryClient.invalidateQueries({ queryKey: ["notifications"] });
+
+  if ((msg.domain || "").toLowerCase() === "booking") {
+    queryClient.invalidateQueries({ queryKey: ["cashier-daily"] });
+    queryClient.invalidateQueries({ queryKey: ["cashier-weekly"] });
+    queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
+    queryClient.invalidateQueries({ queryKey: ["staff-schedule-daily"] });
+    queryClient.invalidateQueries({ queryKey: ["staff-schedule-weekly"] });
+  }
 }
 
 function joinCurrentSalon(joinedSalonRef: { current: number | null }) {
@@ -30,6 +35,8 @@ function joinCurrentSalon(joinedSalonRef: { current: number | null }) {
 }
 
 export function useNotifications() {
+  useMyNotifications();
+
   const accessToken = useAuthStore((s) => s.accessToken);
   const isAuthReady = useAuthStore((s) => s.isAuthReady);
   const salonId = useAuthStore((s) => s.getEffectiveSalonId());
@@ -48,8 +55,7 @@ export function useNotifications() {
     connectNotificationHub({
       onMessage: (msg: NotificationMessage) => {
         if (!active) return;
-        if ((msg.domain || "").toLowerCase() !== "booking") return;
-        handleBookingNotification(msg as BookingNotificationMessage, queryClient);
+        handleNotification(msg as BookingNotificationMessage, queryClient);
       },
       onReconnected: () => {
         if (!active) return;
