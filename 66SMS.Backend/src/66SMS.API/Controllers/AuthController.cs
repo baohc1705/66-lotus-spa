@@ -19,7 +19,6 @@ using _66SMS.Application.IdentityService.Roles.Commands.DeleteRole;
 using _66SMS.Application.IdentityService.Roles.Commands.UpdateRole;
 using _66SMS.Application.IdentityService.Roles.Queries.GetAllRoles;
 using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Helpers;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -32,11 +31,19 @@ namespace _66SMS.API.Controllers
     {
         private readonly IMediator mediator;
         private readonly IJwtService jwtService;
+        private readonly ICookieService cookieService;
+        private readonly IClientIpService clientIpService;
 
-        public AuthController(IMediator mediator, IJwtService jwtService)
+        public AuthController(
+            IMediator mediator,
+            IJwtService jwtService,
+            ICookieService cookieService,
+            IClientIpService clientIpService)
         {
             this.mediator = mediator;
             this.jwtService = jwtService;
+            this.cookieService = cookieService;
+            this.clientIpService = clientIpService;
         }
 
         [HttpPost("register")]
@@ -53,10 +60,10 @@ namespace _66SMS.API.Controllers
         [RedisRateLimit("login")]
         public async Task<IActionResult> Login(LoginCommand command)
         {
-            command.IpAddress = GetIpAddress();
+            command.IpAddress = clientIpService.GetClientIpAddress();
             var result = await mediator.Send(command);
             if (result.Data != null)
-                SetRefreshTokenCookies(result.Data.RefreshToken);
+                cookieService.SetRefreshToken(result.Data.RefreshToken);
             return HandleResult(result);
         }
 
@@ -64,16 +71,14 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> RefreshToken(RefreshTokenCommand command)
         {
-            var refreshToken = Request.Cookies["refreshToken"];
+            var refreshToken = cookieService.GetRefreshToken();
             if (!string.IsNullOrEmpty(refreshToken) && string.IsNullOrEmpty(command.Token))
-            {
                 command.Token = refreshToken;
-            }
 
-            command.IpAddress = GetIpAddress();
+            command.IpAddress = clientIpService.GetClientIpAddress();
             var result = await mediator.Send(command);
             if (result.Data != null)
-                SetRefreshTokenCookies(result.Data.RefreshToken);
+                cookieService.SetRefreshToken(result.Data.RefreshToken);
             return HandleResult(result);
         }
 
@@ -81,15 +86,17 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> Logout()
         {
-            var refreshToken = Request.Cookies["refreshToken"];
-            LogoutCommand command = new LogoutCommand();
-            command.IpAddress = GetIpAddress();
-
+            var command = new LogoutCommand
+            {
+                IpAddress = clientIpService.GetClientIpAddress()
+            };
+            var refreshToken = cookieService.GetRefreshToken();
             if (!string.IsNullOrEmpty(refreshToken))
                 command.Token = refreshToken;
+
             var result = await mediator.Send(command);
             if (result != null)
-                DeleteRefreshTokenCookies();
+                cookieService.DeleteRefreshToken();
             return HandleResult(result!);
         }
 
@@ -163,7 +170,6 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-
         [Authorize(Roles = "admin")]
         [HttpDelete("permission/{id}")]
         public async Task<IActionResult> DeletePermission(int id)
@@ -171,6 +177,7 @@ namespace _66SMS.API.Controllers
             var result = await mediator.Send(new DeletePermissionCommand { Id = id });
             return HandleResult(result);
         }
+
         [HttpPost("role")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> CreateRole([FromBody] CreateRoleCommand command)
@@ -189,7 +196,6 @@ namespace _66SMS.API.Controllers
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
-
 
         [Authorize(Roles = "admin")]
         [HttpDelete("role/{id}")]
@@ -214,31 +220,5 @@ namespace _66SMS.API.Controllers
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
-
-        private static CookieOptions RefreshTokenCookieOptions(DateTimeOffset? expires = null) => new()
-        {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.None,
-            Path = "/",
-            Expires = expires
-        };
-
-        private void SetRefreshTokenCookies(string token)
-        {
-            Response.Cookies.Append(
-                "refreshToken",
-                token,
-                RefreshTokenCookieOptions(DateTimeHelper.UtcNow().AddDays(7)));
-        }
-
-        private void DeleteRefreshTokenCookies()
-        {
-            Response.Cookies.Delete("refreshToken", RefreshTokenCookieOptions());
-        }
-
-        private string GetIpAddress() => Request.Headers.TryGetValue("X-Forwarded-For", out var ip)
-            ? ip.ToString()
-            : HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
     }
 }

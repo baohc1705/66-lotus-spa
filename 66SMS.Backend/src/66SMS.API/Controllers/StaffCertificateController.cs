@@ -84,20 +84,9 @@ namespace _66SMS.API.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetAll(int? staffId, int? status, int? expiringInDays, string? filter, string? orderBy, bool? isDescending, int? pageIndex, int? pageSize)
+        public async Task<IActionResult> GetAll([FromQuery] GetAllStaffCertificatesQuery query)
         {
-            var query = new GetAllStaffCertificatesQuery
-            {
-                StaffId = staffId,
-                Status = status,
-                ExpiringInDays = expiringInDays,
-                Filter = filter,
-                OrderBy = orderBy,
-                IsDescending = isDescending ?? false,
-                PageIndex = pageIndex ?? 1,
-                PageSize = pageSize ?? 20,
-                IsDeleted = false,
-            };
+            query.IsDeleted = false;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

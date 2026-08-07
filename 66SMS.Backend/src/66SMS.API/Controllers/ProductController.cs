@@ -78,20 +78,10 @@ namespace _66SMS.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAll(int? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice, string? orderBy, bool? isDescending, int? pageIndex, int? pageSize)
+        public async Task<IActionResult> GetAll([FromQuery] GetAllProductQuery query)
         {
-            GetAllProductQuery query = new()
-            {
-                CategoryId = categoryId,
-                Keyword = keyword,
-                MinPrice = minPrice,
-                MaxPrice = maxPrice,
-                Status = (int)StatusActiveEnum.ACTIVED,
-                OrderBy = orderBy,
-                IsDescending = isDescending ?? false,
-                PageIndex = pageIndex ?? 1,
-                PageSize = pageSize ?? 10
-            };
+            query.Status = (int)StatusActiveEnum.ACTIVED;
+            query.IsDeleted = false;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

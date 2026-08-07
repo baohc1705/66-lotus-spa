@@ -120,6 +120,6 @@ export interface PayrollCommissionDailyStatsDto {
 
 export interface PayrollCommissionStatsParams {
   staffId?: number;
-  from: string;
-  to: string;
+  fromDate: string;
+  toDate: string;
 }

@@ -23,7 +23,7 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetTechnicians
         /// <returns>Danh sách kỹ thuật viên rảnh rỗi trong ngày.</returns>
         public async Task<Result<IReadOnlyList<BookingTechnicianDto>>> Handle(GetTechniciansQuery request, CancellationToken cancellationToken)
         {
-            var result = await bookingAvailabilityService.GetTechniciansAsync((DateOnly)request.Date!, request.ServiceId, request.SalonId, cancellationToken);
+            var result = await bookingAvailabilityService.GetTechniciansAsync((DateOnly)request.Date!, (int)request.ServiceId!, request.SalonId, cancellationToken);
             return Result<IReadOnlyList<BookingTechnicianDto>>.Success(result);
         }
     }

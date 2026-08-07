@@ -64,8 +64,8 @@ export function PayrollStatsPage() {
     effectiveStaffId && effectiveStaffId > 0
       ? {
           staffId: isAdmin ? effectiveStaffId : undefined,
-          from: range.from,
-          to: range.to,
+          fromDate: range.fromDate,
+          toDate: range.toDate,
         }
       : null;
 

@@ -84,18 +84,9 @@ namespace _66SMS.API.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetAll(int? status, string? filter, string? orderBy, bool? isDescending, int? pageIndex, int? pageSize)
+        public async Task<IActionResult> GetAll([FromQuery] GetAllCertificateTypesQuery query)
         {
-            var query = new GetAllCertificateTypesQuery
-            {
-                Status = status,
-                Filter = filter,
-                OrderBy = orderBy,
-                IsDescending = isDescending ?? false,
-                PageIndex = pageIndex ?? 1,
-                PageSize = pageSize ?? 100,
-                IsDeleted = false,
-            };
+            query.IsDeleted = false;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

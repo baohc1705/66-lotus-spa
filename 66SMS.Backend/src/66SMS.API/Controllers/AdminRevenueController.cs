@@ -193,9 +193,6 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-        /// <summary>
-        /// Xuất Excel so sánh doanh thu tất cả chi nhánh (chỉ Admin).
-        /// </summary>
         [HttpGet("export-by-salon")]
         [PermissionAuthorize("revenue", "read")]
         public async Task<IActionResult> ExportBySalon(
@@ -205,8 +202,7 @@ namespace _66SMS.API.Controllers
             CancellationToken cancellationToken = default)
         {
             var profile = jwtService.GetProfile();
-            var isAdmin = profile?.Roles.Any(r =>
-                string.Equals(r, "Admin", StringComparison.OrdinalIgnoreCase)) == true;
+            var isAdmin = profile?.Roles.Any(r =>string.Equals(r, RoleConst.CODE_ADMIN)) == true;
 
             var result = await mediator.Send(new ExportRevenueBySalonQuery
             {
@@ -222,9 +218,6 @@ namespace _66SMS.API.Controllers
             return File(result.Data.Content, result.Data.ContentType, result.Data.FileName);
         }
 
-        /// <summary>
-        /// Xuất Excel doanh thu 1 chi nhánh: theo KTV + theo dịch vụ (Manager / Admin).
-        /// </summary>
         [HttpGet("export-branch")]
         [PermissionAuthorize("revenue", "read")]
         public async Task<IActionResult> ExportBranch(
@@ -234,23 +227,15 @@ namespace _66SMS.API.Controllers
             CancellationToken cancellationToken = default)
         {
             var profile = jwtService.GetProfile();
-            var isAdmin = profile?.Roles.Any(r =>
-                string.Equals(r, "Admin", StringComparison.OrdinalIgnoreCase)) == true;
+            var isAdmin = profile?.Roles.Any(r =>string.Equals(r, RoleConst.CODE_ADMIN)) == true;
             var tokenSalonId = jwtService.GetSalonId();
 
-            if (!isAdmin
-                && tokenSalonId is > 0
-                && salonId is > 0
-                && salonId != tokenSalonId)
-            {
+            if (!isAdmin && tokenSalonId > 0 && salonId > 0 && salonId != tokenSalonId)
                 return HandleResult(Result<RevenueExportFileDto>.Forbidden(RevenueConst.MSG_SALON_FORBIDDEN));
-            }
 
             var finalSalonId = tokenSalonId ?? salonId;
-            if (finalSalonId is null or <= 0)
-            {
+            if (finalSalonId == null || finalSalonId <= 0)
                 return HandleResult(Result<RevenueExportFileDto>.BadRequest(RevenueConst.MSG_SALON_REQUIRED));
-            }
 
             var result = await mediator.Send(new ExportBranchRevenueQuery
             {

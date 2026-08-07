@@ -28,10 +28,8 @@ export const API = {
   customers: "/customer",
   products: "/product",
   productCategories: "/product-category",
-  productImages: "/product-image",
   services: "/service",
   serviceCategories: "/service-category",
-  serviceImages: "/service-image",
   serviceProducts: "/service-product",
   shifts: "/shift",
   timeSlots: "/time-slots",
@@ -54,6 +52,7 @@ export const API = {
   promotions: "/promotions",
   cashier: {
     daily: "/cashier/daily",
+    weekly: "/cashier/weekly",
     onlineAppointments: "/cashier/online-appointments",
     appointment: "/cashier/appointments",
     positions: "/cashier/positions",
@@ -67,10 +66,6 @@ export const API = {
   address: {
     provinces: "/address/provinces",
     wards: "/address/wards",
-  },
-  media: {
-    image: "/media/image",
-    images: "/media/images",
   },
   notifications: {
     base: "/notifications",

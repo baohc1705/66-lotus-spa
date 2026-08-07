@@ -1,13 +1,9 @@
 using _66SMS.Application.CatalogService.ProductCategories.Commands.CreateProductCategories;
 using _66SMS.Application.CatalogService.ProductCategories.Commands.UpdateProductCategories;
-using _66SMS.Application.CatalogService.ProductImages.Commands.CreateProductImages;
-using _66SMS.Application.CatalogService.ProductImages.Commands.UpdateProductImages;
 using _66SMS.Application.CatalogService.Products.Commands.CreateProducts;
 using _66SMS.Application.CatalogService.Products.Commands.UpdateProducts;
 using _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateServiceCategories;
 using _66SMS.Application.CatalogService.ServiceCategories.Commands.UpdateServiceCategories;
-using _66SMS.Application.CatalogService.ServiceImages.Commands.CreateServiceImages;
-using _66SMS.Application.CatalogService.ServiceImages.Commands.UpdateServiceImages;
 using _66SMS.Application.CatalogService.ServiceProducts.Commands.CreateServiceProducts;
 using _66SMS.Application.CatalogService.ServiceProducts.Commands.UpdateServiceProducts;
 using _66SMS.Application.CatalogService.Services.Commands.CreateServices;
@@ -39,12 +35,6 @@ namespace _66SMS.Application.Mappers
                 .ForMember(dest => dest.Images, opt => opt.Ignore())
                 .IgnoreNullValueTypes();
 
-            CreateMap<CreateProductImageCommand, ProductImage>()
-                .ForMember(dest => dest.Url, opt => opt.MapFrom(src => src.Url ?? string.Empty))
-                .IgnoreNullValueTypes();
-            CreateMap<UpdateProductImageCommand, ProductImage>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .IgnoreNullValueTypes();
             CreateMap<ProductImage, ProductImageDto>()
                 .ForMember(dest => dest.ImageBase64, opt => opt.Ignore())
                 .IgnoreNullValueTypes();
@@ -55,13 +45,9 @@ namespace _66SMS.Application.Mappers
             CreateMap<CreateServiceCategoriesCommand, ServiceCategory>().IgnoreNullValueTypes();
             CreateMap<UpdateServiceCategoriesCommand, ServiceCategory>().IgnoreNullValueTypes();
 
-            CreateMap<CreateServiceImagesCommand, ServiceImage>().IgnoreNullValueTypes();
-            CreateMap<UpdateServiceImagesCommand, ServiceImage>().IgnoreNullValueTypes();
             CreateMap<ServiceImage, ServiceImageDto>().IgnoreNullValueTypes();
             CreateMap<ServiceProduct, ServiceProductDto>().IgnoreNullValueTypes();
             CreateMap<ServiceProduct, ServiceProductResponse>().IgnoreNullValueTypes();
-            // CreateMap<Service, ServiceListDto>().IgnoreNullValueTypes();
-            // CreateMap<Service, ServiceDetailDto>().IgnoreNullValueTypes();
 
             CreateMap<CreateServiceCommand, Service>().IgnoreNullValueTypes();
             CreateMap<ServiceImageItems, ServiceImage>().IgnoreNullValueTypes();

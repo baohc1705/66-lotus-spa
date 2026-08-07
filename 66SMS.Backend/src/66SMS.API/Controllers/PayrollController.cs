@@ -7,6 +7,7 @@ using _66SMS.Application.SalonService.Payrolls.Queries.GetDetailPayroll;
 using _66SMS.Application.SalonService.Payrolls.Queries.GetPayrollCommissionDailyStats;
 using _66SMS.Application.SalonService.Payrolls.Queries.GetPayrollCommissionStats;
 using _66SMS.Contracts.Abstractions;
+using _66SMS.Domain.Constants;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
@@ -64,49 +65,24 @@ namespace _66SMS.API.Controllers
 
         [HttpGet("stats")]
         [PermissionAuthorize("payrolls", "read")]
-        public async Task<IActionResult> GetCommissionStats(
-            [FromQuery] int? staffId,
-            [FromQuery] DateOnly from,
-            [FromQuery] DateOnly to,
-            CancellationToken cancellationToken)
+        public async Task<IActionResult> GetCommissionStats([FromQuery] GetPayrollCommissionStatsQuery query)
         {
             var profile = jwtService.GetProfile();
-            var isAdmin = profile?.Roles.Any(r =>
-                string.Equals(r, "Admin", StringComparison.OrdinalIgnoreCase)) == true;
-
-            var result = await mediator.Send(new GetPayrollCommissionStatsQuery
-            {
-                StaffId = staffId,
-                FromDate = from,
-                ToDate = to,
-                UserId = jwtService.GetUserId(),
-                IsAdmin = isAdmin,
-            }, cancellationToken);
-
+            query.UserId = jwtService.GetUserId();
+            query.IsAdmin = profile?.Roles.Any(r => string.Equals(r, RoleConst.CODE_ADMIN)) == true;
+            var result = await mediator.Send(query);
             return HandleResult(result);
         }
 
         [HttpGet("stats/daily")]
         [PermissionAuthorize("payrolls", "read")]
-        public async Task<IActionResult> GetCommissionDailyStats(
-            [FromQuery] int? staffId,
-            [FromQuery] DateOnly from,
-            [FromQuery] DateOnly to,
-            CancellationToken cancellationToken)
+        public async Task<IActionResult> GetCommissionDailyStats([FromQuery] GetPayrollCommissionDailyStatsQuery query)
         {
             var profile = jwtService.GetProfile();
-            var isAdmin = profile?.Roles.Any(r =>
-                string.Equals(r, "Admin", StringComparison.OrdinalIgnoreCase)) == true;
+            query.UserId = jwtService.GetUserId();
+            query.IsAdmin = profile?.Roles.Any(r => string.Equals(r, RoleConst.CODE_ADMIN)) == true;
 
-            var result = await mediator.Send(new GetPayrollCommissionDailyStatsQuery
-            {
-                StaffId = staffId,
-                FromDate = from,
-                ToDate = to,
-                UserId = jwtService.GetUserId(),
-                IsAdmin = isAdmin,
-            }, cancellationToken);
-
+            var result = await mediator.Send(query);
             return HandleResult(result);
         }
 

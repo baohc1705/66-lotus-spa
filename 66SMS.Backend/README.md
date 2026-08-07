@@ -63,7 +63,6 @@ Tất cả handler trả về Result<T> (nằm trong Contract/Shared/Result.cs) 
 | CatalogService | Service, ServiceCategory, Product, ProductCategory, TreatmentCourse |
 | CustomerService | Customer, MembershipTier, MembershipCard, Wallet |
 | SalonService | Salon, Staff, StaffSalon, Attendance, Payroll, Revenue, Certificate |
-| ReportService | Báo cáo tổng hợp |
 
 ## Database
 

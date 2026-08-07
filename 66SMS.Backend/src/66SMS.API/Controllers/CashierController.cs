@@ -24,47 +24,42 @@ namespace _66SMS.API.Controllers
     {
         private readonly IMediator mediator;
         private readonly IJwtService jwtService;
+        private readonly IClientIpService clientIpService;
 
-        public CashierController(IMediator mediator, IJwtService jwtService)
+        public CashierController(IMediator mediator, IJwtService jwtService, IClientIpService clientIpService)
         {
             this.mediator = mediator;
             this.jwtService = jwtService;
+            this.clientIpService = clientIpService;
         }
 
         [HttpGet("daily")]
         [Authorize]
-        public async Task<IActionResult> GetDaily([FromQuery] DateOnly date, [FromQuery] DateOnly? endDate, [FromQuery] int? salonId)
+        public async Task<IActionResult> GetDaily([FromQuery] GetCashierDailyQuery query)
         {
-            var tokenSalonId = jwtService.GetSalonId();
-            var finalSalonId = tokenSalonId ?? salonId;
-            var query = new GetCashierDailyQuery { Date = date, EndDate = endDate, SalonId = finalSalonId };
+            query.SalonId = jwtService.GetSalonId() ?? query.SalonId;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
 
         [HttpGet("weekly")]
         [Authorize]
-        public async Task<IActionResult> GetWeekly([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate, [FromQuery] int? salonId)
+        public async Task<IActionResult> GetWeekly([FromQuery] GetCashierDailyQuery query)
         {
-            var tokenSalonId = jwtService.GetSalonId();
-            var finalSalonId = tokenSalonId ?? salonId;
-            var query = new GetCashierDailyQuery { Date = startDate, EndDate = endDate, SalonId = finalSalonId };
+            query.SalonId = jwtService.GetSalonId() ?? query.SalonId;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
 
         [HttpGet("online-appointments")]
         [Authorize]
-        public async Task<IActionResult> GetOnlineAppointments([FromQuery] int? salonId)
+        public async Task<IActionResult> GetOnlineAppointments([FromQuery] GetOnlineAppointmentsQuery query)
         {
-            var tokenSalonId = jwtService.GetSalonId();
-            var finalSalonId = tokenSalonId ?? salonId;
-            var query = new GetOnlineAppointmentsQuery { SalonId = finalSalonId };
+            query.SalonId = jwtService.GetSalonId() ?? query.SalonId;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
 
-      
         [HttpPost("appointments")]
         [Authorize]
         public async Task<IActionResult> CreateCashierAppointment([FromBody] CreateCashierAppointmentCommand command)
@@ -74,54 +69,64 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-        [HttpPut("appointments/{id}/position")]
+        [HttpPut("appointments/{appointmentId}/position/{positionId}")]
         [Authorize]
-        public async Task<IActionResult> AssignAppointmentPosition(int id, [FromBody] AssignAppointmentPositionCommand request)
+        public async Task<IActionResult> AssignAppointmentPosition(int appointmentId, int positionId)
         {
-            request.AppointmentId = id;
-            request.UserId = jwtService.GetUserId();
-            var result = await mediator.Send(request);
+            var command = new AssignAppointmentPositionCommand
+            {
+                AppointmentId = appointmentId,
+                PositionId = positionId,
+                UserId = jwtService.GetUserId()
+            };
+            var result = await mediator.Send(command);
             return HandleResult(result);
         }
 
-        [HttpPut("appointments/{id}/staff")]
+        [HttpPut("appointments/{appointmentId}/staff/{staffId}")]
         [Authorize]
-        public async Task<IActionResult> AssignAppointmentStaff(int id, [FromBody] AssignAppointmentStaffCommand request)
+        public async Task<IActionResult> AssignAppointmentStaff(int appointmentId, int staffId)
         {
-            request.AppointmentId = id;
-            request.UserId = jwtService.GetUserId();
-            var result = await mediator.Send(request);
+            var command = new AssignAppointmentStaffCommand
+            {
+                AppointmentId = appointmentId,
+                StaffId = staffId,
+                UserId = jwtService.GetUserId()
+            };
+            var result = await mediator.Send(command);
             return HandleResult(result);
         }
 
         [HttpGet("positions")]
         [Authorize]
-        public async Task<IActionResult> GetPositions([FromQuery] int? salonId, [FromQuery] DateOnly? date)
+        public async Task<IActionResult> GetPositions([FromQuery] GetCashierPositionsQuery query)
         {
-            var tokenSalonId = jwtService.GetSalonId();
-            var finalSalonId = tokenSalonId ?? salonId;
-            var query = new GetCashierPositionsQuery { SalonId = finalSalonId, Date = date };
+            query.SalonId = jwtService.GetSalonId() ?? query.SalonId;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
 
         [HttpPut("appointments/{id}/status")]
         [Authorize]
-        public async Task<IActionResult> UpdateAppointmentStatus(int id, [FromBody] UpdateAppointmentStatusCommand request)
+        public async Task<IActionResult> UpdateAppointmentStatus(
+            [FromRoute] int id,
+            [FromBody] UpdateAppointmentStatusCommand command)
         {
-            request.Id = id;
-            request.UserId = jwtService.GetUserId();
-            var result = await mediator.Send(request);
+            command.Id = id;
+            command.UserId = jwtService.GetUserId();
+            var result = await mediator.Send(command);
             return HandleResult(result);
         }
 
         [HttpPost("appointments/{id}/pay")]
         [Authorize]
-        public async Task<IActionResult> PayAppointment(int id, [FromBody] PayAppointmentCommand request)
+        public async Task<IActionResult> PayAppointment(
+            [FromRoute] int id,
+            [FromBody] PayAppointmentCommand command)
         {
-            request.Id = id;
-            request.UserId = jwtService.GetUserId();
-            var result = await mediator.Send(request);
+            command.Id = id;
+            command.UserId = jwtService.GetUserId();
+            var result = await mediator.Send(command);
             return HandleResult(result);
         }
 
@@ -129,12 +134,10 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> CreateVnPayUrl(int appointmentId)
         {
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4()?.ToString() ?? "127.0.0.1";
-            if (string.IsNullOrEmpty(ipAddress) || ipAddress == "0.0.0.0") ipAddress = "127.0.0.1";
-            var query = new GetCashierVnPayUrlQuery 
-            { 
-                AppointmentId = appointmentId, 
-                IpAddress = ipAddress 
+            var query = new GetCashierVnPayUrlQuery
+            {
+                AppointmentId = appointmentId,
+                IpAddress = clientIpService.GetClientIpAddress()
             };
             var result = await mediator.Send(query);
             return HandleResult(result);
@@ -145,27 +148,22 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> VnPayReturn()
         {
             var collections = HttpContext.Request.Query.ToDictionary(k => k.Key, v => v.Value.ToString());
-            var command = new VnPayReturnCommand 
-            { 
-                QueryData = collections 
+            var command = new VnPayReturnCommand
+            {
+                QueryData = collections
             };
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
 
-        /// <summary>
-        /// API Webhook nhận thông báo thanh toán (IPN) trực tiếp từ server VNPAY.
-        /// API này không cần đăng nhập (AllowAnonymous) vì được gọi ngầm từ hệ thống VNPAY.
-        /// </summary>
         [HttpGet("vnpay-ipn")]
         [AllowAnonymous]
         public async Task<IActionResult> VnPayIpn()
         {
             var collections = HttpContext.Request.Query.ToDictionary(k => k.Key, v => v.Value.ToString());
-           
-            var command = new VnPayIpnCommand 
-            { 
-                QueryData = collections 
+            var command = new VnPayIpnCommand
+            {
+                QueryData = collections
             };
             var result = await mediator.Send(command);
             return Ok(result);
@@ -173,21 +171,9 @@ namespace _66SMS.API.Controllers
 
         [HttpGet("staff-availability")]
         [Authorize]
-        public async Task<IActionResult> GetStaffAvailability(
-            [FromQuery] DateOnly date,
-            [FromQuery] int slotId,
-            [FromQuery] int serviceId,
-            [FromQuery] int? salonId)
+        public async Task<IActionResult> GetStaffAvailability([FromQuery] GetStaffAvailabilityQuery query)
         {
-            var tokenSalonId = jwtService.GetSalonId();
-            var finalSalonId = tokenSalonId ?? salonId;
-            var query = new GetStaffAvailabilityQuery
-            {
-                Date = date,
-                SlotId = slotId,
-                ServiceId = serviceId,
-                SalonId = finalSalonId,
-            };
+            query.SalonId = jwtService.GetSalonId() ?? query.SalonId;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

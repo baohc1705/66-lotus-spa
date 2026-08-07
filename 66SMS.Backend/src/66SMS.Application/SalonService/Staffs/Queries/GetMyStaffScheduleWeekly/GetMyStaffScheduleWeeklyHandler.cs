@@ -1,5 +1,6 @@
 using _66SMS.Application.DTOs.Staffs;
 using _66SMS.Contracts.Enumerations;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
@@ -23,6 +24,9 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleWeekl
 
         public async Task<Result<StaffScheduleWeeklyDto>> Handle(GetMyStaffScheduleWeeklyQuery request, CancellationToken cancellationToken)
         {
+            var weekStart = request.WeekStart ?? ToMonday(DateTimeHelper.UtcToday());
+            var weekEnd = weekStart.AddDays(6);
+
             var staff = await staffSqlRepository.AsQueryable(true)
                 .Where(s => s.UserId == request.UserId)
                 .Select(s => new { s.Id })
@@ -31,11 +35,9 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleWeekl
             if (staff == null)
                 return Result<StaffScheduleWeeklyDto>.NotFound(StaffConst.MSG_STAFF_NOT_FOUND, ErrorCodes.ERR_STAFF_NOT_FOUND);
 
-            var weekEnd = request.WeekStart.AddDays(6);
-
             var rows = await appointmentSqlRepository.AsQueryable(true)
                 .Where(a => a.StaffId == staff.Id
-                    && a.AppointmentDate >= request.WeekStart
+                    && a.AppointmentDate >= weekStart
                     && a.AppointmentDate <= weekEnd)
                 .OrderBy(a => a.AppointmentDate)
                 .ThenBy(a => a.TimeApptStart ?? a.TimeSlot!.StartTime)
@@ -69,7 +71,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleWeekl
             var days = new List<StaffScheduleDayDto>();
             for (int i = 0; i < 7; i++)
             {
-                var currentDate = request.WeekStart.AddDays(i);
+                var currentDate = weekStart.AddDays(i);
                 days.Add(new StaffScheduleDayDto
                 {
                     Date = currentDate.ToString("yyyy-MM-dd"),
@@ -82,10 +84,17 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleWeekl
 
             return Result<StaffScheduleWeeklyDto>.Success(new StaffScheduleWeeklyDto
             {
-                WeekStart = request.WeekStart.ToString("yyyy-MM-dd"),
+                WeekStart = weekStart.ToString("yyyy-MM-dd"),
                 WeekEnd = weekEnd.ToString("yyyy-MM-dd"),
                 Days = days,
             });
+        }
+
+        private static DateOnly ToMonday(DateOnly date)
+        {
+            var dayOfWeek = (int)date.DayOfWeek;
+            var daysFromMonday = dayOfWeek == 0 ? 6 : dayOfWeek - 1;
+            return date.AddDays(-daysFromMonday);
         }
     }
 }

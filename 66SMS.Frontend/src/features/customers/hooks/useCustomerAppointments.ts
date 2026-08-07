@@ -9,7 +9,8 @@ export function useCustomerAppointments(
 ) {
   return useQuery({
     queryKey: ["customer-appointments", userId, pageIndex, PAGE_SIZE],
-    queryFn: () => bookingApi.getByUserId(userId!, pageIndex, PAGE_SIZE),
+    queryFn: () =>
+      bookingApi.getByUserId({ userId: userId!, pageIndex, pageSize: PAGE_SIZE }),
     enabled: userId != null && userId > 0,
   });
 }

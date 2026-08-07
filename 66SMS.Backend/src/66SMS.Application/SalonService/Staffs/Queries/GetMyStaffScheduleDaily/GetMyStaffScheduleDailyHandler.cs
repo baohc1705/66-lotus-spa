@@ -1,5 +1,6 @@
 using _66SMS.Application.DTOs.Staffs;
 using _66SMS.Contracts.Enumerations;
+using _66SMS.Contracts.Helpers;
 using _66SMS.Contracts.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
@@ -23,6 +24,8 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleDaily
 
         public async Task<Result<StaffScheduleDailyDto>> Handle(GetMyStaffScheduleDailyQuery request, CancellationToken cancellationToken)
         {
+            var date = request.Date ?? DateTimeHelper.UtcToday();
+
             var staff = await staffSqlRepository.AsQueryable(true)
                 .Where(s => s.UserId == request.UserId)
                 .Select(s => new { s.Id, s.FullName })
@@ -32,7 +35,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleDaily
                 return Result<StaffScheduleDailyDto>.NotFound(StaffConst.MSG_STAFF_NOT_FOUND, ErrorCodes.ERR_STAFF_NOT_FOUND);
 
             var bookings = await appointmentSqlRepository.AsQueryable(true)
-                .Where(a => a.StaffId == staff.Id && a.AppointmentDate == request.Date)
+                .Where(a => a.StaffId == staff.Id && a.AppointmentDate == date)
                 .OrderBy(a => a.TimeApptStart ?? a.TimeSlot!.StartTime)
                 .Select(a => new StaffScheduleBookingDto
                 {
@@ -59,7 +62,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleDaily
 
             return Result<StaffScheduleDailyDto>.Success(new StaffScheduleDailyDto
             {
-                Date = request.Date.ToString("yyyy-MM-dd"),
+                Date = date.ToString("yyyy-MM-dd"),
                 StaffName = staff.FullName,
                 Bookings = bookings,
             });

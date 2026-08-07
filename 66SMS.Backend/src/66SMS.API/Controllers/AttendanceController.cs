@@ -84,7 +84,10 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("attendances", "read")]
         public async Task<IActionResult> GetDetail(int id)
         {
-            var result = await mediator.Send(new GetDetailAttendanceQuery { Id = id });
+            var result = await mediator.Send(new GetDetailAttendanceQuery
+            {
+                Id = id
+            });
             return HandleResult(result);
         }
     }

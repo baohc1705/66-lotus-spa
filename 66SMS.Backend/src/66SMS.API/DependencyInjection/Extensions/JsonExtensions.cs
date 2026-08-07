@@ -5,25 +5,15 @@ namespace _66SMS.API.DependencyInjection.Extensions
 {
     public static class JsonExtensions
     {
-        /// <summary>
-        /// Extension cài đặt json trong api
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <returns></returns>
         public static IMvcBuilder AddJsonConfig(this IMvcBuilder builder)
         {
             builder.AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                // Cài đặt nếu field nào null không hiển thị trong api
-                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                // Cài đặt convert enum
+                // Show null fields in API response
+                // options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                // Cài đặt bỏ qua các field nếu include cycle
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-                // Đăng ký converter cho DateOnly và TimeOnly theo format mong muốn
-                //options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter("dd/MM/yyyy"));
-                //options.JsonSerializerOptions.Converters.Add(new TimeOnlyJsonConverter("HH:mm"));
             });
 
             return builder;

@@ -57,12 +57,11 @@ export function StaffAvailabilityDialog({
 
   const servicesQuery = useServices({ pageIndex: 1, pageSize: 200 });
 
-  const timeSlotsQuery = useTimeSlots(
-    serviceId ? dateStr : null,
-    serviceId ?? undefined,
-    undefined,
-    salonId ?? undefined,
-  );
+  const timeSlotsQuery = useTimeSlots({
+    date: serviceId ? dateStr : undefined,
+    serviceId: serviceId ?? undefined,
+    salonId: salonId ?? undefined,
+  });
 
   const availabilityQuery = useStaffAvailability(
     open,

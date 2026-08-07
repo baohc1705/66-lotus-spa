@@ -4,8 +4,8 @@ using _66SMS.Application.SalonService.Staffs.Commands.CreateStaff;
 using _66SMS.Application.SalonService.Staffs.Commands.CreateStaffServices;
 using _66SMS.Application.SalonService.Staffs.Commands.DeleteStaff;
 using _66SMS.Application.SalonService.Staffs.Commands.DeleteStaffServices;
-using _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff;
 using _66SMS.Application.SalonService.Staffs.Commands.UpdateMyBookingStatus;
+using _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff;
 using _66SMS.Application.SalonService.Staffs.Commands.UpdateStaffServices;
 using _66SMS.Application.SalonService.Staffs.Queries.GetAllStaffs;
 using _66SMS.Application.SalonService.Staffs.Queries.GetAllStaffServices;
@@ -39,17 +39,6 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> CreateStaff([FromBody] CreateStaffCommand command)
         {
             command.CreatedBy = jwtService.GetUserId();
-            //var tokenSalonId = jwtService.GetSalonId();
-            // if (tokenSalonId.HasValue)
-            // {
-            //     // Manager: ghi đè salon_id từ token
-            //     command.SalonId = tokenSalonId.Value;
-            // }
-            // else if (!command.SalonId.HasValue)
-            // {
-            //     // Admin: bắt buộc phải truyền salon_id trong body
-            //     return HandleResult(Result<object>.BadRequest("salon_id là bắt buộc khi tạo nhân viên với tài khoản Admin"));
-            // }
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -61,7 +50,11 @@ namespace _66SMS.API.Controllers
             var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue)
             {
-                var check = await mediator.Send(new GetDetailStaffQuery { Id = id, SalonId = tokenSalonId });
+                var check = await mediator.Send(new GetDetailStaffQuery
+                {
+                    Id = id,
+                    SalonId = tokenSalonId
+                });
                 if (!check.IsSuccess) 
                     return HandleResult(Result<object>.NotFound("Nhân viên không thuộc chi nhánh của bạn."));
             }
@@ -79,7 +72,11 @@ namespace _66SMS.API.Controllers
             var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue)
             {
-                var check = await mediator.Send(new GetDetailStaffQuery { Id = id, SalonId = tokenSalonId });
+                var check = await mediator.Send(new GetDetailStaffQuery
+                {
+                    Id = id,
+                    SalonId = tokenSalonId
+                });
                 if (!check.IsSuccess) 
                     return HandleResult(Result<object>.NotFound("Nhân viên không thuộc chi nhánh của bạn."));
             }
@@ -94,7 +91,12 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetBySalon(int salonId)
         {
-            var query = new GetAllStaffQuery { SalonId = salonId, PageSize = 100, PageIndex = 1 };
+            var query = new GetAllStaffQuery
+            {
+                SalonId = salonId,
+                PageSize = 100,
+                PageIndex = 1
+            };
             var result = await mediator.Send(query);
             if (!result.IsSuccess)
                 return HandleResult(result);
@@ -128,35 +130,29 @@ namespace _66SMS.API.Controllers
         public async Task<IActionResult> GetDetail(int id)
         {
             var tokenSalonId = jwtService.GetSalonId();
-            var result = await mediator.Send(new GetDetailStaffQuery { Id = id, SalonId = tokenSalonId });
+            var result = await mediator.Send(new GetDetailStaffQuery
+            {
+                Id = id,
+                SalonId = tokenSalonId
+            });
             return HandleResult(result);
         }
 
         [HttpGet("me/schedule/daily")]
         [PermissionAuthorize("staffs", "read")]
-        public async Task<IActionResult> GetMyScheduleDaily([FromQuery] string? date)
+        public async Task<IActionResult> GetMyScheduleDaily([FromQuery] GetMyStaffScheduleDailyQuery query)
         {
-            var workDate = ResolveDateOrToday(date);
-            if (workDate == null)
-                return HandleResult(Result<object>.BadRequest("Tham số date không hợp lệ."));
-
-            var userId = jwtService.GetUserId();
-
-            var result = await mediator.Send(new GetMyStaffScheduleDailyQuery { UserId = userId, Date = workDate.Value });
+            query.UserId = jwtService.GetUserId();
+            var result = await mediator.Send(query);
             return HandleResult(result);
         }
 
         [HttpGet("me/schedule/weekly")]
         [PermissionAuthorize("staffs", "read")]
-        public async Task<IActionResult> GetMyScheduleWeekly([FromQuery] string? weekStart)
+        public async Task<IActionResult> GetMyScheduleWeekly([FromQuery] GetMyStaffScheduleWeeklyQuery query)
         {
-            var start = ResolveWeekStartOrCurrent(weekStart);
-            if (start == null)
-                return HandleResult(Result<object>.BadRequest("Tham số weekStart không hợp lệ."));
-
-            var userId = jwtService.GetUserId();
-
-            var result = await mediator.Send(new GetMyStaffScheduleWeeklyQuery { UserId = userId, WeekStart = start.Value });
+            query.UserId = jwtService.GetUserId();
+            var result = await mediator.Send(query);
             return HandleResult(result);
         }
 
@@ -205,43 +201,6 @@ namespace _66SMS.API.Controllers
         {
             var result = await mediator.Send(query);
             return HandleResult(result);
-        }
-
-        private static DateOnly? ResolveDateOrToday(string? value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return DateOnly.FromDateTime(DateTime.Today);
-
-            if (DateOnly.TryParse(value, out var date))
-                return date;
-
-            return DateTime.TryParse(value, out var dt)
-                ? DateOnly.FromDateTime(dt.Date)
-                : null;
-        }
-
-        private static DateOnly? ResolveWeekStartOrCurrent(string? value)
-        {
-            DateOnly anchor;
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                anchor = DateOnly.FromDateTime(DateTime.Today);
-            }
-            else if (DateOnly.TryParse(value, out anchor))
-            {
-            }
-            else if (DateTime.TryParse(value, out var dt))
-            {
-                anchor = DateOnly.FromDateTime(dt.Date);
-            }
-            else
-            {
-                return null;
-            }
-
-            var dayOfWeek = (int)anchor.ToDateTime(TimeOnly.MinValue).DayOfWeek;
-            var daysFromMonday = dayOfWeek == 0 ? 6 : dayOfWeek - 1;
-            return anchor.AddDays(-daysFromMonday);
         }
     }
 }

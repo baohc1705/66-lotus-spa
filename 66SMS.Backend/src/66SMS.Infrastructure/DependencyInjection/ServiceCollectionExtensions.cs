@@ -17,6 +17,12 @@ namespace _66SMS.Infrastructure.DependencyInjection
             services.AddScoped<IJwtService, JwtService>();
             services.AddJwtService(configuration);
 
+            // Cookie
+            services.AddScoped<ICookieService, CookieService>();
+
+            // Client IP
+            services.AddScoped<IClientIpService, ClientIpService>();
+
             // Hash pass
             services.AddScoped<IPasswordHash, PasswordHash>();
 

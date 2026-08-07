@@ -14,8 +14,30 @@ export type CreateCashierAppointmentPayload = CreateBookingPayload & {
   customerId: number;
 };
 
+export type GetCashierDailyParams = {
+  date?: string;
+  endDate?: string;
+  salonId?: number | null;
+};
+
+export type GetCashierPositionsParams = {
+  salonId?: number | null;
+  date?: string | null;
+};
+
+export type GetStaffAvailabilityParams = {
+  date?: string;
+  slotId?: number;
+  serviceId?: number;
+  salonId?: number | null;
+};
+
 function toDateOnly(date: Date): string {
   return formatDate(date).format("YYYY-MM-DD");
+}
+
+function withSalonId(salonId?: number | null) {
+  return salonId !== undefined && salonId !== null ? { salonId } : {};
 }
 
 export const cashierApi = {
@@ -24,28 +46,26 @@ export const cashierApi = {
       .get<Result<CashierDailyDto>>(API.cashier.daily, {
         params: {
           date: toDateOnly(date),
-          ...(salonId !== undefined && salonId !== null ? { salonId } : {}),
-        },
+          ...withSalonId(salonId),
+        } satisfies GetCashierDailyParams,
       })
       .then((r) => r.data),
 
   getWeekly: (startDate: Date, endDate: Date, salonId?: number | null) =>
     axiosInstance
-      .get<Result<CashierDailyDto>>("/cashier/weekly", {
+      .get<Result<CashierDailyDto>>(API.cashier.weekly, {
         params: {
-          startDate: toDateOnly(startDate),
+          date: toDateOnly(startDate),
           endDate: toDateOnly(endDate),
-          ...(salonId !== undefined && salonId !== null ? { salonId } : {}),
-        },
+          ...withSalonId(salonId),
+        } satisfies GetCashierDailyParams,
       })
       .then((r) => r.data),
 
   getOnlineBookings: (salonId?: number | null) =>
     axiosInstance
       .get<Result<CashierBooking[]>>(API.cashier.onlineAppointments, {
-        params: {
-          ...(salonId !== undefined && salonId !== null ? { salonId } : {}),
-        },
+        params: withSalonId(salonId),
       })
       .then((r) => r.data),
 
@@ -56,50 +76,47 @@ export const cashierApi = {
 
   updateBookingStatus: (id: string | number, status: number, note?: string) =>
     axiosInstance
-      .put<
-        Result<void>
-      >(`${API.cashier.appointment}/${id}/status`, { id, status, note })
+      .put<Result<void>>(`${API.cashier.appointment}/${id}/status`, {
+        status,
+        note,
+      })
       .then((r) => r.data),
 
   getPositions: (salonId?: number | null, date?: string | null) =>
     axiosInstance
       .get<Result<CashierPosition[]>>(API.cashier.positions, {
         params: {
-          ...(salonId !== undefined && salonId !== null ? { salonId } : {}),
+          ...withSalonId(salonId),
           ...(date ? { date } : {}),
-        },
+        } satisfies GetCashierPositionsParams,
       })
       .then((r) => r.data),
 
   assignPosition: (appointmentId: string | number, positionId: number) =>
     axiosInstance
-      .put<Result<void>>(
-        `${API.cashier.appointment}/${appointmentId}/position`,
-        {
-          appointmentId: Number(appointmentId),
-          positionId,
-        },
-      )
+      .put<
+        Result<void>
+      >(`${API.cashier.appointment}/${appointmentId}/position/${positionId}`)
       .then((r) => r.data),
 
   assignStaff: (appointmentId: string | number, staffId: number) =>
     axiosInstance
-      .put<Result<void>>(`${API.cashier.appointment}/${appointmentId}/staff`, {
-        appointmentId: Number(appointmentId),
-        staffId,
-      })
+      .put<
+        Result<void>
+      >(`${API.cashier.appointment}/${appointmentId}/staff/${staffId}`)
       .then((r) => r.data),
 
   payBooking: (id: string | number, paymentMethod: string, note?: string) =>
     axiosInstance
-      .post<
-        Result<void>
-      >(`${API.cashier.appointment}/${id}/pay`, { id: Number(id), paymentMethod, note })
+      .post<Result<void>>(`${API.cashier.appointment}/${id}/pay`, {
+        paymentMethod,
+        note,
+      })
       .then((r) => r.data),
 
-  createVnPayUrl: (bookingId: string | number) =>
+  createVnPayUrl: (appointmentId: string | number) =>
     axiosInstance
-      .get<Result<string>>(`${API.cashier.vnpayCreate}/${bookingId}`)
+      .get<Result<string>>(`${API.cashier.vnpayCreate}/${appointmentId}`)
       .then((r) => r.data),
 
   vnPayReturn: (queryString: string) =>
@@ -121,8 +138,8 @@ export const cashierApi = {
           date: toDateOnly(date),
           slotId,
           serviceId,
-          ...(salonId !== undefined && salonId !== null ? { salonId } : {}),
-        },
+          ...withSalonId(salonId),
+        } satisfies GetStaffAvailabilityParams,
       })
       .then((r) => r.data),
 };

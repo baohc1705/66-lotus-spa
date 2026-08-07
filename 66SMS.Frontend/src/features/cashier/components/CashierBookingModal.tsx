@@ -104,19 +104,19 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
       ? selectedTechnician.id
       : undefined;
 
-  const techniciansQuery = useTechnicians(
-    appointmentDate,
-    serviceId ?? undefined,
-    salonId ?? undefined,
-  );
+  const techniciansQuery = useTechnicians({
+    date: appointmentDate ?? undefined,
+    serviceId: serviceId ?? undefined,
+    salonId: salonId ?? undefined,
+  });
   const technicians = techniciansQuery.data ?? [];
 
-  const timeSlotsQuery = useTimeSlots(
-    appointmentDate,
-    serviceId ?? undefined,
-    technicianIdForApi,
-    salonId ?? undefined,
-  );
+  const timeSlotsQuery = useTimeSlots({
+    date: appointmentDate ?? undefined,
+    serviceId: serviceId ?? undefined,
+    staffId: technicianIdForApi,
+    salonId: salonId ?? undefined,
+  });
   const timeSlots = useMemo(
     () => filterSlotsAfterNow(timeSlotsQuery.data ?? [], appointmentDate),
     [timeSlotsQuery.data, appointmentDate],
@@ -258,17 +258,19 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
     }
 
     try {
-      const lockResult = await createSlotLockMutation.mutateAsync([
-        {
-          slotId: effectiveSlotId,
-          staffId: selectedTechnician?.isAny
-            ? null
-            : (selectedTechnician?.id ?? null),
-          positionId: positionId,
-          appointmentDate,
-          serviceId,
-        },
-      ]);
+      const lockResult = await createSlotLockMutation.mutateAsync({
+        locks: [
+          {
+            slotId: effectiveSlotId,
+            staffId: selectedTechnician?.isAny
+              ? null
+              : (selectedTechnician?.id ?? null),
+            positionId: positionId,
+            appointmentDate,
+            serviceId,
+          },
+        ],
+      });
 
       if (!lockResult.success || !lockResult.lockIds[0]) {
         toast.error("Không thể giữ khung giờ. Vui lòng thử lại.");

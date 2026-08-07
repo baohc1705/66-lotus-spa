@@ -7,6 +7,6 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleWeekl
     public sealed class GetMyStaffScheduleWeeklyQuery : IRequest<Result<StaffScheduleWeeklyDto>>
     {
         public int UserId { get; set; }
-        public DateOnly WeekStart { get; set; }
+        public DateOnly? WeekStart { get; set; }
     }
 }

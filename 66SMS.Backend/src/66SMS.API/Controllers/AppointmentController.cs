@@ -16,98 +16,53 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace _66SMS.API.Controllers
 {
-
     [ApiVersion("1.0")]
     public class AppointmentController : ApiController<AppointmentController>
     {
         private readonly IMediator mediator;
         private readonly IJwtService jwtService;
+        private readonly IClientIpService clientIpService;
 
-        public AppointmentController(IMediator mediator, IJwtService jwtService)
+        public AppointmentController(IMediator mediator, IJwtService jwtService, IClientIpService clientIpService)
         {
             this.mediator = mediator;
             this.jwtService = jwtService;
+            this.clientIpService = clientIpService;
         }
 
-        /// <summary>
-        /// Lấy danh sách ngày có thể đặt lịch (hôm nay theo giờ VN + các ngày tiếp theo).
-        /// </summary>
         [HttpGet("available-days")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAvailableBookingDays([FromQuery] int days = 7)
+        public async Task<IActionResult> GetAvailableBookingDays([FromQuery] GetAvailableBookingDaysQuery query)
         {
-            var result = await mediator.Send(new GetAvailableBookingDaysQuery
-            {
-                Days = days,
-            });
+            var result = await mediator.Send(query);
             return HandleResult(result);
         }
 
-        /// <summary>
-        /// Lấy danh sách nhân viên  khả dụng cho một dịch vụ vào một ngày cụ thể.
-        /// </summary>
-        /// <param name="date">Ngày muốn đặt lịch (YYYY-MM-DD).</param>
-        /// <param name="serviceId">ID của dịch vụ muốn đặt.</param>
-        /// <returns>Danh sách nhân viên khả dụng.</returns>
         [HttpGet("technicians")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetTechnicians([FromQuery] DateOnly date, [FromQuery] int serviceId, [FromQuery] int? salonId = null)
+        public async Task<IActionResult> GetTechnicians([FromQuery] GetTechniciansQuery query)
         {
-            GetTechniciansQuery query = new()
-            {
-                Date = date,
-                ServiceId = serviceId,
-                SalonId = salonId
-            };
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
 
-        /// <summary>
-        /// Lấy danh sách các khung giờ trống cho một dịch vụ (và nhân viên nếu có) vào một ngày cụ thể.
-        /// </summary>
-        /// <param name="date">Ngày muốn đặt lịch.</param>
-        /// <param name="serviceId">ID của dịch vụ.</param>
-        /// <param name="technicianId">ID của nhân viên (tùy chọn). Nếu không truyền sẽ lấy khung giờ trống của tất cả nhân viên.</param>
-        /// <returns>Danh sách khung giờ trống.</returns>
         [HttpGet("time-slots")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetTimeSlots([FromQuery] DateOnly date, [FromQuery] int serviceId, [FromQuery] int? technicianId, [FromQuery] int? salonId = null)
+        public async Task<IActionResult> GetTimeSlots([FromQuery] GetTimeSlotsQuery query)
         {
-            GetTimeSlotsQuery query = new()
-            {
-                Date = date,
-                ServiceId = serviceId,
-                StaffId = technicianId,
-                SalonId = salonId
-            };
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
 
-        /// <summary>
-        /// Khóa (giữ chỗ) một khung giờ trong thời gian ngắn (ví dụ: 10 phút) để tiến hành đặt lịch, tránh khách khác đặt trùng.
-        /// </summary>
-        /// <param name="command">Thông tin yêu cầu giữ chỗ (SlotId, PositionId...).</param>
-        /// <returns>Thông tin khóa giữ chỗ (LockId) để dùng khi tạo lịch hẹn chính thức.</returns>
         [HttpPost("lock")]
         [Authorize]
-        public async Task<IActionResult> CreateSlotLock([FromBody] List<SlotLockDto> locks)
+        public async Task<IActionResult> CreateSlotLock([FromBody] CreateSlotLockCommand command)
         {
-            var command = new CreateSlotLockCommand
-            {
-                Locks = locks,
-                LockedByUserId = jwtService.GetUserId()
-            };
+            command.LockedByUserId = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
 
-        /// <summary>
-        /// Tạo mới danh sách lịch hẹn.
-        /// </summary>
-        /// <param name="guests">Danh sách chi tiết lịch hẹn của từng khách.</param>
-        /// <returns>Danh sách ID của các lịch hẹn vừa tạo.</returns>
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentCommand command)
@@ -117,19 +72,14 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-        /// <summary>
-        /// Lấy danh sách lịch hẹn của khách hàng đang đăng nhập.
-        /// </summary>
-        /// <returns>Danh sách lịch hẹn cá nhân.</returns>
         [HttpGet("me")]
         [Authorize]
         public async Task<IActionResult> GetMyAppointment()
         {
-            GetAllAppointmentQuery query = new()
+            var result = await mediator.Send(new GetAllAppointmentQuery
             {
                 UserId = jwtService.GetUserId()
-            };
-            var result = await mediator.Send(query);
+            });
             return HandleResult(result);
         }
 
@@ -144,56 +94,29 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-        /// <summary>
-        /// Tạo URL VNPAY đặt cọc sau khi đặt lịch online.
-        /// </summary>
-        /// <param name="id">ID của lịch hẹn</param>
-        /// <returns>URL VNPAY</returns>
-        [HttpGet("{id}/deposit-vnpay-url")]
+        [HttpGet("{appointmentId}/deposit-vnpay-url")]
         [Authorize]
-        public async Task<IActionResult> GetDepositVnPayUrl(int id)
+        public async Task<IActionResult> GetDepositVnPayUrl([FromRoute] GetDepositVnPayUrlQuery query)
         {
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4()?.ToString() ?? "127.0.0.1";
-            if (string.IsNullOrEmpty(ipAddress) || ipAddress == "0.0.0.0") ipAddress = "127.0.0.1";
-            var query = new GetDepositVnPayUrlQuery
-            {
-                AppointmentId = id,
-                IpAddress = ipAddress
-            };
+            query.IpAddress = clientIpService.GetClientIpAddress();
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
 
-        /// <summary>
-        /// Thanh toán tiền cọc bằng số dư Ví (Wallet).
-        /// </summary>
-        /// <param name="id">ID của lịch hẹn</param>
-        [HttpPost("{id}/pay-deposit-wallet")]
+        [HttpPost("{appointmentId}/pay-deposit-wallet")]
         [Authorize]
-        public async Task<IActionResult> PayDepositWithWallet(int id)
+        public async Task<IActionResult> PayDepositWithWallet([FromRoute] PayDepositWithWalletCommand command)
         {
-            var command = new PayDepositWithWalletCommand
-            {
-                AppointmentId = id,
-                UserId = jwtService.GetUserId()
-            };
+            command.UserId = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
 
-        /// <summary>
-        /// Hoãn lịch hẹn và hoàn tiền cọc vào ví.
-        /// </summary>
-        /// <param name="id">ID của lịch hẹn</param>
-        [HttpPost("{id}/postpone")]
+        [HttpPost("{appointmentId}/postpone")]
         [Authorize]
-        public async Task<IActionResult> PostponeAppointment(int id)
+        public async Task<IActionResult> PostponeAppointment([FromRoute] PostponeAppointmentCommand command)
         {
-            var command = new PostponeAppointmentCommand
-            {
-                AppointmentId = id,
-                UserId = jwtService.GetUserId()
-            };
+            command.UserId = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }

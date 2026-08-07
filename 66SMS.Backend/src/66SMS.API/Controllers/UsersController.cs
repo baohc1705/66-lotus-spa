@@ -24,11 +24,13 @@ namespace _66SMS.API.Controllers
     {
         private readonly IMediator mediator;
         private readonly IJwtService jwtService;
+        private readonly IClientIpService clientIpService;
 
-        public UsersController(IMediator mediator, IJwtService jwtService)
+        public UsersController(IMediator mediator, IJwtService jwtService, IClientIpService clientIpService)
         {
             this.mediator = mediator;
             this.jwtService = jwtService;
+            this.clientIpService = clientIpService;
         }
 
         [HttpGet("me")]
@@ -102,12 +104,11 @@ namespace _66SMS.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetWalletTopUpVnPayUrl([FromQuery] decimal amount)
         {
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4()?.ToString() ?? "127.0.0.1";
             var result = await mediator.Send(new GetWalletTopUpVnPayUrlQuery
             {
                 UserId = jwtService.GetUserId(),
                 Amount = amount,
-                IpAddress = ipAddress
+                IpAddress = clientIpService.GetClientIpAddress()
             });
             return HandleResult(result);
         }

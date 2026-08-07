@@ -19,22 +19,22 @@ export function getIsoWeekStart(date: Date): Date {
 export function getRangeForView(
   viewMode: PayrollStatsViewMode,
   anchorDate: Date,
-): { from: string; to: string } {
+): { fromDate: string; toDate: string } {
   if (viewMode === "day") {
     const key = toDateKey(anchorDate);
-    return { from: key, to: key };
+    return { fromDate: key, toDate: key };
   }
 
   if (viewMode === "week") {
     const start = getIsoWeekStart(anchorDate);
     const end = new Date(start);
     end.setDate(end.getDate() + 6);
-    return { from: toDateKey(start), to: toDateKey(end) };
+    return { fromDate: toDateKey(start), toDate: toDateKey(end) };
   }
 
   const start = new Date(anchorDate.getFullYear(), anchorDate.getMonth(), 1);
   const end = new Date(anchorDate.getFullYear(), anchorDate.getMonth() + 1, 0);
-  return { from: toDateKey(start), to: toDateKey(end) };
+  return { fromDate: toDateKey(start), toDate: toDateKey(end) };
 }
 
 export function formatSlotTime(value: string | null | undefined): string {

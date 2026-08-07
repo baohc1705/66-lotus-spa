@@ -18,8 +18,8 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
             GetCashierDailyQuery request,
             CancellationToken cancellationToken)
         {
-            var fromDate = request.Date;
-            var toDate = request.EndDate ?? request.Date;
+            var fromDate = request.Date!.Value;
+            var toDate = request.EndDate ?? request.Date!.Value;
 
             var columnRows = await appointmentRepository.GetCashierStaffColumnsAsync(
                 request.SalonId,

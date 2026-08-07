@@ -64,23 +64,6 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-        //[HttpGet]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> GetAll(string? filter, string? orderBy, bool? isDescending, int? pageIndex, int? pageSize)
-        //{
-        //    var query = new GetAllCustomerQuery
-        //    {
-        //        Filter = filter,
-        //        Status = CustomerConst.STATUS_ACTIVED,
-        //        OrderBy = orderBy,
-        //        IsDescending = isDescending ?? false,
-        //        PageIndex = pageIndex ?? 1,
-        //        PageSize = pageSize ?? 10
-        //    };
-        //    var result = await mediator.Send(query);
-        //    return HandleResult(result);
-        //}
-
         [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetDetail(int id)

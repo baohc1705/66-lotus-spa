@@ -4,12 +4,17 @@ import type { AxiosError } from "axios";
 import { bookingApi } from "../api/booking.api";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type { Result } from "@/shared/types/common.types";
-import type { SlotLockDto, CreateBookingPayload } from "../types/booking.types";
+import type {
+  CreateAppointmentPayload,
+  CreateSlotLockPayload,
+  GetTechniciansParams,
+  GetTimeSlotsParams,
+} from "../types/booking.types";
 
 export const useAvailableBookingDays = (days = 7) => {
   return useQuery({
     queryKey: ["booking-available-days", days],
-    queryFn: () => bookingApi.getAvailableDays(days),
+    queryFn: () => bookingApi.getAvailableDays({ days }),
   });
 };
 
@@ -21,11 +26,16 @@ export const useActivePromotions = () => {
   });
 };
 
-export const useTechnicians = (date: string | null, serviceId?: number, salonId?: number) => {
+export const useTechnicians = (params: GetTechniciansParams) => {
   return useQuery({
-    queryKey: ["booking-technicians", date, serviceId, salonId],
-    queryFn: () => bookingApi.getTechnicians(date as string, serviceId!, salonId),
-    enabled: !!date && !!serviceId,
+    queryKey: [
+      "booking-technicians",
+      params.date,
+      params.serviceId,
+      params.salonId,
+    ],
+    queryFn: () => bookingApi.getTechnicians(params),
+    enabled: !!params.date && !!params.serviceId,
   });
 };
 
@@ -36,24 +46,25 @@ export const useBookingPositions = () => {
   });
 };
 
-export const useTimeSlots = (
-  date: string | null,
-  serviceId?: number,
-  technicianId?: number,
-  salonId?: number
-) => {
+export const useTimeSlots = (params: GetTimeSlotsParams) => {
   return useQuery({
-    queryKey: ["booking-timeslots", date, serviceId, technicianId, salonId],
-    queryFn: () =>
-      bookingApi.getTimeSlots(date as string, serviceId!, technicianId, salonId),
-    enabled: !!date && !!serviceId,
+    queryKey: [
+      "booking-timeslots",
+      params.date,
+      params.serviceId,
+      params.staffId,
+      params.salonId,
+    ],
+    queryFn: () => bookingApi.getTimeSlots(params),
+    enabled: !!params.date && !!params.serviceId,
   });
 };
 
 export const useCreateSlotLock = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: SlotLockDto[]) => bookingApi.createSlotLock(payload),
+    mutationFn: (payload: CreateSlotLockPayload) =>
+      bookingApi.createSlotLock(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["booking-timeslots"] });
       queryClient.invalidateQueries({ queryKey: ["booking-technicians"] });
@@ -62,14 +73,14 @@ export const useCreateSlotLock = () => {
       toast.error(getErrorMessage(error, "Không thể giữ khung giờ"));
       queryClient.invalidateQueries({ queryKey: ["booking-timeslots"] });
       queryClient.invalidateQueries({ queryKey: ["booking-technicians"] });
-    }
+    },
   });
 };
 
 export const useCreateBooking = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreateBookingPayload) =>
+    mutationFn: (payload: CreateAppointmentPayload) =>
       bookingApi.createBooking(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["booking-timeslots"] });

@@ -24,14 +24,10 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMine([FromQuery] string? domain, [FromQuery] int take = 30)
+        public async Task<IActionResult> GetMine([FromQuery] GetMyNotificationsQuery query)
         {
-            var result = await mediator.Send(new GetMyNotificationsQuery
-            {
-                UserId = jwtService.GetUserId(),
-                Domain = domain,
-                Take = take,
-            });
+            query.UserId = jwtService.GetUserId();
+            var result = await mediator.Send(query);
             return HandleResult(result);
         }
 

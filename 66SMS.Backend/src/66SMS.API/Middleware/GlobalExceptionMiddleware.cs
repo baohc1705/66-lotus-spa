@@ -37,16 +37,9 @@ namespace _66SMS.API.Middleware
 
             var response = exception switch
             {
-                ValidationException validationEx =>
-                    Result<object>.BadRequest(
-                        string.Join(", ", validationEx.Errors.Select(e => e.ErrorMessage)),
-                        ErrorCodes.ERR_BAD_REQUEST),
-
-                UnauthorizedAccessException =>
-                    Result<object>.Unauthorized("Unauthorized access."),
-                TransactionRollBackException =>
-                   Result<object>.ServerError(),
-
+                ValidationException validationEx => Result<object>.BadRequest(string.Join(", ", validationEx.Errors.Select(e => e.ErrorMessage)), ErrorCodes.ERR_BAD_REQUEST),
+                UnauthorizedAccessException => Result<object>.Unauthorized("Unauthorized access."),
+                TransactionRollBackException => Result<object>.ServerError(),
                 _ => Result<object>.ServerError("An internal server error occurred.")
             };
 

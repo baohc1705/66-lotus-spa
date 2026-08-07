@@ -49,17 +49,17 @@ export function BookingTimeStep() {
     ? formatDate(selectedDate).format("YYYY-MM-DD")
     : null;
 
-  const { data: technicians = [], isLoading: loadingTechs } = useTechnicians(
-    dateInput,
+  const { data: technicians = [], isLoading: loadingTechs } = useTechnicians({
+    date: dateInput ?? undefined,
     serviceId,
-    selectedSalon?.id,
-  );
-  const { data: timeSlots = [], isLoading: loadingSlots } = useTimeSlots(
-    dateInput,
+    salonId: selectedSalon?.id,
+  });
+  const { data: timeSlots = [], isLoading: loadingSlots } = useTimeSlots({
+    date: dateInput ?? undefined,
     serviceId,
-    selectedTechnician?.id,
-    selectedSalon?.id,
-  );
+    staffId: selectedTechnician?.id,
+    salonId: selectedSalon?.id,
+  });
 
   const visibleTimeSlots = useMemo(
     () => filterSlotsAfterNow(timeSlots, dateInput),
@@ -102,14 +102,14 @@ export function BookingTimeStep() {
 
     try {
       setIsLocking(true);
-      const payload = guestsToLock.map((g) => ({
-        slotId: g.selectedTimeSlot!.slotId,
-        staffId: g.selectedTechnician?.id ?? null,
-        appointmentDate: formatDate(g.selectedDate!).format("YYYY-MM-DD"),
-        serviceId: g.selectedService!.id ?? 0,
-      }));
-
-      const res = await createSlotLock(payload);
+      const res = await createSlotLock({
+        locks: guestsToLock.map((g) => ({
+          slotId: g.selectedTimeSlot!.slotId,
+          staffId: g.selectedTechnician?.id ?? null,
+          appointmentDate: formatDate(g.selectedDate!).format("YYYY-MM-DD"),
+          serviceId: g.selectedService!.id ?? 0,
+        })),
+      });
       if (res.success && res.lockIds) {
         guestsToLock.forEach((g, idx) => {
           const originalIndex = store.guests.findIndex(

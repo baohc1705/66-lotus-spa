@@ -7,6 +7,9 @@ using Microsoft.Extensions.Options;
 
 namespace _66SMS.API.Filters
 {
+    /// <summary>
+    /// Rate limit attribute for Redis.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class RedisRateLimitAttribute : Attribute, IAsyncActionFilter
     {
@@ -31,20 +34,19 @@ namespace _66SMS.API.Filters
                 _ => (10, policy),
             };
 
-            var ip = context.HttpContext.Request.Headers.TryGetValue("X-Forwarded-For", out var forwarded)
-                ? forwarded.ToString().Split(',')[0].Trim()
-                : context.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var ip = context.HttpContext.RequestServices
+                .GetRequiredService<IClientIpService>()
+                .GetClientIpAddress();
 
-            var allowed = await rateLimit.IsAllowedAsync(
-                $"{keyPrefix}:{ip}",
-                limit,
-                TimeSpan.FromMinutes(1),
-                context.HttpContext.RequestAborted);
+            var allowed = await rateLimit.IsAllowedAsync($"{keyPrefix}:{ip}", limit, TimeSpan.FromMinutes(1), context.HttpContext.RequestAborted);
 
             if (!allowed)
             {
                 var result = Result<object>.TooManyRequests("Too many requests. Please try again later.");
-                context.Result = new ObjectResult(result) { StatusCode = 429 };
+                context.Result = new ObjectResult(result)
+                {
+                    StatusCode = 429
+                };
                 return;
             }
 

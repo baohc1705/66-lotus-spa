@@ -162,12 +162,14 @@ function CashierInvoiceSidebarForm({
     return new Date(y, m - 1, d);
   }, [booking.bookingDate]);
 
-  const timeSlotsQuery = useTimeSlots(
-    canEditAssignment && !booking.slotId ? (booking.bookingDate ?? null) : null,
-    booking.serviceId ?? undefined,
-    undefined,
-    salonId ?? undefined,
-  );
+  const timeSlotsQuery = useTimeSlots({
+    date:
+      canEditAssignment && !booking.slotId
+        ? (booking.bookingDate ?? undefined)
+        : undefined,
+    serviceId: booking.serviceId ?? undefined,
+    salonId: salonId ?? undefined,
+  });
 
   const resolvedSlotId = useMemo(() => {
     if (booking.slotId) return booking.slotId;

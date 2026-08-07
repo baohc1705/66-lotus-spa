@@ -103,7 +103,5 @@ namespace _66SMS.API.Controllers
             var result = await mediator.Send(new GetDetailWorkScheduleQuery { Id = id });
             return HandleResult(result);
         }
-
-        
     }
 }

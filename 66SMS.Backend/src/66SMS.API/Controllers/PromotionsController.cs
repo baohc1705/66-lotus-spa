@@ -63,9 +63,6 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-        /// <summary>
-        /// Danh sách khuyến mãi đang hoạt động (còn hiệu lực) — dùng cho màn đặt lịch.
-        /// </summary>
         [HttpGet("active")]
         [AllowAnonymous]
         public async Task<IActionResult> GetActive()

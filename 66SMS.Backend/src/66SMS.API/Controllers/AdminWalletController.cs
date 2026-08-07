@@ -41,24 +41,12 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPost("{id}/transaction")]
-        public async Task<IActionResult> ManualTransaction(int id, [FromBody] ManualTransactionRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> ManualTransaction(int id, [FromBody] ManualWalletTransactionCommand command, CancellationToken cancellationToken)
         {
-            var userId = jwtService.GetUserId();
-            var command = new ManualWalletTransactionCommand
-            {
-                WalletId = id,
-                Amount = request.Amount,
-                Note = request.Note,
-                UserId = userId
-            };
+            command.WalletId = id;
+            command.UserId = jwtService.GetUserId();
             var result = await mediator.Send(command, cancellationToken);
             return HandleResult(result);
         }
-    }
-
-    public class ManualTransactionRequest
-    {
-        public decimal Amount { get; set; }
-        public string Note { get; set; } = null!;
     }
 }

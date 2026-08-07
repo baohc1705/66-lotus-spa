@@ -35,7 +35,7 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetBySalon(int salonId)
         {
-            var result = await mediator.Send(new GetConfigAppointmentBySalonQuery(salonId));
+            var result = await mediator.Send(new GetConfigAppointmentBySalonQuery { SalonId = salonId });
             return HandleResult(result);
         }
 
