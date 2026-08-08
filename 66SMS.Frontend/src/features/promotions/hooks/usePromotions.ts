@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import type { AxiosError } from "axios";
 import { promotionApi } from "../api/promotion.api";
 import type { PageRequest, Result } from "@/shared/types/common.types";

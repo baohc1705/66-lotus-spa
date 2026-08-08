@@ -17,7 +17,7 @@ import { formatDisplayDate, parseToDateInput } from "@/shared/utils/date.utils";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import { Button } from "@/shared/components/ui/button";
 import { FormField } from "@/shared/components/forms/FormField";
 import { AdminInput } from "@/shared/components/forms/AdminInput";

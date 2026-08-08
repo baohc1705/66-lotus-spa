@@ -1,6 +1,6 @@
 ﻿import { useState } from "react";
 import { Bell } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import type { AxiosError } from "axios";
 import { cn } from "@/lib/utils";
 import { toLocalTimeOnly } from "@/shared/utils/date.utils";

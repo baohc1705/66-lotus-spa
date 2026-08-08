@@ -49,3 +49,6 @@ export const kitToast = {
   warning: (message: string, title?: string) => push(message, "warning", title),
   info: (message: string, title?: string) => push(message, "info", title),
 };
+
+/** Alias thay `import { toast } from "sonner"` */
+export const toast = kitToast;

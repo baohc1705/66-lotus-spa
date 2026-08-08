@@ -7,7 +7,7 @@ import type { Result } from "@/shared/types/common.types";
 import type { AxiosError } from "axios";
 import { Loader2, Ticket } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import { bookingApi } from "../api/booking.api";
 import { useActivePromotions } from "../hooks/useBookingData";
 import { useBookingStore } from "../stores/bookingStore";

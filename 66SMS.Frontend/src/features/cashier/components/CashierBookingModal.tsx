@@ -10,7 +10,7 @@ import {
   User,
   X,
 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import type { AxiosError } from "axios";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import {

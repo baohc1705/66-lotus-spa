@@ -6,7 +6,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { useEffect, useMemo } from "react";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import {
   useAvailableBookingDays,
   useTechnicians,

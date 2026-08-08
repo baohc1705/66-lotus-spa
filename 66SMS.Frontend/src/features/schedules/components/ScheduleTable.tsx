@@ -12,7 +12,7 @@ import {
   useUpdateWorkSchedule,
   useDeleteWorkSchedule,
 } from "../hooks/useSchedules";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import { formatDate, DateUtil } from "@/shared/utils/date.utils";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 

@@ -514,30 +514,21 @@ export function DataTablePage() {
               />
             )}
             pagination={
-              <div className="flex flex-wrap items-center justify-between gap-3 py-3">
-                <div className="flex items-center gap-3 text-xs text-kit-muted">
-                  <span>
-                    {totalCount === 0
-                      ? "0"
-                      : (safePage - 1) * pageSize + 1}
-                    -
-                    {Math.min(safePage * pageSize, totalCount)} / {totalCount}
-                  </span>
-                  <select
-                    value={pageSize}
-                    onChange={(e) => {
-                      setPageSize(Number(e.target.value));
-                      setPageIndex(1);
-                    }}
-                    className="h-8 cursor-pointer rounded border border-kit bg-kit-white px-2 text-xs text-kit-heading outline-none focus:border-kit-primary"
-                  >
-                    {[5, 10, 20].map((size: number) => (
-                      <option key={size} value={size}>
-                        {size} / page
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setPageIndex(1);
+                  }}
+                  className="h-8 cursor-pointer rounded border border-kit bg-kit-white px-2 text-xs text-kit-heading outline-none focus:border-kit-primary"
+                >
+                  {[5, 10, 20].map((size: number) => (
+                    <option key={size} value={size}>
+                      {size} / page
+                    </option>
+                  ))}
+                </select>
                 <Pagination
                   page={safePage}
                   pageCount={totalPages}

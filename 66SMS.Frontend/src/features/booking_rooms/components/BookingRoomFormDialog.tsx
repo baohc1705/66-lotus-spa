@@ -132,7 +132,7 @@ export function BookingRoomFormDialog({
       open={open}
       onClose={() => onOpenChange(false)}
       title={isEdit ? "Chỉnh sửa phòng dịch vụ" : "Thêm phòng dịch vụ mới"}
-      size="lg"
+      size="xl"
       scrollable
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

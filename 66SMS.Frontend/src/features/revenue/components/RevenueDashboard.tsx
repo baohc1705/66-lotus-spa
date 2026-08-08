@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { RefreshCw, CalendarRange, Download } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import {

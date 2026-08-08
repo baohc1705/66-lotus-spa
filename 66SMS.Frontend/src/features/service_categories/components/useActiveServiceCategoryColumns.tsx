@@ -1,27 +1,21 @@
 ﻿import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { UseMutationResult } from "@tanstack/react-query";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
-import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
+import { Button } from "@/shared/elements/Button";
+import { Checkbox } from "@/shared/forms/Checkbox";
+import { Switch } from "@/shared/forms/Switch";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { Checkbox } from "@/shared/components/ui/checkbox";
-import { Switch } from "@/shared/components/ui/switch";
-import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
+import { Tooltip } from "@/shared/components/Tooltip";
+import { SortableColumnHeader } from "@/shared/tables/SortableColumnHeader";
 import {
   IndexCell,
   MutedCell,
+  NameCell,
   TextCell,
-} from "@/shared/components/DataTable/TableCells";
+} from "@/shared/tables/TableCells";
 import { StatusActive } from "@/shared/constants/status.enum";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type { Result } from "@/shared/types/common.types";
 
 import { SERVICE_CATEGORY_PERM } from "../constants/serviceCategory.permissions";
@@ -78,24 +72,30 @@ export function useActiveServiceCategoryColumns({
       {
         id: "select",
         header: () => (
-          <Checkbox
-            checked={headerChecked}
-            onCheckedChange={onToggleAll}
-            aria-label="Select all"
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              className="mb-0"
+              checked={headerChecked === true}
+              indeterminate={headerChecked === "indeterminate"}
+              onChange={(checked: boolean) => onToggleAll(checked)}
+              aria-label="Select all"
+            />
+          </div>
         ),
         cell: ({ row }) => {
           const item = row.original;
           return (
-            <Checkbox
-              checked={item.id !== undefined && selectedRowIds.has(item.id)}
-              onCheckedChange={(checked) => {
-                if (item.id === undefined) return;
-                onToggleOne(item.id, checked === true);
-              }}
-              aria-label="Select row"
-              onClick={(e) => e.stopPropagation()}
-            />
+            <div onClick={(e) => e.stopPropagation()}>
+              <Checkbox
+                className="mb-0"
+                checked={item.id !== undefined && selectedRowIds.has(item.id)}
+                onChange={(checked: boolean) => {
+                  if (item.id === undefined) return;
+                  onToggleOne(item.id, checked);
+                }}
+                aria-label="Select row"
+              />
+            </div>
           );
         },
         size: 40,
@@ -120,11 +120,11 @@ export function useActiveServiceCategoryColumns({
         cell: ({ row }) => {
           const icon = row.original.icon;
           return (
-            <div className="w-9 h-9 rounded-lg bg-adminGold-600/10 flex items-center justify-center overflow-hidden">
+            <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-md border border-kit bg-kit-page">
               {icon ? (
-                <img src={icon} alt="" className="w-9 h-9 object-cover" />
+                <img src={icon} alt="" className="h-9 w-9 object-cover" />
               ) : (
-                <span className="text-xs text-adminGray-400">—</span>
+                <span className="text-xs text-kit-muted">—</span>
               )}
             </div>
           );
@@ -138,11 +138,11 @@ export function useActiveServiceCategoryColumns({
         cell: ({ row }) => {
           const imageUrl = row.original.imageUrl;
           return (
-            <div className="w-14 h-9 rounded-lg bg-adminGray-100 flex items-center justify-center overflow-hidden">
+            <div className="flex h-9 w-14 items-center justify-center overflow-hidden rounded-md border border-kit bg-kit-page">
               {imageUrl ? (
-                <img src={imageUrl} alt="" className="w-14 h-9 object-cover" />
+                <img src={imageUrl} alt="" className="h-9 w-14 object-cover" />
               ) : (
-                <span className="text-xs text-adminGray-400">—</span>
+                <span className="text-xs text-kit-muted">—</span>
               )}
             </div>
           );
@@ -159,20 +159,17 @@ export function useActiveServiceCategoryColumns({
             orderBy={orderBy}
             isDescending={isDescending}
             onSort={onSort}
+            onPrimary
           />
         ),
-        cell: ({ row }) => (
-          <span className="text-sm font-semibold text-adminInk truncate max-w-44 block">
-            {row.original.name ?? "—"}
-          </span>
-        ),
+        cell: ({ row }) => <NameCell value={row.original.name} />,
         size: 200,
       },
       {
         accessorKey: "description",
         header: cols.description,
         cell: ({ row }) => <TextCell value={row.original.description} />,
-        size: 300,
+        size: 280,
       },
       {
         accessorKey: "sortOrder",
@@ -183,6 +180,7 @@ export function useActiveServiceCategoryColumns({
             orderBy={orderBy}
             isDescending={isDescending}
             onSort={onSort}
+            onPrimary
           />
         ),
         cell: ({ row }) => <MutedCell value={row.original.sortOrder} />,
@@ -200,7 +198,7 @@ export function useActiveServiceCategoryColumns({
             >
               <Switch
                 checked={item.status === StatusActive.Active}
-                onCheckedChange={(checked) => {
+                onChange={(checked: boolean) => {
                   if (item.id) {
                     updateMutation.mutate({
                       id: item.id,
@@ -217,52 +215,50 @@ export function useActiveServiceCategoryColumns({
             </div>
           );
         },
-        size: 120,
+        size: 100,
       },
       {
         id: "actions",
-        header: "",
+        header: "Thao tác",
         cell: ({ row }) => {
           const item = row.original;
           return (
-            <div onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <div
+              className="flex items-center gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <PermissionGate resource={perm.resource} action={perm.update}>
+                <Tooltip text="Sửa">
                   <Button
-                    variant="ghost"
                     size="icon-sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    variant="outline-primary"
+                    className="mb-0 mr-0"
+                    onClick={() => onEdit(item)}
                   >
-                    <MoreHorizontal className="w-4 h-4" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <PermissionGate resource={perm.resource} action={perm.update}>
-                    <DropdownMenuItem onClick={() => onEdit(item)}>
-                      <Pencil className="w-4 h-4" />
-                      {COMMON_MSG.edit}
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                  <PermissionGate
-                    resource={perm.resource}
-                    action={perm.delete}
-                    role={perm.role}
+                </Tooltip>
+              </PermissionGate>
+              <PermissionGate
+                resource={perm.resource}
+                action={perm.delete}
+                role={perm.role}
+              >
+                <Tooltip text="Xóa">
+                  <Button
+                    size="icon-sm"
+                    variant="outline-danger"
+                    className="mb-0 mr-0"
+                    onClick={() => onDelete(item)}
                   >
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={() => onDelete(item)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Xóa nhóm
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </Tooltip>
+              </PermissionGate>
             </div>
           );
         },
-        size: 50,
+        size: 100,
         enableResizing: false,
       },
     ],

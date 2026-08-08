@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import {
   connectNotificationHub,
@@ -13,7 +13,7 @@ import { useNotificationUiStore } from "../stores/notificationUiStore";
 import type { BookingNotificationMessage, NotificationMessage } from "../types/notification.types";
 
 function handleNotification(msg: NotificationMessage, queryClient: ReturnType<typeof useQueryClient>) {
-  toast.info(msg.title || "Thông báo", { description: msg.message });
+  toast.info(msg.message || "Thông báo", msg.title || "Thông báo");
   useNotificationUiStore.getState().add(msg);
   queryClient.invalidateQueries({ queryKey: ["notifications"] });
 

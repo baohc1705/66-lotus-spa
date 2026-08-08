@@ -30,7 +30,7 @@ import {
   toLocalDateOnly,
   toLocalTimeOnly,
 } from "@/shared/utils/date.utils";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import {
   useCheckIn,
   useCheckOut,

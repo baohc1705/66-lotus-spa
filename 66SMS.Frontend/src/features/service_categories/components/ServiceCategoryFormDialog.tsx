@@ -12,23 +12,16 @@ import {
 } from "../schemas/serviceCategory.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
-import { FormSection } from "@/shared/components/forms/FormSection";
 import { Box } from "lucide-react";
-import { FormField } from "@/shared/components/forms/FormField";
-import { AdminInput } from "@/shared/components/forms/AdminInput";
-import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
-import { Switch } from "@/shared/components/ui/switch";
+
+import { Modal } from "@/shared/components/Modal";
 import { ImageUpload } from "@/shared/components/ImageUpload";
+import { Button } from "@/shared/elements/Button";
+import { FormField } from "@/shared/forms/FormField";
+import { FormSection } from "@/shared/forms/FormSection";
+import { Input } from "@/shared/forms/Input";
+import { Switch } from "@/shared/forms/Switch";
+import { Textarea } from "@/shared/forms/Textarea";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
@@ -126,123 +119,121 @@ export function ServiceCategoryFormDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[850px]">
-        <DialogHeader>
-          <DialogTitle>
-            {isEdit ? "Chỉnh sửa nhóm dịch vụ" : "Thêm nhóm dịch vụ mới"}
-          </DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? `Cập nhật thông tin nhóm dịch vụ ${serviceCategory?.name ?? ""}`
-              : "Điền thông tin để tạo nhóm dịch vụ"}
-          </DialogDescription>
-        </DialogHeader>
+    <Modal
+      open={open}
+      onClose={() => onOpenChange(false)}
+      title={isEdit ? "Chỉnh sửa nhóm dịch vụ" : "Thêm nhóm dịch vụ mới"}
+      size="xl"
+      scrollable
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <FormSection icon={Box} title="Thông tin nhóm dịch vụ">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <FormField label="Icon" tooltip="Ảnh icon nhỏ cho nhóm dịch vụ">
+              <ImageUpload
+                key={`icon-${open}-${serviceCategory?.id ?? "new"}`}
+                value={watch("icon") || serviceCategory?.icon}
+                onFileChange={setPendingIconFile}
+                shape="square"
+                label="Chọn icon"
+              />
+            </FormField>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <FormSection icon={Box} title="Thông tin nhóm dịch vụ">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <FormField label="Icon" tooltip="Ảnh icon nhỏ cho nhóm dịch vụ">
-                <ImageUpload
-                  key={`icon-${open}-${serviceCategory?.id ?? "new"}`}
-                  value={watch("icon") || serviceCategory?.icon}
-                  onFileChange={setPendingIconFile}
-                  shape="square"
-                  label="Chọn icon"
+            <FormField
+              label="Ảnh đại diện"
+              tooltip="Ảnh lớn hiển thị nhóm dịch vụ"
+            >
+              <ImageUpload
+                key={`image-${open}-${serviceCategory?.id ?? "new"}`}
+                value={watch("imageUrl") || serviceCategory?.imageUrl}
+                onFileChange={setPendingImageFile}
+                shape="square"
+                label="Chọn ảnh"
+              />
+            </FormField>
+
+            <FormField
+              label="Tên nhóm dịch vụ"
+              tooltip="Vui lòng nhập vào tên nhóm dịch vụ"
+              error={errors.name?.message}
+            >
+              <Input
+                {...register("name")}
+                placeholder="Chăm sóc da cơ bản"
+                invalid={!!errors.name}
+              />
+            </FormField>
+
+            <FormField
+              label="Thứ tự hiển thị"
+              tooltip="Số nhỏ sẽ được ưu tiên hiển thị trước"
+              error={errors.sortOrder?.message}
+            >
+              <Input
+                {...register("sortOrder", { valueAsNumber: true })}
+                type="number"
+                placeholder="0"
+                invalid={!!errors.sortOrder}
+              />
+            </FormField>
+
+            <FormField
+              label="Trạng thái"
+              tooltip="Bật để kích hoạt nhóm dịch vụ"
+              error={errors.status?.message}
+            >
+              <div className="flex h-9 items-center">
+                <Switch
+                  checked={watch("status") === StatusActive.Active}
+                  onChange={(checked: boolean) =>
+                    setValue(
+                      "status",
+                      checked ? StatusActive.Active : StatusActive.Inactive,
+                    )
+                  }
                 />
-              </FormField>
-
-              <FormField
-                label="Ảnh đại diện"
-                tooltip="Ảnh lớn hiển thị nhóm dịch vụ"
-              >
-                <ImageUpload
-                  key={`image-${open}-${serviceCategory?.id ?? "new"}`}
-                  value={watch("imageUrl") || serviceCategory?.imageUrl}
-                  onFileChange={setPendingImageFile}
-                  shape="square"
-                  label="Chọn ảnh"
-                />
-              </FormField>
-
-              <FormField
-                label="Tên nhóm dịch vụ"
-                tooltip="Vui lòng nhập vào tên nhóm dịch vụ"
-                error={errors.name?.message}
-              >
-                <AdminInput
-                  {...register("name")}
-                  placeholder="Chăm sóc da cơ bản"
-                />
-              </FormField>
-
-              <FormField
-                label="Thứ tự hiển thị"
-                tooltip="Số nhỏ sẽ được ưu tiên hiển thị trước"
-                error={errors.sortOrder?.message}
-              >
-                <AdminInput
-                  {...register("sortOrder", { valueAsNumber: true })}
-                  type="number"
-                  placeholder="0"
-                />
-              </FormField>
-
-              <FormField
-                label="Trạng thái"
-                tooltip="Bật để kích hoạt nhóm dịch vụ"
-                error={errors.status?.message}
-              >
-                <div className="flex items-center h-9">
-                  <Switch
-                    checked={watch("status") === StatusActive.Active}
-                    onCheckedChange={(checked) =>
-                      setValue(
-                        "status",
-                        checked ? StatusActive.Active : StatusActive.Inactive,
-                      )
-                    }
-                  />
-                </div>
-              </FormField>
-
-              <div className="sm:col-span-2">
-                <FormField
-                  label="Mô tả"
-                  tooltip="Không dài quá 500 ký tự"
-                  error={errors.description?.message}
-                >
-                  <AdminTextarea
-                    {...register("description")}
-                    placeholder="Mô tả nhóm dịch vụ ở đây"
-                  />
-                </FormField>
               </div>
-            </div>
-          </FormSection>
+            </FormField>
 
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending || isUploading}
+            <FormField
+              label="Mô tả"
+              tooltip="Không dài quá 500 ký tự"
+              error={errors.description?.message}
+              className="sm:col-span-2"
             >
-              {COMMON_MSG.cancel}
-            </Button>
-            <Button
-              type="submit"
-              variant="admin"
-              size="sm"
-              loading={isPending || isUploading}
-            >
-              {isEdit ? "Cập nhật" : "Tạo nhóm dịch vụ"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+              <Textarea
+                {...register("description")}
+                placeholder="Mô tả nhóm dịch vụ ở đây"
+                rows={3}
+                invalid={!!errors.description}
+              />
+            </FormField>
+          </div>
+        </FormSection>
+
+        <div className="flex justify-end gap-2 border-t border-kit pt-3">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="mb-0"
+            onClick={() => onOpenChange(false)}
+            disabled={isPending || isUploading}
+          >
+            {COMMON_MSG.cancel}
+          </Button>
+          <Button
+            type="submit"
+            variant="admin"
+            size="sm"
+            className="mb-0"
+            loading={isPending || isUploading}
+          >
+            {isEdit ? "Cập nhật" : "Tạo nhóm dịch vụ"}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }
 

@@ -40,7 +40,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 
 interface POSOrderItem {
   itemType: number;

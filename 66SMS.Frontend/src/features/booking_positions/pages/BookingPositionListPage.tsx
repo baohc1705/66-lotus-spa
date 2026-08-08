@@ -74,11 +74,8 @@ export function BookingPositionListPage() {
 
   const paged = positionResult?.data;
   const positions = useMemo(() => paged?.items ?? [], [paged?.items]);
-  const totalCount = paged?.totalCount ?? 0;
   const totalPages = Math.max(1, paged?.totalPages ?? 0);
   const safePage = Math.min(pageIndex, totalPages);
-  const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
-  const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
   const allPositions = useMemo(
     () => allPositionsResult?.data?.items ?? [],
@@ -183,25 +180,19 @@ export function BookingPositionListPage() {
               loadingRows={DEFAULT_LOADING_ROWS}
               pagination={
                 <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
-                  <div className="flex items-center gap-3 text-xs text-kit-muted">
-                    <span>
-                      {totalCount === 0 ? "0" : `${rangeStart}-${rangeEnd}`} /{" "}
-                      {totalCount}
-                    </span>
-                    <select
-                      value={pageSize}
-                      onChange={(e) =>
-                        handlePageSizeChange(Number(e.target.value))
-                      }
-                      className="h-8 cursor-pointer rounded border border-kit bg-kit-white px-2 text-xs text-kit-heading outline-none focus:border-kit-primary"
-                    >
-                      {[5, 10, 20].map((size: number) => (
-                        <option key={size} value={size}>
-                          {size} / trang
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <select
+                    value={pageSize}
+                    onChange={(e) =>
+                      handlePageSizeChange(Number(e.target.value))
+                    }
+                    className="h-8 cursor-pointer rounded border border-kit bg-kit-white px-2 text-xs text-kit-heading outline-none focus:border-kit-primary"
+                  >
+                    {[5, 10, 20].map((size: number) => (
+                      <option key={size} value={size}>
+                        {size} / trang
+                      </option>
+                    ))}
+                  </select>
                   <Pagination
                     page={safePage}
                     pageCount={totalPages}

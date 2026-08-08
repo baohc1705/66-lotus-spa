@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { CalendarDays, Copy, AlertCircle } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import { formatDate, DateUtil } from "@/shared/utils/date.utils";
 import { useBulkCreateWorkSchedule } from "../hooks/useSchedules";
 import type { WorkScheduleDTO } from "../types/schedule.types";

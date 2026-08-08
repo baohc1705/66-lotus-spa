@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import type { AxiosError } from "axios";
 import { staffApi } from "../api/staff.api";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";

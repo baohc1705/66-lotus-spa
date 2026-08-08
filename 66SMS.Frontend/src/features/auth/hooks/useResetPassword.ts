@@ -3,7 +3,7 @@ import type { AxiosError } from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { authApi } from '@/features/auth/api/authApi'
 import { getErrorMessage } from '@/shared/utils/errorUtils'
-import { toast } from 'sonner'
+import { toast } from "@/shared/components/kitToast";
 import type { Result } from '@/shared/types/common.types'
 
 export const useResetPassword = () => {

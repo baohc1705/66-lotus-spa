@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { AxiosError } from "axios";
 import { Loader2, Ticket } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import { bookingApi } from "@/features/booking/api/booking.api";
 import { useActivePromotions } from "@/features/booking/hooks/useBookingData";
 import type { ActivePromotionDto } from "@/features/booking/types/booking.types";

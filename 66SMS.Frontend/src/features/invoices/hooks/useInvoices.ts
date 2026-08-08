@@ -2,7 +2,7 @@ import type { AxiosError } from "axios";
 import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import { invoiceApi } from "../api/invoice.api";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";
 import { COMMON_MSG } from "@/shared/constants/common.messages";

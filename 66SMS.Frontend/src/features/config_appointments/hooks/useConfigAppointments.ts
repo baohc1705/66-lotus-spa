@@ -7,7 +7,7 @@ import {
 } from "../api/configAppointment.api";
 import type { Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type {

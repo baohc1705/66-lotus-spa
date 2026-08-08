@@ -4,25 +4,24 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { Activity, ArrowLeft, Plus, Trash2 } from "lucide-react";
-import { motion } from "motion/react";
 import { useCallback, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { TableEmptyState } from "@/shared/components/DataTable/TableEmptyState";
-import { TableSelectionBar } from "@/shared/components/DataTable/TableSelectionBar";
+import { Pagination } from "@/shared/components/Pagination";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { Button } from "@/shared/components/ui/button";
+import { Button } from "@/shared/elements/Button";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
+import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
+import { TableSelectionBar } from "@/shared/tables/TableSelectionBar";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { useRowSelection } from "@/shared/hooks/useRowSelection";
-import { containerVariants } from "@/shared/motion/pageVariants";
 
 import { ServiceCategorySidebar } from "../components/ServiceCategorySidebar";
 import { ServiceDetailExpanded } from "../components/ServiceDetailExpanded";
@@ -101,6 +100,10 @@ export function ServiceListPage() {
   const paged = serviceResult?.data;
   const services = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
+  const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
   const activeServiceCount = useMemo(
     () =>
@@ -171,7 +174,6 @@ export function ServiceListPage() {
 
   const columns = showDeleted ? deletedColumns : activeColumns;
 
-  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: services,
     columns,
@@ -184,6 +186,8 @@ export function ServiceListPage() {
     columnResizeMode: "onChange",
     state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
+    manualPagination: true,
+    manualSorting: true,
   });
 
   const handleDelete = useCallback(() => {
@@ -230,45 +234,28 @@ export function ServiceListPage() {
   const isSidebarMode = layoutMode === "sidebar";
 
   return (
-    <div className="flex h-full overflow-hidden gap-2">
-      {!isSidebarMode && (
-        <ServiceCategorySidebar
-          selectedCategoryId={selectedCategoryId}
-          onSelectCategory={setSelectedCategoryId}
-          showDeleted={showDeleted}
-        />
-      )}
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
+      <ServiceStatCards
+        totalServices={totalCount}
+        activeServices={activeServiceCount}
+        servicesWithImage={servicesWithImage}
+        avgDurationMins={avgDurationMins}
+        isLoading={isLoading}
+      />
 
-      <div className="flex-1 min-w-0 flex flex-col gap-2 overflow-hidden">
-        <div className="shrink-0">
-          <ServiceStatCards
-            totalServices={totalCount}
-            activeServices={activeServiceCount}
-            servicesWithImage={servicesWithImage}
-            avgDurationMins={avgDurationMins}
-            isLoading={isLoading}
+      <div className="flex flex-col items-start gap-3 md:flex-row">
+        {!isSidebarMode && (
+          <ServiceCategorySidebar
+            selectedCategoryId={selectedCategoryId}
+            onSelectCategory={setSelectedCategoryId}
+            showDeleted={showDeleted}
           />
-        </div>
+        )}
 
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={containerVariants}
-          className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative"
-        >
-          {isFetching && !isLoading && (
-            <div className="lotus-admin-table-fetch-bar">
-              <div className="lotus-admin-table-fetch-bar-inner" />
-            </div>
-          )}
-
-          <div className="px-4 pt-3 shrink-0">
-            <DataTableToolbar
-              searchValue={filter}
-              onSearchChange={handleSearchChange}
-              searchPlaceholder="Tìm kiếm dịch vụ..."
-            >
-              {selectedCount > 0 && !showDeleted && (
+        <div className="w-full min-w-0 flex-1">
+          <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+            <div className="border-b border-kit px-3 pt-3">
+              {selectedCount > 0 && !showDeleted ? (
                 <TableSelectionBar
                   count={selectedCount}
                   onClear={clearSelection}
@@ -279,136 +266,158 @@ export function ServiceListPage() {
                       role={perm.role}
                     >
                       <Button
-                        variant="destructive"
+                        variant="danger"
                         size="sm"
-                        className="lotus-admin-btn-toolbar"
+                        className="mb-0"
                         onClick={() => setBulkDeleteOpen(true)}
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="h-3.5 w-3.5" />
                         Xóa đã chọn
                       </Button>
                     </PermissionGate>
                   }
                 />
-              )}
+              ) : null}
 
-              {!showDeleted && (
-                <DataTableViewOptions
-                  table={table}
-                  columnLabels={columnLabels}
-                />
-              )}
-
-              <PermissionGate
-                resource={perm.resource}
-                action={perm.create}
-                role={perm.role}
+              <DataTableToolbar
+                searchValue={filter}
+                onSearchChange={handleSearchChange}
+                searchPlaceholder="Tìm kiếm dịch vụ..."
               >
-                <Button
-                  variant="admin"
-                  size="sm"
-                  onClick={() => setCreateOpen(true)}
-                  className="lotus-admin-table-toolbar-btn"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Thêm dịch vụ
-                </Button>
-              </PermissionGate>
+                {!showDeleted && (
+                  <DataTableViewOptions
+                    table={table}
+                    columnLabels={columnLabels}
+                  />
+                )}
 
-              <PermissionGate
-                resource={perm.resource}
-                action={perm.read}
-                role={perm.role}
-              >
-                <Button
-                  variant="admin"
-                  size="sm"
-                  className="lotus-admin-table-toolbar-btn"
-                  onClick={() => handleToggleView(clearSelection)}
-                  title={showDeleted ? "Quay lại danh sách" : "Dịch vụ đã xóa"}
+                <PermissionGate
+                  resource={perm.resource}
+                  action={perm.create}
+                  role={perm.role}
                 >
-                  {showDeleted ? (
-                    <>
-                      <ArrowLeft className="w-4 h-4" />
-                      {COMMON_MSG.back}
-                    </>
-                  ) : (
-                    <>
-                      <Trash2 className="w-4 h-4" />
-                      {COMMON_MSG.restore}
-                    </>
-                  )}
-                </Button>
-              </PermissionGate>
-            </DataTableToolbar>
-          </div>
+                  <Button
+                    variant="admin"
+                    size="sm"
+                    className="mb-0"
+                    onClick={() => setCreateOpen(true)}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Thêm dịch vụ
+                  </Button>
+                </PermissionGate>
 
-          <DataTable
-            table={table}
-            isLoading={isLoading}
-            loadingRows={
-              pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
-            }
-            onRowClick={showDeleted ? undefined : (row) => row.toggleExpanded()}
-            renderSubComponent={
-              showDeleted
-                ? undefined
-                : ({ row }) =>
-                    row.original.id ? (
-                      <ServiceDetailExpanded
-                        serviceId={row.original.id}
-                        onEdit={(service) => setEditTarget(service)}
-                      />
-                    ) : null
-            }
-            emptyState={
-              showDeleted ? (
-                <TableEmptyState
-                  icon={Trash2}
-                  title="Không có dịch vụ đã xóa"
-                  hint="Các dịch vụ bị xóa sẽ hiển thị tại đây."
-                />
-              ) : (
-                <TableEmptyState
-                  icon={Activity}
-                  title="Chưa có dịch vụ"
-                  hint="Thêm dịch vụ mới để bắt đầu quản lý."
-                  action={
-                    <PermissionGate
-                      resource={perm.resource}
-                      action={perm.create}
-                      role={perm.role}
-                    >
-                      <Button
-                        variant="admin"
-                        size="sm"
-                        onClick={() => setCreateOpen(true)}
-                        className="mt-1 text-xs"
+                <PermissionGate
+                  resource={perm.resource}
+                  action={perm.read}
+                  role={perm.role}
+                >
+                  <Button
+                    variant="admin"
+                    size="sm"
+                    className="mb-0"
+                    onClick={() => handleToggleView(clearSelection)}
+                  >
+                    {showDeleted ? (
+                      <>
+                        <ArrowLeft className="h-4 w-4" />
+                        {COMMON_MSG.back}
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4" />
+                        {COMMON_MSG.restore}
+                      </>
+                    )}
+                  </Button>
+                </PermissionGate>
+              </DataTableToolbar>
+            </div>
+
+            <DataTable
+              table={table}
+              isLoading={isLoading}
+              loadingRows={
+                pageSize > DEFAULT_LOADING_ROWS
+                  ? DEFAULT_LOADING_ROWS
+                  : pageSize
+              }
+              renderExpandedRow={
+                showDeleted
+                  ? undefined
+                  : ({ row }) =>
+                      row.original.id ? (
+                        <ServiceDetailExpanded
+                          serviceId={row.original.id}
+                          onEdit={(service) => setEditTarget(service)}
+                        />
+                      ) : null
+              }
+              emptyState={
+                showDeleted ? (
+                  <TableEmptyState
+                    icon={Trash2}
+                    title="Không có dịch vụ đã xóa"
+                    hint="Các dịch vụ bị xóa sẽ hiển thị tại đây."
+                  />
+                ) : (
+                  <TableEmptyState
+                    icon={Activity}
+                    title="Chưa có dịch vụ"
+                    hint="Thêm dịch vụ mới để bắt đầu quản lý."
+                    action={
+                      <PermissionGate
+                        resource={perm.resource}
+                        action={perm.create}
+                        role={perm.role}
                       >
-                        <Plus className="w-3.5 h-3.5" />
-                        Thêm dịch vụ
-                      </Button>
-                    </PermissionGate>
-                  }
-                />
-              )
-            }
-            pagination={
-              paged && totalCount > 0 ? (
-                <DataTablePagination
-                  pageIndex={paged.pageIndex}
-                  pageSize={paged.pageSize}
-                  totalCount={paged.totalCount}
-                  totalPages={paged.totalPages}
-                  hasPreviousPage={paged.hasPreviousPage}
-                  hasNextPage={paged.hasNextPage}
-                  onPageChange={setPageIndex}
-                  onPageSizeChange={handlePageSizeChange}
-                />
-              ) : null
-            }
-          />
-        </motion.div>
+                        <Button
+                          variant="admin"
+                          size="sm"
+                          className="mb-0"
+                          onClick={() => setCreateOpen(true)}
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                          Thêm dịch vụ
+                        </Button>
+                      </PermissionGate>
+                    }
+                  />
+                )
+              }
+              pagination={
+                paged && totalCount > 0 ? (
+                  <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                    <div className="flex items-center gap-3 text-xs text-kit-muted">
+                      <span>
+                        {rangeStart}-{rangeEnd} / {totalCount}
+                      </span>
+                      <select
+                        value={pageSize}
+                        onChange={(e) =>
+                          handlePageSizeChange(Number(e.target.value))
+                        }
+                        className="h-8 cursor-pointer rounded border border-kit bg-kit-white px-2 text-xs text-kit-heading outline-none focus:border-kit-primary"
+                      >
+                        {[5, 10, 20].map((size: number) => (
+                          <option key={size} value={size}>
+                            {size} / trang
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <Pagination
+                      page={safePage}
+                      pageCount={totalPages}
+                      onPageChange={setPageIndex}
+                      size="sm"
+                    />
+                  </div>
+                ) : null
+              }
+            />
+          </TablePageShell>
+        </div>
       </div>
 
       <ServiceFormDialog open={createOpen} onOpenChange={setCreateOpen} />

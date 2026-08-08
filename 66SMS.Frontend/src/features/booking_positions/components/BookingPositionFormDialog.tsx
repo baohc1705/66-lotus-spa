@@ -116,7 +116,7 @@ export function BookingPositionFormDialog({
       open={open}
       onClose={() => onOpenChange(false)}
       title={isEdit ? "Chỉnh sửa vị trí dịch vụ" : "Thêm vị trí dịch vụ mới"}
-      size="lg"
+      size="xl"
       scrollable
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

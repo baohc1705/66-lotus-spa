@@ -8,7 +8,7 @@ import {
   addManualTransaction,
 } from "../api/wallet.api";
 import type { AdminWalletTransactionDto } from "../types/wallet.types";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import {
   Dialog,
   DialogContent,

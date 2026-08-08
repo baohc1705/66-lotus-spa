@@ -3,7 +3,7 @@ import { invoiceApi } from "@/features/invoices/api/invoice.api";
 import type { InvoiceDto } from "@/features/invoices/types/invoice.types";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import { cashierApi } from "../api/cashier.api";
 import { CashierBookingModal } from "../components/CashierBookingModal";
 import { CashierGrid } from "../components/CashierGrid";

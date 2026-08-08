@@ -1,7 +1,7 @@
 import { formatCurrency } from "@/shared/utils/currency";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import {
   ChevronDown,
   ChevronUp,
