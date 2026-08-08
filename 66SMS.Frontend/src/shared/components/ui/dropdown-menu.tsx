@@ -85,7 +85,7 @@ function DropdownMenuItem({
       data-slot="dropdown-menu-item"
       data-inset={inset}
       data-variant={variant}
-      className={cn("relative flex cursor-default select-none items-center gap-3 px-4 py-2 text-sm outline-none transition-colors data-inset:pl-8 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", variant === "default" && "text-lotus-deep focus:bg-adminGray-50/50", variant === "destructive" && "text-state-danger-text focus:bg-state-danger-bg focus:text-state-danger-text", className)}
+      className={cn("relative flex cursor-default select-none items-center gap-3 px-4 py-2 text-sm outline-hidden transition-colors data-inset:pl-8 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", variant === "default" && "text-lotus-deep focus:bg-adminGray-50/50", variant === "destructive" && "text-state-danger-text focus:bg-state-danger-bg focus:text-state-danger-text", className)}
       {...props}
     />
   )
@@ -100,7 +100,7 @@ function DropdownMenuCheckboxItem({
   return (
     <DropdownMenuPrimitive.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
-      className={cn("relative flex cursor-default select-none items-center gap-2 py-2 pl-8 pr-4 text-sm outline-none transition-colors text-lotus-deep focus:bg-adminGray-50/50 data-disabled:pointer-events-none data-disabled:opacity-50", className)}
+      className={cn("relative flex cursor-default select-none items-center gap-2 py-2 pl-8 pr-4 text-sm outline-hidden transition-colors text-lotus-deep focus:bg-adminGray-50/50 data-disabled:pointer-events-none data-disabled:opacity-50", className)}
       checked={checked}
       {...props}
     >
@@ -122,7 +122,7 @@ function DropdownMenuRadioItem({
   return (
     <DropdownMenuPrimitive.RadioItem
       data-slot="dropdown-menu-radio-item"
-      className={cn("relative flex cursor-default select-none items-center gap-2 py-2 pl-8 pr-4 text-sm outline-none transition-colors text-lotus-deep focus:bg-adminGray-50/50 data-disabled:pointer-events-none data-disabled:opacity-50", className)}
+      className={cn("relative flex cursor-default select-none items-center gap-2 py-2 pl-8 pr-4 text-sm outline-hidden transition-colors text-lotus-deep focus:bg-adminGray-50/50 data-disabled:pointer-events-none data-disabled:opacity-50", className)}
       {...props}
     >
       <span className="absolute left-2 flex size-4 items-center justify-center text-adminGreen-600">
@@ -174,7 +174,7 @@ function DropdownMenuSubTrigger({
 }) {
   return (
     <DropdownMenuPrimitive.SubTrigger
-      className={cn("flex cursor-default select-none items-center gap-2 px-4 py-2 text-sm outline-none text-lotus-deep focus:bg-adminGray-50/50 data-inset:pl-8", inset && "pl-8", className)}
+      className={cn("flex cursor-default select-none items-center gap-2 px-4 py-2 text-sm outline-hidden text-lotus-deep focus:bg-adminGray-50/50 data-inset:pl-8", inset && "pl-8", className)}
       {...props}
     >
       {children}

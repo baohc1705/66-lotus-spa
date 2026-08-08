@@ -135,7 +135,7 @@ export function WorkSchedulePage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm kiếm nhân viên..."
-                className="pl-9 pr-4 py-2 bg-white border border-adminGray-100/50 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-adminGreen-600 w-full transition-shadow placeholder:text-adminGray-400"
+                className="pl-9 pr-4 py-2 bg-white border border-adminGray-100/50 rounded-lg text-sm focus:outline-hidden focus:ring-1 focus:ring-adminGreen-600 w-full transition-shadow placeholder:text-adminGray-400"
               />
             </div>
           )}
@@ -146,7 +146,7 @@ export function WorkSchedulePage() {
                 onClick={() => setViewMode("shift")}
                 className={`flex items-center gap-1.5 px-3 rounded-md text-sm font-semibold transition-colors ${
                   viewMode === "shift"
-                    ? "bg-white text-adminGreen-600 shadow-sm"
+                    ? "bg-white text-adminGreen-600 shadow-xs"
                     : "text-adminGray-600 hover:text-adminInk"
                 }`}
               >
@@ -157,7 +157,7 @@ export function WorkSchedulePage() {
                 onClick={() => setViewMode("staff")}
                 className={`flex items-center gap-1.5 px-3 rounded-md text-sm font-semibold transition-colors ${
                   viewMode === "staff"
-                    ? "bg-white text-adminGreen-600 shadow-sm"
+                    ? "bg-white text-adminGreen-600 shadow-xs"
                     : "text-adminGray-600 hover:text-adminInk"
                 }`}
               >
@@ -168,7 +168,7 @@ export function WorkSchedulePage() {
                 onClick={() => setViewMode("single")}
                 className={`flex items-center gap-1.5 px-3 rounded-md text-sm font-semibold transition-colors ${
                   viewMode === "single"
-                    ? "bg-white text-adminGreen-600 shadow-sm"
+                    ? "bg-white text-adminGreen-600 shadow-xs"
                     : "text-adminGray-600 hover:text-adminInk"
                 }`}
               >
@@ -184,7 +184,7 @@ export function WorkSchedulePage() {
               onChange={(e) =>
                 setSelectedStaffId(Number(e.target.value) || null)
               }
-              className="px-3 py-1.5 border border-adminGray-100/50 rounded-lg bg-white text-sm font-semibold h-9 focus:outline-none focus:ring-1 focus:ring-adminGreen-600 text-adminInk"
+              className="px-3 py-1.5 border border-adminGray-100/50 rounded-lg bg-white text-sm font-semibold h-9 focus:outline-hidden focus:ring-1 focus:ring-adminGreen-600 text-adminInk"
             >
               <option value="">-- Chọn nhân viên --</option>
               {staffList.map((emp) => (

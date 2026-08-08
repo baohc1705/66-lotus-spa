@@ -1,14 +1,222 @@
-@import "@fontsource-variable/geist";
-@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
+@import 'tailwindcss';
+@import '@fontsource-variable/geist';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import './admin.css';
+@import './admin.utilities.css';
+@import './tokens.css';
 
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-@import "./admin.css";
-@import "./tokens.css";
+@theme {
+  --font-sans: 'Be Vietnam Pro', ui-sans-serif, system-ui, sans-serif;
+  --font-geist: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-mono: 'DM Mono', ui-monospace, SFMono-Regular, monospace;
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+  --text-3xs: 0.5625rem;
+  --text-3xs--line-height: 0.75rem;
+  --text-2xs: 0.625rem;
+  --text-2xs--line-height: 0.875rem;
+
+  --radius-admin: var(--admin-radius, 10px);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
+
+  --color-background: rgb(var(--background));
+  --color-foreground: rgb(var(--foreground));
+
+  --color-card: rgb(var(--card));
+  --color-card-foreground: rgb(var(--card-foreground));
+
+  --color-popover: rgb(var(--popover));
+  --color-popover-foreground: rgb(var(--popover-foreground));
+
+  --color-primary: rgb(var(--primary));
+  --color-primary-foreground: rgb(var(--primary-foreground));
+
+  --color-secondary: rgb(var(--secondary));
+  --color-secondary-foreground: rgb(var(--secondary-foreground));
+
+  --color-muted: rgb(var(--muted));
+  --color-muted-foreground: rgb(var(--muted-foreground));
+
+  --color-accent: rgb(var(--accent));
+  --color-accent-foreground: rgb(var(--accent-foreground));
+
+  --color-destructive: rgb(var(--destructive));
+  --color-border: rgb(var(--border));
+  --color-input: rgb(var(--input));
+  --color-ring: rgb(var(--ring));
+  --color-status-pending: rgb(var(--status-pending));
+  --color-status-confirmed: rgb(var(--status-confirmed));
+  --color-status-waiting: rgb(var(--status-waiting));
+  --color-status-in-progress: rgb(var(--status-in-progress));
+  --color-status-completed: rgb(var(--status-completed));
+  --color-status-cancelled: rgb(var(--status-cancelled));
+  --color-lotus-primary: var(--lotus-primary);
+  --color-lotus-secondary: var(--lotus-secondary);
+  --color-lotus-background: var(--lotus-background);
+  --color-lotus-foreground: var(--lotus-foreground);
+  --color-lotus-accent: var(--lotus-accent);
+  --color-lotus-highlight: var(--lotus-highlight);
+  --color-lotus-muted: var(--lotus-muted);
+  --color-lotus-surface: var(--lotus-surface);
+  --color-lotus-rose: var(--lotus-rose);
+  --color-lotus-gold: var(--lotus-gold);
+  --color-lotus-leaf: var(--lotus-leaf);
+  --color-lotus-leaf-light: var(--lotus-leaf-light);
+  --color-lotus-cream: var(--lotus-cream);
+  --color-lotus-deep: var(--lotus-deep);
+  --color-lotus-stone: var(--lotus-stone);
+  --color-lotus-rose-light: var(--lotus-rose-light);
+  --color-lotus-inset: var(--lotus-inset);
+  --color-lotus-error: var(--lotus-error);
+  --color-lotus-vnpay: var(--lotus-vnpay);
+  --color-lotus-vnpay-red: var(--lotus-vnpay-red);
+  --color-lotus-rose-dark: var(--lotus-rose-dark);
+
+  --color-rose-50: var(--rose-50);
+  --color-rose-100: var(--rose-100);
+  --color-rose-200: var(--rose-200);
+  --color-rose-400: var(--rose-400);
+  --color-rose-500: var(--rose-500);
+  --color-rose-600: var(--rose-600);
+  --color-rose-800: var(--rose-800);
+  --color-rose-900: var(--rose-900);
+
+  --color-gold-100: var(--gold-100);
+  --color-gold-600: var(--gold-600);
+  --color-gold-700: var(--gold-700);
+
+  --color-ink: var(--ink);
+
+  --color-warm-50: var(--warm-50);
+  --color-warm-100: var(--warm-100);
+  --color-warm-300: var(--warm-300);
+  --color-warm-400: var(--warm-400);
+  --color-warm-600: var(--warm-600);
+
+  --color-page: var(--bg-page);
+  --color-surface: var(--bg-surface);
+  --color-card-border: var(--border-card);
+
+  --color-success: var(--success-text);
+  --color-success-bg: var(--success-bg);
+  --color-success-text: var(--success-text);
+
+  --color-error: var(--error-text);
+  --color-error-bg: var(--error-bg);
+  --color-error-text: var(--error-text);
+
+  --color-warning: var(--warning-text);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-text: var(--warning-text);
+
+  --color-adminGreen-50: var(--admin-green-50);
+  --color-adminGreen-100: var(--admin-green-100);
+  --color-adminGreen-200: var(--admin-green-200);
+  --color-adminGreen-500: var(--admin-green-500);
+  --color-adminGreen-600: var(--admin-green-600);
+  --color-adminGreen-700: var(--admin-green-700);
+  --color-adminGreen-800: var(--admin-green-800);
+  --color-adminGreen-900: var(--admin-green-900);
+
+  --color-adminGold-100: var(--admin-gold-100);
+  --color-adminGold-600: var(--admin-gold-600);
+  --color-adminGold-700: var(--admin-gold-700);
+
+  --color-adminInk: var(--admin-ink);
+
+  --color-adminGray-50: var(--admin-gray-50);
+  --color-adminGray-100: var(--admin-gray-100);
+  --color-adminGray-300: var(--admin-gray-300);
+  --color-adminGray-400: var(--admin-gray-400);
+  --color-adminGray-600: var(--admin-gray-600);
+
+  --color-state-success-bg: var(--state-success-bg);
+  --color-state-success-text: var(--state-success-text);
+  --color-state-success-border: var(--state-success-border);
+  --color-state-success-solid: var(--state-success-solid);
+
+  --color-state-danger-bg: var(--state-danger-bg);
+  --color-state-danger-text: var(--state-danger-text);
+  --color-state-danger-border: var(--state-danger-border);
+  --color-state-danger-solid: var(--state-danger-solid);
+
+  --color-state-warning-bg: var(--state-warning-bg);
+  --color-state-warning-text: var(--state-warning-text);
+  --color-state-warning-border: var(--state-warning-border);
+  --color-state-warning-solid: var(--state-warning-solid);
+
+  --color-state-info-bg: var(--state-info-bg);
+  --color-state-info-text: var(--state-info-text);
+  --color-state-info-border: var(--state-info-border);
+  --color-state-info-solid: var(--state-info-solid);
+
+  --color-state-neutral-bg: var(--state-neutral-bg);
+  --color-state-neutral-text: var(--state-neutral-text);
+  --color-state-neutral-border: var(--state-neutral-border);
+  --color-state-neutral-solid: var(--state-neutral-solid);
+
+  --shadow-jade: 0 4px 24px 0 rgba(157, 23, 77, 0.14);
+  --shadow-jade-lg: 0 8px 40px 0 rgba(157, 23, 77, 0.16);
+  --shadow-lotus: 0 4px 20px 0 rgba(157, 23, 77, 0.14);
+  --shadow-gold: 0 4px 20px 0 rgba(184, 134, 11, 0.2);
+  --shadow-panel: 0 8px 32px 0 rgba(43, 34, 38, 0.06);
+
+  --animate-slide-in: slide-in 0.22s ease-out;
+  --animate-fade-in: fade-in 0.2s ease-out;
+  --animate-float: float-y 4s ease-in-out infinite;
+
+  @keyframes slide-in {
+    from {
+      transform: translateY(-16px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes float-y {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
 
 /* Hoa Sen Spa — bảng màu chuẩn (color.md)
    Dùng cho booking + landing brand */

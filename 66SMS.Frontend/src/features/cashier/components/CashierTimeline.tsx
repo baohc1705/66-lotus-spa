@@ -268,7 +268,7 @@ export function CashierTimeline({
         >
           <div className="flex sticky top-0 z-40 bg-white">
             <div
-              className="flex-shrink-0 h-10 border-b border-r border-adminGray-300/80 bg-adminGreen-50/50 sticky left-0 z-50 flex items-center px-4"
+              className="shrink-0 h-10 border-b border-r border-adminGray-300/80 bg-adminGreen-50/50 sticky left-0 z-50 flex items-center px-4"
               style={{ width: `${STAFF_COL_WIDTH}px` }}
             >
               <span className="text-xs font-bold text-adminGray-600">
@@ -298,7 +298,7 @@ export function CashierTimeline({
                   className="absolute top-0 z-40 -translate-x-1/2 pointer-events-none"
                   style={{ left: `${currentTimeX}px` }}
                 >
-                  <div className="bg-state-danger-solid text-white text-2xs px-1 rounded-[2px] shadow-sm font-bold mt-2 border border-state-danger-solid">
+                  <div className="bg-state-danger-solid text-white text-2xs px-1 rounded-[2px] shadow-xs font-bold mt-2 border border-state-danger-solid">
                     {currentH.toString().padStart(2, "0")}:
                     {currentM.toString().padStart(2, "0")}
                   </div>
@@ -320,14 +320,14 @@ export function CashierTimeline({
                   style={{ height: `${ROW_HEIGHT}px` }}
                 >
                   <div
-                    className="flex-shrink-0 border-r border-adminGray-300/80 bg-adminGreen-50/20 sticky left-0 z-30 flex items-center gap-2 px-4"
+                    className="shrink-0 border-r border-adminGray-300/80 bg-adminGreen-50/20 sticky left-0 z-30 flex items-center gap-2 px-4"
                     style={{ width: `${STAFF_COL_WIDTH}px` }}
                   >
                     <FallbackImage
                       kind="ktv"
                       src={col.avatar}
                       alt={col.name}
-                      className="w-6 h-6 rounded-[3px] flex-shrink-0 object-cover"
+                      className="w-6 h-6 rounded-[3px] shrink-0 object-cover"
                     />
                     <div className="min-w-0">
                       <p className="font-bold text-xs text-adminInk truncate whitespace-nowrap">
@@ -414,7 +414,7 @@ export function CashierTimeline({
                               </span>
                               <span
                                 className={cn(
-                                  "w-1.5 h-1.5 rounded-full flex-shrink-0",
+                                  "w-1.5 h-1.5 rounded-full shrink-0",
                                   statusBadge,
                                 )}
                               />
@@ -423,7 +423,7 @@ export function CashierTimeline({
                               {booking.serviceName}
                             </div>
                             <div className="text-2xs opacity-75 flex items-center gap-0.5 truncate whitespace-nowrap mt-0.5">
-                              <Clock className="w-2 h-2 flex-shrink-0" />
+                              <Clock className="w-2 h-2 shrink-0" />
                               {booking.startTime} - {booking.endTime}
                             </div>
                           </div>

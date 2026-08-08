@@ -315,16 +315,16 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-      <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-sm p-2 sm:p-2">
+      <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-xs p-2 sm:p-2">
         <div className="relative w-full max-w-4xl max-h-[90vh] bg-adminGray-50 shadow-[0_32px_64px_rgba(42,31,26,0.15)] flex flex-col overflow-hidden border border-adminGold-600/20">
-          <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-adminGold-600/10 bg-adminGray-50/80 z-10">
+          <div className="shrink-0 flex items-center justify-between px-6 py-4 border-b border-adminGold-600/10 bg-adminGray-50/80 z-10">
             <h2 className="text-xl font-bold text-adminInk">
               Thêm Lịch Khách Hàng Mới
             </h2>
             <button
               type="button"
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-adminGold-600/20 hover:bg-adminGold-600/10 text-adminGray-600 hover:text-adminInk transition-all shadow-sm"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-adminGold-600/20 hover:bg-adminGold-600/10 text-adminGray-600 hover:text-adminInk transition-all shadow-xs"
             >
               <X className="w-5 h-5" />
             </button>
@@ -333,7 +333,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar bg-adminGray-50">
             {success ? (
               <div className="flex flex-col items-center justify-center py-20">
-                <div className="w-20 h-20 bg-adminGreen-100 rounded-full flex items-center justify-center mb-6 border border-adminGreen-200 shadow-sm">
+                <div className="w-20 h-20 bg-adminGreen-100 rounded-full flex items-center justify-center mb-6 border border-adminGreen-200 shadow-xs">
                   <CheckCircle2 className="w-10 h-10 text-adminGreen-600" />
                 </div>
                 <h3 className="text-2xl font-bold text-adminInk mb-2">
@@ -353,7 +353,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                   </Button>
                   <Button
                     onClick={onClose}
-                    className="bg-adminGreen-600 text-white hover:bg-adminGreen-600/90 shadow-sm"
+                    className="bg-adminGreen-600 text-white hover:bg-adminGreen-600/90 shadow-xs"
                   >
                     Đóng
                   </Button>
@@ -667,7 +667,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
           </div>
 
           {!success && (
-            <div className="flex-shrink-0 flex items-center justify-between gap-3 px-6 py-4 border-t border-adminGold-600/10 bg-white">
+            <div className="shrink-0 flex items-center justify-between gap-3 px-6 py-4 border-t border-adminGold-600/10 bg-white">
               <div className="flex items-center gap-2 text-xs text-adminGray-600 min-w-0">
                 <MapPin className="w-3.5 h-3.5 shrink-0" />
                 <span className="truncate">

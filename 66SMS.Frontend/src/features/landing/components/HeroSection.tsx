@@ -222,7 +222,7 @@ export const HeroSection = () => {
           <button
             type="button"
             onClick={prevSlide}
-            className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-ink/30 text-white/70 backdrop-blur-sm transition-all hover:bg-ink/50 hover:text-white"
+            className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-ink/30 text-white/70 backdrop-blur-xs transition-all hover:bg-ink/50 hover:text-white"
             aria-label="Previous slide"
           >
             <ChevronLeft className="h-6 w-6" />
@@ -230,7 +230,7 @@ export const HeroSection = () => {
           <button
             type="button"
             onClick={nextSlide}
-            className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-ink/30 text-white/70 backdrop-blur-sm transition-all hover:bg-ink/50 hover:text-white"
+            className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-ink/30 text-white/70 backdrop-blur-xs transition-all hover:bg-ink/50 hover:text-white"
             aria-label="Next slide"
           >
             <ChevronRight className="h-6 w-6" />

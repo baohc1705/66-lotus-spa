@@ -97,7 +97,7 @@ export function PayrollStatsToolbar({
             className={cn(
               "px-3 h-8 text-xs font-semibold transition-colors",
               viewMode === mode
-                ? "bg-white text-primary shadow-sm border border-adminGray-100"
+                ? "bg-white text-primary shadow-xs border border-adminGray-100"
                 : "text-adminGray-600 hover:text-adminInk",
             )}
           >

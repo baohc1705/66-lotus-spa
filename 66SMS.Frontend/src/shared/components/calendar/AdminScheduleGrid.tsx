@@ -131,7 +131,7 @@ export function AdminScheduleGrid({
   return (
     <div className="h-full flex-1 overflow-auto scrollbar-thin bg-white border border-adminGray-100/50 rounded-admin">
       <div className="flex min-w-max h-full">
-        <div className="w-16 flex-shrink-0 border-r border-adminGray-100/50 bg-adminGray-50/50 sticky left-0 z-20">
+        <div className="w-16 shrink-0 border-r border-adminGray-100/50 bg-adminGray-50/50 sticky left-0 z-20">
           <div
             className="border-b border-adminGray-100/50 sticky top-0 bg-adminGray-50/50 z-30"
             style={{ height: HEADER_HEIGHT }}

@@ -17,7 +17,7 @@ export function RoleFormModal({ initial, onClose, onSave, saving }: {
         <div>
           <label className="block text-xs font-semibold text-adminGray-600 mb-1">Tên vai trò *</label>
           <input
-            className="w-full px-3 py-2 rounded-lg border border-border bg-white text-adminInk text-sm outline-none focus:border-adminGreen-600 transition-colors"
+            className="w-full px-3 py-2 rounded-lg border border-border bg-white text-adminInk text-sm outline-hidden focus:border-adminGreen-600 transition-colors"
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="Ví dụ: admin"
@@ -26,7 +26,7 @@ export function RoleFormModal({ initial, onClose, onSave, saving }: {
         <div>
           <label className="block text-xs font-semibold text-adminGray-600 mb-1">Mô tả</label>
           <textarea
-            className="w-full px-3 py-2 rounded-lg border border-border bg-white text-adminInk text-sm outline-none focus:border-adminGreen-600 transition-colors resize-y min-h-[72px]"
+            className="w-full px-3 py-2 rounded-lg border border-border bg-white text-adminInk text-sm outline-hidden focus:border-adminGreen-600 transition-colors resize-y min-h-[72px]"
             value={desc}
             onChange={e => setDesc(e.target.value)}
             placeholder="Mô tả vai trò..."

@@ -92,7 +92,7 @@ export function BookingServiceStep() {
           placeholder="Tìm tên dịch vụ, mô tả..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full rounded-sm border border-warm-100 bg-surface py-2.5 pl-9 pr-4 text-sm text-ink placeholder:text-warm-600 hover:border-warm-300 focus:outline-none focus:border-rose-600"
+          className="w-full rounded-sm border border-warm-100 bg-surface py-2.5 pl-9 pr-4 text-sm text-ink placeholder:text-warm-600 hover:border-warm-300 focus:outline-hidden focus:border-rose-600"
         />
       </div>
 
@@ -148,7 +148,7 @@ export function BookingServiceStep() {
                         </div>
                       </div>
                       {isSelected && (
-                        <div className="w-6 h-6 bg-rose-600 rounded-full flex items-center justify-center text-white shrink-0 shadow-sm">
+                        <div className="w-6 h-6 bg-rose-600 rounded-full flex items-center justify-center text-white shrink-0 shadow-xs">
                           <Check className="w-4 h-4" />
                         </div>
                       )}

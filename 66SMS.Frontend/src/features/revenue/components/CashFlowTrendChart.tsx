@@ -36,7 +36,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     }
 
     return (
-      <div className="bg-white border border-adminGray-100 p-3 rounded-admin shadow-sm text-xs font-sans">
+      <div className="bg-white border border-adminGray-100 p-3 rounded-admin shadow-xs text-xs font-sans">
         <p className="font-semibold text-adminInk mb-2">{displayDate}</p>
         {payload.map((p, idx) => (
           <div

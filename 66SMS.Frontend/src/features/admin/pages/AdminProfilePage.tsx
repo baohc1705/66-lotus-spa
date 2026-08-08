@@ -202,7 +202,7 @@ export function AdminProfilePage() {
           variants={itemVariants}
           className="w-full lg:w-[260px] shrink-0 flex flex-col gap-2"
         >
-          <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-sm p-6 flex flex-col items-center">
+          <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-xs p-6 flex flex-col items-center">
             <input
               id="admin-avatar-upload-input"
               type="file"
@@ -236,7 +236,7 @@ export function AdminProfilePage() {
             </h3>
           </div>
 
-          <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-xs overflow-hidden">
             <div className="px-4 py-2.5 border-b border-adminGray-100/30 bg-adminGray-50/50">
               <span className="text-xs font-bold text-adminGray-600 uppercase tracking-wider block">
                 Menu
@@ -275,9 +275,9 @@ export function AdminProfilePage() {
           </div>
         </motion.div>
 
-        <motion.div variants={itemVariants} className="flex-grow">
+        <motion.div variants={itemVariants} className="grow">
           {activeTab === "profile" ? (
-            <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-sm overflow-hidden min-h-[500px]">
+            <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-xs overflow-hidden min-h-[500px]">
               <div className="flex items-center justify-between px-6 py-4 border-b border-adminGray-100/30 bg-adminGray-50/50">
                 <span className="font-bold text-sm md:text-base text-adminInk">
                   Thông tin tài khoản
@@ -427,7 +427,7 @@ export function AdminProfilePage() {
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-sm overflow-hidden min-h-[500px]">
+            <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-xs overflow-hidden min-h-[500px]">
               <div className="flex items-center justify-between px-6 py-4 border-b border-adminGray-100/30 bg-adminGray-50/50">
                 <span className="font-bold text-sm md:text-base text-adminInk">
                   Đổi mật khẩu

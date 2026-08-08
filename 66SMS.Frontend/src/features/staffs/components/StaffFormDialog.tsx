@@ -534,7 +534,7 @@ function FormField({
           (tooltip ? (
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-state-danger-text cursor-help hover:text-state-danger-text focus:outline-none select-none">
+                <span className="text-state-danger-text cursor-help hover:text-state-danger-text focus:outline-hidden select-none">
                   *
                 </span>
               </TooltipTrigger>

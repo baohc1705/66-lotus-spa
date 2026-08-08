@@ -52,7 +52,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
               loading="eager"
               width={40}
               height={40}
-              className={`h-10 w-auto object-contain shrink-0 filter drop-shadow-sm transition-all duration-500 ease-out group-hover:scale-105 ${!isDark ? "brightness-0 invert opacity-90" : ""}`.trim()}
+              className={`h-10 w-auto object-contain shrink-0 filter drop-shadow-xs transition-all duration-500 ease-out group-hover:scale-105 ${!isDark ? "brightness-0 invert opacity-90" : ""}`.trim()}
             />
             <div className="flex flex-col leading-none justify-center">
               <span

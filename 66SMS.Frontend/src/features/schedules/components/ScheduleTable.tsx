@@ -235,7 +235,7 @@ export function ScheduleTable({
                                 ? handleDragStart(e, ws)
                                 : e.preventDefault()
                             }
-                            className={`px-2.5 py-1.5 bg-white text-adminInk rounded-md text-xs font-medium border border-adminGray-100 shadow-sm truncate transition-colors flex items-center justify-between group/item ${
+                            className={`px-2.5 py-1.5 bg-white text-adminInk rounded-md text-xs font-medium border border-adminGray-100 shadow-xs truncate transition-colors flex items-center justify-between group/item ${
                               canEdit
                                 ? "cursor-grab active:cursor-grabbing hover:border-adminGold-600"
                                 : ""
@@ -325,7 +325,7 @@ export function ScheduleTable({
                         {cellSchedules.map((ws) => (
                           <div
                             key={ws.id}
-                            className="px-2.5 py-1.5 bg-adminGreen-100 text-adminGreen-600 rounded-md text-xs font-medium border border-adminGreen-600/20 shadow-sm truncate"
+                            className="px-2.5 py-1.5 bg-adminGreen-100 text-adminGreen-600 rounded-md text-xs font-medium border border-adminGreen-600/20 shadow-xs truncate"
                             title={ws.shift?.name}
                           >
                             {ws.shift?.name || "Ca làm việc"}
@@ -473,7 +473,7 @@ export function ScheduleTable({
 
   return (
     <>
-      <div className="overflow-x-auto border border-adminGray-100/50 rounded-sm bg-white/70 shadow-sm ">
+      <div className="overflow-x-auto border border-adminGray-100/50 rounded-sm bg-white/70 shadow-xs ">
         <table className="w-full text-sm text-left table-fixed">
           <thead className="bg-adminGray-50/50 border-b border-adminGray-100/50">
             <tr>

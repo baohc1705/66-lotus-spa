@@ -35,7 +35,7 @@ export function ProfileSidebar({
 
   return (
     <div className="w-full lg:w-56 shrink-0">
-      <div className="bg-white rounded-xl p-2.5 shadow-sm">
+      <div className="bg-white rounded-xl p-2.5 shadow-xs">
         <nav className="flex lg:flex-col gap-1 overflow-x-auto scrollbar-none">
           {menuItems.map((item) => {
             const Icon = item.icon;

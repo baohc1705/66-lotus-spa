@@ -35,7 +35,7 @@ function SelectTrigger({
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
-      className={cn("flex w-full items-center justify-between gap-2 rounded-none border border-adminGray-300 bg-white px-3 py-2 text-sm whitespace-nowrap select-none text-lotus-deep data-placeholder:text-lotus-stone outline-none transition-colors duration-150 hover:border-adminGray-400 focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-adminGray-50 [&_svg]:pointer-events-none [&_svg]:shrink-0", className)}
+      className={cn("flex w-full items-center justify-between gap-2 rounded-none border border-adminGray-300 bg-white px-3 py-2 text-sm whitespace-nowrap select-none text-lotus-deep data-placeholder:text-lotus-stone outline-hidden transition-colors duration-150 hover:border-adminGray-400 focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-adminGray-50 [&_svg]:pointer-events-none [&_svg]:shrink-0", className)}
       {...props}
     >
       {children}
@@ -91,7 +91,7 @@ function SelectItem({
   return (
     <SelectPrimitive.Item
       data-slot="select-item"
-      className={cn("relative flex w-full cursor-default select-none items-center gap-2 rounded-sm py-2 pl-3 pr-8 text-sm outline-none text-lotus-deep focus:bg-adminGray-50/50 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", className)}
+      className={cn("relative flex w-full cursor-default select-none items-center gap-2 rounded-sm py-2 pl-3 pr-8 text-sm outline-hidden text-lotus-deep focus:bg-adminGray-50/50 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", className)}
       {...props}
     >
       <span className="pointer-events-none absolute right-2 flex size-4 items-center justify-center text-adminGreen-600">

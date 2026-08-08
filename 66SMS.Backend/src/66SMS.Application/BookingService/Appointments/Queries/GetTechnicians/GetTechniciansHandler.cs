@@ -26,7 +26,7 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetTechnicians
             if (rows.Count == 0)
                 return Result<IReadOnlyList<BookingTechnicianDto>>.Success([]);
 
-            var maxFreeSlots = rows.Max(r => r.SlotsLeft);
+            var maxFreeSlots = rows.Max(r => r.SlotsLeft ?? 0);
             var result = new List<BookingTechnicianDto>
             {
                 new()
@@ -43,15 +43,16 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetTechnicians
 
             foreach (var row in rows)
             {
+                var slotsLeft = row.SlotsLeft ?? 0;
                 result.Add(new BookingTechnicianDto
                 {
                     Id = row.StaffId,
-                    Name = row.StaffName,
+                    Name = row.StaffName ?? string.Empty,
                     Role = AppointmentConst.BOOKING_TECHNICIAN_ROLE,
                     AccountRole = AppointmentConst.BOOKING_ACCOUNT_ROLE_STAFF,
                     Avatar = row.Avatar,
-                    SlotsLeft = row.SlotsLeft,
-                    Status = GetStatusText(row.SlotsLeft),
+                    SlotsLeft = slotsLeft,
+                    Status = GetStatusText(slotsLeft),
                     IsAny = false,
                 });
             }

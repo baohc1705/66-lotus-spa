@@ -346,7 +346,7 @@ export function AttendanceDailyDialog({
           <div className="flex items-center gap-2 text-adminGray-600">
             <Clock size={15} className="text-adminGray-600" />
             <span className="font-medium text-adminGray-600">Ca làm việc:</span>
-            <span className="font-semibold text-adminInk bg-white border border-adminGray-100/60 px-2 py-0.5 rounded shadow-sm">
+            <span className="font-semibold text-adminInk bg-white border border-adminGray-100/60 px-2 py-0.5 rounded shadow-xs">
               {schedule.shift?.name} ({schedule.shift?.shiftPeriodDTOs?.[0]?.shiftStart?.substring(0, 5)} - {schedule.shift?.shiftPeriodDTOs?.[0]?.shiftEnd?.substring(0, 5)})
             </span>
           </div>
@@ -446,7 +446,7 @@ export function AttendanceDailyDialog({
                       <label
                         className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-sm font-semibold cursor-pointer transition-all ${
                           mode === "working"
-                            ? "bg-adminGreen-50 border-adminGreen-600 text-adminGreen-600 shadow-sm"
+                            ? "bg-adminGreen-50 border-adminGreen-600 text-adminGreen-600 shadow-xs"
                             : "border-adminGray-100/80 bg-white text-adminGray-600 hover:bg-adminGray-50"
                         }`}
                       >
@@ -462,7 +462,7 @@ export function AttendanceDailyDialog({
                       <label
                         className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-sm font-semibold cursor-pointer transition-all ${
                           mode === "paid_leave"
-                            ? "bg-adminGreen-50 border-adminGreen-600 text-adminGreen-600 shadow-sm"
+                            ? "bg-adminGreen-50 border-adminGreen-600 text-adminGreen-600 shadow-xs"
                             : "border-adminGray-100/80 bg-white text-adminGray-600 hover:bg-adminGray-50"
                         }`}
                       >
@@ -478,7 +478,7 @@ export function AttendanceDailyDialog({
                       <label
                         className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-sm font-semibold cursor-pointer transition-all ${
                           mode === "unpaid_leave"
-                            ? "bg-adminGreen-50 border-adminGreen-600 text-adminGreen-600 shadow-sm"
+                            ? "bg-adminGreen-50 border-adminGreen-600 text-adminGreen-600 shadow-xs"
                             : "border-adminGray-100/80 bg-white text-adminGray-600 hover:bg-adminGray-50"
                         }`}
                       >

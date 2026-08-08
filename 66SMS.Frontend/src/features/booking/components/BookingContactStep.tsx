@@ -142,7 +142,7 @@ export function BookingContactStep() {
     : 0;
 
   const inputClass = (hasError: boolean) =>
-    `w-full rounded-sm border bg-surface px-4 py-3 text-sm text-ink transition-colors placeholder:text-warm-600 hover:border-warm-300 focus:outline-none focus:border-rose-600 ${
+    `w-full rounded-sm border bg-surface px-4 py-3 text-sm text-ink transition-colors placeholder:text-warm-600 hover:border-warm-300 focus:outline-hidden focus:border-rose-600 ${
       hasError ? "border-error-text" : "border-warm-100"
     }`;
 
@@ -258,7 +258,7 @@ export function BookingContactStep() {
             {...register("note")}
             rows={3}
             placeholder="Yêu cầu chung cho đoàn khách..."
-            className="w-full resize-none rounded-sm border border-warm-100 bg-surface px-4 py-3 text-sm text-ink placeholder:text-warm-600 hover:border-warm-300 focus:outline-none focus:border-rose-600"
+            className="w-full resize-none rounded-sm border border-warm-100 bg-surface px-4 py-3 text-sm text-ink placeholder:text-warm-600 hover:border-warm-300 focus:outline-hidden focus:border-rose-600"
           />
         </div>
 

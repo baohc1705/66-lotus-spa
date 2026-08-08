@@ -53,7 +53,7 @@ export function SearchableSelect({
           type="button"
           disabled={disabled}
           className={cn(
-            'lotus-admin-select-trigger flex items-center justify-between gap-2 rounded-none border border-adminGray-300 bg-white whitespace-nowrap select-none text-lotus-deep outline-none transition-colors duration-150 hover:border-adminGray-400 focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-adminGray-50',
+            'lotus-admin-select-trigger flex items-center justify-between gap-2 rounded-none border border-adminGray-300 bg-white whitespace-nowrap select-none text-lotus-deep outline-hidden transition-colors duration-150 hover:border-adminGray-400 focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-adminGray-50',
             !selected && 'text-lotus-stone',
             className,
           )}
@@ -77,7 +77,7 @@ export function SearchableSelect({
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder={searchPlaceholder}
-              className="flex-1 text-sm text-lotus-deep bg-transparent outline-none placeholder:text-lotus-stone"
+              className="flex-1 text-sm text-lotus-deep bg-transparent outline-hidden placeholder:text-lotus-stone"
             />
           </div>
 
@@ -99,7 +99,7 @@ export function SearchableSelect({
                     setOpen(false)
                   }}
                   className={cn(
-                    'relative flex w-full items-center gap-2 rounded-sm py-2 pl-3 pr-8 text-sm text-left outline-none',
+                    'relative flex w-full items-center gap-2 rounded-sm py-2 pl-3 pr-8 text-sm text-left outline-hidden',
                     opt.disabled
                       ? 'text-lotus-stone/50 cursor-not-allowed'
                       : 'text-lotus-deep hover:bg-adminGray-50/50',

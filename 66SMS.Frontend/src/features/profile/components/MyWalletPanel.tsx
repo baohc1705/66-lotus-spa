@@ -122,7 +122,7 @@ export function MyWalletPanel() {
               setAmountInput(digits);
             }}
             placeholder="Ví dụ: 20000"
-            className="flex-1 rounded-lg border border-lotus-cream px-3 py-2 text-sm text-lotus-deep outline-none focus:border-lotus-rose"
+            className="flex-1 rounded-lg border border-lotus-cream px-3 py-2 text-sm text-lotus-deep outline-hidden focus:border-lotus-rose"
             disabled={isToppingUp}
           />
           <button

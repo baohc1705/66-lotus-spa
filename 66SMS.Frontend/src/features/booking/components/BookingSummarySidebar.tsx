@@ -31,7 +31,7 @@ function TicketPunchRow({ edge }: { edge: "top" | "bottom" }) {
       {Array.from({ length: holeCount }).map((_, i) => (
         <div
           key={`${edge}-${i}`}
-          className="w-4 h-4 rounded-full bg-page shadow-sm shrink-0"
+          className="w-4 h-4 rounded-full bg-page shadow-xs shrink-0"
         />
       ))}
     </div>

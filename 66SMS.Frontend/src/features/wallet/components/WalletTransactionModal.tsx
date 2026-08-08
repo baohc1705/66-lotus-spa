@@ -238,7 +238,7 @@ export function WalletTransactionModal({
                 return (
                   <div
                     key={tx.id}
-                    className="flex flex-col p-4 rounded-xl border border-adminGray-100 bg-white shadow-sm gap-3"
+                    className="flex flex-col p-4 rounded-xl border border-adminGray-100 bg-white shadow-xs gap-3"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-4">

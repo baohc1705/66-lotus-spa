@@ -143,7 +143,7 @@ export function PromotionCodeInput({
               if (error) setError("");
             }}
             disabled={loading}
-            className={`w-full border border-warm-100 bg-surface py-2.5 pl-9 pr-3 text-xs font-medium uppercase text-ink placeholder:normal-case placeholder:text-warm-600 hover:border-warm-300 focus:outline-none focus:border-rose-600 disabled:bg-warm-50 disabled:text-warm-400 ${
+            className={`w-full border border-warm-100 bg-surface py-2.5 pl-9 pr-3 text-xs font-medium uppercase text-ink placeholder:normal-case placeholder:text-warm-600 hover:border-warm-300 focus:outline-hidden focus:border-rose-600 disabled:bg-warm-50 disabled:text-warm-400 ${
               isTicket ? "rounded-full" : "rounded-sm"
             }`}
           />

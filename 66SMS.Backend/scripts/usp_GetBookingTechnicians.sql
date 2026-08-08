@@ -20,7 +20,15 @@ BEGIN
     WHERE id = @service_id AND status = 1;
 
     IF @duration_mins IS NULL
+    BEGIN
+        SELECT
+            CAST(NULL AS INT) AS StaffId,
+            CAST(NULL AS NVARCHAR(100)) AS StaffName,
+            CAST(NULL AS NVARCHAR(500)) AS Avatar,
+            CAST(NULL AS INT) AS SlotsLeft
+        WHERE 1 = 0;
         RETURN;
+    END;
 
     CREATE TABLE #slots (
         slot_index INT NOT NULL PRIMARY KEY,
@@ -38,7 +46,18 @@ BEGIN
     FROM dbo.time_slots;
 
     IF NOT EXISTS (SELECT 1 FROM #slots)
+    BEGIN
+        DROP TABLE #slots;
+        SELECT
+            CAST(NULL AS INT) AS StaffId,
+            CAST(NULL AS NVARCHAR(100)) AS StaffName,
+            CAST(NULL AS NVARCHAR(500)) AS Avatar,
+            CAST(NULL AS INT) AS SlotsLeft
+        WHERE 1 = 0;
         RETURN;
+    END;
+
+    CREATE UNIQUE INDEX IX_slots_slot_id ON #slots (slot_id);
 
     SELECT TOP (1)
         @slot_minutes = CASE
@@ -61,10 +80,10 @@ BEGIN
     );
 
     INSERT INTO #staff (staff_id, staff_name, avatar)
-    SELECT DISTINCT
+    SELECT
         st.id,
-        st.full_name,
-        st.avatar_url
+        MAX(st.full_name),
+        MAX(st.avatar_url)
     FROM dbo.staffs st
     INNER JOIN dbo.users u
         ON u.id = st.user_id AND u.status = 1
@@ -93,12 +112,19 @@ BEGIN
                   AND ssal.salon_id = @salon_id
                   AND ssal.status = 1
             )
-          );
+          )
+    GROUP BY st.id;
 
     IF NOT EXISTS (SELECT 1 FROM #staff)
     BEGIN
         DROP TABLE #staff;
         DROP TABLE #slots;
+        SELECT
+            CAST(NULL AS INT) AS StaffId,
+            CAST(NULL AS NVARCHAR(100)) AS StaffName,
+            CAST(NULL AS NVARCHAR(500)) AS Avatar,
+            CAST(NULL AS INT) AS SlotsLeft
+        WHERE 1 = 0;
         RETURN;
     END;
 
@@ -156,10 +182,13 @@ BEGIN
     FROM shift_groups
     GROUP BY staff_id, group_no;
 
-    CREATE TABLE #booked (
-        staff_id INT NOT NULL,
-        slot_id  INT NOT NULL,
-        PRIMARY KEY (staff_id, slot_id)
+    CREATE INDEX IX_merged_staff ON #merged_shifts (staff_id) INCLUDE (shift_start, shift_end);
+
+    -- slot_index da book theo staff (tranh join lai #slots khi dem free)
+    CREATE TABLE #booked_idx (
+        staff_id   INT NOT NULL,
+        slot_index INT NOT NULL,
+        PRIMARY KEY (staff_id, slot_index)
     );
 
     CREATE TABLE #appt_mins (
@@ -173,15 +202,16 @@ BEGIN
         SUM(aps.duration_snapshot * aps.quantity)
     FROM dbo.appointment_services aps
     INNER JOIN dbo.appointments a ON a.id = aps.appointment_id
+    INNER JOIN #staff s ON s.staff_id = a.staff_id
     WHERE a.appointment_date = @date
       AND a.status NOT IN (5, 6, 9)
       AND aps.status = 1
     GROUP BY aps.appointment_id;
 
-    INSERT INTO #booked (staff_id, slot_id)
+    INSERT INTO #booked_idx (staff_id, slot_index)
     SELECT DISTINCT
         a.staff_id,
-        used_slot.slot_id
+        used_slot.slot_index
     FROM dbo.appointments a
     INNER JOIN #staff s ON s.staff_id = a.staff_id
     INNER JOIN #slots first_slot ON first_slot.slot_id = a.slot_id
@@ -195,10 +225,10 @@ BEGIN
     WHERE a.appointment_date = @date
       AND a.status NOT IN (5, 6, 9);
 
-    INSERT INTO #booked (staff_id, slot_id)
+    INSERT INTO #booked_idx (staff_id, slot_index)
     SELECT DISTINCT
         l.staff_id,
-        used_slot.slot_id
+        used_slot.slot_index
     FROM dbo.appointment_slot_locks l
     INNER JOIN #staff s ON s.staff_id = l.staff_id
     INNER JOIN #slots first_slot ON first_slot.slot_id = l.slot_id
@@ -212,39 +242,55 @@ BEGIN
       AND l.status = 1
       AND l.expires_at > @now
       AND NOT EXISTS (
-          SELECT 1 FROM #booked b
-          WHERE b.staff_id = l.staff_id AND b.slot_id = used_slot.slot_id
+          SELECT 1
+          FROM #booked_idx b
+          WHERE b.staff_id = l.staff_id
+            AND b.slot_index = used_slot.slot_index
       );
+
+    -- candidate start slots trong ca, set-based (khong correlated theo tung staff)
+    CREATE TABLE #free_starts (
+        staff_id  INT NOT NULL,
+        start_idx INT NOT NULL,
+        PRIMARY KEY (staff_id, start_idx)
+    );
+
+    INSERT INTO #free_starts (staff_id, start_idx)
+    SELECT
+        sh.staff_id,
+        sl.slot_index
+    FROM #merged_shifts sh
+    INNER JOIN #slots sl
+        ON sl.start_time >= sh.shift_start
+    INNER JOIN #slots en
+        ON en.slot_index = sl.slot_index + @slots_needed - 1
+       AND en.end_time <= sh.shift_end
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM #booked_idx b
+        WHERE b.staff_id = sh.staff_id
+          AND b.slot_index BETWEEN sl.slot_index AND sl.slot_index + @slots_needed - 1
+    );
 
     SELECT
         s.staff_id AS StaffId,
         s.staff_name AS StaffName,
         s.avatar AS Avatar,
-        (
-            SELECT COUNT(*)
-            FROM #slots sl
-            WHERE EXISTS (
-                SELECT 1
-                FROM #merged_shifts sh
-                INNER JOIN #slots end_slot
-                    ON end_slot.slot_index = sl.slot_index + @slots_needed - 1
-                WHERE sh.staff_id = s.staff_id
-                  AND sl.start_time >= sh.shift_start
-                  AND end_slot.end_time <= sh.shift_end
-                  AND NOT EXISTS (
-                      SELECT 1
-                      FROM #slots check_slot
-                      INNER JOIN #booked b
-                          ON b.staff_id = s.staff_id AND b.slot_id = check_slot.slot_id
-                      WHERE check_slot.slot_index BETWEEN sl.slot_index AND sl.slot_index + @slots_needed - 1
-                  )
-            )
-        ) AS SlotsLeft
+        ISNULL(fc.SlotsLeft, 0) AS SlotsLeft
     FROM #staff s
-    WHERE EXISTS (SELECT 1 FROM #merged_shifts sh WHERE sh.staff_id = s.staff_id)
-    ORDER BY SlotsLeft DESC, s.staff_id;
+    INNER JOIN (
+        SELECT DISTINCT staff_id
+        FROM #merged_shifts
+    ) ms ON ms.staff_id = s.staff_id
+    LEFT JOIN (
+        SELECT staff_id, COUNT(*) AS SlotsLeft
+        FROM #free_starts
+        GROUP BY staff_id
+    ) fc ON fc.staff_id = s.staff_id
+    ORDER BY ISNULL(fc.SlotsLeft, 0) DESC, s.staff_id;
 
-    DROP TABLE #booked;
+    DROP TABLE #free_starts;
+    DROP TABLE #booked_idx;
     DROP TABLE #appt_mins;
     DROP TABLE #merged_shifts;
     DROP TABLE #shifts;

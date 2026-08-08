@@ -45,7 +45,7 @@ export const CustomerTrafficChart = memo(function CustomerTrafficChart({
               onClick={() => setActiveTab(t.key)}
               className={`px-2.5 py-1 text-2xs font-semibold rounded-[4px] transition-all ${
                 activeTab === t.key
-                  ? "bg-white text-adminInk shadow-sm"
+                  ? "bg-white text-adminInk shadow-xs"
                   : "text-adminGray-400 hover:text-adminGray-600"
               }`}
             >

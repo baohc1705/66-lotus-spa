@@ -1,0 +1,320 @@
+@utility rounded-lotus-admin-sm {
+  border-radius: var(--lotus-admin-radius-sm);
+}
+
+@utility max-w-lotus-admin-cell {
+  max-width: var(--lotus-admin-cell-max);
+}
+
+@utility min-h-lotus-admin-textarea {
+  min-height: var(--lotus-admin-textarea-min-h);
+}
+
+@utility lotus-admin-input {
+  /* ── Form ── */
+  @apply h-9 w-full text-sm rounded-none border bg-white;
+  border-color: var(--admin-gray-300);
+  color: var(--admin-ink);
+  &:hover {
+    border-color: var(--admin-gray-400);
+  }
+  &:focus {
+    border-color: var(--admin-green-600);
+    box-shadow: 0 0 0 1px var(--admin-green-600);
+    background: #fff;
+  }
+  &:disabled {
+    background: var(--admin-gray-50);
+    color: var(--admin-gray-400);
+    border-color: var(--admin-gray-200);
+  }
+}
+
+@utility lotus-admin-textarea {
+  @apply w-full text-sm min-h-lotus-admin-textarea resize-none rounded-none border bg-white;
+  border-color: var(--admin-gray-300);
+  color: var(--admin-ink);
+  &:hover {
+    border-color: var(--admin-gray-400);
+  }
+  &:focus {
+    border-color: var(--admin-green-600);
+    box-shadow: 0 0 0 1px var(--admin-green-600);
+    background: #fff;
+  }
+}
+
+@utility lotus-admin-select-trigger {
+  @apply h-9 w-full text-sm rounded-none border bg-white;
+  border-color: var(--admin-gray-300);
+  color: var(--admin-ink);
+  &:hover {
+    border-color: var(--admin-gray-400);
+  }
+  &:focus {
+    border-color: var(--admin-green-600);
+    box-shadow: 0 0 0 1px var(--admin-green-600);
+    background: #fff;
+  }
+  &:focus-visible {
+    border-color: var(--admin-green-600);
+    box-shadow: 0 0 0 1px var(--admin-green-600);
+    background: #fff;
+  }
+}
+
+@utility lotus-admin-form-label {
+  @apply flex items-center gap-1 text-xs font-semibold;
+  color: var(--admin-gray-600);
+}
+
+@utility lotus-admin-form-error {
+  @apply text-2xs font-medium;
+  color: var(--state-danger-text);
+}
+
+@utility lotus-admin-form-section-title {
+  @apply text-sm font-semibold;
+  color: var(--admin-ink);
+
+  /* Form section / empty / filter icons mặc định gold */
+  .admin-dashboard-container & + svg {
+    color: var(--admin-gold-600);
+  }
+}
+
+@utility lotus-admin-btn-toolbar {
+  /* ── Buttons ── */
+  @apply text-xs h-7 px-2;
+}
+
+@utility lotus-admin-table-page-card {
+  /* ── DataTable ── */
+  @apply relative overflow-hidden rounded-admin;
+  background: var(--admin-bg-surface);
+  border: 1px solid var(--admin-border);
+}
+
+@utility lotus-admin-table-fetch-bar {
+  @apply absolute top-0 left-0 right-0 h-0.5 overflow-hidden;
+  background: var(--admin-green-100);
+}
+
+@utility lotus-admin-table-fetch-bar-inner {
+  @apply h-full w-1/3 animate-[slide_1s_ease-in-out_infinite];
+  background: var(--admin-green-600);
+}
+
+@utility lotus-admin-table-cell-index {
+  color: var(--admin-gray-600);
+}
+
+@utility lotus-admin-table-cell-name {
+  @apply font-semibold;
+  color: var(--admin-ink);
+}
+
+@utility lotus-admin-table-cell-muted {
+  color: var(--admin-ink);
+}
+
+@utility lotus-admin-table-cell-muted-sm {
+  @apply text-xs;
+  color: var(--admin-ink);
+}
+
+@utility lotus-admin-table-cell-truncate {
+  @apply truncate max-w-lotus-admin-cell inline-block;
+  color: var(--admin-ink);
+}
+
+@utility lotus-admin-table-toolbar-btn {
+  @apply text-xs gap-1.5;
+}
+
+@utility lotus-admin-table-selection-bar {
+  @apply flex items-center gap-2 mr-auto text-sm font-medium px-3 py-1.5 rounded-lg;
+  color: var(--admin-ink);
+  background: var(--admin-green-50);
+  border: 1px solid var(--admin-green-200);
+}
+
+@utility lotus-admin-table-sort-btn {
+  @apply flex items-center gap-1.5 transition-colors;
+  &:hover {
+    color: var(--admin-green-600);
+  }
+}
+
+@utility lotus-admin-sidebar-search {
+  /* ── Category sidebar ── */
+  @apply w-full text-xs h-8 pl-8 pr-3 rounded focus:outline-hidden;
+  background: var(--admin-gray-50);
+  border: 1px solid var(--admin-gray-100);
+  color: var(--admin-ink);
+  &::placeholder {
+    color: var(--admin-gray-400);
+  }
+  &:hover {
+    border-color: var(--admin-gray-300);
+  }
+  &:focus {
+    border-color: var(--admin-green-600);
+    box-shadow: 0 0 0 1px var(--admin-green-600);
+  }
+}
+
+@utility lotus-admin-sidebar-item {
+  @apply w-full flex items-center justify-between gap-2 px-3 py-1.5 text-sm transition-all duration-150 rounded;
+  color: var(--admin-gray-600);
+  &:hover {
+    background: var(--admin-gray-50);
+  }
+  &.is-active {
+    background: var(--admin-green-100);
+    color: var(--admin-green-900);
+  }
+  &[data-active='true'] {
+    background: var(--admin-green-100);
+    color: var(--admin-green-900);
+  }
+}
+
+@utility lotus-admin-sidebar-badge {
+  @apply text-2xs shrink-0 font-medium px-1.5 py-0.5 rounded-full;
+}
+
+@utility lotus-admin-sidebar-add-btn {
+  @apply w-full text-xs h-8 gap-1.5 justify-center font-bold;
+}
+
+@utility admin-header {
+  /* ── Shell helpers ── */
+  background: var(--admin-bg-header);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@utility admin-nav-tab {
+  color: var(--admin-green-100);
+  &:hover {
+    color: #ffffff;
+  }
+  &.is-active {
+    color: #ffffff;
+  }
+
+  /* Top-nav mega menu / sidebar icons */
+  .admin-dashboard-container & svg {
+    color: var(--admin-gold-600);
+  }
+  .admin-dashboard-container &.is-active svg {
+    color: var(--admin-gold-600);
+  }
+}
+
+@utility admin-nav-tab-underline {
+  background: var(--admin-gold-600);
+}
+
+@utility logo-icon-gold {
+  /* Logo mark dùng admin gold (giống nav icons) */
+  filter: brightness(0) saturate(100%) invert(52%) sepia(72%) saturate(650%)
+    hue-rotate(8deg) brightness(95%) contrast(92%);
+}
+
+@utility admin-sidebar-section-title {
+  /* Shell sidebar (green bg) — inactive text = gold like icons; active = white */
+  color: var(--admin-gold-600);
+  opacity: 0.7;
+}
+
+@utility admin-sidebar-nav-item {
+  color: var(--admin-gold-600);
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+  }
+  &.is-active {
+    background: var(--admin-green-600);
+    color: #ffffff;
+  }
+  .admin-dashboard-container & svg {
+    color: var(--admin-gold-600);
+  }
+  .admin-dashboard-container &.is-active svg {
+    color: #ffffff;
+  }
+}
+
+@utility admin-sidebar-nav-child {
+  color: var(--admin-gold-600);
+  opacity: 0.85;
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    opacity: 1;
+  }
+  &.is-active {
+    background: var(--admin-green-600);
+    color: #ffffff;
+    opacity: 1;
+  }
+
+  .admin-dashboard-container & svg {
+    color: var(--admin-gold-600);
+  }
+
+  .admin-dashboard-container &.is-active svg {
+    color: #ffffff;
+  }
+}
+
+@utility admin-stat-icon--green {
+  background: var(--admin-green-100);
+  color: var(--admin-green-600);
+}
+
+@utility admin-stat-icon--gold {
+  background: var(--admin-gold-100);
+  color: var(--admin-gold-600);
+}
+
+@utility admin-dashboard-container {
+  /* Top-nav mega menu / sidebar icons */
+  & .admin-nav-tab svg {
+    color: var(--admin-gold-600);
+  }
+  & .admin-nav-tab.is-active svg {
+    color: var(--admin-gold-600);
+  }
+  & .admin-sidebar-nav-item svg {
+    color: var(--admin-gold-600);
+  }
+  & .admin-sidebar-nav-child svg {
+    color: var(--admin-gold-600);
+  }
+  & .admin-sidebar-nav-item.is-active svg {
+    color: #ffffff;
+  }
+  & .admin-sidebar-nav-child.is-active svg {
+    color: #ffffff;
+  }
+
+  /* Form section / empty / filter icons mặc định gold */
+  & .lotus-admin-form-section-title + svg {
+    color: var(--admin-gold-600);
+  }
+  & [data-slot='empty-icon'] {
+    color: var(--admin-gold-600);
+  }
+}
+
+@utility lotus-cashier-header {
+  /* ── Cashier shell ── */
+  background-image: linear-gradient(
+    to right,
+    var(--admin-green-900),
+    var(--admin-green-800),
+    var(--admin-green-600)
+  );
+}

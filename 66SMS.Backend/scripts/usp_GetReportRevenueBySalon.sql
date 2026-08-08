@@ -52,7 +52,7 @@ BEGIN
         ISNULL(i.OrderCount, 0) AS OrderCount,
         ISNULL(i.CashIn, 0) AS CashIn,
         ISNULL(c.CommissionOut, 0) AS CommissionOut,
-        CashIn - CommissionOut AS TotalRevenue
+        ISNULL(i.CashIn, 0) - ISNULL(c.CommissionOut, 0) AS TotalRevenue
     FROM dbo.salons s
     LEFT JOIN #Inv i ON i.SalonId = s.id
     LEFT JOIN #Comm c ON c.SalonId = s.id

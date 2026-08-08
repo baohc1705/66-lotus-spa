@@ -80,27 +80,27 @@ export function ServiceDetailExpanded({
   return (
     <div className="bg-adminGray-50/30 w-full overflow-hidden max-h-[400px] overflow-y-auto custom-scrollbar">
       <Tabs defaultValue="info" className="w-full flex-col">
-        <div className="px-4 pt-2 sticky top-0 bg-adminGray-50/95 backdrop-blur-sm z-10">
+        <div className="px-4 pt-2 sticky top-0 bg-adminGray-50/95 backdrop-blur-xs z-10">
           <TabsList className="h-10 border-b border-adminGray-100/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
             <TabsTrigger
               value="info"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-hidden whitespace-nowrap transition-colors"
             >
               Thông tin chung
             </TabsTrigger>
             <TabsTrigger
               value="products"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-hidden whitespace-nowrap transition-colors"
             >
               Sản phẩm tiêu hao ({products.length})
             </TabsTrigger>
           </TabsList>
         </div>
 
-        <TabsContent value="info" className="p-4 m-0 border-none outline-none">
+        <TabsContent value="info" className="p-4 m-0 border-none outline-hidden">
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-xl bg-adminGray-50/50 flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-adminGray-100/50">
+              <div className="w-14 h-14 rounded-xl bg-adminGray-50/50 flex items-center justify-center shrink-0 overflow-hidden shadow-xs border border-adminGray-100/50">
                 <FallbackImage
                   kind="service"
                   src={primaryImage}
@@ -197,7 +197,7 @@ export function ServiceDetailExpanded({
                   variant="admin"
                   size="sm"
                   onClick={() => onEdit?.(service)}
-                  className="bg-adminGreen-600 hover:opacity-90 text-white shadow-sm h-8 px-4 text-sm gap-1.5 rounded-md transition-opacity"
+                  className="bg-adminGreen-600 hover:opacity-90 text-white shadow-xs h-8 px-4 text-sm gap-1.5 rounded-md transition-opacity"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                   Cập nhật
@@ -209,7 +209,7 @@ export function ServiceDetailExpanded({
 
         <TabsContent
           value="products"
-          className="p-4 m-0 border-none outline-none"
+          className="p-4 m-0 border-none outline-hidden"
         >
           {products.length === 0 ? (
             <div className="py-8 text-center text-adminGray-600 text-sm">

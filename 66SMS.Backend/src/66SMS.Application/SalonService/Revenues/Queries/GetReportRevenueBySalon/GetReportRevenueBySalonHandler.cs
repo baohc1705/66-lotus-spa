@@ -20,25 +20,25 @@ namespace _66SMS.Application.SalonService.Revenues.Queries.GetReportRevenueBySal
             var items = rows.Select(x => new ReportRevenueBySalonItemDto
             {
                 SalonId = x.SalonId,
-                SalonName = x.SalonName,
-                StaffCount = x.StaffCount,
-                OrderCount = x.OrderCount,
-                CashIn = x.CashIn,
-                CommissionOut = x.CommissionOut,
-                TotalRevenue = x.TotalRevenue,
+                SalonName = x.SalonName ?? string.Empty,
+                StaffCount = x.StaffCount ?? 0,
+                OrderCount = x.OrderCount ?? 0,
+                CashIn = x.CashIn ?? 0,
+                CommissionOut = x.CommissionOut ?? 0,
+                TotalRevenue = x.TotalRevenue ?? 0,
             }).ToList();
 
-            var totalRevenue = rows.Sum(r => r.TotalRevenue);
-            var totalCommission = rows.Sum(r => r.CommissionOut);
+            var totalCollected = rows.Sum(r => r.CashIn ?? 0);
+            var totalCommission = rows.Sum(r => r.CommissionOut ?? 0);
 
             var dto = new ReportRevenueBySalonDto
             {
                 Stats = new ReportSalonStatsDto
                 {
-                    TotalRevenue = totalRevenue,
-                    TotalCollected = rows.Sum(r => r.CashIn),
+                    TotalRevenue = rows.Sum(r => r.TotalRevenue ?? 0),
+                    TotalCollected = totalCollected,
                     TotalCommission = totalCommission,
-                    Profit = totalRevenue - totalCommission,
+                    Profit = totalCollected - totalCommission,
                 },
                 Rows = items,
             };

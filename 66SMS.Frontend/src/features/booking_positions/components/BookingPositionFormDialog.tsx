@@ -158,7 +158,7 @@ export function BookingPositionFormDialog({
                 <div className="relative" ref={dropdownRef}>
                   <div
                     className={cn(
-                      "flex w-full items-center justify-between gap-2 rounded-md bg-adminGray-100/80 px-3 py-2 text-sm text-adminInk outline-none cursor-pointer border border-transparent hover:bg-adminGray-100 focus-within:bg-white focus-within:ring-2 focus-within:ring-adminGreen-600/30 transition-all",
+                      "flex w-full items-center justify-between gap-2 rounded-md bg-adminGray-100/80 px-3 py-2 text-sm text-adminInk outline-hidden cursor-pointer border border-transparent hover:bg-adminGray-100 focus-within:bg-white focus-within:ring-2 focus-within:ring-adminGreen-600/30 transition-all",
                       dropdownOpen && "bg-white ring-2 ring-adminGreen-600/30"
                     )}
                     onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -173,7 +173,7 @@ export function BookingPositionFormDialog({
                         <Search className="w-4 h-4 mr-2 text-adminGray-600" />
                         <input
                           autoFocus
-                          className="w-full bg-transparent outline-none text-sm placeholder:text-adminGray-600"
+                          className="w-full bg-transparent outline-hidden text-sm placeholder:text-adminGray-600"
                           placeholder="Tìm phòng..."
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}

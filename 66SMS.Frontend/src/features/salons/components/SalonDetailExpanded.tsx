@@ -60,17 +60,17 @@ export function SalonDetailExpanded({
   return (
     <div className="bg-adminGray-50/30 w-full overflow-hidden max-h-[400px] overflow-y-auto custom-scrollbar">
       <Tabs defaultValue="info" className="w-full flex-col">
-        <div className="px-4 pt-2 sticky top-0 bg-adminGray-50/95 backdrop-blur-sm z-10">
+        <div className="px-4 pt-2 sticky top-0 bg-adminGray-50/95 backdrop-blur-xs z-10">
           <TabsList className="h-10 border-b border-adminGray-100/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
             <TabsTrigger
               value="info"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-hidden whitespace-nowrap transition-colors"
             >
               Thông tin chung
             </TabsTrigger>
             <TabsTrigger
               value="staff"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none whitespace-nowrap transition-colors"
+              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-hidden whitespace-nowrap transition-colors"
             >
               <Users className="w-3.5 h-3.5 mr-1.5 inline" />
               Nhân viên
@@ -78,10 +78,10 @@ export function SalonDetailExpanded({
           </TabsList>
         </div>
 
-        <TabsContent value="info" className="p-4 m-0 border-none outline-none">
+        <TabsContent value="info" className="p-4 m-0 border-none outline-hidden">
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-xl bg-adminGray-50/50 flex items-center justify-center shrink-0 shadow-sm border border-adminGray-100/50 overflow-hidden">
+              <div className="w-14 h-14 rounded-xl bg-adminGray-50/50 flex items-center justify-center shrink-0 shadow-xs border border-adminGray-100/50 overflow-hidden">
                 <FallbackImage
                   kind="salon"
                   src={salon.imageUrl}
@@ -165,7 +165,7 @@ export function SalonDetailExpanded({
                 variant="admin"
                 size="sm"
                 onClick={() => onEdit?.(salon)}
-                className="bg-adminGreen-600 hover:opacity-90 text-white shadow-sm h-8 px-4 text-sm gap-1.5 rounded-md transition-opacity"
+                className="bg-adminGreen-600 hover:opacity-90 text-white shadow-xs h-8 px-4 text-sm gap-1.5 rounded-md transition-opacity"
               >
                 <Pencil className="w-3.5 h-3.5" />
                 Cập nhật
@@ -173,7 +173,7 @@ export function SalonDetailExpanded({
             </div>
           </div>
         </TabsContent>
-        <TabsContent value="staff" className="p-4 m-0 border-none outline-none">
+        <TabsContent value="staff" className="p-4 m-0 border-none outline-hidden">
           <SalonStaffPage salonId={salonId} />
         </TabsContent>
       </Tabs>

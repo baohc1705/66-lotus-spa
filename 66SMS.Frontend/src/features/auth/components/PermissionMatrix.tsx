@@ -99,8 +99,8 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
                           title={allChecked ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
                           className={cn(
                             'inline-flex items-center justify-center w-[22px] h-[22px] rounded-[5px] cursor-pointer transition-all',
-                            allChecked && 'bg-adminGreen-600 border-0 shadow-sm',
-                            someChecked && 'bg-adminGold-600 border-0 shadow-sm',
+                            allChecked && 'bg-adminGreen-600 border-0 shadow-xs',
+                            someChecked && 'bg-adminGold-600 border-0 shadow-xs',
                             !allChecked && !someChecked && 'bg-white border-[1.5px] border-border',
                           )}
                         >
@@ -125,7 +125,7 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
                               className={cn(
                                 'inline-flex items-center justify-center w-[22px] h-[22px] rounded-[5px] cursor-pointer transition-all',
                                 checked
-                                  ? 'bg-adminGreen-600 border-0 shadow-sm'
+                                  ? 'bg-adminGreen-600 border-0 shadow-xs'
                                   : 'bg-white border-[1.5px] border-border',
                               )}
                             >

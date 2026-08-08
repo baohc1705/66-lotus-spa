@@ -5,7 +5,6 @@ import type { Result } from "@/shared/types/common.types";
 import { formatDate } from "@/shared/utils/date.utils";
 import {
   type StaffAvailabilityDto,
-  type CashierBooking,
   type CashierDailyDto,
   type CashierPosition,
 } from "../types";

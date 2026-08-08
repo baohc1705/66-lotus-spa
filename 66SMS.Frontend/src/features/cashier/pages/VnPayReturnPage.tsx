@@ -93,7 +93,7 @@ export function VnPayReturnPage() {
             <p className="text-adminGray-600 mb-6">{message}</p>
             <button
               onClick={handleReturn}
-              className="px-6 py-3 bg-adminGreen-600 text-white rounded-admin font-medium hover:bg-adminGreen-600/90 transition-colors w-full shadow-md shadow-sm"
+              className="px-6 py-3 bg-adminGreen-600 text-white rounded-admin font-medium hover:bg-adminGreen-600/90 transition-colors w-full shadow-md shadow-xs"
             >
               {returnText}
             </button>

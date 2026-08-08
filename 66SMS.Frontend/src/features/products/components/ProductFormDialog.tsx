@@ -355,7 +355,7 @@ export function ProductFormDialog({
                         <button
                           type="button"
                           onClick={() => removeImage(index)}
-                          className="absolute -top-1.5 -right-1.5 z-10 h-5 w-5 rounded-full bg-state-danger-solid text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity hover:bg-state-danger-solid shadow-sm"
+                          className="absolute -top-1.5 -right-1.5 z-10 h-5 w-5 rounded-full bg-state-danger-solid text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity hover:bg-state-danger-solid shadow-xs"
                         >
                           <X className="h-3 w-3" />
                         </button>

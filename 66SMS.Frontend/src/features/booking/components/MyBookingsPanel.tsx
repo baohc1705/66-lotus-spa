@@ -265,8 +265,8 @@ export function MyBookingsPanel() {
             key={booking.id}
             className={`rounded-lg overflow-hidden transition-all duration-300 ${
               expandedId === booking.id
-                ? "bg-white ring-1 ring-rose-600/20 shadow-sm"
-                : "bg-warm-50/80 hover:bg-white shadow-sm"
+                ? "bg-white ring-1 ring-rose-600/20 shadow-xs"
+                : "bg-warm-50/80 hover:bg-white shadow-xs"
             }`}
           >
             <div
@@ -354,7 +354,7 @@ export function MyBookingsPanel() {
                             isPayingWalletId === booking.id ||
                             isPayingId === booking.id
                           }
-                          className="px-3 py-1.5 bg-gold-600 text-white text-xs font-medium rounded-md hover:bg-gold-600/90 transition flex items-center gap-1.5 shadow-sm whitespace-nowrap"
+                          className="px-3 py-1.5 bg-gold-600 text-white text-xs font-medium rounded-md hover:bg-gold-600/90 transition flex items-center gap-1.5 shadow-xs whitespace-nowrap"
                         >
                           {isPayingWalletId === booking.id ? (
                             <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -370,7 +370,7 @@ export function MyBookingsPanel() {
                           isPayingId === booking.id ||
                           isPayingWalletId === booking.id
                         }
-                        className="px-3 py-1.5 bg-success-text text-white text-xs font-medium rounded-md hover:bg-success-text/90 transition flex items-center gap-1.5 shadow-sm whitespace-nowrap"
+                        className="px-3 py-1.5 bg-success-text text-white text-xs font-medium rounded-md hover:bg-success-text/90 transition flex items-center gap-1.5 shadow-xs whitespace-nowrap"
                       >
                         {isPayingId === booking.id ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -387,7 +387,7 @@ export function MyBookingsPanel() {
                         handlePostpone(e, booking.id!, booking.paidAmount)
                       }
                       disabled={isPostponingId === booking.id}
-                      className="px-3 py-1.5 border border-error-bg text-error-text hover:bg-error-bg text-xs font-medium rounded-md transition flex items-center gap-1.5 shadow-sm whitespace-nowrap"
+                      className="px-3 py-1.5 border border-error-bg text-error-text hover:bg-error-bg text-xs font-medium rounded-md transition flex items-center gap-1.5 shadow-xs whitespace-nowrap"
                     >
                       {isPostponingId === booking.id ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
