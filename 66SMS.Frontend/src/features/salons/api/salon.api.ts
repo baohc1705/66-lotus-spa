@@ -1,5 +1,4 @@
 import axiosInstance from "@/shared/api/axiosInstance";
-import { API } from "@/shared/api/endpoints";
 import type { Result, PagedResult } from "@/shared/types/common.types";
 import type {
   SalonDTO,
@@ -9,35 +8,34 @@ import type {
   SalonQueryParams,
 } from "../types/salon.types";
 
-const BASE = API.salons;
 
 export const salonApi = {
   getAll: (params: SalonQueryParams) =>
     axiosInstance
-      .get<Result<PagedResult<SalonListItem>>>(BASE, { params })
+      .get<Result<PagedResult<SalonListItem>>>("/salons", { params })
       .then((r) => r.data),
 
   getAdminAll: (params: SalonQueryParams) =>
     axiosInstance
-      .get<Result<PagedResult<SalonListItem>>>(`${BASE}/admin`, { params })
+      .get<Result<PagedResult<SalonListItem>>>(`/salons/admin`, { params })
       .then((r) => r.data),
 
   getDetail: (id: number) =>
-    axiosInstance.get<Result<SalonDTO>>(`${BASE}/${id}`).then((r) => r.data),
+    axiosInstance.get<Result<SalonDTO>>(`/salons/${id}`).then((r) => r.data),
 
   getPrimary: () =>
     axiosInstance
-      .get<Result<SalonDTO | null>>(`${BASE}/primary`)
+      .get<Result<SalonDTO | null>>(`/salons/primary`)
       .then((r) => r.data),
 
   create: (payload: CreateSalonPayload) =>
-    axiosInstance.post<Result<number>>(BASE, payload).then((r) => r.data),
+    axiosInstance.post<Result<number>>("/salons", payload).then((r) => r.data),
 
   update: (id: number, payload: UpdateSalonPayload) =>
     axiosInstance
-      .patch<Result<object>>(`${BASE}/${id}`, payload)
+      .patch<Result<object>>(`/salons/${id}`, payload)
       .then((r) => r.data),
 
   delete: (id: number) =>
-    axiosInstance.delete<Result<object>>(`${BASE}/${id}`).then((r) => r.data),
+    axiosInstance.delete<Result<object>>(`/salons/${id}`).then((r) => r.data),
 };

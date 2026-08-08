@@ -1,5 +1,4 @@
 import axiosInstance from "@/shared/api/axiosInstance";
-import { API } from "@/shared/api/endpoints";
 import type {
   Result,
   PagedResult,
@@ -11,27 +10,25 @@ import type {
   UpdatePromotionPayload,
 } from "../types/promotion.types";
 
-const BASE = API.promotions;
-
 export const promotionApi = {
   getAll: (params: PageRequest) =>
     axiosInstance
-      .get<Result<PagedResult<PromotionDto>>>(BASE, { params })
+      .get<Result<PagedResult<PromotionDto>>>("/promotions", { params })
       .then((r) => r.data),
 
   getDetail: (id: number) =>
     axiosInstance
-      .get<Result<PromotionDto>>(`${BASE}/${id}`)
+      .get<Result<PromotionDto>>(`/promotions/${id}`)
       .then((r) => r.data),
 
   create: (payload: CreatePromotionPayload) =>
-    axiosInstance.post<Result<object>>(BASE, payload).then((r) => r.data),
+    axiosInstance.post<Result<object>>("/promotions", payload).then((r) => r.data),
 
   update: (id: number, payload: UpdatePromotionPayload) =>
     axiosInstance
-      .patch<Result<object>>(`${BASE}/${id}`, payload)
+      .patch<Result<object>>(`/promotions/${id}`, payload)
       .then((r) => r.data),
 
   delete: (id: number) =>
-    axiosInstance.delete<Result<object>>(`${BASE}/${id}`).then((r) => r.data),
+    axiosInstance.delete<Result<object>>(`/promotions/${id}`).then((r) => r.data),
 };

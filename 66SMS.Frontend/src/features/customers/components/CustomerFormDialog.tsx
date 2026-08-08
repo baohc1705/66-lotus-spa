@@ -47,7 +47,6 @@ import { User, ShoppingBag } from "lucide-react";
 import { ImageUpload } from "@/shared/components/ImageUpload";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import axiosInstance from "@/shared/api/axiosInstance";
-import { API } from "@/shared/api/endpoints";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 interface CustomerFormDialogProps {
@@ -158,7 +157,7 @@ export function CustomerFormDialog({
               const customerId = result.data as unknown as number;
               if (customerId > 0) {
                 try {
-                  await axiosInstance.post(API.membershipCards, {
+                  await axiosInstance.post("/membership-cards", {
                     customerId,
                     membershipTierName: "common",
                     issuedAt: new Date().toISOString(),

@@ -1,5 +1,4 @@
 import axiosInstance from "@/shared/api/axiosInstance";
-import { API } from "@/shared/api/endpoints";
 import type {
   Result,
   PagedResult,
@@ -10,33 +9,33 @@ import type { CreateUserPayload, UpdateUserPayload } from "../types/user.types";
 
 export const usersApi = {
   getMe: () =>
-    axiosInstance.get<Result<UserDto>>(API.users.me).then((r) => r.data),
+    axiosInstance.get<Result<UserDto>>("/users/me").then((r) => r.data),
 
   getAll: (params?: PageRequest) =>
     axiosInstance
-      .get<Result<PagedResult<UserDto>>>(API.users.base, { params })
+      .get<Result<PagedResult<UserDto>>>("/users", { params })
       .then((r) => r.data),
 
   getDetail: (id: number) =>
     axiosInstance
-      .get<Result<UserDto>>(`${API.users.base}/${id}`)
+      .get<Result<UserDto>>(`/users/${id}`)
       .then((r) => r.data),
 
   create: (body: CreateUserPayload) =>
     axiosInstance
-      .post<Result<object>>(API.auth.register, body)
+      .post<Result<object>>("/auth/register", body)
       .then((r) => r.data),
 
   update: (body: UpdateUserPayload) =>
-    axiosInstance.put<Result<object>>(API.users.base, body).then((r) => r.data),
+    axiosInstance.put<Result<object>>("/users", body).then((r) => r.data),
 
   delete: (body: { id?: number; ids?: number[] }) =>
     axiosInstance
-      .delete<Result<object>>(API.users.base, { data: body })
+      .delete<Result<object>>("/users", { data: body })
       .then((r) => r.data),
 
   getAllAccounts: (params?: PageRequest) =>
     axiosInstance
-      .get<Result<PagedResult<UserAccountDto>>>(API.users.accounts, { params })
+      .get<Result<PagedResult<UserAccountDto>>>("/users/accounts", { params })
       .then((r) => r.data),
 };

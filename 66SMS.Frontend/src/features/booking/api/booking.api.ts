@@ -1,5 +1,4 @@
 import axiosInstance from "@/shared/api/axiosInstance";
-import { API } from "@/shared/api/endpoints";
 import type { PagedResult, Result } from "@/shared/types/common.types";
 import type {
   AppointmentDto,
@@ -17,16 +16,12 @@ import type {
   TimeSlotDTO,
 } from "../types/booking.types";
 
-const APPOINTMENT_BASE = API.appointment;
-const POSITION_BASE = API.bookingPositions;
-const PROMOTION_BASE = API.promotions;
-
 export const bookingApi = {
   getAvailableDays: async (
     params: GetAvailableBookingDaysParams = {},
   ): Promise<BookingDayDto[]> => {
     const res = await axiosInstance.get<Result<BookingDayDto[]>>(
-      `${APPOINTMENT_BASE}/available-days`,
+      `/appointment/available-days`,
       { params: { days: params.days ?? 7 } },
     );
     return res.data.data || [];
@@ -36,7 +31,7 @@ export const bookingApi = {
     params: GetTechniciansParams,
   ): Promise<TechnicianDTO[]> => {
     const res = await axiosInstance.get<Result<TechnicianDTO[]>>(
-      `${APPOINTMENT_BASE}/technicians`,
+      `/appointment/technicians`,
       { params },
     );
     return res.data.data || [];
@@ -45,13 +40,13 @@ export const bookingApi = {
   getPositions: async (): Promise<BookingPositionDTO[]> => {
     const res = await axiosInstance.get<
       Result<PagedResult<BookingPositionDTO>>
-    >(POSITION_BASE, { params: { pageIndex: 1, pageSize: 100 } });
+    >("/booking-positions", { params: { pageIndex: 1, pageSize: 100 } });
     return res.data.data?.items || [];
   },
 
   getTimeSlots: async (params: GetTimeSlotsParams): Promise<TimeSlotDTO[]> => {
     const res = await axiosInstance.get<Result<TimeSlotDTO[]>>(
-      `${APPOINTMENT_BASE}/time-slots`,
+      `/appointment/time-slots`,
       { params },
     );
     return res.data.data || [];
@@ -61,7 +56,7 @@ export const bookingApi = {
     payload: CreateSlotLockPayload,
   ): Promise<{ success: boolean; lockIds: number[]; message?: string }> => {
     const res = await axiosInstance.post<Result<number[]>>(
-      `${APPOINTMENT_BASE}/lock`,
+      `/appointment/lock`,
       payload,
     );
     return {
@@ -73,7 +68,7 @@ export const bookingApi = {
 
   releaseSlotLock: async (lockIds: number[]): Promise<boolean> => {
     const res = await axiosInstance.post<Result<object>>(
-      `${APPOINTMENT_BASE}/lock/release`,
+      `/appointment/lock/release`,
       { lockIds },
     );
     return res.data.isSuccess;
@@ -83,7 +78,7 @@ export const bookingApi = {
     payload: CreateAppointmentPayload,
   ): Promise<{ success: boolean; bookingIds: number[] }> => {
     const res = await axiosInstance.post<Result<number[]>>(
-      APPOINTMENT_BASE,
+      "/appointment",
       payload,
     );
     return { success: res.data.isSuccess, bookingIds: res.data.data || [] };
@@ -94,7 +89,7 @@ export const bookingApi = {
     orderTotal: number,
   ): Promise<PromotionValidationDto> => {
     const res = await axiosInstance.get<Result<PromotionValidationDto>>(
-      `${PROMOTION_BASE}/validate`,
+      `/promotions/validate`,
       { params: { code, orderTotal } },
     );
     if (!res.data.isSuccess || !res.data.data) {
@@ -105,21 +100,21 @@ export const bookingApi = {
 
   getActivePromotions: async (): Promise<ActivePromotionDto[]> => {
     const res = await axiosInstance.get<Result<ActivePromotionDto[]>>(
-      `${PROMOTION_BASE}/active`,
+      `/promotions/active`,
     );
     return res.data.data ?? [];
   },
 
   getMyBookings: async (): Promise<AppointmentDto[]> => {
     const res = await axiosInstance.get<Result<PagedResult<AppointmentDto>>>(
-      `${APPOINTMENT_BASE}/me`,
+      `/appointment/me`,
     );
     return res.data.data?.items || [];
   },
 
   getDetail: async (id: number): Promise<AppointmentDto> => {
     const res = await axiosInstance.get<Result<AppointmentDto>>(
-      `${APPOINTMENT_BASE}/${id}`,
+      `/appointment/${id}`,
     );
     return res.data.data ?? {};
   },
@@ -130,7 +125,7 @@ export const bookingApi = {
     const pageIndex = params.pageIndex ?? 1;
     const pageSize = params.pageSize ?? 5;
     const res = await axiosInstance.get<Result<PagedResult<AppointmentDto>>>(
-      APPOINTMENT_BASE,
+      "/appointment",
       { params: { ...params, pageIndex, pageSize } },
     );
     return (
@@ -148,21 +143,21 @@ export const bookingApi = {
 
   getDepositVnPayUrl: async (appointmentId: number): Promise<string> => {
     const res = await axiosInstance.get<Result<string>>(
-      `${APPOINTMENT_BASE}/${appointmentId}/deposit-vnpay-url`,
+      `/appointment/${appointmentId}/deposit-vnpay-url`,
     );
     return res.data.data || "";
   },
 
   postponeBooking: async (appointmentId: number): Promise<boolean> => {
     const res = await axiosInstance.post<Result<object>>(
-      `${APPOINTMENT_BASE}/${appointmentId}/postpone`,
+      `/appointment/${appointmentId}/postpone`,
     );
     return res.data.isSuccess;
   },
 
   payDepositWithWallet: async (appointmentId: number): Promise<boolean> => {
     const res = await axiosInstance.post<Result<object>>(
-      `${APPOINTMENT_BASE}/${appointmentId}/pay-deposit-wallet`,
+      `/appointment/${appointmentId}/pay-deposit-wallet`,
     );
     return res.data.isSuccess;
   },

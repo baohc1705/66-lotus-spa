@@ -77,8 +77,7 @@ Mỗi feature nằm trong src/features/[tên]/ và có cấu trúc giống nhau:
 
 - Axios instance chung nằm ở src/shared/api/axiosInstance.ts
 - Base URL lấy từ biến môi trường VITE_API_BASE_URL
-- Endpoint tập trung ở src/shared/api/endpoints.ts
-- Mỗi feature có file api riêng, gọi axios rồi trả Result<T>
+- Mỗi feature có file api riêng, path gọi thẳng trong api đó, trả Result<T>
 
 ## Phân quyền
 

@@ -1,5 +1,4 @@
 import axiosInstance from "@/shared/api/axiosInstance";
-import { API } from "@/shared/api/endpoints";
 import type { Result, PagedResult } from "@/shared/types/common.types";
 import type {
   CertificateTypeDTO,
@@ -15,51 +14,51 @@ import type {
 export const certificateApi = {
   getAllTypes: (params: CertificateTypeQueryParams) =>
     axiosInstance
-      .get<Result<PagedResult<CertificateTypeDTO>>>(API.certificateTypes, { params })
+      .get<Result<PagedResult<CertificateTypeDTO>>>("/certificate-type", { params })
       .then((r) => r.data),
 
   getDetailType: (id: number) =>
     axiosInstance
-      .get<Result<CertificateTypeDTO>>(`${API.certificateTypes}/${id}`)
+      .get<Result<CertificateTypeDTO>>(`/certificate-type/${id}`)
       .then((r) => r.data),
 
   createType: (payload: CreateCertificateTypePayload) =>
     axiosInstance
-      .post<Result<number>>(API.certificateTypes, payload)
+      .post<Result<number>>("/certificate-type", payload)
       .then((r) => r.data),
 
   updateType: (id: number, payload: UpdateCertificateTypePayload) =>
     axiosInstance
-      .patch<Result<object>>(`${API.certificateTypes}/${id}`, payload)
+      .patch<Result<object>>(`/certificate-type/${id}`, payload)
       .then((r) => r.data),
 
   deleteType: (id: number) =>
     axiosInstance
-      .delete<Result<object>>(`${API.certificateTypes}/${id}`)
+      .delete<Result<object>>(`/certificate-type/${id}`)
       .then((r) => r.data),
-  
+
   getAll: (params: StaffCertificateQueryParams) =>
     axiosInstance
-      .get<Result<PagedResult<StaffCertificateDTO>>>(API.staffCertificates, { params })
+      .get<Result<PagedResult<StaffCertificateDTO>>>("/staff-certificate", { params })
       .then((r) => r.data),
 
   getDetail: (id: number) =>
     axiosInstance
-      .get<Result<StaffCertificateDTO>>(`${API.staffCertificates}/${id}`)
+      .get<Result<StaffCertificateDTO>>(`/staff-certificate/${id}`)
       .then((r) => r.data),
 
   create: (payload: CreateStaffCertificatePayload) =>
     axiosInstance
-      .post<Result<number>>(API.staffCertificates, payload)
+      .post<Result<number>>("/staff-certificate", payload)
       .then((r) => r.data),
 
   update: (id: number, payload: UpdateStaffCertificatePayload) =>
     axiosInstance
-      .patch<Result<object>>(`${API.staffCertificates}/${id}`, payload)
+      .patch<Result<object>>(`/staff-certificate/${id}`, payload)
       .then((r) => r.data),
 
   delete: (id: number) =>
     axiosInstance
-      .delete<Result<object>>(`${API.staffCertificates}/${id}`)
+      .delete<Result<object>>(`/staff-certificate/${id}`)
       .then((r) => r.data),
 };

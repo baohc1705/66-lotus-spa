@@ -1,5 +1,4 @@
 import axiosInstance from "@/shared/api/axiosInstance";
-import { API } from "@/shared/api/endpoints";
 import type { Result } from "@/shared/types/common.types";
 import type {
   AdminWalletDto,
@@ -9,14 +8,14 @@ import type {
 
 export const getAdminWallets = async () => {
   const response = await axiosInstance.get<Result<AdminWalletDto[]>>(
-    API.admin.wallets,
+    "/admin/wallets",
   );
   return response.data;
 };
 
 export const getAdminWalletTransactions = async (walletId: number) => {
   const response = await axiosInstance.get<Result<AdminWalletTransactionDto[]>>(
-    `${API.admin.wallets}/${walletId}/transactions`,
+    `/admin/wallets/${walletId}/transactions`,
   );
   return response.data;
 };
@@ -26,7 +25,7 @@ export const addManualTransaction = async (
   data: { amount: number; note: string },
 ) => {
   const response = await axiosInstance.post<Result<object>>(
-    `${API.admin.wallets}/${walletId}/transaction`,
+    `/admin/wallets/${walletId}/transaction`,
     data,
   );
   return response.data;
@@ -34,14 +33,14 @@ export const addManualTransaction = async (
 
 export const getMyWallet = async () => {
   const { data } = await axiosInstance.get<Result<{ balance: number }>>(
-    API.users.meWallet,
+    "/users/me/wallet",
   );
   return data;
 };
 
 export const getMyWalletTransactions = async () => {
   const { data } = await axiosInstance.get<Result<WalletTransactionDto[]>>(
-    API.users.meWalletTx,
+    "/users/me/wallet/transactions",
   );
   return data;
 };
@@ -49,11 +48,8 @@ export const getMyWalletTransactions = async () => {
 export const getWalletTopUpVnPayUrl = async (
   amount: number,
 ): Promise<string> => {
-  const { data } = await axiosInstance.get<Result<string>>(
-    API.users.meWalletTopUpVnPayUrl,
-    {
-      params: { amount },
-    },
-  );
+  const { data } = await axiosInstance.get<Result<string>>("/users/me/wallet/top-up-vnpay-url", {
+    params: { amount },
+  });
   return data.data || "";
 };

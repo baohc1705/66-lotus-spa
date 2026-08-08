@@ -1,5 +1,4 @@
 import axiosInstance from "@/shared/api/axiosInstance";
-import { API } from "@/shared/api/endpoints";
 import type {
   Result,
   PagedResult,
@@ -11,25 +10,24 @@ import type {
   UpdateShiftPayload,
 } from "../types/shift.types";
 
-const BASE = API.shifts;
 
 export const shiftApi = {
   getAll: (params: PageRequest) =>
     axiosInstance
-      .get<Result<PagedResult<ShiftDTO>>>(BASE, { params })
+      .get<Result<PagedResult<ShiftDTO>>>("/shift", { params })
       .then((r) => r.data),
 
   getDetail: (id: number) =>
-    axiosInstance.get<Result<ShiftDTO>>(`${BASE}/${id}`).then((r) => r.data),
+    axiosInstance.get<Result<ShiftDTO>>(`/shift/${id}`).then((r) => r.data),
 
   create: (payload: CreateShiftPayload) =>
-    axiosInstance.post<Result<object>>(BASE, payload).then((r) => r.data),
+    axiosInstance.post<Result<object>>("/shift", payload).then((r) => r.data),
 
   update: (id: number, payload: UpdateShiftPayload) =>
     axiosInstance
-      .patch<Result<object>>(`${BASE}/${id}`, payload)
+      .patch<Result<object>>(`/shift/${id}`, payload)
       .then((r) => r.data),
 
   delete: (id: number) =>
-    axiosInstance.delete<Result<object>>(`${BASE}/${id}`).then((r) => r.data),
+    axiosInstance.delete<Result<object>>(`/shift/${id}`).then((r) => r.data),
 };
