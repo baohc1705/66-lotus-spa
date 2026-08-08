@@ -30,19 +30,30 @@ namespace _66SMS.Application.SalonService.Revenues.Queries.GetRevenueSummary
             var current = rows.FirstOrDefault(r =>
                 string.Equals(r.PeriodTag, "current", StringComparison.OrdinalIgnoreCase));
 
-            var dto = new RevenueSummaryDto();
-            ApplyPeriod(dto, current);
+            var dto = MapSummary(current);
 
             if (request.ComparePrevious)
             {
                 var previous = rows.FirstOrDefault(r =>
                     string.Equals(r.PeriodTag, "previous", StringComparison.OrdinalIgnoreCase));
-                var prevDto = new RevenueSummaryPeriodDto();
-                ApplyPeriod(prevDto, previous);
-                dto.PreviousPeriod = prevDto;
+                dto.PreviousPeriod = MapPeriod(previous);
             }
 
             return Result<RevenueSummaryDto>.Success(dto);
+        }
+
+        private static RevenueSummaryDto MapSummary(RevenueSummaryRowDto? row)
+        {
+            var dto = new RevenueSummaryDto();
+            ApplyPeriod(dto, row);
+            return dto;
+        }
+
+        private static RevenueSummaryPeriodDto MapPeriod(RevenueSummaryRowDto? row)
+        {
+            var dto = new RevenueSummaryPeriodDto();
+            ApplyPeriod(dto, row);
+            return dto;
         }
 
         private static void ApplyPeriod(RevenueSummaryPeriodDto target, RevenueSummaryRowDto? row)
@@ -51,12 +62,10 @@ namespace _66SMS.Application.SalonService.Revenues.Queries.GetRevenueSummary
 
             target.CashIn = row.CashIn;
             target.CashOut = row.CashOut;
-            target.NetCashFlow = row.CashIn - row.CashOut;
+            target.NetCashFlow = row.NetCashFlow;
             target.GrossRevenue = row.GrossRevenue;
             target.TransactionCount = row.TransactionCount;
-            target.AverageOrderValue = row.TransactionCount > 0
-                ? Math.Round(row.GrossRevenue / row.TransactionCount, 0)
-                : 0;
+            target.AverageOrderValue = row.AverageOrderValue;
         }
     }
 }

@@ -8,5 +8,6 @@ namespace _66SMS.Domain.Models
         public int ItemType { get; set; }
         public int Quantity { get; set; }
         public decimal Revenue { get; set; }
+        public decimal Percent { get; set; }
     }
 }

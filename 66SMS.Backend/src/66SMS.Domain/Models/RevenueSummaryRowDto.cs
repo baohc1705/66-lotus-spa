@@ -6,7 +6,9 @@ namespace _66SMS.Domain.Models
         public string PeriodTag { get; set; } = string.Empty;
         public decimal CashIn { get; set; }
         public decimal CashOut { get; set; }
+        public decimal NetCashFlow { get; set; }
         public decimal GrossRevenue { get; set; }
         public int TransactionCount { get; set; }
+        public decimal AverageOrderValue { get; set; }
     }
 }

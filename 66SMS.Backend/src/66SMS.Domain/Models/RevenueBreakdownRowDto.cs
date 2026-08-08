@@ -6,5 +6,6 @@ namespace _66SMS.Domain.Models
         public int ItemType { get; set; }
         public string Label { get; set; } = string.Empty;
         public decimal Amount { get; set; }
+        public decimal Percent { get; set; }
     }
 }

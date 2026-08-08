@@ -109,7 +109,7 @@ export function AdminLayout() {
 
         <div className="app-main__outer flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <div className="app-main__inner min-h-0 flex-1 overflow-y-auto">
-            <div className="p-4 md:p-6">
+            <div className="p-3 md:p-4">
               <Outlet context={{ layoutMode: "sidebar" as const }} />
             </div>
           </div>
