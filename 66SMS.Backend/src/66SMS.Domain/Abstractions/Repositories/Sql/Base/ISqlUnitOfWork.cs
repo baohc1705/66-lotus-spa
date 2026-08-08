@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 
 namespace _66SMS.Domain.Abstractions.Repositories.Sql.Base
 {

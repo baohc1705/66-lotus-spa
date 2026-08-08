@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Contracts.Helpers
+namespace _66SMS.Contract.Helpers
 {
     /// <summary>
     /// Chuẩn thời gian hệ thống: UTC (DateTimeOffset).

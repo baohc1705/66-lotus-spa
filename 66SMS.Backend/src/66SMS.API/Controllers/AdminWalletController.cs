@@ -2,7 +2,7 @@ using _66SMS.API.Abstractions;
 using _66SMS.Application.CustomerService.Wallets.Commands.ManualWalletTransaction;
 using _66SMS.Application.CustomerService.Wallets.Queries.GetWallets;
 using _66SMS.Application.CustomerService.Wallets.Queries.GetWalletTransactions;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

@@ -1,4 +1,4 @@
-namespace _66SMS.Contracts.Settings
+namespace _66SMS.Contract.Settings
 {
     /// <summary>
     /// Cấu hình Redis (cache + rate limit) — section "RedisSettings".

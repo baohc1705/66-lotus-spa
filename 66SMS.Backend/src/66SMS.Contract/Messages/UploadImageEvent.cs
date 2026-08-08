@@ -1,4 +1,4 @@
-namespace _66SMS.Contracts.Messages
+namespace _66SMS.Contract.Messages
 {
     /// <summary>
     /// Request upload ảnh lên Cloudinary (MassTransit request/response).

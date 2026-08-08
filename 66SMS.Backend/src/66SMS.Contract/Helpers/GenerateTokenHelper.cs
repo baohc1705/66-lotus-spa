@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace _66SMS.Contracts.Helpers
+namespace _66SMS.Contract.Helpers
 {
     public static class GenerateTokenHelper
     {

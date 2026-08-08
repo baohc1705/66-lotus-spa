@@ -6,7 +6,7 @@ using _66SMS.Application.SalonService.Payrolls.Queries.GetAllPayrolls;
 using _66SMS.Application.SalonService.Payrolls.Queries.GetDetailPayroll;
 using _66SMS.Application.SalonService.Payrolls.Queries.GetPayrollCommissionDailyStats;
 using _66SMS.Application.SalonService.Payrolls.Queries.GetPayrollCommissionStats;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using _66SMS.Domain.Constants;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;

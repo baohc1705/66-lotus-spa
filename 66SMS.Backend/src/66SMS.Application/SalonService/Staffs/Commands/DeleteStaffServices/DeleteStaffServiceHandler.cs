@@ -1,7 +1,7 @@
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 namespace _66SMS.Application.SalonService.Staffs.Commands.DeleteStaffServices;

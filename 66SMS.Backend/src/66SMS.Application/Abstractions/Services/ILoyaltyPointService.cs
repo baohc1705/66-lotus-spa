@@ -1,4 +1,4 @@
-namespace _66SMS.Application.Abstractions
+namespace _66SMS.Application.Abstractions.Services
 {
     /// <summary>
     /// Service xử lý logic tích lũy điểm và tự động nâng hạng thẻ thành viên

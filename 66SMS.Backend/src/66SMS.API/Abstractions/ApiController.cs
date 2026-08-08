@@ -1,4 +1,4 @@
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace _66SMS.API.Abstractions

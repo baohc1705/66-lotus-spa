@@ -8,7 +8,7 @@ using _66SMS.Application.BookingService.Appointments.Queries.GetAvailableBooking
 using _66SMS.Application.BookingService.Appointments.Queries.GetDepositVnPayUrl;
 using _66SMS.Application.BookingService.Appointments.Queries.GetTechnicians;
 using _66SMS.Application.BookingService.Appointments.Queries.GetTimeSlots;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

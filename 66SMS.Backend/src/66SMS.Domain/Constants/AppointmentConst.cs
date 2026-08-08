@@ -34,6 +34,9 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_UPDATED_BY = "updated_by";
 
         public const string SP_GET_STAFF_AVAILABILITY = "dbo.usp_GetStaffAvailability";
+        public const string SP_GET_BOOKING_TECHNICIANS = "dbo.usp_GetBookingTechnicians";
+        public const string SP_GET_BOOKING_TIME_SLOTS = "dbo.usp_GetBookingTimeSlots";
+        public const string SP_RESOLVE_BOOKING_STAFF = "dbo.usp_ResolveBookingStaff";
         public const string SP_GET_CASHIER_STAFF_COLUMNS = "dbo.usp_GetCashierStaffColumns";
         public const string SP_GET_CASHIER_DAILY_BOOKINGS = "dbo.usp_GetCashierDailyBookings";
         #endregion
@@ -79,6 +82,19 @@ namespace _66SMS.Domain.Constants
         
         public const string MSG_STAFF_AVAILABILITY_SLOT_REQUIRED = "Vui lòng chọn khung giờ.";
         public const string MSG_STAFF_AVAILABILITY_SERVICE_REQUIRED = "Vui lòng chọn dịch vụ.";
+
+        public const string BOOKING_ANY_TECHNICIAN_NAME = "Bất kỳ kỹ thuật viên";
+        public const string BOOKING_ANY_TECHNICIAN_ROLE = "Hệ thống tự động chọn người rảnh nhất";
+        public const string BOOKING_TECHNICIAN_ROLE = "Kỹ thuật viên";
+        public const string BOOKING_ACCOUNT_ROLE_STAFF = "STAFF";
+        public const string BOOKING_STATUS_NO_SLOT = "Nghỉ hôm nay";
+        public const string BOOKING_STATUS_ONE_SLOT = "Còn 1 slot";
+        public const string BOOKING_STATUS_SLOTS_LEFT = "Còn {0} slot";
+
+        public const string MSG_ASSIGN_STAFF_ONLY_WAITING = "Chỉ đổi nhân viên khi lịch hẹn đang chờ phục vụ.";
+        public const string MSG_ASSIGN_STAFF_UNCHANGED = "Nhân viên không thay đổi.";
+        public const string MSG_ASSIGN_STAFF_UNAVAILABLE = "Nhân viên không khả dụng cho khung giờ này (trùng lịch, không có ca, hoặc không làm dịch vụ).";
+        public const string MSG_ASSIGN_STAFF_SUCCESS = "Đã cập nhật nhân viên thành công.";
         #endregion
     }
 }

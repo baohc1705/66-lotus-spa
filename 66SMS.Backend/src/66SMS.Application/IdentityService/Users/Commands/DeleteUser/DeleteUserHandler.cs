@@ -1,5 +1,5 @@
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
@@ -8,7 +8,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.IdentityService.Users.Commands.DeleteUser
 {

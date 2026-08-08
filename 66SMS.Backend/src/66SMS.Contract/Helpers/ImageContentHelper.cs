@@ -1,4 +1,4 @@
-namespace _66SMS.Contracts.Helpers
+namespace _66SMS.Contract.Helpers
 {
     /// <summary>
     /// Phát hiện và kiểm tra loại ảnh từ magic bytes (không tin extension từ client).

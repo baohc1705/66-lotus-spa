@@ -1,7 +1,7 @@
-﻿using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Enumerations;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Enumerations;
 
-namespace _66SMS.Contracts.Shared
+namespace _66SMS.Contract.Shared
 {
     public class Result<TData> : IResult<TData>
     {

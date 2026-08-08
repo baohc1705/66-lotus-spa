@@ -1,3 +1,4 @@
+using _66SMS.Contract.Helpers;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 
@@ -12,13 +13,13 @@ namespace _66SMS.Application.BookingService.Helpers
         public static void MarkInService(BookingPosition position)
         {
             position.Status = BookingPositionConst.STATUS_IN_SERVICE;
-            position.UpdatedAt = Contracts.Helpers.DateTimeHelper.UtcNow();
+            position.UpdatedAt = DateTimeHelper.UtcNow();
         }
 
         public static void MarkAvailable(BookingPosition position)
         {
             position.Status = BookingPositionConst.STATUS_AVAILABLE;
-            position.UpdatedAt = Contracts.Helpers.DateTimeHelper.UtcNow();
+            position.UpdatedAt = DateTimeHelper.UtcNow();
         }
     }
 }

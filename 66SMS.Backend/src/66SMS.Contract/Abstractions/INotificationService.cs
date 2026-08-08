@@ -1,6 +1,6 @@
-﻿using _66SMS.Contracts.Messages;
+using _66SMS.Contract.Messages;
 
-namespace _66SMS.Contracts.Abstractions
+namespace _66SMS.Contract.Abstractions
 {
     public interface INotificationService 
     {

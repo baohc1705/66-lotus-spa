@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 using _66SMS.Application.DTOs.Auth;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 using MediatR;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
 {

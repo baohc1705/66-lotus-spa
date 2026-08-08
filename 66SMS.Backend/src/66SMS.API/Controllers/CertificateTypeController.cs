@@ -5,7 +5,7 @@ using _66SMS.Application.CatalogService.CertificateTypes.Commands.DeleteCertific
 using _66SMS.Application.CatalogService.CertificateTypes.Commands.UpdateCertificateType;
 using _66SMS.Application.CatalogService.CertificateTypes.Queries.GetAllCertificateTypes;
 using _66SMS.Application.CatalogService.CertificateTypes.Queries.GetDetailCertificateType;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;

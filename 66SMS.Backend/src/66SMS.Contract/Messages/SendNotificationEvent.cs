@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Contracts.Messages
+namespace _66SMS.Contract.Messages
 {
     public class SendNotificationEvent<TPayload> :  DomainEvent where TPayload : class
     {

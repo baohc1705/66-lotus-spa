@@ -1,4 +1,4 @@
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 using _66SMS.Application.DTOs.Cashier;
 using MediatR;
 using System.Collections.Generic;

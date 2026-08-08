@@ -5,7 +5,7 @@ using _66SMS.Application.CatalogService.StaffCertificates.Commands.DeleteStaffCe
 using _66SMS.Application.CatalogService.StaffCertificates.Commands.UpdateStaffCertificate;
 using _66SMS.Application.CatalogService.StaffCertificates.Queries.GetAllStaffCertificates;
 using _66SMS.Application.CatalogService.StaffCertificates.Queries.GetDetailStaffCertificate;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;

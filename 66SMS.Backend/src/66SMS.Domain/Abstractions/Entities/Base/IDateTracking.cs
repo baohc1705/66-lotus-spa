@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Domain.Abstractions.Entities.Base
+namespace _66SMS.Domain.Abstractions.Entities.Base
 {
     public interface IDateTracking
     {

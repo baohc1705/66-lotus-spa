@@ -4,9 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using _66SMS.Infrastructure.Messagings;
 using _66SMS.Infrastructure.Consumers;
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Settings;
-using _66SMS.Contracts.Messages;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Settings;
+using _66SMS.Contract.Messages;
 
 namespace _66SMS.Infrastructure.DependencyInjection.Extensions;
 

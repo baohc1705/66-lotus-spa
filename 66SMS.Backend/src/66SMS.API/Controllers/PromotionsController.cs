@@ -6,7 +6,7 @@ using _66SMS.Application.BookingService.Promotions.Queries.GetActivePromotions;
 using _66SMS.Application.BookingService.Promotions.Queries.GetAllPromotions;
 using _66SMS.Application.BookingService.Promotions.Queries.GetDetailPromotion;
 using _66SMS.Application.BookingService.Promotions.Queries.ValidatePromotionCode;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;

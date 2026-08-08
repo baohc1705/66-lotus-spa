@@ -1,4 +1,4 @@
-﻿using _66SMS.Contracts.Constants;
+using _66SMS.Contract.Constants;
 using _66SMS.Domain.Constants;
 using FluentValidation;
 

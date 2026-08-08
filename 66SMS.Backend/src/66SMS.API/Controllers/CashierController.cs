@@ -11,7 +11,7 @@ using _66SMS.Application.BookingService.Cashier.Queries.GetCashierPositions;
 using _66SMS.Application.BookingService.Cashier.Queries.GetCashierVnPayUrl;
 using _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointments;
 using _66SMS.Application.BookingService.Cashier.Queries.GetStaffAvailability;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

@@ -5,8 +5,8 @@ using _66SMS.Application.BookingService.WorkSchedules.Commands.DeleteWorkSchedul
 using _66SMS.Application.BookingService.WorkSchedules.Commands.UpdateWorkSchedule;
 using _66SMS.Application.BookingService.WorkSchedules.Queries.GetAllWorkSchedule;
 using _66SMS.Application.BookingService.WorkSchedules.Queries.GetDetailWorkSchedule;
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Shared;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

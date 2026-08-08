@@ -1,7 +1,7 @@
-using _66SMS.Application.Abstractions;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Application.Abstractions.Services;
 
 namespace _66SMS.Application.BookingService.Helpers
 {

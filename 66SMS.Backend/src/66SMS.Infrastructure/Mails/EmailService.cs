@@ -1,6 +1,6 @@
-﻿using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Settings;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Settings;
+using _66SMS.Contract.Shared;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;

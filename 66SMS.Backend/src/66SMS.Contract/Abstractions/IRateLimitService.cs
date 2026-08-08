@@ -1,4 +1,4 @@
-namespace _66SMS.Contracts.Abstractions
+namespace _66SMS.Contract.Abstractions
 {
     /// <summary>
     /// Rate limit dựa trên Redis sliding-window counter.

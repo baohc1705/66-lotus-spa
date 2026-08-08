@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 
-namespace _66SMS.Contracts.Extensions
+namespace _66SMS.Contract.Extensions
 {
     public static class QueryableExtensions
     {

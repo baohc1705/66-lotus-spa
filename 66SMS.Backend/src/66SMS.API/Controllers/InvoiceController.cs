@@ -7,7 +7,7 @@ using _66SMS.Application.BookingService.Invoices.Commands.UpdateInvoiceItems;
 using _66SMS.Application.BookingService.Invoices.Queries.GetAllInvoices;
 using _66SMS.Application.BookingService.Invoices.Queries.GetDetailInvoice;
 using _66SMS.Application.BookingService.Invoices.Queries.GetInvoicePreviewFromAppointment;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;

@@ -2,7 +2,7 @@ using _66SMS.API.Abstractions;
 using _66SMS.Application.Notifications.Commands.ClearMyNotifications;
 using _66SMS.Application.Notifications.Commands.MarkAllNotificationsRead;
 using _66SMS.Application.Notifications.Queries.GetMyNotifications;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

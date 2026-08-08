@@ -1,5 +1,5 @@
-using _66SMS.Contracts.Helpers;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Helpers;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;

@@ -1,6 +1,6 @@
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Constants;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Constants;
+using _66SMS.Contract.Helpers;
 using Microsoft.AspNetCore.Http;
 
 namespace _66SMS.Infrastructure.Security

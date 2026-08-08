@@ -1,5 +1,5 @@
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Shared;
 using ClosedXML.Excel;
 
 namespace _66SMS.Infrastructure.Excels

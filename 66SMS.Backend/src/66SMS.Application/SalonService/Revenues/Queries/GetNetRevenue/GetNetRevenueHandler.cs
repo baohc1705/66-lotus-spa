@@ -1,6 +1,6 @@
 using _66SMS.Application.DTOs.Revenues;
 using _66SMS.Application.SalonService.Revenues.Queries.GetCustomerTraffic;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
 

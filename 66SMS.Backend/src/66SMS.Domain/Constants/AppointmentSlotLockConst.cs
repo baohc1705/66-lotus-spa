@@ -28,5 +28,7 @@ namespace _66SMS.Domain.Constants
         public const string MSG_APPOINTMENT_SLOT_LOCK_ID_NOT_FOUND = $"{nameof(Entities.AppointmentSlotLock)} with id not found";
         public const string MSG_SLOT_LOCK_CONFLICT = "Khung giờ vừa có người giữ/đặt, vui lòng chọn lại.";
         #endregion
+
+        public const int DEFAULT_LOCK_MINS = 10; // 10 phút
     }
 }

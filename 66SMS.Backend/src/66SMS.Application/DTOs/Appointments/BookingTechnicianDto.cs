@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Application.DTOs.Appointments
+namespace _66SMS.Application.DTOs.Appointments
 {
     public class BookingTechnicianDto
     {

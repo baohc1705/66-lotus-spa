@@ -1,4 +1,4 @@
-namespace _66SMS.Contracts.Shared
+namespace _66SMS.Contract.Shared
 {
     public class CashierDailyBookingRowDto
     {

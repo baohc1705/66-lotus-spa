@@ -1,7 +1,7 @@
-﻿using System.Text.Json;
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Constants;
-using _66SMS.Contracts.Messages;
+using System.Text.Json;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Constants;
+using _66SMS.Contract.Messages;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using Microsoft.AspNetCore.SignalR;

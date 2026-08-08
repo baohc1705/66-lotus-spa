@@ -1,6 +1,4 @@
-using _66SMS.Application.Abstractions;
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Constants;
+using _66SMS.Contract.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Persistence.Repositories.Sql;
@@ -69,7 +67,6 @@ namespace _66SMS.Persistence.DependencyInjection
 
             services.AddScoped<ITimeSlotSqlRepository, TimeSlotSqlRepository>();
             services.AddScoped<IConfigAppointmentSqlRepository, ConfigAppointmentSqlRepository>();
-            services.AddScoped<IBookingContextProvider, BookingContextProvider>();
 
             services.AddScoped<ISalonSqlRepository, SalonSqlRepository>();
             services.AddScoped<ILandingBannerSqlRepository, LandingBannerSqlRepository>();

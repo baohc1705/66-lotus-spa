@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Domain.Exceptions
+namespace _66SMS.Domain.Exceptions
 {
     public class TransactionRollBackException : Exception
     {

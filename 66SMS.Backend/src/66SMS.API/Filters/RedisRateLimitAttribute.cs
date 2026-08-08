@@ -1,6 +1,6 @@
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Settings;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Settings;
+using _66SMS.Contract.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;

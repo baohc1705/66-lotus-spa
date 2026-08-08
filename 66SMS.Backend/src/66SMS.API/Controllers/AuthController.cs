@@ -18,7 +18,7 @@ using _66SMS.Application.IdentityService.Roles.Commands.CreateRole;
 using _66SMS.Application.IdentityService.Roles.Commands.DeleteRole;
 using _66SMS.Application.IdentityService.Roles.Commands.UpdateRole;
 using _66SMS.Application.IdentityService.Roles.Queries.GetAllRoles;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

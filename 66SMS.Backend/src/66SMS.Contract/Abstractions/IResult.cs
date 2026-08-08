@@ -1,6 +1,6 @@
-﻿using _66SMS.Contracts.Enumerations;
+using _66SMS.Contract.Enumerations;
 
-namespace _66SMS.Contracts.Abstractions
+namespace _66SMS.Contract.Abstractions
 {
     public interface IResult<TEntity>
     {

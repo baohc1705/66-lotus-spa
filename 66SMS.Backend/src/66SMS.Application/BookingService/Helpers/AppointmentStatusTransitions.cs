@@ -1,4 +1,4 @@
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 

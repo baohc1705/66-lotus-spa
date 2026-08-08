@@ -1,5 +1,5 @@
 using _66SMS.Domain.Abstractions.Entities;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Domain.Entities
 {

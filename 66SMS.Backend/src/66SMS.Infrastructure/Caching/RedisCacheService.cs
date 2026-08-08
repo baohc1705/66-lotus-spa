@@ -1,6 +1,6 @@
 using System.Text.Json;
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Settings;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Settings;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

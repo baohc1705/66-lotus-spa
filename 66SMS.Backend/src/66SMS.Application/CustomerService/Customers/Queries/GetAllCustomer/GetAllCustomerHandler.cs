@@ -1,6 +1,6 @@
 using _66SMS.Application.DTOs.Customers;
-using _66SMS.Contracts.Extensions;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Extensions;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using AutoMapper;
 using MediatR;

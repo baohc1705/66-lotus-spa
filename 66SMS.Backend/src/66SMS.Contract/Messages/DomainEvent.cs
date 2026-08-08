@@ -1,7 +1,7 @@
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Helpers;
 
-namespace _66SMS.Contracts.Messages
+namespace _66SMS.Contract.Messages
 {
     /// <summary>
     /// Base class cho mọi domain/integration event publish qua MassTransit.

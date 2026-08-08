@@ -1,6 +1,6 @@
-using _66SMS.Contracts.Constants;
+using _66SMS.Contract.Constants;
 
-namespace _66SMS.Contracts.Abstractions
+namespace _66SMS.Contract.Abstractions
 {
     public interface IVnPayService
     {

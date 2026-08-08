@@ -1,12 +1,11 @@
-using _66SMS.Application.Abstractions;
 using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Application.DTOs.Appointments;
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Constants;
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Helpers;
-using _66SMS.Contracts.Messages;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Constants;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Helpers;
+using _66SMS.Contract.Messages;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
@@ -21,11 +20,9 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
     {
         private readonly IAppointmentSqlRepository appointmentSqlRepository;
         private readonly IServiceSqlRepository serviceSqlRepository;
-        private readonly IBookingAvailabilityService bookingAvailabilityService;
         private readonly IAppointmentSlotLockSqlRepository appointmentSlotLockSqlRepository;
         private readonly IStaffSqlRepository staffSqlRepository;
         private readonly ICustomerSqlRepository customerSqlRepository;
-        private readonly IWorkScheduleSqlRepository workScheduleSqlRepository;
         private readonly IPromotionSqlRepository promotionSqlRepository;
         private readonly IConfigAppointmentSqlRepository configAppointmentSqlRepository;
         private readonly ITimeSlotSqlRepository timeSlotSqlRepository;
@@ -35,11 +32,9 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
         public CreateAppointmentHandler(
             IAppointmentSqlRepository appointmentSqlRepository,
             IServiceSqlRepository serviceSqlRepository,
-            IBookingAvailabilityService bookingAvailabilityService,
             IAppointmentSlotLockSqlRepository appointmentSlotLockSqlRepository,
             IStaffSqlRepository staffSqlRepository,
             ICustomerSqlRepository customerSqlRepository,
-            IWorkScheduleSqlRepository workScheduleSqlRepository,
             IPromotionSqlRepository promotionSqlRepository,
             IConfigAppointmentSqlRepository configAppointmentSqlRepository,
             ITimeSlotSqlRepository timeSlotSqlRepository,
@@ -48,11 +43,9 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
         {
             this.appointmentSqlRepository = appointmentSqlRepository;
             this.serviceSqlRepository = serviceSqlRepository;
-            this.bookingAvailabilityService = bookingAvailabilityService;
             this.appointmentSlotLockSqlRepository = appointmentSlotLockSqlRepository;
             this.staffSqlRepository = staffSqlRepository;
             this.customerSqlRepository = customerSqlRepository;
-            this.workScheduleSqlRepository = workScheduleSqlRepository;
             this.promotionSqlRepository = promotionSqlRepository;
             this.configAppointmentSqlRepository = configAppointmentSqlRepository;
             this.timeSlotSqlRepository = timeSlotSqlRepository;
@@ -62,150 +55,167 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
 
         public async Task<Result<List<int>>> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
         {
-            for (var attempt = 0; attempt <= BookingDbConcurrency.MaxDeadlockRetries; attempt++)
-            {
-                try
-                {
-                    return await TryCreateAppointmentsAsync(request, cancellationToken);
-                }
-                catch (Exception ex) when (BookingDbConcurrency.IsDeadlock(ex) && attempt < BookingDbConcurrency.MaxDeadlockRetries)
-                {
-                    await Task.Delay(40 * (attempt + 1), cancellationToken);
-                }
-            }
-
-            return Result<List<int>>.Conflict(AppointmentConst.MSG_APPOINTMENT_SLOT_FULL, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
-        }
-
-        private async Task<Result<List<int>>> TryCreateAppointmentsAsync(
-            CreateAppointmentCommand request,
-            CancellationToken cancellationToken)
-        {
-            using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(
-                IsolationLevel.Serializable,
-                cancellationToken);
+            using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(IsolationLevel.Serializable,cancellationToken);
             try
             {
-                var appointmentIds = new List<int>();
-                var createdAppointments = new List<Appointment>();
                 var now = DateTimeHelper.UtcNow();
+                var guests = request.Guests;
 
-                var customer = await customerSqlRepository.AsQueryable(asNoTracking: true)
-                    .Include(c => c.MembershipCard)
-                    .ThenInclude(mc => mc!.Tier)
-                    .FirstOrDefaultAsync(c => c.UserId == request.CreatedByUserId, cancellationToken);
-
-                int discountPercent = customer?.MembershipCard?.Tier?.DiscountPercent ?? 0;
-
-                foreach (var guest in request.Guests)
+                foreach (var guest in guests)
                 {
-                    var mainServiceId = guest.Services?.FirstOrDefault()?.ServiceId ?? 0;
+                    if (guest.Services == null || guest.Services.Count == 0 || guest.Services.All(s => (s.ServiceId ?? 0) <= 0))
+                        return Result<List<int>>.BadRequest(AppointmentConst.MSG_APPOINTMENT_MIN_ONE_SERVICE, ErrorCodes.ERR_APPOINTMENT_MIN_ONE_SERVICE);
+                }
+
+                var customerInfo = await customerSqlRepository.AsQueryable(asNoTracking: true)
+                    .Where(c => c.UserId == request.CreatedByUserId)
+                    .Select(c => new
+                    {
+                        c.FullName,
+                        DiscountPercent = c.MembershipCard != null && c.MembershipCard.Tier != null
+                            ? c.MembershipCard.Tier.DiscountPercent
+                            : 0
+                    })
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                var discountPercent = customerInfo?.DiscountPercent ?? 0;
+
+                var serviceIds = guests
+                    .SelectMany(g => g.Services!)
+                    .Where(s => s.ServiceId.HasValue)
+                    .Select(s => s.ServiceId!.Value)
+                    .Distinct()
+                    .ToList();
+
+                var servicesById = await serviceSqlRepository.AsQueryable(asNoTracking: true)
+                    .Where(x => serviceIds.Contains(x.Id))
+                    .Select(x => new { x.Id, x.SellingPrice, x.DurationMins })
+                    .ToDictionaryAsync(x => x.Id, cancellationToken);
+
+                var lockIds = guests.Where(g => g.LockId.HasValue).Select(g => g.LockId!.Value).Distinct().ToList();
+                var locksById = lockIds.Count == 0
+                    ? new Dictionary<int, AppointmentSlotLock>()
+                    : await appointmentSlotLockSqlRepository.AsQueryable(asNoTracking: false)
+                        .Where(x => lockIds.Contains(x.Id))
+                        .ToDictionaryAsync(x => x.Id, cancellationToken);
+
+                var slotIds = guests
+                    .Select(g => g.LockId.HasValue && locksById.TryGetValue(g.LockId.Value, out var l) ? l.SlotId : g.SlotId)
+                    .Where(id => id.HasValue)
+                    .Select(id => id!.Value)
+                    .Distinct()
+                    .ToList();
+
+                var slotStartById = slotIds.Count == 0
+                    ? new Dictionary<int, TimeOnly>()
+                    : await timeSlotSqlRepository.AsQueryable(asNoTracking: true)
+                        .Where(x => slotIds.Contains(x.Id))
+                        .Select(x => new { x.Id, x.StartTime })
+                        .ToDictionaryAsync(x => x.Id, x => x.StartTime, cancellationToken);
+
+                var depositBySalon = await AppointmentPaymentCalculator.LoadDepositPercentBySalonAsync(
+                    configAppointmentSqlRepository,
+                    guests.Select(g => g.SalonId),
+                    cancellationToken);
+
+                var salonIds = guests.Where(g => g.SalonId.HasValue).Select(g => g.SalonId!.Value).Distinct().ToList();
+                var staffSalonPairs = salonIds.Count == 0
+                    ? new HashSet<(int StaffId, int SalonId)>()
+                    : (await staffSqlRepository.AsQueryable(asNoTracking: true)
+                        .SelectMany(s => s.StaffSalons!
+                            .Where(ss => ss.Status == StaffSalonConst.STATUS_ACTIVE && salonIds.Contains(ss.SalonId))
+                            .Select(ss => new { StaffId = s.Id, ss.SalonId }))
+                        .ToListAsync(cancellationToken))
+                        .Select(x => (x.StaffId, x.SalonId))
+                        .ToHashSet();
+
+                var createdAppointments = new List<Appointment>();
+
+                foreach (var guest in guests)
+                {
+                    var mainServiceId = guest.Services!.FirstOrDefault(s => (s.ServiceId ?? 0) > 0)?.ServiceId ?? 0;
                     if (mainServiceId == 0)
                         return Result<List<int>>.BadRequest(AppointmentConst.MSG_APPOINTMENT_MIN_ONE_SERVICE, ErrorCodes.ERR_APPOINTMENT_MIN_ONE_SERVICE);
 
-                    int staffId = 0;
-                    int? scheduleId = null;
+                    int staffId;
+                    int? scheduleId;
                     AppointmentSlotLock? validLock = null;
+                    int slotId;
 
                     if (guest.LockId.HasValue)
                     {
-                        validLock = await appointmentSlotLockSqlRepository.FindByIdAsync(guest.LockId.Value, asNoTracking: false);
-                        if (validLock == null ||
-                            validLock.Status != AppointmentSlotLockConst.STATUS_ACTIVE ||
-                            validLock.ExpiresAt <= DateTimeHelper.UtcNow())
+                        if (!locksById.TryGetValue(guest.LockId.Value, out validLock)
+                            || validLock.Status != AppointmentSlotLockConst.STATUS_ACTIVE
+                            || validLock.ExpiresAt <= DateTimeHelper.UtcNow())
                         {
                             transaction.Rollback();
                             return Result<List<int>>.BadRequest(AppointmentConst.MSG_APPOINTMENT_SLOT_LOCK_INVALID, ErrorCodes.ERR_APPOINTMENT_SLOT_LOCK_INVALID);
                         }
 
-                        staffId = validLock.StaffId;
+                        var resolved = await appointmentSqlRepository.ResolveBookingStaffAsync(
+                            validLock.AppointmentDate, mainServiceId, validLock.SlotId,
+                            validLock.StaffId, guest.SalonId, validLock.Id, cancellationToken);
 
-                        var resolvedStaff = await bookingAvailabilityService.ResolveStaffAsync(
-                            validLock.AppointmentDate,
-                            mainServiceId,
-                            validLock.StaffId,
-                            validLock.SlotId,
-                            salonId: guest.SalonId,
-                            excludeLockId: validLock.Id,
-                            cancellationToken);
-
-                        if (resolvedStaff == null)
+                        if (resolved == null)
                         {
                             transaction.Rollback();
                             return Result<List<int>>.Conflict(AppointmentConst.MSG_APPOINTMENT_SLOT_FULL, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
                         }
 
-                        scheduleId = resolvedStaff.Value.ScheduleId;
-                        if (!scheduleId.HasValue)
-                        {
-                            var schedule = await workScheduleSqlRepository.AsQueryable()
-                                .FirstOrDefaultAsync(x => x.StaffId == staffId && x.WorkDate == validLock.AppointmentDate && x.Status == WorkScheduleConst.STATUS_ACTIVED, cancellationToken);
-                            scheduleId = schedule?.Id;
-                        }
+                        staffId = validLock.StaffId;
+                        scheduleId = resolved.ScheduleId;
+                        slotId = validLock.SlotId;
                     }
                     else
                     {
-                        var resolvedStaff = await bookingAvailabilityService.ResolveStaffAsync(
-                            (DateOnly)guest.AppointmentDate!,
-                            mainServiceId,
-                            guest.StaffId,
-                            (int)guest.SlotId!,
-                            salonId: guest.SalonId,
-                            excludeLockId: null,
-                            cancellationToken);
+                        slotId = (int)guest.SlotId!;
+                        var resolved = await appointmentSqlRepository.ResolveBookingStaffAsync(
+                            (DateOnly)guest.AppointmentDate!, mainServiceId, slotId,
+                            guest.StaffId, guest.SalonId, null, cancellationToken);
 
-                        if (resolvedStaff == null)
+                        if (resolved == null)
                         {
                             transaction.Rollback();
                             return Result<List<int>>.Conflict(AppointmentConst.MSG_APPOINTMENT_SLOT_FULL, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
                         }
-                        staffId = resolvedStaff.Value.StaffId;
-                        scheduleId = resolvedStaff.Value.ScheduleId;
+
+                        staffId = resolved.StaffId;
+                        scheduleId = resolved.ScheduleId;
                     }
 
-                    if (guest.SalonId.HasValue)
-                    {
-                        var belongsToSalon = await staffSqlRepository.AsQueryable()
-                            .AnyAsync(s => s.Id == staffId && s.StaffSalons != null && s.StaffSalons.Any(ss => ss.SalonId == guest.SalonId.Value && ss.Status == StaffSalonConst.STATUS_ACTIVE), cancellationToken);
-                        if (!belongsToSalon)
-                            return Result<List<int>>.BadRequest(AppointmentConst.MSG_APPOINTMENT_STAFF_NOT_IN_SALON, ErrorCodes.ERR_APPOINTMENT_STAFF_NOT_IN_SALON);
-                    }
+                    if (guest.SalonId.HasValue && !staffSalonPairs.Contains((staffId, guest.SalonId.Value)))
+                        return Result<List<int>>.BadRequest(AppointmentConst.MSG_APPOINTMENT_STAFF_NOT_IN_SALON, ErrorCodes.ERR_APPOINTMENT_STAFF_NOT_IN_SALON);
 
                     var appointmentServices = new List<AppointmentService>();
                     decimal totalAmount = 0;
 
                     foreach (var reqService in guest.Services!)
                     {
-                        var serviceEntity = await serviceSqlRepository
-                            .AsQueryable()
-                            .Where(x => x.Id == reqService.ServiceId)
-                            .FirstOrDefaultAsync(cancellationToken);
-                        if (serviceEntity == null) continue;
+                        if (!reqService.ServiceId.HasValue || !servicesById.TryGetValue(reqService.ServiceId.Value, out var serviceInfo))
+                            continue;
 
+                        var quantity = (int)reqService.Quantity!;
                         appointmentServices.Add(new AppointmentService
                         {
-                            ServiceId = serviceEntity.Id,
-                            PriceSnapshot = serviceEntity.SellingPrice,
-                            DurationSnapshot = serviceEntity.DurationMins,
-                            Quantity = (int)reqService.Quantity!,
+                            ServiceId = serviceInfo.Id,
+                            PriceSnapshot = serviceInfo.SellingPrice,
+                            DurationSnapshot = serviceInfo.DurationMins,
+                            Quantity = quantity,
                             Status = AppointmentServiceConst.STATUS_ACTIVE,
                             CreatedAt = now
                         });
-                        totalAmount += serviceEntity.SellingPrice * (int)reqService.Quantity;
+                        totalAmount += serviceInfo.SellingPrice * quantity;
                     }
 
                     if (discountPercent > 0 && totalAmount > 0)
-                    {
                         totalAmount -= totalAmount * discountPercent / 100m;
-                    }
 
-                    var depositPercent = await AppointmentPaymentCalculator.ResolveDepositPercentAsync(
-                        configAppointmentSqlRepository,
-                        guest.SalonId,
-                        cancellationToken);
+                    var depositPercent = guest.SalonId.HasValue
+                        && depositBySalon.TryGetValue(guest.SalonId.Value, out var fromConfig)
+                            ? fromConfig
+                            : AppointmentPaymentCalculator.DefaultDepositPercent;
 
-                    var slotId = (int)(validLock != null ? validLock.SlotId : guest.SlotId)!;
-                    var timeSlot = await timeSlotSqlRepository.FindByIdAsync(slotId, true, cancellationToken);
+                    TimeOnly? slotStart = slotStartById.TryGetValue(slotId, out var start) ? start : null;
                     var durationMins = appointmentServices.Sum(s => s.DurationSnapshot * s.Quantity);
                     if (durationMins <= 0) durationMins = 15;
 
@@ -220,10 +230,8 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         PositionId = validLock != null ? validLock.PositionId : guest.PositionId,
                         LockId = validLock?.Id,
                         AppointmentDate = (DateOnly)guest.AppointmentDate!,
-                        TimeApptStart = timeSlot?.StartTime,
-                        TimeApptEnd = timeSlot != null
-                            ? timeSlot.StartTime.AddMinutes(durationMins)
-                            : null,
+                        TimeApptStart = slotStart,
+                        TimeApptEnd = slotStart.HasValue ? slotStart.Value.AddMinutes(durationMins) : null,
                         Status = AppointmentConst.STATUS_PENDING,
                         Note = guest.Note,
                         TotalAmount = totalAmount,
@@ -235,8 +243,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                     };
 
                     appointmentSqlRepository.Add(appointment);
-                    await appointmentSqlRepository.SaveChangeAsync(cancellationToken);
-                    appointmentIds.Add(appointment.Id);
                     createdAppointments.Add(appointment);
 
                     if (validLock != null)
@@ -245,89 +251,30 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         validLock.ReleasedAt = DateTimeHelper.UtcNow();
                         validLock.Appointment = appointment;
                         appointmentSlotLockSqlRepository.Update(validLock);
-                        await appointmentSlotLockSqlRepository.SaveChangeAsync(cancellationToken);
                     }
                 }
 
-                if (!string.IsNullOrWhiteSpace(request.PromotionCode) && createdAppointments.Any())
+                await appointmentSqlRepository.SaveChangeAsync(cancellationToken);
+
+                if (!string.IsNullOrWhiteSpace(request.PromotionCode) && createdAppointments.Count > 0)
                 {
-                    var code = request.PromotionCode.Trim().ToUpper();
-                    var promo = await promotionSqlRepository.AsQueryable()
-                        .Where(p => p.Code == code && p.Status != PromotionConst.STATUS_DELETED)
-                        .FirstOrDefaultAsync(cancellationToken);
+                    var promoResult = await ApplyPromotionAsync(
+                        request.PromotionCode,
+                        createdAppointments,
+                        now,
+                        cancellationToken);
 
-                    if (promo == null)
+                    if (!promoResult.IsSuccess)
                     {
                         transaction.Rollback();
-                        return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_NOT_FOUND, ErrorCodes.ERR_PROMOTION_NOT_FOUND);
+                        return promoResult;
                     }
-
-                    if (promo.Status != PromotionConst.STATUS_ACTIVE)
-                    {
-                        transaction.Rollback();
-                        return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_INACTIVE, ErrorCodes.ERR_PROMOTION_INACTIVE);
-                    }
-
-                    if (promo.StartDate > now || promo.EndDate < now)
-                    {
-                        transaction.Rollback();
-                        return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_EXPIRED, ErrorCodes.ERR_PROMOTION_EXPIRED);
-                    }
-
-                    if (promo.UsageLimit > 0 && promo.UsedCount >= promo.UsageLimit.Value)
-                    {
-                        transaction.Rollback();
-                        return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_USAGE_LIMIT, ErrorCodes.ERR_PROMOTION_USAGE_LIMIT);
-                    }
-
-                    decimal grandTotal = createdAppointments.Sum(a => a.TotalAmount);
-
-                    if (promo.MinOrderValue.HasValue && grandTotal < promo.MinOrderValue.Value)
-                    {
-                        transaction.Rollback();
-                        return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_MIN_ORDER, ErrorCodes.ERR_PROMOTION_MIN_ORDER);
-                    }
-
-                    decimal discount = 0m;
-                    if (promo.DiscountType == PromotionConst.DISCOUNT_TYPE_PERCENT)
-                    {
-                        var percent = promo.DiscountValue ?? 0m;
-                        discount = Math.Round(grandTotal * percent / 100m, 0, MidpointRounding.AwayFromZero);
-                        if (promo.MaxDiscountAmount > 0 && discount > promo.MaxDiscountAmount.Value)
-                        {
-                            discount = promo.MaxDiscountAmount.Value;
-                        }
-                    }
-                    else if (promo.DiscountType == PromotionConst.DISCOUNT_TYPE_FIXED)
-                    {
-                        discount = promo.DiscountValue ?? 0m;
-                        if (discount > grandTotal)
-                        {
-                            discount = grandTotal;
-                        }
-                    }
-
-                    if (discount > 0)
-                    {
-                        var firstApp = createdAppointments.First();
-                        firstApp.TotalAmount = Math.Max(0m, firstApp.TotalAmount - discount);
-
-                        firstApp.Note = string.IsNullOrWhiteSpace(firstApp.Note)
-                            ? $"[Đã áp dụng mã: {promo.Code} giảm {discount:N0}đ]"
-                            : $"{firstApp.Note} [Đã áp dụng mã: {promo.Code} giảm {discount:N0}đ]";
-
-                        appointmentSqlRepository.Update(firstApp);
-                        await appointmentSqlRepository.SaveChangeAsync(cancellationToken);
-                    }
-
-                    promo.UsedCount++;
-                    promotionSqlRepository.Update(promo);
-                    await promotionSqlRepository.SaveChangeAsync(cancellationToken);
                 }
 
                 transaction.Commit();
 
-                var customerName = customer?.FullName ?? "Khách hàng";
+                var appointmentIds = createdAppointments.Select(a => a.Id).ToList();
+                var customerName = customerInfo?.FullName ?? "Khách hàng";
                 var staffIds = createdAppointments.Select(a => a.StaffId).Distinct().ToList();
                 var staffUserByStaffId = await staffSqlRepository.AsQueryable(asNoTracking: true)
                     .Where(s => staffIds.Contains(s.Id))
@@ -365,6 +312,66 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                 transaction.Rollback();
                 throw;
             }
+        }
+
+        private async Task<Result<List<int>>> ApplyPromotionAsync(
+            string promotionCode,
+            List<Appointment> createdAppointments,
+            DateTimeOffset now,
+            CancellationToken cancellationToken)
+        {
+            var code = promotionCode.Trim().ToUpper();
+            var promo = await promotionSqlRepository.AsQueryable()
+                .Where(p => p.Code == code && p.Status != PromotionConst.STATUS_DELETED)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (promo == null)
+                return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_NOT_FOUND, ErrorCodes.ERR_PROMOTION_NOT_FOUND);
+
+            if (promo.Status != PromotionConst.STATUS_ACTIVE)
+                return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_INACTIVE, ErrorCodes.ERR_PROMOTION_INACTIVE);
+
+            if (promo.StartDate > now || promo.EndDate < now)
+                return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_EXPIRED, ErrorCodes.ERR_PROMOTION_EXPIRED);
+
+            if (promo.UsageLimit > 0 && promo.UsedCount >= promo.UsageLimit.Value)
+                return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_USAGE_LIMIT, ErrorCodes.ERR_PROMOTION_USAGE_LIMIT);
+
+            decimal grandTotal = createdAppointments.Sum(a => a.TotalAmount);
+
+            if (promo.MinOrderValue.HasValue && grandTotal < promo.MinOrderValue.Value)
+                return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_MIN_ORDER, ErrorCodes.ERR_PROMOTION_MIN_ORDER);
+
+            decimal discount = 0m;
+            if (promo.DiscountType == PromotionConst.DISCOUNT_TYPE_PERCENT)
+            {
+                var percent = promo.DiscountValue ?? 0m;
+                discount = Math.Round(grandTotal * percent / 100m, 0, MidpointRounding.AwayFromZero);
+                if (promo.MaxDiscountAmount > 0 && discount > promo.MaxDiscountAmount.Value)
+                    discount = promo.MaxDiscountAmount.Value;
+            }
+            else if (promo.DiscountType == PromotionConst.DISCOUNT_TYPE_FIXED)
+            {
+                discount = promo.DiscountValue ?? 0m;
+                if (discount > grandTotal)
+                    discount = grandTotal;
+            }
+
+            if (discount > 0)
+            {
+                var firstApp = createdAppointments.First();
+                firstApp.TotalAmount = Math.Max(0m, firstApp.TotalAmount - discount);
+                firstApp.Note = string.IsNullOrWhiteSpace(firstApp.Note)
+                    ? $"[Đã áp dụng mã: {promo.Code} giảm {discount:N0}đ]"
+                    : $"{firstApp.Note} [Đã áp dụng mã: {promo.Code} giảm {discount:N0}đ]";
+                appointmentSqlRepository.Update(firstApp);
+            }
+
+            promo.UsedCount++;
+            promotionSqlRepository.Update(promo);
+            await promotionSqlRepository.SaveChangeAsync(cancellationToken);
+
+            return Result<List<int>>.Success(createdAppointments.Select(a => a.Id).ToList());
         }
     }
 }

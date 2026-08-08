@@ -5,7 +5,7 @@ using _66SMS.Application.SalonService.Attendances.Commands.CreateManualAttendanc
 using _66SMS.Application.SalonService.Attendances.Commands.UpdateAttendance;
 using _66SMS.Application.SalonService.Attendances.Queries.GetAllAttendances;
 using _66SMS.Application.SalonService.Attendances.Queries.GetDetailAttendance;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;

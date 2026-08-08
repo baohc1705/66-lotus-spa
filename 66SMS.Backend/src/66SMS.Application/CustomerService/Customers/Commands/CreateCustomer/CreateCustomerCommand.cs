@@ -1,8 +1,8 @@
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Constants;
 using MediatR;
 using System.Text.Json.Serialization;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
 {

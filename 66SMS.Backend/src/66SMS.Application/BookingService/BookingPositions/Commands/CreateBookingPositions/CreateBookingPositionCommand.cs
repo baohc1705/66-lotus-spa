@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Enums;
 using MediatR;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.BookingService.BookingPositions.Commands.CreateBookingPositions
 {

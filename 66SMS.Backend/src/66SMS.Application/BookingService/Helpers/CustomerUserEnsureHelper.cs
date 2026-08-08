@@ -1,13 +1,13 @@
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using _66SMS.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.BookingService.Helpers
 {

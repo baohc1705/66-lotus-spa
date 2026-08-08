@@ -1,4 +1,4 @@
-﻿using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using Isopoh.Cryptography.Argon2;
 
 namespace _66SMS.Infrastructure.Security

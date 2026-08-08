@@ -1,5 +1,5 @@
 using MediatR;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 using System.Text.Json.Serialization;
 
 namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.DeleteStaffCertificateMultiples

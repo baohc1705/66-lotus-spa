@@ -1,4 +1,4 @@
-namespace _66SMS.Contracts.Enumerations
+namespace _66SMS.Contract.Enumerations
 {
     public enum ErrorCodes
     {

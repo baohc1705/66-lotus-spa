@@ -1,29 +1,35 @@
-using _66SMS.Application.Abstractions;
 using _66SMS.Application.DTOs.Appointments;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
+using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
 
 namespace _66SMS.Application.BookingService.Appointments.Queries.GetTimeSlots
 {
     public class GetTimeSlotsHandler : IRequestHandler<GetTimeSlotsQuery, Result<IReadOnlyList<BookingTimeSlotDto>>>
     {
-        private readonly IBookingAvailabilityService bookingAvailabilityService;
+        private readonly IAppointmentSqlRepository appointmentSqlRepository;
 
-        public GetTimeSlotsHandler(IBookingAvailabilityService bookingAvailabilityService)
+        public GetTimeSlotsHandler(IAppointmentSqlRepository appointmentSqlRepository)
         {
-            this.bookingAvailabilityService = bookingAvailabilityService;
+            this.appointmentSqlRepository = appointmentSqlRepository;
         }
 
-        /// <summary>
-        /// Xử lý yêu cầu truy vấn danh sách các khung giờ trống.
-        /// Chuyển tiếp yêu cầu sang service cốt lõi (BookingAvailabilityService).
-        /// </summary>
-        /// <param name="request">Yêu cầu lấy danh sách khung giờ (chứa Ngày, ServiceId và tùy chọn StaffId).</param>
-        /// <param name="cancellationToken">Token hủy tác vụ bất đồng bộ.</param>
-        /// <returns>Danh sách khung giờ kèm theo trạng thái (available, booked, outside).</returns>
         public async Task<Result<IReadOnlyList<BookingTimeSlotDto>>> Handle(GetTimeSlotsQuery request, CancellationToken cancellationToken)
         {
-            var result = await bookingAvailabilityService.GetTimeSlotsAsync((DateOnly)request.Date!, (int)request.ServiceId!, request.StaffId, request.SalonId, cancellationToken);
+            var rows = await appointmentSqlRepository.GetBookingTimeSlotsAsync(
+                (DateOnly)request.Date!,
+                (int)request.ServiceId!,
+                request.StaffId,
+                request.SalonId,
+                cancellationToken);
+
+            var result = rows.Select(r => new BookingTimeSlotDto
+            {
+                SlotId = r.SlotId,
+                Time = r.Time,
+                Status = r.Status,
+            }).ToList();
+
             return Result<IReadOnlyList<BookingTimeSlotDto>>.Success(result);
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Contracts.Constants
+namespace _66SMS.Contract.Constants
 {
     public class RegexConst
     {

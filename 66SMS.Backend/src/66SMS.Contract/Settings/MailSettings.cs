@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Contracts.Settings
+namespace _66SMS.Contract.Settings
 {
     public class MailSettings
     {

@@ -15,7 +15,7 @@ using _66SMS.Application.BookingService.TimeSlots.Commands.CreateTimeSlot;
 using _66SMS.Application.BookingService.TimeSlots.Commands.UpdateTimeSlot;
 using _66SMS.Application.BookingService.WorkSchedules.Commands.CreateWorkSchedule;
 using _66SMS.Application.BookingService.WorkSchedules.Commands.UpdateWorkSchedule;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using System.Collections.Generic;

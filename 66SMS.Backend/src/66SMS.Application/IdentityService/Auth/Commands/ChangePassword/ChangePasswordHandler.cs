@@ -1,5 +1,6 @@
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
@@ -32,7 +33,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.ChangePassword
 
             // Return bad request if verify password fail
             if (!verifyCurrentPass)
-                return Result<object>.BadRequest(UserConst.MSG_USER_WRONG_PASSWORD, Contracts.Enumerations.ErrorCodes.ERR_USER_INVALID_PASSWORD);
+                return Result<object>.BadRequest(UserConst.MSG_USER_WRONG_PASSWORD, ErrorCodes.ERR_USER_INVALID_PASSWORD);
 
             // Hash new pass for user
             user.PasswordHash = passwordHash.Hash(request.NewPassword!);

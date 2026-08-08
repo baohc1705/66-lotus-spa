@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-namespace _66SMS.Contracts.Helpers
+namespace _66SMS.Contract.Helpers
 {
     /// <summary>
     /// Hash object thành chuỗi ngắn để ghép vào Redis cache key (list filter).

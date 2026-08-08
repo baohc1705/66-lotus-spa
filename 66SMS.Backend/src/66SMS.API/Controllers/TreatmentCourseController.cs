@@ -5,7 +5,7 @@ using _66SMS.Application.CatalogService.TreatmentCourses.Commands.DeleteTreatmen
 using _66SMS.Application.CatalogService.TreatmentCourses.Commands.UpdateTreatmentCourse;
 using _66SMS.Application.CatalogService.TreatmentCourses.Queries.GetAllTreatmentCourses;
 using _66SMS.Application.CatalogService.TreatmentCourses.Queries.GetDetailTreatmentCourse;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;

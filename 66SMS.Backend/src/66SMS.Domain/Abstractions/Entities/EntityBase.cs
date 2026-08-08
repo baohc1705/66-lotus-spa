@@ -1,4 +1,4 @@
-﻿using _66SMS.Domain.Abstractions.Entities.Base;
+using _66SMS.Domain.Abstractions.Entities.Base;
 
 namespace _66SMS.Domain.Abstractions.Entities
 {

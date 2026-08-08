@@ -1,5 +1,5 @@
-using _66SMS.Contracts.Constants;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Constants;
+using _66SMS.Contract.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using System.Security.Claims;

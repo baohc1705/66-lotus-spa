@@ -1,7 +1,7 @@
 using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Application.DTOs.Appointments;
-using _66SMS.Contracts.Extensions;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Extensions;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

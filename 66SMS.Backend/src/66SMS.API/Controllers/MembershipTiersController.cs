@@ -4,7 +4,7 @@ using _66SMS.Application.CustomerService.MembershipTiers.Commands.DeleteMembersh
 using _66SMS.Application.CustomerService.MembershipTiers.Commands.UpdateMembershipTiers;
 using _66SMS.Application.CustomerService.MembershipTiers.Queries.GetAllMembershipTiers;
 using _66SMS.Application.CustomerService.MembershipTiers.Queries.GetDetailMembershipTier;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

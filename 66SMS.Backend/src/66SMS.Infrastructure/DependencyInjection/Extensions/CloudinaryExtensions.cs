@@ -1,5 +1,5 @@
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Settings;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Settings;
 using _66SMS.Infrastructure.Storage.Cloudinary;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

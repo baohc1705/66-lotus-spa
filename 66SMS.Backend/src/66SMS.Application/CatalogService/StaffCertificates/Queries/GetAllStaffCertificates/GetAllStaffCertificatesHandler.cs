@@ -1,12 +1,12 @@
 using _66SMS.Application.DTOs.Certificates;
-using _66SMS.Contracts.Extensions;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Extensions;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.CatalogService.StaffCertificates.Queries.GetAllStaffCertificates
 {

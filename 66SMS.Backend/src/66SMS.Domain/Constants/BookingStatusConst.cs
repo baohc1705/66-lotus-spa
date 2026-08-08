@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Domain.Constants
+namespace _66SMS.Domain.Constants
 {
     public class BookingStatusConst
     {

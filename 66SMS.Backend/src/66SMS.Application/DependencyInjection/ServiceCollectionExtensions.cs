@@ -1,9 +1,8 @@
-using _66SMS.Application.Abstractions;
 using _66SMS.Application.Abstractions.Behaviors;
 using _66SMS.Application.BookingService.Helpers;
-using _66SMS.Application.SalonService.Helpers;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using _66SMS.Application.Abstractions.Services;
 
 namespace _66SMS.Application.DependencyInjection
 {
@@ -25,7 +24,6 @@ namespace _66SMS.Application.DependencyInjection
             {
                 cfg.AddMaps(assembly);
             });
-            services.AddScoped<IBookingAvailabilityService, AppointmentAvailabilityService>();
             services.AddScoped<ILoyaltyPointService, LoyaltyPointService>();
             return services;
         }
