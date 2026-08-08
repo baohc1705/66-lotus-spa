@@ -4,6 +4,7 @@ using _66SMS.Contract.Constants;
 using _66SMS.Contract.Messages;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
+using _66SMS.Domain.Messages;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -12,6 +13,11 @@ namespace _66SMS.Infrastructure.Realtime
 {
     public class NotificationService : INotificationService
     {
+        private static readonly JsonSerializerOptions PayloadJsonOptions = new()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        };
+
         private readonly IHubContext<NotificationHub> hubContext;
         private readonly INotificationSqlRepository notificationSqlRepository;
         private readonly IStaffSalonSqlRepository staffSalonSqlRepository;
@@ -36,19 +42,20 @@ namespace _66SMS.Infrastructure.Realtime
         {
             try
             {
-                var userIds = await ResolveRecipientUserIdsAsync(notificationEvent, cancellationToken);
+                var booking = notificationEvent.Payload as BookingNotificationPayload;
+                var userIds = await ResolveRecipientUserIdsAsync(booking, cancellationToken);
                 var payloadJson = notificationEvent.Payload == null
                     ? null
-                    : JsonSerializer.Serialize(notificationEvent.Payload);
+                    : JsonSerializer.Serialize(notificationEvent.Payload, PayloadJsonOptions);
 
-                var customerUserId = notificationEvent.CustomerUserId;
-                var customerMessage = string.IsNullOrWhiteSpace(notificationEvent.CustomerMessage)
+                var customerUserId = booking?.CustomerUserId;
+                var customerMessage = string.IsNullOrWhiteSpace(booking?.CustomerMessage)
                     ? notificationEvent.Message
-                    : notificationEvent.CustomerMessage;
+                    : booking!.CustomerMessage;
                 var staffMessage = notificationEvent.Message;
 
-                var customerIds = customerUserId is int cid && userIds.Contains(cid)
-                    ? new List<int> { cid }
+                var customerIds = customerUserId != null && userIds.Contains(customerUserId.Value)
+                    ? new List<int> { customerUserId.Value }
                     : new List<int>();
                 var staffIds = userIds.Where(id => id != customerUserId).ToList();
 
@@ -60,7 +67,7 @@ namespace _66SMS.Infrastructure.Realtime
                         notificationEvent.EventType,
                         notificationEvent.Title,
                         staffMessage,
-                        notificationEvent.SalonId,
+                        booking?.SalonId,
                         payloadJson,
                         cancellationToken);
                 }
@@ -73,7 +80,7 @@ namespace _66SMS.Infrastructure.Realtime
                         notificationEvent.EventType,
                         notificationEvent.Title,
                         customerMessage,
-                        notificationEvent.SalonId,
+                        booking?.SalonId,
                         payloadJson,
                         cancellationToken);
                 }
@@ -84,26 +91,23 @@ namespace _66SMS.Infrastructure.Realtime
                     eventType = notificationEvent.EventType,
                     title = notificationEvent.Title,
                     message,
-                    salonId = notificationEvent.SalonId,
-                    customerUserId = notificationEvent.CustomerUserId,
-                    staffUserId = notificationEvent.StaffUserId,
                     payload = notificationEvent.Payload,
                 };
 
-                if (notificationEvent.SalonId != null)
-                    await hubContext.Clients.Group(NotificationConst.GROUP_SALON_PREFIX + notificationEvent.SalonId)
+                if (booking?.SalonId != null)
+                    await hubContext.Clients.Group(NotificationConst.GROUP_SALON_PREFIX + booking.SalonId)
                         .SendAsync("ReceiveNotification", Body(staffMessage), cancellationToken);
 
-                if (notificationEvent.CustomerUserId != null)
-                    await hubContext.Clients.Group(NotificationConst.GROUP_USER_PREFIX + notificationEvent.CustomerUserId)
+                if (booking?.CustomerUserId != null)
+                    await hubContext.Clients.Group(NotificationConst.GROUP_USER_PREFIX + booking.CustomerUserId)
                         .SendAsync("ReceiveNotification", Body(customerMessage), cancellationToken);
 
-                if (notificationEvent.StaffUserId != null && notificationEvent.StaffUserId != notificationEvent.CustomerUserId)
-                    await hubContext.Clients.Group(NotificationConst.GROUP_USER_PREFIX + notificationEvent.StaffUserId)
+                if (booking?.StaffUserId != null && booking.StaffUserId != booking.CustomerUserId)
+                    await hubContext.Clients.Group(NotificationConst.GROUP_USER_PREFIX + booking.StaffUserId)
                         .SendAsync("ReceiveNotification", Body(staffMessage), cancellationToken);
 
                 logger.LogInformation("Sent notification {Domain}/{EventType} salon={SalonId} recipients={Count}",
-                    notificationEvent.Domain, notificationEvent.EventType, notificationEvent.SalonId, userIds.Count);
+                    notificationEvent.Domain, notificationEvent.EventType, booking?.SalonId, userIds.Count);
             }
             catch (Exception ex)
             {
@@ -111,22 +115,24 @@ namespace _66SMS.Infrastructure.Realtime
             }
         }
 
-        private async Task<List<int>> ResolveRecipientUserIdsAsync<TPayload>(
-            SendNotificationEvent<TPayload> notificationEvent,
-            CancellationToken cancellationToken) where TPayload : class
+        private async Task<List<int>> ResolveRecipientUserIdsAsync(
+            BookingNotificationPayload? booking,
+            CancellationToken cancellationToken)
         {
             var userIds = new HashSet<int>();
+            if (booking == null)
+                return userIds.ToList();
 
-            if (notificationEvent.CustomerUserId is int customerUserId)
-                userIds.Add(customerUserId);
+            if (booking.CustomerUserId != null)
+                userIds.Add(booking.CustomerUserId.Value);
 
-            if (notificationEvent.StaffUserId is int staffUserId)
-                userIds.Add(staffUserId);
+            if (booking.StaffUserId != null)
+                userIds.Add(booking.StaffUserId.Value);
 
-            if (notificationEvent.SalonId is int salonId)
+            if (booking.SalonId != null)
             {
                 var staffIds = await staffSalonSqlRepository.AsQueryable()
-                    .Where(x => x.SalonId == salonId && x.Status == StaffSalonConst.STATUS_ACTIVE)
+                    .Where(x => x.SalonId == booking.SalonId && x.Status == StaffSalonConst.STATUS_ACTIVE)
                     .Select(x => x.StaffId)
                     .ToListAsync(cancellationToken);
 

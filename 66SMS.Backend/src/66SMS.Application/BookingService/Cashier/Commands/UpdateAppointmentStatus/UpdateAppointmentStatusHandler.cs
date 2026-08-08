@@ -229,12 +229,12 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                 EventType = NotificationConst.EVENT_APPOINTMENT_STATUS_CHANGED,
                 Title = "Cập nhật lịch hẹn",
                 Message = staffMessage,
-                CustomerMessage = customerMessage,
-                SalonId = appointment.SalonId,
-                CustomerUserId = appointment.CreatedByUserId,
-                StaffUserId = staffUserId,
                 Payload = new BookingNotificationPayload
                 {
+                    CustomerMessage = customerMessage,
+                    SalonId = appointment.SalonId,
+                    CustomerUserId = appointment.CreatedByUserId,
+                    StaffUserId = staffUserId,
                     AppointmentId = appointment.Id,
                     StaffId = appointment.StaffId,
                     Status = appointment.Status,

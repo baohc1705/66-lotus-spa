@@ -325,8 +325,6 @@ namespace _66SMS.Infrastructure.Excels
             sheet.Columns().AdjustToContents();
         }
 
-
-
         public byte[] BuildReportByPeriodWorkbook(DateOnly from, DateOnly to, string grain, IReadOnlyList<ReportRevenueByPeriodRowDto> rows)
         {
             using var workbook = new XLWorkbook();

@@ -195,12 +195,12 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                 EventType = NotificationConst.EVENT_DEPOSIT_PAID,
                 Title = "Đã thanh toán cọc",
                 Message = $"Khách hàng {customerName} vừa thanh toán cọc cho lịch hẹn #{appointment.Id} vào lúc {at}.",
-                CustomerMessage = $"Bạn đã thanh toán cọc cho lịch hẹn #{appointment.Id} vào lúc {at}.",
-                SalonId = appointment.SalonId,
-                CustomerUserId = appointment.CreatedByUserId,
-                StaffUserId = info?.StaffUserId,
                 Payload = new BookingNotificationPayload
                 {
+                    CustomerMessage = $"Bạn đã thanh toán cọc cho lịch hẹn #{appointment.Id} vào lúc {at}.",
+                    SalonId = appointment.SalonId,
+                    CustomerUserId = appointment.CreatedByUserId,
+                    StaffUserId = info?.StaffUserId,
                     AppointmentId = appointment.Id,
                     StaffId = appointment.StaffId,
                     Status = appointment.Status,

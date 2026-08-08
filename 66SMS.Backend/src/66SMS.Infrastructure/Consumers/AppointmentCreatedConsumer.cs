@@ -41,10 +41,10 @@ namespace _66SMS.Infrastructure.Consumers
                     EventType = NotificationConst.EVENT_APPOINTMENT_CREATED,
                     Title = "Lịch hẹn mới",
                     Message = $"Khách hàng {customerName} vừa đặt lịch hẹn #{item.AppointmentId} vào lúc {bookedAt}",
-                    SalonId = item.SalonId,
-                    StaffUserId = staffUserId,
                     Payload = new BookingNotificationPayload
                     {
+                        SalonId = item.SalonId,
+                        StaffUserId = staffUserId,
                         AppointmentId = item.AppointmentId,
                         StaffId = item.StaffId,
                         Status = item.Status,

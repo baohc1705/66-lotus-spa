@@ -1,17 +1,11 @@
 namespace _66SMS.Contract.Messages
 {
-    public class SendNotificationEvent<TPayload> :  DomainEvent where TPayload : class
+    public class SendNotificationEvent<TPayload> : DomainEvent where TPayload : class
     {
         public string Domain { get; set; } = null!;
         public string EventType { get; set; } = null!;
         public string Title { get; set; } = null!;
         public string Message { get; set; } = null!;
-        public string? CustomerMessage { get; set; }
-
-        public int? SalonId { get; set; }
-        public int? CustomerUserId { get; set; }
-        public int? StaffUserId { get; set; }
-
         public TPayload? Payload { get; set; }
     }
 }

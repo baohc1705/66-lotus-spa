@@ -6,8 +6,7 @@ using Quartz;
 namespace _66SMS.Infrastructure.BackgroundJobs
 {
     /// <summary>
-    /// Job đánh dấu soft lock ACTIVE đã quá ExpiresAt thành EXPIRED —
-    /// cần để filtered unique index nhả (staff, date, slot) sau TTL.
+    /// Job đánh dấu soft lock ACTIVE đã quá ExpiresAt thành EXPIRED
     /// </summary>
     [DisallowConcurrentExecution]
     public class CleanupExpiredSlotLocksJob : IJob
