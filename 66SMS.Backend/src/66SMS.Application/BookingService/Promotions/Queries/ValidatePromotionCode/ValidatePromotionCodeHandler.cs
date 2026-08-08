@@ -55,7 +55,7 @@ namespace _66SMS.Application.BookingService.Promotions.Queries.ValidatePromotion
             {
                 var percent = promo.DiscountValue ?? 0m;
                 discountAmount = Math.Round(request.OrderTotal * percent / 100m, 0, MidpointRounding.AwayFromZero);
-                
+
                 if (promo.MaxDiscountAmount > 0 && discountAmount > promo.MaxDiscountAmount.Value)
                 {
                     discountAmount = promo.MaxDiscountAmount.Value;

@@ -2,9 +2,6 @@ using _66SMS.Application.DTOs.TimeSlots;
 using _66SMS.Contract.Extensions;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
-using _66SMS.Domain.Entities;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using MediatR;
 
 namespace _66SMS.Application.BookingService.TimeSlots.Queries.GetAllTimeSlot
@@ -12,22 +9,21 @@ namespace _66SMS.Application.BookingService.TimeSlots.Queries.GetAllTimeSlot
     public class GetAllTimeSlotHandler : IRequestHandler<GetAllTimeSlotQuery, Result<PagedResult<TimeSlotDto>>>
     {
         private readonly ITimeSlotSqlRepository timeSlotSqlRepository;
-        private readonly IMapper mapper;
 
-        public GetAllTimeSlotHandler(
-            ITimeSlotSqlRepository timeSlotSqlRepository,
-            IMapper mapper)
+        public GetAllTimeSlotHandler(ITimeSlotSqlRepository timeSlotSqlRepository)
         {
             this.timeSlotSqlRepository = timeSlotSqlRepository;
-            this.mapper = mapper;
         }
 
         public async Task<Result<PagedResult<TimeSlotDto>>> Handle(GetAllTimeSlotQuery request, CancellationToken cancellationToken)
         {
-            IQueryable<TimeSlot> query = timeSlotSqlRepository.AsQueryable();
-
-            PagedResult<TimeSlotDto> result = await query
-                .ProjectTo<TimeSlotDto>(mapper.ConfigurationProvider)
+            var result = await timeSlotSqlRepository.AsQueryable()
+                .Select(x => new TimeSlotDto
+                {
+                    Id = x.Id,
+                    StartTime = x.StartTime,
+                    EndTime = x.EndTime,
+                })
                 .ToPagedAsync(request, cancellationToken);
 
             return Result<PagedResult<TimeSlotDto>>.Success(result);

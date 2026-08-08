@@ -10,9 +10,6 @@ using System.Data;
 
 namespace _66SMS.Application.CatalogService.Products.Commands.DeleteProducts
 {
-    /// <summary>
-    /// Handler for <see cref="DeleteProductCommand"/>
-    /// </summary>
     public class DeleteProductHandler : IRequestHandler<DeleteProductCommand, Result<object>>
     {
         private readonly IProductSqlRepository productSqlRepository;
@@ -34,33 +31,18 @@ namespace _66SMS.Application.CatalogService.Products.Commands.DeleteProducts
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Find by id and tracking
                 Product? product = await productSqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
 
-                // return not found if product is null
                 if (product is null || product.Status == (int)StatusActiveEnum.DELETED)
                 {
                    return Result<object>.NotFound(ProductConst.MSG_PRODUCT_ID_NOT_FOUND, ErrorCodes.ERR_PRODUCT_NOT_FOUND);
                 }  
 
-                // update status is deleted soft deleted
                 product.Status = (int)StatusActiveEnum.DELETED;
 
-                // Update and persist to database
                 productSqlRepository.Update(product);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // // Xóa các entity con (ProductImages)
-                // List<ProductImage> productImages = await productImageSqlRepository
-                //     .AsQueryable(false)
-                //     .Where(x => x.ProductId == product.Id)
-                //     .ToListAsync(cancellationToken);
-
-                // if (productImages.Any())
-                // {
-                //     productImageSqlRepository.RemoveRange(productImages);
-                // }
-                // await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                 transaction.Commit();
 

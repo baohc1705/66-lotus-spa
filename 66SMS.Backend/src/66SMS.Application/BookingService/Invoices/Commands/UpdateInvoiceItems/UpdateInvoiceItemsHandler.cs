@@ -104,7 +104,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.UpdateInvoiceItems
                 decimal subTotal = 0;
                 foreach (var i in request.Items)
                 {
-                    var quantity = i.Quantity ?? 1;
+                    var quantity = i.Quantity!.Value;
                     var lineDiscount = i.DiscountAmount ?? 0;
                     string itemName;
                     decimal unitPrice;

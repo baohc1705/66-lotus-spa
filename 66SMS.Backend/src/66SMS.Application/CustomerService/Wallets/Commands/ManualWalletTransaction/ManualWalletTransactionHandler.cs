@@ -17,7 +17,7 @@ namespace _66SMS.Application.CustomerService.Wallets.Commands.ManualWalletTransa
         private readonly ISqlUnitOfWork sqlUnitOfWork;
 
         public ManualWalletTransactionHandler(
-            IWalletSqlRepository walletRepository, 
+            IWalletSqlRepository walletRepository,
             IWalletTransactionSqlRepository transactionRepository,
             ISqlUnitOfWork sqlUnitOfWork)
         {
@@ -28,11 +28,6 @@ namespace _66SMS.Application.CustomerService.Wallets.Commands.ManualWalletTransa
 
         public async Task<Result<object>> Handle(ManualWalletTransactionCommand request, CancellationToken cancellationToken)
         {
-            if (request.Amount == 0)
-            {
-                return Result<object>.BadRequest(WalletConst.MSG_WALLET_INVALID_AMOUNT, ErrorCodes.ERR_WALLET_INVALID_AMOUNT);
-            }
-
             using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
@@ -40,14 +35,10 @@ namespace _66SMS.Application.CustomerService.Wallets.Commands.ManualWalletTransa
                     .FirstOrDefaultAsync(w => w.Id == request.WalletId, cancellationToken);
 
                 if (wallet == null)
-                {
                     return Result<object>.NotFound(WalletConst.MSG_WALLET_NOT_FOUND, ErrorCodes.ERR_WALLET_NOT_FOUND);
-                }
 
                 if (wallet.Balance + request.Amount < 0)
-                {
                     return Result<object>.BadRequest($"Số dư ví không đủ để trừ. (Hiện có: {wallet.Balance:N0}đ)");
-                }
 
                 wallet.Balance += request.Amount;
                 walletRepository.Update(wallet);
@@ -58,20 +49,20 @@ namespace _66SMS.Application.CustomerService.Wallets.Commands.ManualWalletTransa
                     Amount = request.Amount,
                     BalanceAfter = wallet.Balance,
                     Type = request.Amount > 0 ? WalletTransactionConst.TYPE_TOP_UP : WalletTransactionConst.TYPE_ADMIN_ADJUST,
-                    Note = string.IsNullOrWhiteSpace(request.Note) ? null : request.Note.Trim(),
                     Status = WalletTransactionConst.STATUS_SUCCESS,
                     CreatedAt = DateTimeHelper.UtcNow(),
                     CreatedBy = request.UserId
                 };
+                if (!string.IsNullOrWhiteSpace(request.Note))
+                    walletTx.Note = request.Note.Trim();
 
                 transactionRepository.Add(walletTx);
-
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
 
-                return Result<object>.Success("Giao dịch thành công.");
+                return Result<object>.Success(WalletConst.MSG_WALLET_TRANSACTION_SUCCESS);
             }
-            catch (Exception)
+            catch
             {
                 transaction.Rollback();
                 throw;

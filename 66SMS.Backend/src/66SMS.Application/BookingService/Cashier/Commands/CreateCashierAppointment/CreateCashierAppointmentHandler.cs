@@ -256,9 +256,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
 
                     TimeOnly? slotStart = slotStarts.TryGetValue(slotId, out var startTime) ? startTime : null;
                     var durationMinutes = appointmentServices.Sum(s => s.DurationSnapshot * s.Quantity);
-                    if (durationMinutes <= 0) durationMinutes = 15;
 
-                    // Lễ tân đặt: chờ phục vụ ngay, không yêu cầu cọc
                     var appointment = new Appointment
                     {
                         AppointmentCode = $"LH-{now:yyyyMMddHHmmss}{Random.Shared.Next(100, 999)}",
@@ -271,7 +269,9 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                         LockId = activeLock?.Id,
                         AppointmentDate = (DateOnly)guest.AppointmentDate!,
                         TimeApptStart = slotStart,
-                        TimeApptEnd = slotStart.HasValue ? slotStart.Value.AddMinutes(durationMinutes) : null,
+                        TimeApptEnd = slotStart.HasValue && durationMinutes > 0
+                            ? slotStart.Value.AddMinutes(durationMinutes)
+                            : null,
                         Status = AppointmentConst.STATUS_WAITING,
                         Note = guest.Note,
                         TotalAmount = totalAmount,

@@ -115,7 +115,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Login
                 UserId = userExisted.Id,
                 Token = rawRefreshToken,
                 ExpiresAt = DateTimeHelper.UtcNow().AddDays(jwtOptions.Value.RefreshTokenExpiryDays),
-                CreatedByIp = request.IpAddress ?? "",
+                CreatedByIp = request.IpAddress,
                 CreatedAt = DateTimeHelper.UtcNow(),
             });
 
@@ -176,7 +176,6 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Login
             }
             else
             {
-                // staff / manager / admin (nếu có bản ghi staff) — lấy SalonId cho token
                 var staff = await staffSqlRepository
                     .AsQueryable(true)
                     .Where(x => x.UserId == user.Id)

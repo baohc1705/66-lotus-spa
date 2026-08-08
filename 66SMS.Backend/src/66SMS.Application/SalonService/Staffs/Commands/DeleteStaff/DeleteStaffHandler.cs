@@ -15,7 +15,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.DeleteStaff
 {
     public class DeleteStaffHandler : IRequestHandler<DeleteStaffCommand, Result<object>>
     {
-        
+
         private readonly IStaffSqlRepository staffSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly ICacheService cacheService;

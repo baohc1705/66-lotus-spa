@@ -47,8 +47,6 @@ namespace _66SMS.Application.BookingService.Shifts.Commands.UpdateShift
                             {
                                 if (activePeriod.EffectiveFrom >= request.ShiftPeriod.EffectiveFrom.Value)
                                 {
-                                    // If the old period starts on or after the new period,
-                                    // we just update it instead of creating a negative duration period
                                     mapper.Map(request.ShiftPeriod, activePeriod);
                                     shiftPeriodSqlRepository.Update(activePeriod);
                                     shouldCreateNew = false;

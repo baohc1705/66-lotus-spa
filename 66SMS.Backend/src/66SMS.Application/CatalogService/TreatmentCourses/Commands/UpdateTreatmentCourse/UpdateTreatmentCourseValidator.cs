@@ -7,6 +7,7 @@ namespace _66SMS.Application.CatalogService.TreatmentCourses.Commands.UpdateTrea
     {
         public UpdateTreatmentCourseValidator()
         {
+            RuleFor(x => x.Id).NotNull().GreaterThan(0);
             RuleFor(x => x.Code).NotEmpty().MaximumLength(TreatmentCourseConst.CODE_MAX_LENGTH).When(x => x.Code != null);
             RuleFor(x => x.Name).NotEmpty().MaximumLength(TreatmentCourseConst.NAME_MAX_LENGTH).When(x => x.Name != null);
             RuleFor(x => x.SellingPrice).GreaterThanOrEqualTo(0).When(x => x.SellingPrice.HasValue);

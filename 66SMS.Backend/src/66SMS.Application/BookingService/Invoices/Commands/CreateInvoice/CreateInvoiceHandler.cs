@@ -56,7 +56,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
 
                 foreach (var i in request.Items)
                 {
-                    var quantity = i.Quantity ?? 1;
+                    var quantity = i.Quantity!.Value;
                     var lineDiscount = i.DiscountAmount ?? 0;
                     string itemName;
                     decimal unitPrice;
@@ -123,7 +123,6 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
                     items.Add(item);
                 }
 
-                // Load khách hàng  để áp dụng membership + loyalty
                 Customer? customer = null;
                 if (request.CustomerId.HasValue)
                 {
@@ -132,7 +131,6 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
                         return Result<int>.BadRequest("Khách hàng không tồn tại.", ErrorCodes.ERR_CUSTOMER_NOT_FOUND);
                 }
 
-                // Giảm giá theo hạng thành viên
                 int? tierId = null;
                 decimal membershipDiscount = 0;
                 decimal pointMultiplier = 1;
@@ -159,7 +157,6 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
                     }
                 }
 
-                // Dùng điểm loyalty để trừ tiền
                 var pointsUsed = request.LoyaltyPointsUsed ?? 0;
                 if (pointsUsed > 0)
                 {
@@ -186,14 +183,12 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
                     status = InvoiceConst.STATUS_UNPAID;
                 }
 
-                // Điểm tích lũy (chỉ tích khi đã thanh toán đủ)
                 int pointsEarned = 0;
                 if (status == InvoiceConst.STATUS_PAID && customer != null)
                 {
                     pointsEarned = loyaltyPointService.CalculateEarnedPoints(total, pointMultiplier);
                 }
 
-                // Cập nhật điểm + lịch sử mua của khách
                 if (customer != null)
                 {
                     customer.LoyaltyPoint = (customer.LoyaltyPoint ?? 0) - pointsUsed + pointsEarned;

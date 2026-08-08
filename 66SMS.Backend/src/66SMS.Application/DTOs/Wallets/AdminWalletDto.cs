@@ -6,9 +6,9 @@ namespace _66SMS.Application.DTOs.Wallets
     {
         public int Id { get; set; }
         public int CustomerId { get; set; }
-        public string CustomerName { get; set; } = null!;
-        public string CustomerPhone { get; set; } = null!;
-        public string CustomerAvatar { get; set; } = null!;
+        public string? CustomerName { get; set; }
+        public string? CustomerPhone { get; set; }
+        public string? CustomerAvatar { get; set; }
         public decimal Balance { get; set; }
         public int Status { get; set; }
         public DateTimeOffset CreatedAt { get; set; }

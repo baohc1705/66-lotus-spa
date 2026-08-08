@@ -4,6 +4,7 @@ using _66SMS.Contract.Enumerations;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
+using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,7 +34,30 @@ namespace _66SMS.Application.SalonService.Attendances.Queries.GetDetailAttendanc
             if (attendance == null)
                 return Result<AttendanceDTO>.NotFound(AttendanceConst.MSG_NOT_FOUND, ErrorCodes.ERR_ATTENDANCE_NOT_FOUND);
 
-            return Result<AttendanceDTO>.Success(AttendanceMapper.ToDto(attendance));
+            return Result<AttendanceDTO>.Success(ToDto(attendance));
+        }
+
+        private static AttendanceDTO ToDto(Attendance x)
+        {
+            return new AttendanceDTO
+            {
+                Id = x.Id,
+                StaffId = x.StaffId,
+                StaffName = x.Staff?.FullName,
+                SalonId = x.SalonId,
+                SalonName = x.Salon?.Name,
+                WorkScheduleId = x.WorkScheduleId,
+                WorkDate = x.WorkDate,
+                CheckInAt = x.CheckInAt,
+                CheckOutAt = x.CheckOutAt,
+                WorkedHours = x.WorkedHours,
+                Status = x.Status,
+                Note = x.Note,
+                ShiftName = x.WorkSchedule?.ShiftPeriod?.Shift?.Name,
+                CreatedAt = x.CreatedAt,
+                UpdatedAt = x.UpdatedAt,
+                WorkCredits = AttendanceWorkCreditCalculator.CalculateWorkCredit(x),
+            };
         }
     }
 }

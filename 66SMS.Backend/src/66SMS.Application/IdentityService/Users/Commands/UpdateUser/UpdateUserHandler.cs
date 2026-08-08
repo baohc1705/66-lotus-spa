@@ -10,9 +10,6 @@ using System.Data;
 
 namespace _66SMS.Application.IdentityService.Users.Commands.UpdateUser
 {
-    /// <summary>
-    /// Handler for <see cref="UpdateUserCommand"/>
-    /// </summary>
     public class UpdateUserHandler : IRequestHandler<UpdateUserCommand, Result<object>>
     {
         private readonly IUserSqlRepository userSqlRepository;
@@ -27,27 +24,21 @@ namespace _66SMS.Application.IdentityService.Users.Commands.UpdateUser
 
         public async Task<Result<object>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
-            // Find user with id provied
             User? user = await userSqlRepository.FindByIdAsync((int)request.Id!, false, cancellationToken);
 
-            // return not found if user is null
             if (user is null)
                 return Result<object>.NotFound(UserConst.MSG_USER_ID_NOT_FOUND, ErrorCodes.ERR_USER_NOT_FOUND);
 
-            // Map ignore null
             mapper.Map(request, user);
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Update and persist to database
                 userSqlRepository.Update(user);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // Commit transaction
                 transaction.Commit();
 
-                // return success result
                 return Result<object>.Ok();
             }
             catch (Exception)

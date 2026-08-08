@@ -1,11 +1,11 @@
 using _66SMS.Application.DTOs.Attendances;
+using _66SMS.Application.SalonService.Helpers;
 using _66SMS.Contract.Extensions;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using AttendanceMapper = _66SMS.Application.SalonService.Helpers.AttendanceMapper;
 
 namespace _66SMS.Application.SalonService.Attendances.Queries.GetAllAttendances
 {
@@ -52,13 +52,36 @@ namespace _66SMS.Application.SalonService.Attendances.Queries.GetAllAttendances
 
             var pagedDto = new PagedResult<AttendanceDTO>
             {
-                Items = paged.Items.Select(AttendanceMapper.ToDto).ToList(),
+                Items = paged.Items.Select(ToDto).ToList(),
                 PageIndex = paged.PageIndex,
                 PageSize = paged.PageSize,
                 TotalCount = paged.TotalCount,
             };
 
             return Result<PagedResult<AttendanceDTO>>.Success(pagedDto);
+        }
+
+        private static AttendanceDTO ToDto(Attendance x)
+        {
+            return new AttendanceDTO
+            {
+                Id = x.Id,
+                StaffId = x.StaffId,
+                StaffName = x.Staff?.FullName,
+                SalonId = x.SalonId,
+                SalonName = x.Salon?.Name,
+                WorkScheduleId = x.WorkScheduleId,
+                WorkDate = x.WorkDate,
+                CheckInAt = x.CheckInAt,
+                CheckOutAt = x.CheckOutAt,
+                WorkedHours = x.WorkedHours,
+                Status = x.Status,
+                Note = x.Note,
+                ShiftName = x.WorkSchedule?.ShiftPeriod?.Shift?.Name,
+                CreatedAt = x.CreatedAt,
+                UpdatedAt = x.UpdatedAt,
+                WorkCredits = AttendanceWorkCreditCalculator.CalculateWorkCredit(x),
+            };
         }
     }
 }

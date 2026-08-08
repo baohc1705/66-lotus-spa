@@ -45,7 +45,6 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
 
         public async Task<Result<TokenResponseDTO>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
-            // Token lấy từ body hoặc cookie (controller merge). Rỗng = chưa đăng nhập / cookie mất.
             if (string.IsNullOrWhiteSpace(request.Token))
                 return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_INVALID_TOKEN, ErrorCodes.ERR_AUTH_TOKEN_INVALID);
 
@@ -105,7 +104,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
                 UserId = user.Id,
                 Token = newRawToken,
                 ExpiresAt = DateTimeHelper.UtcNow().AddDays(jwtOptions.Value.RefreshTokenExpiryDays),
-                CreatedByIp = request.IpAddress ?? "",
+                CreatedByIp = request.IpAddress,
                 CreatedAt = DateTimeHelper.UtcNow(),
             });
 

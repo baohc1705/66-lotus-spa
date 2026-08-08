@@ -47,17 +47,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
 
         public async Task<Result<object>> Handle(CreateStaffCommand request, CancellationToken cancellationToken)
         {
-            User user = new User
-            {
-                Username = string.Empty,
-                Email = string.Empty,
-                PasswordHash = string.Empty,
-                CreatedAt = DateTimeHelper.UtcNow(),
-                CreatedBy = request.CreatedBy,
-                Status = (int)StatusActiveEnum.ACTIVED,
-                IsEmailConfirmed = true,
-            };
-
             string roleCode = request.Role ?? RoleConst.CODE_STAFF;
             var role = await roleSqlRepository
                 .AsQueryable(true)
@@ -68,23 +57,31 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
             if (role == null)
                 return Result<object>.NotFound(RoleConst.MSG_ROLE_NOT_FOUND, ErrorCodes.ERR_ROLE_NOT_FOUND);
 
-            // Role manager + có chi nhánh → IsManager = true
-            int salonId = request.SalonId ?? 1;
+            var phone = request.Phone!.Trim();
+            var salonId = request.SalonId!.Value;
             bool isManager = role.Code == RoleConst.CODE_MANAGER;
 
-            user.UserRoles = new List<UserRole>
+            var user = new User
             {
-                new UserRole
+                Username = phone,
+                Email = string.IsNullOrWhiteSpace(request.Email) ? $"{phone}@temp.lotusspa.local" : request.Email.Trim(),
+                PasswordHash = passwordHash.Hash(phone),
+                CreatedAt = DateTimeHelper.UtcNow(),
+                CreatedBy = request.CreatedBy,
+                Status = (int)StatusActiveEnum.ACTIVED,
+                IsEmailConfirmed = true,
+                UserRoles = new List<UserRole>
                 {
-                    RoleId = role.Id,
-                    AssignedAt = DateTimeHelper.UtcNow(),
-                    AssignedBy = request.CreatedBy,
+                    new UserRole
+                    {
+                        RoleId = role.Id,
+                        AssignedAt = DateTimeHelper.UtcNow(),
+                        AssignedBy = request.CreatedBy,
+                    }
                 }
             };
 
             Staff staff = mapper.Map<Staff>(request);
-            staff.Code = string.Empty;
-            staff.AvatarUrl = string.Empty;
             staff.StaffSalons = new List<StaffSalon>
             {
                 new StaffSalon
@@ -109,7 +106,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaff
 
                 staff.Code = $"SEN{staff.Id:D4}";
                 staff.User!.Username = staff.Code;
-                staff.User.Email = string.IsNullOrEmpty(request.Email) ? $"{staff.Code}@lotusspa.com.vn" : request.Email;
+                staff.User.Email = string.IsNullOrWhiteSpace(request.Email) ? $"{staff.Code}@lotusspa.com.vn" : request.Email.Trim();
                 staff.User.PasswordHash = passwordHash.Hash(staff.Code);
 
                 if (!string.IsNullOrEmpty(request.AvatarUrl))

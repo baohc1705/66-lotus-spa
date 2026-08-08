@@ -9,9 +9,6 @@ using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.ProductCategories.Queries.GetDetailProductCategory
 {
-    /// <summary>
-    /// Handler for <see cref="GetDetailProductCategoryQuery"/>
-    /// </summary>
     public class GetDetailProductCategoryHandler : IRequestHandler<GetDetailProductCategoryQuery, Result<ProductCategoryDto>>
     {
         private readonly IProductCategorySqlRepository productCategorySqlRepository;
@@ -23,7 +20,6 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Queries.GetDetailP
 
         public async Task<Result<ProductCategoryDto>> Handle(GetDetailProductCategoryQuery request, CancellationToken cancellationToken)
         {
-            // Find category with id
             ProductCategoryDto? productCategoryDto = await productCategorySqlRepository
                 .AsQueryable(true)
                 .Where(x => x.Id == request.Id && x.Status != (int)StatusActiveEnum.DELETED)

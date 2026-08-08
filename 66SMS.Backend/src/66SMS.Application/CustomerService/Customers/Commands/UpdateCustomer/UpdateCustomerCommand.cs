@@ -15,7 +15,6 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.UpdateCustomer
         public int? Id { get; set; }
         public string? FullName { get; set; }
         public string? AvatarUrl { get; set; }
-        /// <summary>Base64 ảnh mới — upload qua IImageUploadService.</summary>
         public string? ImageBase64 { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public int? Gender { get; set; }

@@ -249,13 +249,14 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                     {
                         ItemType = InvoiceItemConst.TYPE_SERVICE,
                         RefId = appService.ServiceId,
-                        ItemName = appService.Service?.Name ?? string.Empty,
                         UnitPrice = unitPrice,
                         Quantity = quantity,
                         LineTotal = lineTotal,
                         StaffId = appointment.StaffId,
                         Status = InvoiceItemConst.STATUS_ACTIVE,
                     };
+                    if (appService.Service != null)
+                        item.ItemName = appService.Service.Name;
 
                     if (appService.Service?.CommissionRate is decimal rate)
                     {

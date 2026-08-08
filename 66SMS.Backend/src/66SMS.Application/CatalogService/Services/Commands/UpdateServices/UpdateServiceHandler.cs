@@ -14,9 +14,6 @@ using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
 {
-    /// <summary>
-    /// Handler for <see cref="UpdateServiceCommand"/>
-    /// </summary>
     public class UpdateServiceHandler : IRequestHandler<UpdateServiceCommand, Result<object>>
     {
         private readonly IServiceSqlRepository serviceSqlRepository;
@@ -89,9 +86,6 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
             }
         }
 
-        /// <summary>
-        /// Có rồi thì cập nhật, chưa có thì thêm mới. Product không còn trong list thì xóa.
-        /// </summary>
         private async Task SyncServiceProductsAsync(
             int serviceId,
             List<CreateServices.ServiceProductItems> items,
@@ -135,7 +129,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
                 var found = existing.FirstOrDefault(x => x.ProductId == productId);
                 if (found != null)
                 {
-                    found.QuantityUsed = item.QuantityUsed ?? 1;
+                    found.QuantityUsed = item.QuantityUsed!.Value;
                     found.UnitCost = unitCost;
                     found.Note = item.Note;
                     found.Status = item.Status ?? (int)StatusActiveEnum.ACTIVED;
@@ -148,7 +142,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
                     {
                         ServiceId = serviceId,
                         ProductId = productId,
-                        QuantityUsed = item.QuantityUsed ?? 1,
+                        QuantityUsed = item.QuantityUsed!.Value,
                         UnitCost = unitCost,
                         Note = item.Note,
                         Status = item.Status ?? (int)StatusActiveEnum.ACTIVED,

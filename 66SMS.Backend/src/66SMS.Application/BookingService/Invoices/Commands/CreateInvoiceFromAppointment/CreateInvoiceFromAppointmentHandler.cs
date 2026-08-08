@@ -30,7 +30,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
 
         public async Task<Result<int>> Handle(CreateInvoiceFromAppointmentCommand request, CancellationToken cancellationToken)
         {
-            
+
             var appointment = await appointmentRepository.AsQueryable(asNoTracking: false)
                 .Include(a => a.Payments)
                 .Include(a => a.Services!)
@@ -46,7 +46,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
                 return Result<int>.NotFound(AppointmentConst.MSG_APPOINTMENT_NOT_FOUND, ErrorCodes.ERR_APPOINTMENT_NOT_FOUND);
             }
 
-            
+
             if (appointment.Status != AppointmentConst.STATUS_COMPLETED)
             {
                 return Result<int>.BadRequest("Lịch hẹn chưa hoàn thành phục vụ để tạo hóa đơn.", ErrorCodes.ERR_APPOINTMENT_ALREADY_THIS_STATUS);
@@ -79,13 +79,14 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
                         {
                             ItemType = InvoiceItemConst.TYPE_SERVICE,
                             RefId = appService.ServiceId,
-                            ItemName = appService.Service?.Name ?? string.Empty,
                             UnitPrice = unitPrice,
                             Quantity = quantity,
                             LineTotal = lineTotal,
                             StaffId = appointment.StaffId,
                             Status = InvoiceItemConst.STATUS_ACTIVE,
                         };
+                        if (appService.Service != null)
+                            item.ItemName = appService.Service.Name;
 
                         if (appService.Service?.CommissionRate is decimal rate)
                         {

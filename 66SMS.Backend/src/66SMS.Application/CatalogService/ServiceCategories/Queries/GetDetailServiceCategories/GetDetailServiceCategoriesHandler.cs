@@ -9,9 +9,6 @@ using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetDetailServiceCategories
 {
-    /// <summary>
-    /// Handler for <see cref="GetDetailServiceCategoriesQuery"/>
-    /// </summary>
     public class GetDetailServiceCategoriesHandler : IRequestHandler<GetDetailServiceCategoriesQuery, Result<ServiceCategoryDto>>
     {
         private readonly IServiceCategorySqlRepository serviceCategorySqlRepository;

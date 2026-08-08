@@ -19,12 +19,10 @@ public class GetAllUserAccountHandler : IRequestHandler<GetAllUserAccountQuery, 
     {
         var query = userSqlRepository.AsQueryable(true);
 
-        // Search keyword
         if (!string.IsNullOrEmpty(request.Filter))
             query = query.Where(x => x.Username.Contains(request.Filter) ||
                                     x.Email.Contains(request.Filter));
 
-        // Order by
         query = request.OrderBy?.ToLower() switch
         {
             "username" => request.IsDescending ? query.OrderByDescending(x => x.Username) : query.OrderBy(x => x.Username),
@@ -33,7 +31,6 @@ public class GetAllUserAccountHandler : IRequestHandler<GetAllUserAccountQuery, 
             _ => request.IsDescending ? query.OrderByDescending(x => x.Username) : query.OrderBy(x => x.Username)
         };
 
-        // Projection
         var dtoQuery = query.Select(x => new UserAccountDto
         {
              Username = x.Username,
@@ -48,10 +45,9 @@ public class GetAllUserAccountHandler : IRequestHandler<GetAllUserAccountQuery, 
              UpdatedAt = x.UpdatedAt,
         });
 
-        // Pagination
         var result = await dtoQuery.ToPagedAsync(request, cancellationToken);
 
         return Result<PagedResult<UserAccountDto>>.Success(result);
     }
-    
+
 }

@@ -11,10 +11,6 @@ using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.BookingService.Helpers
 {
-    /// <summary>
-    /// Đảm bảo Customer có User để gắn Appointment.CreatedByUserId.
-    /// Username = SĐT, Password = SĐT, Email = email khách.
-    /// </summary>
     public static class CustomerUserEnsureHelper
     {
         public static async Task<Result<int>> EnsureCustomerUserIdAsync(

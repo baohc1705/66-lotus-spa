@@ -91,7 +91,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
             using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-              
+
                 if (request.PaymentMethod == InvoiceConst.PAYMENT_WALLET)
                 {
                     int? walletUserId = appointment?.CreatedByUserId ?? customer?.UserId;
@@ -133,7 +133,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                     walletTransactionRepository.Add(walletTx);
                 }
 
-             
+
                 invoice.PaidAmount = invoice.TotalAmount;
                 if (change != 0)
                     invoice.ChangeAmount = change;
@@ -146,7 +146,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                 invoice.UpdatedBy = request.CashierId;
                 invoiceRepository.Update(invoice);
 
-         
+
                 if (appointment != null)
                 {
                     int appointmentMethod = request.PaymentMethod switch
@@ -179,7 +179,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                     appointmentRepository.Update(appointment);
                 }
 
-        
+
                 int earnedPoints = 0;
                 if (customer != null)
                 {
@@ -195,7 +195,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                             await loyaltyPointService.AddPointsAndCheckUpgradeAsync(
                                 customer.UserId.Value,
                                 invoice.TotalAmount,
-                                request.CashierId ?? 0,
+                                request.CashierId ?? customer.UserId.Value,
                                 cancellationToken);
                         }
                         else

@@ -10,9 +10,6 @@ using System.Data;
 
 namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateServiceCategories
 {
-    /// <summary>
-    /// Handler for <see cref="CreateServiceCategoriesCommand"/>
-    /// </summary>
     public class CreateServiceCategoriesHandler : IRequestHandler<CreateServiceCategoriesCommand, Result<object>>
     {
         private readonly IServiceCategorySqlRepository serviceCategorySqlRepository;
@@ -37,38 +34,30 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.CreateSer
 
         public async Task<Result<object>> Handle(CreateServiceCategoriesCommand request, CancellationToken cancellationToken)
         {
-            // Begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Map request to domain entity
                 ServiceCategory? service = mapper.Map<ServiceCategory>(request);
-                service.Icon = string.Empty;
 
-                // Create and persist to database
                 serviceCategorySqlRepository.Add(service);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // Upload icon if provided
                 if (!string.IsNullOrWhiteSpace(request.Icon))
                 {
                     service.Icon = await imageUploadService.UploadAsync(request.Icon, ServiceCategoryConst.GenerateIconFileName(service.Id), ServiceCategoryConst.IMAGE_FOLDER, cancellationToken);
                 }
 
-                // Upload image if provided
                 if (!string.IsNullOrWhiteSpace(request.ImageUrl))
                 {
                     service.ImageUrl = await imageUploadService.UploadAsync(request.ImageUrl, ServiceCategoryConst.GenerateImageFileName(service.Id), ServiceCategoryConst.IMAGE_FOLDER, cancellationToken);
                 }
 
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-                // Commit transaction
                 transaction.Commit();
 
                 await cacheService.RemoveByPrefixAsync(ServiceCategoryConst.CACHE_PREFIX, cancellationToken);
                 await cacheService.RemoveByPrefixAsync(ServiceConst.CACHE_PREFIX, cancellationToken);
 
-                // return to created result
                 return Result<object>.Created(service.Id);
             }
             catch (Exception)

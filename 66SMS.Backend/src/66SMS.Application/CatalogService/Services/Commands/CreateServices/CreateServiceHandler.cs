@@ -11,9 +11,6 @@ using System.Data;
 
 namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
 {
-    /// <summary>
-    /// Handler for <see cref="CreateServiceCommand"/>
-    /// </summary>
     public class CreateServiceHandler : IRequestHandler<CreateServiceCommand, Result<object>>
     {
         private readonly IServiceSqlRepository serviceSqlRepository;
@@ -42,8 +39,6 @@ namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
         public async Task<Result<object>> Handle(CreateServiceCommand request, CancellationToken cancellationToken)
         {
             Service? service = mapper.Map<Service>(request);
-            service.Code = string.Empty;
-            service.ImageUrl = string.Empty;
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try

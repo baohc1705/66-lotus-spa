@@ -6,9 +6,6 @@ using MediatR;
 
 namespace _66SMS.Application.IdentityService.Roles.Commands.UpdateRole
 {
-    /// <summary>
-    /// Handler for <see cref="UpdateRoleCommand"/>
-    /// </summary>
     public class UpdateRoleHandler : IRequestHandler<UpdateRoleCommand, Result<object>>
     {
         private readonly IRoleSqlRepository roleSqlRepository;

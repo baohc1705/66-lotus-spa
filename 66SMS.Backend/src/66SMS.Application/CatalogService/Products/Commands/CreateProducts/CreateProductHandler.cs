@@ -10,9 +10,6 @@ using System.Data;
 
 namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
 {
-    /// <summary>
-    /// Handler for <see cref="CreateProductCommand"/>
-    /// </summary>
     public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result<int>>
     {
         private readonly IProductSqlRepository productSqlRepository;
@@ -38,7 +35,6 @@ namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
             try
             {
                 Product product = mapper.Map<Product>(request);
-                product.Code = string.Empty;
 
                 var pendingUploads = new List<(ProductImage Image, string Base64)>();
 
@@ -49,12 +45,13 @@ namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
                     {
                         var image = new ProductImage
                         {
-                            Url = string.IsNullOrWhiteSpace(dto.ImageBase64)
-                                ? (dto.Url ?? string.Empty)
-                                : string.Empty,
-                            IsPrimary = dto.IsPrimary ?? false,
-                            SortOrder = dto.SortOrder ?? 0,
+                            Url = string.IsNullOrWhiteSpace(dto.ImageBase64) ? (dto.Url ?? string.Empty) : string.Empty,
                         };
+                        if (dto.IsPrimary == true)
+                            image.IsPrimary = true;
+                        if (dto.SortOrder is int sortOrder)
+                            image.SortOrder = sortOrder;
+
                         product.Images.Add(image);
                         if (!string.IsNullOrWhiteSpace(dto.ImageBase64))
                             pendingUploads.Add((image, dto.ImageBase64!));

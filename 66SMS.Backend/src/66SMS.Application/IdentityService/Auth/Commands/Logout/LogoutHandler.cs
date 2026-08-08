@@ -8,9 +8,6 @@ using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.Logout
 {
-    /// <summary>
-    /// Handler for <see cref="LogoutCommand"/>
-    /// </summary>
     public class LogoutHandler : IRequestHandler<LogoutCommand, Result<object>>
     {
         private readonly IRefreshTokenSqlRepository refreshTokenSqlRepository;

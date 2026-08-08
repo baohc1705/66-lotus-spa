@@ -16,9 +16,6 @@ using System.Data;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
 {
-    /// <summary>
-    /// Handler for  <see cref="RegisterCommand"/>
-    /// </summary>
     public class RegisterHandler : IRequestHandler<RegisterCommand, Result<int>>
     {
         private readonly IUserSqlRepository userSqlRepository;
@@ -48,19 +45,16 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
 
         public async Task<Result<int>> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
-            // Kiểm tra email và username đã tồn tại chưa
             bool emailOrUsernameExisted = await userSqlRepository
                 .AsQueryable(true)
                 .Where(x => x.Username == request.UserName || x.Email == request.Email)
                 .AnyAsync(cancellationToken);
 
-            // Nếu email hoặc username đã tồn tại, trả về lỗi
             if (emailOrUsernameExisted)
             {
                 return Result<int>.Conflict(UserConst.MSG_USER_ALREADY_EXISTS, ErrorCodes.ERR_USER_ALREADY_EXISTS);
             }
 
-            // Lấy role customer theo code (schema: roles.code)
             int roleId = await roleSqlRepository
                 .AsQueryable(true)
                 .Where(x => x.Code == RoleConst.CODE_CUSTOMER && x.Status == RoleConst.STATUS_ACTIVED)
@@ -75,15 +69,12 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
             user.PasswordHash = passwordHash.Hash(request.Password!);
             user.OtpCode = Random.Shared.Next(100000, 999999).ToString();
 
-            // Bắt đầu transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Thêm vào repository
                 userSqlRepository.Add(user);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // Tạo và liên kết user role
                 var userRole = new UserRole
                 {
                     UserId = user.Id,
@@ -91,7 +82,6 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
                 };
                 user.UserRoles = new List<UserRole> { userRole };
 
-                // Tạo và liên kết customer
                 var customer = new Customer
                 {
                     UserId = user.Id, // Gán cứng UserId vừa sinh ra
@@ -103,11 +93,9 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
                 };
                 user.Customer = customer;
 
-                // Lưu thay đổi vào database
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
 
-                // Gửi email OTP qua queue
                 var otpMail = emailTemplateFactory.CreateOtpEmail(
                     user.Email,
                     user.Username,
@@ -120,7 +108,6 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Registers
                     HtmlBody = otpMail.HtmlBody,
                 }, cancellationToken);
 
-                // Gửi event để tạo wallet và membership card khi customer được tạo
                 await domainEventPublisher.PublishAsync(new CreatedUserEvent
                 {
                     UserId = user.Id,

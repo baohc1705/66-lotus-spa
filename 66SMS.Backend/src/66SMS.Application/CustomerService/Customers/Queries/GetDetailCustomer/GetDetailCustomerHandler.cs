@@ -3,24 +3,18 @@ using _66SMS.Contract.Enumerations;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
-using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.CustomerService.Customers.Queries.GetDetailCustomer
 {
-    /// <summary>
-    /// Handler for <see cref="GetDetailCustomerQuery"/>
-    /// </summary>
     public class GetDetailCustomerHandler : IRequestHandler<GetDetailCustomerQuery, Result<CustomerDTO>>
     {
         private readonly ICustomerSqlRepository customerSqlRepository;
-        private readonly IMapper mapper;
 
-        public GetDetailCustomerHandler(ICustomerSqlRepository customerSqlRepository, IMapper mapper)
+        public GetDetailCustomerHandler(ICustomerSqlRepository customerSqlRepository)
         {
             this.customerSqlRepository = customerSqlRepository;
-            this.mapper = mapper;
         }
 
         public async Task<Result<CustomerDTO>> Handle(GetDetailCustomerQuery request, CancellationToken cancellationToken)
@@ -53,7 +47,7 @@ namespace _66SMS.Application.CustomerService.Customers.Queries.GetDetailCustomer
 
             if (customer == null)
                 return Result<CustomerDTO>.NotFound(CustomerConst.MSG_CUSTOMER_ID_NOT_FOUND, ErrorCodes.ERR_CUSTOMER_NOT_FOUND);
-           
+
             return Result<CustomerDTO>.Success(customer);
         }
     }

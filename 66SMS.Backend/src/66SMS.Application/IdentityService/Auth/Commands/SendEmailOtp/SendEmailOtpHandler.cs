@@ -12,9 +12,6 @@ using System.Data;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.SendEmailOtp
 {
-    /// <summary>
-    /// Handler for <see cref="SendEmailOtpCommand"/>
-    /// </summary>
     public class SendEmailOtpHandler : IRequestHandler<SendEmailOtpCommand, Result<object>>
     {
         private readonly IUserSqlRepository userSqlRepository;

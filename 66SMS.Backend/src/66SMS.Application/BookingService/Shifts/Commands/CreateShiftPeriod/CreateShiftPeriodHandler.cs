@@ -39,7 +39,7 @@ namespace _66SMS.Application.BookingService.Shifts.Commands.CreateShiftPeriod
 
             ShiftPeriod shiftPeriod = mapper.Map<ShiftPeriod>(request);
             shiftPeriod.CreatedAt = DateTimeHelper.UtcNow();
-            shiftPeriod.CreatedBy = request.CreatedBy ?? 1;
+            shiftPeriod.CreatedBy = request.CreatedBy;
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try

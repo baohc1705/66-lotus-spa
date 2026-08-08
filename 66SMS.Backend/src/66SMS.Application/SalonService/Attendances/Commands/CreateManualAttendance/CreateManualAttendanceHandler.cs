@@ -25,7 +25,6 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CreateManualAtten
         {
             var workDate = request.WorkDate ?? DateTimeHelper.UtcNow().ToDateOnly();
 
-            // Mỗi ca (workSchedule) một bản ghi — tránh đụng các ca khác cùng ngày
             bool exists;
             if (request.WorkScheduleId.HasValue && request.WorkScheduleId > 0)
             {
@@ -52,7 +51,6 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CreateManualAtten
                 WorkScheduleId = request.WorkScheduleId,
                 WorkDate = workDate,
                 Status = request.Status,
-                WorkedHours = 0,
                 Note = request.Note,
                 CreatedAt = DateTimeHelper.UtcNow(),
             };

@@ -29,16 +29,11 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CheckIn
 
         public async Task<Result<int>> Handle(CheckInCommand request, CancellationToken cancellationToken)
         {
-            if (!request.WorkScheduleId.HasValue || request.WorkScheduleId <= 0)
-                return Result<int>.BadRequest(
-                    AttendanceConst.MSG_WORK_SCHEDULE_REQUIRED,
-                    ErrorCodes.ERR_ATTENDANCE_WORK_SCHEDULE_REQUIRED);
-
             var now = DateTimeHelper.UtcNow();
             var today = now.ToDateOnly();
 
             var workSchedule = await workScheduleRepository.FindByIdAsync(
-                request.WorkScheduleId.Value, asNoTracking: true, cancellationToken);
+                request.WorkScheduleId!.Value, asNoTracking: true, cancellationToken);
             if (workSchedule == null
                 || workSchedule.StaffId != request.StaffId
                 || workSchedule.WorkDate != today)
@@ -59,7 +54,6 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CheckIn
                 WorkScheduleId = request.WorkScheduleId,
                 WorkDate = today,
                 CheckInAt = now,
-                WorkedHours = 0,
                 Status = AttendanceConst.STATUS_CHECKED_IN,
                 Note = request.Note,
                 CreatedAt = DateTimeHelper.UtcNow(),

@@ -68,7 +68,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
                         cancellationToken);
                 }
 
-                // 1) Đổi role trước (nếu có)
                 if (!string.IsNullOrEmpty(request.Role))
                 {
                     if (staff.User == null)
@@ -105,22 +104,19 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
                             UserId = staff.UserId,
                             RoleId = roleId,
                             AssignedAt = DateTimeHelper.UtcNow(),
-                            AssignedBy = request.UpdatedBy ?? 1,
+                            AssignedBy = request.UpdatedBy,
                         });
                     }
                 }
 
-                // 2) Xác định IsManager: role manager + có salon
                 bool isManagerRole = await IsManagerRoleAsync(staff, request.Role, cancellationToken);
 
-                // 3) Đổi / giữ chi nhánh + set IsManager
                 if (request.SalonId.HasValue)
                 {
                     SyncStaffSalon(staff, request.SalonId.Value, isManagerRole);
                 }
                 else if (!string.IsNullOrEmpty(request.Role))
                 {
-                    // Chỉ đổi role → cập nhật IsManager trên assignment đang active
                     staff.StaffSalons ??= new List<StaffSalon>();
                     foreach (var assignment in staff.StaffSalons.Where(x => x.Status == (int)StatusActiveEnum.ACTIVED))
                     {
@@ -167,9 +163,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
             }
         }
 
-        /// <summary>
-        /// Role manager nếu request.Role = manager, hoặc staff đang có role manager.
-        /// </summary>
         private async Task<bool> IsManagerRoleAsync(
             Staff staff,
             string? requestRole,
@@ -190,9 +183,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
             return staff.User.UserRoles.Any(x => x.RoleId == managerRoleId);
         }
 
-        /// <summary>
-        /// Gán staff vào salon; IsManager = true khi role manager.
-        /// </summary>
         private static void SyncStaffSalon(Staff staff, int salonId, bool isManager)
         {
             staff.StaffSalons ??= new List<StaffSalon>();

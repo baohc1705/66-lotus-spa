@@ -14,9 +14,6 @@ using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
 {
-    /// <summary>
-    /// Handler for <see cref="CreateCustomerCommand"/>
-    /// </summary>
     public class CreateCustomerHandler : IRequestHandler<CreateCustomerCommand, Result<object>>
     {
         private readonly ICustomerSqlRepository customerSqlRepository;
@@ -97,7 +94,6 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
                 customer.Wallet = new Wallet
                 {
                     CustomerId = customer.Id,
-                    Balance = 0,
                     Status = WalletConst.STATUS_ACTIVE,
                     CreatedAt = DateTimeHelper.UtcNow()
                 };

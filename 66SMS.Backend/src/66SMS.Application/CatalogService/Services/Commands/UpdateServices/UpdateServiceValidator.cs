@@ -23,7 +23,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
             RuleForEach(x => x.ServiceProducts).ChildRules(sp =>
             {
                 sp.RuleFor(p => p.ProductId).GreaterThan(0).When(p => p.ProductId != null);
-                sp.RuleFor(p => p.QuantityUsed).GreaterThan(0).When(p => p.QuantityUsed != null);
+                sp.RuleFor(p => p.QuantityUsed).NotNull().GreaterThan(0);
                 sp.RuleFor(p => p.UnitCost).GreaterThanOrEqualTo(0).When(p => p.UnitCost != null);
             }).When(x => x.ServiceProducts != null);
         }

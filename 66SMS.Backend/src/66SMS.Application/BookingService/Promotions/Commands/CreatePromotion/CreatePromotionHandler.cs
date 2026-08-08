@@ -34,7 +34,7 @@ namespace _66SMS.Application.BookingService.Promotions.Commands.CreatePromotion
 
             Promotion promotion = mapper.Map<Promotion>(request);
             promotion.CreatedAt = DateTimeHelper.UtcNow();
-            
+
             if (promotion.UsageLimit <= 0)
                 promotion.UsageLimit = null;
             if (promotion.MaxDiscountAmount <= 0)

@@ -10,9 +10,6 @@ using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.Products.Queries.GetDetailProduct
 {
-    /// <summary>
-    /// Handler for <see cref="GetDetailProductQuery"/>
-    /// </summary>
     public class GetDetailProductHandler : IRequestHandler<GetDetailProductQuery, Result<ProductFullDto>>
     {
         private readonly IProductSqlRepository productSqlRepository;

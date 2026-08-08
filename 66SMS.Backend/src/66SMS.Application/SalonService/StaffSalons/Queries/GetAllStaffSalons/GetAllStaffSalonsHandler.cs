@@ -9,7 +9,7 @@ namespace _66SMS.Application.SalonService.StaffSalons.Queries.GetAllStaffSalons
     public class GetAllStaffSalonsHandler : IRequestHandler<GetAllStaffSalonsQuery, Result<PagedResult<StaffSalonDto>>>
     {
         private readonly IStaffSalonSqlRepository staffSalonSqlRepository;
-       
+
 
         public GetAllStaffSalonsHandler(IStaffSalonSqlRepository staffSalonSqlRepository)
         {

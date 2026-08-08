@@ -11,9 +11,6 @@ using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.IdentityService.Roles.Commands.AssignPermissions
 {
-    /// <summary>
-    /// Handler for <see cref="AssignPermissionsCommand"/>
-    /// </summary>
     public class AssignPermissionsHandler : IRequestHandler<AssignPermissionsCommand, Result<object>>
     {
         private readonly IRoleSqlRepository roleSqlRepository;
@@ -29,16 +26,13 @@ namespace _66SMS.Application.IdentityService.Roles.Commands.AssignPermissions
         }
         public async Task<Result<object>> Handle(AssignPermissionsCommand request, CancellationToken cancellationToken)
         {
-            // check role existed
             bool hasRole = await roleSqlRepository
                 .AsQueryable()
                 .Where(x => x.Id == request.RoleId)
                 .AnyAsync(cancellationToken);
 
-            // return if role not existed
             if (!hasRole) return Result<object>.NotFound(RoleConst.MSG_ROLE_NOT_FOUND, ErrorCodes.ERR_ROLE_NOT_FOUND);
 
-            // check if permission ids not null
             if (request.PermissionIds!.Count > 0)
             {
                 bool allExist = await permissionSqlRepository.AsQueryable()
@@ -48,20 +42,16 @@ namespace _66SMS.Application.IdentityService.Roles.Commands.AssignPermissions
                     return Result<object>.NotFound("Một hoặc nhiều quyền không tồn tại.", ErrorCodes.ERR_PERMISSION_NOT_FOUND);
             }
 
-            // Find all permission of role 
             var existings = await rolePermissionSqlRepository.AsQueryable()
                 .Where(x => x.RoleId == request.RoleId)
                 .ToListAsync(cancellationToken);
 
-            // Begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Delete all permission before insert new
                 if (existings.Count > 0)
                     rolePermissionSqlRepository.RemoveRange(existings);
 
-                // Assign list permisison
                 List<RolePermission> rolePermissions = [];
                 foreach (var permissionId in request.PermissionIds)
                 {
@@ -73,20 +63,16 @@ namespace _66SMS.Application.IdentityService.Roles.Commands.AssignPermissions
                     });
                 }
 
-                // If list permission not empty then add range and persist to database
                 if (rolePermissions.Count > 0)
                     rolePermissionSqlRepository.AddRange(rolePermissions);
                 await rolePermissionSqlRepository.SaveChangeAsync(cancellationToken);
 
-                // Commit transaction
                 transaction.Commit();
 
-                // return ok result
                 return Result<object>.Ok();
             } 
             catch
             {
-                // Rollback on failure
                 transaction.Rollback(); throw;
             }
         }

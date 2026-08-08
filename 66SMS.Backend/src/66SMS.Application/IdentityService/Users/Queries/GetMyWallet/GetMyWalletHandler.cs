@@ -24,7 +24,6 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetMyWallet
 
             if (user == null || user.Customer == null)
             {
-                // Nếu User chưa có Customer profile, mặc định số dư là 0 (chưa có Ví)
                 return Result<MyWalletDto>.Success(new MyWalletDto { Balance = 0 });
             }
 

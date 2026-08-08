@@ -23,7 +23,7 @@ namespace _66SMS.Application.CustomerService.Wallets.Queries.GetWalletTransactio
                 .Where(t => t.WalletId == request.WalletId)
                 .OrderByDescending(t => t.CreatedAt)
                 .ToListAsync(cancellationToken);
-            
+
             var userIds = transactions.Where(t => t.CreatedBy.HasValue).Select(t => t.CreatedBy).Distinct().ToList();
             var usersList = await userRepository.AsQueryable(asNoTracking: true)
                 .Include(u => u.Staff)

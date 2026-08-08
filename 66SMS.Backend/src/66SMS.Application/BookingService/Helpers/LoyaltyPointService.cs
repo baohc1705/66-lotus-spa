@@ -11,7 +11,6 @@ namespace _66SMS.Application.BookingService.Helpers
         private readonly IMembershipTierSqlRepository membershipTierSqlRepository;
         private readonly IMembershipCardSqlRepository membershipCardSqlRepository;
 
-        // 1 điểm = 10.000 VND
         private const decimal PointsToSpendingRate = 10000m;
 
         public LoyaltyPointService(
@@ -24,7 +23,6 @@ namespace _66SMS.Application.BookingService.Helpers
             this.membershipCardSqlRepository = membershipCardSqlRepository;
         }
 
-        // Công thức: 1 điểm / 10,000 VND, nhân hệ số hạng thẻ
         public int CalculateEarnedPoints(decimal amountPaid, decimal pointMultiplier)
         {
             if (amountPaid <= 0) return 0;
@@ -63,7 +61,6 @@ namespace _66SMS.Application.BookingService.Helpers
             var currentTier = customer.MembershipCard.Tier;
             var eligibleTier = activeTiers.FirstOrDefault(t => equivalentSpending >= t.MinSpending);
 
-            // Chỉ nâng hạng, không tự hạ hạng
             if (eligibleTier != null && eligibleTier.MinSpending > currentTier.MinSpending)
             {
                 customer.MembershipCard.MembershipTierId = eligibleTier.Id;

@@ -6,6 +6,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
     {
         public CreateSlotLockValidator()
         {
+            RuleFor(x => x.LockedByUserId).NotNull().GreaterThan(0);
             RuleFor(x => x.Locks).NotEmpty();
             RuleForEach(x => x.Locks).ChildRules(slotLock =>
             {

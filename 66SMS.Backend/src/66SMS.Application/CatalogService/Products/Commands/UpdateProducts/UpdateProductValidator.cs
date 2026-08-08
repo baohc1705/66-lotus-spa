@@ -10,6 +10,7 @@ namespace _66SMS.Application.CatalogService.Products.Commands.UpdateProducts
     {
         public UpdateProductValidator()
         {
+            RuleFor(x => x.Id).GreaterThan(0);
             RuleFor(x => x.Name).MaximumLength(ProductConst.NAME_MAX_LENGTH).When(x => x.Name != null);
             RuleFor(x => x.Description).MaximumLength(ProductConst.DESCRIPTION_MAX_LENGTH).When(x => x.Description != null);
             RuleFor(x => x.Unit).MaximumLength(ProductConst.UNIT_MAX_LENGTH).When(x => x.Description != null);

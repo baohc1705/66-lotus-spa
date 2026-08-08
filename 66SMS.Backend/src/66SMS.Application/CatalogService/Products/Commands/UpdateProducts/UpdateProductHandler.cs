@@ -10,9 +10,6 @@ using MediatR;
 
 namespace _66SMS.Application.CatalogService.Products.Commands.UpdateProducts
 {
-    /// <summary>
-    /// Handler for <see cref="UpdateProductCommand"/>
-    /// </summary>
     public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result<object>>
     {
         private readonly IProductSqlRepository productSqlRepository;
@@ -85,22 +82,26 @@ namespace _66SMS.Application.CatalogService.Products.Commands.UpdateProducts
                             Url = string.IsNullOrWhiteSpace(dto.ImageBase64)
                                 ? (dto.Url ?? string.Empty)
                                 : string.Empty,
-                            IsPrimary = dto.IsPrimary ?? false,
-                            SortOrder = dto.SortOrder ?? 0,
                         };
+                        if (dto.IsPrimary == true)
+                            image.IsPrimary = true;
+                        if (dto.SortOrder is int sortOrder)
+                            image.SortOrder = sortOrder;
+
                         productImageSqlRepository.Add(image);
                         await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
                         if (!string.IsNullOrWhiteSpace(dto.ImageBase64))
                         {
-                            image.Url = await imageUploadService.UploadAsync(
+                            var uploaded = await imageUploadService.UploadAsync(
                                 dto.ImageBase64,
                                 ProductConst.GenerateImageFileName(image.Id),
                                 ProductConst.IMAGE_FOLDER,
-                                cancellationToken) ?? string.Empty;
+                                cancellationToken);
 
-                            if (!string.IsNullOrWhiteSpace(image.Url))
+                            if (!string.IsNullOrWhiteSpace(uploaded))
                             {
+                                image.Url = uploaded;
                                 productImageSqlRepository.Update(image);
                                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                             }

@@ -31,7 +31,6 @@ namespace _66SMS.Application.BookingService.BookingRooms.Queries.GetDetailBookin
                 return Result<BookingRoomDto>.Success(cached);
             }
 
-            // Get data from database.
             var result = await bookingRoomSqlRepository
                 .AsQueryable(true)
                 .Where(room => room.Id == request.Id)
@@ -72,7 +71,6 @@ namespace _66SMS.Application.BookingService.BookingRooms.Queries.GetDetailBookin
                 return Result<BookingRoomDto>.NotFound(BookingRoomConst.MSG_BOOKING_ROOM_NOT_FOUND, ErrorCodes.ERR_BOOKING_ROOM_NOT_FOUND);
             }
 
-            // Set cached data.
             await cacheService.SetAsync(cacheKey, result, BookingRoomConst.CACHE_TTL_DETAIL, cancellationToken);
 
             return Result<BookingRoomDto>.Success(result);

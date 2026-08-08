@@ -37,21 +37,13 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Queries.GetDetailMe
             var query = membershipCardSqlRepository.AsQueryable();
 
             if (request.Id.HasValue)
-            {
                 query = query.Where(x => x.Id == request.Id.Value);
-            }
-            else if (request.CustomerId.HasValue)
-            {
+
+            if (request.CustomerId.HasValue)
                 query = query.Where(x => x.CustomerId == request.CustomerId.Value);
-            }
-            else if (customer != null)
-            {
+
+            if (customer != null)
                 query = query.Where(x => x.CustomerId == customer.Id);
-            }
-            else
-            {
-                return Result<MembershipCardDto>.BadRequest("Search criteria is required.");
-            }
 
             MembershipCardDto? membershipCardDto = await query
                 .Select(x => new MembershipCardDto

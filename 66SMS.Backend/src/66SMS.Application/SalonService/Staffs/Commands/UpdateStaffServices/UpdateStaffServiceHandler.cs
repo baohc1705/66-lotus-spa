@@ -21,19 +21,16 @@ public class UpdateStaffServiceHandler : IRequestHandler<UpdateStaffServiceComma
     }
     public async Task<Result<object>> Handle(UpdateStaffServiceCommand request, CancellationToken cancellationToken)
     {
-        // get existing staff service
         var existingStaffService = await staffServiceSqlRepository
           .AsQueryable(false)
           .Where(x => x.Id == request.Id)
           .FirstOrDefaultAsync(cancellationToken);
-        // if no staff service found, return not found
         if (existingStaffService == null)
         {
             return Result<object>.NotFound();
         }
         mapper.Map(request, existingStaffService);
 
-        // check if service id is already assigned to another staff
         if (request.ServiceId.HasValue)
         {
             var existingService = await staffServiceSqlRepository
@@ -57,18 +54,13 @@ public class UpdateStaffServiceHandler : IRequestHandler<UpdateStaffServiceComma
                 return Result<object>.Conflict();
             }
         }   
-        
-        // begin transaction
+
         using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
         try
         {
-            // update staff service
             staffServiceSqlRepository.Update(existingStaffService);
-            // save changes
             await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
-            // commit transaction
             transaction.Commit();
-            // return success
             return Result<object>.Ok();
         }
         catch

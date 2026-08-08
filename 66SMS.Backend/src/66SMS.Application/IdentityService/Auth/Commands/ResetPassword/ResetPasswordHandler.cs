@@ -28,13 +28,12 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.ResetPassword
 
             User? user = await userSqlRepository.AsQueryable(asNoTracking: false).Where(x => x.Email.ToLower() == email).FirstOrDefaultAsync(cancellationToken) ?? throw GlobalException.NotFound("User not found");
 
-            
+
             if (!GenerateTokenHelper.Verify(request.Token!, user.PasswordResetToken)
                 || user.PasswordResetTokenExpiry == null
                 || user.PasswordResetTokenExpiry.Value.IsExpired())
                 throw GlobalException.BadRequest("Token invalid");
 
-            // hash pass and delete token
             user.PasswordHash = passwordHash.Hash(request.NewPassword!);
             user.PasswordResetToken = null;
             user.PasswordResetTokenExpiry = null;

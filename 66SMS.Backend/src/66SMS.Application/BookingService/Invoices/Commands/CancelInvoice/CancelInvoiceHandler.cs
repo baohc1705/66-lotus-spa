@@ -44,7 +44,6 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CancelInvoice
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Hoàn kho cho các dòng sản phẩm
                 if (invoice.Items != null)
                 {
                     foreach (var item in invoice.Items)
@@ -63,7 +62,6 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CancelInvoice
                     }
                 }
 
-                // Hoàn lại điểm loyalty (cộng lại điểm đã dùng, trừ điểm đã tích)
                 if (invoice.CustomerId.HasValue && (invoice.LoyaltyPointsUsed > 0 || invoice.LoyaltyPointsEarned > 0))
                 {
                     var customer = await customerRepository.FindByIdAsync(invoice.CustomerId.Value, false, cancellationToken);

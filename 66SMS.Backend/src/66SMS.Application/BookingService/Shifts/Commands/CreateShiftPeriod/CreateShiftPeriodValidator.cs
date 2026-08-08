@@ -8,6 +8,7 @@ namespace _66SMS.Application.BookingService.Shifts.Commands.CreateShiftPeriod
         public CreateShiftPeriodValidator()
         {
             RuleFor(x => x.ShiftId).GreaterThan(0);
+            RuleFor(x => x.CreatedBy).GreaterThan(0).When(x => x.CreatedBy.HasValue);
             RuleFor(x => x.ShiftStart).NotNull();
             RuleFor(x => x.ShiftEnd).NotNull()
                 .GreaterThan(x => x.ShiftStart!.Value)

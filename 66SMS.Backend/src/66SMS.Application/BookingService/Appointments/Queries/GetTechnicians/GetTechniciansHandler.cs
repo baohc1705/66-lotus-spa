@@ -35,7 +35,6 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetTechnicians
                     Name = AppointmentConst.BOOKING_ANY_TECHNICIAN_NAME,
                     Role = AppointmentConst.BOOKING_ANY_TECHNICIAN_ROLE,
                     AccountRole = AppointmentConst.BOOKING_ACCOUNT_ROLE_STAFF,
-                    Avatar = string.Empty,
                     SlotsLeft = maxFreeSlots,
                     Status = GetStatusText(maxFreeSlots),
                     IsAny = true,

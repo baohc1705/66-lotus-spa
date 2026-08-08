@@ -10,9 +10,6 @@ using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.CustomerService.Customers.Commands.DeleteCustomer
 {
-    /// <summary>
-    /// Handler for <see cref="DeleteCustomerCommand"/>
-    /// </summary>
     public class DeleteCustomerHandler : IRequestHandler<DeleteCustomerCommand, Result<object>>
     {
         private readonly ICustomerSqlRepository customerSqlRepository;
@@ -25,34 +22,26 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.DeleteCustomer
 
         public async Task<Result<object>> Handle(DeleteCustomerCommand request, CancellationToken cancellationToken)
         {
-            // Find customer by id and tracking
             Customer? customer = await customerSqlRepository.FindByIdAsync((int)request.Id!, false, cancellationToken);
 
-            // return not found if customer is null
             if (customer == null)
                 return Result<object>.NotFound(CustomerConst.MSG_CUSTOMER_ID_NOT_FOUND, ErrorCodes.ERR_CUSTOMER_NOT_FOUND);
 
-            // begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // update status is deleted
                 customer.Status = CustomerConst.STATUS_DELETED;
                 customer.UpdatedAt = DateTimeHelper.UtcNow();
 
-                // update and persist to database
                 customerSqlRepository.Update(customer);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // commit transaction
                 transaction.Commit();
 
-                // return result success
                 return Result<object>.Ok();
             }
             catch
             {
-                // rollback on failure
                 transaction.Rollback();
                 throw;
             }

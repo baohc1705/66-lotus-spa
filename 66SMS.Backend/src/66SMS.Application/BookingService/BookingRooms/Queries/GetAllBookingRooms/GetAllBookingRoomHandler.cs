@@ -25,7 +25,6 @@ namespace _66SMS.Application.BookingService.BookingRooms.Queries.GetAllBookingRo
 
         public async Task<Result<PagedResult<BookingRoomDto>>> Handle(GetAllBookingRoomQuery request, CancellationToken cancellationToken)
         {
-            // Generate cache key.
             var filterHash = CacheKeyHash.FromObject(new
             {
                 request.SalonId,
@@ -36,17 +35,13 @@ namespace _66SMS.Application.BookingService.BookingRooms.Queries.GetAllBookingRo
                 request.IsDescending,
             });
 
-            // Generate cache key.
             var cacheKey = BookingRoomConst.CacheKeyList(filterHash);
 
-            // Get cached data.
             var cached = await cacheService.GetAsync<PagedResult<BookingRoomDto>>(cacheKey, cancellationToken);
 
-            // If cached data is not null, return cached data.
             if (cached is not null)
                 return Result<PagedResult<BookingRoomDto>>.Success(cached);
 
-            // Get data from database.
             var query = bookingRoomSqlRepository.AsQueryable();
 
             if (request.SalonId.HasValue)
@@ -80,7 +75,6 @@ namespace _66SMS.Application.BookingService.BookingRooms.Queries.GetAllBookingRo
                 })
                 .ToPagedAsync(request, cancellationToken);
 
-            // Set cached data.
             await cacheService.SetAsync(cacheKey, result, BookingRoomConst.CACHE_TTL_LIST, cancellationToken);
 
             return Result<PagedResult<BookingRoomDto>>.Success(result);

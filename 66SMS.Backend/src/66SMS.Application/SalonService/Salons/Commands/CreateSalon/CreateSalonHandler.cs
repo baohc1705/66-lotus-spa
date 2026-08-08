@@ -11,9 +11,6 @@ using System.Data;
 
 namespace _66SMS.Application.SalonService.Salons.Commands.CreateSalon
 {
-    /// <summary>
-    /// Handler for <see cref="CreateSalonCommand"/>
-    /// </summary>
     public class CreateSalonHandler : IRequestHandler<CreateSalonCommand, Result<object>>
     {
         private readonly ISalonSqlRepository salonSqlRepository;
@@ -42,7 +39,6 @@ namespace _66SMS.Application.SalonService.Salons.Commands.CreateSalon
                 request.ImageUrl = null;
 
             Salon salon = mapper.Map<Salon>(request);
-            salon.Code = string.Empty;
 
             if (request.IsPrimary != true)
                 salon.IsPrimary = null;

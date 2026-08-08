@@ -14,9 +14,6 @@ using Microsoft.Extensions.Options;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.ForgotPassword
 {
-    /// <summary>
-    /// Handler for <see cref="ForgotPasswordCommand"/>
-    /// </summary>
     public class ForgotPasswordHandler : IRequestHandler<ForgotPasswordCommand, Result<object>>
     {
         private readonly IUserSqlRepository userSqlRepository;
@@ -51,7 +48,6 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.ForgotPassword
                 .Where(x => x.Email.ToLower() == email)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            // Luôn trả về Ok dù không tìm thấy user (chống user enumeration)
             if (user == null)
                 return Result<object>.Ok();
 

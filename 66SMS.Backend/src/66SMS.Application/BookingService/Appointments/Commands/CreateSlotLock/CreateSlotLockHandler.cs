@@ -113,11 +113,11 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                             SlotId = slotId,
                             StaffId = resolved.StaffId,
                             PositionId = lockRequest.PositionId,
-                            LockedByUserId = request.LockedByUserId ?? 1,
+                            LockedByUserId = request.LockedByUserId!.Value,
                             AppointmentDate = (DateOnly)lockRequest.AppointmentDate!,
                             SlotsNeeded = slotsNeeded,
                             LockedAt = DateTimeHelper.UtcNow(),
-                            ExpiresAt = DateTimeHelper.UtcNow().AddMinutes(AppointmentSlotLockConst.DEFAULT_LOCK_MINS), // khóa 10 phút
+                            ExpiresAt = DateTimeHelper.UtcNow().AddMinutes(AppointmentSlotLockConst.DEFAULT_LOCK_MINS),
                             Status = AppointmentSlotLockConst.STATUS_ACTIVE
                         };
 

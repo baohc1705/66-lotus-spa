@@ -2,8 +2,6 @@ using _66SMS.Contract.Enumerations;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using _66SMS.Application.DTOs;
@@ -13,12 +11,10 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetMySalon
     public class GetMySalonHandler : IRequestHandler<GetMySalonQuery, Result<SalonDto>>
     {
         private readonly ISalonSqlRepository salonSqlRepository;
-        private readonly IMapper mapper;
 
-        public GetMySalonHandler(ISalonSqlRepository salonSqlRepository, IMapper mapper)
+        public GetMySalonHandler(ISalonSqlRepository salonSqlRepository)
         {
             this.salonSqlRepository = salonSqlRepository;
-            this.mapper = mapper;
         }
 
         public async Task<Result<SalonDto>> Handle(GetMySalonQuery request, CancellationToken cancellationToken)
@@ -28,7 +24,28 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetMySalon
 
             var salon = await salonSqlRepository.AsQueryable()
                 .Where(x => x.Id == request.SalonId.Value)
-                .ProjectTo<SalonDto>(mapper.ConfigurationProvider)
+                .Select(x => new SalonDto
+                {
+                    Id = x.Id,
+                    Code = x.Code,
+                    Name = x.Name,
+                    Phone = x.Phone,
+                    Email = x.Email,
+                    StreetAddress = x.StreetAddress,
+                    ProvinceCode = x.ProvinceCode,
+                    WardCode = x.WardCode,
+                    FullAddress = x.FullAddress,
+                    Latitude = x.Latitude,
+                    Longitude = x.Longitude,
+                    WorkingDays = x.WorkingDays,
+                    TaxCode = x.TaxCode,
+                    ImageUrl = x.ImageUrl,
+                    Description = x.Description,
+                    SortOrder = x.SortOrder,
+                    IsPrimary = x.IsPrimary,
+                    Status = x.Status,
+                    CreatedAt = x.CreatedAt,
+                })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (salon == null)

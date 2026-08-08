@@ -12,9 +12,6 @@ using System.Data;
 
 namespace _66SMS.Application.CustomerService.MembershipCards.Commands.CreateMembershipCards
 {
-    /// <summary>
-    /// Handler for <see cref="CreateMembershipCardCommand"/>
-    /// </summary>
     public class CreateMembershipCardHandler : IRequestHandler<CreateMembershipCardCommand, Result<int>>
     {
         private readonly IMembershipCardSqlRepository membershipCardSqlRepository;
@@ -39,16 +36,13 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.CreateMemb
 
         public async Task<Result<int>> Handle(CreateMembershipCardCommand request, CancellationToken cancellationToken)
         {
-            // find customer by id
             Customer? customer = await customerSqlRepository.FindByIdAsync(request.CustomerId);
 
-            // return not found if customer is null
             if (customer == null)
             {
                 return Result<int>.NotFound(CustomerConst.MSG_CUSTOMER_NOT_FOUND, ErrorCodes.ERR_CUSTOMER_NOT_FOUND);
             }
 
-            // find membership tier by id or name
             MembershipTier? tier = null;
 
             if (request.MembershipTierId.HasValue && request.MembershipTierId.Value > 0)
@@ -66,7 +60,6 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.CreateMemb
                         cancellationToken);
             }
 
-            // Fallback to the default tier (lowest MinSpending) if not found
             if (tier == null)
             {
                 tier = await membershipTierSqlRepository
@@ -75,34 +68,27 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.CreateMemb
                     .FirstOrDefaultAsync(cancellationToken);
             }
 
-            // return not found if tier is null
             if (tier == null)
             {
                 return Result<int>.NotFound(MembershipTierConst.MSG_MEMBERSHIP_TIER_NOT_FOUND, ErrorCodes.ERR_MEMBERSHIP_TIER_NOT_FOUND);
             }
 
-            // begin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // map request to domain entity
                 MembershipCard membershipCard = mapper.Map<MembershipCard>(request);
                 membershipCard.MembershipTierId = tier.Id;
                 membershipCard.CardCode = GenerateCardCode();
 
-                // add and persist to database
                 membershipCardSqlRepository.Add(membershipCard);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // commit transaction
                 transaction.Commit();
 
-                // return result
                 return Result<int>.Created(membershipCard.Id);
             }
             catch (Exception)
             {
-                // rollback transaction on failure
                 transaction.Rollback();
                 throw;
             }

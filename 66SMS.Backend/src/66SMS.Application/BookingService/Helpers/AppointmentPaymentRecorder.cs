@@ -10,9 +10,8 @@ namespace _66SMS.Application.BookingService.Helpers
              Appointment appointment, int phase, decimal amount, int method, string? transactionId, string? note, out string? error)
         {
             error = null;
-            if (amount <= 0) { error = "S? ti?n thanh to�n kh�ng h?p l?."; return false; }
+            if (amount <= 0) { error = "Số tiền thanh toán không hợp lệ."; return false; }
 
-            // Kh�ng ghi v??t t?ng ti?n l?ch (d?ch v?) � ti?n SP ch? n?m tr�n h�a ??n
             var maxAddable = Math.Max(0m, appointment.TotalAmount - appointment.PaidAmount);
             if (amount > maxAddable)
                 amount = maxAddable;

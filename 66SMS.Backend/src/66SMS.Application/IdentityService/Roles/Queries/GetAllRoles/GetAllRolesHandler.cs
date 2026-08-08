@@ -6,9 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.IdentityService.Roles.Queries.GetAllRoles
 {
-    /// <summary>
-    /// Handler for <see cref="GetAllRoleQuery"/>
-    /// </summary>
     public class GetAllRolesHandler : IRequestHandler<GetAllRoleQuery, Result<List<RoleDTO>>>
     {
         private readonly IRoleSqlRepository roleSqlRepository;
@@ -20,7 +17,6 @@ namespace _66SMS.Application.IdentityService.Roles.Queries.GetAllRoles
 
         public async Task<Result<List<RoleDTO>>> Handle(GetAllRoleQuery request, CancellationToken cancellationToken)
         {
-            // Kiem tra co include gi khong
             var query = roleSqlRepository.AsQueryable().AsQueryable();
             if (request.Include != null && request.Include.Count() > 0)
             {

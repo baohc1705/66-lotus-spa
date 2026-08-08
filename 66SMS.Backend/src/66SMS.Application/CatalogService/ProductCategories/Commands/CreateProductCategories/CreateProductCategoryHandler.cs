@@ -8,9 +8,6 @@ using System.Data;
 
 namespace _66SMS.Application.CatalogService.ProductCategories.Commands.CreateProductCategories
 {
-    /// <summary>
-    /// Handler for <see cref="CreateProductCategoryCommand"/>
-    /// </summary>
     public class CreateProductCategoryHandler : IRequestHandler<CreateProductCategoryCommand, Result<int>>
     {
         private readonly IProductCategorySqlRepository productCategorySqlRepository;
@@ -29,24 +26,19 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Commands.CreatePro
 
         public async Task<Result<int>> Handle(CreateProductCategoryCommand request, CancellationToken cancellationToken)
         {
-            // Map request to domain entity
             ProductCategory productCategory = mapper.Map<ProductCategory>(request);
 
-            // Beigin transaction
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Insert and persist to database
                 productCategorySqlRepository.Add(productCategory);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // Commit transaction
                 transaction.Commit();
                 return Result<int>.Success(productCategory.Id);
             }
             catch
             {
-                // Rollback on failure
                 transaction.Rollback();
                 throw;
             }

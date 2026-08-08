@@ -26,11 +26,6 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CheckOut
 
         public async Task<Result<int>> Handle(CheckOutCommand request, CancellationToken cancellationToken)
         {
-            if (!request.WorkScheduleId.HasValue || request.WorkScheduleId <= 0)
-                return Result<int>.BadRequest(
-                    AttendanceConst.MSG_WORK_SCHEDULE_REQUIRED,
-                    ErrorCodes.ERR_ATTENDANCE_WORK_SCHEDULE_REQUIRED);
-
             var now = DateTimeHelper.UtcNow();
             var today = now.ToDateOnly();
 

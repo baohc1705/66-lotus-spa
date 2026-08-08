@@ -6,10 +6,7 @@ using _66SMS.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.BookingService.Helpers
-{
-    /// <summary>
-    /// Cộng tiền vào ví khi VNPay nạp thành công 
-    /// </summary>
+{   
     public static class WalletTopUpApplyService
     {
         public static async Task<Result<object>> ApplyAsync(

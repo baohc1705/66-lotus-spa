@@ -11,9 +11,6 @@ using System.Data;
 
 namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteServiceCategories
 {
-    /// <summary>
-    /// Handler for <see cref="DeleteServiceCategoriesCommand"/>
-    /// </summary>
     public class DeleteServiceCategoriesHandler : IRequestHandler<DeleteServiceCategoriesCommand, Result<object>>
     {
         private readonly IServiceCategorySqlRepository serviceCategorySqlRepository;
@@ -32,38 +29,30 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Commands.DeleteSer
 
         public async Task<Result<object>> Handle(DeleteServiceCategoriesCommand request, CancellationToken cancellationToken)
         {
-            // Find service by id
             ServiceCategory? entity = await serviceCategorySqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
 
-            // Return not found if service is null
             if (entity == null)
             {
                 return Result<object>.NotFound(ServiceCategoryConst.MSG_SERVICE_CATEGORY_NOT_FOUND, ErrorCodes.ERR_SERVICE_CATEGORY_NOT_FOUND);
             }
 
-            // Update status is deleted
             entity.Status = (int)StatusActiveEnum.DELETED;
-            
-            // Begin transaction
+
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Update and persist to database
                 serviceCategorySqlRepository.Update(entity);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                // Commit transaction
                 transaction.Commit();
 
                 await cacheService.RemoveByPrefixAsync(ServiceCategoryConst.CACHE_PREFIX, cancellationToken);
                 await cacheService.RemoveByPrefixAsync(ServiceConst.CACHE_PREFIX, cancellationToken);
 
-                // return success result
                 return Result<object>.Ok();
             }
             catch (Exception)
             {
-                // Rollback on failure
                 transaction.Rollback();
                 throw;
             }

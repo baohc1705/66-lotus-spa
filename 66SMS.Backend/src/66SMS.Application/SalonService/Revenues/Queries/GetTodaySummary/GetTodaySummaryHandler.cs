@@ -19,7 +19,6 @@ namespace _66SMS.Application.SalonService.Revenues.Queries.GetTodaySummary
             GetTodaySummaryQuery request,
             CancellationToken cancellationToken)
         {
-            // Ngày local VN (+07)
             var todayVn = DateOnly.FromDateTime(
                 DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(7)).DateTime);
 

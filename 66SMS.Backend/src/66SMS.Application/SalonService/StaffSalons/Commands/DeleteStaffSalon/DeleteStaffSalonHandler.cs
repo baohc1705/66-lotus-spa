@@ -1,12 +1,10 @@
 using _66SMS.Contract.Abstractions;
 using _66SMS.Contract.Enumerations;
-using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
-using _66SMS.Domain.Enums;
 using MediatR;
 using System.Data;
 
@@ -30,13 +28,12 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.DeleteStaffSalon
 
         public async Task<Result<object>> Handle(DeleteStaffSalonCommand request, CancellationToken cancellationToken)
         {
-            /// Find the staff salon by id
             StaffSalon? staffSalon = await staffSalonSqlRepository.FindByIdAsync((int)request.Id!);
             if (staffSalon == null)
                 return Result<object>.NotFound(StaffSalonConst.MSG_STAFF_SALON_NOT_FOUND, ErrorCodes.ERR_STAFF_SALON_NOT_FOUND);
 
             var salonId = staffSalon.SalonId;
-            
+
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {

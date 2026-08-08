@@ -15,9 +15,7 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Commands.DeletePro
         private readonly IProductCategorySqlRepository productCategorySqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
 
-        public DeleteProductCategoryMultiplesHandler(
-            IProductCategorySqlRepository productCategorySqlRepository,
-            ISqlUnitOfWork sqlUnitOfWork)
+        public DeleteProductCategoryMultiplesHandler(IProductCategorySqlRepository productCategorySqlRepository, ISqlUnitOfWork sqlUnitOfWork)
         {
             this.productCategorySqlRepository = productCategorySqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
@@ -32,7 +30,6 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Commands.DeletePro
                 .Where(x => requestIds.Contains(x.Id))
                 .ToListAsync(cancellationToken);
 
-            // So sanh 2 list bang HashSet - O(n), lookup O(1)
             var existingIds = existingCategories.Select(x => x.Id).ToHashSet();
             if (existingIds.Count != requestIds.Count)
             {

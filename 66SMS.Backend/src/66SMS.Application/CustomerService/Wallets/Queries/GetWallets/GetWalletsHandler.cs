@@ -24,9 +24,9 @@ namespace _66SMS.Application.CustomerService.Wallets.Queries.GetWallets
                 {
                     Id = w.Id,
                     CustomerId = w.CustomerId,
-                    CustomerName = w.Customer!.FullName ?? "N/A",
-                    CustomerPhone =  w.Customer.Phone ?? "N/A",
-                    CustomerAvatar =  w.Customer!.AvatarUrl ?? "N/A",
+                    CustomerName = w.Customer!.FullName,
+                    CustomerPhone = w.Customer.Phone,
+                    CustomerAvatar = w.Customer.AvatarUrl,
                     Balance = w.Balance,
                     Status = w.Status,
                     CreatedAt = w.CreatedAt,

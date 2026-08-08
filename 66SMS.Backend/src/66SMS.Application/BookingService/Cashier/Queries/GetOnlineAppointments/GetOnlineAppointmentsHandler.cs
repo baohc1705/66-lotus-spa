@@ -93,9 +93,10 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointment
                 }
 
                 var durationMins = a.Services?.Sum(s => s.Service?.DurationMins ?? 0) ?? 0;
-                if (durationMins == 0) durationMins = 15;
                 var startTs = a.TimeApptStart ?? a.TimeSlot?.StartTime;
-                var endTs = startTs.HasValue ? (a.TimeApptEnd ?? startTs.Value.AddMinutes(durationMins)) : a.TimeApptEnd;
+                TimeOnly? endTs = a.TimeApptEnd;
+                if (endTs is null && startTs.HasValue && durationMins > 0)
+                    endTs = startTs.Value.AddMinutes(durationMins);
 
                 return new CashierBookingDto
                 {
