@@ -1,6 +1,8 @@
-import { useAuthStore } from "@/features/auth/stores/authStore";
-import { Button } from "@/shared/components/ui/button";
 import { FileOutput, MapPin } from "lucide-react";
+import { useAuthStore } from "@/features/auth/stores/authStore";
+import { TabNav } from "@/shared/components/Tabs";
+import { Button } from "@/shared/elements/Button";
+import { Dropdown } from "@/shared/elements/Dropdown";
 import type { RevenueReportGrain } from "../types/revenue.types";
 
 type SalonOption = { id: number; name: string };
@@ -34,6 +36,10 @@ const GRAINS: { key: RevenueReportGrain; label: string }[] = [
   { key: "year", label: "Năm" },
 ];
 
+const DATE_INPUT =
+  "h-8 rounded border border-kit bg-kit-white px-2.5 text-xs font-semibold " +
+  "text-kit-heading outline-hidden focus:border-kit-primary";
+
 export function ReportFilterBar({
   showSalon,
   showGrain,
@@ -56,84 +62,89 @@ export function ReportFilterBar({
   const isAdmin = useAuthStore((s) => s.hasRole("Admin"));
   const mySalon = useAuthStore((s) => s.mySalon);
 
+  const selectedSalonName =
+    salons.find((s: SalonOption) => s.id === salonId)?.name ??
+    "Tất cả chi nhánh";
   const managerSalonName =
     salons.find((s: SalonOption) => s.id === salonId)?.name ??
     mySalon?.salonName ??
     "Chi nhánh của bạn";
+  const selectedCategoryName =
+    categories.find((c: CategoryOption) => c.id === categoryId)?.name ??
+    "Tất cả danh mục";
 
   return (
-    <div className="flex flex-wrap items-center gap-2 justify-between bg-white border rounded-lg p-3">
+    <div className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded border border-kit bg-kit-white p-2.5 shadow-kit-card">
       <div className="flex flex-wrap items-center gap-2">
-        {showSalon && isAdmin && (
-          <select
-            className="border rounded px-2 py-1.5 text-sm"
-            value={salonId ?? ""}
-            onChange={(e) => {
-              const v = e.target.value;
-              onSalonChange?.(v === "" ? null : Number(v));
-            }}
-          >
-            <option value="">Tất cả chi nhánh</option>
-            {salons.map((s: SalonOption) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        )}
+        {showSalon && isAdmin ? (
+          <Dropdown
+            variant="outline-secondary"
+            size="sm"
+            className="!mb-0 !mr-0"
+            label={selectedSalonName}
+            items={[
+              {
+                type: "item",
+                label: "Tất cả chi nhánh",
+                onClick: () => onSalonChange?.(null),
+              },
+              ...salons.map((s: SalonOption) => ({
+                type: "item" as const,
+                label: s.name,
+                onClick: () => onSalonChange?.(s.id),
+              })),
+            ]}
+          />
+        ) : null}
 
-        {showSalon && !isAdmin && (
-          <div className="flex items-center gap-1.5 border rounded px-2.5 py-1.5 text-sm text-slate-700 bg-slate-50">
-            <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-            <span className="truncate max-w-[220px]">{managerSalonName}</span>
+        {showSalon && !isAdmin ? (
+          <div className="inline-flex h-8 items-center gap-1.5 rounded border border-kit bg-kit-page px-2.5 text-xs font-semibold text-kit-heading">
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-kit-muted" />
+            <span className="max-w-56 truncate">{managerSalonName}</span>
           </div>
-        )}
+        ) : null}
 
-        {showCategory && (
-          <select
-            className="border rounded px-2 py-1.5 text-sm"
-            value={categoryId ?? ""}
-            onChange={(e) => {
-              const v = e.target.value;
-              onCategoryChange?.(v === "" ? null : Number(v));
-            }}
-          >
-            <option value="">Tất cả</option>
-            {categories.map((c: CategoryOption) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        )}
+        {showCategory ? (
+          <Dropdown
+            variant="outline-secondary"
+            size="sm"
+            className="!mb-0 !mr-0"
+            label={selectedCategoryName}
+            items={[
+              {
+                type: "item",
+                label: "Tất cả danh mục",
+                onClick: () => onCategoryChange?.(null),
+              },
+              ...categories.map((c: CategoryOption) => ({
+                type: "item" as const,
+                label: c.name,
+                onClick: () => onCategoryChange?.(c.id),
+              })),
+            ]}
+          />
+        ) : null}
 
-        {showGrain && grain && onGrainChange && (
-          <div className="flex border rounded overflow-hidden text-sm">
-            {GRAINS.map((g) => (
-              <button
-                key={g.key}
-                type="button"
-                className={`px-2.5 py-1.5 ${
-                  grain === g.key ? "bg-blue-600 text-white" : "bg-white"
-                }`}
-                onClick={() => onGrainChange(g.key)}
-              >
-                {g.label}
-              </button>
-            ))}
-          </div>
-        )}
+        {showGrain && grain && onGrainChange ? (
+          <TabNav
+            items={GRAINS.map((g) => ({ id: g.key, label: g.label }))}
+            activeId={grain}
+            onChange={(id) => onGrainChange(id as RevenueReportGrain)}
+            variant="btn-outline-alternate-pill"
+            className="mb-0"
+          />
+        ) : null}
 
         <input
           type="date"
-          className="border rounded px-2 py-1.5 text-sm"
+          className={DATE_INPUT}
           value={from}
           onChange={(e) => onFromChange(e.target.value)}
         />
-        <span className="text-slate-400">–</span>
+        <span className="text-kit-muted">–</span>
         <input
           type="date"
-          className="border rounded px-2 py-1.5 text-sm"
+          className={DATE_INPUT}
           value={to}
           onChange={(e) => onToChange(e.target.value)}
         />
@@ -141,12 +152,14 @@ export function ReportFilterBar({
 
       <Button
         type="button"
-        variant="admin"
+        variant="primary"
         size="sm"
+        className="!mb-0 !mr-0"
         onClick={onExport}
         disabled={exporting}
+        loading={exporting}
       >
-        <FileOutput className="w-4 h-4 mr-1" />
+        <FileOutput className="mr-1.5 h-4 w-4" />
         {exporting ? "Đang xuất..." : "Xuất Excel"}
       </Button>
     </div>

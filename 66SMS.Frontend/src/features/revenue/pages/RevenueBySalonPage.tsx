@@ -64,8 +64,7 @@ export function RevenueBySalonPage() {
   }));
 
   return (
-    <div className="space-y-2 p-2">
-      <h1 className="text-lg font-bold">Báo cáo doanh thu theo thời gian</h1>
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
       <ReportFilterBar
         salonId={filters.salonId}
         from={filters.from}
@@ -81,34 +80,42 @@ export function RevenueBySalonPage() {
         exporting={exportExcel.isPending}
       />
 
-      {stats && (
+      {stats ? (
         <ReportStatCards
           cards={[
             {
               title: "Tổng doanh thu",
+              description: "Doanh thu các chi nhánh",
               value: formatCurrency(stats.totalRevenue),
-              className: "bg-sky-500",
+              tone: "midnight-bloom",
+              valueTone: "white",
             },
             {
               title: "Tổng thu",
+              description: "Tiền thu trong kỳ",
               value: formatCurrency(stats.totalCollected),
-              className: "bg-rose-500",
+              tone: "tempting-azure",
+              valueTone: "dark",
             },
             {
               title: "Tổng chi",
+              description: "Chi phí trong kỳ",
               value: formatCurrency(stats.totalCommission),
-              className: "bg-violet-500",
+              tone: "sunny-morning",
+              valueTone: "dark",
             },
             {
               title: "Lợi nhuận",
+              description: "Doanh thu trừ chi",
               value: formatCurrency(stats.profit),
-              className: "bg-emerald-500",
+              tone: "mixed-hopes",
+              valueTone: "white",
             },
           ]}
         />
-      )}
+      ) : null}
 
-      <div className="grid grid-cols-1 xl:grid-cols-5 gap-2">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-5">
         <div className="xl:col-span-2">
           <RevenueVerticalBarChart
             data={chartData}
