@@ -1,4 +1,4 @@
-import type { UseMutationResult } from "@tanstack/react-query";
+﻿import type { UseMutationResult } from "@tanstack/react-query";
 import type { ColumnDef, Row } from "@tanstack/react-table";
 import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useMemo } from "react";
@@ -132,7 +132,7 @@ export function useActiveProductColumns({
                   className="w-8 h-8 object-cover"
                 />
               </div>
-              <span className="text-sm font-semibold text-adminInk truncate max-w-[180px]">
+              <span className="text-sm font-semibold text-adminInk truncate max-w-44">
                 {prod.name ?? "—"}
               </span>
             </div>

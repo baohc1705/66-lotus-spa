@@ -248,7 +248,7 @@ export function TreatmentCourseFormDialog({
                   <AdminTextarea
                     {...register("description")}
                     placeholder="Mô tả ngắn về liệu trình..."
-                    className="min-h-[60px] resize-none"
+                    className="min-h-15 resize-none"
                   />
                 </FormField>
               </div>

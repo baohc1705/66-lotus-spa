@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+﻿import { useState, useRef, useEffect } from 'react'
 import { Popover } from 'radix-ui'
 import { ChevronDownIcon, CheckIcon, SearchIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -67,7 +67,7 @@ export function SearchableSelect({
         <Popover.Content
           sideOffset={4}
           align="start"
-          className="z-[90] w-[var(--radix-popover-trigger-width)] min-w-[200px] bg-white rounded-md shadow-md border border-adminGray-100 overflow-hidden animate-in fade-in-0 zoom-in-95"
+          className="z-50 w-[var(--radix-popover-trigger-width)] min-w-48 bg-white rounded-md shadow-md border border-adminGray-100 overflow-hidden animate-in fade-in-0 zoom-in-95"
           onOpenAutoFocus={e => e.preventDefault()}
         >
           <div className="flex items-center gap-2 px-3 py-2 border-b border-adminGray-100">

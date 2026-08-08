@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "motion/react";
 import { CalendarHeart, RefreshCw, UserRound } from "lucide-react";
@@ -216,7 +216,7 @@ export function PayrollStatsPage() {
                 <label className="text-xs font-semibold text-adminInk/80">
                   Nhân viên
                 </label>
-                <div className="h-9 px-3 flex items-center border border-adminGray-100 bg-adminGray-50 text-sm font-medium text-adminInk min-w-[160px]">
+                <div className="h-9 px-3 flex items-center border border-adminGray-100 bg-adminGray-50 text-sm font-medium text-adminInk min-w-40">
                   {staffName}
                 </div>
               </div>

@@ -89,6 +89,44 @@
     --lotus-admin-radius-sm: 5px;
     --lotus-admin-cell-max: 300px;
     --lotus-admin-textarea-min-h: 80px;
+
+    --kit-primary: var(--color-blue-600);
+    --kit-secondary: var(--color-gray-500);
+    --kit-success: var(--color-green-500);
+    --kit-info: var(--color-sky-500);
+    --kit-warning: var(--color-yellow-400);
+    --kit-warning-text: var(--color-yellow-600);
+    --kit-danger: var(--color-red-600);
+    --kit-focus: var(--color-slate-700);
+    --kit-alt: var(--color-purple-700);
+    --kit-light: var(--color-gray-200);
+    --kit-dark: var(--color-gray-800);
+    --kit-body: var(--color-gray-600);
+    --kit-muted: var(--color-gray-500);
+    --kit-heading: var(--color-gray-800);
+    --kit-on-warning: var(--color-gray-900);
+    --kit-border: var(--color-gray-200);
+    --kit-page: var(--color-gray-50);
+    --kit-track: var(--color-gray-200);
+    --kit-white: var(--color-white);
+    --kit-soft-primary-bg: var(--color-blue-100);
+    --kit-soft-primary-text: var(--color-blue-800);
+    --kit-soft-primary-border: var(--color-blue-200);
+    --kit-soft-secondary-bg: var(--color-gray-100);
+    --kit-soft-secondary-text: var(--color-gray-700);
+    --kit-soft-secondary-border: var(--color-gray-200);
+    --kit-soft-success-bg: var(--color-green-100);
+    --kit-soft-success-text: var(--color-green-800);
+    --kit-soft-success-border: var(--color-green-200);
+    --kit-soft-danger-bg: var(--color-red-100);
+    --kit-soft-danger-text: var(--color-red-800);
+    --kit-soft-danger-border: var(--color-red-200);
+    --kit-soft-warning-bg: var(--color-yellow-100);
+    --kit-soft-warning-text: var(--color-yellow-800);
+    --kit-soft-warning-border: var(--color-yellow-200);
+    --kit-soft-info-bg: var(--color-sky-100);
+    --kit-soft-info-text: var(--color-sky-800);
+    --kit-soft-info-border: var(--color-sky-200);
   }
 }
 

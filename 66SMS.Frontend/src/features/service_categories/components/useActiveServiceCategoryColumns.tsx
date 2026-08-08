@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { UseMutationResult } from "@tanstack/react-query";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
@@ -162,7 +162,7 @@ export function useActiveServiceCategoryColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="text-sm font-semibold text-adminInk truncate max-w-[180px] block">
+          <span className="text-sm font-semibold text-adminInk truncate max-w-44 block">
             {row.original.name ?? "—"}
           </span>
         ),

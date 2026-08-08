@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Bell } from "lucide-react";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
@@ -54,7 +54,7 @@ export function NotificationBell({ className }: Props) {
       >
         <Bell className="w-4 h-4" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-adminGold-600 text-adminGreen-950 text-[10px] leading-4 font-bold border border-white/40">
+          <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-adminGold-600 text-adminGreen-950 text-xs leading-4 font-bold border border-white/40">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { RotateCcw } from "lucide-react";
 
@@ -71,7 +71,7 @@ export function useDeletedProductColumns({
                   className="w-8 h-8 object-cover"
                 />
               </div>
-              <span className="text-sm font-semibold text-adminInk truncate max-w-[180px]">
+              <span className="text-sm font-semibold text-adminInk truncate max-w-44">
                 {prod.name ?? "—"}
               </span>
             </div>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import {
   Calendar,
   Check,
@@ -527,7 +527,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                                     {tech.role || "Nhân viên"}
                                   </p>
                                   <span
-                                    className={`inline-block mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                                    className={`inline-block mt-1 text-xs font-bold px-1.5 py-0.5 rounded ${
                                       isReady
                                         ? "bg-adminGreen-100 text-adminGreen-800"
                                         : "bg-adminGray-100 text-adminGray-600"
@@ -551,7 +551,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                             — Chọn tham khảo các khung giờ sau
                           </span>
                         </p>
-                        <div className="flex items-center gap-3 text-[10px] text-adminGray-500">
+                        <div className="flex items-center gap-3 text-xs text-adminGray-500">
                           <span className="flex items-center gap-1">
                             <span className="w-2.5 h-2.5 rounded-full border border-adminGray-300 bg-white inline-block" />
                             Trống
@@ -623,7 +623,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                                 <span className="text-xs font-bold">
                                   {slot.time}
                                 </span>
-                                <span className="text-[10px] opacity-90">
+                                <span className="text-xs opacity-90">
                                   {label}
                                 </span>
                               </button>

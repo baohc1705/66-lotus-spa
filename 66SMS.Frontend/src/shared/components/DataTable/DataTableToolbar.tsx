@@ -18,12 +18,12 @@ export function DataTableToolbar({
   debounceMs = 300,
 }: DataTableToolbarProps) {
   const [localValue, setLocalValue] = useState(searchValue);
+  const [prevSearchValue, setPrevSearchValue] = useState(searchValue);
 
-  useEffect(() => {
-    setTimeout(() => {
-      setLocalValue(searchValue);
-    }, 0);
-  }, [searchValue]);
+  if (searchValue !== prevSearchValue) {
+    setPrevSearchValue(searchValue);
+    setLocalValue(searchValue);
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -35,33 +35,32 @@ export function DataTableToolbar({
   }, [localValue, debounceMs, onSearchChange, searchValue]);
 
   return (
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-4">
-      <div className="relative flex-1 max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-lotus-stone pointer-events-none" />
+    <div className="mb-4 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+      <div className="relative max-w-sm flex-1">
+        <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-lotus-stone" />
         <Input
           value={localValue}
           onChange={(e) => setLocalValue(e.target.value)}
           placeholder={searchPlaceholder}
-          className="pl-9 pr-8 py-2 text-sm h-9 rounded-lg border-adminGray-100/50 bg-white/60 focus:bg-white"
+          className="h-9 rounded-lg border-adminGray-100/50 bg-white/60 py-2 pr-8 pl-9 text-sm focus:bg-white"
         />
-        {localValue && (
+        {localValue ? (
           <button
+            type="button"
             onClick={() => {
               setLocalValue("");
               onSearchChange("");
             }}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-lotus-stone hover:text-lotus-deep transition-colors"
+            className="absolute top-1/2 right-2.5 h-4 w-4 -translate-y-1/2 text-lotus-stone transition-colors hover:text-lotus-deep"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="h-3.5 w-3.5" />
           </button>
-        )}
+        ) : null}
       </div>
 
-      {children && (
-        <div className="flex items-center gap-2 ml-auto shrink-0">
-          {children}
-        </div>
-      )}
+      {children ? (
+        <div className="ml-auto flex shrink-0 items-center gap-2">{children}</div>
+      ) : null}
     </div>
   );
 }

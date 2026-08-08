@@ -16,7 +16,6 @@ interface AdminStatCardProps {
   label: string;
   value: number | string;
   icon: React.ElementType;
-  /** Icon nổi bật — mặc định gold theo bảng màu admin */
   tone?: AdminStatTone;
   valueClass?: string;
   isLoading?: boolean;

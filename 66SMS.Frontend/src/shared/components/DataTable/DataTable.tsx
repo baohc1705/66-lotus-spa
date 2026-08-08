@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+﻿import { Fragment } from "react";
 import { flexRender, type Table as ReactTable } from "@tanstack/react-table";
 import {
   Table,
@@ -75,7 +75,7 @@ export function DataTable<TData>({
                 <TableRow key={`skel-${i}`}>
                   {table.getVisibleFlatColumns().map((col, j) => (
                     <TableCell key={j} style={{ width: col.getSize() }}>
-                      <Skeleton className="h-4 w-3/4 max-w-[120px] rounded" />
+                      <Skeleton className="h-4 w-3/4 max-w-28 rounded" />
                     </TableCell>
                   ))}
                 </TableRow>

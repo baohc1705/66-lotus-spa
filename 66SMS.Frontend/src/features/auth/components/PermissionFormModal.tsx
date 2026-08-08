@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { RolePermissionModal } from './RolePermissionModal';
 
 export function PermissionFormModal({ initial, onClose, onSave, saving }: {
@@ -48,7 +48,7 @@ export function PermissionFormModal({ initial, onClose, onSave, saving }: {
         <div>
           <label className="block text-xs font-semibold text-adminGray-600 mb-1">Mô tả</label>
           <textarea
-            className="w-full px-3 py-2 rounded-lg border border-border bg-white text-adminInk text-sm outline-hidden focus:border-adminGreen-600 transition-colors resize-y min-h-[60px]"
+            className="w-full px-3 py-2 rounded-lg border border-border bg-white text-adminInk text-sm outline-hidden focus:border-adminGreen-600 transition-colors resize-y min-h-15"
             value={desc}
             onChange={e => setDesc(e.target.value)}
             placeholder="Mô tả quyền..."

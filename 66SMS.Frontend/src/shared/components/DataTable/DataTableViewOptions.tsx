@@ -1,4 +1,4 @@
-import { type Table } from "@tanstack/react-table";
+﻿import { type Table } from "@tanstack/react-table";
 import { SlidersHorizontal } from "lucide-react";
 
 import { Button } from "@/shared/components/ui/button";
@@ -30,7 +30,7 @@ export function DataTableViewOptions<TData>({
           Cột
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[180px]">
+      <DropdownMenuContent align="end" className="w-44">
         {table
           .getAllColumns()
           .filter(

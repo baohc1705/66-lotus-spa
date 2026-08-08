@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@source "../../node_modules/calendarkit-pro/dist/**/*.{js,mjs}";
 @import '@fontsource-variable/geist';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
@@ -161,6 +162,7 @@
   --shadow-gold: 0 4px 20px 0 rgba(184, 134, 11, 0.2);
 
   --animate-fade-in: fade-in 0.2s ease-out;
+  --animate-progress-bar-stripes: progress-bar-stripes 1s linear infinite;
 
   @keyframes fade-in {
     from {
@@ -179,16 +181,40 @@
       transform: translateX(400%);
     }
   }
+
+  @keyframes progress-bar-stripes {
+    0% {
+      background-position: 1rem 0;
+    }
+    100% {
+      background-position: 0 0;
+    }
+  }
+
+  @keyframes toast-progress {
+    from {
+      width: 100%;
+    }
+    to {
+      width: 0%;
+    }
+  }
 }
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
+@utility progress-bar-striped {
+  background-image: linear-gradient(
+    45deg,
+    rgb(255 255 255 / 0.15) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgb(255 255 255 / 0.15) 50%,
+    rgb(255 255 255 / 0.15) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 1rem 1rem;
+}
 
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
 @layer base {
   *,
   ::after,
@@ -199,10 +225,7 @@
   }
 }
 
-/* Hoa Sen Spa — bảng màu chuẩn (color.md)
-   Dùng cho booking + landing brand */
 :root {
-  /* Rose — primary */
   --rose-900: #5c0b2b;
   --rose-800: #7a0f3b;
   --rose-600: #9d174d;
@@ -212,12 +235,10 @@
   --rose-100: #f6d9e3;
   --rose-50: #fceef3;
 
-  /* Gold — accent */
   --gold-700: #8c6608;
   --gold-600: #b8860b;
   --gold-100: #f3e4be;
 
-  /* Neutral */
   --ink: #2b2226;
   --warm-600: #7a6a6e;
   --warm-400: #a79a9d;
@@ -225,12 +246,10 @@
   --warm-100: #e9e2e4;
   --warm-50: #f3eff0;
 
-  /* Base */
   --bg-page: #fafaf9;
   --bg-surface: #ffffff;
   --border-card: #efefee;
 
-  /* Semantic */
   --success-bg: #dcefe1;
   --success-text: #3b7a4e;
   --error-bg: #f7dede;
@@ -239,7 +258,6 @@
   --warning-text: #8c6608;
 }
 
-/* Global scrollbar */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
@@ -265,7 +283,6 @@
   scrollbar-width: none;
 }
 
-/* Display type (landing hero / section titles) */
 .text-display-hero {
   font-size: clamp(2rem, 9vw, 2.75rem);
   line-height: 1.08;
@@ -301,7 +318,6 @@
   line-height: 1.1;
 }
 
-/* Hide native password reveal button in MS Edge and Chromium browsers on Windows */
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
   display: none;

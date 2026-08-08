@@ -1,4 +1,4 @@
-import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+﻿import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ScheduleViewMode } from "../types";
 
@@ -130,7 +130,7 @@ export function StaffScheduleToolbar({
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <div className="flex items-center gap-2 px-3 text-sm font-semibold text-adminInk min-w-[200px] justify-center select-none">
+          <div className="flex items-center gap-2 px-3 text-sm font-semibold text-adminInk min-w-48 justify-center select-none">
             <Calendar className="w-4 h-4 text-adminGray-600 shrink-0" />
             <span className="truncate">{dateLabel}</span>
           </div>

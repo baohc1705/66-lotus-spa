@@ -452,7 +452,7 @@ export function ProductFormDialog({
                     <AdminTextarea
                       {...register("description")}
                       placeholder="Mô tả ngắn gọn về sản phẩm..."
-                      className="min-h-[60px] resize-none"
+                      className="min-h-15 resize-none"
                     />
                   </FormField>
                 </div>

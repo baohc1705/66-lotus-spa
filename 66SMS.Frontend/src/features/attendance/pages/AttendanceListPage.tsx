@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/features/auth/stores/authStore";
+﻿import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useWorkSchedules } from "@/features/schedules/hooks/useSchedules";
 import type { WorkScheduleDTO } from "@/features/schedules/types/schedule.types";
 import { useShifts } from "@/features/shifts/hooks/useShifts";
@@ -319,7 +319,7 @@ export function AttendanceListPage() {
             >
               <ChevronLeft size={16} />
             </button>
-            <div className="px-4 text-sm font-bold text-adminInk select-none min-w-[200px] text-center border-x border-adminGray-100">
+            <div className="px-4 text-sm font-bold text-adminInk select-none min-w-48 text-center border-x border-adminGray-100">
               {weekLabel}
             </div>
             <button

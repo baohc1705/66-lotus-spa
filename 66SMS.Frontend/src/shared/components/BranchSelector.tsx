@@ -12,23 +12,39 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 
+const triggerClass =
+  "h-8 w-full rounded border border-white/25 bg-transparent px-3 py-1 text-xs text-white " +
+  "hover:bg-transparent focus:bg-transparent focus:ring-0 data-[state=open]:bg-transparent";
+
 export function BranchSelector() {
-  const { user, hasRole, selectedSalonId, setSelectedSalonId, managedSalonId, mySalon } = useAuthStore();
+  const {
+    user,
+    hasRole,
+    selectedSalonId,
+    setSelectedSalonId,
+    managedSalonId,
+    mySalon,
+  } = useAuthStore();
   const isAdmin = hasRole("Admin");
-  
+
   const { data: allSalons = [], isLoading: isLoadingAllSalons } = useActiveSalons();
 
   const staffId = user?.staffInfo?.id;
   const { data: staffSalonsResult, isLoading: isLoadingStaffSalons } = useQuery({
     queryKey: ["staff-salons-assigned", staffId],
-    queryFn: () => staffSalonApi.getAll({ staffId, status: 1, pageIndex: 1, pageSize: 100 }),
+    queryFn: () =>
+      staffSalonApi.getAll({
+        staffId,
+        status: 1,
+        pageIndex: 1,
+        pageSize: 100,
+      }),
     enabled: !isAdmin && !!staffId,
   });
 
-  // Salon được gán (role không phải Admin)
   const assignedSalons = useMemo(() => {
     if (isAdmin) return [];
-    
+
     const list: Array<{ id: number; name: string }> = [];
     const seenIds = new Set<number>();
 
@@ -38,24 +54,22 @@ export function BranchSelector() {
           seenIds.add(item.salonId);
           list.push({
             id: item.salonId,
-            name: item.salonName || `Chi nhánh #${item.salonId}`
+            name: item.salonName || `Chi nhánh #${item.salonId}`,
           });
         }
       }
     });
-    
-    // Không có gán thì dùng managedSalonId
+
     if (list.length === 0 && managedSalonId) {
       list.push({
         id: managedSalonId,
-        name: mySalon?.salonName || "Chi nhánh quản lý"
+        name: mySalon?.salonName || "Chi nhánh quản lý",
       });
     }
-    
+
     return list;
   }, [isAdmin, staffSalonsResult, managedSalonId, mySalon?.salonName]);
 
-  // Tự chọn salon theo role
   useEffect(() => {
     if (isAdmin) return;
 
@@ -80,99 +94,82 @@ export function BranchSelector() {
 
   if (isLoading) {
     return (
-      <div className="animate-pulse bg-transparent h-8 w-full rounded-[4px] border border-white/20 flex items-center justify-center text-xs text-white/80 font-normal px-4">
-        <MapPin className="w-3.5 h-3.5 text-white/80 shrink-0 mr-1.5 animate-bounce" />
+      <div className="flex h-8 w-full animate-pulse items-center justify-center gap-1.5 rounded border border-white/20 px-4 text-xs text-white/80">
+        <MapPin className="size-3.5 shrink-0" />
         Đang tải...
       </div>
     );
   }
 
-  // Admin: chọn tất cả / từng chi nhánh
   if (isAdmin) {
     const value = selectedSalonId !== null ? selectedSalonId.toString() : "all";
 
-    const handleValueChange = (val: string) => {
-      if (val === "all") {
-        setSelectedSalonId(null);
-      } else {
-        setSelectedSalonId(parseInt(val, 10));
-      }
-    };
-
     return (
-      <div className="flex items-center gap-1.5 w-full">
-        <Select value={value} onValueChange={handleValueChange}>
-          <SelectTrigger className="w-full !bg-transparent hover:!bg-transparent focus:!bg-transparent data-[state=open]:!bg-transparent !text-white border border-white/25 h-8 py-1 rounded-[4px] text-xs font-normal focus:ring-0 focus:ring-offset-0 [&_svg]:!text-white/80">
-            <div className="flex items-center gap-1.5 truncate">
-              <MapPin className="w-3.5 h-3.5 text-white/80 shrink-0" />
-              <SelectValue placeholder="Chọn chi nhánh" />
-            </div>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all" className="text-xs font-medium focus:bg-adminGray-50/50">
-              Tất cả chi nhánh
+      <Select
+        value={value}
+        onValueChange={(val: string) => {
+          if (val === "all") setSelectedSalonId(null);
+          else setSelectedSalonId(parseInt(val, 10));
+        }}
+      >
+        <SelectTrigger className={triggerClass}>
+          <div className="flex items-center gap-1.5 truncate">
+            <MapPin className="size-3.5 shrink-0 opacity-80" />
+            <SelectValue placeholder="Chọn chi nhánh" />
+          </div>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all" className="text-xs">
+            Tất cả chi nhánh
+          </SelectItem>
+          {allSalons.map((salon) => (
+            <SelectItem key={salon.id} value={salon.id?.toString() ?? ""} className="text-xs">
+              {salon.name}
             </SelectItem>
-            {allSalons.map((salon) => (
-              <SelectItem
-                key={salon.id}
-                value={salon.id?.toString() ?? ""}
-                className="text-xs font-medium focus:bg-adminGray-50/50"
-              >
-                {salon.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+          ))}
+        </SelectContent>
+      </Select>
     );
   }
 
-  // Role khác Admin
   if (assignedSalons.length === 0) {
     return (
-      <div className="flex items-center gap-1.5 px-3 py-1 bg-transparent rounded-[4px] border border-white/20 h-8 w-full text-white/60">
-        <MapPin className="w-3.5 h-3.5 text-white/60 shrink-0" />
-        <span className="text-xs font-normal truncate">Chưa phân chi nhánh</span>
+      <div className="flex h-8 w-full items-center gap-1.5 rounded border border-white/20 px-3 text-xs text-white/60">
+        <MapPin className="size-3.5 shrink-0" />
+        <span className="truncate">Chưa phân chi nhánh</span>
       </div>
     );
   }
 
   if (assignedSalons.length === 1) {
     return (
-      <div className="flex items-center gap-1.5 px-3 py-1 bg-transparent rounded-[4px] border border-white/25 h-8 w-full max-w-[240px] truncate text-white">
-        <MapPin className="w-3.5 h-3.5 text-white/80 shrink-0" />
-        <span className="text-xs font-normal truncate">{assignedSalons[0].name}</span>
+      <div className="flex h-8 w-full max-w-60 items-center gap-1.5 truncate rounded border border-white/25 px-3 text-xs text-white">
+        <MapPin className="size-3.5 shrink-0 opacity-80" />
+        <span className="truncate">{assignedSalons[0].name}</span>
       </div>
     );
   }
 
-  // Nhiều chi nhánh: dropdown
   const value = selectedSalonId !== null ? selectedSalonId.toString() : "";
-  const handleValueChange = (val: string) => {
-    setSelectedSalonId(parseInt(val, 10));
-  };
 
   return (
-    <div className="flex items-center gap-1.5 w-full">
-      <Select value={value} onValueChange={handleValueChange}>
-        <SelectTrigger className="w-full !bg-transparent hover:!bg-transparent focus:!bg-transparent data-[state=open]:!bg-transparent !text-white border border-white/25 h-8 py-1 rounded-[4px] text-xs font-normal focus:ring-0 focus:ring-offset-0 [&_svg]:!text-white/80">
-          <div className="flex items-center gap-1.5 truncate">
-            <MapPin className="w-3.5 h-3.5 text-white/80 shrink-0" />
-            <SelectValue placeholder="Chọn chi nhánh" />
-          </div>
-        </SelectTrigger>
-        <SelectContent>
-          {assignedSalons.map((salon) => (
-            <SelectItem
-              key={salon.id}
-              value={salon.id.toString()}
-              className="text-xs font-medium focus:bg-adminGray-50/50"
-            >
-              {salon.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <Select
+      value={value}
+      onValueChange={(val: string) => setSelectedSalonId(parseInt(val, 10))}
+    >
+      <SelectTrigger className={triggerClass}>
+        <div className="flex items-center gap-1.5 truncate">
+          <MapPin className="size-3.5 shrink-0 opacity-80" />
+          <SelectValue placeholder="Chọn chi nhánh" />
+        </div>
+      </SelectTrigger>
+      <SelectContent>
+        {assignedSalons.map((salon) => (
+          <SelectItem key={salon.id} value={salon.id.toString()} className="text-xs">
+            {salon.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
