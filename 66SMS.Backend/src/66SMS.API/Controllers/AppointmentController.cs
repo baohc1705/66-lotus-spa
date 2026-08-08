@@ -3,6 +3,7 @@ using _66SMS.Application.BookingService.Appointments.Commands.CreateAppointment;
 using _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock;
 using _66SMS.Application.BookingService.Appointments.Commands.PayDepositWithWallet;
 using _66SMS.Application.BookingService.Appointments.Commands.PostponeAppointment;
+using _66SMS.Application.BookingService.Appointments.Commands.ReleaseSlotLock;
 using _66SMS.Application.BookingService.Appointments.Queries.GetAllAppointment;
 using _66SMS.Application.BookingService.Appointments.Queries.GetAvailableBookingDays;
 using _66SMS.Application.BookingService.Appointments.Queries.GetDepositVnPayUrl;
@@ -58,6 +59,15 @@ namespace _66SMS.API.Controllers
         [HttpPost("lock")]
         [Authorize]
         public async Task<IActionResult> CreateSlotLock([FromBody] CreateSlotLockCommand command)
+        {
+            command.LockedByUserId = jwtService.GetUserId();
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpPost("lock/release")]
+        [Authorize]
+        public async Task<IActionResult> ReleaseSlotLock([FromBody] ReleaseSlotLockCommand command)
         {
             command.LockedByUserId = jwtService.GetUserId();
             var result = await mediator.Send(command);

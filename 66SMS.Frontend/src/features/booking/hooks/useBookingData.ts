@@ -70,7 +70,18 @@ export const useCreateSlotLock = () => {
       queryClient.invalidateQueries({ queryKey: ["booking-technicians"] });
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, "Không thể giữ khung giờ"));
+      toast.error(getErrorMessage(error, "Thời lượng dịch vụ vượt quá khung giờ còn lại. Vui lòng chọn giờ sớm hơn."));
+      queryClient.invalidateQueries({ queryKey: ["booking-timeslots"] });
+      queryClient.invalidateQueries({ queryKey: ["booking-technicians"] });
+    },
+  });
+};
+
+export const useReleaseSlotLock = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (lockIds: number[]) => bookingApi.releaseSlotLock(lockIds),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["booking-timeslots"] });
       queryClient.invalidateQueries({ queryKey: ["booking-technicians"] });
     },

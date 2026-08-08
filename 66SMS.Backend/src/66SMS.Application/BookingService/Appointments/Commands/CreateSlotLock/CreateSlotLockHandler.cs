@@ -72,6 +72,21 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                         })
                         .ToDictionaryAsync(x => x.Id, x => x.DurationMins, cancellationToken);
 
+                    var userId = request.LockedByUserId!.Value;
+                    var now = DateTimeHelper.UtcNow();
+
+                    var oldLocks = await appointmentSlotLockSqlRepository.AsQueryable(asNoTracking: false)
+                        .Where(x => x.LockedByUserId == userId
+                            && x.Status == AppointmentSlotLockConst.STATUS_ACTIVE)
+                        .ToListAsync(cancellationToken);
+
+                    foreach (var oldLock in oldLocks)
+                    {
+                        oldLock.Status = AppointmentSlotLockConst.STATUS_RELEASED;
+                        oldLock.ReleasedAt = now;
+                        appointmentSlotLockSqlRepository.Update(oldLock);
+                    }
+
                     var createdLocks = new List<AppointmentSlotLock>();
 
                     foreach (var lockRequest in request.Locks)
@@ -113,11 +128,11 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                             SlotId = slotId,
                             StaffId = resolved.StaffId,
                             PositionId = lockRequest.PositionId,
-                            LockedByUserId = request.LockedByUserId!.Value,
+                            LockedByUserId = userId,
                             AppointmentDate = (DateOnly)lockRequest.AppointmentDate!,
                             SlotsNeeded = slotsNeeded,
-                            LockedAt = DateTimeHelper.UtcNow(),
-                            ExpiresAt = DateTimeHelper.UtcNow().AddMinutes(AppointmentSlotLockConst.DEFAULT_LOCK_MINS),
+                            LockedAt = now,
+                            ExpiresAt = now.AddMinutes(AppointmentSlotLockConst.DEFAULT_LOCK_MINS),
                             Status = AppointmentSlotLockConst.STATUS_ACTIVE
                         };
 

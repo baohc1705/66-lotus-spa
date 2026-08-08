@@ -25,7 +25,6 @@ public static class MassTransitExtensions
             x.AddConsumer<CreatedUserConsumer>();
             x.AddConsumer<UploadImageConsumer>();
             x.AddConsumer<SendNotificationConsumer<BookingNotificationPayload>>();
-            x.AddConsumer<AppointmentCreatedConsumer>();
             x.AddRequestClient<UploadImageEvent>(RequestTimeout.After(s: 60));
 
             x.UsingRabbitMq((context, cfg) =>

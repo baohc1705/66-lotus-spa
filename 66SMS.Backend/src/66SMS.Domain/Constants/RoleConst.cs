@@ -29,6 +29,7 @@ namespace _66SMS.Domain.Constants
         public const string CODE_ADMIN = "admin";
         public const string CODE_MANAGER = "manager";
         public const string CODE_STAFF = "staff";
+        public const string CODE_RECEPTIONIST = "receptionist";
         #endregion
 
         #region Message

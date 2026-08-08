@@ -14,6 +14,8 @@ BEGIN
     DECLARE @duration_mins INT;
     DECLARE @slot_minutes  INT;
     DECLARE @slots_needed  INT;
+    DECLARE @slot_count    INT;
+    DECLARE @staff_role_id INT;
     DECLARE @now           DATETIMEOFFSET(7) = SYSDATETIMEOFFSET();
 
     SELECT @duration_mins = duration_mins
@@ -21,208 +23,167 @@ BEGIN
     WHERE id = @service_id AND status = 1;
 
     IF @duration_mins IS NULL
+    BEGIN
+        SELECT CAST(NULL AS INT) AS SlotId, CAST(NULL AS VARCHAR(5)) AS [Time],
+               CAST(NULL AS NVARCHAR(20)) AS Status
+        WHERE 1 = 0;
         RETURN;
+    END;
 
-    CREATE TABLE #slots (
+    DECLARE @slots TABLE (
         slot_index INT NOT NULL PRIMARY KEY,
-        slot_id    INT NOT NULL,
+        slot_id    INT NOT NULL UNIQUE,
         start_time TIME(7) NOT NULL,
         end_time   TIME(7) NOT NULL
     );
 
-    INSERT INTO #slots (slot_index, slot_id, start_time, end_time)
-    SELECT
-        ROW_NUMBER() OVER (ORDER BY start_time) - 1,
-        id,
-        start_time,
-        end_time
+    INSERT INTO @slots (slot_index, slot_id, start_time, end_time)
+    SELECT ROW_NUMBER() OVER (ORDER BY start_time) - 1, id, start_time, end_time
     FROM dbo.time_slots;
 
-    IF NOT EXISTS (SELECT 1 FROM #slots)
+    SET @slot_count = @@ROWCOUNT;
+    IF @slot_count = 0
+    BEGIN
+        SELECT CAST(NULL AS INT) AS SlotId, CAST(NULL AS VARCHAR(5)) AS [Time],
+               CAST(NULL AS NVARCHAR(20)) AS Status
+        WHERE 1 = 0;
         RETURN;
+    END;
 
-    SELECT TOP (1)
-        @slot_minutes = CASE
-            WHEN DATEDIFF(MINUTE, start_time, end_time) > 0
-                THEN DATEDIFF(MINUTE, start_time, end_time)
-            ELSE 30
-        END
-    FROM #slots
-    ORDER BY slot_index;
+    SELECT TOP (1) @slot_minutes = CASE
+        WHEN DATEDIFF(MINUTE, start_time, end_time) > 0 THEN DATEDIFF(MINUTE, start_time, end_time)
+        ELSE 30 END
+    FROM @slots ORDER BY slot_index;
 
     SET @slots_needed = CASE
         WHEN CEILING(@duration_mins * 1.0 / @slot_minutes) < 1 THEN 1
         ELSE CAST(CEILING(@duration_mins * 1.0 / @slot_minutes) AS INT)
     END;
 
-    CREATE TABLE #staff (
-        staff_id INT NOT NULL PRIMARY KEY
-    );
+    SELECT TOP (1) @staff_role_id = id FROM dbo.roles WHERE code = N'staff' AND status = 1;
 
-    INSERT INTO #staff (staff_id)
-    SELECT DISTINCT st.id
-    FROM dbo.staffs st
-    INNER JOIN dbo.users u
-        ON u.id = st.user_id AND u.status = 1
-    INNER JOIN dbo.user_roles ur
-        ON ur.user_id = u.id
-    INNER JOIN dbo.roles r
-        ON r.id = ur.role_id
-       AND r.status = 1
-       AND r.code = N'staff'
-    INNER JOIN dbo.staff_services ss
-        ON ss.staff_id = st.id
-       AND ss.service_id = @service_id
-       AND ss.status = 1
-    INNER JOIN dbo.work_schedules ws
-        ON ws.staff_id = st.id
-       AND ws.work_date = @date
-       AND ws.status = 1
-       AND ws.shift_period_id IS NOT NULL
-    WHERE st.status = 1
+    DECLARE @staff TABLE (staff_id INT NOT NULL PRIMARY KEY);
+
+    INSERT INTO @staff (staff_id)
+    SELECT st.id
+    FROM dbo.staff_services ss
+    INNER JOIN dbo.staffs st ON st.id = ss.staff_id AND st.status = 1
+    WHERE ss.service_id = @service_id
+      AND ss.status = 1
+      AND @staff_role_id IS NOT NULL
       AND (@staff_id IS NULL OR st.id = @staff_id)
+      AND EXISTS (
+            SELECT 1 FROM dbo.users u
+            INNER JOIN dbo.user_roles ur ON ur.user_id = u.id AND ur.role_id = @staff_role_id
+            WHERE u.id = st.user_id AND u.status = 1
+          )
+      AND EXISTS (
+            SELECT 1 FROM dbo.work_schedules ws
+            WHERE ws.staff_id = st.id AND ws.work_date = @date
+              AND ws.status = 1 AND ws.shift_period_id IS NOT NULL
+          )
       AND (
             @salon_id IS NULL
             OR EXISTS (
-                SELECT 1
-                FROM dbo.staff_salons ssal
-                WHERE ssal.staff_id = st.id
-                  AND ssal.salon_id = @salon_id
-                  AND ssal.status = 1
+                SELECT 1 FROM dbo.staff_salons ssal
+                WHERE ssal.staff_id = st.id AND ssal.salon_id = @salon_id AND ssal.status = 1
             )
           );
 
-    CREATE TABLE #shifts (
-        staff_id    INT NOT NULL,
-        shift_start TIME(7) NOT NULL,
-        shift_end   TIME(7) NOT NULL
+    DECLARE @in_shift TABLE (
+        staff_id   INT NOT NULL,
+        slot_index INT NOT NULL,
+        PRIMARY KEY (staff_id, slot_index)
     );
 
-    INSERT INTO #shifts (staff_id, shift_start, shift_end)
-    SELECT
-        ws.staff_id,
-        sp.shift_start,
-        sp.shift_end
+    INSERT INTO @in_shift (staff_id, slot_index)
+    SELECT DISTINCT ws.staff_id, sl.slot_index
     FROM dbo.work_schedules ws
-    INNER JOIN #staff s ON s.staff_id = ws.staff_id
+    INNER JOIN @staff s ON s.staff_id = ws.staff_id
     INNER JOIN dbo.shift_periods sp ON sp.id = ws.shift_period_id
+    INNER JOIN @slots sl
+        ON sl.start_time >= sp.shift_start
+       AND sl.end_time <= sp.shift_end
     WHERE ws.work_date = @date
       AND ws.status = 1
       AND ws.shift_period_id IS NOT NULL;
 
-    CREATE TABLE #merged_shifts (
-        staff_id    INT NOT NULL,
-        shift_start TIME(7) NOT NULL,
-        shift_end   TIME(7) NOT NULL
+    DECLARE @booked TABLE (
+        staff_id   INT NOT NULL,
+        slot_index INT NOT NULL,
+        PRIMARY KEY (staff_id, slot_index)
     );
 
-    ;WITH shift_rows AS (
-        SELECT
-            staff_id,
-            shift_start,
-            shift_end,
-            CASE
-                WHEN LAG(shift_end) OVER (PARTITION BY staff_id ORDER BY shift_start) IS NULL
-                  OR shift_start > LAG(shift_end) OVER (PARTITION BY staff_id ORDER BY shift_start)
-                THEN 1
-                ELSE 0
-            END AS is_new
-        FROM #shifts
+    ;WITH appt_dur AS (
+        SELECT aps.appointment_id, SUM(aps.duration_snapshot * aps.quantity) AS mins
+        FROM dbo.appointments ax
+        INNER JOIN @staff sx ON sx.staff_id = ax.staff_id
+        INNER JOIN dbo.appointment_services aps ON aps.appointment_id = ax.id AND aps.status = 1
+        WHERE ax.appointment_date = @date AND ax.status NOT IN (5, 6, 9)
+        GROUP BY aps.appointment_id
     ),
-    shift_groups AS (
+    occupied AS (
         SELECT
-            staff_id,
-            shift_start,
-            shift_end,
-            SUM(is_new) OVER (
-                PARTITION BY staff_id
-                ORDER BY shift_start
-                ROWS UNBOUNDED PRECEDING
-            ) AS group_no
-        FROM shift_rows
+            a.staff_id,
+            fs.slot_index AS start_index,
+            CASE
+                WHEN CEILING(ISNULL(d.mins, @slot_minutes) * 1.0 / @slot_minutes) < 1 THEN 1
+                ELSE CAST(CEILING(ISNULL(d.mins, @slot_minutes) * 1.0 / @slot_minutes) AS INT)
+            END AS needed
+        FROM dbo.appointments a
+        INNER JOIN @staff s ON s.staff_id = a.staff_id
+        INNER JOIN @slots fs ON fs.slot_id = a.slot_id
+        LEFT JOIN appt_dur d ON d.appointment_id = a.id
+        WHERE a.appointment_date = @date AND a.status NOT IN (5, 6, 9)
+
+        UNION ALL
+
+        SELECT
+            l.staff_id,
+            fs.slot_index,
+            CASE WHEN l.slots_needed > 0 THEN l.slots_needed ELSE @slots_needed END
+        FROM dbo.appointment_slot_locks l
+        INNER JOIN @staff s ON s.staff_id = l.staff_id
+        INNER JOIN @slots fs ON fs.slot_id = l.slot_id
+        WHERE l.appointment_date = @date AND l.status = 1 AND l.expires_at > @now
     )
-    INSERT INTO #merged_shifts (staff_id, shift_start, shift_end)
-    SELECT staff_id, MIN(shift_start), MAX(shift_end)
-    FROM shift_groups
-    GROUP BY staff_id, group_no;
+    INSERT INTO @booked (staff_id, slot_index)
+    SELECT DISTINCT o.staff_id, o.start_index + n.slot_index
+    FROM occupied o
+    INNER JOIN @slots n ON n.slot_index < o.needed
+    WHERE o.start_index + n.slot_index < @slot_count;
 
-    CREATE TABLE #booked (
-        staff_id INT NOT NULL,
-        slot_id  INT NOT NULL,
-        PRIMARY KEY (staff_id, slot_id)
+    DECLARE @can_start TABLE (
+        staff_id  INT NOT NULL,
+        start_idx INT NOT NULL,
+        PRIMARY KEY (staff_id, start_idx)
     );
 
-    CREATE TABLE #appt_mins (
-        appointment_id INT NOT NULL PRIMARY KEY,
-        mins           INT NOT NULL
-    );
-
-    INSERT INTO #appt_mins (appointment_id, mins)
-    SELECT
-        aps.appointment_id,
-        SUM(aps.duration_snapshot * aps.quantity)
-    FROM dbo.appointment_services aps
-    INNER JOIN dbo.appointments a ON a.id = aps.appointment_id
-    WHERE a.appointment_date = @date
-      AND a.status NOT IN (5, 6, 9)
-      AND aps.status = 1
-    GROUP BY aps.appointment_id;
-
-    INSERT INTO #booked (staff_id, slot_id)
-    SELECT DISTINCT
-        a.staff_id,
-        used_slot.slot_id
-    FROM dbo.appointments a
-    INNER JOIN #slots first_slot ON first_slot.slot_id = a.slot_id
-    LEFT JOIN #appt_mins d ON d.appointment_id = a.id
-    INNER JOIN #slots used_slot
-        ON used_slot.slot_index >= first_slot.slot_index
-       AND used_slot.slot_index < first_slot.slot_index + CASE
-            WHEN CEILING(ISNULL(d.mins, @slot_minutes) * 1.0 / @slot_minutes) < 1 THEN 1
-            ELSE CAST(CEILING(ISNULL(d.mins, @slot_minutes) * 1.0 / @slot_minutes) AS INT)
-        END
-    WHERE a.appointment_date = @date
-      AND a.status NOT IN (5, 6, 9);
-
-    INSERT INTO #booked (staff_id, slot_id)
-    SELECT DISTINCT
-        l.staff_id,
-        used_slot.slot_id
-    FROM dbo.appointment_slot_locks l
-    INNER JOIN #slots first_slot ON first_slot.slot_id = l.slot_id
-    INNER JOIN #slots used_slot
-        ON used_slot.slot_index >= first_slot.slot_index
-       AND used_slot.slot_index < first_slot.slot_index + CASE
-            WHEN l.slots_needed > 0 THEN l.slots_needed
-            ELSE @slots_needed
-        END
-    WHERE l.appointment_date = @date
-      AND l.status = 1
-      AND l.expires_at > @now
+    INSERT INTO @can_start (staff_id, start_idx)
+    SELECT sh.staff_id, sh.slot_index
+    FROM @in_shift sh
+    WHERE (
+            SELECT COUNT(*) FROM @in_shift i
+            WHERE i.staff_id = sh.staff_id
+              AND i.slot_index >= sh.slot_index
+              AND i.slot_index < sh.slot_index + @slots_needed
+          ) = @slots_needed
       AND NOT EXISTS (
-          SELECT 1 FROM #booked b
-          WHERE b.staff_id = l.staff_id AND b.slot_id = used_slot.slot_id
-      );
+            SELECT 1 FROM @booked b
+            WHERE b.staff_id = sh.staff_id
+              AND b.slot_index >= sh.slot_index
+              AND b.slot_index < sh.slot_index + @slots_needed
+          );
 
     IF @staff_id IS NOT NULL
        AND (
-            NOT EXISTS (SELECT 1 FROM #staff WHERE staff_id = @staff_id)
-            OR NOT EXISTS (SELECT 1 FROM #merged_shifts WHERE staff_id = @staff_id)
+            NOT EXISTS (SELECT 1 FROM @staff WHERE staff_id = @staff_id)
+            OR NOT EXISTS (SELECT 1 FROM @in_shift WHERE staff_id = @staff_id)
           )
     BEGIN
-        SELECT
-            sl.slot_id AS SlotId,
-            CONVERT(varchar(5), sl.start_time, 108) AS [Time],
-            CAST(N'outside' AS NVARCHAR(20)) AS Status
-        FROM #slots sl
-        ORDER BY sl.slot_index;
-
-        DROP TABLE #booked;
-        DROP TABLE #appt_mins;
-        DROP TABLE #merged_shifts;
-        DROP TABLE #shifts;
-        DROP TABLE #staff;
-        DROP TABLE #slots;
+        SELECT sl.slot_id AS SlotId, CONVERT(varchar(5), sl.start_time, 108) AS [Time],
+               CAST(N'outside' AS NVARCHAR(20)) AS Status
+        FROM @slots sl ORDER BY sl.slot_index;
         RETURN;
     END;
 
@@ -232,69 +193,43 @@ BEGIN
             sl.slot_id AS SlotId,
             CONVERT(varchar(5), sl.start_time, 108) AS [Time],
             CASE
-                WHEN NOT EXISTS (
-                    SELECT 1
-                    FROM #merged_shifts sh
-                    WHERE sh.staff_id = @staff_id
-                      AND sl.start_time >= sh.shift_start
-                      AND sl.end_time <= sh.shift_end
-                ) THEN N'outside'
-                WHEN EXISTS (
-                    SELECT 1
-                    FROM #booked b
-                    WHERE b.staff_id = @staff_id AND b.slot_id = sl.slot_id
-                ) THEN N'booked'
-                ELSE N'available'
+                WHEN i.slot_index IS NULL THEN N'outside'
+                WHEN cs.start_idx IS NOT NULL THEN N'available'
+                WHEN b.slot_index IS NOT NULL THEN N'booked'
+                ELSE N'short'
             END AS Status
-        FROM #slots sl
+        FROM @slots sl
+        LEFT JOIN @in_shift i ON i.staff_id = @staff_id AND i.slot_index = sl.slot_index
+        LEFT JOIN @booked b ON b.staff_id = @staff_id AND b.slot_index = sl.slot_index
+        LEFT JOIN @can_start cs ON cs.staff_id = @staff_id AND cs.start_idx = sl.slot_index
         ORDER BY sl.slot_index;
     END
     ELSE
     BEGIN
+        ;WITH slot_stats AS (
+            SELECT
+                sl.slot_index,
+                SUM(CASE WHEN i.staff_id IS NOT NULL THEN 1 ELSE 0 END) AS in_shift_cnt,
+                SUM(CASE WHEN i.staff_id IS NOT NULL AND b.staff_id IS NULL THEN 1 ELSE 0 END) AS free_start_cnt,
+                SUM(CASE WHEN cs.staff_id IS NOT NULL THEN 1 ELSE 0 END) AS can_start_cnt
+            FROM @slots sl
+            LEFT JOIN @in_shift i ON i.slot_index = sl.slot_index
+            LEFT JOIN @booked b ON b.staff_id = i.staff_id AND b.slot_index = i.slot_index
+            LEFT JOIN @can_start cs ON cs.staff_id = i.staff_id AND cs.start_idx = sl.slot_index
+            GROUP BY sl.slot_index
+        )
         SELECT
             sl.slot_id AS SlotId,
             CONVERT(varchar(5), sl.start_time, 108) AS [Time],
             CASE
-                WHEN EXISTS (
-                    SELECT 1
-                    FROM #staff st
-                    INNER JOIN #merged_shifts sh ON sh.staff_id = st.staff_id
-                    WHERE sl.start_time >= sh.shift_start
-                      AND sl.end_time <= sh.shift_end
-                      AND NOT EXISTS (
-                          SELECT 1 FROM #booked b
-                          WHERE b.staff_id = st.staff_id AND b.slot_id = sl.slot_id
-                      )
-                ) THEN N'available'
-                WHEN EXISTS (
-                    SELECT 1
-                    FROM #staff st
-                    INNER JOIN #merged_shifts sh ON sh.staff_id = st.staff_id
-                    WHERE sl.start_time >= sh.shift_start
-                      AND sl.end_time <= sh.shift_end
-                )
-                AND NOT EXISTS (
-                    SELECT 1
-                    FROM #staff st
-                    INNER JOIN #merged_shifts sh ON sh.staff_id = st.staff_id
-                    WHERE sl.start_time >= sh.shift_start
-                      AND sl.end_time <= sh.shift_end
-                      AND NOT EXISTS (
-                          SELECT 1 FROM #booked b
-                          WHERE b.staff_id = st.staff_id AND b.slot_id = sl.slot_id
-                      )
-                ) THEN N'booked'
+                WHEN ISNULL(st.can_start_cnt, 0) > 0 THEN N'available'
+                WHEN ISNULL(st.free_start_cnt, 0) > 0 THEN N'short'
+                WHEN ISNULL(st.in_shift_cnt, 0) > 0 THEN N'booked'
                 ELSE N'outside'
             END AS Status
-        FROM #slots sl
+        FROM @slots sl
+        LEFT JOIN slot_stats st ON st.slot_index = sl.slot_index
         ORDER BY sl.slot_index;
     END;
-
-    DROP TABLE #booked;
-    DROP TABLE #appt_mins;
-    DROP TABLE #merged_shifts;
-    DROP TABLE #shifts;
-    DROP TABLE #staff;
-    DROP TABLE #slots;
 END
 GO

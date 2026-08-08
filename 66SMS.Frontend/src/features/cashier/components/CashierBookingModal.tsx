@@ -561,6 +561,10 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                             Đã đặt
                           </span>
                           <span className="flex items-center gap-1">
+                            <span className="w-2.5 h-2.5 rounded-full bg-adminGray-300 inline-block" />
+                            Không đủ giờ
+                          </span>
+                          <span className="flex items-center gap-1">
                             <span className="w-2.5 h-2.5 rounded-full bg-adminGray-200 inline-block" />
                             Ngoài giờ
                           </span>
@@ -600,6 +604,8 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                               label = "Đã đặt";
                               classes =
                                 "border-red-100 bg-red-50 text-red-600 cursor-not-allowed line-through opacity-70";
+                            } else if (s === "short") {
+                              label = "Không đủ giờ";
                             } else if (s === "outside") {
                               label = "Ngoài giờ";
                             } else if (s === "break" || s === "nghỉ") {

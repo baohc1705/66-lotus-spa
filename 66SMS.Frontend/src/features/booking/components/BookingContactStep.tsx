@@ -10,7 +10,11 @@ import {
 } from "@/features/profile/hooks/useMembershipInfo";
 import { useConfigAppointmentBySalon } from "@/features/config_appointments/hooks/useConfigAppointments";
 import { useBookingStore } from "../stores/bookingStore";
-import { useCreateBooking } from "../hooks/useBookingData";
+import {
+  useCreateBooking,
+  useCreateSlotLock,
+  useReleaseSlotLock,
+} from "../hooks/useBookingData";
 import {
   bookingContactSchema,
   type BookingContactFormValues,
@@ -29,10 +33,13 @@ export function BookingContactStep() {
     promotionCode,
     appliedPromotion,
     setCreatedBookingIds,
+    setGuestLockId,
   } = useBookingStore();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { mutateAsync: createBooking } = useCreateBooking();
+  const { mutateAsync: createSlotLockMutation } = useCreateSlotLock();
+  const { mutateAsync: releaseSlotLockMutation } = useReleaseSlotLock();
+  const { mutateAsync: createBookingMutation } = useCreateBooking();
 
   const accessToken = useAuthStore((s) => s.accessToken);
   const membershipCardQuery = useMyMembershipCard(!!accessToken);
@@ -73,12 +80,12 @@ export function BookingContactStep() {
 
   const onSubmit = async (data: BookingContactFormValues) => {
     const invalidGuests = guests.filter(
-      (g) => !g.selectedService || !g.selectedDate || !g.selectedTimeSlot
+      (g) => !g.selectedService || !g.selectedDate || !g.selectedTimeSlot,
     );
 
     if (invalidGuests.length > 0) {
       toast.error(
-        "Vui lòng chọn đầy đủ Dịch vụ và Thời gian cho tất cả khách hàng."
+        "Vui lòng chọn đầy đủ Dịch vụ và Thời gian cho tất cả khách hàng.",
       );
       return;
     }
@@ -88,16 +95,42 @@ export function BookingContactStep() {
       return;
     }
 
+    let lockedIds: number[] = [];
+
     try {
       setIsSubmitting(true);
       setContactInfo(data);
 
-      const payload: GuestAppointmentDto[] = guests.map((guest, index) => {
+      const lockRes = await createSlotLockMutation({
+        locks: guests.map((g) => ({
+          slotId: g.selectedTimeSlot!.slotId,
+          staffId: g.selectedTechnician?.id ?? null,
+          appointmentDate: formatDate(g.selectedDate!).format("YYYY-MM-DD"),
+          serviceId: g.selectedService!.id ?? 0,
+        })),
+      });
+
+      if (!lockRes.success || !lockRes.lockIds?.length) {
+        toast.error(
+          lockRes.message ||
+            "Không thể giữ khung giờ này, vui lòng chọn giờ khác.",
+        );
+        return;
+      }
+
+      lockedIds = lockRes.lockIds;
+      guests.forEach((_g, idx: number) => {
+        if (lockedIds[idx]) {
+          setGuestLockId(idx, lockedIds[idx]);
+        }
+      });
+
+      const payload: GuestAppointmentDto[] = guests.map((guest, index: number) => {
         const isFirstGuest = index === 0;
         const customerNote = data.note?.trim();
 
         return {
-          lockId: guest.lockId,
+          lockId: lockedIds[index],
           staffId: guest.selectedTechnician?.id ?? null,
           slotId: guest.selectedTimeSlot!.slotId || 0,
           appointmentDate: formatDate(guest.selectedDate!).format("YYYY-MM-DD"),
@@ -109,7 +142,7 @@ export function BookingContactStep() {
         };
       });
 
-      const result = await createBooking({
+      const result = await createBookingMutation({
         promotionCode: appliedPromotion ? promotionCode : undefined,
         guests: payload,
       });
@@ -118,10 +151,13 @@ export function BookingContactStep() {
         setCreatedBookingIds(result.bookingIds || []);
         toast.success("Đặt lịch thành công! Cảm ơn bạn đã tin tưởng.");
         nextStep();
+      } else if (lockedIds.length > 0) {
+        await releaseSlotLockMutation(lockedIds).catch(() => undefined);
       }
-    } catch (error) {
-      toast.error("Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.");
-      console.error(error);
+    } catch {
+      if (lockedIds.length > 0) {
+        await releaseSlotLockMutation(lockedIds).catch(() => undefined);
+      }
     } finally {
       setIsSubmitting(false);
     }

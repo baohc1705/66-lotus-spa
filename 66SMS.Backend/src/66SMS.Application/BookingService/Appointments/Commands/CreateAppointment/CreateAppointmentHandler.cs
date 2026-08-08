@@ -1,7 +1,9 @@
 using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Constants;
 using _66SMS.Contract.Enumerations;
 using _66SMS.Contract.Helpers;
+using _66SMS.Contract.Messages;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -21,6 +23,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
         private readonly IAppointmentSlotLockSqlRepository appointmentSlotLockSqlRepository;
         private readonly IStaffSqlRepository staffSqlRepository;
         private readonly ICustomerSqlRepository customerSqlRepository;
+        private readonly IWorkScheduleSqlRepository workScheduleSqlRepository;
         private readonly IPromotionSqlRepository promotionSqlRepository;
         private readonly IConfigAppointmentSqlRepository configAppointmentSqlRepository;
         private readonly ITimeSlotSqlRepository timeSlotSqlRepository;
@@ -33,6 +36,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             IAppointmentSlotLockSqlRepository appointmentSlotLockSqlRepository,
             IStaffSqlRepository staffSqlRepository,
             ICustomerSqlRepository customerSqlRepository,
+            IWorkScheduleSqlRepository workScheduleSqlRepository,
             IPromotionSqlRepository promotionSqlRepository,
             IConfigAppointmentSqlRepository configAppointmentSqlRepository,
             ITimeSlotSqlRepository timeSlotSqlRepository,
@@ -44,6 +48,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             this.appointmentSlotLockSqlRepository = appointmentSlotLockSqlRepository;
             this.staffSqlRepository = staffSqlRepository;
             this.customerSqlRepository = customerSqlRepository;
+            this.workScheduleSqlRepository = workScheduleSqlRepository;
             this.promotionSqlRepository = promotionSqlRepository;
             this.configAppointmentSqlRepository = configAppointmentSqlRepository;
             this.timeSlotSqlRepository = timeSlotSqlRepository;
@@ -144,6 +149,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
 
                     if (guest.LockId.HasValue)
                     {
+                        // Lock da resolve staff o CreateSlotLock — khong goi lai SP.
                         if (!locks.TryGetValue(guest.LockId.Value, out var slotLock)
                             || slotLock.Status != AppointmentSlotLockConst.STATUS_ACTIVE
                             || slotLock.ExpiresAt <= DateTimeHelper.UtcNow())
@@ -151,24 +157,15 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                             return Result<List<int>>.BadRequest(AppointmentConst.MSG_APPOINTMENT_SLOT_LOCK_INVALID, ErrorCodes.ERR_APPOINTMENT_SLOT_LOCK_INVALID);
                         }
 
-                        var staffInfo = await appointmentSqlRepository.ResolveBookingStaffAsync(
-                            slotLock.AppointmentDate,
-                            mainServiceId,
-                            slotLock.SlotId,
-                            slotLock.StaffId,
-                            guest.SalonId,
-                            slotLock.Id,
-                            cancellationToken);
-
-                        if (staffInfo == null)
-                        {
-                            return Result<List<int>>.Conflict(AppointmentConst.MSG_APPOINTMENT_SLOT_FULL, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
-                        }
-
                         activeLock = slotLock;
                         staffId = slotLock.StaffId;
-                        scheduleId = staffInfo.ScheduleId;
                         slotId = slotLock.SlotId;
+                        scheduleId = await workScheduleSqlRepository.AsQueryable(asNoTracking: true)
+                            .Where(x => x.StaffId == staffId
+                                && x.WorkDate == slotLock.AppointmentDate
+                                && x.Status == WorkScheduleConst.STATUS_ACTIVED)
+                            .Select(x => (int?)x.Id)
+                            .FirstOrDefaultAsync(cancellationToken);
                     }
                     else
                     {
@@ -286,19 +283,36 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
 
                 transaction.Commit();
 
-                var customerName = customerInfo?.FullName;
-                await domainEventPublisher.PublishAsync(new AppointmentCreatedEvent
+                var customerName = customerInfo?.FullName ?? "Khách hàng";
+                var staffIds = createdAppointments.Select(a => a.StaffId).Distinct().ToList();
+                var staffUserByStaffId = await staffSqlRepository.AsQueryable(asNoTracking: true)
+                    .Where(s => staffIds.Contains(s.Id))
+                    .Select(s => new { s.Id, s.UserId })
+                    .ToDictionaryAsync(s => s.Id, s => s.UserId, cancellationToken);
+
+                var bookedAt = DateTimeHelper.UtcNow().ToOffset(TimeSpan.FromHours(7)).ToString("HH:mm dd/MM/yyyy");
+                foreach (var created in createdAppointments)
                 {
-                    CustomerName = customerName,
-                    Items = createdAppointments.Select(x => new AppointmentCreatedItem
+                    staffUserByStaffId.TryGetValue(created.StaffId, out var staffUserId);
+
+                    await domainEventPublisher.PublishAsync(new SendNotificationEvent<BookingNotificationPayload>
                     {
-                        AppointmentId = x.Id,
-                        StaffId = x.StaffId,
-                        SalonId = x.SalonId,
-                        Status = x.Status,
-                        AppointmentDate = x.AppointmentDate,
-                    }).ToList(),
-                }, cancellationToken);
+                        Domain = NotificationConst.DOMAIN_BOOKING,
+                        EventType = NotificationConst.EVENT_APPOINTMENT_CREATED,
+                        Title = "Lịch hẹn mới",
+                        Message = $"Khách hàng {customerName} vừa đặt lịch hẹn #{created.Id} vào lúc {bookedAt}",
+                        Payload = new BookingNotificationPayload
+                        {
+                            SalonId = created.SalonId,
+                            StaffUserId = staffUserId,
+                            AppointmentId = created.Id,
+                            StaffId = created.StaffId,
+                            Status = created.Status,
+                            CustomerName = customerName,
+                            AppointmentDate = created.AppointmentDate,
+                        },
+                    }, cancellationToken);
+                }
 
                 return Result<List<int>>.Created(createdAppointments.Select(x => x.Id).ToList());
             }

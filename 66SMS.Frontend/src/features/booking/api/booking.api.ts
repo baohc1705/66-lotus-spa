@@ -59,12 +59,24 @@ export const bookingApi = {
 
   createSlotLock: async (
     payload: CreateSlotLockPayload,
-  ): Promise<{ success: boolean; lockIds: number[] }> => {
+  ): Promise<{ success: boolean; lockIds: number[]; message?: string }> => {
     const res = await axiosInstance.post<Result<number[]>>(
       `${APPOINTMENT_BASE}/lock`,
       payload,
     );
-    return { success: res.data.isSuccess, lockIds: res.data.data || [] };
+    return {
+      success: res.data.isSuccess,
+      lockIds: res.data.data || [],
+      message: res.data.message,
+    };
+  },
+
+  releaseSlotLock: async (lockIds: number[]): Promise<boolean> => {
+    const res = await axiosInstance.post<Result<object>>(
+      `${APPOINTMENT_BASE}/lock/release`,
+      { lockIds },
+    );
+    return res.data.isSuccess;
   },
 
   createBooking: async (
