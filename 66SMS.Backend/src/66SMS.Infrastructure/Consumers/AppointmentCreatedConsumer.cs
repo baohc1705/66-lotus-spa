@@ -2,6 +2,7 @@ using _66SMS.Contract.Constants;
 using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Messages;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Messages;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 

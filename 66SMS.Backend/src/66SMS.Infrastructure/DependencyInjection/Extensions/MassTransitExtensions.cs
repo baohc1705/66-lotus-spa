@@ -7,6 +7,7 @@ using _66SMS.Infrastructure.Consumers;
 using _66SMS.Contract.Abstractions;
 using _66SMS.Contract.Settings;
 using _66SMS.Contract.Messages;
+using _66SMS.Domain.Messages;
 
 namespace _66SMS.Infrastructure.DependencyInjection.Extensions;
 

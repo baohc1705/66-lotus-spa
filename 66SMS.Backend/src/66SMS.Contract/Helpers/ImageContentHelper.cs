@@ -1,16 +1,8 @@
 namespace _66SMS.Contract.Helpers
 {
-    /// <summary>
-    /// Phát hiện và kiểm tra loại ảnh từ magic bytes (không tin extension từ client).
-    /// Chỉ chấp nhận jpg/jpeg, png, webp.
-    /// </summary>
     public static class ImageContentHelper
     {
         public static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
-
-        /// <summary>
-        /// Decode base64 (có thể có prefix data:image/...;base64,) rồi phát hiện extension từ nội dung.
-        /// </summary>
         public static bool TryDecodeAndDetect(
             string? imageBase64,
             out byte[] bytes,
@@ -40,10 +32,6 @@ namespace _66SMS.Contract.Helpers
 
             return TryDetectExtension(bytes, out extension, out contentType);
         }
-
-        /// <summary>
-        /// Phát hiện extension từ magic bytes. Trả false nếu không phải ảnh hợp lệ / không nằm trong danh sách cho phép.
-        /// </summary>
         public static bool TryDetectExtension(byte[] content, out string extension, out string contentType)
         {
             extension = string.Empty;
@@ -81,9 +69,6 @@ namespace _66SMS.Contract.Helpers
             return false;
         }
 
-        /// <summary>
-        /// Kiểm tra nội dung file khớp với extension khai báo (defense in depth ở consumer).
-        /// </summary>
         public static bool MatchesDeclaredExtension(byte[] content, string? declaredFileName)
         {
             if (!TryDetectExtension(content, out var detected, out _))

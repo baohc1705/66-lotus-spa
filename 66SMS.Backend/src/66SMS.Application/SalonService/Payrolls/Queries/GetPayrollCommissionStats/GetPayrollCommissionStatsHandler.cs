@@ -2,6 +2,7 @@ using _66SMS.Application.DTOs;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
+using _66SMS.Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

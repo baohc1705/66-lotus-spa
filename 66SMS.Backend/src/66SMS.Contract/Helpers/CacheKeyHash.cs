@@ -4,9 +4,6 @@ using System.Text.Json;
 
 namespace _66SMS.Contract.Helpers
 {
-    /// <summary>
-    /// Hash object thành chuỗi ngắn để ghép vào Redis cache key (list filter).
-    /// </summary>
     public static class CacheKeyHash
     {
         public static string FromObject(object value)

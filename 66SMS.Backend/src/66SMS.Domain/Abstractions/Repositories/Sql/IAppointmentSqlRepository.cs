@@ -1,6 +1,6 @@
-using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Entities;
+using _66SMS.Domain.Models;
 
 namespace _66SMS.Domain.Abstractions.Repositories.Sql
 {

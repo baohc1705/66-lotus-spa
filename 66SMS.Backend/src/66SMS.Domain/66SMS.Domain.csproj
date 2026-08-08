@@ -10,13 +10,10 @@
   <ItemGroup>
     <Compile Remove="Abstractions\Events\**" />
     <Compile Remove="Abstractions\Repositories\Mongo\**" />
-    <Compile Remove="Abstractions\Services\**" />
     <EmbeddedResource Remove="Abstractions\Events\**" />
     <EmbeddedResource Remove="Abstractions\Repositories\Mongo\**" />
-    <EmbeddedResource Remove="Abstractions\Services\**" />
     <None Remove="Abstractions\Events\**" />
     <None Remove="Abstractions\Repositories\Mongo\**" />
-    <None Remove="Abstractions\Services\**" />
   </ItemGroup>
 
   <ItemGroup>

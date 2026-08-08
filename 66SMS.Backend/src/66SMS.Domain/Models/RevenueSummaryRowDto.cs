@@ -1,4 +1,4 @@
-namespace _66SMS.Contract.Shared
+namespace _66SMS.Domain.Models
 {
     /// <summary>Flat row từ usp_GetRevenueSummary.</summary>
     public class RevenueSummaryRowDto

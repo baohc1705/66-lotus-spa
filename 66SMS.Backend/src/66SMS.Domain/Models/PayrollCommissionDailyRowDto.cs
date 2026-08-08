@@ -1,4 +1,4 @@
-namespace _66SMS.Contract.Shared
+namespace _66SMS.Domain.Models
 {
     /// <summary>
     /// Dòng từ usp_GetPayrollCommissionDailyStats (view tháng).

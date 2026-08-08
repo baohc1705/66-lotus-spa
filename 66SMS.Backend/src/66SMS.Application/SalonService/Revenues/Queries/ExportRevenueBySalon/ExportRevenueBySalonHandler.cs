@@ -1,7 +1,7 @@
 using _66SMS.Application.DTOs;
-using _66SMS.Contract.Abstractions;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Abstractions.Services;
 using MediatR;
 
 namespace _66SMS.Application.SalonService.Revenues.Queries.ExportRevenueBySalon

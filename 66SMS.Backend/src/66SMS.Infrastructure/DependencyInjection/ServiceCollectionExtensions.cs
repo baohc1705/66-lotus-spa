@@ -1,5 +1,6 @@
 using _66SMS.Contract.Abstractions;
 using _66SMS.Contract.Settings;
+using _66SMS.Domain.Abstractions.Services;
 using _66SMS.Infrastructure.DependencyInjection.Extensions;
 using _66SMS.Infrastructure.Excels;
 using _66SMS.Infrastructure.Mails;

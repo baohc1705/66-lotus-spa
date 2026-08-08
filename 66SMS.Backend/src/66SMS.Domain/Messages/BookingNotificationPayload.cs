@@ -1,4 +1,4 @@
-namespace _66SMS.Contract.Messages
+namespace _66SMS.Domain.Messages
 {
     public class BookingNotificationPayload
     {

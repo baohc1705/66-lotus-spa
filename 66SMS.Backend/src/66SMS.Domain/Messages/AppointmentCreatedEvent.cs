@@ -1,4 +1,6 @@
-namespace _66SMS.Contract.Messages
+using _66SMS.Contract.Messages;
+
+namespace _66SMS.Domain.Messages
 {
     public class AppointmentCreatedEvent : DomainEvent
     {
