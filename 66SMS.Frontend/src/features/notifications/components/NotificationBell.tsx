@@ -11,14 +11,16 @@ import { eventBadgeClass, eventLabel } from "../utils/notificationEvent";
 
 type Props = {
   className?: string;
+  variant?: "dark" | "light";
 };
 
-export function NotificationBell({ className }: Props) {
+export function NotificationBell({ className, variant = "dark" }: Props) {
   const [open, setOpen] = useState(false);
   const unreadCount = useNotificationUiStore((s) => s.unreadCount);
   const items = useNotificationUiStore((s) => s.items);
   const markAllReadLocal = useNotificationUiStore((s) => s.markAllRead);
   const clearLocal = useNotificationUiStore((s) => s.clear);
+  const isLight = variant === "light";
 
   const handleOpen = () => {
     const next = !open;
@@ -50,11 +52,23 @@ export function NotificationBell({ className }: Props) {
         type="button"
         onClick={handleOpen}
         title="Thông báo"
-        className="w-8 h-8 rounded-[4px] bg-white/10 text-white border border-white/20 flex items-center justify-center hover:bg-white/20 transition-all relative"
+        className={cn(
+          "relative flex h-9 w-9 items-center justify-center rounded-md border transition-all",
+          isLight
+            ? "border-kit bg-kit-page text-kit-body hover:bg-blue-50 hover:text-kit-primary"
+            : "h-8 w-8 rounded-[4px] border-white/20 bg-white/10 text-white hover:bg-white/20",
+        )}
       >
-        <Bell className="w-4 h-4" />
+        <Bell className="h-4 w-4" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-adminGold-600 text-adminGreen-950 text-xs leading-4 font-bold border border-white/40">
+          <span
+            className={cn(
+              "absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full text-xs leading-4 font-bold border",
+              isLight
+                ? "bg-kit-primary text-white border-white"
+                : "bg-adminGold-600 text-adminGreen-950 border-white/40",
+            )}
+          >
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}

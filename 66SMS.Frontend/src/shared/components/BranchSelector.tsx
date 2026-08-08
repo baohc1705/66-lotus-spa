@@ -12,11 +12,35 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 
-const triggerClass =
-  "h-8 w-full rounded border border-white/25 bg-transparent px-3 py-1 text-xs text-white " +
-  "hover:bg-transparent focus:bg-transparent focus:ring-0 data-[state=open]:bg-transparent";
+type BranchSelectorProps = {
+  variant?: "dark" | "light";
+};
 
-export function BranchSelector() {
+const triggerClassByVariant = {
+  dark:
+    "h-8 w-full rounded border border-white/25 bg-transparent px-3 py-1 text-xs text-white " +
+    "hover:bg-transparent focus:bg-transparent focus:ring-0 data-[state=open]:bg-transparent",
+  light:
+    "h-9 w-full rounded-md border border-kit bg-kit-page px-3 py-1 text-xs text-kit-heading " +
+    "hover:bg-white focus:bg-white focus:ring-0 data-[state=open]:bg-white",
+};
+
+const loadingClassByVariant = {
+  dark: "border-white/20 text-white/80",
+  light: "border-kit text-kit-muted bg-kit-page",
+};
+
+const emptyClassByVariant = {
+  dark: "border-white/20 text-white/60",
+  light: "border-kit text-kit-muted bg-kit-page",
+};
+
+const singleClassByVariant = {
+  dark: "border-white/25 text-white",
+  light: "border-kit text-kit-heading bg-kit-page",
+};
+
+export function BranchSelector({ variant = "dark" }: BranchSelectorProps) {
   const {
     user,
     hasRole,
@@ -26,6 +50,7 @@ export function BranchSelector() {
     mySalon,
   } = useAuthStore();
   const isAdmin = hasRole("Admin");
+  const triggerClass = triggerClassByVariant[variant];
 
   const { data: allSalons = [], isLoading: isLoadingAllSalons } = useActiveSalons();
 
@@ -94,7 +119,12 @@ export function BranchSelector() {
 
   if (isLoading) {
     return (
-      <div className="flex h-8 w-full animate-pulse items-center justify-center gap-1.5 rounded border border-white/20 px-4 text-xs text-white/80">
+      <div
+        className={
+          "flex h-8 w-full animate-pulse items-center justify-center gap-1.5 rounded px-4 text-xs " +
+          loadingClassByVariant[variant]
+        }
+      >
         <MapPin className="size-3.5 shrink-0" />
         Đang tải...
       </div>
@@ -134,7 +164,12 @@ export function BranchSelector() {
 
   if (assignedSalons.length === 0) {
     return (
-      <div className="flex h-8 w-full items-center gap-1.5 rounded border border-white/20 px-3 text-xs text-white/60">
+      <div
+        className={
+          "flex h-8 w-full items-center gap-1.5 rounded px-3 text-xs " +
+          emptyClassByVariant[variant]
+        }
+      >
         <MapPin className="size-3.5 shrink-0" />
         <span className="truncate">Chưa phân chi nhánh</span>
       </div>
@@ -143,7 +178,12 @@ export function BranchSelector() {
 
   if (assignedSalons.length === 1) {
     return (
-      <div className="flex h-8 w-full max-w-60 items-center gap-1.5 truncate rounded border border-white/25 px-3 text-xs text-white">
+      <div
+        className={
+          "flex h-8 w-full max-w-60 items-center gap-1.5 truncate rounded px-3 text-xs " +
+          singleClassByVariant[variant]
+        }
+      >
         <MapPin className="size-3.5 shrink-0 opacity-80" />
         <span className="truncate">{assignedSalons[0].name}</span>
       </div>
