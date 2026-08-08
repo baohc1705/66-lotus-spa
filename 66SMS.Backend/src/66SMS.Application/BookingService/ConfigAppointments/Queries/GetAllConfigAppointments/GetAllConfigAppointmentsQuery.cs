@@ -1,4 +1,4 @@
-using _66SMS.Application.DTOs.ConfigAppointments;
+using _66SMS.Application.DTOs;
 using _66SMS.Contract.Shared;
 using MediatR;
 

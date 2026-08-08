@@ -10,12 +10,9 @@ using _66SMS.Application.CatalogService.Services.Commands.CreateServices;
 using _66SMS.Application.CatalogService.Services.Commands.UpdateServices;
 using _66SMS.Application.CatalogService.TreatmentCourses.Commands.CreateTreatmentCourse;
 using _66SMS.Application.CatalogService.TreatmentCourses.Commands.UpdateTreatmentCourse;
-using _66SMS.Application.DTOs.ProductImages;
-using _66SMS.Application.DTOs.ServiceImages;
-using _66SMS.Application.DTOs.ServiceProducts;
+using _66SMS.Application.DTOs;
 using _66SMS.Domain.Entities;
 using AutoMapper;
-using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.Mappers
 {

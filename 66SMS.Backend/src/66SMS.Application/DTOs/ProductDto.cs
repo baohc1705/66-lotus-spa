@@ -1,5 +1,3 @@
-using _66SMS.Application.DTOs.ProductImages;
-
 namespace _66SMS.Application.DTOs
 {
     public class ProductFullDto

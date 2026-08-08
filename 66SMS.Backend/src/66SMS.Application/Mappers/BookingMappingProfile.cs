@@ -1,7 +1,3 @@
-using _66SMS.Application.DTOs.Appointments;
-using _66SMS.Application.DTOs.ConfigAppointments;
-using _66SMS.Application.DTOs.Shifts;
-using _66SMS.Application.DTOs.TimeSlots;
 using _66SMS.Application.BookingService.BookingPositions.Commands.CreateBookingPositions;
 using _66SMS.Application.BookingService.BookingPositions.Commands.UpdateBookingPositions;
 using _66SMS.Application.BookingService.BookingRooms.Commands.CreateBookingRooms;
@@ -15,13 +11,10 @@ using _66SMS.Application.BookingService.TimeSlots.Commands.CreateTimeSlot;
 using _66SMS.Application.BookingService.TimeSlots.Commands.UpdateTimeSlot;
 using _66SMS.Application.BookingService.WorkSchedules.Commands.CreateWorkSchedule;
 using _66SMS.Application.BookingService.WorkSchedules.Commands.UpdateWorkSchedule;
+using _66SMS.Application.DTOs;
 using _66SMS.Contract.Helpers;
 using _66SMS.Domain.Entities;
 using AutoMapper;
-using System.Collections.Generic;
-using System.Linq;
-using _66SMS.Application.BookingService.Helpers;
-using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.Mappers
 {

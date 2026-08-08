@@ -4,7 +4,7 @@ using _66SMS.Application.BookingService.Shifts.Commands.CreateShiftPeriod;
 using _66SMS.Application.BookingService.Shifts.Commands.DeleteShift;
 using _66SMS.Application.BookingService.Shifts.Commands.UpdateShift;
 using _66SMS.Application.BookingService.Shifts.Queries.GetAllShift;
-using _66SMS.Application.DTOs.Shifts;
+using _66SMS.Application.DTOs;
 using _66SMS.Contract.Abstractions;
 using _66SMS.Contract.Shared;
 using _66SMS.Infrastructure.Security;

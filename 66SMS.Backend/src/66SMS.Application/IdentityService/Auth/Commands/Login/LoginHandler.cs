@@ -1,4 +1,3 @@
-using _66SMS.Application.DTOs.Auth;
 using _66SMS.Contract.Abstractions;
 using _66SMS.Contract.Constants;
 using _66SMS.Contract.Enumerations;
@@ -13,6 +12,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using _66SMS.Contract.Helpers;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.Login
 {

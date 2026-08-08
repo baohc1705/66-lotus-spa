@@ -1,4 +1,4 @@
-using _66SMS.Application.DTOs.Attendances;
+using _66SMS.Application.DTOs;
 using _66SMS.Application.SalonService.Helpers;
 using _66SMS.Contract.Extensions;
 using _66SMS.Contract.Shared;

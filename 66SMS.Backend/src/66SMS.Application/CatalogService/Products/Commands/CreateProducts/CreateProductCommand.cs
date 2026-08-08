@@ -1,10 +1,10 @@
-using _66SMS.Application.DTOs.ProductImages;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Enums;
 using MediatR;
 using System.Text.Json.Serialization;
 using _66SMS.Contract.Helpers;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
 {

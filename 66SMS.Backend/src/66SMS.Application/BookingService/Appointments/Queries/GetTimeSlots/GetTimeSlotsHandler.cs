@@ -1,4 +1,4 @@
-using _66SMS.Application.DTOs.Appointments;
+using _66SMS.Application.DTOs;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;

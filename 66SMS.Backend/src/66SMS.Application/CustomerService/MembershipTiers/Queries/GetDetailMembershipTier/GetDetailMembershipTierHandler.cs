@@ -1,10 +1,10 @@
-using _66SMS.Application.DTOs.MembershipTiers;
 using _66SMS.Contract.Enumerations;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CustomerService.MembershipTiers.Queries.GetDetailMembershipTier
 {

@@ -1,4 +1,3 @@
-using _66SMS.Application.DTOs.Certificates;
 using _66SMS.Contract.Extensions;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -6,6 +5,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using _66SMS.Contract.Helpers;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.StaffCertificates.Queries.GetAllStaffCertificates
 {

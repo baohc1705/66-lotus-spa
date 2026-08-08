@@ -1,4 +1,4 @@
-using _66SMS.Application.DTOs.Staffs;
+using _66SMS.Application.DTOs;
 using _66SMS.Contract.Abstractions;
 using _66SMS.Contract.Extensions;
 using _66SMS.Contract.Shared;

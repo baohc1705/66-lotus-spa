@@ -1,5 +1,4 @@
-using _66SMS.Application.DTOs.Shifts;
-using _66SMS.Application.DTOs.WorkSchedules;
+using _66SMS.Application.DTOs;
 using _66SMS.Contract.Extensions;
 using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Shared;

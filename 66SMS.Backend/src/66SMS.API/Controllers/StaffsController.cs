@@ -1,5 +1,5 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.DTOs.Staffs;
+using _66SMS.Application.DTOs;
 using _66SMS.Application.SalonService.Staffs.Commands.CreateStaff;
 using _66SMS.Application.SalonService.Staffs.Commands.CreateStaffServices;
 using _66SMS.Application.SalonService.Staffs.Commands.DeleteStaff;

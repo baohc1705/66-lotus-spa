@@ -1,5 +1,5 @@
 using _66SMS.API.Abstractions;
-using _66SMS.Application.DTOs.Revenues;
+using _66SMS.Application.DTOs;
 using _66SMS.Application.SalonService.Revenues.Queries.ExportBranchRevenue;
 using _66SMS.Application.SalonService.Revenues.Queries.ExportReportRevenueByPeriod;
 using _66SMS.Application.SalonService.Revenues.Queries.ExportReportRevenueBySalon;

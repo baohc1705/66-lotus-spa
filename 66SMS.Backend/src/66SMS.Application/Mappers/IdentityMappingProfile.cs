@@ -1,4 +1,3 @@
-using _66SMS.Application.DTOs.Users;
 using _66SMS.Application.IdentityService.Users.Commands.UpdateUser;
 using _66SMS.Application.IdentityService.Permissions.Commands.CreatePermission;
 using _66SMS.Application.IdentityService.Roles.Commands.CreateRole;
@@ -8,6 +7,7 @@ using AutoMapper;
 using _66SMS.Application.IdentityService.Permissions.Commands.UpdatePermission;
 using _66SMS.Application.IdentityService.Roles.Commands.UpdateRole;
 using _66SMS.Application.IdentityService.Users.Commands.DeleteUser;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.Mappers
 {

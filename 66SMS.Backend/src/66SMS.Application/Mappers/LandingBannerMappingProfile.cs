@@ -1,6 +1,6 @@
 using _66SMS.Application.CmsService.LandingBanners.Commands.CreateLandingBanner;
 using _66SMS.Application.CmsService.LandingBanners.Commands.UpdateLandingBanner;
-using _66SMS.Application.DTOs.LandingBanners;
+using _66SMS.Application.DTOs;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 

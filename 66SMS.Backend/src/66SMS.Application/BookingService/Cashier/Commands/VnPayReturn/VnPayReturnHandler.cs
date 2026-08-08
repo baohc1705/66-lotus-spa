@@ -1,6 +1,6 @@
 using _66SMS.Application.Abstractions.Services;
 using _66SMS.Application.BookingService.Helpers;
-using _66SMS.Application.DTOs.Cashier;
+using _66SMS.Application.DTOs;
 using _66SMS.Contract.Abstractions;
 using _66SMS.Contract.Enumerations;
 using _66SMS.Contract.Helpers;
