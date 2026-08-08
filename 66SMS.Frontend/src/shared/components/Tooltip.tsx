@@ -7,7 +7,6 @@ type TooltipProps = {
   children: ReactNode;
   text: string;
   placement?: Placement;
-  /** Architect `.tooltip-light` — trắng, có border/shadow, không mũi tên */
   variant?: "dark" | "light";
   className?: string;
 };

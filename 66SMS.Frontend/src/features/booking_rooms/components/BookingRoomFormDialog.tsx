@@ -1,6 +1,4 @@
-﻿import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
-import { AdminInput } from "@/shared/components/forms/AdminInput";
-import { useForm, type Resolver } from "react-hook-form";
+﻿import { useForm, type Resolver } from "react-hook-form";
 import {
   useCreateBookingRoom,
   useUpdateBookingRoom,
@@ -18,30 +16,19 @@ import {
 } from "../schemas/bookingRoom.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
-import { FormSection } from "@/shared/components/forms/FormSection";
 import { DoorOpen } from "lucide-react";
-import { FormField } from "@/shared/components/forms/FormField";
-import { Switch } from "@/shared/components/ui/switch";
+
+import { Modal } from "@/shared/components/Modal";
 import { ImageUpload } from "@/shared/components/ImageUpload";
+import { Button } from "@/shared/elements/Button";
+import { FormField } from "@/shared/forms/FormField";
+import { FormSection } from "@/shared/forms/FormSection";
+import { Input } from "@/shared/forms/Input";
+import { Select } from "@/shared/forms/Select";
+import { Switch } from "@/shared/forms/Switch";
+import { Textarea } from "@/shared/forms/Textarea";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/shared/components/ui/select";
-import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 
 interface BookingRoomFormDialogProps {
   open: boolean;
@@ -133,127 +120,124 @@ export function BookingRoomFormDialog({
     }
   };
 
+  const salonPlaceholder =
+    salonsResult === undefined
+      ? "Đang tải chi nhánh..."
+      : salons.length === 0
+        ? "Không có chi nhánh"
+        : "Chọn chi nhánh...";
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[850px]">
-        <DialogHeader>
-          <DialogTitle>
-            {isEdit ? "Chỉnh sửa phòng dịch vụ" : "Thêm phòng dịch vụ mới"}
-          </DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? `Cập nhật thông tin phòng dịch vụ ${bookingRoom?.name ?? ""}`
-              : "Điền thông tin để tạo phòng dịch vụ"}
-          </DialogDescription>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <FormSection icon={DoorOpen} title="Thông tin phòng dịch vụ">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {!isEdit && (
-                <FormField
-                  label="Chi nhánh *"
-                  tooltip="Phòng thuộc chi nhánh nào"
-                  error={errors.salonId?.message}
+    <Modal
+      open={open}
+      onClose={() => onOpenChange(false)}
+      title={isEdit ? "Chỉnh sửa phòng dịch vụ" : "Thêm phòng dịch vụ mới"}
+      size="lg"
+      scrollable
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <FormSection icon={DoorOpen} title="Thông tin phòng dịch vụ">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {!isEdit && (
+              <FormField
+                label="Chi nhánh *"
+                tooltip="Phòng thuộc chi nhánh nào"
+                error={errors.salonId?.message}
+              >
+                <Select
+                  value={watch("salonId")?.toString() ?? ""}
+                  onChange={(e) =>
+                    setValue("salonId", Number(e.target.value), {
+                      shouldValidate: true,
+                    })
+                  }
+                  invalid={!!errors.salonId}
                 >
-                  <Select
-                    value={watch("salonId")?.toString() ?? ""}
-                    onValueChange={(v) =>
-                      setValue("salonId", Number(v), { shouldValidate: true })
-                    }
-                  >
-                    <AdminSelectTrigger>
-                      <SelectValue
-                        placeholder={
-                          salonsResult === undefined
-                            ? "Đang tải chi nhánh..."
-                            : salons.length === 0
-                              ? "Không có chi nhánh"
-                              : "Chọn chi nhánh..."
-                        }
-                      />
-                    </AdminSelectTrigger>
-                    <SelectContent>
-                      {salons.map((s: SalonDTO) => (
-                        <SelectItem key={s.id} value={String(s.id)}>
-                          {s.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
-              )}
-
-              <FormField
-                label="Tên phòng"
-                tooltip="Vui lòng nhập vào tên phòng dịch vụ"
-                error={errors.name?.message}
-              >
-                <AdminInput {...register("name")} placeholder="Phòng VIP 1" />
+                  <option value="">{salonPlaceholder}</option>
+                  {salons.map((s: SalonDTO) => (
+                    <option key={s.id} value={String(s.id)}>
+                      {s.name}
+                    </option>
+                  ))}
+                </Select>
               </FormField>
+            )}
 
-              <FormField
-                label="Trạng thái"
-                tooltip="Bật để kích hoạt phòng"
-                error={errors.status?.message}
-              >
-                <div className="flex items-center h-9">
-                  <Switch
-                    checked={watch("status") === 1}
-                    onCheckedChange={(checked) =>
-                      setValue("status", checked ? 1 : 0)
-                    }
-                  />
-                </div>
-              </FormField>
+            <FormField
+              label="Tên phòng"
+              tooltip="Vui lòng nhập vào tên phòng dịch vụ"
+              error={errors.name?.message}
+            >
+              <Input
+                {...register("name")}
+                placeholder="Phòng VIP 1"
+                invalid={!!errors.name}
+              />
+            </FormField>
 
-              <div className="sm:col-span-2">
-                <ImageUpload
-                  value={watch("imageUrl")}
-                  onFileChange={setPendingFile}
-                  shape="square"
-                  label="Chọn ảnh phòng"
+            <FormField
+              label="Trạng thái"
+              tooltip="Bật để kích hoạt phòng"
+              error={errors.status?.message}
+            >
+              <div className="flex h-9 items-center">
+                <Switch
+                  checked={watch("status") === 1}
+                  onChange={(checked: boolean) =>
+                    setValue("status", checked ? 1 : 0)
+                  }
                 />
               </div>
+            </FormField>
 
-              <div className="sm:col-span-2">
-                <FormField
-                  label="Ghi chú"
-                  tooltip="Ghi chú không dài quá 500 ký tự"
-                  error={errors.note?.message}
-                >
-                  <AdminTextarea
-                    {...register("note")}
-                    placeholder="Ghi chú ở đây"
-                    className=""
-                  />
-                </FormField>
-              </div>
+            <div className="sm:col-span-2">
+              <ImageUpload
+                value={watch("imageUrl")}
+                onFileChange={setPendingFile}
+                shape="square"
+                label="Chọn ảnh phòng"
+              />
             </div>
-          </FormSection>
 
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
+            <FormField
+              label="Ghi chú"
+              tooltip="Ghi chú không dài quá 500 ký tự"
+              error={errors.note?.message}
+              className="sm:col-span-2"
             >
-              {COMMON_MSG.cancel}
-            </Button>
-            <Button
-              type="submit"
-              variant="admin"
-              size="sm"
-              loading={isPending || isUploading}
-            >
-              {isEdit ? "Cập nhật" : "Tạo phòng"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+              <Textarea
+                {...register("note")}
+                placeholder="Ghi chú ở đây"
+                rows={3}
+                invalid={!!errors.note}
+              />
+            </FormField>
+          </div>
+        </FormSection>
+
+        <div className="flex justify-end gap-2 border-t border-kit pt-3">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="mb-0"
+            onClick={() => onOpenChange(false)}
+            disabled={isPending}
+          >
+            {COMMON_MSG.cancel}
+          </Button>
+          <Button
+            type="submit"
+            variant="admin"
+            size="sm"
+            className="mb-0"
+            loading={isPending || isUploading}
+          >
+            {isEdit ? "Cập nhật" : "Tạo phòng"}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }
 

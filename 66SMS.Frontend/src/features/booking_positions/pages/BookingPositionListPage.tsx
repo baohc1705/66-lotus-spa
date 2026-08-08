@@ -1,18 +1,15 @@
 import { useMemo } from "react";
-import {
-  useReactTable,
-  getCoreRowModel,
-} from "@tanstack/react-table";
+import { useReactTable, getCoreRowModel } from "@tanstack/react-table";
 import { Plus } from "lucide-react";
 
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { Button } from "@/shared/components/ui/button";
-import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
+import { Pagination } from "@/shared/components/Pagination";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { Button } from "@/shared/elements/Button";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
+import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
@@ -31,6 +28,7 @@ import {
   useDeleteBookingPosition,
   useUpdateBookingPosition,
 } from "../hooks/useBookingPositions";
+import type { BookingPositionDTO } from "../types/booking_position.types";
 
 const ENTITY = "vị trí dịch vụ";
 
@@ -60,7 +58,11 @@ export function BookingPositionListPage() {
     filter,
   } = listState;
 
-  const { data: positionResult, isLoading, isFetching } = useAdminBookingPositions(queryParams);
+  const {
+    data: positionResult,
+    isLoading,
+    isFetching,
+  } = useAdminBookingPositions(queryParams);
 
   const { data: allPositionsResult } = useAdminBookingPositions({
     pageIndex: 1,
@@ -73,16 +75,26 @@ export function BookingPositionListPage() {
   const paged = positionResult?.data;
   const positions = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
+  const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
-  const allPositions = useMemo(() => allPositionsResult?.data?.items ?? [], [allPositionsResult]);
+  const allPositions = useMemo(
+    () => allPositionsResult?.data?.items ?? [],
+    [allPositionsResult],
+  );
 
-  const totalPositionsCount = allPositions.length;
+  const totalPositionsCount =
+    allPositionsResult?.data?.totalCount ?? allPositions.length;
   const activePositionsCount = useMemo(
-    () => allPositions.filter((p: { status?: number }) => p.status === 1).length,
+    () =>
+      allPositions.filter((p: BookingPositionDTO) => p.status === 1).length,
     [allPositions],
   );
   const maintenancePositionsCount = useMemo(
-    () => allPositions.filter((p: { status?: number }) => p.status === 0).length,
+    () =>
+      allPositions.filter((p: BookingPositionDTO) => p.status === 0).length,
     [allPositions],
   );
 
@@ -109,7 +121,10 @@ export function BookingPositionListPage() {
     manualSorting: true,
   });
 
-  const columnLabels = useMemo(() => ({ ...BOOKING_POSITION_COLUMN_LABELS }), []);
+  const columnLabels = useMemo(
+    () => ({ ...BOOKING_POSITION_COLUMN_LABELS }),
+    [],
+  );
 
   const handleDelete = () => {
     if (deleteTarget?.id) {
@@ -122,60 +137,81 @@ export function BookingPositionListPage() {
   };
 
   return (
-    <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
       <BookingPositionStatCards
         totalPositions={totalPositionsCount}
         activePositions={activePositionsCount}
         maintenancePositions={maintenancePositionsCount}
-        isLoading={isLoading}
+        isLoading={isLoading && allPositions.length === 0}
       />
 
-      <div className="flex flex-col md:flex-row gap-6 mt-6 items-start">
+      <div className="flex flex-col items-start gap-4 md:flex-row">
         <BookingRoomSidebar
           selectedRoomId={selectedRoomId}
           onSelectRoom={handleSelectRoom}
         />
 
-        <div className="flex-1 w-full space-y-4">
-          <DataTableToolbar
-            searchPlaceholder="Tìm kiếm vị trí..."
-            searchValue={filter}
-            onSearchChange={handleSearchChange}
-          >
-            <DataTableViewOptions table={table} columnLabels={columnLabels} />
-            <div className="flex items-center gap-2 ml-auto">
-              <PermissionGate resource={perm.resource} action={perm.create}>
-                <Button
-                  variant="admin"
-                  size="sm"
-                  onClick={() => setCreateOpen(true)}
-                  className="lotus-admin-table-toolbar-btn"
-                >
-                  <Plus className="w-4 h-4" />
-                  Thêm vị trí
-                </Button>
-              </PermissionGate>
+        <div className="w-full min-w-0 flex-1">
+          <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+            <div className="border-b border-kit px-4 pt-4">
+              <DataTableToolbar
+                searchPlaceholder="Tìm kiếm vị trí..."
+                searchValue={filter}
+                onSearchChange={handleSearchChange}
+              >
+                <DataTableViewOptions
+                  table={table}
+                  columnLabels={columnLabels}
+                />
+                <PermissionGate resource={perm.resource} action={perm.create}>
+                  <Button
+                    variant="admin"
+                    size="sm"
+                    className="mb-0"
+                    onClick={() => setCreateOpen(true)}
+                  >
+                    <Plus className="h-4 w-4" />
+                    Thêm vị trí
+                  </Button>
+                </PermissionGate>
+              </DataTableToolbar>
             </div>
-          </DataTableToolbar>
 
-          <div className="lotus-admin-table-page-card">
             <DataTable
               table={table}
               isLoading={isLoading}
               loadingRows={DEFAULT_LOADING_ROWS}
+              pagination={
+                <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                  <div className="flex items-center gap-3 text-xs text-kit-muted">
+                    <span>
+                      {totalCount === 0 ? "0" : `${rangeStart}-${rangeEnd}`} /{" "}
+                      {totalCount}
+                    </span>
+                    <select
+                      value={pageSize}
+                      onChange={(e) =>
+                        handlePageSizeChange(Number(e.target.value))
+                      }
+                      className="h-8 cursor-pointer rounded border border-kit bg-kit-white px-2 text-xs text-kit-heading outline-none focus:border-kit-primary"
+                    >
+                      {[5, 10, 20].map((size: number) => (
+                        <option key={size} value={size}>
+                          {size} / trang
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <Pagination
+                    page={safePage}
+                    pageCount={totalPages}
+                    onPageChange={listState.setPageIndex}
+                    size="sm"
+                  />
+                </div>
+              }
             />
-          </div>
-
-          <DataTablePagination
-            pageIndex={pageIndex}
-            pageSize={pageSize}
-            totalCount={totalCount}
-            totalPages={paged?.totalPages ?? 0}
-            hasPreviousPage={paged?.hasPreviousPage ?? false}
-            hasNextPage={paged?.hasNextPage ?? false}
-            onPageChange={listState.setPageIndex}
-            onPageSizeChange={handlePageSizeChange}
-          />
+          </TablePageShell>
         </div>
       </div>
 
@@ -203,12 +239,15 @@ export function BookingPositionListPage() {
             if (!open) setDeleteTarget(null);
           }}
           title={CONFIRM_MSG.deleteTitle(ENTITY)}
-          description={CONFIRM_MSG.deleteDescription(ENTITY, deleteTarget.name ?? "")}
+          description={CONFIRM_MSG.deleteDescription(
+            ENTITY,
+            deleteTarget.name ?? "",
+          )}
           onConfirm={handleDelete}
           confirmLabel={COMMON_MSG.delete}
           loading={deleteMutation.isPending}
         />
       )}
-    </TablePageShell>
+    </div>
   );
 }

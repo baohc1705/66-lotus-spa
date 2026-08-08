@@ -1,15 +1,25 @@
+import { useState } from "react";
 import { Pencil, MapPin } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/shared/components/ui/tabs";
-import { Skeleton } from "@/shared/components/ui/skeleton";
+import { Button } from "@/shared/elements/Button";
+import { Badge } from "@/shared/elements/Badge";
+import { Nav, NavItem, NavLink } from "@/shared/elements/Nav";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
 import { FallbackImage } from "@/shared/components/FallbackImage";
+import {
+  TableDetailActions,
+  TableDetailExpanded,
+  TableDetailField,
+  TableDetailGrid,
+  TableDetailHeader,
+} from "@/shared/tables/TableDetailExpanded";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "@/shared/tables/Table";
 import { useBookingRoomDetail } from "../hooks/useBookingRooms";
 import { BOOKING_ROOM_PERM } from "../constants/booking_room.permissions";
 import type { BookingRoomDTO } from "../types/booking_room.types";
@@ -20,12 +30,15 @@ interface BookingRoomDetailExpandedProps {
   onEdit?: (room: BookingRoomDTO) => void;
 }
 
-const POSITION_STATUS_MAP: StatusMap = {
-  "0": { label: "Bảo trì", variant: "error" },
-  "1": { label: "Trống", variant: "success", dot: true },
-  "3": { label: "Trống", variant: "success", dot: true },
-  "4": { label: "Đang phục vụ", variant: "warning", dot: true },
-};
+function positionBadge(status?: number) {
+  if (status === 4) {
+    return <Badge variant="warning" soft>Đang phục vụ</Badge>;
+  }
+  if (status === 0) {
+    return <Badge variant="danger" soft>Bảo trì</Badge>;
+  }
+  return <Badge variant="success" soft>Trống</Badge>;
+}
 
 export function BookingRoomDetailExpanded({
   roomId,
@@ -34,190 +47,132 @@ export function BookingRoomDetailExpanded({
   const { data: result, isLoading } = useBookingRoomDetail(roomId);
   const room = result?.data;
   const positions = room?.positions ?? [];
+  const [tab, setTab] = useState<"info" | "positions">("info");
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-4 bg-adminGray-50/30">
-        <div className="flex gap-4 mb-4">
-          <Skeleton className="w-24 h-8" />
-          <Skeleton className="w-24 h-8" />
-        </div>
-        <Skeleton className="w-48 h-6" />
-        <div className="grid grid-cols-2 gap-8">
-          <Skeleton className="h-24" />
-          <Skeleton className="h-24" />
-        </div>
-      </div>
+      <TableDetailExpanded>
+        <p className="text-sm text-kit-muted">Đang tải chi tiết phòng...</p>
+      </TableDetailExpanded>
     );
   }
 
   if (!room) {
     return (
-      <div className="p-6 text-center text-adminGray-600 text-sm bg-adminGray-50/30">
-        Không tìm thấy thông tin phòng dịch vụ
-      </div>
+      <TableDetailExpanded>
+        <p className="text-sm text-kit-muted">
+          Không tìm thấy thông tin phòng dịch vụ
+        </p>
+      </TableDetailExpanded>
     );
   }
 
   return (
-    <div className="bg-adminGray-50/30 w-full overflow-hidden max-h-[400px] overflow-y-auto custom-scrollbar">
-      <Tabs defaultValue="info" className="w-full flex-col">
-        <div className="px-4 pt-2 sticky top-0 bg-adminGray-50/95 backdrop-blur-xs z-10">
-          <TabsList className="h-10 border-b border-adminGray-100/80 justify-start rounded-none bg-transparent p-0 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar">
-            <TabsTrigger
-              value="info"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-hidden whitespace-nowrap transition-colors"
+    <TableDetailExpanded maxHeightClass="max-h-100">
+      <Nav pills className="mb-2">
+        <NavItem>
+          <NavLink active={tab === "info"} onClick={() => setTab("info")}>
+            Thông tin chung
+          </NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink
+            active={tab === "positions"}
+            onClick={() => setTab("positions")}
+          >
+            Danh sách vị trí ({positions.length})
+          </NavLink>
+        </NavItem>
+      </Nav>
+
+      {tab === "info" ? (
+        <>
+          <TableDetailHeader
+            icon={
+              <FallbackImage
+                kind="position"
+                src={room.imageUrl}
+                alt={room.name ?? ""}
+                className="h-full w-full object-cover"
+              />
+            }
+            title={room.name ?? "—"}
+            subtitle={
+              (room.salonName ? `${room.salonName} · ` : "") +
+              (room.status === 1 ? "Hoạt động" : "Ngưng hoạt động")
+            }
+          />
+
+          <TableDetailGrid>
+            <TableDetailField label="Tên phòng" value={room.name} />
+            <TableDetailField label="Chi nhánh" value={room.salonName} />
+            <TableDetailField
+              label="Vị trí trống"
+              value={`${room.availableCount ?? 0}`}
+            />
+            <TableDetailField
+              label="Đang phục vụ"
+              value={`${room.inServiceCount ?? 0}`}
+            />
+            <TableDetailField label="Ghi chú" value={room.note} />
+          </TableDetailGrid>
+
+          <TableDetailActions>
+            <PermissionGate
+              resource={BOOKING_ROOM_PERM.resource}
+              action={BOOKING_ROOM_PERM.update}
             >
-              Thông tin chung
-            </TabsTrigger>
-            <TabsTrigger
-              value="positions"
-              className="relative h-10 rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 pb-2 pt-2 text-sm font-medium text-adminGray-600 hover:text-adminGreen-600/80 data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-hidden whitespace-nowrap transition-colors"
-            >
-              Danh sách vị trí ({positions.length})
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        <TabsContent value="info" className="p-4 m-0 border-none outline-hidden">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-xl bg-adminGray-50/50 flex items-center justify-center shrink-0 overflow-hidden shadow-xs border border-adminGray-100/50">
-                <FallbackImage
-                  kind="position"
-                  src={room.imageUrl}
-                  alt={room.name ?? ""}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-base font-bold text-adminInk truncate">
-                  {room.name ?? "—"}
-                </h3>
-                <p className="text-xs text-adminGray-600 mt-0.5">
-                  {room.salonName ? `${room.salonName} · ` : ""}
-                  Trạng thái:{" "}
-                  {room.status === 1 ? "Hoạt động" : "Ngưng hoạt động"}
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0">
-              <div className="flex flex-col">
-                <DetailField label="Tên phòng" value={room.name} />
-              </div>
-              <div className="flex flex-col">
-                <DetailField label="Chi nhánh" value={room.salonName} />
-              </div>
-              <div className="flex flex-col">
-                <DetailField
-                  label="Vị trí trống"
-                  value={`${room.availableCount ?? 0}`}
-                />
-              </div>
-              <div className="flex flex-col">
-                <DetailField
-                  label="Đang phục vụ"
-                  value={`${room.inServiceCount ?? 0}`}
-                />
-              </div>
-              <div className="flex flex-col md:col-span-2">
-                <DetailField label="Ghi chú" value={room.note} />
-              </div>
-            </div>
-
-            <div className="flex items-end justify-end mt-2 pt-4 border-t border-adminGray-100/80">
-              <PermissionGate
-                resource={BOOKING_ROOM_PERM.resource}
-                action={BOOKING_ROOM_PERM.update}
+              <Button
+                variant="admin"
+                size="sm"
+                className="mb-0"
+                onClick={() => onEdit?.(room)}
               >
-                <Button
-                  variant="admin"
-                  size="sm"
-                  onClick={() => onEdit?.(room)}
-                  className="bg-adminGreen-600 hover:opacity-90 text-white shadow-xs h-8 px-4 text-sm gap-1.5 rounded-md transition-opacity"
-                >
-                  <Pencil className="w-3.5 h-3.5" />
-                  Cập nhật
-                </Button>
-              </PermissionGate>
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent
-          value="positions"
-          className="p-4 m-0 border-none outline-hidden"
-        >
-          {positions.length === 0 ? (
-            <div className="py-8 text-center text-adminGray-600 text-sm">
-              Chưa có vị trí nào được thiết lập trong phòng này
-            </div>
-          ) : (
-            <div className="rounded-md border border-adminGray-100 overflow-x-auto w-full">
-              <table className="w-full text-left text-sm min-w-[500px]">
-                <thead className="bg-adminGray-50 border-b border-adminGray-100 text-adminGray-600">
-                  <tr>
-                    <th className="py-2.5 px-4 font-semibold w-16 text-center">
-                      Thứ tự
-                    </th>
-                    <th className="py-2.5 px-4 font-semibold">Tên vị trí</th>
-                    <th className="py-2.5 px-4 font-semibold">Trạng thái</th>
-                    <th className="py-2.5 px-4 font-semibold">Ghi chú</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-adminGray-100 bg-white">
-                  {positions.map((pos: BookingPositionDTO) => (
-                    <tr
-                      key={pos.id}
-                      className="hover:bg-adminGray-50/50 transition-colors"
-                    >
-                      <td className="py-2.5 px-4 font-semibold text-adminGray-600 text-center">
-                        {pos.sortOrder ?? "-"}
-                      </td>
-                      <td className="py-2.5 px-4 font-medium text-adminInk">
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-3.5 h-3.5 text-adminGreen-600/70" />
-                          {pos.name}
-                        </div>
-                      </td>
-                      <td className="py-2.5 px-4">
-                        <StatusBadge
-                          status={pos.status?.toString()}
-                          statusMap={POSITION_STATUS_MAP}
-                        />
-                      </td>
-                      <td
-                        className="py-2.5 px-4 text-adminGray-600 truncate max-w-[200px]"
-                        title={pos.note}
-                      >
-                        {pos.note || "—"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-}
-
-function DetailField({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | null | undefined;
-}) {
-  return (
-    <div className="py-3.5 border-b border-adminGray-100/80 last:border-b-0 group">
-      <p className="text-xs text-adminGray-600 mb-1">{label}</p>
-      <p className="text-sm font-medium text-adminInk truncate">
-        {value || "—"}
-      </p>
-    </div>
+                <Pencil className="h-3.5 w-3.5" />
+                Cập nhật
+              </Button>
+            </PermissionGate>
+          </TableDetailActions>
+        </>
+      ) : positions.length === 0 ? (
+        <p className="py-6 text-center text-sm text-kit-muted">
+          Chưa có vị trí nào được thiết lập trong phòng này
+        </p>
+      ) : (
+        <div className="overflow-x-auto rounded border border-kit bg-kit-white">
+          <Table size="sm" hover>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell className="w-16 text-center">
+                  Thứ tự
+                </TableHeaderCell>
+                <TableHeaderCell>Tên vị trí</TableHeaderCell>
+                <TableHeaderCell>Trạng thái</TableHeaderCell>
+                <TableHeaderCell>Ghi chú</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {positions.map((pos: BookingPositionDTO) => (
+                <TableRow key={pos.id}>
+                  <TableCell className="text-center text-kit-muted">
+                    {pos.sortOrder ?? "-"}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2 font-medium text-kit-heading">
+                      <MapPin className="h-3.5 w-3.5 text-kit-primary" />
+                      {pos.name}
+                    </div>
+                  </TableCell>
+                  <TableCell>{positionBadge(pos.status)}</TableCell>
+                  <TableCell className="max-w-xs truncate text-kit-muted">
+                    {pos.note || "—"}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </TableDetailExpanded>
   );
 }

@@ -4,7 +4,7 @@ import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { bookingRoomApi } from "@/features/booking_rooms/api/bookingRoom.api";
 import type { Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { kitToast } from "@/shared/components/kitToast";
 import { TOAST_MSG } from "@/shared/constants/toast.messages";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type {
@@ -52,13 +52,13 @@ export function useCreateBookingRoom() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: BOOKING_ROOM_KEYS.all });
-        toast.success(TOAST_MSG.createSuccess(ENTITY));
+        kitToast.success(TOAST_MSG.createSuccess(ENTITY));
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        kitToast.error(result.message || COMMON_MSG.error);
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
+      kitToast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
     },
   });
 }
@@ -76,13 +76,13 @@ export function useUpdateBookingRoom() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: BOOKING_ROOM_KEYS.all });
-        toast.success(TOAST_MSG.updateSuccess(ENTITY));
+        kitToast.success(TOAST_MSG.updateSuccess(ENTITY));
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        kitToast.error(result.message || COMMON_MSG.error);
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(
+      kitToast.error(
         getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
       );
     },
@@ -97,13 +97,13 @@ export function useDeleteBookingRoom() {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: BOOKING_ROOM_KEYS.all });
         qc.invalidateQueries({ queryKey: ["booking-positions"] });
-        toast.success(TOAST_MSG.deleteSuccess(ENTITY));
+        kitToast.success(TOAST_MSG.deleteSuccess(ENTITY));
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        kitToast.error(result.message || COMMON_MSG.error);
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
+      kitToast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
     },
   });
 }
