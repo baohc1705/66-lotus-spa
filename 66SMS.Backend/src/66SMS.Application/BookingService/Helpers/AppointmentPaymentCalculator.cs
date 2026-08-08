@@ -4,39 +4,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.BookingService.Helpers
 {
-  
     public static class AppointmentPaymentCalculator
     {
-       
-        public const int DefaultDepositPercent = 20;
-
-        public static async Task<int> ResolveDepositPercentAsync(
+        public static async Task<int?> ResolveDepositPercentAsync(
             IConfigAppointmentSqlRepository configAppointmentSqlRepository,
             int? salonId,
             CancellationToken cancellationToken = default)
         {
             if (!salonId.HasValue)
-            {
-                return DefaultDepositPercent;
-            }
+                return null;
 
-            var percent = await configAppointmentSqlRepository.AsQueryable(asNoTracking: true)
+            return await configAppointmentSqlRepository.AsQueryable(asNoTracking: true)
                 .Where(x => x.SalonId == salonId.Value)
                 .Select(x => x.DepositPercent)
                 .FirstOrDefaultAsync(cancellationToken);
-
-            return percent ?? DefaultDepositPercent;
         }
 
-        public static async Task<int> GetEffectiveDepositPercentAsync(
+        public static async Task<int?> GetEffectiveDepositPercentAsync(
             Appointment appointment,
             IConfigAppointmentSqlRepository configAppointmentSqlRepository,
             CancellationToken cancellationToken = default)
         {
             if (appointment.DepositPercent.HasValue)
-            {
                 return appointment.DepositPercent.Value;
-            }
 
             return await ResolveDepositPercentAsync(
                 configAppointmentSqlRepository,
@@ -56,9 +46,7 @@ namespace _66SMS.Application.BookingService.Helpers
                 .ToList();
 
             if (ids.Count == 0)
-            {
                 return new Dictionary<int, int>();
-            }
 
             return await configAppointmentSqlRepository.AsQueryable(asNoTracking: true)
                 .Where(x => x.SalonId != null
@@ -70,48 +58,58 @@ namespace _66SMS.Application.BookingService.Helpers
                     cancellationToken);
         }
 
-        public static int GetEffectiveDepositPercent(
+        public static int? GetEffectiveDepositPercent(
             Appointment appointment,
             IReadOnlyDictionary<int, int>? depositPercentBySalon = null)
         {
             if (appointment.DepositPercent.HasValue)
-            {
                 return appointment.DepositPercent.Value;
-            }
 
             if (appointment.SalonId.HasValue
                 && depositPercentBySalon != null
                 && depositPercentBySalon.TryGetValue(appointment.SalonId.Value, out var fromConfig))
-            {
                 return fromConfig;
-            }
 
-            return DefaultDepositPercent;
+            return null;
         }
 
-        public static decimal GetDepositAmount(decimal? totalAmount, int depositPercent = DefaultDepositPercent)
+        public static decimal GetDepositAmount(decimal? totalAmount, int depositPercent)
         {
             var total = totalAmount ?? 0m;
             if (total <= 0m)
-            {
                 return 0m;
-            }
 
             return Math.Round(total * depositPercent / 100m, 0, MidpointRounding.AwayFromZero);
         }
 
         public static decimal GetDepositAmount(
             Appointment appointment,
-            IReadOnlyDictionary<int, int>? depositPercentBySalon = null) =>
-            GetDepositAmount(appointment.TotalAmount, GetEffectiveDepositPercent(appointment, depositPercentBySalon));
+            IReadOnlyDictionary<int, int>? depositPercentBySalon = null)
+        {
+            var percent = GetEffectiveDepositPercent(appointment, depositPercentBySalon);
+            if (!percent.HasValue)
+                return 0m;
+
+            return GetDepositAmount(appointment.TotalAmount, percent.Value);
+        }
 
         public static decimal GetRemainingAmount(Appointment appointment) =>
             Math.Max(0m, appointment.TotalAmount - appointment.PaidAmount);
 
         public static bool HasDepositPaid(
             Appointment appointment,
-            IReadOnlyDictionary<int, int>? depositPercentBySalon = null) =>
-            appointment.PaidAmount >= GetDepositAmount(appointment, depositPercentBySalon);
+            IReadOnlyDictionary<int, int>? depositPercentBySalon = null)
+        {
+            var percent = GetEffectiveDepositPercent(appointment, depositPercentBySalon);
+            if (!percent.HasValue)
+                return false;
+
+            var depositAmount = GetDepositAmount(appointment.TotalAmount, percent.Value);
+            if (depositAmount <= 0)
+                return true;
+
+            return appointment.PaidAmount >= depositAmount;
+        }
 
         public static bool IsFullyPaid(Appointment appointment) =>
             appointment.PaidAmount >= appointment.TotalAmount;

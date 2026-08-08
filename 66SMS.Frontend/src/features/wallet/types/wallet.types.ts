@@ -27,6 +27,7 @@ export interface AdminWalletTransactionDto {
 export interface WalletTransactionDto {
   id: string | number;
   amount: number;
+  type?: number;
   note?: string;
   createdAt: string;
 }

@@ -11,7 +11,8 @@ namespace _66SMS.Domain.Constants
 
         #region Message
         public const string MSG_TIME_SLOT_ID_NOT_FOUND = $"{nameof(Entities.TimeSlot)} with id not found";
-        public const string MSG_TIME_SLOT_NOT_FOUND = "Time slot not found.";
+        public const string MSG_TIME_SLOT_NOT_FOUND = "Khung giờ không tồn tại.";
+        public const string MSG_TIME_SLOT_NOT_ENOUGH = "Không đủ khung giờ liên tiếp cho dịch vụ, vui lòng chọn giờ khác.";
         public static int DEFAULT_SLOT_MINUTES = 30;
 
         public static int ResolveSlotMinutes(TimeOnly start, TimeOnly end)

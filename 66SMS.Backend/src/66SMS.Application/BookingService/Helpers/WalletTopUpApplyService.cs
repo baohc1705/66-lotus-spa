@@ -63,7 +63,7 @@ namespace _66SMS.Application.BookingService.Helpers
                 Amount = amount,
                 BalanceAfter = wallet.Balance,
                 Type = WalletTransactionConst.TYPE_TOP_UP,
-                Note = $"Nạp tiền VNPay | {noteMarker}",
+                Note = noteMarker,
                 Status = WalletTransactionConst.STATUS_SUCCESS,
                 CreatedAt = DateTimeHelper.UtcNow(),
                 CreatedBy = wallet.Customer?.UserId

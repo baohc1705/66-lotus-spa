@@ -2,6 +2,7 @@ using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
@@ -34,7 +35,7 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Commands.BulkCreateWor
             var shiftPeriodIds = request.Schedules.Select(x => x.ShiftPeriodId).Distinct().ToList();
 
             var existingSchedules = workScheduleSqlRepository.AsQueryable()
-                .Where(x => x.Status != _66SMS.Domain.Constants.WorkScheduleConst.STATUS_DELETED
+                .Where(x => x.Status != WorkScheduleConst.STATUS_DELETED
                          && staffIds.Contains(x.StaffId) 
                          && shiftPeriodIds.Contains(x.ShiftPeriodId) 
                          && workDates.Contains(x.WorkDate))
@@ -48,7 +49,7 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Commands.BulkCreateWor
                 {
                     var entity = mapper.Map<WorkSchedule>(schedule);
                     entity.CreatedAt = DateTimeHelper.UtcNow();
-                    entity.Status = _66SMS.Domain.Constants.WorkScheduleConst.STATUS_ACTIVED;
+                    entity.Status = WorkScheduleConst.STATUS_ACTIVED;
                     validSchedules.Add(entity);
                 }
             }

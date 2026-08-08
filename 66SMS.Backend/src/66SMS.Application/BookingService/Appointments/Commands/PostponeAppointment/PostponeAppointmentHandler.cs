@@ -1,65 +1,65 @@
+using _66SMS.Application.BookingService.Helpers;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
-using _66SMS.Contract.Enumerations;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Application.BookingService.Helpers;
-using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.BookingService.Appointments.Commands.PostponeAppointment
 {
-    public sealed class PostponeAppointmentHandler(
-        IAppointmentSqlRepository appointmentSqlRepository,
-        IUserSqlRepository userSqlRepository,
-        IWalletSqlRepository walletSqlRepository,
-        IWalletTransactionSqlRepository walletTransactionSqlRepository,
-        IBookingPositionSqlRepository bookingPositionSqlRepository,
-        ISqlUnitOfWork sqlUnitOfWork)
-        : IRequestHandler<PostponeAppointmentCommand, Result<object>>
+    public sealed class PostponeAppointmentHandler : IRequestHandler<PostponeAppointmentCommand, Result<object>>
     {
+        private readonly IAppointmentSqlRepository appointmentSqlRepository;
+        private readonly IUserSqlRepository userSqlRepository;
+        private readonly IWalletSqlRepository walletSqlRepository;
+        private readonly IWalletTransactionSqlRepository walletTransactionSqlRepository;
+        private readonly IBookingPositionSqlRepository bookingPositionSqlRepository;
+        private readonly ISqlUnitOfWork sqlUnitOfWork;
+
+        public PostponeAppointmentHandler(
+            IAppointmentSqlRepository appointmentSqlRepository,
+            IUserSqlRepository userSqlRepository,
+            IWalletSqlRepository walletSqlRepository,
+            IWalletTransactionSqlRepository walletTransactionSqlRepository,
+            IBookingPositionSqlRepository bookingPositionSqlRepository,
+            ISqlUnitOfWork sqlUnitOfWork)
+        {
+            this.appointmentSqlRepository = appointmentSqlRepository;
+            this.userSqlRepository = userSqlRepository;
+            this.walletSqlRepository = walletSqlRepository;
+            this.walletTransactionSqlRepository = walletTransactionSqlRepository;
+            this.bookingPositionSqlRepository = bookingPositionSqlRepository;
+            this.sqlUnitOfWork = sqlUnitOfWork;
+        }
+
         public async Task<Result<object>> Handle(
             PostponeAppointmentCommand request,
             CancellationToken cancellationToken)
         {
-            var userId = request.UserId;
-            if (userId == null)
-            {
-                return Result<object>.Unauthorized("Vui lòng đăng nhập.");
-            }
-
             var appointment = await appointmentSqlRepository.AsQueryable(asNoTracking: false)
                 .Include(a => a.Payments)
-                .FirstOrDefaultAsync(a => a.Id == request.AppointmentId, cancellationToken);
+                .FirstOrDefaultAsync(a => a.Id == (int)request.AppointmentId!, cancellationToken);
 
             if (appointment == null)
-            {
                 return Result<object>.NotFound(AppointmentConst.MSG_APPOINTMENT_NOT_FOUND, ErrorCodes.ERR_APPOINTMENT_NOT_FOUND);
-            }
 
-            if (appointment.CreatedByUserId != userId)
-            {
+            if (appointment.CreatedByUserId != (int)request.UserId!)
                 return Result<object>.Forbidden("Bạn không có quyền hoãn lịch hẹn này.");
-            }
 
             if (appointment.Status == AppointmentConst.STATUS_CANCELLED)
-            {
                 return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_CANCELLED, ErrorCodes.ERR_APPOINTMENT_CANCELLED);
-            }
 
-            if (appointment.Status == AppointmentConst.STATUS_COMPLETED || 
-                appointment.Status == AppointmentConst.STATUS_NO_SHOW || 
+            if (appointment.Status == AppointmentConst.STATUS_COMPLETED ||
+                appointment.Status == AppointmentConst.STATUS_NO_SHOW ||
                 AppointmentPaymentCalculator.IsFullyPaid(appointment))
-            {
                 return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_CANNOT_POSTPONE_COMPLETED, ErrorCodes.ERR_APPOINTMENT_CANNOT_POSTPONE);
-            }
 
             if (appointment.Status != AppointmentConst.STATUS_WAITING)
-            {
                 return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_POSTPONE_ONLY_PAID_PENDING, ErrorCodes.ERR_APPOINTMENT_CANNOT_POSTPONE);
-            }
 
             using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
@@ -74,13 +74,10 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PostponeAppoin
                         foreach (var p in appointment.Payments)
                         {
                             if (p.Status == AppointmentPaymentConst.STATUS_PAID)
-                            {
                                 p.Status = AppointmentPaymentConst.STATUS_REFUNDED;
-                            }
                         }
                     }
 
-                    // Hoàn tiền vào Wallet
                     Wallet wallet;
                     try
                     {
@@ -93,22 +90,18 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PostponeAppoin
 
                     wallet.Balance += paidAmount;
                     if (wallet.Id > 0)
-                    {
                         walletSqlRepository.Update(wallet);
-                    }
 
-                    var walletTx = new WalletTransaction
+                    walletTransactionSqlRepository.Add(new WalletTransaction
                     {
                         Wallet = wallet,
                         Amount = paidAmount,
                         BalanceAfter = wallet.Balance,
                         Type = WalletTransactionConst.TYPE_REFUND_FROM_APPOINTMENT,
-                        Note = $"Hoàn tiền cọc do hoãn/hủy lịch hẹn #{appointment.Id}",
                         Status = WalletTransactionConst.STATUS_SUCCESS,
                         CreatedAt = DateTimeHelper.UtcNow(),
-                        CreatedBy = userId
-                    };
-                    walletTransactionSqlRepository.Add(walletTx);
+                        CreatedBy = request.UserId
+                    });
                 }
 
                 appointment.UpdatedAt = DateTimeHelper.UtcNow();
@@ -122,7 +115,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PostponeAppoin
 
                 transaction.Commit();
 
-                return Result<object>.Success("Hoãn lịch và hoàn tiền cọc vào ví thành công.");
+                return Result<object>.Success(AppointmentConst.MSG_APPOINTMENT_POSTPONE_REFUND_SUCCESS);
             }
             catch
             {

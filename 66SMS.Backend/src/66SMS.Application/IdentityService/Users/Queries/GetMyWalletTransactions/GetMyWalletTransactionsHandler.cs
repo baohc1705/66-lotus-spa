@@ -49,6 +49,7 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetMyWalletTransactio
                 {
                     Id = t.Id,
                     Amount = t.Amount,
+                    Type = t.Type,
                     Note = t.Note,
                     CreatedAt = t.CreatedAt
                 })

@@ -21,16 +21,18 @@ namespace _66SMS.Application.BookingService.Helpers
 
             appointment.PaidAmount += amount;
             appointment.Payments ??= new List<AppointmentPayment>();
-            appointment.Payments.Add(new AppointmentPayment
+            var payment = new AppointmentPayment
             {
                 Phase = phase,
                 Amount = amount,
                 Method = method,
                 TransactionId = transactionId,
-                Note = note,
                 Status = AppointmentPaymentConst.STATUS_PAID,
                 CreatedAt = DateTimeHelper.UtcNow(),
-            });
+            };
+            if (note != null)
+                payment.Note = note;
+            appointment.Payments.Add(payment);
             return true;
         }
     }

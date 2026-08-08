@@ -9,9 +9,9 @@ namespace _66SMS.Domain.Entities
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public string? Content { get; set; }
-        public int TotalSessions { get; set; }
-        public decimal OriginalPrice { get; set; }
-        public decimal SellingPrice { get; set; }
+        public int TotalSessions { get; set; } = 0;
+        public decimal OriginalPrice { get; set; } = 0;
+        public decimal SellingPrice { get; set; } = 0;
         public string? ImageUrl { get; set; }
         public int? SortOrder { get; set; }
         public int Status { get; set; }

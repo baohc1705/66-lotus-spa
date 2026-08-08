@@ -11,7 +11,7 @@ namespace _66SMS.Domain.Entities
         public string Title { get; set; } = null!;
         public string Message { get; set; } = null!;
         public string? PayloadJson { get; set; }
-        public bool IsRead { get; set; }
+        public bool IsRead { get; set; } = false;
         public DateTimeOffset CreatedAt { get; set; }
     }
 }

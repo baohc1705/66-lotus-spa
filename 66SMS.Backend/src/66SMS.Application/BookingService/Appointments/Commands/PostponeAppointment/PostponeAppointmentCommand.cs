@@ -5,7 +5,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PostponeAppoin
 {
     public sealed class PostponeAppointmentCommand : IRequest<Result<object>>
     {
-        public int AppointmentId { get; set; }
+        public int? AppointmentId { get; set; }
         public int? UserId { get; set; }
     }
 }

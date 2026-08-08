@@ -105,6 +105,13 @@ export const bookingApi = {
     return res.data.data?.items || [];
   },
 
+  getDetail: async (id: number): Promise<AppointmentDto> => {
+    const res = await axiosInstance.get<Result<AppointmentDto>>(
+      `${APPOINTMENT_BASE}/${id}`,
+    );
+    return res.data.data ?? {};
+  },
+
   getByUserId: async (
     params: GetAllAppointmentParams,
   ): Promise<PagedResult<AppointmentDto>> => {

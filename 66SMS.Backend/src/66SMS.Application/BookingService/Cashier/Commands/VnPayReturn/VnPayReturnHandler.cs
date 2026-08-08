@@ -1,29 +1,49 @@
+using _66SMS.Application.Abstractions.Services;
+using _66SMS.Application.BookingService.Helpers;
+using _66SMS.Application.DTOs.Cashier;
 using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
-using _66SMS.Application.DTOs.Cashier;
-using _66SMS.Contract.Enumerations;
-using _66SMS.Contract.Helpers;
 using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Application.BookingService.Helpers;
-using _66SMS.Application.Abstractions.Services;
 
 namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayReturn
 {
-    public sealed class VnPayReturnHandler(
-        IVnPayService vnPayService,
-        IAppointmentSqlRepository appointmentRepository,
-        IWalletSqlRepository walletRepository,
-        IWalletTransactionSqlRepository walletTransactionRepository,
-        IInvoiceSqlRepository invoiceRepository,
-        IConfigAppointmentSqlRepository configAppointmentSqlRepository,
-        ILoyaltyPointService loyaltyPointService,
-        ISqlUnitOfWork unitOfWork)
-        : IRequestHandler<VnPayReturnCommand, Result<VnPayReturnDto>>
+    public sealed class VnPayReturnHandler : IRequestHandler<VnPayReturnCommand, Result<VnPayReturnDto>>
     {
+        private readonly IVnPayService vnPayService;
+        private readonly IAppointmentSqlRepository appointmentRepository;
+        private readonly IWalletSqlRepository walletRepository;
+        private readonly IWalletTransactionSqlRepository walletTransactionRepository;
+        private readonly IInvoiceSqlRepository invoiceRepository;
+        private readonly IConfigAppointmentSqlRepository configAppointmentSqlRepository;
+        private readonly ILoyaltyPointService loyaltyPointService;
+        private readonly ISqlUnitOfWork unitOfWork;
+
+        public VnPayReturnHandler(
+            IVnPayService vnPayService,
+            IAppointmentSqlRepository appointmentRepository,
+            IWalletSqlRepository walletRepository,
+            IWalletTransactionSqlRepository walletTransactionRepository,
+            IInvoiceSqlRepository invoiceRepository,
+            IConfigAppointmentSqlRepository configAppointmentSqlRepository,
+            ILoyaltyPointService loyaltyPointService,
+            ISqlUnitOfWork unitOfWork)
+        {
+            this.vnPayService = vnPayService;
+            this.appointmentRepository = appointmentRepository;
+            this.walletRepository = walletRepository;
+            this.walletTransactionRepository = walletTransactionRepository;
+            this.invoiceRepository = invoiceRepository;
+            this.configAppointmentSqlRepository = configAppointmentSqlRepository;
+            this.loyaltyPointService = loyaltyPointService;
+            this.unitOfWork = unitOfWork;
+        }
+
         public async Task<Result<VnPayReturnDto>> Handle(VnPayReturnCommand request, CancellationToken cancellationToken)
         {
             var result = vnPayService.PaymentExecute(request.QueryData);
@@ -72,20 +92,28 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayReturn
                     AppointmentPaymentConst.MSG_PAYMENT_ORDER_NOT_FOUND,
                     ErrorCodes.ERR_PAYMENT_ORDER_NOT_FOUND);
 
-            var depositPercent = result.Phase == AppointmentPaymentConst.PHASE_DEPOSIT
-                ? await AppointmentPaymentCalculator.GetEffectiveDepositPercentAsync(
+            int? depositPercent = null;
+            if (result.Phase == AppointmentPaymentConst.PHASE_DEPOSIT)
+            {
+                depositPercent = await AppointmentPaymentCalculator.GetEffectiveDepositPercentAsync(
                     appointment,
                     configAppointmentSqlRepository,
-                    cancellationToken)
-                : (int?)null;
+                    cancellationToken);
+
+                if (depositPercent == null)
+                    return Result<VnPayReturnDto>.BadRequest(
+                        ConfigAppointmentConst.MSG_DEPOSIT_PERCENT_NOT_CONFIGURED,
+                        ErrorCodes.ERR_CONFIG_APPOINTMENT_NOT_FOUND);
+            }
 
             var apply = AppointmentPaymentApplyService.ApplyVnPaySuccess(
                 appointment,
                 result.Phase,
                 result.TransactionId,
                 depositPercent);
+
             if (!apply.IsSuccess)
-                return Result<VnPayReturnDto>.BadRequest(apply.Message);
+                return Result<VnPayReturnDto>.BadRequest(apply.Message, apply.ErrorCode);
 
             appointmentRepository.Update(appointment);
 
@@ -113,7 +141,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayReturn
                         || invoice.Status == InvoiceConst.STATUS_DRAFT))
                 {
                     invoice.PaidAmount = invoice.TotalAmount;
-                    invoice.ChangeAmount = 0;
                     invoice.PaymentMethod = InvoiceConst.PAYMENT_VNPAY;
                     invoice.TransactionId = result.TransactionId;
                     invoice.Status = InvoiceConst.STATUS_PAID;

@@ -6,6 +6,7 @@ using _66SMS.Application.BookingService.Appointments.Commands.PostponeAppointmen
 using _66SMS.Application.BookingService.Appointments.Queries.GetAllAppointment;
 using _66SMS.Application.BookingService.Appointments.Queries.GetAvailableBookingDays;
 using _66SMS.Application.BookingService.Appointments.Queries.GetDepositVnPayUrl;
+using _66SMS.Application.BookingService.Appointments.Queries.GetDetailAppointment;
 using _66SMS.Application.BookingService.Appointments.Queries.GetTechnicians;
 using _66SMS.Application.BookingService.Appointments.Queries.GetTimeSlots;
 using _66SMS.Contract.Abstractions;
@@ -91,6 +92,14 @@ namespace _66SMS.API.Controllers
             if (tokenSalonId.HasValue)
                 query.SalonId = tokenSalonId.Value;
             var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        [HttpGet("{id:int}")]
+        [Authorize]
+        public async Task<IActionResult> GetDetailAppointment([FromRoute] int id)
+        {
+            var result = await mediator.Send(new GetDetailAppointmentQuery { Id = id });
             return HandleResult(result);
         }
 

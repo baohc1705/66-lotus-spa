@@ -94,34 +94,33 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
                     if (lineTotal < 0) lineTotal = 0;
                     subTotal += lineTotal;
 
-                    decimal? commissionRate = null;
-                    decimal commissionAmount = 0;
-
-                    if (i.StaffId.HasValue)
-                    {
-                        var service = await serviceRepository.FindByIdAsync(i.RefId!.Value, true, cancellationToken);
-                        if (service != null && service.CommissionRate.HasValue)
-                        {
-                            commissionRate = service.CommissionRate.Value;
-                            commissionAmount = Math.Round(lineTotal * (service.CommissionRate.Value / 100m), 0);
-                        }
-                    }
-
-                    items.Add(new InvoiceItem
+                    var item = new InvoiceItem
                     {
                         ItemType = i.ItemType!.Value,
                         RefId = i.RefId!.Value,
                         ItemName = itemName,
                         UnitPrice = unitPrice,
                         Quantity = quantity,
-                        DiscountAmount = lineDiscount,
                         LineTotal = lineTotal,
                         StaffId = i.StaffId,
                         Note = i.Note,
                         Status = InvoiceItemConst.STATUS_ACTIVE,
-                        CommissionRate = commissionRate,
-                        CommissionAmount = commissionAmount,
-                    });
+                    };
+
+                    if (lineDiscount != 0)
+                        item.DiscountAmount = lineDiscount;
+
+                    if (i.StaffId.HasValue)
+                    {
+                        var service = await serviceRepository.FindByIdAsync(i.RefId!.Value, true, cancellationToken);
+                        if (service?.CommissionRate is decimal rate)
+                        {
+                            item.CommissionRate = rate;
+                            item.CommissionAmount = Math.Round(lineTotal * (rate / 100m), 0);
+                        }
+                    }
+
+                    items.Add(item);
                 }
 
                 // Load khách hàng  để áp dụng membership + loyalty
@@ -214,16 +213,9 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
                     SalonId = request.SalonId,
                     CashierId = request.CashierId,
                     SubTotal = subTotal,
-                    DiscountAmount = manualDiscount,
                     MembershipTierId = tierId,
-                    MembershipDiscountAmount = membershipDiscount,
-                    LoyaltyPointsUsed = pointsUsed,
-                    LoyaltyPointsValue = pointsValue,
-                    LoyaltyPointsEarned = pointsEarned,
-                    TaxAmount = tax,
                     TotalAmount = total,
                     PaidAmount = paid,
-                    ChangeAmount = change,
                     PaymentMethod = request.PaymentMethod ?? InvoiceConst.PAYMENT_CASH,
                     TransactionId = request.TransactionId,
                     Status = status,
@@ -233,6 +225,21 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
                     CreatedBy = request.CreatedBy,
                     Items = items,
                 };
+
+                if (manualDiscount != 0)
+                    invoice.DiscountAmount = manualDiscount;
+                if (membershipDiscount != 0)
+                    invoice.MembershipDiscountAmount = membershipDiscount;
+                if (pointsUsed != 0)
+                    invoice.LoyaltyPointsUsed = pointsUsed;
+                if (pointsValue != 0)
+                    invoice.LoyaltyPointsValue = pointsValue;
+                if (pointsEarned != 0)
+                    invoice.LoyaltyPointsEarned = pointsEarned;
+                if (tax != 0)
+                    invoice.TaxAmount = tax;
+                if (change != 0)
+                    invoice.ChangeAmount = change;
 
                 invoiceRepository.Add(invoice);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);

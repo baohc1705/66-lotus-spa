@@ -1,4 +1,3 @@
-using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Contract.Enumerations;
 using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Shared;
@@ -10,12 +9,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentPosition
 {
-    public sealed class AssignAppointmentPositionHandler(
-        IAppointmentSqlRepository appointmentSqlRepository,
-        IBookingPositionSqlRepository bookingPositionSqlRepository,
-        ISqlUnitOfWork sqlUnitOfWork)
-        : IRequestHandler<AssignAppointmentPositionCommand, Result<object>>
+    public sealed class AssignAppointmentPositionHandler : IRequestHandler<AssignAppointmentPositionCommand, Result<object>>
     {
+        private readonly IAppointmentSqlRepository appointmentSqlRepository;
+        private readonly IBookingPositionSqlRepository bookingPositionSqlRepository;
+        private readonly ISqlUnitOfWork sqlUnitOfWork;
+
+        public AssignAppointmentPositionHandler(
+            IAppointmentSqlRepository appointmentSqlRepository,
+            IBookingPositionSqlRepository bookingPositionSqlRepository,
+            ISqlUnitOfWork sqlUnitOfWork)
+        {
+            this.appointmentSqlRepository = appointmentSqlRepository;
+            this.bookingPositionSqlRepository = bookingPositionSqlRepository;
+            this.sqlUnitOfWork = sqlUnitOfWork;
+        }
+
         public async Task<Result<object>> Handle(
             AssignAppointmentPositionCommand request,
             CancellationToken cancellationToken)
@@ -24,41 +33,29 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentPo
                 .FirstOrDefaultAsync(a => a.Id == request.AppointmentId, cancellationToken);
 
             if (appointment == null)
-            {
                 return Result<object>.NotFound(AppointmentConst.MSG_APPOINTMENT_NOT_FOUND, ErrorCodes.ERR_APPOINTMENT_NOT_FOUND);
-            }
 
             if (appointment.Status != AppointmentConst.STATUS_WAITING)
-            {
                 return Result<object>.BadRequest("Chỉ gán/đổi vị trí khi lịch hẹn đang chờ phục vụ.");
-            }
 
             if (appointment.PositionId == request.PositionId)
-            {
                 return Result<object>.Success("Vị trí không thay đổi.");
-            }
 
             var newPosition = await bookingPositionSqlRepository.AsQueryable()
                 .Include(p => p.Room)
                 .FirstOrDefaultAsync(p => p.Id == request.PositionId, cancellationToken);
 
             if (newPosition == null)
-            {
                 return Result<object>.NotFound(BookingPositionConst.MSG_BOOKING_POSITION_NOT_FOUND, ErrorCodes.ERR_BOOKING_POSITION_NOT_FOUND);
-            }
 
             if (appointment.SalonId.HasValue
                 && newPosition.Room?.SalonId != appointment.SalonId.Value)
-            {
                 return Result<object>.BadRequest("Vị trí không thuộc chi nhánh của lịch hẹn.");
-            }
 
-            if (!BookingPositionHelper.IsAvailable(newPosition.Status))
-            {
+            if (newPosition.Status != BookingPositionConst.STATUS_AVAILABLE
+                && newPosition.Status != BookingPositionConst.STATUS_ACTIVED)
                 return Result<object>.Conflict("Vị trí này đang được sử dụng. Vui lòng chọn vị trí khác.");
-            }
 
-            // Vị trí đã gắn lịch chờ phục vụ khác trong cùng ngày → không cho chọn
             var takenByOther = await appointmentSqlRepository.AsQueryable(asNoTracking: true)
                 .AnyAsync(
                     a => a.Id != appointment.Id
@@ -71,9 +68,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentPo
                     cancellationToken);
 
             if (takenByOther)
-            {
                 return Result<object>.Conflict("Vị trí này đã có lịch hẹn khác. Vui lòng chọn vị trí khác.");
-            }
 
             using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
@@ -84,7 +79,8 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentPo
                         .FirstOrDefaultAsync(p => p.Id == appointment.PositionId.Value, cancellationToken);
                     if (oldPosition != null)
                     {
-                        BookingPositionHelper.MarkAvailable(oldPosition);
+                        oldPosition.Status = BookingPositionConst.STATUS_AVAILABLE;
+                        oldPosition.UpdatedAt = DateTimeHelper.UtcNow();
                         bookingPositionSqlRepository.Update(oldPosition);
                     }
                 }
@@ -93,7 +89,8 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentPo
                 appointment.UpdatedAt = DateTimeHelper.UtcNow();
                 appointment.UpdatedBy = request.UserId;
 
-                BookingPositionHelper.MarkInService(newPosition);
+                newPosition.Status = BookingPositionConst.STATUS_IN_SERVICE;
+                newPosition.UpdatedAt = DateTimeHelper.UtcNow();
 
                 appointmentSqlRepository.Update(appointment);
                 bookingPositionSqlRepository.Update(newPosition);

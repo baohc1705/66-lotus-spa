@@ -8,7 +8,7 @@ namespace _66SMS.Domain.Entities
         public int UserId { get; set; }
         public string Token { get; set; } = null!;
         public DateTimeOffset ExpiresAt { get; set; }
-        public bool IsRevoked { get; set; }
+        public bool IsRevoked { get; set; } = false;
         public string? CreatedByIp { get; set; }
         public string? RevokedByIp { get; set; }
         public DateTimeOffset? RevokedAt { get; set; }

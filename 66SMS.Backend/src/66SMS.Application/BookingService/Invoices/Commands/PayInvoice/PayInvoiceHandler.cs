@@ -112,7 +112,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
 
                     if (wallet.Balance < remainingAmount)
                     {
-                        return Result<object>.BadRequest($"Ví của khách hàng không đủ số dư (Hiện có: {wallet.Balance:N0}đ).", ErrorCodes.ERR_INVOICE_NOT_ENOUGH_POINTS);
+                        return Result<object>.BadRequest(WalletConst.MSG_WALLET_INSUFFICIENT_BALANCE, ErrorCodes.ERR_INVOICE_NOT_ENOUGH_POINTS);
                     }
 
                     wallet.Balance -= remainingAmount;
@@ -124,17 +124,19 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                         Amount = -remainingAmount,
                         BalanceAfter = wallet.Balance,
                         Type = WalletTransactionConst.TYPE_PAYMENT_FOR_APPOINTMENT,
-                        Note = $"Thanh toán phần còn lại cho hóa đơn #{invoice.InvoiceCode}",
                         Status = WalletTransactionConst.STATUS_SUCCESS,
                         CreatedAt = DateTimeHelper.UtcNow(),
-                        CreatedBy = request.CashierId ?? 0
+                        CreatedBy = request.CashierId
                     };
+                    if (!string.IsNullOrWhiteSpace(request.Note))
+                        walletTx.Note = request.Note.Trim();
                     walletTransactionRepository.Add(walletTx);
                 }
 
              
                 invoice.PaidAmount = invoice.TotalAmount;
-                invoice.ChangeAmount = change;
+                if (change != 0)
+                    invoice.ChangeAmount = change;
                 invoice.PaymentMethod = request.PaymentMethod;
                 invoice.Status = InvoiceConst.STATUS_PAID;
                 invoice.Note = request.Note;

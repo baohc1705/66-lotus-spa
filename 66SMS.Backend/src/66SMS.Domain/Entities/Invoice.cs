@@ -11,17 +11,17 @@ namespace _66SMS.Domain.Entities
         public int? AppointmentId { get; set; }
         public int? SalonId { get; set; }
         public int? CashierId { get; set; }
-        public decimal SubTotal { get; set; }
-        public decimal DiscountAmount { get; set; }
+        public decimal SubTotal { get; set; } = 0;
+        public decimal DiscountAmount { get; set; } = 0;
         public int? MembershipTierId { get; set; }
-        public decimal MembershipDiscountAmount { get; set; }
-        public int LoyaltyPointsUsed { get; set; }
-        public decimal LoyaltyPointsValue { get; set; }
-        public int LoyaltyPointsEarned { get; set; }
-        public decimal TaxAmount { get; set; }
-        public decimal TotalAmount { get; set; }
-        public decimal PaidAmount { get; set; }
-        public decimal ChangeAmount { get; set; }
+        public decimal MembershipDiscountAmount { get; set; } = 0;
+        public int LoyaltyPointsUsed { get; set; } = 0;
+        public decimal LoyaltyPointsValue { get; set; } = 0;
+        public int LoyaltyPointsEarned { get; set; } = 0;
+        public decimal TaxAmount { get; set; } = 0;
+        public decimal TotalAmount { get; set; } = 0;
+        public decimal PaidAmount { get; set; } = 0;
+        public decimal ChangeAmount { get; set; } = 0;
         public int PaymentMethod { get; set; }
         public string? TransactionId { get; set; }
         public int Status { get; set; }

@@ -174,8 +174,17 @@ export function MyWalletPanel() {
                       </div>
                       <div>
                         <p className="font-medium text-lotus-deep">
-                          {tx.note ||
-                            (isPositive ? "Hoàn tiền ví" : "Thanh toán cọc")}
+                          {tx.note && !tx.note.startsWith("TxnRef:")
+                            ? tx.note
+                            : tx.type === 1
+                              ? "Hoàn tiền"
+                              : tx.type === 2
+                                ? "Thanh toán"
+                                : tx.type === 3
+                                  ? "Nạp tiền"
+                                  : tx.type === 4
+                                    ? "Điều chỉnh"
+                                    : "Giao dịch"}
                         </p>
                         <p className="text-xs text-lotus-stone mt-0.5">
                           {formatDateTimeDisplay(tx.createdAt)}

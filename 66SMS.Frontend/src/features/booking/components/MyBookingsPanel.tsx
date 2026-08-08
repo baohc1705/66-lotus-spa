@@ -38,6 +38,12 @@ export function MyBookingsPanel() {
   const [isPayingWalletId, setIsPayingWalletId] = useState<number | null>(null);
   const [isPostponingId, setIsPostponingId] = useState<number | null>(null);
 
+  const { data: expandedDetail } = useQuery({
+    queryKey: ["appointment-detail", expandedId],
+    queryFn: () => bookingApi.getDetail(expandedId!),
+    enabled: expandedId != null,
+  });
+
   const [walletConfirm, setWalletConfirm] = useState<{
     open: boolean;
     appointmentId?: number;
@@ -248,7 +254,13 @@ export function MyBookingsPanel() {
       </div>
 
       <div className="space-y-3">
-        {bookings.map((booking: AppointmentDto) => (
+        {bookings.map((booking: AppointmentDto) => {
+          const detail =
+            expandedId === booking.id && expandedDetail?.id === booking.id
+              ? expandedDetail
+              : booking;
+
+          return (
           <div
             key={booking.id}
             className={`rounded-lg overflow-hidden transition-all duration-300 ${
@@ -419,10 +431,10 @@ export function MyBookingsPanel() {
                             <span className="text-warm-600 block mb-1">
                               Dịch vụ đã chọn:
                             </span>
-                            {booking.serviceNames &&
-                            booking.serviceNames.length > 0 ? (
+                            {detail.serviceNames &&
+                            detail.serviceNames.length > 0 ? (
                               <ul className="space-y-1">
-                                {booking.serviceNames.map((srv, idx) => (
+                                {detail.serviceNames.map((srv: string, idx: number) => (
                                   <li
                                     key={idx}
                                     className="text-ink font-medium before:content-['•'] before:mr-2 before:text-gold-600"
@@ -447,50 +459,52 @@ export function MyBookingsPanel() {
                             </span>
                             <span className="text-ink font-medium">
                               {formatCurrency(
-                                booking.servicesSubTotal ?? booking.totalAmount,
+                                detail.servicesSubTotal ?? detail.totalAmount,
                               )}
                             </span>
                           </div>
                         </div>
 
-                        {(booking.membershipDiscountAmount ?? 0) > 0 && (
+                        {detail.membershipDiscountAmount != null &&
+                          detail.membershipDiscountAmount > 0 && (
                           <div className="flex items-center gap-3 text-sm pl-7">
                             <span className="text-warm-600 mr-2">
                               Giảm giá thẻ thành viên:
                             </span>
                             <span className="text-success-text font-medium">
                               -
-                              {formatCurrency(booking.membershipDiscountAmount)}
+                              {formatCurrency(detail.membershipDiscountAmount)}
                             </span>
                           </div>
                         )}
 
-                        {(booking.promotionDiscountAmount ?? 0) > 0 && (
+                        {detail.promotionDiscountAmount != null &&
+                          detail.promotionDiscountAmount > 0 && (
                           <div className="flex items-center gap-3 text-sm pl-7">
                             <span className="text-warm-600 mr-2">
                               Giảm giá mã khuyến mãi:
                             </span>
                             <span className="text-success-text font-medium">
-                              -{formatCurrency(booking.promotionDiscountAmount)}
+                              -{formatCurrency(detail.promotionDiscountAmount)}
                             </span>
                           </div>
                         )}
 
                         <div className="flex items-center gap-3 text-sm pl-7">
                           <span className="text-warm-600 mr-2">
-                            Cọc yêu cầu ({booking.depositPercent}%):
+                            Cọc yêu cầu ({detail.depositPercent}%):
                           </span>
                           <span className="text-gold-600 font-medium">
                             {formatCurrency(
-                              ((booking.totalAmount || 0) *
-                                (booking.depositPercent || 0)) /
+                              ((detail.totalAmount || 0) *
+                                (detail.depositPercent || 0)) /
                                 100,
                             )}
                           </span>
                         </div>
 
-                        {booking.depositDeadlineAt &&
-                          booking.status === APPOINTMENT_STATUS.CONFIRMED && (
+                        {detail.depositDeadlineAt &&
+                          detail.status === APPOINTMENT_STATUS.CONFIRMED && (
                             <div className="flex items-center gap-3 text-sm pl-7">
                               <span className="text-warm-600 mr-2">
                                 Hạn chót cọc:
@@ -499,7 +513,7 @@ export function MyBookingsPanel() {
                                 {new Intl.DateTimeFormat("vi-VN", {
                                   dateStyle: "short",
                                   timeStyle: "short",
-                                }).format(new Date(booking.depositDeadlineAt))}
+                                }).format(new Date(detail.depositDeadlineAt))}
                               </span>
                             </div>
                           )}
@@ -519,7 +533,7 @@ export function MyBookingsPanel() {
                               Nhân viên:
                             </span>
                             <span className="text-ink font-medium">
-                              {booking.staffFullName || "Chưa xếp nhân viên"}
+                              {detail.staffFullName || "Chưa xếp nhân viên"}
                             </span>
                           </div>
                         </div>
@@ -531,12 +545,12 @@ export function MyBookingsPanel() {
                               Chi nhánh:
                             </span>
                             <span className="text-ink font-medium">
-                              {booking.salonName || "Chưa xác định"}
+                              {detail.salonName || "Chưa xác định"}
                             </span>
                           </div>
                         </div>
 
-                        {booking.note && (
+                        {detail.note && (
                           <div className="flex items-start gap-3 text-sm">
                             <StickyNote className="w-4 h-4 text-warm-600 mt-0.5" />
                             <div>
@@ -544,7 +558,7 @@ export function MyBookingsPanel() {
                                 Ghi chú:
                               </span>
                               <p className="text-ink bg-warm-50 p-2 rounded-lg text-xs italic">
-                                {booking.note}
+                                {detail.note}
                               </p>
                             </div>
                           </div>
@@ -556,7 +570,8 @@ export function MyBookingsPanel() {
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <ConfirmDialog

@@ -40,9 +40,13 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetDepositVnPay
                 appointment,
                 configAppointmentSqlRepository,
                 cancellationToken);
-            var depositAmount = AppointmentPaymentCalculator.GetDepositAmount(appointment.TotalAmount, depositPercent);
 
-            var url = vnPayService.CreatePaymentUrl(appointment.Id, depositAmount, $"Dat coc {appointment.Id}", request.IpAddress!, AppointmentPaymentConst.PHASE_DEPOSIT);
+            if (depositPercent == null)
+                return Result<string>.BadRequest(ConfigAppointmentConst.MSG_DEPOSIT_PERCENT_NOT_CONFIGURED,ErrorCodes.ERR_CONFIG_APPOINTMENT_NOT_FOUND);
+
+            var depositAmount = AppointmentPaymentCalculator.GetDepositAmount(appointment.TotalAmount, depositPercent.Value);
+
+            var url = vnPayService.CreatePaymentUrl(appointment.Id, depositAmount, request.IpAddress!, AppointmentPaymentConst.PHASE_DEPOSIT);
             return Result<string>.Success(url);
         }
     }

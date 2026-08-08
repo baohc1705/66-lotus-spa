@@ -6,8 +6,8 @@ namespace _66SMS.Infrastructure.Mails
     public sealed class DepositInvoiceTemplate : EmailTemplateBase
     {
         private readonly string toEmail;
-        private readonly string customerName;
-        private readonly string serviceName;
+        private readonly string? customerName;
+        private readonly string? serviceName;
         private readonly DateTime appointmentTime;
         private readonly decimal depositAmount;
         private readonly decimal remainingAmount;
@@ -15,8 +15,8 @@ namespace _66SMS.Infrastructure.Mails
 
         public DepositInvoiceTemplate(
             string toEmail,
-            string customerName,
-            string serviceName,
+            string? customerName,
+            string? serviceName,
             DateTime appointmentTime,
             decimal depositAmount,
             decimal remainingAmount,

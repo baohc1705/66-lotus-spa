@@ -1,10 +1,8 @@
-using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Application.DTOs.Appointments;
 using _66SMS.Contract.Extensions;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.BookingService.Appointments.Queries.GetAllAppointment
 {
@@ -21,13 +19,9 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetAllAppointme
         {
             var query = appointmentSqlRepository.AsQueryable();
             if (request.UserId != null && request.UserId > 0)
-            {
                 query = query.Where(x => x.CreatedByUserId == request.UserId);
-            }
             if (request.SalonId.HasValue)
-            {
                 query = query.Where(x => x.SalonId == request.SalonId.Value);
-            }
 
             var result = await query
                 .OrderByDescending(x => x.CreatedAt)
@@ -35,6 +29,7 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetAllAppointme
                 {
                     Id = x.Id,
                     AppointmentCode = x.AppointmentCode,
+                    CustomerId = x.CreatedByUser!.Customer!.Id,
                     StaffId = x.StaffId,
                     SlotId = x.SlotId,
                     PositionId = x.PositionId,
@@ -46,54 +41,19 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetAllAppointme
                     DepositPercent = x.DepositPercent,
                     DepositDeadlineAt = x.DepositDeadlineAt,
                     CreatedAt = x.CreatedAt.ToString(),
-                    ServicesSubTotal = x.Services!
-                        .Sum(s => s.PriceSnapshot * s.Quantity),
-                    StaffFullName = x.Staff != null ? x.Staff.FullName : null,
-                    SalonName = x.Salon != null ? x.Salon.Name : null,
-                    TimeSlotStartTime = x.TimeApptStart ?? (x.TimeSlot != null ? x.TimeSlot.StartTime : null),
-                    TimeSlotEndTime = x.TimeApptEnd ?? (x.TimeSlot != null ? x.TimeSlot.EndTime : null),
+                    ServicesSubTotal = x.Services!.Sum(s => s.PriceSnapshot * s.Quantity),
+                    StaffFullName = x.Staff!.FullName,
+                    SalonName = x.Salon!.Name,
+                    TimeSlotStartTime = x.TimeApptStart ?? x.TimeSlot!.StartTime,
+                    TimeSlotEndTime = x.TimeApptEnd ?? x.TimeSlot!.EndTime,
+                    PositionName = x.Position!.Name,
+                    PositionRoomName = x.Position!.Room!.Name,
                     ServiceNames = x.Services!
-                        .Where(s => s.Service != null && s.Service.Name != null)
-                        .Select(s => s.Service!.Name!)
+                        .Where(s => s.Service != null)
+                        .Select(s => s.Service!.Name)
                         .ToList(),
                 })
                 .ToPagedAsync(request, cancellationToken);
-
-          
-            if (result.Items.Count > 0)
-            {
-                var appointmentIds = result.Items
-                    .Where(i => i.Id.HasValue)
-                    .Select(i => i.Id!.Value)
-                    .ToList();
-
-                var appointments = await appointmentSqlRepository.AsQueryable(true)
-                    .Where(a => appointmentIds.Contains(a.Id))
-                    .Include(a => a.CreatedByUser!)
-                        .ThenInclude(u => u.Customer!)
-                            .ThenInclude(c => c!.MembershipCard!)
-                                .ThenInclude(mc => mc!.Tier)
-                    .ToListAsync(cancellationToken);
-
-                var customerMap = appointments.ToDictionary(
-                    a => a.Id,
-                    a => a.CreatedByUser?.Customer);
-
-                foreach (var item in result.Items)
-                {
-                    if (!item.Id.HasValue) continue;
-
-                    customerMap.TryGetValue(item.Id.Value, out var customer);
-                    var (membership, promo, _) = AppointmentInvoiceDiscountHelper.Split(
-                        item.ServicesSubTotal ?? 0m,
-                        item.TotalAmount ?? 0m,
-                        item.Note,
-                        customer);
-
-                    item.MembershipDiscountAmount = membership;
-                    item.PromotionDiscountAmount = promo;
-                }
-            }
 
             return Result<PagedResult<AppointmentDto>>.Success(result);
         }

@@ -1,20 +1,30 @@
+using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Enumerations;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
-using _66SMS.Contract.Enumerations;
 using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Application.BookingService.Helpers;
 
 namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierVnPayUrl
 {
-    public sealed class GetCashierVnPayUrlHandler(
-        IAppointmentSqlRepository appointmentRepository,
-        IInvoiceSqlRepository invoiceRepository,
-        IVnPayService vnPayService)
-        : IRequestHandler<GetCashierVnPayUrlQuery, Result<string>>
+    public sealed class GetCashierVnPayUrlHandler : IRequestHandler<GetCashierVnPayUrlQuery, Result<string>>
     {
+        private readonly IAppointmentSqlRepository appointmentRepository;
+        private readonly IInvoiceSqlRepository invoiceRepository;
+        private readonly IVnPayService vnPayService;
+
+        public GetCashierVnPayUrlHandler(
+            IAppointmentSqlRepository appointmentRepository,
+            IInvoiceSqlRepository invoiceRepository,
+            IVnPayService vnPayService)
+        {
+            this.appointmentRepository = appointmentRepository;
+            this.invoiceRepository = invoiceRepository;
+            this.vnPayService = vnPayService;
+        }
+
         public async Task<Result<string>> Handle(GetCashierVnPayUrlQuery request, CancellationToken cancellationToken)
         {
             var appointment = await appointmentRepository.AsQueryable(asNoTracking: true)
@@ -38,16 +48,16 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierVnPayUrl
                 .OrderByDescending(i => i.Id)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            var amount = invoice != null ? Math.Max(0m, invoice.TotalAmount - invoice.PaidAmount) : AppointmentPaymentCalculator.GetRemainingAmount(appointment);
+            var amount = invoice != null
+                ? Math.Max(0m, invoice.TotalAmount - invoice.PaidAmount)
+                : AppointmentPaymentCalculator.GetRemainingAmount(appointment);
 
             if (amount <= 0)
                 return Result<string>.BadRequest(AppointmentConst.MSG_APPOINTMENT_NO_REMAINING_AMOUNT, ErrorCodes.ERR_APPOINTMENT_NO_REMAINING_AMOUNT);
 
-            var description = $"Thanh toan phan con lai don {appointment.Id}";
             var url = vnPayService.CreatePaymentUrl(
                 appointment.Id,
                 amount,
-                description,
                 request.IpAddress,
                 AppointmentPaymentConst.PHASE_FINAL_PAYMENT);
 

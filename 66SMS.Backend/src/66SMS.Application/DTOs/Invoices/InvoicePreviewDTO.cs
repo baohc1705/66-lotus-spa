@@ -23,7 +23,7 @@ namespace _66SMS.Application.DTOs.Invoices
     public class InvoicePreviewItemDTO
     {
         public int ServiceId { get; set; }
-        public string ServiceName { get; set; } = null!;
+        public string? ServiceName { get; set; }
         public decimal UnitPrice { get; set; }
         public int Quantity { get; set; }
         public decimal LineTotal { get; set; }

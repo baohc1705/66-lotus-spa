@@ -35,7 +35,7 @@ namespace _66SMS.Application.BookingService.Helpers
                 customer = new Customer
                 {
                     UserId = user.Id,
-                    FullName = user.Staff?.FullName ?? user.Username ?? "User",
+                    FullName = user.Staff?.FullName ?? user.Username ?? string.Empty,
                     Phone = user.Staff?.Phone,
                     Status = CustomerConst.STATUS_ACTIVED,
                     CreatedAt = DateTimeHelper.UtcNow()

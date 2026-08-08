@@ -1,3 +1,4 @@
+using _66SMS.Application.Abstractions.Services;
 using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Contract.Abstractions;
 using _66SMS.Contract.Constants;
@@ -9,30 +10,52 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Application.Abstractions.Services;
 
 namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
 {
-    public sealed class VnPayIpnHandler(
-        IVnPayService vnPayService,
-        IAppointmentSqlRepository appointmentRepository,
-        IWalletSqlRepository walletRepository,
-        IWalletTransactionSqlRepository walletTransactionRepository,
-        IInvoiceSqlRepository invoiceRepository,
-        IConfigAppointmentSqlRepository configAppointmentSqlRepository,
-        ILoyaltyPointService loyaltyPointService,
-        IEmailTemplateFactory emailTemplateFactory,
-        IDomainEventPublisher domainEventPublisher,
-        ISqlUnitOfWork unitOfWork)
-        : IRequestHandler<VnPayIpnCommand, VnPayIpnResponse>
+    public sealed class VnPayIpnHandler : IRequestHandler<VnPayIpnCommand, VnPayIpnResponse>
     {
+        private readonly IVnPayService vnPayService;
+        private readonly IAppointmentSqlRepository appointmentRepository;
+        private readonly IWalletSqlRepository walletRepository;
+        private readonly IWalletTransactionSqlRepository walletTransactionRepository;
+        private readonly IInvoiceSqlRepository invoiceRepository;
+        private readonly IConfigAppointmentSqlRepository configAppointmentSqlRepository;
+        private readonly ILoyaltyPointService loyaltyPointService;
+        private readonly IEmailTemplateFactory emailTemplateFactory;
+        private readonly IDomainEventPublisher domainEventPublisher;
+        private readonly ISqlUnitOfWork unitOfWork;
+
+        public VnPayIpnHandler(
+            IVnPayService vnPayService,
+            IAppointmentSqlRepository appointmentRepository,
+            IWalletSqlRepository walletRepository,
+            IWalletTransactionSqlRepository walletTransactionRepository,
+            IInvoiceSqlRepository invoiceRepository,
+            IConfigAppointmentSqlRepository configAppointmentSqlRepository,
+            ILoyaltyPointService loyaltyPointService,
+            IEmailTemplateFactory emailTemplateFactory,
+            IDomainEventPublisher domainEventPublisher,
+            ISqlUnitOfWork unitOfWork)
+        {
+            this.vnPayService = vnPayService;
+            this.appointmentRepository = appointmentRepository;
+            this.walletRepository = walletRepository;
+            this.walletTransactionRepository = walletTransactionRepository;
+            this.invoiceRepository = invoiceRepository;
+            this.configAppointmentSqlRepository = configAppointmentSqlRepository;
+            this.loyaltyPointService = loyaltyPointService;
+            this.emailTemplateFactory = emailTemplateFactory;
+            this.domainEventPublisher = domainEventPublisher;
+            this.unitOfWork = unitOfWork;
+        }
+
         public async Task<VnPayIpnResponse> Handle(VnPayIpnCommand request, CancellationToken cancellationToken)
         {
             var result = vnPayService.PaymentExecute(request.QueryData);
             if (!result.Success && string.IsNullOrEmpty(result.VnPayResponseCode))
-            {
                 return VnPayIpnResponse.InvalidSignature();
-            }
+
             if (result.IsWalletTopUp)
             {
                 if (result.WalletId <= 0)
@@ -67,7 +90,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                 return VnPayIpnResponse.Success();
             }
 
-           
             var appointment = await appointmentRepository.AsQueryable()
                 .Include(a => a.Payments)
                 .FirstOrDefaultAsync(a => a.Id == result.AppointmentId, cancellationToken);
@@ -75,22 +97,15 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
             if (appointment == null)
                 return VnPayIpnResponse.OrderNotFound();
 
-      
             bool isAlreadyConfirmed;
             if (result.Phase == AppointmentPaymentConst.PHASE_DEPOSIT)
-            {
-               
                 isAlreadyConfirmed = !AppointmentStatusTransitions.CanPayDeposit(appointment);
-            }
             else
-            {
                 isAlreadyConfirmed = !AppointmentStatusTransitions.CanPayBalance(appointment.Status);
-            }
-            
+
             if (isAlreadyConfirmed)
-            {
                 return VnPayIpnResponse.OrderAlreadyConfirmed();
-            }
+
             if (result.Success)
             {
                 var depositPercent = result.Phase == AppointmentPaymentConst.PHASE_DEPOSIT
@@ -100,17 +115,17 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                         cancellationToken)
                     : (int?)null;
 
+                if (result.Phase == AppointmentPaymentConst.PHASE_DEPOSIT && depositPercent == null)
+                    return VnPayIpnResponse.InvalidOrder();
+
                 var apply = AppointmentPaymentApplyService.ApplyVnPaySuccess(
                     appointment,
                     result.Phase,
                     result.TransactionId,
                     depositPercent);
 
-              
                 if (!apply.IsSuccess)
-                {
                     return VnPayIpnResponse.OrderAlreadyConfirmed();
-                }
 
                 if (result.Phase == AppointmentPaymentConst.PHASE_FINAL_PAYMENT
                     && apply.Data is bool isNewlyPaid && isNewlyPaid
@@ -136,7 +151,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                             || invoice.Status == InvoiceConst.STATUS_DRAFT))
                     {
                         invoice.PaidAmount = invoice.TotalAmount;
-                        invoice.ChangeAmount = 0;
                         invoice.PaymentMethod = InvoiceConst.PAYMENT_VNPAY;
                         invoice.TransactionId = result.TransactionId;
                         invoice.Status = InvoiceConst.STATUS_PAID;
@@ -171,7 +185,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 
-            var customerName = info?.CustomerName ?? "Khách hàng";
+            var customerName = info?.CustomerName;
             var at = DateTimeHelper.UtcNow().ToOffset(TimeSpan.FromHours(7)).ToString("HH:mm dd/MM/yyyy");
 
             await domainEventPublisher.PublishAsync(new SendNotificationEvent<BookingNotificationPayload>
@@ -231,34 +245,30 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                     var lineTotal = unitPrice * quantity;
                     subTotal += lineTotal;
 
-                    decimal? commissionRate = null;
-                    decimal commissionAmount = 0;
-
-                    if (appService.Service != null && appService.Service.CommissionRate.HasValue)
-                    {
-                        commissionRate = appService.Service.CommissionRate.Value;
-                        commissionAmount = Math.Round(lineTotal * (commissionRate.Value / 100m), 0);
-                    }
-
-                    items.Add(new InvoiceItem
+                    var item = new InvoiceItem
                     {
                         ItemType = InvoiceItemConst.TYPE_SERVICE,
                         RefId = appService.ServiceId,
-                        ItemName = appService.Service?.Name ?? "Dịch vụ",
+                        ItemName = appService.Service?.Name ?? string.Empty,
                         UnitPrice = unitPrice,
                         Quantity = quantity,
-                        DiscountAmount = 0,
                         LineTotal = lineTotal,
                         StaffId = appointment.StaffId,
                         Status = InvoiceItemConst.STATUS_ACTIVE,
-                        CommissionRate = commissionRate,
-                        CommissionAmount = commissionAmount,
-                    });
+                    };
+
+                    if (appService.Service?.CommissionRate is decimal rate)
+                    {
+                        item.CommissionRate = rate;
+                        item.CommissionAmount = Math.Round(lineTotal * (rate / 100m), 0);
+                    }
+
+                    items.Add(item);
                 }
             }
 
             var customer = appointment.CreatedByUser?.Customer;
-            var (membershipDiscount, promoDiscount, membershipTierId) = AppointmentInvoiceDiscountHelper.Split(subTotal, appointment.TotalAmount, appointment.Note, customer);
+            var (membershipDiscount, promoDiscount, membershipTierId) = AppointmentInvoiceDiscountHelper.Split(subTotal, appointment.TotalAmount, customer);
 
             var invoice = new Invoice
             {
@@ -272,16 +282,11 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                 DiscountAmount = promoDiscount,
                 MembershipTierId = membershipTierId,
                 MembershipDiscountAmount = membershipDiscount,
-                LoyaltyPointsUsed = 0,
-                LoyaltyPointsValue = 0,
-                LoyaltyPointsEarned = 0,
-                TaxAmount = 0,
                 TotalAmount = appointment.TotalAmount,
                 PaidAmount = appointment.PaidAmount,
-                ChangeAmount = 0,
                 PaymentMethod = InvoiceConst.PAYMENT_BANK_TRANSFER,
                 Status = InvoiceConst.STATUS_UNPAID,
-                Note = $"Hóa đơn cọc lịch hẹn #{appointment.Id}",
+                Note = appointment.Note,
                 IssuedAt = DateTimeHelper.UtcNow(),
                 CreatedAt = DateTimeHelper.UtcNow(),
                 CreatedBy = appointment.CreatedByUserId,
@@ -295,18 +300,19 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
             if (string.IsNullOrWhiteSpace(customerEmail))
                 return;
 
+            var startTime = appointment.TimeApptStart ?? appointment.TimeSlot?.StartTime;
+            if (startTime is null)
+                return;
+
             var serviceName = appointment.Services != null && appointment.Services.Any()
                 ? string.Join(", ", appointment.Services.Where(s => s.Service != null).Select(s => s.Service!.Name))
-                : "Dịch vụ";
-
-            var appointmentTime = appointment.AppointmentDate.ToDateTime(
-                appointment.TimeApptStart ?? appointment.TimeSlot?.StartTime ?? new TimeOnly(9, 0));
+                : null;
 
             var mail = emailTemplateFactory.CreateDepositInvoiceEmail(
                 customerEmail,
-                appointment.CreatedByUser?.Customer?.FullName ?? appointment.CreatedByUser?.Username ?? "Quý khách",
+                appointment.CreatedByUser?.Customer?.FullName ?? appointment.CreatedByUser?.Username,
                 serviceName,
-                appointmentTime,
+                appointment.AppointmentDate.ToDateTime(startTime.Value),
                 appointment.PaidAmount,
                 appointment.TotalAmount - appointment.PaidAmount,
                 invoice.InvoiceCode);

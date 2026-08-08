@@ -9,8 +9,8 @@ namespace _66SMS.Domain.Entities
     {
         public int ProductId { get; set; }
         public string Url { get; set; } = null!;
-        public int SortOrder { get; set; }
-        public bool IsPrimary { get; set; }
+        public int SortOrder { get; set; } = 0;
+        public bool IsPrimary { get; set; } = false;
 
         public Product? Product { get; set; }
     }

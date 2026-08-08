@@ -75,29 +75,25 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
                         var lineTotal = unitPrice * quantity;
                         subTotal += lineTotal;
 
-                        decimal? commissionRate = null;
-                        decimal commissionAmount = 0;
-
-                        if (appService.Service != null && appService.Service.CommissionRate.HasValue)
-                        {
-                            commissionRate = appService.Service.CommissionRate.Value;
-                            commissionAmount = Math.Round(lineTotal * (commissionRate.Value / 100m), 0);
-                        }
-
-                        items.Add(new InvoiceItem
+                        var item = new InvoiceItem
                         {
                             ItemType = InvoiceItemConst.TYPE_SERVICE,
                             RefId = appService.ServiceId,
-                            ItemName = appService.Service?.Name ?? "Dịch vụ",
+                            ItemName = appService.Service?.Name ?? string.Empty,
                             UnitPrice = unitPrice,
                             Quantity = quantity,
-                            DiscountAmount = 0,
                             LineTotal = lineTotal,
                             StaffId = appointment.StaffId,
                             Status = InvoiceItemConst.STATUS_ACTIVE,
-                            CommissionRate = commissionRate,
-                            CommissionAmount = commissionAmount,
-                        });
+                        };
+
+                        if (appService.Service?.CommissionRate is decimal rate)
+                        {
+                            item.CommissionRate = rate;
+                            item.CommissionAmount = Math.Round(lineTotal * (rate / 100m), 0);
+                        }
+
+                        items.Add(item);
                     }
                 }
 
@@ -124,7 +120,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
                 var customer = appointment.CreatedByUser?.Customer;
 
                 var (membershipDiscount, promoDiscount, membershipTierId) =
-                    AppointmentInvoiceDiscountHelper.Split(subTotal, appointment.TotalAmount, appointment.Note, customer);
+                    AppointmentInvoiceDiscountHelper.Split(subTotal, appointment.TotalAmount, customer);
 
                 var invoice = new Invoice
                 {
@@ -139,13 +135,8 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
                     DiscountAmount = promoDiscount,
                     MembershipTierId = membershipTierId,
                     MembershipDiscountAmount = membershipDiscount,
-                    LoyaltyPointsUsed = 0,
-                    LoyaltyPointsValue = 0,
-                    LoyaltyPointsEarned = 0,
-                    TaxAmount = 0,
                     TotalAmount = appointment.TotalAmount,
-                    PaidAmount = appointment.PaidAmount, 
-                    ChangeAmount = 0,
+                    PaidAmount = appointment.PaidAmount,
                     PaymentMethod = paymentMethod,
                     Status = status,
                     Note = appointment.Note,

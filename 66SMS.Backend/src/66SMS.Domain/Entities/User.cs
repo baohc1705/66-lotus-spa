@@ -8,8 +8,8 @@ namespace _66SMS.Domain.Entities
         public string Username { get; set; } = null!;
         public string Email { get; set; } = null!;
         public string PasswordHash { get; set; } = null!;
-        public bool IsEmailConfirmed { get; set; }
-        public int AccessFailedCount { get; set; }
+        public bool IsEmailConfirmed { get; set; } = false;
+        public int AccessFailedCount { get; set; } = 0;
         public int Status { get; set; }
         public DateTimeOffset? LockoutEnd { get; set; }
         public DateTimeOffset? LastLoginAt { get; set; }

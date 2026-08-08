@@ -6,8 +6,8 @@ namespace _66SMS.Domain.Entities
     {
         public int AppointmentId { get; set; }
         public int Phase { get; set; }
-        public decimal Amount { get; set; }
-        public decimal RefundedAmount { get; set; }
+        public decimal Amount { get; set; } = 0;
+        public decimal RefundedAmount { get; set; } = 0;
         public int Method { get; set; }
         public string? TransactionId { get; set; }
         public DateTimeOffset? DueDate { get; set; }

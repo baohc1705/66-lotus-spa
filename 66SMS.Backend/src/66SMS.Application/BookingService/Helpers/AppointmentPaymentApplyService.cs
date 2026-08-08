@@ -1,3 +1,4 @@
+using _66SMS.Contract.Enumerations;
 using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Constants;
@@ -22,16 +23,19 @@ namespace _66SMS.Application.BookingService.Helpers
                 if (!AppointmentStatusTransitions.CanPayDeposit(appointment))
                     return Result<object>.BadRequest("Lỗi: Không ở trạng thái chờ cọc hoặc đã cọc.");
 
-                var percent = depositPercent
-                    ?? appointment.DepositPercent
-                    ?? AppointmentPaymentCalculator.DefaultDepositPercent;
+                var percent = depositPercent ?? appointment.DepositPercent;
+                if (percent == null)
+                    return Result<object>.BadRequest(
+                        ConfigAppointmentConst.MSG_DEPOSIT_PERCENT_NOT_CONFIGURED,
+                        ErrorCodes.ERR_CONFIG_APPOINTMENT_NOT_FOUND);
+
                 var depositAmount = AppointmentPaymentCalculator.GetDepositAmount(
                     appointment.TotalAmount,
-                    percent);
+                    percent.Value);
 
                 if (!AppointmentPaymentRecorder.TryRecordPayment(
                     appointment, AppointmentPaymentConst.PHASE_DEPOSIT, depositAmount,
-                    AppointmentPaymentConst.METHOD_BANK_TRANSFER, transactionId, "Deposited with VNPAY", out var error))
+                    AppointmentPaymentConst.METHOD_BANK_TRANSFER, transactionId, null, out var error))
                     return Result<object>.BadRequest(error!);
 
                 appointment.Status = AppointmentConst.STATUS_WAITING;
@@ -51,7 +55,7 @@ namespace _66SMS.Application.BookingService.Helpers
 
             if (!AppointmentPaymentRecorder.TryRecordPayment(
                 appointment, AppointmentPaymentConst.PHASE_FINAL_PAYMENT, balanceAmount,
-                AppointmentPaymentConst.METHOD_BANK_TRANSFER, transactionId, "Thanh toán phần còn lại qua VNPAY", out var balanceErr))
+                AppointmentPaymentConst.METHOD_BANK_TRANSFER, transactionId, null, out var balanceErr))
                 return Result<object>.BadRequest(balanceErr!);
 
             appointment.UpdatedAt = DateTimeHelper.UtcNow();

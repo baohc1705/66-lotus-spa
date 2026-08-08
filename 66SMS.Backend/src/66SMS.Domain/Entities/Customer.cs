@@ -11,7 +11,7 @@ namespace _66SMS.Domain.Entities
         public DateOnly? DateOfBirth { get; set; }
         public int? Gender { get; set; }
         public string? Phone { get; set; }
-        public int? LoyaltyPoint { get; set; }
+        public int? LoyaltyPoint { get; set; } = 0;
         public DateTimeOffset? FirstPurchaseAt { get; set; }
         public DateTimeOffset? LastPurchaseAt { get; set; }
         public string? Source { get; set; }

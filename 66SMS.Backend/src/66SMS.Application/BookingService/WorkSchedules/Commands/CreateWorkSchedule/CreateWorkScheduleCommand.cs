@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using _66SMS.Contract.Shared;
 using MediatR;
 
@@ -9,7 +10,7 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Commands.CreateWorkSch
         public int? StaffId { get; set; }
         public int? SalonId { get; set; }
         public DateOnly? WorkDate { get; set; }
-        [System.Text.Json.Serialization.JsonIgnore]
+        [JsonIgnore]
         public int? CreatedBy { get; set; }
     }
 }

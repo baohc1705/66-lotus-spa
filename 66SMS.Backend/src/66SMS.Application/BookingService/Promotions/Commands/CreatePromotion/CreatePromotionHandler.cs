@@ -33,7 +33,6 @@ namespace _66SMS.Application.BookingService.Promotions.Commands.CreatePromotion
                 return Result<object>.Conflict(PromotionConst.MSG_CODE_EXISTED, ErrorCodes.ERR_PROMOTION_CODE_EXISTED);
 
             Promotion promotion = mapper.Map<Promotion>(request);
-            promotion.UsedCount = 0;
             promotion.CreatedAt = DateTimeHelper.UtcNow();
             
             if (promotion.UsageLimit <= 0)

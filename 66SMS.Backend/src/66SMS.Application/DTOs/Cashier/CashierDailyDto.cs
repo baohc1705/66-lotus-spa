@@ -13,14 +13,14 @@ namespace _66SMS.Application.DTOs.Cashier
     {
         public string Id { get; set; } = null!;
         public string? AppointmentCode { get; set; }
-        public string CustomerName { get; set; } = null!;
+        public string? CustomerName { get; set; }
         public string? CustomerPhone { get; set; }
         public string? CustomerAvatar { get; set; }
         public string? BookingDate { get; set; }
-        public string ServiceName { get; set; } = null!;
+        public string? ServiceName { get; set; }
         public int? ServiceId { get; set; }
         public int StaffId { get; set; }
-        public string StaffName { get; set; } = null!;
+        public string? StaffName { get; set; }
         public int SlotId { get; set; }
         public string StartTime { get; set; } = null!;
         public string EndTime { get; set; } = null!;

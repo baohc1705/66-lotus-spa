@@ -6,9 +6,9 @@ namespace _66SMS.Domain.Entities
     {
         public int AppointmentId { get; set; }
         public int ServiceId { get; set; }
-        public decimal PriceSnapshot { get; set; }
-        public int DurationSnapshot { get; set; }
-        public int Quantity { get; set; }
+        public decimal PriceSnapshot { get; set; } = 0;
+        public int DurationSnapshot { get; set; } = 0;
+        public int Quantity { get; set; } = 0;
         public int Status { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }

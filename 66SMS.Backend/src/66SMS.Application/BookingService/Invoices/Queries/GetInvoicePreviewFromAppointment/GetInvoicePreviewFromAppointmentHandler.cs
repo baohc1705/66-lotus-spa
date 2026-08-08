@@ -58,7 +58,7 @@ namespace _66SMS.Application.BookingService.Invoices.Queries.GetInvoicePreviewFr
                     items.Add(new InvoicePreviewItemDTO
                     {
                         ServiceId = appService.ServiceId,
-                        ServiceName = appService.Service?.Name ?? "Dịch vụ",
+                        ServiceName = appService.Service?.Name,
                         UnitPrice = unitPrice,
                         Quantity = quantity,
                         LineTotal = lineTotal,

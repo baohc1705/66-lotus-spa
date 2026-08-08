@@ -10,7 +10,7 @@ namespace _66SMS.Domain.Entities
         public int? PositionId { get; set; }
         public int LockedByUserId { get; set; }
         public DateOnly AppointmentDate { get; set; }
-        public int SlotsNeeded { get; set; }
+        public int SlotsNeeded { get; set; } = 1;
         public DateTimeOffset LockedAt { get; set; }
         public DateTimeOffset ExpiresAt { get; set; }
         public DateTimeOffset? ReleasedAt { get; set; }

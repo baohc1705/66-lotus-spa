@@ -144,7 +144,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.UpdateInvoiceItems
                     if (lineTotal < 0) lineTotal = 0;
                     subTotal += lineTotal;
 
-                    invoice.Items.Add(new InvoiceItem
+                    var item = new InvoiceItem
                     {
                         InvoiceId = invoice.Id,
                         ItemType = i.ItemType!.Value,
@@ -152,16 +152,22 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.UpdateInvoiceItems
                         ItemName = itemName,
                         UnitPrice = unitPrice,
                         Quantity = quantity,
-                        DiscountAmount = lineDiscount,
                         LineTotal = lineTotal,
                         StaffId = i.StaffId,
                         Note = i.Note,
                         Status = (int)StatusActiveEnum.ACTIVED,
-                        CommissionRate = commissionRate,
-                        CommissionAmount = commissionRate.HasValue
-                            ? Math.Round(lineTotal * (commissionRate.Value / 100m), 0)
-                            : 0,
-                    });
+                    };
+
+                    if (lineDiscount != 0)
+                        item.DiscountAmount = lineDiscount;
+
+                    if (commissionRate is decimal rate)
+                    {
+                        item.CommissionRate = rate;
+                        item.CommissionAmount = Math.Round(lineTotal * (rate / 100m), 0);
+                    }
+
+                    invoice.Items.Add(item);
                 }
 
                 int? tierId = invoice.MembershipTierId;

@@ -277,7 +277,9 @@ export function WalletTransactionModal({
                             )}
                           </div>
                           <p className="font-semibold text-adminInk text-xs mt-1">
-                            {tx.note}
+                            {tx.note && !tx.note.startsWith("TxnRef:")
+                              ? tx.note
+                              : typeInfo.label}
                           </p>
                           <div className="flex items-center gap-2 mt-1 text-2xs text-adminGray-600">
                             <span>{formatDateTimeDisplay(tx.createdAt)}</span>

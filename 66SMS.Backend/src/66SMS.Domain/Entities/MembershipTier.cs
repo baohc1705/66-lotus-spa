@@ -6,9 +6,9 @@ namespace _66SMS.Domain.Entities
     {
         public string Code { get; set; } = null!;
         public string Name { get; set; } = null!;
-        public decimal MinSpending { get; set; }
+        public decimal MinSpending { get; set; } = 0;
         public int? DiscountPercent { get; set; }
-        public decimal PointMultiplier { get; set; }
+        public decimal PointMultiplier { get; set; } = 1;
         public string? Benefits { get; set; }
         public int Status { get; set; }
 

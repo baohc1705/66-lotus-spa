@@ -19,26 +19,21 @@ namespace _66SMS.Infrastructure.Payments.VnPay
         /// <summary>
         /// LOGIC TẠO URL: Map các field required của VNPAY và gọi VnPayLibrary
         /// </summary>
-        public string CreatePaymentUrl(int appointmentId, decimal amount, string description, string ipAddress, int phase = 2)
-        {
-            var tick = DateTimeHelper.UtcNow().Ticks.ToString(); // Đảm bảo TxnRef luôn là duy nhất
-            var phaseCode = phase == AppointmentPaymentConst.PHASE_DEPOSIT ? "DEPOSIT" : "BALANCE"; // Phân biệt loại thanh toán 
-
-            return BuildPaymentUrl(
-                amount,
-                description,
-                ipAddress,
-                $"{appointmentId}_{phaseCode}_{tick}");
-        }
-
-        public string CreateWalletTopUpUrl(int walletId, decimal amount, string description, string ipAddress)
+        public string CreatePaymentUrl(int appointmentId, decimal amount, string ipAddress, int phase = 2)
         {
             var tick = DateTimeHelper.UtcNow().Ticks.ToString();
-            return BuildPaymentUrl(
-                amount,
-                description,
-                ipAddress,
-                $"{walletId}_{PhaseTopUp}_{tick}");
+            var phaseCode = phase == AppointmentPaymentConst.PHASE_DEPOSIT ? "DEPOSIT" : "BALANCE";
+            var txnRef = $"{appointmentId}_{phaseCode}_{tick}";
+
+            return BuildPaymentUrl(amount, ipAddress, txnRef);
+        }
+
+        public string CreateWalletTopUpUrl(int walletId, decimal amount, string ipAddress)
+        {
+            var tick = DateTimeHelper.UtcNow().Ticks.ToString();
+            var txnRef = $"{walletId}_{PhaseTopUp}_{tick}";
+
+            return BuildPaymentUrl(amount, ipAddress, txnRef);
         }
 
         /// <summary>
@@ -119,19 +114,18 @@ namespace _66SMS.Infrastructure.Payments.VnPay
             };
         }
 
-        private string BuildPaymentUrl(decimal amount, string description, string ipAddress, string txnRef)
+        private string BuildPaymentUrl(decimal amount, string ipAddress, string txnRef)
         {
             var vnpay = new VnPayLibrary();
             vnpay.AddRequestData("vnp_Version", "2.1.0");
             vnpay.AddRequestData("vnp_Command", "pay");
             vnpay.AddRequestData("vnp_TmnCode", vnPaySettings.TmnCode);
-            vnpay.AddRequestData("vnp_Amount", ((long)(amount * 100)).ToString()); // Quy tắc VNPAY: Amount phải nhân 100
-            // VNPay yêu cầu chuỗi yyyyMMddHHmmss; dùng UTC thống nhất hệ thống
+            vnpay.AddRequestData("vnp_Amount", ((long)(amount * 100)).ToString());
             vnpay.AddRequestData("vnp_CreateDate", DateTimeHelper.UtcNowString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", "VND");
             vnpay.AddRequestData("vnp_IpAddr", ipAddress);
             vnpay.AddRequestData("vnp_Locale", "vn");
-            vnpay.AddRequestData("vnp_OrderInfo", description);
+            vnpay.AddRequestData("vnp_OrderInfo", txnRef);
             vnpay.AddRequestData("vnp_OrderType", "other");
             vnpay.AddRequestData("vnp_ReturnUrl", vnPaySettings.ReturnUrl);
             vnpay.AddRequestData("vnp_TxnRef", txnRef);

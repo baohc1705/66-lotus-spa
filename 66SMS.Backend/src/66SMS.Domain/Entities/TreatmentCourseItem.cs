@@ -6,8 +6,8 @@ namespace _66SMS.Domain.Entities
     {
         public int TreatmentCourseId { get; set; }
         public int ServiceId { get; set; }
-        public int SessionNumber { get; set; }
-        public int Quantity { get; set; }
+        public int SessionNumber { get; set; } = 0;
+        public int Quantity { get; set; } = 0;
         public string? Note { get; set; }
         public int Status { get; set; }
 

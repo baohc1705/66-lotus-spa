@@ -13,10 +13,10 @@ namespace _66SMS.Domain.Entities
         public string? Description { get; set; }
         public string? Content { get; set; }
         public string Unit { get; set; } = null!;
-        public decimal CostPrice { get; set; }
+        public decimal CostPrice { get; set; } = 0;
         public decimal? SellingPrice { get; set; }
-        public int StockQuantity { get; set; }
-        public int MinStock { get; set; }
+        public int StockQuantity { get; set; } = 0;
+        public int MinStock { get; set; } = 0;
         public int Status { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }

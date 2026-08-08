@@ -1,30 +1,50 @@
-using _66SMS.Contract.Shared;
-using _66SMS.Domain.Abstractions.Repositories.Sql;
-using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Contract.Abstractions;
 using _66SMS.Contract.Constants;
 using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Messages;
+using _66SMS.Contract.Shared;
+using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Application.BookingService.Helpers;
-using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentStatus
 {
-    public sealed class UpdateAppointmentStatusHandler(
-        IAppointmentSqlRepository appointmentSqlRepository,
-        IStaffSqlRepository staffSqlRepository,
-        IUserSqlRepository userSqlRepository,
-        IWalletSqlRepository walletSqlRepository,
-        IWalletTransactionSqlRepository walletTransactionSqlRepository,
-        IBookingPositionSqlRepository bookingPositionSqlRepository,
-        IDomainEventPublisher domainEventPublisher,
-        ISqlUnitOfWork sqlUnitOfWork)
-        : IRequestHandler<UpdateAppointmentStatusCommand, Result<object>>
+    public sealed class UpdateAppointmentStatusHandler : IRequestHandler<UpdateAppointmentStatusCommand, Result<object>>
     {
+        private readonly IAppointmentSqlRepository appointmentSqlRepository;
+        private readonly IStaffSqlRepository staffSqlRepository;
+        private readonly IUserSqlRepository userSqlRepository;
+        private readonly IWalletSqlRepository walletSqlRepository;
+        private readonly IWalletTransactionSqlRepository walletTransactionSqlRepository;
+        private readonly IBookingPositionSqlRepository bookingPositionSqlRepository;
+        private readonly IDomainEventPublisher domainEventPublisher;
+        private readonly ISqlUnitOfWork sqlUnitOfWork;
+
+        public UpdateAppointmentStatusHandler(
+            IAppointmentSqlRepository appointmentSqlRepository,
+            IStaffSqlRepository staffSqlRepository,
+            IUserSqlRepository userSqlRepository,
+            IWalletSqlRepository walletSqlRepository,
+            IWalletTransactionSqlRepository walletTransactionSqlRepository,
+            IBookingPositionSqlRepository bookingPositionSqlRepository,
+            IDomainEventPublisher domainEventPublisher,
+            ISqlUnitOfWork sqlUnitOfWork)
+        {
+            this.appointmentSqlRepository = appointmentSqlRepository;
+            this.staffSqlRepository = staffSqlRepository;
+            this.userSqlRepository = userSqlRepository;
+            this.walletSqlRepository = walletSqlRepository;
+            this.walletTransactionSqlRepository = walletTransactionSqlRepository;
+            this.bookingPositionSqlRepository = bookingPositionSqlRepository;
+            this.domainEventPublisher = domainEventPublisher;
+            this.sqlUnitOfWork = sqlUnitOfWork;
+        }
+
         public async Task<Result<object>> Handle(
             UpdateAppointmentStatusCommand request,
             CancellationToken cancellationToken)
@@ -36,22 +56,16 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                 .FirstOrDefaultAsync(a => a.Id == request.Id, cancellationToken);
 
             if (appointment == null)
-            {
                 return Result<object>.NotFound(AppointmentConst.MSG_APPOINTMENT_NOT_FOUND, ErrorCodes.ERR_APPOINTMENT_NOT_FOUND);
-            }
 
             if (appointment.Status == request.Status && request.Status != AppointmentConst.STATUS_WAITING)
-            {
                 return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_ALREADY_THIS_STATUS, ErrorCodes.ERR_APPOINTMENT_ALREADY_THIS_STATUS);
-            }
 
             if (request.Status == AppointmentConst.STATUS_CONFIRMED
                 && appointment.Status == AppointmentConst.STATUS_PENDING
                 && !AppointmentPaymentCalculator.HasDepositPaid(appointment)
                 && appointment.DepositDeadlineAt != null)
-            {
                 return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_ALREADY_CONFIRMED_WAITING_DEPOSIT, ErrorCodes.ERR_APPOINTMENT_ALREADY_THIS_STATUS);
-            }
 
             using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
 
@@ -140,7 +154,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                         Amount = paidBeforeCancel,
                         BalanceAfter = wallet.Balance,
                         Type = WalletTransactionConst.TYPE_REFUND_FROM_APPOINTMENT,
-                        Note = $"Hoàn tiền do thu ngân hủy lịch hẹn #{appointment.Id}",
                         Status = WalletTransactionConst.STATUS_SUCCESS,
                         CreatedAt = DateTimeHelper.UtcNow(),
                         CreatedBy = request.UserId
@@ -167,7 +180,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                     request.UserId,
                     confirmedWaitingDeposit: false,
                     cancellationToken);
-                return Result<object>.Success("Cập nhật trạng thái thành công.");
+                return Result<object>.Success(AppointmentConst.MSG_APPOINTMENT_UPDATE_STATUS_SUCCESS);
             }
             catch
             {
@@ -187,21 +200,17 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                 .Select(s => (int?)s.UserId)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            var customerName = appointment.CreatedByUser?.Customer?.FullName
-                ?? appointment.CreatedByUser?.Username
-                ?? "khách";
+            var customerName = appointment.CreatedByUser?.Customer?.FullName ?? appointment.CreatedByUser?.Username;
 
-            var actorName = "Thu ngân";
+            string? actorName = null;
             if (actorUserId is int uid)
             {
-                var actor = await userSqlRepository.AsQueryable(asNoTracking: true)
+                actorName = await userSqlRepository.AsQueryable(asNoTracking: true)
                     .Where(u => u.Id == uid)
                     .Select(u => u.Staff != null
                         ? u.Staff.FullName
                         : (u.Customer != null ? u.Customer.FullName : u.Username))
                     .FirstOrDefaultAsync(cancellationToken);
-                if (!string.IsNullOrWhiteSpace(actor))
-                    actorName = actor;
             }
 
             var at = DateTimeHelper.UtcNow().ToOffset(TimeSpan.FromHours(7)).ToString("HH:mm dd/MM/yyyy");

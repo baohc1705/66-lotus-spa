@@ -5,6 +5,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.DeleteAppointm
 {
     public class DeleteAppointmentCommand : IRequest<Result<object>>
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
     }
 }

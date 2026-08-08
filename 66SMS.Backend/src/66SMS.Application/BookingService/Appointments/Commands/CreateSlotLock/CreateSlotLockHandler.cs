@@ -1,5 +1,4 @@
 using System.Data;
-using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Contract.Enumerations;
 using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Shared;
@@ -81,7 +80,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                         var startIndex = slots.FindIndex(s => s.Id == slotId);
                         if (startIndex < 0)
                         {
-                            return Result<List<int>>.BadRequest($"Slot {slotId} không tồn tại.");
+                            return Result<List<int>>.BadRequest(TimeSlotConst.MSG_TIME_SLOT_NOT_FOUND, ErrorCodes.ERR_TIME_SLOT_NOT_FOUND);
                         }
 
                         if (!durationByServiceId.TryGetValue((int)lockRequest.ServiceId!, out var durationMins))
@@ -92,7 +91,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                         var slotsNeeded = TimeSlotConst.CalcSlotsNeeded(durationMins, slotMinutes);
                         if (startIndex + slotsNeeded > slots.Count)
                         {
-                            return Result<List<int>>.BadRequest($"Không đủ khung giờ liên tiếp từ {slots[startIndex].StartTime:HH\\:mm} cho dịch vụ {durationMins} phút.");
+                            return Result<List<int>>.BadRequest(TimeSlotConst.MSG_TIME_SLOT_NOT_ENOUGH, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
                         }
 
                         var resolved = await appointmentSqlRepository.ResolveBookingStaffAsync(
@@ -106,11 +105,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
 
                         if (resolved == null)
                         {
-                            var startLabel = slots[startIndex].StartTime.ToString(@"HH\:mm");
-                            return Result<List<int>>.Conflict(slotsNeeded > 1
-                                ? $"Khung giờ {startLabel} không đủ {durationMins} phút liên tiếp (có slot phía sau đã được đặt/giữ). Vui lòng chọn giờ khác."
-                                : AppointmentSlotLockConst.MSG_SLOT_LOCK_CONFLICT,
-                                ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
+                            return Result<List<int>>.Conflict(AppointmentSlotLockConst.MSG_SLOT_LOCK_CONFLICT, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
                         }
 
                         var slotLock = new AppointmentSlotLock
@@ -140,10 +135,26 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                     throw;
                 }
             }
-            catch (DbUpdateException ex) when (BookingDbConcurrency.IsUniqueViolation(ex))
+            catch (DbUpdateException ex) when (IsUniqueViolation(ex))
             {
                 return Result<List<int>>.Conflict(AppointmentSlotLockConst.MSG_SLOT_LOCK_CONFLICT, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
             }
+        }
+        private static bool IsUniqueViolation(Exception ex)
+        {
+            for (var e = ex; e != null; e = e.InnerException!)
+            {
+                var numberProp = e.GetType().GetProperty("Number");
+                if (numberProp?.GetValue(e) is int number && (number == 2601 || number == 2627))
+                    return true;
+
+                if (e.Message.Contains("UNIQUE KEY", StringComparison.OrdinalIgnoreCase)
+                    || e.Message.Contains("duplicate key", StringComparison.OrdinalIgnoreCase)
+                    || e.Message.Contains("UX_slot_lock_active", StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
         }
     }
 }

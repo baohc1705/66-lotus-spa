@@ -55,11 +55,7 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetWalletTopUpVnPayUr
             }
 
             var ip = string.IsNullOrWhiteSpace(request.IpAddress) ? "127.0.0.1" : request.IpAddress;
-            var url = vnPayService.CreateWalletTopUpUrl(
-                wallet.Id,
-                request.Amount,
-                $"Nap tien vi {wallet.Id}",
-                ip);
+            var url = vnPayService.CreateWalletTopUpUrl(wallet.Id, request.Amount, ip);
 
             return Result<string>.Success(url);
         }

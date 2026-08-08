@@ -13,7 +13,7 @@ namespace _66SMS.Domain.Entities
         public DateOnly WorkDate { get; set; }
         public DateTimeOffset? CheckInAt { get; set; }
         public DateTimeOffset? CheckOutAt { get; set; }
-        public decimal WorkedHours { get; set; }
+        public decimal WorkedHours { get; set; } = 0;
         public int Status { get; set; }
         public string? Note { get; set; }
 

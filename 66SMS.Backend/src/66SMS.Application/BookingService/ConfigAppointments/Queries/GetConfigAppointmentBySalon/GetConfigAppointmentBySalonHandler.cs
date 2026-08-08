@@ -1,6 +1,8 @@
 using _66SMS.Application.DTOs.ConfigAppointments;
+using _66SMS.Contract.Enumerations;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,14 +38,14 @@ namespace _66SMS.Application.BookingService.ConfigAppointments.Queries.GetConfig
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (dto == null)
-            {
-                // Chưa cấu hình → trả % mặc định để UI đặt lịch vẫn hiển thị đúng
-                return Result<ConfigAppointmentDto>.Success(new ConfigAppointmentDto
-                {
-                    SalonId = request.SalonId,
-                    DepositPercent = 20,
-                });
-            }
+                return Result<ConfigAppointmentDto>.NotFound(
+                    ConfigAppointmentConst.MSG_NOT_FOUND,
+                    ErrorCodes.ERR_CONFIG_APPOINTMENT_NOT_FOUND);
+
+            if (dto.DepositPercent == null)
+                return Result<ConfigAppointmentDto>.BadRequest(
+                    ConfigAppointmentConst.MSG_DEPOSIT_PERCENT_NOT_CONFIGURED,
+                    ErrorCodes.ERR_CONFIG_APPOINTMENT_NOT_FOUND);
 
             return Result<ConfigAppointmentDto>.Success(dto);
         }

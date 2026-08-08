@@ -43,7 +43,6 @@ namespace _66SMS.Application.BookingService.BookingPositions.Commands.DeleteBook
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
 
-                // Xóa cache list vị trí + chi tiết phòng (expanded chứa positions).
                 await cacheService.RemoveAsync(BookingPositionConst.CacheKeyDetail(bookingPosition.Id), cancellationToken);
                 await cacheService.RemoveByPrefixAsync(BookingPositionConst.CACHE_PREFIX, cancellationToken);
                 await cacheService.RemoveAsync(BookingRoomConst.CacheKeyDetail(bookingPosition.RoomId), cancellationToken);

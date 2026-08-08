@@ -12,6 +12,7 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetMyWalletTransactio
     {
         public int Id { get; set; }
         public decimal Amount { get; set; }
+        public int Type { get; set; }
         public string? Note { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
     }

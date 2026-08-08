@@ -58,9 +58,7 @@ namespace _66SMS.Application.CustomerService.Wallets.Commands.ManualWalletTransa
                     Amount = request.Amount,
                     BalanceAfter = wallet.Balance,
                     Type = request.Amount > 0 ? WalletTransactionConst.TYPE_TOP_UP : WalletTransactionConst.TYPE_ADMIN_ADJUST,
-                    Note = string.IsNullOrWhiteSpace(request.Note) 
-                        ? (request.Amount > 0 ? "Nạp tiền thủ công" : "Trừ tiền thủ công") 
-                        : request.Note.Trim(),
+                    Note = string.IsNullOrWhiteSpace(request.Note) ? null : request.Note.Trim(),
                     Status = WalletTransactionConst.STATUS_SUCCESS,
                     CreatedAt = DateTimeHelper.UtcNow(),
                     CreatedBy = request.UserId

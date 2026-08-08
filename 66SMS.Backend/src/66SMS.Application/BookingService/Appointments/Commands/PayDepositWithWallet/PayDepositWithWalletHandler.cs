@@ -14,98 +14,100 @@ using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWithWallet
 {
-    public sealed class PayDepositWithWalletHandler(
-        IAppointmentSqlRepository appointmentSqlRepository,
-        IUserSqlRepository userSqlRepository,
-        IWalletSqlRepository walletSqlRepository,
-        IWalletTransactionSqlRepository walletTransactionSqlRepository,
-        IInvoiceSqlRepository invoiceSqlRepository,
-        IConfigAppointmentSqlRepository configAppointmentSqlRepository,
-        IEmailTemplateFactory emailTemplateFactory,
-        IDomainEventPublisher domainEventPublisher,
-        ISqlUnitOfWork sqlUnitOfWork)
-        : IRequestHandler<PayDepositWithWalletCommand, Result<object>>
+    public sealed class PayDepositWithWalletHandler : IRequestHandler<PayDepositWithWalletCommand, Result<object>>
     {
+        private readonly IAppointmentSqlRepository appointmentSqlRepository;
+        private readonly IUserSqlRepository userSqlRepository;
+        private readonly IWalletSqlRepository walletSqlRepository;
+        private readonly IWalletTransactionSqlRepository walletTransactionSqlRepository;
+        private readonly IInvoiceSqlRepository invoiceSqlRepository;
+        private readonly IConfigAppointmentSqlRepository configAppointmentSqlRepository;
+        private readonly IEmailTemplateFactory emailTemplateFactory;
+        private readonly IDomainEventPublisher domainEventPublisher;
+        private readonly ISqlUnitOfWork sqlUnitOfWork;
+
+        public PayDepositWithWalletHandler(
+            IAppointmentSqlRepository appointmentSqlRepository,
+            IUserSqlRepository userSqlRepository,
+            IWalletSqlRepository walletSqlRepository,
+            IWalletTransactionSqlRepository walletTransactionSqlRepository,
+            IInvoiceSqlRepository invoiceSqlRepository,
+            IConfigAppointmentSqlRepository configAppointmentSqlRepository,
+            IEmailTemplateFactory emailTemplateFactory,
+            IDomainEventPublisher domainEventPublisher,
+            ISqlUnitOfWork sqlUnitOfWork)
+        {
+            this.appointmentSqlRepository = appointmentSqlRepository;
+            this.userSqlRepository = userSqlRepository;
+            this.walletSqlRepository = walletSqlRepository;
+            this.walletTransactionSqlRepository = walletTransactionSqlRepository;
+            this.invoiceSqlRepository = invoiceSqlRepository;
+            this.configAppointmentSqlRepository = configAppointmentSqlRepository;
+            this.emailTemplateFactory = emailTemplateFactory;
+            this.domainEventPublisher = domainEventPublisher;
+            this.sqlUnitOfWork = sqlUnitOfWork;
+        }
+
         public async Task<Result<object>> Handle(
             PayDepositWithWalletCommand request,
             CancellationToken cancellationToken)
         {
-            var userId = request.UserId;
-            if (userId == null)
-            {
-                return Result<object>.Unauthorized("Vui lòng đăng nhập.");
-            }
-
             var appointment = await appointmentSqlRepository.AsQueryable(asNoTracking: false)
                 .Include(a => a.Payments)
-                .FirstOrDefaultAsync(a => a.Id == request.AppointmentId, cancellationToken);
+                .FirstOrDefaultAsync(a => a.Id == (int)request.AppointmentId!, cancellationToken);
 
             if (appointment == null)
-            {
                 return Result<object>.NotFound(AppointmentConst.MSG_APPOINTMENT_NOT_FOUND, ErrorCodes.ERR_APPOINTMENT_NOT_FOUND);
-            }
 
-            if (appointment.CreatedByUserId != userId)
-            {
+            if (appointment.CreatedByUserId != (int)request.UserId!)
                 return Result<object>.Forbidden("Bạn không có quyền thanh toán cho lịch hẹn này.");
+
+            if (AppointmentPaymentCalculator.HasDepositPaid(appointment))
+                return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_DEPOSIT_ALREADY_PAID, ErrorCodes.ERR_APPOINTMENT_DEPOSIT_ALREADY_PAID);
+
+            var depositPercent = await AppointmentPaymentCalculator.GetEffectiveDepositPercentAsync(
+                appointment, configAppointmentSqlRepository, cancellationToken);
+
+            if (depositPercent == null)
+                return Result<object>.BadRequest(
+                    ConfigAppointmentConst.MSG_DEPOSIT_PERCENT_NOT_CONFIGURED,
+                    ErrorCodes.ERR_CONFIG_APPOINTMENT_NOT_FOUND);
+
+            var depositAmount = AppointmentPaymentCalculator.GetDepositAmount(appointment.TotalAmount, depositPercent.Value);
+
+            if (depositAmount <= 0)
+                return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_DEPOSIT_INVALID_AMOUNT, ErrorCodes.ERR_APPOINTMENT_SLOT_LOCK_INVALID);
+
+            Wallet wallet;
+            try
+            {
+                wallet = await WalletManager.GetOrCreateWalletAsync((int)request.UserId!, userSqlRepository, walletSqlRepository, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                return Result<object>.BadRequest(ex.Message);
             }
 
-            DepositInvoiceEmailData? emailData = null;
+            if (wallet.Balance < depositAmount)
+                return Result<object>.BadRequest(WalletConst.MSG_WALLET_INSUFFICIENT_BALANCE, ErrorCodes.ERR_WALLET_INSUFFICIENT_BALANCE);
 
             using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                var depositPercent = await AppointmentPaymentCalculator.GetEffectiveDepositPercentAsync(
-                    appointment,
-                    configAppointmentSqlRepository,
-                    cancellationToken);
-                var depositAmount = AppointmentPaymentCalculator.GetDepositAmount(
-                    appointment.TotalAmount,
-                    depositPercent);
-
-                if (depositAmount <= 0)
-                {
-                    return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_DEPOSIT_INVALID_AMOUNT, ErrorCodes.ERR_APPOINTMENT_SLOT_LOCK_INVALID);
-                }
-
-                if (AppointmentPaymentCalculator.HasDepositPaid(appointment))
-                {
-                    return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_DEPOSIT_ALREADY_PAID, ErrorCodes.ERR_APPOINTMENT_DEPOSIT_ALREADY_PAID);
-                }
-
-                Wallet wallet;
-                try
-                {
-                    wallet = await WalletManager.GetOrCreateWalletAsync((int)request.UserId!, userSqlRepository, walletSqlRepository, cancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    return Result<object>.BadRequest(ex.Message);
-                }
-
-                if (wallet.Balance < depositAmount)
-                {
-                    return Result<object>.BadRequest(WalletConst.MSG_WALLET_INSUFFICIENT_BALANCE, ErrorCodes.ERR_WALLET_INSUFFICIENT_BALANCE);
-                }
-
                 wallet.Balance -= depositAmount;
                 if (wallet.Id > 0)
-                {
                     walletSqlRepository.Update(wallet);
-                }
 
-                var walletTx = new WalletTransaction
+                walletTransactionSqlRepository.Add(new WalletTransaction
                 {
                     Wallet = wallet,
                     Amount = -depositAmount,
                     BalanceAfter = wallet.Balance,
                     Type = WalletTransactionConst.TYPE_PAYMENT_FOR_APPOINTMENT,
-                    Note = $"Thanh toán tiền cọc bằng ví cho lịch hẹn #{appointment.Id}",
                     Status = WalletTransactionConst.STATUS_SUCCESS,
                     CreatedAt = DateTimeHelper.UtcNow(),
-                    CreatedBy = userId
-                };
-                walletTransactionSqlRepository.Add(walletTx);
+                    CreatedBy = request.UserId,
+                });
 
                 if (!AppointmentPaymentRecorder.TryRecordPayment(
                         appointment,
@@ -113,9 +115,10 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                         depositAmount,
                         AppointmentPaymentConst.METHOD_WALLET,
                         null,
-                        "Thanh toán cọc qua Ví",
+                        null,
                         out var error))
                 {
+                    transaction.Rollback();
                     return Result<object>.BadRequest(error!);
                 }
 
@@ -124,30 +127,22 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                 appointment.UpdatedBy = request.UserId;
                 appointmentSqlRepository.Update(appointment);
 
-                emailData = await TryPrepareDepositInvoiceAsync(appointment.Id, cancellationToken);
+                await CreateDepositInvoiceAndSendEmailAsync(appointment.Id, cancellationToken);
 
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
-
-                if (emailData != null)
-                {
-                    await SendDepositInvoiceEmailAsync(emailData, cancellationToken);
-                }
-
-                await PublishDepositPaidAsync(appointment, cancellationToken);
-
-                return Result<object>.Success("Thanh toán tiền cọc thành công.");
             }
             catch
             {
                 transaction.Rollback();
                 throw;
             }
+
+            await PublishDepositPaidAsync(appointment, cancellationToken);
+            return Result<object>.Success(AppointmentConst.MSG_APPOINTMENT_PAY_DEPOSIT_SUCCESS);
         }
 
-        private async Task PublishDepositPaidAsync(
-            Appointment appointment,
-            CancellationToken cancellationToken)
+        private async Task PublishDepositPaidAsync(Appointment appointment, CancellationToken cancellationToken)
         {
             var staff = await appointmentSqlRepository.AsQueryable(asNoTracking: true)
                 .Where(a => a.Id == appointment.Id)
@@ -158,7 +153,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 
-            var customerName = staff?.CustomerName ?? "Khách hàng";
+            var customerName = staff?.CustomerName;
             var at = DateTimeHelper.UtcNow().ToOffset(TimeSpan.FromHours(7)).ToString("HH:mm dd/MM/yyyy");
 
             await domainEventPublisher.PublishAsync(new SendNotificationEvent<BookingNotificationPayload>
@@ -182,12 +177,11 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
             }, cancellationToken);
         }
 
-        private async Task<DepositInvoiceEmailData?> TryPrepareDepositInvoiceAsync(
+        private async Task CreateDepositInvoiceAndSendEmailAsync(
             int appointmentId,
             CancellationToken cancellationToken)
         {
             var appointment = await appointmentSqlRepository.AsQueryable(asNoTracking: false)
-                .Include(a => a.Payments)
                 .Include(a => a.Services!)
                     .ThenInclude(s => s.Service)
                 .Include(a => a.TimeSlot)
@@ -197,58 +191,52 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                             .ThenInclude(mc => mc!.Tier)
                 .FirstOrDefaultAsync(a => a.Id == appointmentId, cancellationToken);
 
-            if (appointment == null || !AppointmentPaymentCalculator.HasDepositPaid(appointment))
-                return null;
+            if (appointment is null)
+                return;
 
             var hasExistingInvoice = await invoiceSqlRepository.AsQueryable()
                 .AnyAsync(i => i.AppointmentId == appointment.Id && i.Status != InvoiceConst.STATUS_CANCELLED, cancellationToken);
 
             if (hasExistingInvoice)
-                return null;
+                return;
 
             var items = new List<InvoiceItem>();
             decimal subTotal = 0;
 
-            if (appointment.Services != null)
+            foreach (var appService in appointment.Services ?? [])
             {
-                foreach (var appService in appointment.Services)
+                var quantity = appService.Quantity;
+                var unitPrice = appService.PriceSnapshot;
+                var lineTotal = unitPrice * quantity;
+                subTotal += lineTotal;
+
+                var item = new InvoiceItem
                 {
-                    var quantity = appService.Quantity;
-                    var unitPrice = appService.PriceSnapshot;
-                    var lineTotal = unitPrice * quantity;
-                    subTotal += lineTotal;
+                    ItemType = InvoiceItemConst.TYPE_SERVICE,
+                    RefId = appService.ServiceId,
+                    ItemName = appService.Service?.Name ?? string.Empty,
+                    UnitPrice = unitPrice,
+                    Quantity = quantity,
+                    LineTotal = lineTotal,
+                    StaffId = appointment.StaffId,
+                    Status = InvoiceItemConst.STATUS_ACTIVE,
+                };
 
-                    decimal? commissionRate = null;
-                    decimal commissionAmount = 0;
-
-                    if (appService.Service != null && appService.Service.CommissionRate.HasValue)
-                    {
-                        commissionRate = appService.Service.CommissionRate.Value;
-                        commissionAmount = Math.Round(lineTotal * (commissionRate.Value / 100m), 0);
-                    }
-
-                    items.Add(new InvoiceItem
-                    {
-                        ItemType = InvoiceItemConst.TYPE_SERVICE,
-                        RefId = appService.ServiceId,
-                        ItemName = appService.Service?.Name ?? "Dịch vụ",
-                        UnitPrice = unitPrice,
-                        Quantity = quantity,
-                        DiscountAmount = 0,
-                        LineTotal = lineTotal,
-                        StaffId = appointment.StaffId,
-                        Status = InvoiceItemConst.STATUS_ACTIVE,
-                        CommissionRate = commissionRate,
-                        CommissionAmount = commissionAmount,
-                    });
+                if (appService.Service?.CommissionRate is decimal rate)
+                {
+                    item.CommissionRate = rate;
+                    item.CommissionAmount = Math.Round(lineTotal * (rate / 100m), 0);
                 }
+
+                items.Add(item);
             }
 
             var customer = appointment.CreatedByUser?.Customer;
             var (membershipDiscount, promoDiscount, membershipTierId) =
-                AppointmentInvoiceDiscountHelper.Split(subTotal, appointment.TotalAmount, appointment.Note, customer);
+                AppointmentInvoiceDiscountHelper.Split(subTotal, appointment.TotalAmount, customer);
 
             var invoiceCode = $"HD-{DateTimeHelper.UtcNow():yyyyMMddHHmmssfff}";
+            var now = DateTimeHelper.UtcNow();
 
             invoiceSqlRepository.Add(new Invoice
             {
@@ -262,52 +250,37 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                 DiscountAmount = promoDiscount,
                 MembershipTierId = membershipTierId,
                 MembershipDiscountAmount = membershipDiscount,
-                LoyaltyPointsUsed = 0,
-                LoyaltyPointsValue = 0,
-                LoyaltyPointsEarned = 0,
-                TaxAmount = 0,
                 TotalAmount = appointment.TotalAmount,
                 PaidAmount = appointment.PaidAmount,
-                ChangeAmount = 0,
                 PaymentMethod = InvoiceConst.PAYMENT_WALLET,
                 Status = InvoiceConst.STATUS_UNPAID,
-                Note = $"Hóa đơn cọc lịch hẹn #{appointment.Id}",
-                IssuedAt = DateTimeHelper.UtcNow(),
-                CreatedAt = DateTimeHelper.UtcNow(),
+                Note = appointment.Note,
+                IssuedAt = now,
+                CreatedAt = now,
                 CreatedBy = appointment.CreatedByUserId,
-                Items = items
+                Items = items,
             });
 
             var customerEmail = appointment.CreatedByUser?.Email;
             if (string.IsNullOrWhiteSpace(customerEmail))
-                return null;
+                return;
 
-            var serviceName = appointment.Services != null && appointment.Services.Any()
-                ? string.Join(", ", appointment.Services.Where(s => s.Service != null).Select(s => s.Service!.Name))
-                : "Dịch vụ";
+            var startTime = appointment.TimeApptStart ?? appointment.TimeSlot?.StartTime;
+            if (startTime is null)
+                return;
 
-            return new DepositInvoiceEmailData(
+            var serviceName = string.Join(
+                ", ",
+                (appointment.Services ?? []).Where(s => s.Service != null).Select(s => s.Service!.Name));
+
+            var mail = emailTemplateFactory.CreateDepositInvoiceEmail(
                 customerEmail,
-                customer?.FullName ?? appointment.CreatedByUser?.Username ?? "Quý khách",
-                serviceName,
-                appointment.AppointmentDate.ToDateTime(appointment.TimeApptStart ?? appointment.TimeSlot?.StartTime ?? new TimeOnly(9, 0)),
+                customer?.FullName ?? appointment.CreatedByUser?.Username,
+                string.IsNullOrWhiteSpace(serviceName) ? null : serviceName,
+                appointment.AppointmentDate.ToDateTime(startTime.Value),
                 appointment.PaidAmount,
                 appointment.TotalAmount - appointment.PaidAmount,
                 invoiceCode);
-        }
-
-        private async Task SendDepositInvoiceEmailAsync(
-            DepositInvoiceEmailData emailData,
-            CancellationToken cancellationToken)
-        {
-            var mail = emailTemplateFactory.CreateDepositInvoiceEmail(
-                emailData.ToEmail,
-                emailData.CustomerName,
-                emailData.ServiceName,
-                emailData.AppointmentTime,
-                emailData.DepositAmount,
-                emailData.RemainingAmount,
-                emailData.InvoiceCode);
 
             await domainEventPublisher.PublishAsync(new SendEmailEvent
             {
@@ -316,14 +289,5 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
                 HtmlBody = mail.HtmlBody,
             }, cancellationToken);
         }
-
-        private sealed record DepositInvoiceEmailData(
-            string ToEmail,
-            string CustomerName,
-            string ServiceName,
-            DateTime AppointmentTime,
-            decimal DepositAmount,
-            decimal RemainingAmount,
-            string InvoiceCode);
     }
 }
