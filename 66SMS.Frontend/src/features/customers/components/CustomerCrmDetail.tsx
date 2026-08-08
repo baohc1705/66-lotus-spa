@@ -82,7 +82,7 @@ export function CustomerCrmDetail({
           <Button
             size="sm"
             variant="admin"
-            className="h-8 text-xs bg-lotus-primary hover:bg-lotus-primary-600 text-white font-semibold"
+            className="h-8 text-xs bg-lotus-primary hover:bg-lotus-primary/90 text-white font-semibold"
             onClick={() => onEdit(customer)}
           >
             <Pencil className="w-3.5 h-3.5 mr-1" />

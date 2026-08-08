@@ -59,9 +59,6 @@
   --color-lotus-primary: var(--lotus-primary);
   --color-lotus-secondary: var(--lotus-secondary);
   --color-lotus-background: var(--lotus-background);
-  --color-lotus-foreground: var(--lotus-foreground);
-  --color-lotus-accent: var(--lotus-accent);
-  --color-lotus-highlight: var(--lotus-highlight);
   --color-lotus-muted: var(--lotus-muted);
   --color-lotus-surface: var(--lotus-surface);
   --color-lotus-rose: var(--lotus-rose);
@@ -72,10 +69,7 @@
   --color-lotus-deep: var(--lotus-deep);
   --color-lotus-stone: var(--lotus-stone);
   --color-lotus-rose-light: var(--lotus-rose-light);
-  --color-lotus-inset: var(--lotus-inset);
   --color-lotus-error: var(--lotus-error);
-  --color-lotus-vnpay: var(--lotus-vnpay);
-  --color-lotus-vnpay-red: var(--lotus-vnpay-red);
   --color-lotus-rose-dark: var(--lotus-rose-dark);
 
   --color-rose-50: var(--rose-50);
@@ -132,8 +126,10 @@
 
   --color-adminGray-50: var(--admin-gray-50);
   --color-adminGray-100: var(--admin-gray-100);
+  --color-adminGray-200: var(--admin-gray-200);
   --color-adminGray-300: var(--admin-gray-300);
   --color-adminGray-400: var(--admin-gray-400);
+  --color-adminGray-500: var(--admin-gray-500);
   --color-adminGray-600: var(--admin-gray-600);
 
   --color-state-success-bg: var(--state-success-bg);
@@ -161,26 +157,11 @@
   --color-state-neutral-border: var(--state-neutral-border);
   --color-state-neutral-solid: var(--state-neutral-solid);
 
-  --shadow-jade: 0 4px 24px 0 rgba(157, 23, 77, 0.14);
   --shadow-jade-lg: 0 8px 40px 0 rgba(157, 23, 77, 0.16);
-  --shadow-lotus: 0 4px 20px 0 rgba(157, 23, 77, 0.14);
   --shadow-gold: 0 4px 20px 0 rgba(184, 134, 11, 0.2);
-  --shadow-panel: 0 8px 32px 0 rgba(43, 34, 38, 0.06);
 
-  --animate-slide-in: slide-in 0.22s ease-out;
   --animate-fade-in: fade-in 0.2s ease-out;
-  --animate-float: float-y 4s ease-in-out infinite;
 
-  @keyframes slide-in {
-    from {
-      transform: translateY(-16px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
   @keyframes fade-in {
     from {
       opacity: 0;
@@ -189,13 +170,13 @@
       opacity: 1;
     }
   }
-  @keyframes float-y {
-    0%,
-    100% {
-      transform: translateY(0px);
+
+  @keyframes slide {
+    from {
+      transform: translateX(-100%);
     }
-    50% {
-      transform: translateY(-12px);
+    to {
+      transform: translateX(400%);
     }
   }
 }
@@ -258,7 +239,7 @@
   --warning-text: #8c6608;
 }
 
-/* ── Global scrollbar ── */
+/* Global scrollbar */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
@@ -284,7 +265,7 @@
   scrollbar-width: none;
 }
 
-/* ── Display type (landing hero / section titles) ── */
+/* Display type (landing hero / section titles) */
 .text-display-hero {
   font-size: clamp(2rem, 9vw, 2.75rem);
   line-height: 1.08;
@@ -310,11 +291,6 @@
   line-height: 1.15;
 }
 
-.text-display-section-sm {
-  font-size: clamp(1.5rem, 2.5vw, 2rem);
-  line-height: 1.15;
-}
-
 .text-display-script {
   font-size: clamp(1.25rem, 2.2vw, 1.6rem);
   line-height: 1.1;
@@ -323,19 +299,6 @@
 .text-display-script-lg {
   font-size: clamp(1.5rem, 2.6vw, 2.15rem);
   line-height: 1.1;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.2s ease-out;
 }
 
 /* Hide native password reveal button in MS Edge and Chromium browsers on Windows */

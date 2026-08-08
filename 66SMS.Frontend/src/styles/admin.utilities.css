@@ -11,7 +11,6 @@
 }
 
 @utility lotus-admin-input {
-  /* ── Form ── */
   @apply h-9 w-full text-sm rounded-none border bg-white;
   border-color: var(--admin-gray-300);
   color: var(--admin-ink);
@@ -76,20 +75,13 @@
 @utility lotus-admin-form-section-title {
   @apply text-sm font-semibold;
   color: var(--admin-ink);
-
-  /* Form section / empty / filter icons mặc định gold */
-  .admin-dashboard-container & + svg {
-    color: var(--admin-gold-600);
-  }
 }
 
 @utility lotus-admin-btn-toolbar {
-  /* ── Buttons ── */
   @apply text-xs h-7 px-2;
 }
 
 @utility lotus-admin-table-page-card {
-  /* ── DataTable ── */
   @apply relative overflow-hidden rounded-admin;
   background: var(--admin-bg-surface);
   border: 1px solid var(--admin-border);
@@ -147,7 +139,6 @@
 }
 
 @utility lotus-admin-sidebar-search {
-  /* ── Category sidebar ── */
   @apply w-full text-xs h-8 pl-8 pr-3 rounded focus:outline-hidden;
   background: var(--admin-gray-50);
   border: 1px solid var(--admin-gray-100);
@@ -174,10 +165,6 @@
     background: var(--admin-green-100);
     color: var(--admin-green-900);
   }
-  &[data-active='true'] {
-    background: var(--admin-green-100);
-    color: var(--admin-green-900);
-  }
 }
 
 @utility lotus-admin-sidebar-badge {
@@ -189,7 +176,6 @@
 }
 
 @utility admin-header {
-  /* ── Shell helpers ── */
   background: var(--admin-bg-header);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -202,12 +188,7 @@
   &.is-active {
     color: #ffffff;
   }
-
-  /* Top-nav mega menu / sidebar icons */
-  .admin-dashboard-container & svg {
-    color: var(--admin-gold-600);
-  }
-  .admin-dashboard-container &.is-active svg {
+  & svg {
     color: var(--admin-gold-600);
   }
 }
@@ -217,13 +198,11 @@
 }
 
 @utility logo-icon-gold {
-  /* Logo mark dùng admin gold (giống nav icons) */
   filter: brightness(0) saturate(100%) invert(52%) sepia(72%) saturate(650%)
     hue-rotate(8deg) brightness(95%) contrast(92%);
 }
 
 @utility admin-sidebar-section-title {
-  /* Shell sidebar (green bg) — inactive text = gold like icons; active = white */
   color: var(--admin-gold-600);
   opacity: 0.7;
 }
@@ -238,10 +217,10 @@
     background: var(--admin-green-600);
     color: #ffffff;
   }
-  .admin-dashboard-container & svg {
+  & svg {
     color: var(--admin-gold-600);
   }
-  .admin-dashboard-container &.is-active svg {
+  &.is-active svg {
     color: #ffffff;
   }
 }
@@ -259,12 +238,10 @@
     color: #ffffff;
     opacity: 1;
   }
-
-  .admin-dashboard-container & svg {
+  & svg {
     color: var(--admin-gold-600);
   }
-
-  .admin-dashboard-container &.is-active svg {
+  &.is-active svg {
     color: #ffffff;
   }
 }
@@ -279,38 +256,7 @@
   color: var(--admin-gold-600);
 }
 
-@utility admin-dashboard-container {
-  /* Top-nav mega menu / sidebar icons */
-  & .admin-nav-tab svg {
-    color: var(--admin-gold-600);
-  }
-  & .admin-nav-tab.is-active svg {
-    color: var(--admin-gold-600);
-  }
-  & .admin-sidebar-nav-item svg {
-    color: var(--admin-gold-600);
-  }
-  & .admin-sidebar-nav-child svg {
-    color: var(--admin-gold-600);
-  }
-  & .admin-sidebar-nav-item.is-active svg {
-    color: #ffffff;
-  }
-  & .admin-sidebar-nav-child.is-active svg {
-    color: #ffffff;
-  }
-
-  /* Form section / empty / filter icons mặc định gold */
-  & .lotus-admin-form-section-title + svg {
-    color: var(--admin-gold-600);
-  }
-  & [data-slot='empty-icon'] {
-    color: var(--admin-gold-600);
-  }
-}
-
 @utility lotus-cashier-header {
-  /* ── Cashier shell ── */
   background-image: linear-gradient(
     to right,
     var(--admin-green-900),

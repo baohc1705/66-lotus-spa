@@ -1,12 +1,8 @@
-/* Admin Dashboard — bảng màu admin-color.md
+/* Admin Dashboard — palette + scoped override.
    Sửa giao diện admin chỉ tại file này + shell components. */
 
 @layer base {
   :root {
-    --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
-    --font-display: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
-    --font-mono: "DM Mono", ui-monospace, SFMono-Regular, monospace;
-
     /* Default shadcn (landing / public) — Rose brand */
     --background: 253 251 251;
     --foreground: 30 23 24;
@@ -45,8 +41,10 @@
 
     --admin-ink: #23262b;
     --admin-gray-600: #5b6168;
+    --admin-gray-500: #7a828c;
     --admin-gray-400: #979da4;
     --admin-gray-300: #c7cbd1;
+    --admin-gray-200: #dfe2e6;
     --admin-gray-100: #edeff1;
     --admin-gray-50: #f7f8f9;
 
@@ -94,7 +92,6 @@
   }
 }
 
-/* ── Admin palette (scoped override + lotus remap) ── */
 .admin-dashboard-container {
   /* shadcn tokens (RGB channels) — Green 600 */
   --background: 247 248 249;
@@ -120,12 +117,8 @@
   --lotus-primary: var(--admin-green-600);
   --lotus-secondary: var(--admin-green-200);
   --lotus-background: var(--admin-bg-page);
-  --lotus-foreground: var(--admin-ink);
-  --lotus-accent: var(--admin-gold-600);
-  --lotus-highlight: var(--admin-gold-100);
   --lotus-muted: var(--admin-gray-100);
   --lotus-surface: var(--admin-bg-surface);
-
   --lotus-rose: var(--admin-green-600);
   --lotus-rose-dark: var(--admin-green-700);
   --lotus-rose-light: var(--admin-green-50);
@@ -135,7 +128,6 @@
   --lotus-cream: var(--admin-gray-50);
   --lotus-deep: var(--admin-ink);
   --lotus-stone: var(--admin-gray-600);
-  --lotus-inset: var(--admin-gray-50);
   --lotus-error: var(--state-danger-solid);
 
   font-family: "Be Vietnam Pro", system-ui, -apple-system, BlinkMacSystemFont,
