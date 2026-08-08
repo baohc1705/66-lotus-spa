@@ -2,7 +2,6 @@ using _66SMS.Application.DTOs.Customers;
 using _66SMS.Contract.Extensions;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
-using AutoMapper;
 using MediatR;
 
 namespace _66SMS.Application.CustomerService.Customers.Queries.GetAllCustomer
@@ -10,12 +9,10 @@ namespace _66SMS.Application.CustomerService.Customers.Queries.GetAllCustomer
     public class GetAllCustomerHandler : IRequestHandler<GetAllCustomerQuery, Result<PagedResult<CustomerDTO>>>
     {
         private readonly ICustomerSqlRepository customerSqlRepository;
-        private readonly IMapper mapper;
 
-        public GetAllCustomerHandler(ICustomerSqlRepository customerSqlRepository, IMapper mapper)
+        public GetAllCustomerHandler(ICustomerSqlRepository customerSqlRepository)
         {
             this.customerSqlRepository = customerSqlRepository;
-            this.mapper = mapper;
         }
 
         public async Task<Result<PagedResult<CustomerDTO>>> Handle(GetAllCustomerQuery request, CancellationToken cancellationToken)
@@ -27,19 +24,13 @@ namespace _66SMS.Application.CustomerService.Customers.Queries.GetAllCustomer
             }
 
             if (request.Status != null)
-            {
                 query = query.Where(x => x.Status == request.Status);
-            }
 
             if (request.Gender != null)
-            {
                 query = query.Where(x => x.Gender == request.Gender);
-            }
 
             if (!string.IsNullOrEmpty(request.Source))
-            {
                 query = query.Where(x => x.Source == request.Source);
-            }
 
             query = request.OrderBy?.ToLower() switch
             {

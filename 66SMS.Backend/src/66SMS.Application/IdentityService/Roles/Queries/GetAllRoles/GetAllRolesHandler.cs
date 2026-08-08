@@ -17,47 +17,43 @@ namespace _66SMS.Application.IdentityService.Roles.Queries.GetAllRoles
 
         public async Task<Result<List<RoleDTO>>> Handle(GetAllRoleQuery request, CancellationToken cancellationToken)
         {
-            var query = roleSqlRepository.AsQueryable().AsQueryable();
-            if (request.Include != null && request.Include.Count() > 0)
-            {
-                foreach (string item in request.Include)
-                {
-                    query = item.ToLower() switch
-                    {
-                        "roleusers" => query.Include(x => x.UserRoles!).ThenInclude(r => r.User),
-                        "rolepermissions" => query.Include(x => x.RolePermissions!).ThenInclude(p => p.Permission),
-                        _ => query
-                    };
-                }
-            }
-            else
-            {
-                query = query.Include(ur => ur.UserRoles!).ThenInclude(r => r.User!)
-                             .Include(rp => rp.RolePermissions!).ThenInclude(p => p.Permission);
-            }
+            var hasIncludeFilter = request.Include != null && request.Include.Count > 0;
+            var includeUsers = !hasIncludeFilter
+                || request.Include!.Any(i => i.Equals("roleusers", StringComparison.OrdinalIgnoreCase));
+            var includePermissions = !hasIncludeFilter
+                || request.Include!.Any(i => i.Equals("rolepermissions", StringComparison.OrdinalIgnoreCase));
 
-            var roles = await query.ToListAsync(cancellationToken);
-            var roleDtos = roles.Select(x => new RoleDTO
-            {
-                Id = x.Id,
-                Code = x.Code,
-                Name = x.Name!,
-                Desctiption = x.Description!,
-                Status = x.Status.ToString(),
-                RoleUsers = x.UserRoles?.Select(x => new RoleUserDTO
+            var roles = await roleSqlRepository.AsQueryable()
+                .Select(x => new RoleDTO
                 {
                     Id = x.Id,
-                    Username = x.User!.Username
-                }).ToList() ?? null,
-                RolePermissions = x.RolePermissions?.Select(x => new RolePermissionDTO
-                {
-                    Id = x.Id,
-                    PermissionId = x.PermissionId,
-                    Name = x.Permission!.Name,
-                }).ToList() ?? null,
-            }).ToList();
+                    Code = x.Code,
+                    Name = x.Name!,
+                    Desctiption = x.Description!,
+                    Status = x.Status.ToString(),
+                    RoleUsers = includeUsers
+                        ? x.UserRoles!
+                            .Select(ur => new RoleUserDTO
+                            {
+                                Id = ur.Id,
+                                Username = ur.User!.Username,
+                            })
+                            .ToList()
+                        : null,
+                    RolePermissions = includePermissions
+                        ? x.RolePermissions!
+                            .Select(rp => new RolePermissionDTO
+                            {
+                                Id = rp.Id,
+                                PermissionId = rp.PermissionId,
+                                Name = rp.Permission!.Name,
+                            })
+                            .ToList()
+                        : null,
+                })
+                .ToListAsync(cancellationToken);
 
-            return Result<List<RoleDTO>>.Success(roleDtos);
+            return Result<List<RoleDTO>>.Success(roles);
         }
     }
 }

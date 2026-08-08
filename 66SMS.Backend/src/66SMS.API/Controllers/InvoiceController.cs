@@ -6,7 +6,6 @@ using _66SMS.Application.BookingService.Invoices.Commands.PayInvoice;
 using _66SMS.Application.BookingService.Invoices.Commands.UpdateInvoiceItems;
 using _66SMS.Application.BookingService.Invoices.Queries.GetAllInvoices;
 using _66SMS.Application.BookingService.Invoices.Queries.GetDetailInvoice;
-using _66SMS.Application.BookingService.Invoices.Queries.GetInvoicePreviewFromAppointment;
 using _66SMS.Contract.Abstractions;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
@@ -92,14 +91,6 @@ namespace _66SMS.API.Controllers
             command.Id = id;
             command.CashierId = jwtService.GetUserId();
             var result = await mediator.Send(command);
-            return HandleResult(result);
-        }
-
-        [HttpGet("from-appointment/{appointmentId}/preview")]
-        [PermissionAuthorize("invoices", "read")]
-        public async Task<IActionResult> GetPreviewFromAppointment(int appointmentId)
-        {
-            var result = await mediator.Send(new GetInvoicePreviewFromAppointmentQuery { AppointmentId = appointmentId });
             return HandleResult(result);
         }
 

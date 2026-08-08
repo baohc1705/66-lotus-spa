@@ -12,7 +12,7 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetMyWalletTransactio
         private readonly IWalletTransactionSqlRepository walletTransactionSqlRepository;
 
         public GetMyWalletTransactionsHandler(
-            IUserSqlRepository userSqlRepository, 
+            IUserSqlRepository userSqlRepository,
             IWalletSqlRepository walletSqlRepository,
             IWalletTransactionSqlRepository walletTransactionSqlRepository)
         {
@@ -23,27 +23,26 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetMyWalletTransactio
 
         public async Task<Result<IEnumerable<MyWalletTransactionDto>>> Handle(GetMyWalletTransactionsQuery request, CancellationToken cancellationToken)
         {
-            var user = await userSqlRepository.AsQueryable(asNoTracking: true)
-                .Include(u => u.Customer)
-                .FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
-
             var emptyList = Enumerable.Empty<MyWalletTransactionDto>();
 
-            if (user == null || user.Customer == null)
-            {
-                return Result<IEnumerable<MyWalletTransactionDto>>.Success(emptyList);
-            }
+            var customerId = await userSqlRepository.AsQueryable(asNoTracking: true)
+                .Where(u => u.Id == request.UserId)
+                .Select(u => u.Customer != null ? (int?)u.Customer.Id : null)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            var wallet = await walletSqlRepository.AsQueryable(asNoTracking: true)
-                .FirstOrDefaultAsync(w => w.CustomerId == user.Customer.Id, cancellationToken);
-
-            if (wallet == null)
-            {
+            if (customerId == null)
                 return Result<IEnumerable<MyWalletTransactionDto>>.Success(emptyList);
-            }
+
+            var walletId = await walletSqlRepository.AsQueryable(asNoTracking: true)
+                .Where(w => w.CustomerId == customerId.Value)
+                .Select(w => (int?)w.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (walletId == null)
+                return Result<IEnumerable<MyWalletTransactionDto>>.Success(emptyList);
 
             var transactions = await walletTransactionSqlRepository.AsQueryable(asNoTracking: true)
-                .Where(t => t.WalletId == wallet.Id)
+                .Where(t => t.WalletId == walletId.Value)
                 .OrderByDescending(t => t.CreatedAt)
                 .Select(t => new MyWalletTransactionDto
                 {

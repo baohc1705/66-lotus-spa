@@ -2,22 +2,17 @@ using _66SMS.Application.DTOs.Shifts;
 using _66SMS.Contract.Extensions;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
-using _66SMS.Domain.Entities;
-using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.BookingService.Shifts.Queries.GetAllShift
 {
     public class GetAllShiftHandler : IRequestHandler<GetAllShiftQuery, Result<PagedResult<ShiftDTO>>>
     {
         private readonly IShiftSqlRepository shiftSqlRepository;
-        private readonly IMapper mapper;
 
-        public GetAllShiftHandler(IShiftSqlRepository shiftSqlRepository, IMapper mapper)
+        public GetAllShiftHandler(IShiftSqlRepository shiftSqlRepository)
         {
             this.shiftSqlRepository = shiftSqlRepository;
-            this.mapper = mapper;
         }
 
         public async Task<Result<PagedResult<ShiftDTO>>> Handle(GetAllShiftQuery request, CancellationToken cancellationToken)
@@ -35,17 +30,25 @@ namespace _66SMS.Application.BookingService.Shifts.Queries.GetAllShift
                 _ => request.IsDescending ? query.OrderByDescending(x => x.Id) : query.OrderBy(x => x.Id)
             };
 
-            query = query.Include(x => x.ShiftPeriods);
-
-            PagedResult<Shift> paged = await query.ToPagedAsync(request, cancellationToken);
-
-            PagedResult<ShiftDTO> pagedDto = new()
-            {
-                Items = mapper.Map<List<ShiftDTO>>(paged.Items),
-                PageIndex = paged.PageIndex,
-                PageSize = paged.PageSize,
-                TotalCount = paged.TotalCount,
-            };
+            var pagedDto = await query
+                .Select(x => new ShiftDTO
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Description = x.Description,
+                    ShiftPeriodDTOs = x.ShiftPeriods!
+                        .Select(sp => new ShiftPeriodDTO
+                        {
+                            Id = sp.Id,
+                            ShiftStart = sp.ShiftStart,
+                            ShiftEnd = sp.ShiftEnd,
+                            EffectiveFrom = sp.EffectiveFrom,
+                            EffectiveTo = sp.EffectiveTo,
+                            CreatedAt = sp.CreatedAt,
+                        })
+                        .ToList(),
+                })
+                .ToPagedAsync(request, cancellationToken);
 
             return Result<PagedResult<ShiftDTO>>.Success(pagedDto);
         }

@@ -53,7 +53,6 @@ export const API = {
   cashier: {
     daily: "/cashier/daily",
     weekly: "/cashier/weekly",
-    onlineAppointments: "/cashier/online-appointments",
     appointment: "/cashier/appointments",
     positions: "/cashier/positions",
     vnpayCreate: "/cashier/vnpay/create-url",

@@ -116,9 +116,9 @@ namespace _66SMS.Application.SalonService.Payrolls.Queries.GetPayrollCommissionS
                         .Where(n => !string.IsNullOrWhiteSpace(n))
                         .Distinct());
 
-                    var durationMins = first.DurationMins is > 0 ? first.DurationMins.Value : 15;
+                    var durationMins = first.DurationMins is > 0 ? first.DurationMins.Value : 0;
                     var startTime = first.SlotStartTime;
-                    var endTime = startTime.HasValue
+                    var endTime = startTime.HasValue && durationMins > 0
                         ? startTime.Value.AddMinutes(durationMins)
                         : first.SlotEndTime;
 

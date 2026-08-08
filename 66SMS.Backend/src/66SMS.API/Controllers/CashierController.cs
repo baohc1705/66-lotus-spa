@@ -9,7 +9,6 @@ using _66SMS.Application.BookingService.Cashier.Commands.VnPayReturn;
 using _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily;
 using _66SMS.Application.BookingService.Cashier.Queries.GetCashierPositions;
 using _66SMS.Application.BookingService.Cashier.Queries.GetCashierVnPayUrl;
-using _66SMS.Application.BookingService.Cashier.Queries.GetOnlineAppointments;
 using _66SMS.Application.BookingService.Cashier.Queries.GetStaffAvailability;
 using _66SMS.Contract.Abstractions;
 using Asp.Versioning;
@@ -45,15 +44,6 @@ namespace _66SMS.API.Controllers
         [HttpGet("weekly")]
         [Authorize]
         public async Task<IActionResult> GetWeekly([FromQuery] GetCashierDailyQuery query)
-        {
-            query.SalonId = jwtService.GetSalonId() ?? query.SalonId;
-            var result = await mediator.Send(query);
-            return HandleResult(result);
-        }
-
-        [HttpGet("online-appointments")]
-        [Authorize]
-        public async Task<IActionResult> GetOnlineAppointments([FromQuery] GetOnlineAppointmentsQuery query)
         {
             query.SalonId = jwtService.GetSalonId() ?? query.SalonId;
             var result = await mediator.Send(query);

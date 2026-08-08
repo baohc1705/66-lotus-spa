@@ -22,27 +22,7 @@ namespace _66SMS.Application.CustomerService.Wallets.Queries.GetWalletTransactio
             var transactions = await transactionRepository.AsQueryable(asNoTracking: true)
                 .Where(t => t.WalletId == request.WalletId)
                 .OrderByDescending(t => t.CreatedAt)
-                .ToListAsync(cancellationToken);
-
-            var userIds = transactions.Where(t => t.CreatedBy.HasValue).Select(t => t.CreatedBy).Distinct().ToList();
-            var usersList = await userRepository.AsQueryable(asNoTracking: true)
-                .Include(u => u.Staff)
-                .Include(u => u.Customer)
-                .Where(u => userIds.Contains(u.Id))
-                .ToListAsync(cancellationToken);
-
-            var users = usersList
-                .GroupBy(u => u.Id)
-                .ToDictionary(g => g.Key, g => g.First());
-
-            var dtos = transactions.Select(t => {
-                string createdByName = "Hệ thống";
-                if (t.CreatedBy.HasValue && users.TryGetValue(t.CreatedBy.Value, out var user))
-                {
-                    createdByName = user.Staff?.FullName ?? user.Customer?.FullName ?? user.Username;
-                }
-
-                return new AdminWalletTransactionDto
+                .Select(t => new AdminWalletTransactionDto
                 {
                     Id = t.Id,
                     WalletId = t.WalletId,
@@ -54,11 +34,37 @@ namespace _66SMS.Application.CustomerService.Wallets.Queries.GetWalletTransactio
                     Status = t.Status,
                     CreatedAt = t.CreatedAt,
                     CreatedBy = t.CreatedBy,
-                    CreatedByName = createdByName
-                };
-            }).ToList();
+                    CreatedByName = string.Empty,
+                })
+                .ToListAsync(cancellationToken);
 
-            return Result<IEnumerable<AdminWalletTransactionDto>>.Success(dtos);
+            var userIds = transactions
+                .Where(t => t.CreatedBy.HasValue)
+                .Select(t => t.CreatedBy!.Value)
+                .Distinct()
+                .ToList();
+
+            if (userIds.Count > 0)
+            {
+                var namesByUserId = await userRepository.AsQueryable(asNoTracking: true)
+                    .Where(u => userIds.Contains(u.Id))
+                    .Select(u => new
+                    {
+                        u.Id,
+                        Name = u.Staff != null
+                            ? u.Staff.FullName
+                            : (u.Customer != null ? u.Customer.FullName : u.Username),
+                    })
+                    .ToDictionaryAsync(x => x.Id, x => x.Name, cancellationToken);
+
+                foreach (var t in transactions)
+                {
+                    if (t.CreatedBy.HasValue && namesByUserId.TryGetValue(t.CreatedBy.Value, out var name))
+                        t.CreatedByName = name;
+                }
+            }
+
+            return Result<IEnumerable<AdminWalletTransactionDto>>.Success(transactions);
         }
     }
 }

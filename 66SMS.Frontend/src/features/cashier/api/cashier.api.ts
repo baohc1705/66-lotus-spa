@@ -62,13 +62,6 @@ export const cashierApi = {
       })
       .then((r) => r.data),
 
-  getOnlineBookings: (salonId?: number | null) =>
-    axiosInstance
-      .get<Result<CashierBooking[]>>(API.cashier.onlineAppointments, {
-        params: withSalonId(salonId),
-      })
-      .then((r) => r.data),
-
   createAppointment: (payload: CreateCashierAppointmentPayload) =>
     axiosInstance
       .post<Result<number[]>>(API.cashier.appointment, payload)

@@ -28,7 +28,6 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierVnPayUrl
         public async Task<Result<string>> Handle(GetCashierVnPayUrlQuery request, CancellationToken cancellationToken)
         {
             var appointment = await appointmentRepository.AsQueryable(asNoTracking: true)
-                .Include(a => a.Payments)
                 .FirstOrDefaultAsync(a => a.Id == request.AppointmentId, cancellationToken);
 
             if (appointment == null)

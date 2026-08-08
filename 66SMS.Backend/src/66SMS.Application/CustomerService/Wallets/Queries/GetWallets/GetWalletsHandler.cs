@@ -18,7 +18,6 @@ namespace _66SMS.Application.CustomerService.Wallets.Queries.GetWallets
         public async Task<Result<IEnumerable<AdminWalletDto>>> Handle(GetWalletsQuery request, CancellationToken cancellationToken)
         {
             var wallets = await walletRepository.AsQueryable(asNoTracking: true)
-                .Include(w => w.Customer)
                 .OrderByDescending(w => w.CreatedAt)
                 .Select(w => new AdminWalletDto
                 {

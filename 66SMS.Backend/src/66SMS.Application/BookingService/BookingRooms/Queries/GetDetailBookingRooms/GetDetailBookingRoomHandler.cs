@@ -4,7 +4,6 @@ using _66SMS.Contract.Enumerations;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
-using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,12 +12,11 @@ namespace _66SMS.Application.BookingService.BookingRooms.Queries.GetDetailBookin
     public class GetDetailBookingRoomHandler : IRequestHandler<GetDetailBookingRoomQuery, Result<BookingRoomDto>>
     {
         private readonly IBookingRoomSqlRepository bookingRoomSqlRepository;
-        private readonly IMapper mapper;
         private readonly ICacheService cacheService;
-        public GetDetailBookingRoomHandler(IBookingRoomSqlRepository bookingRoomSqlRepository, IMapper mapper, ICacheService cacheService)
+
+        public GetDetailBookingRoomHandler(IBookingRoomSqlRepository bookingRoomSqlRepository, ICacheService cacheService)
         {
             this.bookingRoomSqlRepository = bookingRoomSqlRepository;
-            this.mapper = mapper;
             this.cacheService = cacheService;
         }
 
@@ -27,9 +25,7 @@ namespace _66SMS.Application.BookingService.BookingRooms.Queries.GetDetailBookin
             var cacheKey = BookingRoomConst.CacheKeyDetail((int)request.Id!);
             var cached = await cacheService.GetAsync<BookingRoomDto>(cacheKey, cancellationToken);
             if (cached is not null)
-            {
                 return Result<BookingRoomDto>.Success(cached);
-            }
 
             var result = await bookingRoomSqlRepository
                 .AsQueryable(true)
@@ -67,9 +63,7 @@ namespace _66SMS.Application.BookingService.BookingRooms.Queries.GetDetailBookin
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (result == null)
-            {
                 return Result<BookingRoomDto>.NotFound(BookingRoomConst.MSG_BOOKING_ROOM_NOT_FOUND, ErrorCodes.ERR_BOOKING_ROOM_NOT_FOUND);
-            }
 
             await cacheService.SetAsync(cacheKey, result, BookingRoomConst.CACHE_TTL_DETAIL, cancellationToken);
 

@@ -5,7 +5,6 @@ using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
-using AutoMapper;
 using MediatR;
 
 namespace _66SMS.Application.BookingService.BookingPositions.Queries.GetAllBookingPositions
@@ -13,13 +12,11 @@ namespace _66SMS.Application.BookingService.BookingPositions.Queries.GetAllBooki
     public class GetAllBookingPositionHandler : IRequestHandler<GetAllBookingPositionQuery, Result<PagedResult<BookingPositionDto>>>
     {
         private readonly IBookingPositionSqlRepository bookingPositionSqlRepository;
-        private readonly IMapper mapper;
-        private readonly ICacheService cacheService;    
+        private readonly ICacheService cacheService;
 
-        public GetAllBookingPositionHandler(IBookingPositionSqlRepository bookingPositionSqlRepository, IMapper mapper, ICacheService cacheService)
+        public GetAllBookingPositionHandler(IBookingPositionSqlRepository bookingPositionSqlRepository, ICacheService cacheService)
         {
             this.bookingPositionSqlRepository = bookingPositionSqlRepository;
-            this.mapper = mapper;
             this.cacheService = cacheService;
         }
 
@@ -40,16 +37,12 @@ namespace _66SMS.Application.BookingService.BookingPositions.Queries.GetAllBooki
             var cached = await cacheService.GetAsync<PagedResult<BookingPositionDto>>(cacheKey, cancellationToken);
 
             if (cached is not null)
-            {
                 return Result<PagedResult<BookingPositionDto>>.Success(cached);
-            }
 
             var query = bookingPositionSqlRepository.AsQueryable();
 
             if (request.RoomId.HasValue)
-            {
                 query = query.Where(x => x.RoomId == request.RoomId.Value);
-            }
 
             if (!string.IsNullOrEmpty(request.Keyword))
             {

@@ -5,7 +5,6 @@ using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
-using AutoMapper;
 using MediatR;
 
 namespace _66SMS.Application.BookingService.BookingRooms.Queries.GetAllBookingRooms
@@ -13,13 +12,11 @@ namespace _66SMS.Application.BookingService.BookingRooms.Queries.GetAllBookingRo
     public class GetAllBookingRoomHandler : IRequestHandler<GetAllBookingRoomQuery, Result<PagedResult<BookingRoomDto>>>
     {
         private readonly IBookingRoomSqlRepository bookingRoomSqlRepository;
-        private readonly IMapper mapper;
         private readonly ICacheService cacheService;
 
-        public GetAllBookingRoomHandler(IBookingRoomSqlRepository bookingRoomSqlRepository, IMapper mapper, ICacheService cacheService)
+        public GetAllBookingRoomHandler(IBookingRoomSqlRepository bookingRoomSqlRepository, ICacheService cacheService)
         {
             this.bookingRoomSqlRepository = bookingRoomSqlRepository;
-            this.mapper = mapper;
             this.cacheService = cacheService;
         }
 
@@ -45,9 +42,7 @@ namespace _66SMS.Application.BookingService.BookingRooms.Queries.GetAllBookingRo
             var query = bookingRoomSqlRepository.AsQueryable();
 
             if (request.SalonId.HasValue)
-            {
                 query = query.Where(x => x.SalonId == request.SalonId.Value);
-            }
 
             if (!string.IsNullOrEmpty(request.Keyword))
             {

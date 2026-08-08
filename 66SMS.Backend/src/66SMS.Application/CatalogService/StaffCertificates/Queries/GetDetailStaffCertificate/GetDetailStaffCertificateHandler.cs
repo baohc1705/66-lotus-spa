@@ -21,8 +21,6 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Queries.GetDetailS
         {
             var item = await staffCertificateRepository
                 .AsQueryable()
-                .Include(x => x.Staff)
-                .Include(x => x.CertificateType)
                 .Where(x => x.Id == request.Id && x.Status != StaffCertificateConst.STATUS_DELETED)
                 .Select(x => new StaffCertificateDTO
                 {

@@ -5,7 +5,6 @@ using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.CatalogService.StaffCertificates.Queries.GetAllStaffCertificates
@@ -21,9 +20,7 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Queries.GetAllStaf
 
         public async Task<Result<PagedResult<StaffCertificateDTO>>> Handle(GetAllStaffCertificatesQuery request, CancellationToken cancellationToken)
         {
-            IQueryable<StaffCertificate> query = staffCertificateRepository.AsQueryable()
-                .Include(x => x.Staff)
-                .Include(x => x.CertificateType);
+            IQueryable<StaffCertificate> query = staffCertificateRepository.AsQueryable();
 
             if (request.IsDeleted)
             {

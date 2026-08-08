@@ -4,7 +4,6 @@ using _66SMS.Contract.Enumerations;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
-using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,41 +22,41 @@ namespace _66SMS.Application.SalonService.Attendances.Queries.GetDetailAttendanc
         {
             var attendance = await attendanceRepository
                 .AsQueryable()
-                .Include(x => x.Staff)
-                .Include(x => x.Salon)
-                .Include(x => x.WorkSchedule!)
-                .ThenInclude(w => w.ShiftPeriod!)
-                .ThenInclude(sp => sp.Shift)
                 .Where(x => x.Id == request.Id)
+                .Select(x => new AttendanceDTO
+                {
+                    Id = x.Id,
+                    StaffId = x.StaffId,
+                    StaffName = x.Staff != null ? x.Staff.FullName : null,
+                    SalonId = x.SalonId,
+                    SalonName = x.Salon != null ? x.Salon.Name : null,
+                    WorkScheduleId = x.WorkScheduleId,
+                    WorkDate = x.WorkDate,
+                    CheckInAt = x.CheckInAt,
+                    CheckOutAt = x.CheckOutAt,
+                    WorkedHours = x.WorkedHours,
+                    Status = x.Status,
+                    Note = x.Note,
+                    ShiftName = x.WorkSchedule != null
+                        && x.WorkSchedule.ShiftPeriod != null
+                        && x.WorkSchedule.ShiftPeriod.Shift != null
+                            ? x.WorkSchedule.ShiftPeriod.Shift.Name
+                            : null,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
+                })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (attendance == null)
                 return Result<AttendanceDTO>.NotFound(AttendanceConst.MSG_NOT_FOUND, ErrorCodes.ERR_ATTENDANCE_NOT_FOUND);
 
-            return Result<AttendanceDTO>.Success(ToDto(attendance));
-        }
+            attendance.WorkCredits = AttendanceWorkCreditCalculator.CalculateWorkCredit(
+                attendance.Status ?? 0,
+                attendance.WorkedHours ?? 0m,
+                attendance.CheckInAt,
+                attendance.CheckOutAt);
 
-        private static AttendanceDTO ToDto(Attendance x)
-        {
-            return new AttendanceDTO
-            {
-                Id = x.Id,
-                StaffId = x.StaffId,
-                StaffName = x.Staff?.FullName,
-                SalonId = x.SalonId,
-                SalonName = x.Salon?.Name,
-                WorkScheduleId = x.WorkScheduleId,
-                WorkDate = x.WorkDate,
-                CheckInAt = x.CheckInAt,
-                CheckOutAt = x.CheckOutAt,
-                WorkedHours = x.WorkedHours,
-                Status = x.Status,
-                Note = x.Note,
-                ShiftName = x.WorkSchedule?.ShiftPeriod?.Shift?.Name,
-                CreatedAt = x.CreatedAt,
-                UpdatedAt = x.UpdatedAt,
-                WorkCredits = AttendanceWorkCreditCalculator.CalculateWorkCredit(x),
-            };
+            return Result<AttendanceDTO>.Success(attendance);
         }
     }
 }

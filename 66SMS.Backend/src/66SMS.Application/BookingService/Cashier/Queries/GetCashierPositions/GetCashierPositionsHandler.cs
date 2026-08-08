@@ -23,7 +23,6 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierPositions
             CancellationToken cancellationToken)
         {
             var query = bookingPositionSqlRepository.AsQueryable()
-                .Include(p => p.Room)
                 .Where(p => p.Status != BookingPositionConst.STATUS_DELETED && p.Status != BookingPositionConst.STATUS_INACTIVED);
 
             if (request.SalonId.HasValue)
@@ -33,6 +32,14 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierPositions
                 .OrderBy(p => p.Room!.Name)
                 .ThenBy(p => p.SortOrder)
                 .ThenBy(p => p.Name)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.RoomId,
+                    p.Name,
+                    RoomName = p.Room!.Name,
+                    p.Status,
+                })
                 .ToListAsync(cancellationToken);
 
             HashSet<int> bookedPositionIds = [];
@@ -64,7 +71,7 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierPositions
                     Id = p.Id,
                     RoomId = p.RoomId,
                     Name = p.Name,
-                    RoomName = p.Room!.Name,
+                    RoomName = p.RoomName,
                     Status = occupiedByAppointment ? BookingPositionConst.STATUS_IN_SERVICE : p.Status,
                     StatusLabel = occupiedByAppointment
                         ? "Đã có lịch"
