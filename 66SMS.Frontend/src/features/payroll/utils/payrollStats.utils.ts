@@ -69,3 +69,17 @@ export function appointmentKey(
   if (appointmentId) return `ap-${appointmentId}`;
   return `inv-${invoiceId ?? 0}`;
 }
+
+export function toCalendarDateTime(
+  dateKey: string,
+  timeHHMM: string,
+): Date | null {
+  if (!dateKey || timeHHMM === "--:--") return null;
+  const parts = timeHHMM.split(":");
+  const hour = Number(parts[0]);
+  const minute = Number(parts[1]);
+  if (Number.isNaN(hour) || Number.isNaN(minute)) return null;
+  const date = new Date(`${dateKey}T00:00:00`);
+  date.setHours(hour, minute, 0, 0);
+  return date;
+}

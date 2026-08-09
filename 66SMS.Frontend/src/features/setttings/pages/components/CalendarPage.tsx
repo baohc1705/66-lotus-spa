@@ -1,7 +1,5 @@
-import { BodyTabs } from "@/shared/components/Tabs";
 import { Calendar } from "@/shared/components/Calendar";
-import { Card, CardBody } from "@/shared/elements/Card";
-import { DemoPageShell } from "../../components/DemoPageShell";
+import { DemoPageShell, DemoSection } from "../../components/DemoPageShell";
 
 export function CalendarPage() {
   return (
@@ -9,17 +7,9 @@ export function CalendarPage() {
       title="Calendar"
       subtitle="Calendars are used for date selection and schedule overview."
     >
-      <BodyTabs
-        items={[{ id: "basic", label: "Basic Calendar" }]}
-        activeId="basic"
-        onChange={() => {}}
-      />
-
-      <Card className="main-card mb-3">
-        <CardBody>
-          <Calendar />
-        </CardBody>
-      </Card>
+      <DemoSection title="Basic Calendar">
+        <Calendar />
+      </DemoSection>
     </DemoPageShell>
   );
 }

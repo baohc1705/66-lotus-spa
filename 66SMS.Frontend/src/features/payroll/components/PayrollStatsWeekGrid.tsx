@@ -1,65 +1,75 @@
-import { formatCurrency } from "@/shared/utils/currency";
 import {
-  AdminScheduleGrid,
-  type AdminScheduleEvent,
-} from "@/shared/components/calendar/AdminScheduleGrid";
+  Calendar,
+  type CalendarEvent,
+} from "@/shared/components/Calendar";
+import { formatCurrency } from "@/shared/utils/currency";
+
 import type { PayrollCommissionAppointmentDto } from "../types/payroll.types";
 import {
   appointmentKey,
   formatSlotTime,
   resolveServiceEndTime,
+  toCalendarDateTime,
 } from "../utils/payrollStats.utils";
 
-interface DayColumn {
+type DayColumn = {
   date: string;
   appointments: PayrollCommissionAppointmentDto[];
-}
+};
 
-interface PayrollStatsWeekGridProps {
+type PayrollStatsWeekGridProps = {
   days: DayColumn[];
   highlightDate?: Date;
   onAppointmentClick: (item: PayrollCommissionAppointmentDto) => void;
-}
+  onDateChange?: (date: Date) => void;
+};
+
+const EVENT_COLOR = "#22c55e";
 
 export function PayrollStatsWeekGrid({
   days,
   highlightDate,
   onAppointmentClick,
+  onDateChange,
 }: PayrollStatsWeekGridProps) {
   const byId = new Map<string, PayrollCommissionAppointmentDto>();
-  const events: AdminScheduleEvent[] = [];
+  const events: CalendarEvent[] = [];
 
-  days.forEach((day) => {
-    day.appointments.forEach((item) => {
-      const start = formatSlotTime(item.slotStartTime);
-      const end = resolveServiceEndTime(
+  days.forEach((day: DayColumn) => {
+    day.appointments.forEach((item: PayrollCommissionAppointmentDto) => {
+      const startText = formatSlotTime(item.slotStartTime);
+      const endText = resolveServiceEndTime(
         item.slotStartTime,
         item.slotEndTime,
         item.durationMins,
       );
-      if (start === "--:--" || end === "--:--") return;
+      const start = toCalendarDateTime(day.date, startText);
+      const end = toCalendarDateTime(day.date, endText);
+      if (!start || !end) return;
 
       const id = `${day.date}-${appointmentKey(item.appointmentId, item.invoiceId)}`;
       byId.set(id, item);
       events.push({
         id,
-        date: day.date,
-        title: item.customerName ?? "Khách hàng",
-        subtitle: item.serviceName ?? "Dịch vụ",
-        startTime: start,
-        endTime: end,
-        footerRight: formatCurrency(item.totalCommission),
-        status: "paid",
+        title: `${item.customerName ?? "Khách"} · ${formatCurrency(item.totalCommission)}`,
+        description: item.serviceName ?? "Dịch vụ",
+        start,
+        end,
+        color: EVENT_COLOR,
       });
     });
   });
 
   return (
-    <AdminScheduleGrid
-      days={days.map((d) => ({ date: d.date }))}
+    <Calendar
+      className="h-full min-h-[480px]"
       events={events}
-      highlightDate={highlightDate}
-      onEventClick={(event) => {
+      view="week"
+      date={highlightDate ?? new Date()}
+      onDateChange={onDateChange}
+      readOnly
+      hideViewSwitcher
+      onEventClick={(event: CalendarEvent) => {
         const item = byId.get(event.id);
         if (item) onAppointmentClick(item);
       }}

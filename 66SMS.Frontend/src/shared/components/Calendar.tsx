@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { vi } from "date-fns/locale";
+import type { Locale } from "date-fns";
 import { Scheduler } from "calendarkit-pro";
 import type {
   CalendarEvent,
@@ -18,60 +20,182 @@ export type {
   ViewType,
 };
 
-const KIT_THEME: CalendarTheme = {
-  fontFamily: "inherit",
-  borderRadius: "0.375rem",
-  colors: {
-    primary: "var(--kit-primary)",
-    secondary: "var(--kit-secondary)",
-    background: "var(--kit-white)",
-    foreground: "var(--kit-heading)",
-    border: "var(--kit-border)",
-    muted: "var(--kit-page)",
-    accent: "var(--kit-soft-primary-bg)",
-  },
+/** calendarkit chi bat 24h khi locale.code === "fr"; van dung localize tieng Viet. */
+const VI_LOCALE: Locale = { ...vi, code: "fr" };
+
+const WEEKDAYS_VI = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+
+const ENGLISH_MONTHS = [
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
+];
+
+const VI_TRANSLATIONS: Partial<CalendarTranslations> & {
+  calendars?: string;
+  create?: string;
+  localTime?: string;
+} = {
+  today: "Hôm nay",
+  month: "Tháng",
+  week: "Tuần",
+  day: "Ngày",
+  agenda: "Lịch trình",
+  resource: "Tài nguyên",
+  createEvent: "Tạo sự kiện",
+  editEvent: "Sửa sự kiện",
+  delete: "Xóa",
+  save: "Lưu",
+  cancel: "Hủy",
+  title: "Tiêu đề",
+  start: "Bắt đầu",
+  end: "Kết thúc",
+  allDay: "Cả ngày",
+  description: "Mô tả",
+  repeat: "Lặp lại",
+  noRepeat: "Không lặp lại",
+  selectCalendar: "Chọn lịch",
+  selectType: "Chọn loại",
+  daily: "Hàng ngày",
+  weekly: "Hàng tuần",
+  monthly: "Hàng tháng",
+  yearly: "Hàng năm",
+  event: "Sự kiện",
+  task: "Công việc",
+  appointmentSchedule: "Lịch hẹn",
+  new: "Mới",
+  dateAndTime: "Ngày và giờ",
+  timezone: "Múi giờ",
+  whosJoining: "Người tham gia",
+  suggestedTimes: "Giờ gợi ý",
+  viewSuggestions: "Xem gợi ý",
+  whereWillItBe: "Địa điểm",
+  location: "Vị trí",
+  descriptionAndAttachments: "Mô tả và đính kèm",
+  dragAndDrop: "Kéo thả",
+  guests: "Khách",
+  addAttachment: "Thêm đính kèm",
+  moreOptions: "Thêm tùy chọn",
+  doesNotRepeat: "Không lặp lại",
+  locationHelpText: "Nhập địa điểm",
+  calendars: "Lịch",
+  create: "Tạo",
+  localTime: "Giờ địa phương",
+};
+
+function parseEnglishMonthTitle(text: string): Date | null {
+  const parts = text.trim().split(/\s+/);
+  if (parts.length < 2) return null;
+  const monthIndex = ENGLISH_MONTHS.indexOf(parts[0].toLowerCase());
+  const year = Number(parts[1]);
+  if (monthIndex < 0 || Number.isNaN(year)) return null;
+  return new Date(year, monthIndex, 1);
+}
+
+function localizeMiniCalendar(root: HTMLElement) {
+  const monthTitle = root.querySelector(
+    "span.text-sm.font-semibold.capitalize",
+  ) as HTMLElement | null;
+
+  if (monthTitle) {
+    const raw = monthTitle.textContent?.trim() ?? "";
+    if (!raw.startsWith("Tháng")) {
+      const parsed = parseEnglishMonthTitle(raw);
+      if (parsed) {
+        monthTitle.textContent = `Tháng ${parsed.getMonth() + 1} năm ${parsed.getFullYear()}`;
+      }
+    }
+  }
+
+  const weekdayCells = root.querySelectorAll(
+    ".grid.grid-cols-7.gap-y-2.text-center.mb-2 > div",
+  );
+  weekdayCells.forEach((cell: Element, index: number) => {
+    const label = WEEKDAYS_VI[index];
+    if (!label) return;
+    if (cell.textContent !== label) cell.textContent = label;
+  });
+}
+
+/** Hex giong --kit-* (blue-600, gray-500, ...) — calendarkit chi nhan hex/rgb, khong nhan var(). */
+const KIT_COLORS = {
+  primary: "#2563eb",
+  secondary: "#6b7280",
+  background: "#ffffff",
+  foreground: "#1f2937",
+  border: "#e5e7eb",
+  muted: "#f9fafb",
+  accent: "#dbeafe",
+  accentForeground: "#1e40af",
+  primaryForeground: "#ffffff",
+};
+
+const KIT_EVENT_COLORS = {
+  primary: "#2563eb",
+  success: "#22c55e",
+  info: "#0ea5e9",
+  warning: "#facc15",
+  danger: "#dc2626",
+  alternate: "#7e22ce",
 };
 
 const DEMO_EVENTS: CalendarEvent[] = [
   {
     id: "1",
-    title: "All Day Event",
+    title: "Sự kiện cả ngày",
     start: new Date(2023, 0, 1),
     end: new Date(2023, 0, 1, 23, 59),
     allDay: true,
+    color: KIT_EVENT_COLORS.primary,
   },
   {
     id: "2",
-    title: "Long Event",
+    title: "Sự kiện dài ngày",
     start: new Date(2023, 0, 7),
     end: new Date(2023, 0, 10),
     allDay: true,
+    color: KIT_EVENT_COLORS.info,
   },
   {
     id: "3",
-    title: "Meeting",
+    title: "Họp nội bộ",
     start: new Date(2023, 0, 12, 10, 30),
     end: new Date(2023, 0, 12, 12, 30),
+    color: KIT_EVENT_COLORS.success,
   },
   {
     id: "4",
-    title: "Lunch",
+    title: "Ăn trưa",
     start: new Date(2023, 0, 12, 12, 0),
     end: new Date(2023, 0, 12, 13, 0),
+    color: KIT_EVENT_COLORS.warning,
   },
   {
     id: "5",
-    title: "Conference",
+    title: "Hội thảo",
     start: new Date(2023, 0, 11, 9, 0),
     end: new Date(2023, 0, 13, 17, 0),
+    color: KIT_EVENT_COLORS.alternate,
   },
   {
     id: "6",
-    title: "Birthday Party",
+    title: "Sinh nhật",
     start: new Date(2023, 0, 13, 7, 0),
     end: new Date(2023, 0, 13, 9, 0),
+    color: KIT_EVENT_COLORS.danger,
   },
 ];
+
+const DEMO_DATE = new Date(2023, 0, 12);
 
 export type CalendarProps = {
   className?: string;
@@ -93,6 +217,8 @@ export type CalendarProps = {
   hideViewSwitcher?: boolean;
   language?: "en" | "fr";
   translations?: Partial<CalendarTranslations>;
+  locale?: Locale;
+  timezone?: string;
   theme?: CalendarTheme;
   calendars?: {
     id: string;
@@ -107,15 +233,43 @@ export type CalendarProps = {
   onThemeToggle?: () => void;
 };
 
-function mergeTheme(custom?: CalendarTheme): CalendarTheme {
-  if (!custom) return KIT_THEME;
+function mergeColors(custom?: CalendarTheme) {
   return {
-    fontFamily: custom.fontFamily ?? KIT_THEME.fontFamily,
-    borderRadius: custom.borderRadius ?? KIT_THEME.borderRadius,
-    colors: {
-      ...KIT_THEME.colors,
-      ...custom.colors,
-    },
+    ...KIT_COLORS,
+    ...custom?.colors,
+    accentForeground: KIT_COLORS.accentForeground,
+    primaryForeground: KIT_COLORS.primaryForeground,
+  };
+}
+
+function buildKitStyle(custom?: CalendarTheme): CSSProperties {
+  const colors = mergeColors(custom);
+  const radius = custom?.borderRadius ?? "0.375rem";
+  const fontFamily = custom?.fontFamily ?? "inherit";
+
+  return {
+    fontFamily,
+    ["--radius" as string]: radius,
+    ["--primary" as string]: colors.primary,
+    ["--color-primary" as string]: colors.primary,
+    ["--primary-foreground" as string]: colors.primaryForeground,
+    ["--color-primary-foreground" as string]: colors.primaryForeground,
+    ["--secondary" as string]: colors.secondary,
+    ["--color-secondary" as string]: colors.secondary,
+    ["--background" as string]: colors.background,
+    ["--color-background" as string]: colors.background,
+    ["--foreground" as string]: colors.foreground,
+    ["--color-foreground" as string]: colors.foreground,
+    ["--border" as string]: colors.border,
+    ["--color-border" as string]: colors.border,
+    ["--muted" as string]: colors.muted,
+    ["--color-muted" as string]: colors.muted,
+    ["--muted-foreground" as string]: colors.secondary,
+    ["--color-muted-foreground" as string]: colors.secondary,
+    ["--accent" as string]: colors.accent,
+    ["--color-accent" as string]: colors.accent,
+    ["--accent-foreground" as string]: colors.accentForeground,
+    ["--color-accent-foreground" as string]: colors.accentForeground,
   };
 }
 
@@ -139,6 +293,8 @@ export function Calendar({
   hideViewSwitcher = false,
   language = "en",
   translations,
+  locale,
+  timezone = "Asia/Ho_Chi_Minh",
   theme,
   calendars,
   resources,
@@ -147,14 +303,36 @@ export function Calendar({
   isDarkMode,
   onThemeToggle,
 }: CalendarProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const isEventsControlled = events !== undefined;
   const [innerEvents, setInnerEvents] = useState<CalendarEvent[]>(DEMO_EVENTS);
   const [innerView, setInnerView] = useState<ViewType>(defaultView);
-  const [innerDate, setInnerDate] = useState<Date>(defaultDate ?? new Date());
+  const [innerDate, setInnerDate] = useState<Date>(
+    defaultDate ?? (isEventsControlled ? new Date() : DEMO_DATE),
+  );
 
   const currentEvents = isEventsControlled ? events : innerEvents;
   const currentView = view ?? innerView;
   const currentDate = date ?? innerDate;
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    function applyVietnamese() {
+      if (!rootRef.current) return;
+      localizeMiniCalendar(rootRef.current);
+    }
+
+    applyVietnamese();
+    const observer = new MutationObserver(applyVietnamese);
+    observer.observe(root, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+    return () => observer.disconnect();
+  }, [currentDate, currentView]);
 
   function handleViewChange(next: ViewType) {
     if (view === undefined) setInnerView(next);
@@ -174,7 +352,11 @@ export function Calendar({
     if (isEventsControlled || readOnly) return;
     setInnerEvents((prev: CalendarEvent[]) => [
       ...prev,
-      { ...event, id: crypto.randomUUID() } as CalendarEvent,
+      {
+        ...event,
+        id: crypto.randomUUID(),
+        color: event.color ?? KIT_EVENT_COLORS.primary,
+      } as CalendarEvent,
     ]);
   }
 
@@ -202,9 +384,17 @@ export function Calendar({
 
   return (
     <div
+      ref={rootRef}
       id="calendar"
-      className={"font-sans text-sm text-kit-body " + className}
+      className={"kit-calendar font-sans text-sm text-kit-body " + className}
+      style={buildKitStyle(theme)}
     >
+      <style>{`
+        .kit-calendar .flex-1.px-4.space-y-5.mt-5,
+        .kit-calendar .mt-auto.px-4.pt-5 {
+          display: none !important;
+        }
+      `}</style>
       <Scheduler
         events={currentEvents}
         view={currentView}
@@ -215,9 +405,10 @@ export function Calendar({
         isLoading={isLoading}
         hideViewSwitcher={hideViewSwitcher}
         language={language}
-        translations={translations}
-        theme={mergeTheme(theme)}
-        calendars={calendars}
+        translations={{ ...VI_TRANSLATIONS, ...translations }}
+        locale={locale ?? VI_LOCALE}
+        timezone={timezone}
+        calendars={calendars ?? []}
         resources={resources}
         eventTypes={eventTypes}
         onCalendarToggle={onCalendarToggle}

@@ -1,24 +1,34 @@
-import { formatCurrency } from "@/shared/utils/currency";
-import { TableEmptyState } from "@/shared/components/DataTable/TableEmptyState";
 import { CalendarHeart } from "lucide-react";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "@/shared/tables/Table";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { formatCurrency } from "@/shared/utils/currency";
+
 import type {
   PayrollCommissionDailyDto,
   PayrollCommissionDailySummaryDto,
 } from "../types/payroll.types";
 
-interface PayrollStatsMonthTableProps {
+type PayrollStatsMonthTableProps = {
   dailyStats: PayrollCommissionDailyDto[];
   summary: PayrollCommissionDailySummaryDto | undefined;
   onDayClick?: (workDate: string) => void;
-}
+};
 
 function formatHours(hours: number): string {
   if (!hours || hours <= 0) return "0 giờ";
-  const h = Math.floor(hours);
-  const m = Math.round((hours - h) * 60);
-  if (h === 0) return `${m} phút`;
-  if (m === 0) return `${h} giờ`;
-  return `${h} giờ ${m} phút`;
+  const hourPart = Math.floor(hours);
+  const minutePart = Math.round((hours - hourPart) * 60);
+  if (hourPart === 0) return `${minutePart} phút`;
+  if (minutePart === 0) return `${hourPart} giờ`;
+  return `${hourPart} giờ ${minutePart} phút`;
 }
 
 export function PayrollStatsMonthTable({
@@ -38,62 +48,58 @@ export function PayrollStatsMonthTable({
 
   return (
     <div className="w-full overflow-auto">
-      <table className="w-full text-sm">
-        <thead className="bg-adminGray-50 sticky top-0 z-10 border-b border-adminGray-100">
-          <tr className="text-left text-xs text-adminGray-600">
-            <th className="px-4 py-2.5 font-semibold">Ngày</th>
-            <th className="px-4 py-2.5 font-semibold text-right">
+      <Table hover striped bordered={false}>
+        <TableHead className="sticky top-0 z-10 bg-kit-page">
+          <TableRow>
+            <TableHeaderCell>Ngày</TableHeaderCell>
+            <TableHeaderCell className="text-right">
               Tổng đơn hàng
-            </th>
-            <th className="px-4 py-2.5 font-semibold text-right">
+            </TableHeaderCell>
+            <TableHeaderCell className="text-right">
               Tổng giờ phục vụ
-            </th>
-            <th className="px-4 py-2.5 font-semibold text-right">
+            </TableHeaderCell>
+            <TableHeaderCell className="text-right">
               Tổng hoa hồng
-            </th>
-          </tr>
-        </thead>
-        <tbody>
+            </TableHeaderCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {dailyStats.map((day: PayrollCommissionDailyDto) => (
-            <tr
+            <TableRow
               key={day.workDate}
-              className={`border-b border-adminGray-100 transition-colors ${
-                onDayClick
-                  ? "hover:bg-adminGray-50/70 cursor-pointer"
-                  : "hover:bg-adminGray-50/40"
-              }`}
+              className={onDayClick ? "cursor-pointer" : undefined}
               onClick={() => onDayClick?.(day.workDate)}
             >
-              <td className="px-4 py-2.5 whitespace-nowrap font-medium text-adminInk">
+              <TableCell className="whitespace-nowrap font-medium text-kit-heading">
                 {day.workDate}
-              </td>
-              <td className="px-4 py-2.5 text-right text-adminGray-600">
+              </TableCell>
+              <TableCell className="text-right text-kit-muted">
                 {day.orderCount}
-              </td>
-              <td className="px-4 py-2.5 text-right text-adminGray-600">
+              </TableCell>
+              <TableCell className="text-right text-kit-muted">
                 {formatHours(day.serviceHours)}
-              </td>
-              <td className="px-4 py-2.5 text-right font-semibold text-primary">
+              </TableCell>
+              <TableCell className="text-right font-semibold text-kit-primary">
                 {formatCurrency(day.totalCommission)}
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-        <tfoot className="bg-adminGray-50 border-t border-adminGray-100">
-          <tr className="text-xs font-semibold text-adminInk">
-            <td className="px-4 py-2.5">{dailyStats.length} ngày</td>
-            <td className="px-4 py-2.5 text-right">
+          <TableRow className="bg-kit-page">
+            <TableCell className="text-xs font-semibold text-kit-heading">
+              {dailyStats.length} ngày
+            </TableCell>
+            <TableCell className="text-right text-xs font-semibold text-kit-heading">
               {summary?.totalOrders ?? 0} đơn
-            </td>
-            <td className="px-4 py-2.5 text-right">
+            </TableCell>
+            <TableCell className="text-right text-xs font-semibold text-kit-heading">
               {formatHours(summary?.totalServiceHours ?? 0)}
-            </td>
-            <td className="px-4 py-2.5 text-right text-primary">
+            </TableCell>
+            <TableCell className="text-right text-xs font-semibold text-kit-primary">
               {formatCurrency(summary?.totalCommission ?? 0)}
-            </td>
-          </tr>
-        </tfoot>
-      </table>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
     </div>
   );
 }
