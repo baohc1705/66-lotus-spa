@@ -48,13 +48,19 @@ export function Logo({
       />
 
       {isOnDark ? (
-        <div className="flex flex-col leading-none justify-center">
-          <span className="font-semibold text-xs tracking-wide text-white font-sans uppercase">
-            HOA SEN
+        <div className="flex flex-col justify-center leading-none">
+          <span className="font-sans text-xs font-semibold tracking-wide text-white uppercase">
+            HOA SEN <span className="font-light normal-case italic">Spa</span>
           </span>
-          <span className="text-3xs tracking-[0.24em] uppercase font-sans mt-0.5 text-white/60">
-            SPA & SALON
-          </span>
+          {showTagline ? (
+            <span className="mt-0.5 font-sans text-3xs font-medium tracking-[0.18em] text-white/70 uppercase">
+              {taglineText || "SPA & SALON"}
+            </span>
+          ) : (
+            <span className="mt-0.5 font-sans text-3xs tracking-[0.24em] text-white/60 uppercase">
+              SPA & SALON
+            </span>
+          )}
         </div>
       ) : (
         <div className="flex flex-col leading-none justify-center">

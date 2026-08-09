@@ -1,33 +1,30 @@
+import { useEffect, useState } from "react";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { invoiceApi } from "@/features/invoices/api/invoice.api";
 import type { InvoiceDto } from "@/features/invoices/types/invoice.types";
-import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { toast } from "@/shared/components/kitToast";
 import { cashierApi } from "../api/cashier.api";
 import { CashierBookingModal } from "../components/CashierBookingModal";
-import { CashierGrid } from "../components/CashierGrid";
+import { CashierCalendar } from "../components/CashierCalendar";
 import { CashierHeader } from "../components/CashierHeader";
 import { CashierInvoiceSidebar } from "../components/CashierInvoiceSidebar";
 import { CashierPOS } from "../components/CashierPOS";
-import { CashierTimeline } from "../components/CashierTimeline";
-import { CashierToolbar } from "../components/CashierToolbar";
-import { CashierWeeklyView } from "../components/CashierWeeklyView";
 import { PositionAvailabilityDialog } from "../components/PositionAvailabilityDialog";
 import { StaffAvailabilityDialog } from "../components/StaffAvailabilityDialog";
 import { useCashierData, useCashierWeekly } from "../hooks/useCashier";
-import type {
-  CashierBooking,
-  CashierTimeRange,
-  CashierViewMode,
-} from "../types";
+import type { CashierBooking } from "../types";
+import {
+  getIsoWeekStart,
+  getMonthRange,
+  type CashierCalendarView,
+} from "../utils/cashierCalendar.utils";
 
 export function CashierPage() {
   const [activeTab, setActiveTab] = useState<"calendar" | "invoices">(
     "calendar",
   );
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [timeRange, setTimeRange] = useState<CashierTimeRange>("daily");
+  const [viewMode, setViewMode] = useState<CashierCalendarView>("day");
   const [selectedBooking, setSelectedBooking] = useState<CashierBooking | null>(
     null,
   );
@@ -38,44 +35,33 @@ export function CashierPage() {
   const [isPaying, setIsPaying] = useState(false);
   const [pendingCheckoutInvoice, setPendingCheckoutInvoice] =
     useState<InvoiceDto | null>(null);
-  const [viewMode, setViewMode] = useState<CashierViewMode>(
-    () =>
-      (localStorage.getItem("cashier-view-mode") as CashierViewMode) ||
-      "timeline",
-  );
-
-  useEffect(() => {
-    localStorage.setItem("cashier-view-mode", viewMode);
-  }, [viewMode]);
 
   const { hasRole, getEffectiveSalonId } = useAuthStore();
   const isAdmin = hasRole("Admin");
   const isReceptionist = hasRole("Receptionist");
-
   const salonId = getEffectiveSalonId();
 
-  const weekStart = new Date(currentDate);
-  const day = weekStart.getDay();
-  const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
-  weekStart.setDate(diff);
+  const weekStart = getIsoWeekStart(currentDate);
   const weekEnd = new Date(weekStart);
   weekEnd.setDate(weekStart.getDate() + 6);
+  const monthRange = getMonthRange(currentDate);
 
-  const dailyQuery = useCashierData(
-    currentDate,
+  let rangeStart = weekStart;
+  let rangeEnd = weekEnd;
+  if (viewMode === "month") {
+    rangeStart = monthRange.start;
+    rangeEnd = monthRange.end;
+  }
+
+  const dailyQuery = useCashierData(currentDate, salonId, viewMode === "day");
+  const rangeQuery = useCashierWeekly(
+    rangeStart,
+    rangeEnd,
     salonId,
-    timeRange === "daily",
-  );
-  const weeklyQuery = useCashierWeekly(
-    weekStart,
-    weekEnd,
-    salonId,
-    timeRange === "weekly",
+    viewMode !== "day",
   );
 
-  const { data, isLoading, isError, error, refetch } =
-    timeRange === "daily" ? dailyQuery : weeklyQuery;
-  const moveBooking = timeRange === "daily" ? dailyQuery.moveBooking : () => {};
+  const calendarQuery = viewMode === "day" ? dailyQuery : rangeQuery;
 
   useEffect(() => {
     if (!isAdmin && !isReceptionist) {
@@ -94,10 +80,6 @@ export function CashierPage() {
   const handleBookingClick = (booking: CashierBooking) => {
     setSelectedBooking(booking);
     setIsSidebarOpen(true);
-  };
-
-  const handleEmptySlotClick = () => {
-    setIsBookingModalOpen(true);
   };
 
   const handlePayInvoice = async (booking: CashierBooking) => {
@@ -134,10 +116,7 @@ export function CashierPage() {
   };
 
   return (
-    <div className="admin-dashboard-container h-screen w-full flex flex-col bg-adminGray-50 overflow-hidden font-sans text-adminInk relative">
-      <div className="absolute top-0 left-0 w-[50vw] h-[50vw] rounded-full bg-adminGreen-600/5 blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2 z-0" />
-      <div className="absolute bottom-0 right-0 w-[40vw] h-[40vw] rounded-full bg-adminGold-600/5 blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3 z-0" />
-
+    <div className="relative flex h-screen w-full flex-col overflow-hidden bg-kit-page font-sans text-sm text-kit-body">
       <CashierHeader activeTab={activeTab} onTabChange={setActiveTab} />
 
       {activeTab === "invoices" ? (
@@ -147,65 +126,24 @@ export function CashierPage() {
         />
       ) : (
         <>
-          <CashierToolbar
-            currentDate={currentDate}
-            onDateChange={setCurrentDate}
-            onAddBooking={handleAddBooking}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            timeRange={timeRange}
-            onTimeRangeChange={setTimeRange}
-            onOpenStaffAvailability={() => setStaffAvailOpen(true)}
-            onOpenPositionAvailability={() => setPositionAvailOpen(true)}
-          />
-
-          <div className="flex-1 flex min-h-0 min-w-0 w-full overflow-hidden relative z-10 border-t border-adminGray-100">
-            {isLoading ? (
-              <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-xs">
-                <Loader2 className="w-8 h-8 text-adminGreen-600 animate-spin" />
-              </div>
-            ) : isError ? (
-              <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-xs text-adminGreen-600 text-sm gap-2">
-                <span>{error ?? "Không tải được lịch hẹn"}</span>
-                <button
-                  type="button"
-                  onClick={() => refetch()}
-                  className="underline text-adminInk hover:text-adminGreen-600 transition-colors"
-                >
-                  Thử lại
-                </button>
-              </div>
-            ) : !data ? (
-              <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-xs text-adminGray-600">
-                Không thể tải dữ liệu lưới lịch
-              </div>
-            ) : timeRange === "weekly" ? (
-              <CashierWeeklyView
-                startDate={weekStart}
-                endDate={weekEnd}
-                bookings={data.bookings}
-                onBookingClick={handleBookingClick}
-                onEmptySlotClick={handleEmptySlotClick}
-              />
-            ) : viewMode === "grid" ? (
-              <CashierGrid
-                date={currentDate}
-                columns={data.columns}
-                bookings={data.bookings}
-                onBookingClick={handleBookingClick}
-                onEmptySlotClick={handleEmptySlotClick}
-                onBookingMove={moveBooking}
-              />
-            ) : (
-              <CashierTimeline
-                date={currentDate}
-                columns={data.columns}
-                bookings={data.bookings}
-                onBookingClick={handleBookingClick}
-                onEmptySlotClick={handleEmptySlotClick}
-                onBookingMove={moveBooking}
-              />
-            )}
+          <div className="relative z-10 flex min-h-0 min-w-0 w-full flex-1 overflow-hidden p-2">
+            <CashierCalendar
+              date={currentDate}
+              viewMode={viewMode}
+              columns={calendarQuery.data?.columns ?? []}
+              bookings={calendarQuery.data?.bookings ?? []}
+              isLoading={calendarQuery.isLoading}
+              isError={calendarQuery.isError}
+              errorMessage={calendarQuery.error}
+              onDateChange={setCurrentDate}
+              onViewChange={setViewMode}
+              onBookingClick={handleBookingClick}
+              onEmptySlotClick={handleAddBooking}
+              onRetry={() => calendarQuery.refetch()}
+              onAddBooking={handleAddBooking}
+              onOpenStaffAvailability={() => setStaffAvailOpen(true)}
+              onOpenPositionAvailability={() => setPositionAvailOpen(true)}
+            />
           </div>
 
           <CashierInvoiceSidebar
@@ -236,7 +174,7 @@ export function CashierPage() {
             onStatusUpdated={async () => {
               setIsSidebarOpen(false);
               setSelectedBooking(null);
-              await refetch();
+              await calendarQuery.refetch();
             }}
           />
 
@@ -244,7 +182,7 @@ export function CashierPage() {
             isOpen={isBookingModalOpen}
             onClose={() => {
               setIsBookingModalOpen(false);
-              refetch();
+              calendarQuery.refetch();
             }}
           />
 

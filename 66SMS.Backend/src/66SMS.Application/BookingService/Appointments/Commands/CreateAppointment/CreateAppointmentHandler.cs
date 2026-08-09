@@ -177,6 +177,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                             guest.StaffId,
                             guest.SalonId,
                             null,
+                            null,
                             cancellationToken);
 
                         if (staffInfo == null)

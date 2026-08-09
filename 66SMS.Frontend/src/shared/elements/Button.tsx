@@ -275,8 +275,16 @@ export function Button({
 }: ButtonProps) {
   const isDisabled = disabled || loading;
   let buttonClass =
-    "mb-2 mr-2 inline-flex items-center justify-center gap-0 font-medium leading-normal " +
+    "inline-flex items-center justify-center gap-0 font-medium leading-normal " +
     "font-sans transition-all disabled:opacity-65 disabled:cursor-not-allowed ";
+
+  // Chi them margin mac dinh khi caller khong tu set mb-/mr-.
+  if (className.indexOf("mb-") < 0) {
+    buttonClass += "mb-2 ";
+  }
+  if (className.indexOf("mr-") < 0) {
+    buttonClass += "mr-2 ";
+  }
 
   buttonClass += resolveButtonVariant(variant, borderless) + " ";
   buttonClass += resolveButtonSize(size) + " ";

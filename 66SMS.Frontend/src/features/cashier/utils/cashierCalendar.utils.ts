@@ -1,0 +1,440 @@
+import type { BookingStatus, CashierBooking } from "../types";
+
+export type CashierCalendarStatus =
+  | "pending"
+  | "confirmed"
+  | "waiting"
+  | "in-progress"
+  | "completed"
+  | "cancelled";
+
+export const CASHIER_STATUS_CARD_CLASS: Record<CashierCalendarStatus, string> =
+  {
+    pending: "bg-kit-secondary text-kit-white border-kit-secondary",
+    confirmed: "bg-kit-info text-kit-white border-kit-info",
+    waiting: "bg-kit-warning text-kit-on-warning border-kit-warning",
+    "in-progress": "bg-kit-alt text-kit-white border-kit-alt",
+    completed: "bg-kit-success text-kit-white border-kit-success",
+    cancelled: "bg-kit-danger text-kit-white border-kit-danger",
+  };
+
+export const CASHIER_STATUS_DOT_CLASS: Record<CashierCalendarStatus, string> = {
+  pending: "bg-kit-secondary",
+  confirmed: "bg-kit-info",
+  waiting: "bg-kit-warning",
+  "in-progress": "bg-kit-alt",
+  completed: "bg-kit-success",
+  cancelled: "bg-kit-danger",
+};
+
+export const CASHIER_STATUS_LABELS: Record<CashierCalendarStatus, string> = {
+  pending: "Chưa xác nhận",
+  confirmed: "Đã xác nhận",
+  waiting: "Chờ phục vụ",
+  "in-progress": "Đang phục vụ",
+  completed: "Đã phục vụ",
+  cancelled: "Đã hủy",
+};
+
+const STATUS_FILTER_ORDER: CashierCalendarStatus[] = [
+  "pending",
+  "confirmed",
+  "waiting",
+  "in-progress",
+  "completed",
+  "cancelled",
+];
+
+export function toCalendarStatus(status: BookingStatus): CashierCalendarStatus {
+  if (status === "unpaid" || status === "paid") {
+    return "completed";
+  }
+  if (status === "not-arrived") {
+    return "waiting";
+  }
+  if (CASHIER_STATUS_LABELS[status as CashierCalendarStatus]) {
+    return status as CashierCalendarStatus;
+  }
+  return "pending";
+}
+
+export function getStatusFilterItems() {
+  const items = [];
+  for (let index = 0; index < STATUS_FILTER_ORDER.length; index++) {
+    const status = STATUS_FILTER_ORDER[index];
+    items.push({
+      id: status,
+      label: CASHIER_STATUS_LABELS[status],
+      colorClass: CASHIER_STATUS_DOT_CLASS[status],
+      active: true,
+    });
+  }
+  return items;
+}
+
+export function toDateKey(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return year + "-" + month + "-" + day;
+}
+
+export type CashierCalendarView = "day" | "week" | "month";
+
+export function getViewLabel(view: CashierCalendarView): string {
+  if (view === "week") {
+    return "Tuần";
+  }
+  if (view === "month") {
+    return "Tháng";
+  }
+  return "Ngày";
+}
+
+export function getIsoWeekStart(date: Date): Date {
+  const next = new Date(date);
+  next.setHours(0, 0, 0, 0);
+  const day = next.getDay();
+  let diff = 1 - day;
+  if (day === 0) {
+    diff = -6;
+  }
+  next.setDate(next.getDate() + diff);
+  return next;
+}
+
+/** 7 ngay T2 -> CN cua tuan chua date. */
+export function getWeekDays(date: Date): Date[] {
+  const start = getIsoWeekStart(date);
+  const days: Date[] = [];
+  for (let index = 0; index < 7; index++) {
+    const day = new Date(start);
+    day.setDate(start.getDate() + index);
+    days.push(day);
+  }
+  return days;
+}
+
+export function getMonthRange(date: Date): { start: Date; end: Date } {
+  const start = new Date(date.getFullYear(), date.getMonth(), 1);
+  const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  return { start: start, end: end };
+}
+
+export function shiftCalendarDate(
+  date: Date,
+  view: CashierCalendarView,
+  direction: -1 | 1,
+): Date {
+  const next = new Date(date);
+  if (view === "week") {
+    next.setDate(next.getDate() + direction * 7);
+    return next;
+  }
+  if (view === "month") {
+    next.setMonth(next.getMonth() + direction);
+    return next;
+  }
+  next.setDate(next.getDate() + direction);
+  return next;
+}
+
+export function timeToMins(timeValue: string): number {
+  const parts = timeValue.trim().split(":");
+  const hour = Number(parts[0] || 0);
+  const minute = Number(parts[1] || 0);
+  if (Number.isNaN(hour) || Number.isNaN(minute)) {
+    return 0;
+  }
+  return hour * 60 + minute;
+}
+
+export function minsToTime(totalMins: number): string {
+  const hour = Math.floor(totalMins / 60);
+  const minute = totalMins % 60;
+  const hourText = String(hour).padStart(2, "0");
+  const minuteText = String(minute).padStart(2, "0");
+  return hourText + ":" + minuteText;
+}
+
+/**
+ * Truc gio lich thu ngan: HARDCODE tren client (khong load API TimeSlot).
+ * Moi o = 30 phut (SLOT_STEP_MINS). Cot gio hien tung moc 08:00, 08:30, ...
+ * VD: 08:00-09:30 = 3 o cao.
+ */
+export const SLOT_START_HOUR = 8;
+export const SLOT_END_HOUR = 22;
+export const SLOT_STEP_MINS = 30;
+export const SLOT_ROW_HEIGHT_PX = 56;
+
+export function buildDayTimeSlots(): string[] {
+  const slots: string[] = [];
+  const startMins = SLOT_START_HOUR * 60;
+  const endMins = SLOT_END_HOUR * 60;
+  for (let mins = startMins; mins < endMins; mins = mins + SLOT_STEP_MINS) {
+    slots.push(minsToTime(mins));
+  }
+  return slots;
+}
+
+export function floorToSlot(timeValue: string): string {
+  const mins = timeToMins(timeValue);
+  const floored = Math.floor(mins / SLOT_STEP_MINS) * SLOT_STEP_MINS;
+  return minsToTime(floored);
+}
+
+export function getBookingDurationMins(booking: CashierBooking): number {
+  const startMins = timeToMins(booking.startTime);
+  const endMins = timeToMins(booking.endTime);
+  const duration = endMins - startMins;
+  if (duration <= 0) {
+    return SLOT_STEP_MINS;
+  }
+  return duration;
+}
+
+export function getBookingSlotCount(booking: CashierBooking): number {
+  const duration = getBookingDurationMins(booking);
+  const slotCount = duration / SLOT_STEP_MINS;
+  if (slotCount < 1) {
+    return 1;
+  }
+  return slotCount;
+}
+
+export function getBookingContentLines(durationMins: number): 1 | 2 | 3 {
+  if (durationMins < 30) {
+    return 1;
+  }
+  if (durationMins < 60) {
+    return 2;
+  }
+  return 3;
+}
+
+export function getBookingsForSlot(
+  bookings: CashierBooking[],
+  staffId: string,
+  slotTime: string,
+  activeStatusIds: string[],
+): CashierBooking[] {
+  const result: CashierBooking[] = [];
+  for (let index = 0; index < bookings.length; index++) {
+    const booking = bookings[index];
+    if (String(booking.staffId) !== staffId) {
+      continue;
+    }
+    const calendarStatus = toCalendarStatus(booking.status);
+    if (activeStatusIds.indexOf(calendarStatus) < 0) {
+      continue;
+    }
+    if (floorToSlot(booking.startTime) !== slotTime) {
+      continue;
+    }
+    result.push(booking);
+  }
+  return result;
+}
+
+export function getBookingsForDaySlot(
+  bookings: CashierBooking[],
+  date: Date,
+  slotTime: string,
+  activeStatusIds: string[],
+): CashierBooking[] {
+  const result: CashierBooking[] = [];
+  const dateKey = toDateKey(date);
+  for (let index = 0; index < bookings.length; index++) {
+    const booking = bookings[index];
+    if (booking.bookingDate !== dateKey) {
+      continue;
+    }
+    const calendarStatus = toCalendarStatus(booking.status);
+    if (activeStatusIds.indexOf(calendarStatus) < 0) {
+      continue;
+    }
+    if (floorToSlot(booking.startTime) !== slotTime) {
+      continue;
+    }
+    result.push(booking);
+  }
+  return result;
+}
+
+export function getBookingsCountOnDay(
+  bookings: CashierBooking[],
+  date: Date,
+  activeStatusIds: string[],
+): number {
+  let count = 0;
+  const dateKey = toDateKey(date);
+  for (let index = 0; index < bookings.length; index++) {
+    const booking = bookings[index];
+    if (booking.bookingDate !== dateKey) {
+      continue;
+    }
+    const calendarStatus = toCalendarStatus(booking.status);
+    if (activeStatusIds.indexOf(calendarStatus) < 0) {
+      continue;
+    }
+    count = count + 1;
+  }
+  return count;
+}
+
+/** Loc lich 1 ngay theo trang thai, sap xep theo gio. */
+export function getFilteredBookingsForDay(
+  bookings: CashierBooking[],
+  date: Date,
+  activeStatusIds: string[],
+): CashierBooking[] {
+  const result: CashierBooking[] = [];
+  const dateKey = toDateKey(date);
+  for (let index = 0; index < bookings.length; index++) {
+    const booking = bookings[index];
+    if (booking.bookingDate !== dateKey) {
+      continue;
+    }
+    const calendarStatus = toCalendarStatus(booking.status);
+    if (activeStatusIds.indexOf(calendarStatus) < 0) {
+      continue;
+    }
+    result.push(booking);
+  }
+
+  for (let i = 0; i < result.length; i++) {
+    for (let j = i + 1; j < result.length; j++) {
+      if (timeToMins(result[j].startTime) < timeToMins(result[i].startTime)) {
+        const temp = result[i];
+        result[i] = result[j];
+        result[j] = temp;
+      }
+    }
+  }
+  return result;
+}
+
+/** View tuan theo NV: lich cua 1 nhan vien trong 1 ngay. */
+export function getBookingsForStaffDay(
+  bookings: CashierBooking[],
+  staffId: string,
+  date: Date,
+  activeStatusIds: string[],
+): CashierBooking[] {
+  const dayBookings = getFilteredBookingsForDay(bookings, date, activeStatusIds);
+  const result: CashierBooking[] = [];
+  for (let index = 0; index < dayBookings.length; index++) {
+    if (String(dayBookings[index].staffId) !== staffId) {
+      continue;
+    }
+    result.push(dayBookings[index]);
+  }
+  return result;
+}
+
+export function isSameDateKey(date: Date, dateKey?: string | null): boolean {
+  if (!dateKey) {
+    return true;
+  }
+  return dateKey === toDateKey(date);
+}
+
+export function formatDayTitle(date: Date): string {
+  const weekday = date.toLocaleDateString("vi-VN", { weekday: "long" });
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  const weekdayLabel = weekday.charAt(0).toUpperCase() + weekday.slice(1);
+  return weekdayLabel + ", " + day + "/" + month + "/" + year;
+}
+
+export function formatWeekTitle(date: Date): string {
+  const days = getWeekDays(date);
+  const start = days[0];
+  const end = days[6];
+  const startText =
+    String(start.getDate()).padStart(2, "0") +
+    "/" +
+    String(start.getMonth() + 1).padStart(2, "0");
+  const endText =
+    String(end.getDate()).padStart(2, "0") +
+    "/" +
+    String(end.getMonth() + 1).padStart(2, "0") +
+    "/" +
+    end.getFullYear();
+  return "Tuần " + startText + " – " + endText;
+}
+
+export function formatMonthTitle(date: Date): string {
+  return "Tháng " + (date.getMonth() + 1) + " năm " + date.getFullYear();
+}
+
+export function formatCalendarTitle(
+  date: Date,
+  view: CashierCalendarView,
+): string {
+  if (view === "week") {
+    return formatWeekTitle(date);
+  }
+  if (view === "month") {
+    return formatMonthTitle(date);
+  }
+  return formatDayTitle(date);
+}
+
+export function getMonthGridDays(anchorDate: Date): Date[] {
+  const firstOfMonth = new Date(
+    anchorDate.getFullYear(),
+    anchorDate.getMonth(),
+    1,
+  );
+  const start = getIsoWeekStart(firstOfMonth);
+  const days: Date[] = [];
+  const cursor = new Date(start);
+
+  for (let index = 0; index < 42; index++) {
+    days.push(new Date(cursor));
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  return days;
+}
+
+export function isSameDay(a: Date, b: Date): boolean {
+  if (a.getFullYear() !== b.getFullYear()) {
+    return false;
+  }
+  if (a.getMonth() !== b.getMonth()) {
+    return false;
+  }
+  if (a.getDate() !== b.getDate()) {
+    return false;
+  }
+  return true;
+}
+
+export function getActiveStatusIds(
+  filters: { id: string; active: boolean }[],
+): string[] {
+  const ids: string[] = [];
+  for (let index = 0; index < filters.length; index++) {
+    if (filters[index].active) {
+      ids.push(filters[index].id);
+    }
+  }
+  return ids;
+}
+
+export function getDayBookings(
+  bookings: CashierBooking[],
+  date: Date,
+): CashierBooking[] {
+  const result: CashierBooking[] = [];
+  for (let index = 0; index < bookings.length; index++) {
+    const booking = bookings[index];
+    if (isSameDateKey(date, booking.bookingDate)) {
+      result.push(booking);
+    }
+  }
+  return result;
+}

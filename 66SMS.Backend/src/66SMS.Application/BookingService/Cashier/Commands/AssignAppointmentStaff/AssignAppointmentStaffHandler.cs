@@ -50,6 +50,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentSt
                 request.StaffId,
                 appointment.SalonId,
                 appointment.LockId,
+                appointment.Id,
                 cancellationToken);
 
             if (resolved == null)

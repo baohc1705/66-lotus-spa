@@ -2,19 +2,14 @@ import { useState } from "react";
 import type { AxiosError } from "axios";
 import { Loader2, Ticket } from "lucide-react";
 import { toast } from "@/shared/components/kitToast";
+import { Modal } from "@/shared/components/Modal";
+import { TabNav } from "@/shared/components/Tabs";
+import { Button } from "@/shared/elements/Button";
+import { CurrencyInput } from "@/shared/forms/CurrencyInput";
+import { FormField } from "@/shared/forms/FormField";
 import { bookingApi } from "@/features/booking/api/booking.api";
 import { useActivePromotions } from "@/features/booking/hooks/useBookingData";
 import type { ActivePromotionDto } from "@/features/booking/types/booking.types";
-import { AdminInput } from "@/shared/components/forms/AdminInput";
-import { FormField } from "@/shared/components/forms/FormField";
-import { Button } from "@/shared/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type { Result } from "@/shared/types/common.types";
 import { cn } from "@/lib/utils";
@@ -100,141 +95,19 @@ export function CashierPromotionModal({
   };
 
   return (
-    <Dialog
+    <Modal
       open={open}
-      onOpenChange={(nextOpen) => {
-        if (!nextOpen) handleClose();
-      }}
-    >
-      <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-adminInk">
-            Giảm giá / Khuyến mãi
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-4 py-2">
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              type="button"
-              size="sm"
-              variant={tab === "promo" ? "admin" : "outline"}
-              onClick={() => setTab("promo")}
-            >
-              Khuyến mãi
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant={tab === "manual" ? "admin" : "outline"}
-              onClick={() => {
-                setTempDiscount(currentDiscount);
-                setTab("manual");
-              }}
-            >
-              Giảm thủ công
-            </Button>
-          </div>
-
-          {tab === "promo" ? (
-            <div className="space-y-2 max-h-[45vh] overflow-y-auto pr-1">
-              {isLoading && (
-                <div className="flex items-center justify-center gap-2 py-8 text-sm text-adminGray-600">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Đang tải khuyến mãi...
-                </div>
-              )}
-
-              {!isLoading && (isError || promotions.length === 0) && (
-                <p className="text-sm text-adminGray-600 text-center py-8">
-                  Không có khuyến mãi đang áp dụng.
-                </p>
-              )}
-
-              {!isLoading &&
-                promotions.map((promo: ActivePromotionDto) => {
-                  const code = promo.code.toUpperCase();
-                  const isApplied = currentPromotionCode === code;
-                  const isApplying = applyingCode === code;
-
-                  return (
-                    <button
-                      key={promo.id}
-                      type="button"
-                      disabled={isApplying}
-                      onClick={() => handleApplyPromo(promo)}
-                      className={cn(
-                        "w-full text-left rounded-[5px] border px-3 py-3 transition",
-                        isApplied
-                          ? "border-adminGreen-600/40 bg-adminGreen-600/5"
-                          : "border-adminGray-100 bg-adminGray-50/40 hover:border-adminGold-600/40 hover:bg-white",
-                      )}
-                    >
-                      <div className="flex items-start gap-2.5">
-                        <Ticket
-                          className={cn(
-                            "w-4 h-4 shrink-0 mt-0.5",
-                            isApplied
-                              ? "text-adminGreen-600"
-                              : "text-adminGold-600",
-                          )}
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="font-mono text-sm font-semibold text-adminInk truncate">
-                              {code}
-                            </span>
-                            {isApplying ? (
-                              <Loader2 className="w-3.5 h-3.5 animate-spin text-adminGreen-600 shrink-0" />
-                            ) : isApplied ? (
-                              <span className="text-xs font-semibold text-adminGreen-600 shrink-0">
-                                Đã chọn
-                              </span>
-                            ) : (
-                              <span className="text-xs font-semibold text-adminGold-600 shrink-0">
-                                Áp dụng
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-sm font-medium text-adminInk mt-0.5 line-clamp-1">
-                            {promo.name}
-                          </p>
-                          <p className="text-xs text-adminGray-600 mt-0.5">
-                            {formatDiscountLabel(promo)}
-                            {promo.minOrderValue != null &&
-                              promo.minOrderValue > 0 &&
-                              ` · Đơn tối thiểu ${promo.minOrderValue.toLocaleString("vi-VN")}đ`}
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-            </div>
-          ) : (
-            <FormField label="Số tiền giảm (VND)">
-              <AdminInput
-                type="number"
-                min={0}
-                value={tempDiscount}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setTempDiscount(Number(e.target.value) || 0)
-                }
-                placeholder="Nhập số tiền giảm..."
-              />
-              <p className="text-xs text-adminGray-600 mt-1">
-                Giảm thủ công sẽ bỏ mã khuyến mãi đang chọn (nếu có).
-              </p>
-            </FormField>
-          )}
-        </div>
-
-        <DialogFooter className="pt-2 gap-2 sm:justify-between">
+      onClose={handleClose}
+      title="Giảm giá / Khuyến mãi"
+      size="md"
+      scrollable
+      footer={
+        <>
           <Button
             type="button"
-            variant="outline"
+            variant="outline-danger"
             size="sm"
-            className="text-state-danger-text hover:text-state-danger-text hover:bg-state-danger-bg border-state-danger-text/30"
+            className="mb-0 mr-auto"
             onClick={() => {
               onClear();
               handleClose();
@@ -243,32 +116,133 @@ export function CashierPromotionModal({
           >
             Xóa giảm giá
           </Button>
-          <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mb-0"
+            onClick={handleClose}
+          >
+            {COMMON_MSG.cancel}
+          </Button>
+          {tab === "manual" && (
             <Button
               type="button"
-              variant="outline"
+              variant="primary"
               size="sm"
-              onClick={handleClose}
+              className="mb-0"
+              onClick={() => {
+                onApplyManual(Math.max(0, tempDiscount));
+                handleClose();
+                toast.success("Đã áp dụng giảm giá");
+              }}
             >
-              {COMMON_MSG.cancel}
+              Xác nhận
             </Button>
-            {tab === "manual" && (
-              <Button
-                type="button"
-                variant="admin"
-                size="sm"
-                onClick={() => {
-                  onApplyManual(Math.max(0, tempDiscount));
-                  handleClose();
-                  toast.success("Đã áp dụng giảm giá");
-                }}
-              >
-                Xác nhận
-              </Button>
+          )}
+        </>
+      }
+    >
+      <div className="space-y-4">
+        <TabNav
+          variant="btn-group-primary"
+          activeId={tab}
+          onChange={(id) => {
+            if (id === "manual") setTempDiscount(currentDiscount);
+            setTab(id as "promo" | "manual");
+          }}
+          items={[
+            { id: "promo", label: "Khuyến mãi" },
+            { id: "manual", label: "Giảm thủ công" },
+          ]}
+        />
+
+        {tab === "promo" ? (
+          <div className="space-y-2 max-h-[45vh] overflow-y-auto pr-1">
+            {isLoading && (
+              <div className="flex items-center justify-center gap-2 py-8 text-sm text-kit-muted">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Đang tải khuyến mãi...
+              </div>
             )}
+
+            {!isLoading && (isError || promotions.length === 0) && (
+              <p className="text-sm text-kit-muted text-center py-8">
+                Không có khuyến mãi đang áp dụng.
+              </p>
+            )}
+
+            {!isLoading &&
+              promotions.map((promo: ActivePromotionDto) => {
+                const code = promo.code.toUpperCase();
+                const isApplied = currentPromotionCode === code;
+                const isApplying = applyingCode === code;
+
+                return (
+                  <button
+                    key={promo.id}
+                    type="button"
+                    disabled={isApplying}
+                    onClick={() => handleApplyPromo(promo)}
+                    className={cn(
+                      "w-full text-left rounded border px-3 py-3 transition",
+                      isApplied
+                        ? "border-kit-success/40 bg-kit-success/5"
+                        : "border-kit bg-kit-page hover:border-kit-primary/40 hover:bg-kit-white",
+                    )}
+                  >
+                    <div className="flex items-start gap-2.5">
+                      <Ticket
+                        className={cn(
+                          "w-4 h-4 shrink-0 mt-0.5",
+                          isApplied ? "text-kit-success" : "text-kit-warning",
+                        )}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-mono text-sm font-semibold text-kit-heading truncate">
+                            {code}
+                          </span>
+                          {isApplying ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-kit-success shrink-0" />
+                          ) : isApplied ? (
+                            <span className="text-xs font-semibold text-kit-success shrink-0">
+                              Đã chọn
+                            </span>
+                          ) : (
+                            <span className="text-xs font-semibold text-kit-warning shrink-0">
+                              Áp dụng
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm font-medium text-kit-heading mt-0.5 line-clamp-1">
+                          {promo.name}
+                        </p>
+                        <p className="text-xs text-kit-muted mt-0.5">
+                          {formatDiscountLabel(promo)}
+                          {promo.minOrderValue != null &&
+                            promo.minOrderValue > 0 &&
+                            ` · Đơn tối thiểu ${promo.minOrderValue.toLocaleString("vi-VN")}đ`}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
           </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        ) : (
+          <FormField
+            label="Số tiền giảm (VND)"
+            help="Giảm thủ công sẽ bỏ mã khuyến mãi đang chọn (nếu có)."
+          >
+            <CurrencyInput
+              value={tempDiscount}
+              onChange={(value) => setTempDiscount(value ?? 0)}
+              placeholder="Nhập số tiền giảm..."
+            />
+          </FormField>
+        )}
+      </div>
+    </Modal>
   );
 }

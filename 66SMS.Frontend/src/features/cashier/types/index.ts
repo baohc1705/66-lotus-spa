@@ -1,6 +1,3 @@
-export type CashierViewMode = 'timeline' | 'grid'
-export type CashierTimeRange = 'daily' | 'weekly'
-
 export type BookingStatus =
   | 'pending'
   | 'confirmed'

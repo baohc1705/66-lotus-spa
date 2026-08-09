@@ -3,13 +3,15 @@ IF OBJECT_ID(N'dbo.usp_ResolveBookingStaff', N'P') IS NOT NULL
 GO
 
 -- Tim 1 staff nhan duoc slot. @staff_id NULL = bat ky.
+-- @exclude_appointment_id: bo qua lich dang doi gio (tranh tu ban minh).
 CREATE PROCEDURE dbo.usp_ResolveBookingStaff
-    @date            DATE,
-    @service_id      INT,
-    @slot_id         INT,
-    @staff_id        INT = NULL,
-    @salon_id        INT = NULL,
-    @exclude_lock_id INT = NULL
+    @date                   DATE,
+    @service_id             INT,
+    @slot_id                INT,
+    @staff_id               INT = NULL,
+    @salon_id               INT = NULL,
+    @exclude_lock_id        INT = NULL,
+    @exclude_appointment_id INT = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -107,6 +109,7 @@ BEGIN
     INNER JOIN dbo.appointments a ON a.id = aps.appointment_id
     WHERE a.appointment_date = @date
       AND a.status NOT IN (5, 6, 9)
+      AND (@exclude_appointment_id IS NULL OR a.id <> @exclude_appointment_id)
       AND aps.status = 1
     GROUP BY aps.appointment_id;
 
@@ -121,6 +124,7 @@ BEGIN
         WHERE a.staff_id = s.staff_id
           AND a.appointment_date = @date
           AND a.status NOT IN (5, 6, 9)
+          AND (@exclude_appointment_id IS NULL OR a.id <> @exclude_appointment_id)
           AND COALESCE(a.time_appt_start, ts.start_time) < @window_end
           AND COALESCE(
                 CAST(a.time_appt_end AS DATETIME),

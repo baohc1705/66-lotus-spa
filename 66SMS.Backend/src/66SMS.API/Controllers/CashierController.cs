@@ -3,6 +3,7 @@ using _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentPositi
 using _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentStaff;
 using _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppointment;
 using _66SMS.Application.BookingService.Cashier.Commands.PayAppointment;
+using _66SMS.Application.BookingService.Cashier.Commands.RescheduleAppointment;
 using _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentStatus;
 using _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn;
 using _66SMS.Application.BookingService.Cashier.Commands.VnPayReturn;
@@ -83,6 +84,18 @@ namespace _66SMS.API.Controllers
                 StaffId = staffId,
                 UserId = jwtService.GetUserId()
             };
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpPut("appointments/{appointmentId}/reschedule")]
+        [Authorize]
+        public async Task<IActionResult> RescheduleAppointment(
+            int appointmentId,
+            [FromBody] RescheduleAppointmentCommand command)
+        {
+            command.AppointmentId = appointmentId;
+            command.UserId = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }

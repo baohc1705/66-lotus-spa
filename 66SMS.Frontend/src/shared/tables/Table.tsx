@@ -152,24 +152,32 @@ export function TableCell({
   className,
   style,
   colSpan,
+  rowSpan,
   asHeader,
 }: {
   children?: ReactNode;
   className?: string;
   style?: CSSProperties;
   colSpan?: number;
+  rowSpan?: number;
   asHeader?: boolean;
 }) {
   if (asHeader) {
     return (
-      <th colSpan={colSpan} style={style} className={className} scope="row">
+      <th
+        colSpan={colSpan}
+        rowSpan={rowSpan}
+        style={style}
+        className={className}
+        scope="row"
+      >
         {children}
       </th>
     );
   }
 
   return (
-    <td colSpan={colSpan} style={style} className={className}>
+    <td colSpan={colSpan} rowSpan={rowSpan} style={style} className={className}>
       {children}
     </td>
   );

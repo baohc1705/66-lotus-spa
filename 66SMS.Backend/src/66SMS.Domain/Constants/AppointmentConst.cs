@@ -96,6 +96,15 @@ namespace _66SMS.Domain.Constants
         public const string MSG_ASSIGN_STAFF_UNCHANGED = "Nhân viên không thay đổi.";
         public const string MSG_ASSIGN_STAFF_UNAVAILABLE = "Nhân viên không khả dụng cho khung giờ này.";
         public const string MSG_ASSIGN_STAFF_SUCCESS = "Đã cập nhật nhân viên thành công.";
+
+        public const string MSG_RESCHEDULE_ONLY_BEFORE_SERVICE =
+            "Chỉ đổi ngày/giờ khi lịch chưa bắt đầu phục vụ (chưa xác nhận, đã xác nhận hoặc chờ phục vụ).";
+        public const string MSG_RESCHEDULE_UNCHANGED = "Ngày và khung giờ không thay đổi.";
+        public const string MSG_RESCHEDULE_SLOT_UNAVAILABLE =
+            "Khung giờ mới không trống hoặc nhân viên không khả dụng. Vui lòng chọn lại.";
+        public const string MSG_RESCHEDULE_SUCCESS = "Đã đổi ngày/giờ lịch hẹn thành công.";
+        public const string MSG_RESCHEDULE_SLOT_REQUIRED = "Vui lòng chọn khung giờ mới.";
+        public const string MSG_RESCHEDULE_DATE_REQUIRED = "Vui lòng chọn ngày hẹn mới.";
         #endregion
     }
 }

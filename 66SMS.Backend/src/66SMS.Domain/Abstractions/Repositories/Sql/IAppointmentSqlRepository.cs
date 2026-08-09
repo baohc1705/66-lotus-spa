@@ -39,6 +39,7 @@ namespace _66SMS.Domain.Abstractions.Repositories.Sql
             int? staffId,
             int? salonId,
             int? excludeLockId,
+            int? excludeAppointmentId = null,
             CancellationToken cancellationToken = default);
 
         Task<IReadOnlyList<CashierStaffColumnRowDto>> GetCashierStaffColumnsAsync(

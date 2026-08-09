@@ -104,7 +104,7 @@ export function Dropdown({
   const menu = open ? (
     <div
       className={
-        "absolute z-30 min-w-60 rounded border border-kit bg-kit-white py-1 " +
+        "absolute z-50 min-w-60 rounded border border-kit bg-kit-white py-1 " +
         "text-sm font-sans shadow-kit-pop " +
         alignClass +
         menuPositionClass(placement)
@@ -161,7 +161,12 @@ export function Dropdown({
     return (
       <div
         ref={rootRef}
-        className={"relative mb-2 mr-2 inline-flex " + className}
+        className={
+          "relative inline-flex " +
+          (className.indexOf("mb-") < 0 ? "mb-2 " : "") +
+          (className.indexOf("mr-") < 0 ? "mr-2 " : "") +
+          className
+        }
       >
         <button
           type="button"
@@ -191,7 +196,12 @@ export function Dropdown({
   return (
     <div
       ref={rootRef}
-      className={"relative mb-2 mr-2 inline-block " + className}
+      className={
+        "relative inline-block " +
+        (className.indexOf("mb-") < 0 ? "mb-2 " : "") +
+        (className.indexOf("mr-") < 0 ? "mr-2 " : "") +
+        className
+      }
     >
       <button
         type="button"
