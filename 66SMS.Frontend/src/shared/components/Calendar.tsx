@@ -216,7 +216,11 @@ export type CalendarProps = {
   isLoading?: boolean;
   hideViewSwitcher?: boolean;
   language?: "en" | "fr";
-  translations?: Partial<CalendarTranslations>;
+  translations?: Partial<CalendarTranslations> & {
+    calendars?: string;
+    create?: string;
+    localTime?: string;
+  };
   locale?: Locale;
   timezone?: string;
   theme?: CalendarTheme;
@@ -386,13 +390,26 @@ export function Calendar({
     <div
       ref={rootRef}
       id="calendar"
-      className={"kit-calendar font-sans text-sm text-kit-body " + className}
+      className={
+        "kit-calendar flex h-full min-h-0 flex-col font-sans text-sm text-kit-body " +
+        className
+      }
       style={buildKitStyle(theme)}
     >
       <style>{`
-        .kit-calendar .flex-1.px-4.space-y-5.mt-5,
+        /* An chon Local Time / Timezone o cuoi sidebar */
         .kit-calendar .mt-auto.px-4.pt-5 {
           display: none !important;
+        }
+        /* Card su kien (ngay/tuan): thanh mau trang thai solid ben trai */
+        .kit-calendar .glass.overflow-hidden {
+          border-left-width: 4px !important;
+          border-left-style: solid !important;
+        }
+        /* Fill chieu cao parent (max viewport) */
+        .kit-calendar > div {
+          height: 100%;
+          min-height: 0;
         }
       `}</style>
       <Scheduler
