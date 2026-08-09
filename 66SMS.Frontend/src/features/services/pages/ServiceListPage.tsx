@@ -2,18 +2,34 @@ import {
   getCoreRowModel,
   getExpandedRowModel,
   useReactTable,
+  type ColumnDef,
+  type Row,
 } from "@tanstack/react-table";
-import { Activity, ArrowLeft, Plus, Trash2 } from "lucide-react";
+import {
+  Activity,
+  ArrowLeft,
+  Eye,
+  Pencil,
+  Plus,
+  RotateCcw,
+  Trash2,
+} from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import { Pagination } from "@/shared/components/Pagination";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { Tooltip } from "@/shared/components/Tooltip";
+import { Badge } from "@/shared/elements/Badge";
 import { Button } from "@/shared/elements/Button";
+import { Checkbox } from "@/shared/forms/Checkbox";
+import { Switch } from "@/shared/forms/Switch";
 import { DataTable } from "@/shared/tables/DataTable";
 import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
 import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { SortableColumnHeader } from "@/shared/tables/SortableColumnHeader";
 import { TableEmptyState } from "@/shared/tables/TableEmptyState";
 import { TablePageShell } from "@/shared/tables/TablePageShell";
 import { TableSelectionBar } from "@/shared/tables/TableSelectionBar";
@@ -22,16 +38,13 @@ import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { useRowSelection } from "@/shared/hooks/useRowSelection";
+import { formatCurrency } from "@/shared/utils/currency";
+import { formatDateTimeDisplay } from "@/shared/utils/date.utils";
 
 import { ServiceCategorySidebar } from "../components/ServiceCategorySidebar";
 import { ServiceDetailExpanded } from "../components/ServiceDetailExpanded";
 import { ServiceFormDialog } from "../components/ServiceFormDialog";
 import { ServiceStatCards } from "../components/ServiceStatCards";
-import {
-  SERVICE_COLUMN_LABELS,
-  useActiveServiceColumns,
-} from "../components/useActiveServiceColumns";
-import { useDeletedServiceColumns } from "../components/useDeletedServiceColumns";
 import { SERVICE_PERM } from "../constants/service.permissions";
 import { useServiceListState } from "../hooks/useServiceListState";
 import {
@@ -42,12 +55,24 @@ import {
   useRestoreService,
   useUpdateService,
 } from "../hooks/useServices";
-import type { ServiceDto } from "../types/service.types";
+import type { ServiceListDto } from "../types/service.types";
 
 const ENTITY = "dịch vụ";
 const ENTITY_SUBJECT = "Dịch vụ";
 
+const COLUMN_LABELS = {
+  code: "Mã DV",
+  imageUrl: "Ảnh",
+  name: "Tên dịch vụ",
+  categoryName: "Nhóm dịch vụ",
+  sellingPrice: "Giá bán",
+  durationMins: "Thời gian",
+  status: "Trạng thái",
+};
+
 export function ServiceListPage() {
+  "use no memo";
+
   const perm = SERVICE_PERM;
 
   const listState = useServiceListState();
@@ -98,44 +123,31 @@ export function ServiceListPage() {
     : activeQuery.isFetching;
 
   const paged = serviceResult?.data;
-  const services = useMemo(() => paged?.items ?? [], [paged?.items]);
+  const services = paged?.items ?? [];
   const totalCount = paged?.totalCount ?? 0;
   const totalPages = Math.max(1, paged?.totalPages ?? 0);
   const safePage = Math.min(pageIndex, totalPages);
   const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
   const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
-  const activeServiceCount = useMemo(
-    () =>
-      services.filter((s: ServiceDto) => s.status === StatusActive.Active)
-        .length,
-    [services],
-  );
+  let activeServiceCount = 0;
+  let servicesWithImage = 0;
+  let durationSum = 0;
+  let durationCount = 0;
+  for (const s of services) {
+    if (s.status === StatusActive.Active) activeServiceCount += 1;
+    if (s.imageUrl) servicesWithImage += 1;
+    if ((s.durationMins ?? 0) > 0) {
+      durationSum += s.durationMins ?? 0;
+      durationCount += 1;
+    }
+  }
+  const avgDurationMins =
+    durationCount === 0 ? 0 : Math.round(durationSum / durationCount);
 
-  const servicesWithImage = useMemo(
-    () => services.filter((s: ServiceDto) => !!s.imageUrl).length,
-    [services],
-  );
-
-  const avgDurationMins = useMemo(() => {
-    const withDuration = services.filter(
-      (s: ServiceDto) => (s.durationMins ?? 0) > 0,
-    );
-    if (withDuration.length === 0) return 0;
-    const total = withDuration.reduce(
-      (sum: number, s: ServiceDto) => sum + (s.durationMins ?? 0),
-      0,
-    );
-    return Math.round(total / withDuration.length);
-  }, [services]);
-
-  const pageIds = useMemo(
-    () =>
-      services
-        .map((s: ServiceDto) => s.id)
-        .filter((id): id is number => id !== undefined),
-    [services],
-  );
+  const pageIds = services
+    .map((s: ServiceListDto) => s.id)
+    .filter((id): id is number => id !== undefined);
 
   const {
     selectedRowIds,
@@ -151,29 +163,307 @@ export function ServiceListPage() {
   const updateMutation = useUpdateService();
   const restoreMutation = useRestoreService();
 
-  const activeColumns = useActiveServiceColumns({
-    pageIndex,
-    pageSize,
+  const columns = useMemo(() => {
+    const cols: ColumnDef<ServiceListDto>[] = [];
+
+    if (!showDeleted) {
+      cols.push({
+        id: "select",
+        header: () => (
+          <div onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              className="mb-0"
+              checked={headerChecked === true}
+              indeterminate={headerChecked === "indeterminate"}
+              onChange={(checked: boolean) => toggleAll(checked)}
+              aria-label="Select all"
+            />
+          </div>
+        ),
+        cell: ({ row }) => {
+          const item = row.original;
+          return (
+            <div onClick={(e) => e.stopPropagation()}>
+              <Checkbox
+                className="mb-0"
+                checked={item.id !== undefined && selectedRowIds.has(item.id)}
+                onChange={(checked: boolean) => {
+                  if (item.id === undefined) return;
+                  toggleOne(item.id, checked);
+                }}
+                aria-label="Select row"
+              />
+            </div>
+          );
+        },
+        size: 40,
+        enableResizing: false,
+      });
+    }
+
+    cols.push(
+      {
+        accessorKey: "code",
+        header: () =>
+          showDeleted ? (
+            COLUMN_LABELS.code
+          ) : (
+            <SortableColumnHeader
+              label={COLUMN_LABELS.code}
+              column="code"
+              orderBy={orderBy}
+              isDescending={isDescending}
+              onSort={handleSort}
+              onPrimary
+            />
+          ),
+        cell: ({ row }) => (
+          <Badge variant="secondary" soft>
+            {row.original.code ?? "—"}
+          </Badge>
+        ),
+        size: 100,
+      },
+      {
+        id: "imageUrl",
+        accessorKey: "imageUrl",
+        header: COLUMN_LABELS.imageUrl,
+        cell: ({ row }) => (
+          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-md border border-kit bg-kit-page">
+            <FallbackImage
+              kind="service"
+              src={row.original.imageUrl}
+              alt=""
+              className="h-10 w-10 object-cover"
+            />
+          </div>
+        ),
+        size: 72,
+        enableResizing: false,
+      },
+      {
+        accessorKey: "name",
+        header: () =>
+          showDeleted ? (
+            COLUMN_LABELS.name
+          ) : (
+            <SortableColumnHeader
+              label={COLUMN_LABELS.name}
+              column="name"
+              orderBy={orderBy}
+              isDescending={isDescending}
+              onSort={handleSort}
+              onPrimary
+            />
+          ),
+        cell: ({ row }) => (
+          <span className="font-medium text-kit-heading">
+            {row.original.name ?? "—"}
+          </span>
+        ),
+        size: 180,
+      },
+      {
+        accessorKey: "categoryName",
+        header: COLUMN_LABELS.categoryName,
+        cell: ({ row }) => (
+          <span className="text-kit-muted">
+            {row.original.categoryName ?? "—"}
+          </span>
+        ),
+        size: 150,
+      },
+      {
+        accessorKey: "sellingPrice",
+        header: () =>
+          showDeleted ? (
+            COLUMN_LABELS.sellingPrice
+          ) : (
+            <SortableColumnHeader
+              label={COLUMN_LABELS.sellingPrice}
+              column="sellingPrice"
+              orderBy={orderBy}
+              isDescending={isDescending}
+              onSort={handleSort}
+              onPrimary
+            />
+          ),
+        cell: ({ row }) => (
+          <span className="text-sm font-bold text-kit-primary">
+            {formatCurrency(row.original.sellingPrice)}
+          </span>
+        ),
+        size: 110,
+      },
+      {
+        accessorKey: "durationMins",
+        header: COLUMN_LABELS.durationMins,
+        cell: ({ row }) => (
+          <span className="text-kit-muted">
+            {row.original.durationMins
+              ? `${row.original.durationMins} phút`
+              : "—"}
+          </span>
+        ),
+        size: 100,
+      },
+    );
+
+    if (!showDeleted) {
+      cols.push(
+        {
+          accessorKey: "status",
+          header: COLUMN_LABELS.status,
+          cell: ({ row }) => {
+            const item = row.original;
+            return (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center"
+              >
+                <Switch
+                  checked={item.status === StatusActive.Active}
+                  onChange={(checked: boolean) => {
+                    if (!item.id) return;
+                    updateMutation.mutate({
+                      id: item.id,
+                      payload: {
+                        status: checked
+                          ? StatusActive.Active
+                          : StatusActive.Inactive,
+                      },
+                    });
+                  }}
+                  disabled={updateMutation.isPending}
+                />
+              </div>
+            );
+          },
+          size: 100,
+        },
+        {
+          accessorKey: "createdAt",
+          header: "Ngày tạo",
+          cell: ({ row }) => (
+            <span className="text-kit-muted">
+              {formatDateTimeDisplay(row.original.createdAt)}
+            </span>
+          ),
+          size: 140,
+        },
+        {
+          id: "actions",
+          header: "Thao tác",
+          cell: ({ row }) => {
+            const item = row.original;
+            const expanded = row.getIsExpanded();
+            return (
+              <div
+                className="flex items-center gap-1"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Tooltip text={expanded ? "Đóng chi tiết" : "Xem chi tiết"}>
+                  <Button
+                    size="icon-sm"
+                    variant="outline-info"
+                    className="mb-0 mr-0"
+                    onClick={() => row.toggleExpanded()}
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                  </Button>
+                </Tooltip>
+                <PermissionGate resource={perm.resource} action={perm.update}>
+                  <Tooltip text="Sửa">
+                    <Button
+                      size="icon-sm"
+                      variant="outline-primary"
+                      className="mb-0 mr-0"
+                      onClick={() => setEditTarget(item)}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  </Tooltip>
+                </PermissionGate>
+                <PermissionGate
+                  resource={perm.resource}
+                  action={perm.delete}
+                  role={perm.role}
+                >
+                  <Tooltip text="Xóa">
+                    <Button
+                      size="icon-sm"
+                      variant="outline-danger"
+                      className="mb-0 mr-0"
+                      onClick={() => setDeleteTarget(item)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </Tooltip>
+                </PermissionGate>
+              </div>
+            );
+          },
+          size: 130,
+          enableResizing: false,
+        },
+      );
+    } else {
+      cols.push(
+        {
+          accessorKey: "updatedAt",
+          header: "Ngày xóa",
+          cell: ({ row }) => (
+            <span className="text-kit-muted">
+              {formatDateTimeDisplay(row.original.updatedAt)}
+            </span>
+          ),
+          size: 140,
+        },
+        {
+          id: "actions",
+          header: "Thao tác",
+          cell: ({ row }) => (
+            <PermissionGate
+              resource={perm.resource}
+              action={perm.update}
+              role={perm.role}
+            >
+              <Tooltip text={COMMON_MSG.restore}>
+                <Button
+                  size="icon-sm"
+                  variant="outline-success"
+                  className="mb-0 mr-0"
+                  onClick={() => setRestoreTarget(row.original)}
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                </Button>
+              </Tooltip>
+            </PermissionGate>
+          ),
+          size: 80,
+          enableResizing: false,
+        },
+      );
+    }
+
+    return cols;
+  }, [
+    showDeleted,
     orderBy,
     isDescending,
-    onSort: handleSort,
+    handleSort,
     headerChecked,
     selectedRowIds,
-    onToggleAll: toggleAll,
-    onToggleOne: toggleOne,
-    onEdit: setEditTarget,
-    onDelete: setDeleteTarget,
+    toggleAll,
+    toggleOne,
     updateMutation,
-  });
+    setEditTarget,
+    setDeleteTarget,
+    setRestoreTarget,
+    perm,
+  ]);
 
-  const deletedColumns = useDeletedServiceColumns({
-    pageIndex,
-    pageSize,
-    onRestore: setRestoreTarget,
-  });
-
-  const columns = showDeleted ? deletedColumns : activeColumns;
-
+  // eslint-disable-next-line react-hooks/incompatible-library -- useReactTable
   const table = useReactTable({
     data: services,
     columns,
@@ -225,8 +515,6 @@ export function ServiceListPage() {
       },
     });
   }, [restoreTarget, restoreMutation, setRestoreTarget]);
-
-  const columnLabels = useMemo(() => ({ ...SERVICE_COLUMN_LABELS }), []);
 
   const { layoutMode } = useOutletContext<{
     layoutMode: "top-nav" | "sidebar";
@@ -287,7 +575,7 @@ export function ServiceListPage() {
                 {!showDeleted && (
                   <DataTableViewOptions
                     table={table}
-                    columnLabels={columnLabels}
+                    columnLabels={COLUMN_LABELS}
                   />
                 )}
 
@@ -297,7 +585,7 @@ export function ServiceListPage() {
                   role={perm.role}
                 >
                   <Button
-                    variant="admin"
+                    variant="primary"
                     size="sm"
                     className="mb-0"
                     onClick={() => setCreateOpen(true)}
@@ -313,7 +601,7 @@ export function ServiceListPage() {
                   role={perm.role}
                 >
                   <Button
-                    variant="admin"
+                    variant="secondary"
                     size="sm"
                     className="mb-0"
                     onClick={() => handleToggleView(clearSelection)}
@@ -345,7 +633,7 @@ export function ServiceListPage() {
               renderExpandedRow={
                 showDeleted
                   ? undefined
-                  : ({ row }) =>
+                  : ({ row }: { row: Row<ServiceListDto> }) =>
                       row.original.id ? (
                         <ServiceDetailExpanded
                           serviceId={row.original.id}

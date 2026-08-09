@@ -93,11 +93,11 @@ export function getProfitBadgeClass(tone: ProfitTone): string {
   if (tone === "loss") {
     return "bg-state-danger-bg text-state-danger-text";
   }
-  return "bg-adminGray-100 text-adminGray-600";
+  return "bg-kit-page text-kit-muted";
 }
 
 export function getProfitTextClass(tone: ProfitTone): string {
   if (tone === "profit") return "text-state-success-text";
   if (tone === "loss") return "text-state-danger-text";
-  return "text-adminGray-600";
+  return "text-kit-muted";
 }

@@ -223,6 +223,7 @@ export function StaffFormDialog({
                 <ImageUpload
                   value={avatarUrl || staff?.avatarUrl}
                   onFileChange={setPendingFile}
+                  shape="circle"
                   label="Đổi ảnh đại diện"
                 />
               </div>

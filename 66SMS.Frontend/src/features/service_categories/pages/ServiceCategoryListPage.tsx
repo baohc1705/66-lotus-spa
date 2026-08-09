@@ -115,8 +115,6 @@ export function ServiceCategoryListPage() {
   const restoreMutation = useRestoreServiceCategory();
 
   const activeColumns = useActiveServiceCategoryColumns({
-    pageIndex,
-    pageSize,
     orderBy,
     isDescending,
     onSort: handleSort,
@@ -130,8 +128,6 @@ export function ServiceCategoryListPage() {
   });
 
   const deletedColumns = useDeletedServiceCategoryColumns({
-    pageIndex,
-    pageSize,
     onRestore: setRestoreTarget,
   });
 
@@ -233,7 +229,7 @@ export function ServiceCategoryListPage() {
               role={perm.role}
             >
               <Button
-                variant="admin"
+                variant="primary"
                 size="sm"
                 className="mb-0"
                 onClick={() => setCreateOpen(true)}
@@ -249,7 +245,7 @@ export function ServiceCategoryListPage() {
               role={perm.role}
             >
               <Button
-                variant="admin"
+                variant="secondary"
                 size="sm"
                 className="mb-0"
                 onClick={() => handleToggleView(clearSelection)}

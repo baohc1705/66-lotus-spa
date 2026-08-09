@@ -1,10 +1,14 @@
 ﻿export type ProgressTone =
   | "primary"
+  | "secondary"
   | "success"
   | "info"
   | "warning"
   | "danger"
-  | "alternate";
+  | "focus"
+  | "alternate"
+  | "light"
+  | "dark";
 
 type ProgressSegment = {
   value: number;
@@ -38,11 +42,15 @@ function sizeHeight(size: ProgressSize): string {
 }
 
 function toneBg(tone: ProgressTone): string {
+  if (tone === "secondary") return "bg-kit-secondary";
   if (tone === "success") return "bg-kit-success";
   if (tone === "info") return "bg-kit-info";
   if (tone === "warning") return "bg-kit-warning text-kit-on-warning";
   if (tone === "danger") return "bg-kit-danger";
+  if (tone === "focus") return "bg-kit-focus";
   if (tone === "alternate") return "bg-kit-alt";
+  if (tone === "light") return "bg-kit-light text-kit-dark";
+  if (tone === "dark") return "bg-kit-dark";
   return "bg-kit-primary";
 }
 
@@ -102,6 +110,7 @@ export function Progress({
       >
         {bars.map((bar: ProgressSegment, index: number) => {
           const width = Math.max(0, Math.min(100, (bar.value / max) * 100));
+          const barTone = bar.tone ?? "primary";
           return (
             <div
               key={index}
@@ -110,8 +119,11 @@ export function Progress({
               aria-valuemin={0}
               aria-valuemax={max}
               className={
-                "flex items-center justify-center text-white transition-all " +
-                toneBg(bar.tone ?? "primary") +
+                "flex items-center justify-center transition-all " +
+                (barTone === "light" || barTone === "warning"
+                  ? ""
+                  : "text-white ") +
+                toneBg(barTone) +
                 " " +
                 stripeClass(!!bar.striped, !!bar.animated)
               }

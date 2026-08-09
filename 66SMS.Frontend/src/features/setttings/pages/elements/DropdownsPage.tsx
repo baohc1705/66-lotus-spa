@@ -1,4 +1,4 @@
-import { Dropdown } from "@/shared/elements/Dropdown";
+﻿import { Dropdown } from "@/shared/elements/Dropdown";
 import type { ButtonVariant } from "@/shared/elements/Button";
 import { DemoPageShell, DemoSection } from "../../components/DemoPageShell";
 
@@ -90,7 +90,7 @@ export function DropdownsPage() {
               <Dropdown label="Dropup" variant="primary" split placement="top" wide />
               <Dropdown label="Dropright" variant="primary" split placement="right" wide />
             </div>
-            <hr className="my-4 border-gray-100" />
+            <hr className="my-4 border-kit" />
             <div className="flex flex-wrap justify-center">
               <Dropdown label="Dropleft" variant="primary" placement="left" wide />
               <Dropdown label="Dropup" variant="primary" placement="top" wide />
@@ -118,7 +118,7 @@ export function DropdownsPage() {
               <Dropdown label="Normal" variant="primary" split />
               <Dropdown label="Small" variant="primary" size="sm" split />
             </div>
-            <hr className="my-4 border-gray-100" />
+            <hr className="my-4 border-kit" />
             <div className="flex flex-wrap justify-center">
               <Dropdown label="Large" variant="primary" size="lg" />
               <Dropdown label="Normal" variant="primary" />

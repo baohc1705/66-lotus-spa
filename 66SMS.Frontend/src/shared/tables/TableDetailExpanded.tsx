@@ -53,15 +53,30 @@ export function TableDetailHeader({
   );
 }
 
+type TableDetailGridCols = 1 | 2 | 3 | 4;
+
+const gridColsClass: Record<TableDetailGridCols, string> = {
+  1: "md:grid-cols-1",
+  2: "md:grid-cols-2",
+  3: "md:grid-cols-3",
+  4: "md:grid-cols-4",
+};
+
 export function TableDetailGrid({
   children,
   className = "",
+  cols = 2,
 }: {
   children: ReactNode;
   className?: string;
+  cols?: TableDetailGridCols;
 }) {
   return (
-    <div className={"grid grid-cols-1 gap-x-4 md:grid-cols-2 " + className}>
+    <div
+      className={
+        "grid grid-cols-1 gap-x-4 gap-y-0 " + gridColsClass[cols] + " " + className
+      }
+    >
       {children}
     </div>
   );

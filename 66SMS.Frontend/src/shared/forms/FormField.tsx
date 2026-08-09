@@ -39,7 +39,7 @@ export function FormField({
         className={
           horizontal
             ? "col-form-label mb-0 pt-2 text-sm text-kit-body " + labelCols
-            : "form-label mb-1 block text-sm text-kit-body"
+            : "form-label mb-0.5 block text-sm text-kit-body"
         }
       >
         {cleanLabel}
@@ -59,7 +59,7 @@ export function FormField({
 
   if (horizontal) {
     return (
-      <div className={"relative mb-3 flex flex-col sm:flex-row sm:items-start " + className}>
+      <div className={"relative mb-2 flex flex-col sm:flex-row sm:items-start " + className}>
         {labelEl}
         <div className="min-w-0 flex-1">
           {children}
@@ -70,7 +70,7 @@ export function FormField({
   }
 
   return (
-    <div className={"relative mb-3 " + className}>
+    <div className={"relative mb-2 " + className}>
       {labelEl}
       {children}
       {feedback}

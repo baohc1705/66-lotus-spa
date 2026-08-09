@@ -1,4 +1,4 @@
-import {
+﻿import {
   Box,
   Inbox,
   MessageCircle,
@@ -84,7 +84,7 @@ export function NavigationPage() {
           </Nav>
         </div>
 
-        <hr className="my-5 border-gray-100" />
+        <hr className="my-5 border-kit" />
         <div className="text-center">
           <Dropdown label="Dropdown Basic" variant="primary">
             <Nav vertical className="w-56 p-1">
@@ -224,7 +224,7 @@ export function NavigationPage() {
           </NavLink>
         </Nav>
 
-        <hr className="my-4 border-gray-100" />
+        <hr className="my-4 border-kit" />
 
         <Nav>
           <NavLink href="#" active>
@@ -247,7 +247,7 @@ export function NavigationPage() {
           </NavLink>
         </Nav>
 
-        <hr className="my-4 border-gray-100" />
+        <hr className="my-4 border-kit" />
 
         <Nav justified>
           <NavItem>
@@ -291,7 +291,7 @@ export function NavigationPage() {
           </NavLink>
         </Nav>
 
-        <hr className="my-4 border-gray-100" />
+        <hr className="my-4 border-kit" />
 
         <Nav pills>
           <NavLink href="#" active>
@@ -314,7 +314,7 @@ export function NavigationPage() {
           </NavLink>
         </Nav>
 
-        <hr className="my-4 border-gray-100" />
+        <hr className="my-4 border-kit" />
 
         <Nav pills justified>
           <NavItem>

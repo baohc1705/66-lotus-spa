@@ -1,7 +1,16 @@
 ﻿import { createPortal } from "react-dom";
 import type { ReactNode } from "react";
 
-export type ToastVariant = "primary" | "success" | "danger" | "warning" | "info";
+export type ToastVariant =
+  | "primary"
+  | "secondary"
+  | "success"
+  | "danger"
+  | "warning"
+  | "info"
+  | "focus"
+  | "alternate"
+  | "dark";
 
 export type ToastPosition =
   | "top-right"
@@ -74,6 +83,42 @@ function variantStyle(variant: ToastVariant): {
     return {
       toastClass: "toast-info",
       bg: "bg-kit-info",
+      text: "text-kit-white",
+      icon: ICON_INFO,
+      shadow: "shadow-kit-toast",
+    };
+  }
+  if (variant === "secondary") {
+    return {
+      toastClass: "toast-info",
+      bg: "bg-kit-secondary",
+      text: "text-kit-white",
+      icon: ICON_INFO,
+      shadow: "shadow-kit-toast",
+    };
+  }
+  if (variant === "focus") {
+    return {
+      toastClass: "toast-info",
+      bg: "bg-kit-focus",
+      text: "text-kit-white",
+      icon: ICON_INFO,
+      shadow: "shadow-kit-toast",
+    };
+  }
+  if (variant === "alternate") {
+    return {
+      toastClass: "toast-info",
+      bg: "bg-kit-alt",
+      text: "text-kit-white",
+      icon: ICON_INFO,
+      shadow: "shadow-kit-toast",
+    };
+  }
+  if (variant === "dark") {
+    return {
+      toastClass: "toast-info",
+      bg: "bg-kit-dark",
       text: "text-kit-white",
       icon: ICON_INFO,
       shadow: "shadow-kit-toast",

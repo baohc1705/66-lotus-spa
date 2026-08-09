@@ -37,28 +37,29 @@ import {
   Cloud,
   Sun,
 } from "lucide-react";
+import { BodyTabs } from "@/shared/components/Tabs";
 import { DemoPageShell, DemoSection } from "../../components/DemoPageShell";
 
 const gradientIcons: { icon: ElementType; gradient: string; name: string }[] = [
-  { icon: Filter, gradient: "bg-[linear-gradient(45deg,#ff9a9e_0%,#fad0c4_100%)]", name: "warm-flame" },
-  { icon: HelpCircle, gradient: "bg-[linear-gradient(to_top,#a18cd1_0%,#fbc2eb_100%)]", name: "night-fade" },
-  { icon: Moon, gradient: "bg-[linear-gradient(120deg,#f6d365_0%,#fda085_100%)]", name: "sunny-morning" },
-  { icon: Plane, gradient: "bg-[linear-gradient(120deg,#84fab0_0%,#8fd3f4_100%)]", name: "tempting-azure" },
-  { icon: Box, gradient: "bg-[linear-gradient(120deg,#a6c0fe_0%,#f68084_100%)]", name: "amy-crisp" },
-  { icon: Lock, gradient: "bg-[linear-gradient(to_right,#4facfe_0%,#00f2fe_100%)]", name: "malibu-beach" },
-  { icon: Monitor, gradient: "bg-[linear-gradient(120deg,#fccb90_0%,#d57eeb_100%)]", name: "mean-fruit" },
-  { icon: Mouse, gradient: "bg-[linear-gradient(to_top,#cfd9df_0%,#e2ebf0_100%)]", name: "heavy-rain" },
-  { icon: Paintbrush, gradient: "bg-[radial-gradient(circle_248px_at_center,#16d9e3_0%,#30c7ec_47%,#46aef7_100%)]", name: "arielle-smile" },
-  { icon: Menu, gradient: "bg-[linear-gradient(120deg,#f093fb_0%,#f5576c_100%)]", name: "ripe-malin" },
-  { icon: Watch, gradient: "bg-[linear-gradient(120deg,#e0c3fc_0%,#8ec5fc_100%)]", name: "deep-blue" },
-  { icon: Volume2, gradient: "bg-[linear-gradient(to_top,#96deda_0%,#50c9c3_100%)]", name: "happy-itmeo" },
-  { icon: Video, gradient: "bg-[linear-gradient(120deg,#89f7fe_0%,#66a6ff_100%)]", name: "happy-fisher" },
-  { icon: Wallet, gradient: "bg-[linear-gradient(135deg,#667eea_0%,#764ba2_100%)]", name: "plum-plate" },
-  { icon: PaintBucket, gradient: "bg-[linear-gradient(to_top,#0ba360_0%,#3cba92_100%)]", name: "grow-early" },
-  { icon: Diamond, gradient: "bg-[linear-gradient(to_right,#f78ca0_0%,#f9748f_19%,#fd868c_60%,#fe9a8b_100%)]", name: "strong-bliss" },
-  { icon: Wand2, gradient: "bg-[linear-gradient(to_right,#c471f5_0%,#fa71cd_100%)]", name: "mixed-hopes" },
-  { icon: Circle, gradient: "bg-[linear-gradient(to_right,#434343_0%,#000_100%)]", name: "premium-dark" },
-  { icon: Hourglass, gradient: "bg-[linear-gradient(to_top,#ff0844_0%,#ffb199_100%)]", name: "love-kiss" },
+  { icon: Filter, gradient: "gradient-warm-flame", name: "warm-flame" },
+  { icon: HelpCircle, gradient: "gradient-night-fade", name: "night-fade" },
+  { icon: Moon, gradient: "gradient-sunny-morning", name: "sunny-morning" },
+  { icon: Plane, gradient: "gradient-tempting-azure", name: "tempting-azure" },
+  { icon: Box, gradient: "gradient-amy-crisp", name: "amy-crisp" },
+  { icon: Lock, gradient: "gradient-malibu-beach", name: "malibu-beach" },
+  { icon: Monitor, gradient: "gradient-mean-fruit", name: "mean-fruit" },
+  { icon: Mouse, gradient: "gradient-heavy-rain", name: "heavy-rain" },
+  { icon: Paintbrush, gradient: "gradient-arielle-smile", name: "arielle-smile" },
+  { icon: Menu, gradient: "gradient-ripe-malin", name: "ripe-malin" },
+  { icon: Watch, gradient: "gradient-deep-blue", name: "deep-blue" },
+  { icon: Volume2, gradient: "gradient-happy-itmeo", name: "happy-itmeo" },
+  { icon: Video, gradient: "gradient-happy-fisher", name: "happy-fisher" },
+  { icon: Wallet, gradient: "gradient-plum-plate", name: "plum-plate" },
+  { icon: PaintBucket, gradient: "gradient-grow-early", name: "grow-early" },
+  { icon: Diamond, gradient: "gradient-strong-bliss", name: "strong-bliss" },
+  { icon: Wand2, gradient: "gradient-mixed-hopes", name: "mixed-hopes" },
+  { icon: Circle, gradient: "gradient-premium-dark", name: "premium-dark" },
+  { icon: Hourglass, gradient: "gradient-love-kiss", name: "love-kiss" },
 ];
 
 const catalogIcons: { icon: ElementType; name: string }[] = [
@@ -89,39 +90,21 @@ const catalogIcons: { icon: ElementType; name: string }[] = [
 ];
 
 export function IconsPage() {
-  const [tab, setTab] = useState<"gradient" | "catalog">("gradient");
+  const [tab, setTab] = useState("gradient");
 
   return (
     <DemoPageShell
       title="Icons"
       subtitle="Lucide icons styled like Architect Pe7 / FontAwesome demos (gradient + catalog)."
     >
-      <div className="mb-4 flex gap-2 border-b border-gray-200 text-sm">
-        <button
-          type="button"
-          onClick={() => setTab("gradient")}
-          className={
-            "px-4 py-2 font-normal " +
-            (tab === "gradient"
-              ? "border-b-2 border-[#3f6ad8] text-[#3f6ad8]"
-              : "text-[#6c757d]")
-          }
-        >
-          Gradient Icons
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab("catalog")}
-          className={
-            "px-4 py-2 font-normal " +
-            (tab === "catalog"
-              ? "border-b-2 border-[#3f6ad8] text-[#3f6ad8]"
-              : "text-[#6c757d]")
-          }
-        >
-          Icon Catalog
-        </button>
-      </div>
+      <BodyTabs
+        items={[
+          { id: "gradient", label: "Gradient Icons" },
+          { id: "catalog", label: "Icon Catalog" },
+        ]}
+        activeId={tab}
+        onChange={setTab}
+      />
 
       {tab === "gradient" ? (
         <DemoSection title="Gradient Icons">
@@ -151,10 +134,10 @@ export function IconsPage() {
               return (
                 <div
                   key={item.name}
-                  className="flex flex-col items-center rounded border border-gray-100 bg-white p-4 text-center"
+                  className="flex flex-col items-center rounded border border-kit bg-kit-white p-4 text-center"
                 >
-                  <IconComp className="mb-2 h-6 w-6 text-[#3f6ad8]" />
-                  <p className="text-sm text-[#6c757d]">{item.name}</p>
+                  <IconComp className="mb-2 h-6 w-6 text-kit-primary" />
+                  <p className="text-sm text-kit-muted">{item.name}</p>
                 </div>
               );
             })}

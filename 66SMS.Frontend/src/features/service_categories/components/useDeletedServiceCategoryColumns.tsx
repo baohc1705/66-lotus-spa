@@ -5,12 +5,7 @@ import { RotateCcw } from "lucide-react";
 import { Button } from "@/shared/elements/Button";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Tooltip } from "@/shared/components/Tooltip";
-import {
-  IndexCell,
-  MutedCell,
-  NameCell,
-  TextCell,
-} from "@/shared/tables/TableCells";
+import { MutedCell, NameCell, TextCell } from "@/shared/tables/TableCells";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 import { SERVICE_CATEGORY_COLUMN_LABELS } from "./useActiveServiceCategoryColumns";
@@ -18,14 +13,10 @@ import { SERVICE_CATEGORY_PERM } from "../constants/serviceCategory.permissions"
 import type { ServiceCategoryDto } from "../types/serviceCategory.types";
 
 interface UseDeletedServiceCategoryColumnsParams {
-  pageIndex: number;
-  pageSize: number;
   onRestore: (item: ServiceCategoryDto) => void;
 }
 
 export function useDeletedServiceCategoryColumns({
-  pageIndex,
-  pageSize,
   onRestore,
 }: UseDeletedServiceCategoryColumnsParams) {
   const cols = SERVICE_CATEGORY_COLUMN_LABELS;
@@ -33,19 +24,6 @@ export function useDeletedServiceCategoryColumns({
 
   return useMemo<ColumnDef<ServiceCategoryDto>[]>(
     () => [
-      {
-        id: "index",
-        header: "#",
-        cell: ({ row }) => (
-          <IndexCell
-            pageIndex={pageIndex}
-            pageSize={pageSize}
-            rowIndex={row.index}
-          />
-        ),
-        size: 50,
-        enableResizing: false,
-      },
       {
         accessorKey: "icon",
         header: cols.icon,
@@ -125,6 +103,6 @@ export function useDeletedServiceCategoryColumns({
         enableResizing: false,
       },
     ],
-    [pageIndex, pageSize, onRestore, cols, perm],
+    [onRestore, cols, perm],
   );
 }

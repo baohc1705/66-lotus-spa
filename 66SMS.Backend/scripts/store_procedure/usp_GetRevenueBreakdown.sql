@@ -36,7 +36,7 @@ BEGIN
             WHEN SUM(Amount) OVER () > 0
                 THEN ROUND(Amount * 100.0 / SUM(Amount) OVER (), 0)
             ELSE 0
-        END AS Percent
+        END AS [Percent]
     FROM raw_rows
     ORDER BY ItemType;
 END

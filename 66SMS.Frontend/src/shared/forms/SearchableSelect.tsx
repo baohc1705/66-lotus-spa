@@ -1,6 +1,6 @@
 ﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
-import { inputControlClass, type InputSize } from "./inputStyles";
+import { inputControlClass, type InputSize } from "./Input";
 import type { SelectOption } from "./Select";
 
 type SearchableSelectProps = {
@@ -152,9 +152,9 @@ export function SearchableSelect({
               }
             />
           </div>
-          <ul role="listbox" className="m-0 max-h-52 list-none overflow-y-auto p-0">
+          <ul role="listbox" className="m-0 max-h-52 list-none overflow-y-auto py-1">
             {filtered.length === 0 ? (
-              <li className="px-3 py-2 text-sm text-kit-muted">{emptyText}</li>
+              <li className="px-3 py-1 text-sm text-kit-muted">{emptyText}</li>
             ) : (
               filtered.map((opt: SelectOption) => {
                 const active = opt.value === selected;
@@ -165,10 +165,10 @@ export function SearchableSelect({
                       role="option"
                       aria-selected={active}
                       className={
-                        "block w-full px-3 py-2 text-left text-sm " +
+                        "block w-full px-3 py-1 text-left text-sm " +
                         (active
-                          ? "bg-kit-primary text-kit-white"
-                          : "text-kit-body hover:bg-blue-50")
+                          ? "bg-blue-50 text-kit-primary"
+                          : "text-kit-body hover:bg-blue-50 hover:text-kit-primary")
                       }
                       onClick={() => pick(opt.value)}
                     >

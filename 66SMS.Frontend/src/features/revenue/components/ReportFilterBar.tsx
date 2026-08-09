@@ -3,6 +3,7 @@ import { useAuthStore } from "@/features/auth/stores/authStore";
 import { TabNav } from "@/shared/components/Tabs";
 import { Button } from "@/shared/elements/Button";
 import { Dropdown } from "@/shared/elements/Dropdown";
+import { Input } from "@/shared/forms/Input";
 import type { RevenueReportGrain } from "../types/revenue.types";
 
 type SalonOption = { id: number; name: string };
@@ -35,10 +36,6 @@ const GRAINS: { key: RevenueReportGrain; label: string }[] = [
   { key: "quarter", label: "Quý" },
   { key: "year", label: "Năm" },
 ];
-
-const DATE_INPUT =
-  "h-8 rounded border border-kit bg-kit-white px-2.5 text-xs font-semibold " +
-  "text-kit-heading outline-hidden focus:border-kit-primary";
 
 export function ReportFilterBar({
   showSalon,
@@ -80,7 +77,7 @@ export function ReportFilterBar({
           <Dropdown
             variant="outline-secondary"
             size="sm"
-            className="!mb-0 !mr-0"
+            className="mb-0! mr-0!"
             label={selectedSalonName}
             items={[
               {
@@ -108,7 +105,7 @@ export function ReportFilterBar({
           <Dropdown
             variant="outline-secondary"
             size="sm"
-            className="!mb-0 !mr-0"
+            className="mb-0! mr-0!"
             label={selectedCategoryName}
             items={[
               {
@@ -135,18 +132,24 @@ export function ReportFilterBar({
           />
         ) : null}
 
-        <input
+        <Input
           type="date"
-          className={DATE_INPUT}
+          inputSize="sm"
+          className="h-8 w-auto cursor-pointer font-semibold"
           value={from}
-          onChange={(e) => onFromChange(e.target.value)}
+          onChange={(e: { target: { value: string } }) =>
+            onFromChange(e.target.value)
+          }
         />
         <span className="text-kit-muted">–</span>
-        <input
+        <Input
           type="date"
-          className={DATE_INPUT}
+          inputSize="sm"
+          className="h-8 w-auto cursor-pointer font-semibold"
           value={to}
-          onChange={(e) => onToChange(e.target.value)}
+          onChange={(e: { target: { value: string } }) =>
+            onToChange(e.target.value)
+          }
         />
       </div>
 
@@ -154,7 +157,7 @@ export function ReportFilterBar({
         type="button"
         variant="primary"
         size="sm"
-        className="!mb-0 !mr-0"
+        className="mb-0! mr-0!"
         onClick={onExport}
         disabled={exporting}
         loading={exporting}

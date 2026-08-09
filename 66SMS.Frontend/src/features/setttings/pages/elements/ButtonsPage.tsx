@@ -37,7 +37,7 @@ function ToggleGroup(props: {
   mode: "checkbox" | "radio";
 }) {
   const [selected, setSelected] = useState(
-    props.mode === "radio" ? "one" : (["one"] as string[])
+    props.mode === "radio" ? "one" : (["one"] as string[]),
   );
 
   function isOn(key: string) {
@@ -99,10 +99,22 @@ function SwitchDemo() {
   return (
     <div className="flex flex-col gap-4">
       <Switch checked={on} onChange={setOn} label={on ? "On" : "Off"} />
-      <Switch checked={notify} onChange={setNotify} label="Enable notifications" />
-      <Switch checked={dark} onChange={setDark} label="Dark mode" />
+      <Switch
+        checked={notify}
+        onChange={setNotify}
+        tone="success"
+        label="Enable notifications"
+      />
+      <Switch checked={dark} onChange={setDark} tone="dark" label="Dark mode" />
+      <Switch checked={true} onChange={() => {}} tone="danger" label="Danger on" />
+      <Switch checked={true} onChange={() => {}} tone="alternate" label="Alt on" />
       <Switch checked={true} onChange={() => {}} label="Disabled on" disabled />
-      <Switch checked={false} onChange={() => {}} label="Disabled off" disabled />
+      <Switch
+        checked={false}
+        onChange={() => {}}
+        label="Disabled off"
+        disabled
+      />
     </div>
   );
 }
@@ -137,7 +149,11 @@ export function ButtonsPage() {
         <DemoSection title="Color Transition No Borders">
           <div className="flex flex-wrap">
             {outlineVariants.map((item) => (
-              <Button key={"nb-" + item.variant} variant={item.variant} borderless>
+              <Button
+                key={"nb-" + item.variant}
+                variant={item.variant}
+                borderless
+              >
                 {item.label}
               </Button>
             ))}
@@ -157,7 +173,11 @@ export function ButtonsPage() {
         <DemoSection title="Disabled State">
           <div className="flex flex-wrap">
             {solidVariants.map((item) => (
-              <Button key={"d-" + item.variant} variant={item.variant} disabled>
+              <Button
+                key={"d-" + item.variant}
+                variant={item.variant}
+                disabled
+              >
                 {item.label}
               </Button>
             ))}

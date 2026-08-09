@@ -15,11 +15,10 @@ type Props = {
 
 export function ReportStatCards({ cards }: Props) {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
       {cards.map((card: ReportStatCardItem) => (
         <StatCard
           key={card.title}
-          className="mb-2"
           title={card.title}
           value={card.value}
           description={card.description}

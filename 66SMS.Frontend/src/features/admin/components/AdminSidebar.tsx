@@ -20,6 +20,15 @@ function isPathActive(pathname: string, path?: string) {
   return pathname === path || pathname.startsWith(path + "/");
 }
 
+function findBestMatchingPath(pathname: string, paths: string[]) {
+  let best: string | null = null;
+  for (const path of paths) {
+    if (!isPathActive(pathname, path)) continue;
+    if (best == null || path.length > best.length) best = path;
+  }
+  return best;
+}
+
 function itemHasActiveChild(pathname: string, item: MenuItem) {
   if (!item.children) return false;
   return item.children.some((child: SubMenuItem) =>
@@ -120,6 +129,10 @@ export function AdminSidebar(props: AdminSidebarProps) {
                         : "left-[10px] ");
 
                     if (hasChildren) {
+                      const bestChildPath = findBestMatchingPath(
+                        pathname,
+                        item.children!.map((c: SubMenuItem) => c.path),
+                      );
                       return (
                         <li
                           key={item.label}
@@ -186,10 +199,7 @@ export function AdminSidebar(props: AdminSidebarProps) {
                               />
                             ) : null}
                             {item.children!.map((child: SubMenuItem) => {
-                              const childActive = isPathActive(
-                                pathname,
-                                child.path,
-                              );
+                              const childActive = bestChildPath === child.path;
                               return (
                                 <li key={child.path}>
                                   <Link

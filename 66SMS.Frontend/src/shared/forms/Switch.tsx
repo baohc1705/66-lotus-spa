@@ -1,16 +1,41 @@
+export type SwitchTone =
+  | "primary"
+  | "secondary"
+  | "success"
+  | "info"
+  | "warning"
+  | "danger"
+  | "focus"
+  | "alternate"
+  | "dark";
+
 type SwitchProps = {
   checked: boolean;
   onChange: (checked: boolean) => void;
   label?: string;
   disabled?: boolean;
+  tone?: SwitchTone;
   className?: string;
 };
+
+function toneOnClass(tone: SwitchTone): string {
+  if (tone === "secondary") return "bg-kit-secondary";
+  if (tone === "success") return "bg-kit-success";
+  if (tone === "info") return "bg-kit-info";
+  if (tone === "warning") return "bg-kit-warning";
+  if (tone === "danger") return "bg-kit-danger";
+  if (tone === "focus") return "bg-kit-focus";
+  if (tone === "alternate") return "bg-kit-alt";
+  if (tone === "dark") return "bg-kit-dark";
+  return "bg-kit-primary";
+}
 
 export function Switch({
   checked,
   onChange,
   label,
   disabled = false,
+  tone = "primary",
   className = "",
 }: SwitchProps) {
   return (
@@ -24,7 +49,7 @@ export function Switch({
         className={
           "relative inline-flex h-5 w-9 items-center rounded-full transition-colors " +
           "disabled:cursor-not-allowed disabled:opacity-50 " +
-          (checked ? "bg-kit-primary" : "bg-kit-track")
+          (checked ? toneOnClass(tone) : "bg-kit-track")
         }
       >
         <span

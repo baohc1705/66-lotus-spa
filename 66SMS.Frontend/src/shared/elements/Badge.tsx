@@ -28,8 +28,8 @@ function resolveVariant(variant: BadgeVariant, soft: boolean): string {
     if (variant === "danger") return "soft-kit-danger";
     if (variant === "warning") return "soft-kit-warning";
     if (variant === "info") return "soft-kit-info";
-    if (variant === "focus") return "bg-slate-100 text-kit-focus";
-    if (variant === "alternate") return "bg-purple-100 text-kit-alt";
+    if (variant === "focus") return "soft-kit-focus";
+    if (variant === "alternate") return "soft-kit-alternate";
     if (variant === "light") return "soft-kit-light";
     if (variant === "dark") return "soft-kit-dark";
     return "soft-kit-primary";

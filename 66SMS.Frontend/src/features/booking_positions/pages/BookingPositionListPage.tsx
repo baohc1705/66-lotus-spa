@@ -96,8 +96,6 @@ export function BookingPositionListPage() {
   );
 
   const activeColumns = useActiveBookingPositionColumns({
-    pageIndex,
-    pageSize,
     orderBy,
     isDescending,
     onSort: handleSort,

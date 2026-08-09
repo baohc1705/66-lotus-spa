@@ -104,8 +104,6 @@ export function BookingRoomListPage() {
   );
 
   const activeColumns = useActiveBookingRoomColumns({
-    pageIndex,
-    pageSize,
     orderBy,
     isDescending,
     onSort: handleSort,

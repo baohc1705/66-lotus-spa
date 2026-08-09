@@ -9,12 +9,7 @@ import { Switch } from "@/shared/forms/Switch";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Tooltip } from "@/shared/components/Tooltip";
 import { SortableColumnHeader } from "@/shared/tables/SortableColumnHeader";
-import {
-  IndexCell,
-  MutedCell,
-  NameCell,
-  TextCell,
-} from "@/shared/tables/TableCells";
+import { MutedCell, NameCell, TextCell } from "@/shared/tables/TableCells";
 import { StatusActive } from "@/shared/constants/status.enum";
 import type { Result } from "@/shared/types/common.types";
 
@@ -32,8 +27,6 @@ export const SERVICE_CATEGORY_COLUMN_LABELS = {
 } as const;
 
 interface UseActiveServiceCategoryColumnsParams {
-  pageIndex: number;
-  pageSize: number;
   orderBy?: string;
   isDescending: boolean;
   onSort: (column: string) => void;
@@ -51,8 +44,6 @@ interface UseActiveServiceCategoryColumnsParams {
 }
 
 export function useActiveServiceCategoryColumns({
-  pageIndex,
-  pageSize,
   orderBy,
   isDescending,
   onSort,
@@ -99,19 +90,6 @@ export function useActiveServiceCategoryColumns({
           );
         },
         size: 40,
-        enableResizing: false,
-      },
-      {
-        id: "index",
-        header: "#",
-        cell: ({ row }) => (
-          <IndexCell
-            pageIndex={pageIndex}
-            pageSize={pageSize}
-            rowIndex={row.index}
-          />
-        ),
-        size: 50,
         enableResizing: false,
       },
       {
@@ -263,8 +241,6 @@ export function useActiveServiceCategoryColumns({
       },
     ],
     [
-      pageIndex,
-      pageSize,
       orderBy,
       isDescending,
       onSort,

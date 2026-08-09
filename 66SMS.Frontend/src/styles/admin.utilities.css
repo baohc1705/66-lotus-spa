@@ -371,6 +371,15 @@
 @utility border-kit-info {
   border-color: var(--kit-info);
 }
+@utility border-kit-focus {
+  border-color: var(--kit-focus);
+}
+@utility border-kit-alt {
+  border-color: var(--kit-alt);
+}
+@utility border-kit-dark {
+  border-color: var(--kit-dark);
+}
 
 @utility soft-kit-primary {
   background-color: var(--kit-soft-primary-bg);
@@ -401,6 +410,16 @@
   background-color: var(--kit-soft-info-bg);
   color: var(--kit-soft-info-text);
   border-color: var(--kit-soft-info-border);
+}
+@utility soft-kit-focus {
+  background-color: var(--kit-soft-focus-bg);
+  color: var(--kit-soft-focus-text);
+  border-color: var(--kit-soft-focus-border);
+}
+@utility soft-kit-alternate {
+  background-color: var(--kit-soft-alternate-bg);
+  color: var(--kit-soft-alternate-text);
+  border-color: var(--kit-soft-alternate-border);
 }
 @utility soft-kit-light {
   background-color: var(--kit-page);
@@ -572,6 +591,9 @@
 }
 @utility gradient-royal {
   @apply bg-gradient-to-r from-slate-900 to-slate-700;
+}
+@utility gradient-plum-plate {
+  @apply bg-gradient-to-br from-indigo-500 to-purple-700;
 }
 @utility gradient-asteroid {
   @apply bg-gradient-to-t from-slate-950 via-slate-800 to-slate-700;

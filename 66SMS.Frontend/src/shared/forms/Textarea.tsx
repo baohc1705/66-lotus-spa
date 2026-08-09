@@ -1,5 +1,5 @@
 import type { TextareaHTMLAttributes } from "react";
-import { inputControlClass, type InputSize } from "./inputStyles";
+import { inputControlClass, type InputSize } from "./Input";
 
 type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   className?: string;

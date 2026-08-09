@@ -10,7 +10,7 @@ import {
   resolveButtonVariant,
   type ButtonSize,
   type ButtonVariant,
-} from "@/shared/elements/buttonStyles";
+} from "@/shared/elements/Button";
 
 export type DropdownPlacement = "bottom" | "top" | "left" | "right";
 
@@ -98,7 +98,7 @@ export function Dropdown({
   const menu = open ? (
     <div
       className={
-        "absolute z-30 min-w-60 rounded border border-kit bg-kit-white py-2.5 " +
+        "absolute z-30 min-w-60 rounded border border-kit bg-kit-white py-1 " +
         "text-sm font-sans shadow-kit-pop " +
         alignClass +
         menuPositionClass(placement)
@@ -117,7 +117,7 @@ export function Dropdown({
               return (
                 <div
                   key={"h-" + index}
-                  className="px-4 py-1.5 text-xs font-bold uppercase text-kit-muted"
+                  className="px-3 py-1 text-xs font-bold uppercase text-kit-muted"
                 >
                   {item.label}
                 </div>
@@ -128,7 +128,7 @@ export function Dropdown({
                 key={"i-" + index + "-" + item.label}
                 type="button"
                 role="menuitem"
-                className="block w-full px-4 py-1.5 text-left text-sm text-kit-body hover:bg-blue-50 hover:text-kit-primary"
+                className="block w-full px-3 py-1 text-left text-sm text-kit-body hover:bg-blue-50 hover:text-kit-primary"
                 onClick={() => {
                   if (item.onClick) item.onClick();
                   setOpen(false);

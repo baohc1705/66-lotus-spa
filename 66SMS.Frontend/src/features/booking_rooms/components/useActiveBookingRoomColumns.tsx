@@ -7,11 +7,7 @@ import { Switch } from "@/shared/forms/Switch";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Tooltip } from "@/shared/components/Tooltip";
 import { SortableColumnHeader } from "@/shared/tables/SortableColumnHeader";
-import {
-  IndexCell,
-  NameCell,
-  TextCell,
-} from "@/shared/tables/TableCells";
+import { NameCell, TextCell } from "@/shared/tables/TableCells";
 import { BOOKING_ROOM_PERM } from "../constants/booking_room.permissions";
 import type {
   BookingRoomDTO,
@@ -27,8 +23,6 @@ export const BOOKING_ROOM_COLUMN_LABELS = {
 } as const;
 
 interface UseActiveBookingRoomColumnsParams {
-  pageIndex: number;
-  pageSize: number;
   orderBy?: string;
   isDescending: boolean;
   onSort: (column: string) => void;
@@ -44,8 +38,6 @@ interface UseActiveBookingRoomColumnsParams {
 }
 
 export function useActiveBookingRoomColumns({
-  pageIndex,
-  pageSize,
   orderBy,
   isDescending,
   onSort,
@@ -58,19 +50,6 @@ export function useActiveBookingRoomColumns({
 
   return useMemo<ColumnDef<BookingRoomDTO>[]>(
     () => [
-      {
-        id: "index",
-        header: "#",
-        cell: ({ row }) => (
-          <IndexCell
-            pageIndex={pageIndex}
-            pageSize={pageSize}
-            rowIndex={row.index}
-          />
-        ),
-        size: 50,
-        enableResizing: false,
-      },
       {
         accessorKey: "name",
         header: () => (
@@ -198,17 +177,6 @@ export function useActiveBookingRoomColumns({
         enableResizing: false,
       },
     ],
-    [
-      pageIndex,
-      pageSize,
-      orderBy,
-      isDescending,
-      onSort,
-      onEdit,
-      onDelete,
-      updateMutation,
-      cols,
-      perm,
-    ],
+    [orderBy, isDescending, onSort, onEdit, onDelete, updateMutation, cols, perm],
   );
 }

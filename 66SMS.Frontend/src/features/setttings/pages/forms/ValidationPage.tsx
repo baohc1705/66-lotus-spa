@@ -46,7 +46,7 @@ export function ValidationPage() {
     >
       <Card>
         <CardBody>
-          <CardTitle>Bootstrap 5 Form Validation</CardTitle>
+          <CardTitle>Form Validation</CardTitle>
           <form
             noValidate
             onSubmit={(e: { preventDefault(): void }) => {

@@ -50,6 +50,7 @@ export function AccordionsPage() {
             <CardBody>
               <CardTitle>Simple</CardTitle>
               <Accordion
+                tone="alternate"
                 items={[
                   {
                     id: "1",

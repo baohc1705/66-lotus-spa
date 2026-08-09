@@ -14,6 +14,7 @@ import {
 import { Button } from "@/shared/elements/Button";
 import { Badge } from "@/shared/elements/Badge";
 import { ListGroup, ListGroupItem } from "@/shared/elements/ListGroup";
+import { Input } from "@/shared/forms/Input";
 import { useServiceCategories } from "@/features/service_categories/hooks/useServiceCategories";
 import { ServiceCategoryFormDialog } from "@/features/service_categories/components/ServiceCategoryFormDialog";
 import { useAdminServices, useDeletedServices } from "../hooks/useServices";
@@ -90,13 +91,16 @@ export function ServiceCategorySidebar({
     <>
       <div className="flex w-56 shrink-0 flex-col gap-3">
         <div className="relative">
-          <Search className="pointer-events-none absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-kit-muted" />
-          <input
+          <Search className="pointer-events-none absolute top-1/2 left-2.5 z-10 h-3.5 w-3.5 -translate-y-1/2 text-kit-muted" />
+          <Input
             type="text"
+            inputSize="sm"
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={(e: { target: { value: string } }) =>
+              setSearchText(e.target.value)
+            }
             placeholder="Tìm danh mục..."
-            className="h-9 w-full rounded-md border border-kit bg-kit-white py-2 pr-3 pl-8 text-sm text-kit-body outline-none focus:border-kit-primary focus:ring-2 focus:ring-blue-600/25"
+            className="h-9 pl-8"
           />
         </div>
 

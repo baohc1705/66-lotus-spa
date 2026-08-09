@@ -16,7 +16,7 @@ export function BookingRoomStatCards({
   const dash = isLoading ? "—" : undefined;
 
   return (
-    <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+    <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
       <StatCard
         title="Tổng phòng"
         value={dash ?? totalRooms}

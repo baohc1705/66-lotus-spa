@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 import { DoorOpen } from "lucide-react";
 
 import { Modal } from "@/shared/components/Modal";
-import { ImageUpload } from "@/shared/components/ImageUpload";
+import { ImageUpload } from "@/shared/forms/ImageUpload";
 import { Button } from "@/shared/elements/Button";
 import { FormField } from "@/shared/forms/FormField";
 import { FormSection } from "@/shared/forms/FormSection";

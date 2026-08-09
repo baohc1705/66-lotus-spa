@@ -4,7 +4,6 @@ import {
   ArrowDownRight,
   ArrowRight,
   ArrowUpRight,
-  CalendarRange,
   Download,
   RefreshCw,
 } from "lucide-react";
@@ -34,7 +33,10 @@ import { LineChart } from "@/shared/charts/LineChart";
 import { PieChart } from "@/shared/charts/PieChart";
 import { TabNav } from "@/shared/components/Tabs";
 import { Badge } from "@/shared/elements/Badge";
+import { Button } from "@/shared/elements/Button";
 import { Card, CardBody, CardHeader } from "@/shared/elements/Card";
+import { Dropdown } from "@/shared/elements/Dropdown";
+import { Input } from "@/shared/forms/Input";
 import {
   Table,
   TableBody,
@@ -60,10 +62,16 @@ const YEAR_OPTIONS = (() => {
   return years;
 })();
 
-const FILTER_INPUT =
-  "cursor-pointer border-0 bg-transparent text-xs font-semibold text-kit-heading outline-hidden";
+const PRESET_OPTIONS: { key: RevenuePreset; label: string }[] = [
+  { key: "today", label: "Hôm nay" },
+  { key: "7days", label: "7 ngày qua" },
+  { key: "30days", label: "30 ngày qua" },
+  { key: "thisMonth", label: "Tháng này" },
+  { key: "day", label: "Theo ngày" },
+  { key: "month", label: "Theo tháng" },
+  { key: "year", label: "Theo năm" },
+];
 
-/** % tăng trưởng từ BE (GrowthPercent) — chỉ hiển thị mũi tên + số */
 function TrendBadge(props: { value: number | null | undefined }) {
   if (props.value === null || props.value === undefined) {
     return <span className="text-kit-muted">—</span>;
@@ -104,7 +112,7 @@ function StaffInitial(props: { name: string }) {
       ? parts[0].slice(0, 2).toUpperCase()
       : (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   return (
-    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-kit-primary">
+    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full soft-kit-primary text-xs font-bold">
       {initials}
     </div>
   );
@@ -278,120 +286,118 @@ export function AdminDashboard() {
 
   return (
     <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
-      <div className="mb-2 flex flex-wrap items-center gap-2">
-        <div className="flex h-8 items-center gap-1.5 rounded border border-kit bg-kit-white px-2.5">
-          <CalendarRange className="h-3.5 w-3.5 text-kit-muted" />
-          <select
-            value={preset}
-            onChange={(e) => setPreset(e.target.value as RevenuePreset)}
-            className={FILTER_INPUT}
-          >
-            <option value="today">Hôm nay</option>
-            <option value="7days">7 ngày qua</option>
-            <option value="30days">30 ngày qua</option>
-            <option value="thisMonth">Tháng này</option>
-            <option value="day">Theo ngày</option>
-            <option value="month">Theo tháng</option>
-            <option value="year">Theo năm</option>
-          </select>
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded border border-kit bg-kit-white p-2.5 shadow-kit-card">
+        <div className="flex flex-wrap items-center gap-2">
+          <Dropdown
+            variant="outline-secondary"
+            size="sm"
+            className="mb-0! mr-0!"
+            label={
+              PRESET_OPTIONS.find((p) => p.key === preset)?.label ?? "Kỳ báo cáo"
+            }
+            items={PRESET_OPTIONS.map((p) => ({
+              type: "item" as const,
+              label: p.label,
+              onClick: () => setPreset(p.key),
+            }))}
+          />
+
+          {preset === "day" ? (
+            <Input
+              type="date"
+              inputSize="sm"
+              className="h-8 w-auto cursor-pointer font-semibold"
+              value={selectedDay}
+              onChange={(e: { target: { value: string } }) =>
+                setSelectedDay(e.target.value)
+              }
+            />
+          ) : null}
+
+          {preset === "month" ? (
+            <Input
+              type="month"
+              inputSize="sm"
+              className="h-8 w-auto cursor-pointer font-semibold"
+              value={selectedMonth}
+              onChange={(e: { target: { value: string } }) =>
+                setSelectedMonth(e.target.value)
+              }
+            />
+          ) : null}
+
+          {preset === "year" ? (
+            <Dropdown
+              variant="outline-secondary"
+              size="sm"
+              className="mb-0! mr-0!"
+              label={String(selectedYear)}
+              items={YEAR_OPTIONS.map((y: number) => ({
+                type: "item" as const,
+                label: String(y),
+                onClick: () => setSelectedYear(y),
+              }))}
+            />
+          ) : null}
         </div>
 
-        {preset === "day" ? (
-          <div className="flex h-8 items-center rounded border border-kit bg-kit-white px-2.5">
-            <input
-              type="date"
-              value={selectedDay}
-              onChange={(e) => setSelectedDay(e.target.value)}
-              className={FILTER_INPUT}
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant="outline-secondary"
+            size="sm"
+            className="mb-0! mr-0! h-8 w-8 p-0"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            title="Làm mới"
+            aria-label="Làm mới"
+          >
+            <RefreshCw
+              className={"h-3.5 w-3.5 " + (isRefreshing ? "animate-spin" : "")}
             />
-          </div>
-        ) : null}
+          </Button>
 
-        {preset === "month" ? (
-          <div className="flex h-8 items-center rounded border border-kit bg-kit-white px-2.5">
-            <input
-              type="month"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className={FILTER_INPUT}
-            />
-          </div>
-        ) : null}
-
-        {preset === "year" ? (
-          <div className="flex h-8 items-center rounded border border-kit bg-kit-white px-2.5">
-            <select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(Number(e.target.value))}
-              className={FILTER_INPUT}
+          {isAdmin ? (
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              className="mb-0! mr-0!"
+              onClick={handleExportBySalon}
+              disabled={exportBySalonMutation.isPending}
+              loading={exportBySalonMutation.isPending}
             >
-              {YEAR_OPTIONS.map((y: number) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
-          </div>
-        ) : null}
+              <Download className="mr-1.5 h-3.5 w-3.5" />
+              Xuất Excel
+            </Button>
+          ) : null}
 
-        <button
-          type="button"
-          onClick={handleRefresh}
-          disabled={isRefreshing}
-          title="Làm mới"
-          className={
-            "inline-flex h-8 w-8 items-center justify-center rounded border border-kit " +
-            "bg-kit-white text-kit-muted hover:bg-kit-page " +
-            (isRefreshing ? "opacity-50" : "")
-          }
-        >
-          <RefreshCw className={"h-3.5 w-3.5 " + (isRefreshing ? "animate-spin" : "")} />
-        </button>
-
-        {isAdmin ? (
-          <button
-            type="button"
-            onClick={handleExportBySalon}
-            disabled={exportBySalonMutation.isPending}
-            className={
-              "inline-flex h-8 items-center gap-1.5 rounded border border-kit bg-kit-white " +
-              "px-2.5 text-xs font-semibold text-kit-heading hover:bg-kit-page " +
-              (exportBySalonMutation.isPending ? "opacity-50" : "")
-            }
-          >
-            <Download className="h-3.5 w-3.5 text-kit-muted" />
-            Xuất Excel
-          </button>
-        ) : null}
-
-        {canExportBranch ? (
-          <button
-            type="button"
-            onClick={handleExportBranch}
-            disabled={exportBranchMutation.isPending}
-            className={
-              "inline-flex h-8 items-center gap-1.5 rounded border border-kit bg-kit-white " +
-              "px-2.5 text-xs font-semibold text-kit-heading hover:bg-kit-page " +
-              (exportBranchMutation.isPending ? "opacity-50" : "")
-            }
-          >
-            <Download className="h-3.5 w-3.5 text-kit-muted" />
-            Báo cáo chi nhánh
-          </button>
-        ) : null}
+          {canExportBranch ? (
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              className="mb-0! mr-0!"
+              onClick={handleExportBranch}
+              disabled={exportBranchMutation.isPending}
+              loading={exportBranchMutation.isPending}
+            >
+              <Download className="mr-1.5 h-3.5 w-3.5" />
+              Báo cáo chi nhánh
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       {/* 4 stats kỳ — tone theo BoxesPage */}
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          className="mb-2"
           tone="midnight-bloom"
           title="Doanh thu gộp"
           value={isLoading ? "…" : formatCurrency(summary?.grossRevenue ?? 0)}
           valueTone="white"
         />
         <StatCard
-          className="mb-2"
           tone="premium-dark"
           title="Số giao dịch"
           value={
@@ -400,14 +406,12 @@ export function AdminDashboard() {
           valueTone="warning"
         />
         <StatCard
-          className="mb-2"
           tone="sunny-morning"
           title="Giá trị trung bình mỗi đơn"
           value={isLoading ? "…" : formatCurrency(summary?.averageOrderValue ?? 0)}
           valueTone="dark"
         />
         <StatCard
-          className="mb-2"
           tone="happy-green"
           title="Dòng tiền ròng"
           value={isLoading ? "…" : formatCurrency(summary?.netCashFlow ?? 0)}
@@ -416,9 +420,8 @@ export function AdminDashboard() {
       </div>
 
       {/* 4 stats hôm nay — thanh tiến độ lấy từ BE */}
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          className="mb-2"
           title="Khách hôm nay"
           description={
             today
@@ -429,7 +432,6 @@ export function AdminDashboard() {
           valueTone="primary"
         />
         <StatCard
-          className="mb-2"
           title="Lịch hẹn hôm nay"
           description={
             today ? (
@@ -455,7 +457,6 @@ export function AdminDashboard() {
           }}
         />
         <StatCard
-          className="mb-2"
           title="Thu hôm nay"
           description={
             today ? `Doanh thu ròng ${formatCurrency(today.cash.netRevenue)}` : "Chưa có dữ liệu"
@@ -466,7 +467,6 @@ export function AdminDashboard() {
           valueTone="warning"
         />
         <StatCard
-          className="mb-2"
           title="Chi hôm nay"
           description={
             today

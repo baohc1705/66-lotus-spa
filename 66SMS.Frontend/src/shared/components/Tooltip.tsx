@@ -16,7 +16,7 @@ const GAP = 6;
 
 function posStyle(
   placement: Placement,
-  rect: DOMRect
+  rect: DOMRect,
 ): { top: number; left: number; transform: string } {
   const offset = ARROW + GAP;
   if (placement === "right") {
@@ -47,18 +47,34 @@ function posStyle(
   };
 }
 
-function arrowClass(placement: Placement): string {
+function arrowClass(placement: Placement, light: boolean): string {
   const base = "absolute h-0 w-0 border-[6px] border-transparent";
   if (placement === "right") {
-    return base + " top-1/2 left-0 -translate-x-full -translate-y-1/2 border-r-black";
+    return (
+      base +
+      " top-1/2 left-0 -translate-x-full -translate-y-1/2 " +
+      (light ? "border-r-white" : "border-r-gray-800")
+    );
   }
   if (placement === "bottom") {
-    return base + " top-0 left-1/2 -translate-x-1/2 -translate-y-full border-b-black";
+    return (
+      base +
+      " top-0 left-1/2 -translate-x-1/2 -translate-y-full " +
+      (light ? "border-b-white" : "border-b-gray-800")
+    );
   }
   if (placement === "left") {
-    return base + " top-1/2 right-0 translate-x-full -translate-y-1/2 border-l-black";
+    return (
+      base +
+      " top-1/2 right-0 translate-x-full -translate-y-1/2 " +
+      (light ? "border-l-white" : "border-l-gray-800")
+    );
   }
-  return base + " bottom-0 left-1/2 -translate-x-1/2 translate-y-full border-t-black";
+  return (
+    base +
+    " bottom-0 left-1/2 -translate-x-1/2 translate-y-full " +
+    (light ? "border-t-white" : "border-t-gray-800")
+  );
 }
 
 export function Tooltip({
@@ -70,9 +86,11 @@ export function Tooltip({
 }: TooltipProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const [open, setOpen] = useState(false);
-  const [coords, setCoords] = useState<{ top: number; left: number; transform: string } | null>(
-    null
-  );
+  const [coords, setCoords] = useState<{
+    top: number;
+    left: number;
+    transform: string;
+  } | null>(null);
   const light = variant === "light";
 
   useEffect(() => {
@@ -81,9 +99,9 @@ export function Tooltip({
   }, [open, placement]);
 
   const innerClass = light
-    ? "max-w-48 rounded border border-black/20 bg-white px-2 py-1 text-center " +
+    ? "max-w-48 rounded border border-kit bg-kit-white px-2 py-1 text-center " +
       "text-sm leading-normal text-kit-heading shadow-kit-card"
-    : "max-w-48 rounded bg-black px-2 py-1 text-center text-sm leading-normal text-white";
+    : "max-w-48 rounded bg-kit-dark px-2 py-1 text-center text-sm leading-normal text-kit-white";
 
   return (
     <span
@@ -107,9 +125,9 @@ export function Tooltip({
               }}
             >
               <span className={"relative block " + innerClass}>{text}</span>
-              {!light ? <span className={arrowClass(placement)} aria-hidden /> : null}
+              <span className={arrowClass(placement, light)} aria-hidden />
             </span>,
-            document.body
+            document.body,
           )
         : null}
     </span>

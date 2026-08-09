@@ -103,7 +103,7 @@ export function LayoutsPage() {
                 <Checkbox inline label="Some input" />
                 <Checkbox inline label="Some other input" />
               </form>
-              <div className="mb-3 h-px bg-[#e9ecef]" />
+              <div className="mb-3 h-px bg-kit-track" />
               <form
                 className="flex flex-wrap items-start gap-2"
                 onSubmit={(e: { preventDefault(): void }) => e.preventDefault()}
@@ -211,7 +211,7 @@ export function LayoutsPage() {
               </FormField>
 
               <div className="relative mb-3 flex flex-col sm:flex-row">
-                <legend className="col-form-label mb-0 pt-2 text-sm text-[#495057] sm:w-2/12">
+                <legend className="col-form-label mb-0 pt-2 text-sm text-kit-body sm:w-2/12">
                   Radio Buttons
                 </legend>
                 <div className="min-w-0 flex-1">

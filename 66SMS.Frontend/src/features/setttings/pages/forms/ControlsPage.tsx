@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { BodyTabs } from "@/shared/components/Tabs";
 import { Button } from "@/shared/elements/Button";
 import { Card, CardBody, CardTitle } from "@/shared/elements/Card";
@@ -58,7 +58,7 @@ export function ControlsPage() {
   return (
     <DemoPageShell
       title="Form Controls"
-      subtitle="Wide selection of forms controls, using the Bootstrap 5 code base, but built with React."
+      subtitle="Wide selection of forms controls, using kit form controls."
     >
       <BodyTabs
         items={[
@@ -126,7 +126,7 @@ export function ControlsPage() {
                 <Input inputSize="lg" placeholder="lg" className="mb-2" />
                 <Input placeholder="default" className="mb-2" />
                 <Input inputSize="sm" placeholder="sm" className="mb-2" />
-                <div className="my-3 h-px bg-[#e9ecef]" />
+                <div className="my-3 h-px bg-kit-track" />
                 <Select
                   inputSize="lg"
                   className="mb-2"
@@ -141,7 +141,7 @@ export function ControlsPage() {
                   className="mb-2"
                   options={[{ value: "sm", label: "Small Select" }]}
                 />
-                <div className="my-3 h-px bg-[#e9ecef]" />
+                <div className="my-3 h-px bg-kit-track" />
                 <SearchableSelect
                   inputSize="lg"
                   className="mb-2"
@@ -167,7 +167,7 @@ export function ControlsPage() {
                     value="one"
                     checked={radio1 === "one"}
                     onChange={setRadio1}
-                    label="Option one is this and that—be sure to include why it's great"
+                    label="Option one is this and thatâ€”be sure to include why it's great"
                   />
                   <Radio
                     name="radio1"
@@ -351,8 +351,9 @@ export function ControlsPage() {
               <CardBody>
                 <CardTitle>Checkboxes</CardTitle>
                 <Checkbox id="c1" label="Check this custom checkbox" />
-                <Checkbox id="c2" label="Or this one" />
-                <Checkbox id="c3" label="But not this disabled one" disabled />
+                <Checkbox id="c2" tone="success" label="Success checkbox" />
+                <Checkbox id="c3" tone="danger" label="Danger checkbox" />
+                <Checkbox id="c4" label="But not this disabled one" disabled />
               </CardBody>
             </Card>
             <Card>

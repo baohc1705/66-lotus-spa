@@ -39,7 +39,7 @@ BEGIN
             WHEN SUM(Revenue) OVER () > 0
                 THEN ROUND(Revenue * 100.0 / SUM(Revenue) OVER (), 0)
             ELSE 0
-        END AS Percent
+        END AS [Percent]
     FROM top_rows
     ORDER BY Revenue DESC;
 END

@@ -110,7 +110,7 @@ export function ServiceDetailExpanded({
               subtitle={`Mã: ${service.code || "—"} · Thời gian: ${service.durationMins || 0} phút`}
             />
 
-            <TableDetailGrid>
+            <TableDetailGrid cols={3}>
               <TableDetailField
                 label="Nhóm dịch vụ"
                 value={service.categoryName}

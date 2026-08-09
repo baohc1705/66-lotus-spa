@@ -201,6 +201,7 @@ export function CustomerFormDialog({
               <ImageUpload
                 value={avatarUrlValue || customer?.avatarUrl}
                 onFileChange={setPendingFile}
+                shape="circle"
                 label="Đổi ảnh đại diện"
               />
             </div>
