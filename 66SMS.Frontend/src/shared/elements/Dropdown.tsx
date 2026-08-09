@@ -14,8 +14,14 @@ import {
 
 export type DropdownPlacement = "bottom" | "top" | "left" | "right";
 
-type DropdownItem =
-  | { type: "item"; label: string; onClick?: () => void }
+export type DropdownItem =
+  | {
+      type: "item";
+      label: string;
+      icon?: ReactNode;
+      danger?: boolean;
+      onClick?: () => void;
+    }
   | { type: "header"; label: string }
   | { type: "divider" };
 
@@ -128,12 +134,22 @@ export function Dropdown({
                 key={"i-" + index + "-" + item.label}
                 type="button"
                 role="menuitem"
-                className="block w-full px-3 py-1 text-left text-sm text-kit-body hover:bg-blue-50 hover:text-kit-primary"
+                className={
+                  "flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm " +
+                  (item.danger
+                    ? "text-kit-danger hover:bg-red-50 hover:text-kit-danger"
+                    : "text-kit-body hover:bg-blue-50 hover:text-kit-primary")
+                }
                 onClick={() => {
                   if (item.onClick) item.onClick();
                   setOpen(false);
                 }}
               >
+                {item.icon ? (
+                  <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center">
+                    {item.icon}
+                  </span>
+                ) : null}
                 {item.label}
               </button>
             );

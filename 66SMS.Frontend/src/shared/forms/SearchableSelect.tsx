@@ -1,4 +1,5 @@
 ﻿import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
 import { inputControlClass, type InputSize } from "./Input";
 import type { SelectOption } from "./Select";
@@ -42,12 +43,17 @@ export function SearchableSelect({
 
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [menuBox, setMenuBox] = useState<{
+    top: number;
+    left: number;
+    width: number;
+  } | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   const selectedOption = useMemo(
     () => options.find((o: SelectOption) => o.value === selected),
-    [options, selected]
+    [options, selected],
   );
 
   const filtered = useMemo(() => {
@@ -55,21 +61,44 @@ export function SearchableSelect({
     if (!q) return options;
     return options.filter(
       (o: SelectOption) =>
-        o.label.toLowerCase().includes(q) || o.value.toLowerCase().includes(q)
+        o.label.toLowerCase().includes(q) || o.value.toLowerCase().includes(q),
     );
   }, [options, query]);
 
   useEffect(() => {
+    if (!open) return;
+
     function onDocClick(e: MouseEvent) {
-      if (!rootRef.current) return;
-      if (!rootRef.current.contains(e.target as Node)) {
-        setOpen(false);
-        setQuery("");
-      }
+      const menu = document.getElementById("kit-searchable-select-menu");
+      if (menu && menu.contains(e.target as Node)) return;
+      if (rootRef.current && rootRef.current.contains(e.target as Node)) return;
+      setOpen(false);
+      setQuery("");
     }
+
+    function onReposition() {
+      const el = rootRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const openUp = spaceBelow < 240 && rect.top > spaceBelow;
+      setMenuBox({
+        top: openUp ? Math.max(8, rect.top - 244) : rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+      });
+    }
+
+    onReposition();
     document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, []);
+    window.addEventListener("resize", onReposition);
+    window.addEventListener("scroll", onReposition, true);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      window.removeEventListener("resize", onReposition);
+      window.removeEventListener("scroll", onReposition, true);
+    };
+  }, [open]);
 
   useEffect(() => {
     if (open && searchRef.current) {
@@ -87,6 +116,10 @@ export function SearchableSelect({
     setOpen(false);
     setQuery("");
   }
+
+  const openUp =
+    menuBox != null &&
+    menuBox.top < (rootRef.current?.getBoundingClientRect().top ?? 0);
 
   return (
     <div ref={rootRef} className={"relative " + className}>
@@ -106,7 +139,9 @@ export function SearchableSelect({
           (disabled ? "" : "cursor-pointer ")
         }
       >
-        <span className={"truncate " + (selectedOption ? "" : "text-kit-muted")}>
+        <span
+          className={"truncate " + (selectedOption ? "" : "text-kit-muted")}
+        >
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <span className="flex shrink-0 items-center gap-1 text-kit-muted">
@@ -123,64 +158,92 @@ export function SearchableSelect({
               <X className="size-3.5" />
             </span>
           ) : null}
-          {open ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+          {open ? (
+            <ChevronUp className="size-3.5" />
+          ) : (
+            <ChevronDown className="size-3.5" />
+          )}
         </span>
       </button>
 
-      {open ? (
-        <div className="absolute left-0 right-0 z-30 mt-1 overflow-hidden rounded border border-kit bg-kit-white shadow-kit-pop">
-          <div className="border-b border-kit p-2">
-            <input
-              ref={searchRef}
-              type="text"
-              value={query}
-              placeholder={searchPlaceholder}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e: { key: string; preventDefault(): void }) => {
-                if (e.key === "Escape") {
-                  setOpen(false);
-                  setQuery("");
-                }
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  if (filtered.length > 0) pick(filtered[0].value);
-                }
+      {open && menuBox
+        ? createPortal(
+            <div
+              id="kit-searchable-select-menu"
+              role="listbox"
+              style={{
+                top: menuBox.top,
+                left: menuBox.left,
+                width: menuBox.width,
               }}
               className={
-                "w-full rounded border border-kit px-2 py-1.5 text-sm text-kit-body outline-none " +
-                "placeholder:text-kit-muted focus:border-kit-primary focus:ring-2 focus:ring-blue-600/25"
+                "fixed z-60 overflow-hidden rounded border border-kit " +
+                "bg-kit-white text-sm font-sans shadow-kit-pop"
               }
-            />
-          </div>
-          <ul role="listbox" className="m-0 max-h-52 list-none overflow-y-auto py-1">
-            {filtered.length === 0 ? (
-              <li className="px-3 py-1 text-sm text-kit-muted">{emptyText}</li>
-            ) : (
-              filtered.map((opt: SelectOption) => {
-                const active = opt.value === selected;
-                return (
-                  <li key={opt.value}>
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={active}
-                      className={
-                        "block w-full px-3 py-1 text-left text-sm " +
-                        (active
-                          ? "bg-blue-50 text-kit-primary"
-                          : "text-kit-body hover:bg-blue-50 hover:text-kit-primary")
-                      }
-                      onClick={() => pick(opt.value)}
-                    >
-                      {opt.label}
-                    </button>
+            >
+              <div className="border-b border-kit p-2">
+                <input
+                  ref={searchRef}
+                  type="text"
+                  value={query}
+                  placeholder={searchPlaceholder}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e: {
+                    key: string;
+                    preventDefault(): void;
+                  }) => {
+                    if (e.key === "Escape") {
+                      setOpen(false);
+                      setQuery("");
+                    }
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      if (filtered.length > 0) pick(filtered[0].value);
+                    }
+                  }}
+                  className={
+                    "w-full rounded border border-kit px-2 py-1.5 text-sm text-kit-body outline-none " +
+                    "placeholder:text-kit-muted focus:border-kit-primary focus:ring-2 focus:ring-blue-600/25"
+                  }
+                />
+              </div>
+              <ul
+                role="listbox"
+                className="m-0 max-h-52 list-none overflow-y-auto py-1"
+              >
+                {filtered.length === 0 ? (
+                  <li className="px-3 py-1 text-sm text-kit-muted">
+                    {emptyText}
                   </li>
-                );
-              })
-            )}
-          </ul>
-        </div>
-      ) : null}
+                ) : (
+                  filtered.map((opt: SelectOption) => {
+                    const active = opt.value === selected;
+                    return (
+                      <li key={opt.value}>
+                        <button
+                          type="button"
+                          role="option"
+                          aria-selected={active}
+                          className={
+                            "block w-full px-3 py-1 text-left text-sm " +
+                            (active
+                              ? "bg-blue-50 text-kit-primary"
+                              : "text-kit-body hover:bg-blue-50 hover:text-kit-primary")
+                          }
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => pick(opt.value)}
+                        >
+                          {opt.label}
+                        </button>
+                      </li>
+                    );
+                  })
+                )}
+              </ul>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }

@@ -1,18 +1,15 @@
 import { useMemo, useState } from "react";
-import { Scissors, Search, CheckSquare, Square } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
-import { FormSection } from "@/shared/components/forms/FormSection";
+import { CheckSquare, Scissors, Search, Square } from "lucide-react";
+
+import { Modal } from "@/shared/components/Modal";
+import { Button } from "@/shared/elements/Button";
+import { FormSection } from "@/shared/forms/FormSection";
+import { Input } from "@/shared/forms/Input";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { formatCurrency } from "@/shared/utils/currency";
 import { useAdminServices } from "@/features/services/hooks/useServices";
 import type { ServiceListDto } from "@/features/services/types/service.types";
+
 import type { StaffServiceDto } from "../types/staff.types";
 import {
   useCreateStaffServicesMutation,
@@ -41,19 +38,18 @@ export function AssignStaffServiceDialog({
   const [searchText, setSearchText] = useState("");
   const [validationError, setValidationError] = useState("");
 
-  const { data: assignedResult, isLoading: isLoadingAssigned } = useStaffServices(
-    {
-      staffId: staffId ?? undefined,
-      pageIndex: 1,
-      pageSize: 500,
-    },
-    open && staffId != null && staffId > 0,
-  );
+  const { data: assignedResult, isLoading: isLoadingAssigned } =
+    useStaffServices(
+      {
+        staffId: staffId ?? undefined,
+        pageIndex: 1,
+        pageSize: 500,
+      },
+      open && staffId != null && staffId > 0,
+    );
 
-  const { data: servicesResult, isLoading: isLoadingServices } = useAdminServices(
-    { pageIndex: 1, pageSize: 500 },
-    open,
-  );
+  const { data: servicesResult, isLoading: isLoadingServices } =
+    useAdminServices({ pageIndex: 1, pageSize: 500 }, open);
 
   const createMutation = useCreateStaffServicesMutation();
 
@@ -70,9 +66,7 @@ export function AssignStaffServiceDialog({
     const items = servicesResult?.data?.items ?? [];
     return items.filter(
       (s: ServiceListDto) =>
-        s.id != null &&
-        s.status === 1 &&
-        !assignedServiceIds.has(s.id),
+        s.id != null && s.status === 1 && !assignedServiceIds.has(s.id),
     );
   }, [servicesResult?.data?.items, assignedServiceIds]);
 
@@ -93,9 +87,9 @@ export function AssignStaffServiceDialog({
     setValidationError("");
   }
 
-  function handleOpenChange(next: boolean) {
-    if (!next) resetForm();
-    onOpenChange(next);
+  function handleClose() {
+    resetForm();
+    onOpenChange(false);
   }
 
   function toggleService(id: number) {
@@ -112,7 +106,9 @@ export function AssignStaffServiceDialog({
       .filter((id): id is number => id != null);
     const allSelected = allFilteredIds.every((id) => selectedIds.includes(id));
     if (allSelected) {
-      setSelectedIds((prev) => prev.filter((id) => !allFilteredIds.includes(id)));
+      setSelectedIds((prev) =>
+        prev.filter((id) => !allFilteredIds.includes(id)),
+      );
     } else {
       setSelectedIds((prev) => [
         ...prev,
@@ -140,159 +136,164 @@ export function AssignStaffServiceDialog({
       { staffId, serviceIds: selectedIds },
       {
         onSuccess: (result) => {
-          if (result.isSuccess) handleOpenChange(false);
+          if (result.isSuccess) handleClose();
         },
       },
     );
   }
 
+  const subtitle = staff?.fullName
+    ? `Chọn dịch vụ cho nhân viên ${staff.fullName}${staff.code ? ` (${staff.code})` : ""}`
+    : "Chọn dịch vụ để phân công cho nhân viên";
+
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[560px]">
-        <DialogHeader>
-          <DialogTitle>Phân công dịch vụ</DialogTitle>
-          <DialogDescription>
-            {staff?.fullName
-              ? `Chọn dịch vụ cho nhân viên ${staff.fullName}${staff.code ? ` (${staff.code})` : ""}`
-              : "Chọn dịch vụ để phân công cho nhân viên"}
-          </DialogDescription>
-        </DialogHeader>
+    <Modal
+      open={open}
+      onClose={handleClose}
+      title="Phân công dịch vụ"
+      size="lg"
+      scrollable
+    >
+      <p className="mb-3 text-sm text-kit-muted">{subtitle}</p>
 
-        <FormSection icon={Scissors} title="Chọn dịch vụ">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="relative flex-1">
-              <Search
-                size={14}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-adminGray-400"
-              />
-              <input
-                type="text"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                placeholder="Tìm theo tên, mã hoặc danh mục..."
-                className="w-full pl-8 pr-3 py-1.5 border border-adminGray-100 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-adminGreen-600 bg-white"
-              />
-            </div>
-            <button
-              type="button"
-              onClick={toggleAll}
-              disabled={filteredServices.length === 0}
-              className="flex items-center gap-1.5 text-xs font-semibold text-adminGreen-600 hover:text-adminInk transition-colors whitespace-nowrap disabled:opacity-40"
-            >
-              {allFilteredSelected ? (
-                <CheckSquare size={14} />
-              ) : (
-                <Square size={14} />
-              )}
-              {allFilteredSelected ? "Bỏ chọn tất cả" : "Chọn tất cả"}
-            </button>
+      <FormSection icon={Scissors} title="Chọn dịch vụ">
+        <div className="mb-3 flex items-center gap-2">
+          <div className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute top-1/2 left-2.5 z-10 h-3.5 w-3.5 -translate-y-1/2 text-kit-muted" />
+            <Input
+              type="text"
+              inputSize="sm"
+              value={searchText}
+              onChange={(e: { target: { value: string } }) =>
+                setSearchText(e.target.value)
+              }
+              placeholder="Tìm theo tên, mã hoặc danh mục..."
+              className="h-9 pl-8"
+            />
           </div>
-
-          <div className="border border-adminGray-100 rounded-lg overflow-hidden">
-            {isLoading ? (
-              <div className="py-8 text-center text-sm text-adminGray-400">
-                Đang tải danh sách dịch vụ...
-              </div>
-            ) : filteredServices.length === 0 ? (
-              <div className="py-8 text-center text-sm text-adminGray-400">
-                {searchText
-                  ? "Không tìm thấy dịch vụ phù hợp"
-                  : "Tất cả dịch vụ đã được phân công cho nhân viên này"}
-              </div>
-            ) : (
-              <ul className="divide-y divide-adminGray-100 max-h-[280px] overflow-y-auto">
-                {filteredServices.map((service: ServiceListDto) => {
-                  const id = service.id!;
-                  const isSelected = selectedIds.includes(id);
-                  return (
-                    <li key={id}>
-                      <button
-                        type="button"
-                        onClick={() => toggleService(id)}
-                        className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-adminGray-50 ${
-                          isSelected ? "bg-adminGray-50/40" : ""
-                        }`}
-                      >
-                        <div
-                          className={`w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors ${
-                            isSelected
-                              ? "bg-adminGreen-600 border-adminGreen-600"
-                              : "border-adminGray-300"
-                          }`}
-                        >
-                          {isSelected && (
-                            <svg
-                              viewBox="0 0 12 12"
-                              className="w-3 h-3 text-white"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            >
-                              <polyline points="2,6 5,9 10,3" />
-                            </svg>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <span className="text-sm font-medium text-adminInk truncate block">
-                            {service.name}
-                          </span>
-                          <span className="text-xs text-adminGray-400">
-                            {[service.code, service.categoryName]
-                              .filter(Boolean)
-                              .join(" · ")}
-                            {service.durationMins != null
-                              ? ` · ${service.durationMins} phút`
-                              : ""}
-                          </span>
-                        </div>
-                        <span className="text-xs text-adminInk/70 shrink-0">
-                          {formatCurrency(service.sellingPrice)}
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
-
-          <div className="mt-2 flex items-center justify-between min-h-[20px]">
-            {selectedIds.length > 0 ? (
-              <span className="text-xs text-adminGreen-600 font-medium">
-                Đã chọn {selectedIds.length} dịch vụ
-              </span>
-            ) : (
-              <span />
-            )}
-            {validationError && (
-              <span className="text-xs text-state-danger-text">
-                {validationError}
-              </span>
-            )}
-          </div>
-        </FormSection>
-
-        <DialogFooter>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => handleOpenChange(false)}
-            disabled={createMutation.isPending}
+            className="mb-0 shrink-0"
+            onClick={toggleAll}
+            disabled={filteredServices.length === 0}
           >
-            Hủy
+            {allFilteredSelected ? (
+              <CheckSquare className="h-3.5 w-3.5" />
+            ) : (
+              <Square className="h-3.5 w-3.5" />
+            )}
+            {allFilteredSelected ? "Bỏ chọn tất cả" : "Chọn tất cả"}
           </Button>
-          <Button
-            type="button"
-            variant="admin"
-            size="sm"
-            loading={createMutation.isPending}
-            onClick={onSubmit}
-          >
-            Phân công ({selectedIds.length})
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+
+        <div className="overflow-hidden rounded border border-kit">
+          {isLoading ? (
+            <div className="py-8 text-center text-sm text-kit-muted">
+              Đang tải danh sách dịch vụ...
+            </div>
+          ) : filteredServices.length === 0 ? (
+            <div className="py-8 text-center text-sm text-kit-muted">
+              {searchText
+                ? "Không tìm thấy dịch vụ phù hợp"
+                : "Tất cả dịch vụ đã được phân công cho nhân viên này"}
+            </div>
+          ) : (
+            <ul className="max-h-70 divide-y divide-kit overflow-y-auto">
+              {filteredServices.map((service: ServiceListDto) => {
+                const id = service.id!;
+                const isSelected = selectedIds.includes(id);
+                return (
+                  <li key={id}>
+                    <button
+                      type="button"
+                      onClick={() => toggleService(id)}
+                      className={
+                        "flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-kit-page " +
+                        (isSelected ? "bg-kit-page/60" : "")
+                      }
+                    >
+                      <span
+                        className={
+                          "flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors " +
+                          (isSelected
+                            ? "border-kit-primary bg-kit-primary"
+                            : "border-kit")
+                        }
+                      >
+                        {isSelected ? (
+                          <svg
+                            viewBox="0 0 12 12"
+                            className="h-3 w-3 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <polyline points="2,6 5,9 10,3" />
+                          </svg>
+                        ) : null}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium text-kit-heading">
+                          {service.name}
+                        </span>
+                        <span className="text-xs text-kit-muted">
+                          {[service.code, service.categoryName]
+                            .filter(Boolean)
+                            .join(" · ")}
+                          {service.durationMins != null
+                            ? ` · ${service.durationMins} phút`
+                            : ""}
+                        </span>
+                      </div>
+                      <span className="shrink-0 text-xs text-kit-body">
+                        {formatCurrency(service.sellingPrice)}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+
+        <div className="mt-2 flex min-h-5 items-center justify-between">
+          {selectedIds.length > 0 ? (
+            <span className="text-xs font-medium text-kit-primary">
+              Đã chọn {selectedIds.length} dịch vụ
+            </span>
+          ) : (
+            <span />
+          )}
+          {validationError ? (
+            <span className="text-xs text-kit-danger">{validationError}</span>
+          ) : null}
+        </div>
+      </FormSection>
+
+      <div className="mt-4 flex justify-end gap-2 border-t border-kit pt-3">
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          className="mb-0"
+          onClick={handleClose}
+          disabled={createMutation.isPending}
+        >
+          {COMMON_MSG.cancel}
+        </Button>
+        <Button
+          type="button"
+          variant="admin"
+          size="sm"
+          className="mb-0"
+          loading={createMutation.isPending}
+          onClick={onSubmit}
+        >
+          Phân công ({selectedIds.length})
+        </Button>
+      </div>
+    </Modal>
   );
 }

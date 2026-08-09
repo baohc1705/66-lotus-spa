@@ -2,22 +2,37 @@ import {
   getCoreRowModel,
   getExpandedRowModel,
   useReactTable,
+  type ColumnDef,
   type Row,
 } from "@tanstack/react-table";
-import { ArrowLeft, Package, Plus, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Eye,
+  Package,
+  Pencil,
+  Plus,
+  RotateCcw,
+  Trash2,
+} from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 
 import { useProductCategories } from "@/features/product_categories/hooks/useProductCategories";
 import type { ProductCategoryDto } from "@/features/product_categories/types/productCategory.types";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import { Pagination } from "@/shared/components/Pagination";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { Tooltip } from "@/shared/components/Tooltip";
+import { Badge } from "@/shared/elements/Badge";
 import { Button } from "@/shared/elements/Button";
+import { Checkbox } from "@/shared/forms/Checkbox";
 import { Select } from "@/shared/forms/Select";
+import { Switch } from "@/shared/forms/Switch";
 import { DataTable } from "@/shared/tables/DataTable";
 import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
 import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { SortableColumnHeader } from "@/shared/tables/SortableColumnHeader";
 import { TableEmptyState } from "@/shared/tables/TableEmptyState";
 import { TablePageShell } from "@/shared/tables/TablePageShell";
 import { TableSelectionBar } from "@/shared/tables/TableSelectionBar";
@@ -26,16 +41,13 @@ import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { useRowSelection } from "@/shared/hooks/useRowSelection";
+import { formatCurrency } from "@/shared/utils/currency";
+import { formatDateTimeDisplay } from "@/shared/utils/date.utils";
 
 import { ProductCategorySidebar } from "../components/ProductCategorySidebar";
 import { ProductDetailExpanded } from "../components/ProductDetailExpanded";
 import { ProductFormDialog } from "../components/ProductFormDialog";
 import { ProductStatCards } from "../components/ProductStatCards";
-import {
-  PRODUCT_COLUMN_LABELS,
-  useActiveProductColumns,
-} from "../components/useActiveProductColumns";
-import { useDeletedProductColumns } from "../components/useDeletedProductColumns";
 import { PRODUCT_PERM } from "../constants/product.permissions";
 import { useProductListState } from "../hooks/useProductListState";
 import {
@@ -50,6 +62,17 @@ import type { ProductDto } from "../types/product.types";
 
 const ENTITY = "sản phẩm";
 const ENTITY_SUBJECT = "Sản phẩm";
+
+const COLUMN_LABELS = {
+  code: "Mã SP",
+  imageUrl: "Ảnh",
+  name: "Tên sản phẩm",
+  categoryName: "Danh mục",
+  stockQuantity: "Tồn kho",
+  unit: "Đơn vị",
+  sellingPrice: "Giá bán",
+  status: "Trạng thái",
+};
 
 export function ProductListPage() {
   "use no memo";
@@ -144,24 +167,320 @@ export function ProductListPage() {
     [setSelectedCategoryId, setPageIndex],
   );
 
-  const activeColumns = useActiveProductColumns({
+  const columns = useMemo(() => {
+    const cols: ColumnDef<ProductDto>[] = [];
+
+    if (!showDeleted) {
+      cols.push({
+        id: "select",
+        header: () => (
+          <div onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              className="mb-0"
+              checked={headerChecked === true}
+              indeterminate={headerChecked === "indeterminate"}
+              onChange={(checked: boolean) => toggleAll(checked)}
+              aria-label="Select all"
+            />
+          </div>
+        ),
+        cell: ({ row }) => {
+          const item = row.original;
+          return (
+            <div onClick={(e) => e.stopPropagation()}>
+              <Checkbox
+                className="mb-0"
+                checked={item.id != null && selectedRowIds.has(item.id)}
+                onChange={(checked: boolean) => {
+                  if (item.id == null) return;
+                  toggleOne(item.id, checked);
+                }}
+                aria-label="Select row"
+              />
+            </div>
+          );
+        },
+        size: 40,
+        enableResizing: false,
+      });
+    }
+
+    cols.push(
+      {
+        accessorKey: "code",
+        header: () =>
+          showDeleted ? (
+            COLUMN_LABELS.code
+          ) : (
+            <SortableColumnHeader
+              label={COLUMN_LABELS.code}
+              column="code"
+              orderBy={orderBy}
+              isDescending={isDescending}
+              onSort={handleSort}
+              onPrimary
+            />
+          ),
+        cell: ({ row }) => (
+          <Badge variant="secondary" soft>
+            {row.original.code ?? "—"}
+          </Badge>
+        ),
+        size: 100,
+      },
+      {
+        id: "imageUrl",
+        accessorKey: "imageUrl",
+        header: COLUMN_LABELS.imageUrl,
+        cell: ({ row }) => (
+          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-md border border-kit bg-kit-page">
+            <FallbackImage
+              kind="product"
+              src={row.original.imageUrl}
+              alt=""
+              className="h-10 w-10 object-cover"
+            />
+          </div>
+        ),
+        size: 72,
+        enableResizing: false,
+      },
+      {
+        accessorKey: "name",
+        header: () =>
+          showDeleted ? (
+            COLUMN_LABELS.name
+          ) : (
+            <SortableColumnHeader
+              label={COLUMN_LABELS.name}
+              column="name"
+              orderBy={orderBy}
+              isDescending={isDescending}
+              onSort={handleSort}
+              onPrimary
+            />
+          ),
+        cell: ({ row }) => (
+          <span className="font-medium text-kit-heading">
+            {row.original.name ?? "—"}
+          </span>
+        ),
+        size: 180,
+      },
+      {
+        accessorKey: "categoryName",
+        header: COLUMN_LABELS.categoryName,
+        cell: ({ row }) => (
+          <span className="text-kit-muted">
+            {row.original.categoryName ?? "—"}
+          </span>
+        ),
+        size: 140,
+      },
+      {
+        accessorKey: "stockQuantity",
+        header: () =>
+          showDeleted ? (
+            COLUMN_LABELS.stockQuantity
+          ) : (
+            <SortableColumnHeader
+              label={COLUMN_LABELS.stockQuantity}
+              column="stockquantity"
+              orderBy={orderBy}
+              isDescending={isDescending}
+              onSort={handleSort}
+              onPrimary
+            />
+          ),
+        cell: ({ row }) => {
+          const stock = row.original.stockQuantity ?? 0;
+          const minStock = row.original.minStock ?? 0;
+          const isLowStock = stock <= minStock;
+          return (
+            <span
+              className={`font-semibold ${isLowStock ? "text-kit-danger" : "text-kit-heading"}`}
+            >
+              {stock}
+            </span>
+          );
+        },
+        size: 100,
+      },
+      {
+        accessorKey: "unit",
+        header: COLUMN_LABELS.unit,
+        cell: ({ row }) => (
+          <span className="text-kit-muted">{row.original.unit ?? "—"}</span>
+        ),
+        size: 80,
+      },
+      {
+        accessorKey: "sellingPrice",
+        header: () =>
+          showDeleted ? (
+            COLUMN_LABELS.sellingPrice
+          ) : (
+            <SortableColumnHeader
+              label={COLUMN_LABELS.sellingPrice}
+              column="sellingPrice"
+              orderBy={orderBy}
+              isDescending={isDescending}
+              onSort={handleSort}
+              onPrimary
+            />
+          ),
+        cell: ({ row }) => (
+          <span className="text-sm font-bold text-kit-primary">
+            {formatCurrency(row.original.sellingPrice)}
+          </span>
+        ),
+        size: 120,
+      },
+    );
+
+    if (!showDeleted) {
+      cols.push(
+        {
+          accessorKey: "status",
+          header: COLUMN_LABELS.status,
+          cell: ({ row }) => {
+            const item = row.original;
+            return (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center"
+              >
+                <Switch
+                  checked={item.status === StatusActive.Active}
+                  onChange={(checked: boolean) => {
+                    if (!item.id) return;
+                    updateMutation.mutate({
+                      id: item.id,
+                      payload: {
+                        status: checked
+                          ? StatusActive.Active
+                          : StatusActive.Inactive,
+                      },
+                    });
+                  }}
+                  disabled={updateMutation.isPending}
+                />
+              </div>
+            );
+          },
+          size: 100,
+        },
+        {
+          id: "actions",
+          header: "Thao tác",
+          cell: ({ row }) => {
+            const item = row.original;
+            const expanded = row.getIsExpanded();
+            return (
+              <div
+                className="flex items-center gap-1"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Tooltip text={expanded ? "Đóng chi tiết" : "Xem chi tiết"}>
+                  <Button
+                    size="icon-sm"
+                    variant="outline-info"
+                    className="mb-0 mr-0"
+                    onClick={() => row.toggleExpanded()}
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                  </Button>
+                </Tooltip>
+                <PermissionGate resource={perm.resource} action={perm.update}>
+                  <Tooltip text="Sửa">
+                    <Button
+                      size="icon-sm"
+                      variant="outline-primary"
+                      className="mb-0 mr-0"
+                      onClick={() => setEditTarget(item)}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  </Tooltip>
+                </PermissionGate>
+                <PermissionGate
+                  resource={perm.resource}
+                  action={perm.delete}
+                  role={perm.role}
+                >
+                  <Tooltip text="Xóa">
+                    <Button
+                      size="icon-sm"
+                      variant="outline-danger"
+                      className="mb-0 mr-0"
+                      onClick={() => setDeleteTarget(item)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </Tooltip>
+                </PermissionGate>
+              </div>
+            );
+          },
+          size: 130,
+          enableResizing: false,
+        },
+      );
+    } else {
+      cols.push(
+        {
+          accessorKey: "updatedAt",
+          header: "Ngày xóa",
+          cell: ({ row }) => (
+            <span className="text-kit-muted">
+              {formatDateTimeDisplay(row.original.updatedAt)}
+            </span>
+          ),
+          size: 140,
+        },
+        {
+          id: "actions",
+          header: "Thao tác",
+          cell: ({ row }) => (
+            <PermissionGate
+              resource={perm.resource}
+              action={perm.update}
+              role={perm.role}
+            >
+              <Tooltip text={COMMON_MSG.restore}>
+                <Button
+                  size="icon-sm"
+                  variant="outline-success"
+                  className="mb-0 mr-0"
+                  onClick={() => setRestoreTarget(row.original)}
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                </Button>
+              </Tooltip>
+            </PermissionGate>
+          ),
+          size: 80,
+          enableResizing: false,
+        },
+      );
+    }
+
+    return cols;
+  }, [
+    showDeleted,
     orderBy,
     isDescending,
-    onSort: handleSort,
+    handleSort,
     headerChecked,
     selectedRowIds,
-    onToggleAll: toggleAll,
-    onToggleOne: toggleOne,
-    onEdit: setEditTarget,
-    onDelete: setDeleteTarget,
+    toggleAll,
+    toggleOne,
     updateMutation,
-  });
-
-  const deletedColumns = useDeletedProductColumns({
-    onRestore: setRestoreTarget,
-  });
-
-  const columns = showDeleted ? deletedColumns : activeColumns;
+    setEditTarget,
+    setDeleteTarget,
+    setRestoreTarget,
+    perm,
+  ]);
 
   // eslint-disable-next-line react-hooks/incompatible-library -- useReactTable
   const table = useReactTable({
@@ -215,8 +534,6 @@ export function ProductListPage() {
       },
     });
   }, [restoreTarget, restoreMutation, setRestoreTarget]);
-
-  const columnLabels = useMemo(() => ({ ...PRODUCT_COLUMN_LABELS }), []);
 
   const { layoutMode } = useOutletContext<{
     layoutMode: "top-nav" | "sidebar";
@@ -290,7 +607,7 @@ export function ProductListPage() {
                 {!showDeleted && (
                   <DataTableViewOptions
                     table={table}
-                    columnLabels={columnLabels}
+                    columnLabels={COLUMN_LABELS}
                   />
                 )}
 

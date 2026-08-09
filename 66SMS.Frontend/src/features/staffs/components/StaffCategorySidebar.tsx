@@ -9,9 +9,12 @@ import {
   Shield,
   type LucideIcon,
 } from "lucide-react";
+import { Badge } from "@/shared/elements/Badge";
+import { ListGroup, ListGroupItem } from "@/shared/elements/ListGroup";
+import { Input } from "@/shared/forms/Input";
 import { useGetAllRoles } from "@/features/auth/hooks/useGetAllRoles";
-import { useAdminStaffs } from "../hooks/useStaffs";
 import type { RoleDTO } from "@/features/auth/types/auth.types";
+import { useAdminStaffs } from "../hooks/useStaffs";
 import type { StaffDto } from "../types/staff.types";
 
 interface StaffCategorySidebarProps {
@@ -38,7 +41,6 @@ export function StaffCategorySidebar({
   const [searchText, setSearchText] = useState("");
 
   const { data: rolesResult, isLoading: isLoadingRoles } = useGetAllRoles();
-
   const roles = useMemo(() => rolesResult?.data ?? [], [rolesResult?.data]);
 
   const { data: countStaffsResult } = useAdminStaffs({
@@ -47,9 +49,10 @@ export function StaffCategorySidebar({
     salonId,
   });
 
-  const countStaffs = useMemo(() => {
-    return countStaffsResult?.data?.items ?? [];
-  }, [countStaffsResult]);
+  const countStaffs = useMemo(
+    () => countStaffsResult?.data?.items ?? [],
+    [countStaffsResult],
+  );
 
   const countMap = useMemo(() => {
     const map = new Map<string, number>();
@@ -76,104 +79,69 @@ export function StaffCategorySidebar({
   }, [roles, searchText]);
 
   return (
-    <aside className="w-2/12 shrink-0 flex flex-col h-full bg-white rounded overflow-hidden">
-      <div className="px-3 pt-3 pb-2 shrink-0">
-        <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-adminGray-400 pointer-events-none" />
-          <input
-            type="text"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Tìm vai trò..."
-            className="lotus-admin-sidebar-search"
-          />
-        </div>
+    <div className="flex w-56 shrink-0 flex-col gap-3">
+      <div className="relative">
+        <Search className="pointer-events-none absolute top-1/2 left-2.5 z-10 h-3.5 w-3.5 -translate-y-1/2 text-kit-muted" />
+        <Input
+          type="text"
+          inputSize="sm"
+          value={searchText}
+          onChange={(e: { target: { value: string } }) =>
+            setSearchText(e.target.value)
+          }
+          placeholder="Tìm vai trò..."
+          className="h-9 pl-8"
+        />
       </div>
 
-      <nav className="flex-1 flex-col h-full overflow-y-auto custom-scrollbar px-2 pb-2 space-y-0.5">
-        <button
-          type="button"
+      <ListGroup className="mb-0 max-h-96 overflow-y-auto">
+        <ListGroupItem
+          action
+          active={selectedRole === null}
           onClick={() => onSelectRole(null)}
-          className={`lotus-admin-sidebar-item ${
-            selectedRole === null
-              ? "bg-adminGreen-100 text-adminGreen-600 font-semibold border-l-[3px] border-adminGreen-600"
-              : "text-adminInk/70 hover:bg-adminGreen-50 hover:text-adminGreen-600 border-l-[3px] border-transparent"
-          }`}
         >
-          <div className="flex items-center gap-2 min-w-0">
-            <Users
-              className={`w-4 h-4 shrink-0 ${
-                selectedRole === null
-                  ? "text-adminGreen-600"
-                  : "text-adminGray-400"
-              }`}
-            />
+          <span className="flex min-w-0 items-center gap-2">
+            <Users className="h-4 w-4 shrink-0" />
             <span className="truncate">Tất cả vai trò</span>
-          </div>
-          <span
-            className={`lotus-admin-sidebar-badge ${
-              selectedRole === null
-                ? "bg-adminGreen-600/20 text-adminGreen-600"
-                : "bg-adminGray-100 text-adminGray-600"
-            }`}
-          >
-            {totalCount}
           </span>
-        </button>
+          <Badge variant={selectedRole === null ? "light" : "secondary"} pill>
+            {totalCount}
+          </Badge>
+        </ListGroupItem>
 
-        {isLoadingRoles ? (
-          <div className="space-y-1 px-1 mt-1">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-7 bg-adminGray-100/50 rounded animate-pulse"
-              />
-            ))}
-          </div>
-        ) : (
-          filteredRoles.map((role: RoleDTO) => {
-            const roleCode = role.code ?? "";
-            const isActive =
-              selectedRole?.toLowerCase() === roleCode.toLowerCase();
-            const count = roleCode
-              ? (countMap.get(roleCode.toLowerCase()) ?? 0)
-              : 0;
-            const Icon = getRoleIcon(role);
-            return (
-              <button
-                key={role.id}
-                type="button"
-                onClick={() => onSelectRole(roleCode || null)}
-                className={`lotus-admin-sidebar-item group ${
-                  isActive
-                    ? "bg-adminGreen-100 text-adminGreen-600 font-semibold border-l-[3px] border-adminGreen-600"
-                    : "text-adminInk/70 hover:bg-adminGreen-50 hover:text-adminGreen-600 border-l-[3px] border-transparent"
-                }`}
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <Icon
-                    className={`w-4 h-4 shrink-0 ${
-                      isActive
-                        ? "text-adminGreen-600"
-                        : "text-adminGray-400 group-hover:text-adminGray-600"
-                    }`}
-                  />
-                  <span className="truncate">{role.name ?? "—"}</span>
-                </div>
-                <span
-                  className={`lotus-admin-sidebar-badge ${
-                    isActive
-                      ? "bg-adminGreen-600/20 text-adminGreen-600"
-                      : "bg-adminGray-100 text-adminGray-600"
-                  }`}
+        {isLoadingRoles
+          ? Array.from({ length: 4 }).map((_, i: number) => (
+              <ListGroupItem key={i} disabled>
+                <span className="h-4 w-28 animate-pulse rounded bg-kit-page" />
+                <span className="h-4 w-6 animate-pulse rounded-full bg-kit-page" />
+              </ListGroupItem>
+            ))
+          : filteredRoles.map((role: RoleDTO) => {
+              const roleCode = role.code ?? "";
+              const isActive =
+                selectedRole?.toLowerCase() === roleCode.toLowerCase();
+              const count = roleCode
+                ? (countMap.get(roleCode.toLowerCase()) ?? 0)
+                : 0;
+              const Icon = getRoleIcon(role);
+              return (
+                <ListGroupItem
+                  key={role.id}
+                  action
+                  active={isActive}
+                  onClick={() => onSelectRole(roleCode || null)}
                 >
-                  {count}
-                </span>
-              </button>
-            );
-          })
-        )}
-      </nav>
-    </aside>
+                  <span className="flex min-w-0 items-center gap-2">
+                    <Icon className="h-4 w-4 shrink-0" />
+                    <span className="truncate">{role.name ?? "—"}</span>
+                  </span>
+                  <Badge variant={isActive ? "light" : "secondary"} pill>
+                    {count}
+                  </Badge>
+                </ListGroupItem>
+              );
+            })}
+      </ListGroup>
+    </div>
   );
 }
