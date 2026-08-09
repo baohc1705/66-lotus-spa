@@ -5,6 +5,15 @@ export function eventLabel(eventType: string): string {
   return eventType;
 }
 
+export function eventBadgeVariant(
+  eventType: string,
+): "warning" | "success" | "secondary" | "info" {
+  if (eventType === "AppointmentCreated") return "warning";
+  if (eventType === "DepositPaid") return "success";
+  if (eventType === "AppointmentStatusChanged") return "info";
+  return "secondary";
+}
+
 export function eventBadgeClass(eventType: string, variant: "admin" | "lotus" = "admin"): string {
   if (variant === "lotus") {
     if (eventType === "AppointmentCreated") {

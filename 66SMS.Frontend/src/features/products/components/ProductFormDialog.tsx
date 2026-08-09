@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useForm,
   useFieldArray,
@@ -25,7 +25,6 @@ import { Input } from "@/shared/forms/Input";
 import { Select } from "@/shared/forms/Select";
 import { Switch } from "@/shared/forms/Switch";
 import { Textarea } from "@/shared/forms/Textarea";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 
@@ -570,7 +569,7 @@ export function ProductFormDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={isPending || isUploading}
               >
-                {COMMON_MSG.cancel}
+                Hủy
               </Button>
               <Button
                 type="submit"

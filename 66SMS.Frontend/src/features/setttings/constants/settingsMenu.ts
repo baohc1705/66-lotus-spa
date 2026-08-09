@@ -29,7 +29,6 @@ export type SettingsMenuSection = {
   items: SettingsMenuItem[];
 };
 
-/** Mirror exact ArchitectUI sidebar.hbs organization */
 export const SETTINGS_MENU: SettingsMenuSection[] = [
   {
     heading: "Dashboards",

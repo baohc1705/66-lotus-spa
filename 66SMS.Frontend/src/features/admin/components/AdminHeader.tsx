@@ -112,7 +112,7 @@ export function AdminHeader(props: AdminHeaderProps) {
         </h1>
 
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
-          <div className="w-36 sm:w-44 shrink-0">
+          <div className="w-36 min-w-0 shrink-0 sm:w-44">
             <BranchSelector variant="light" />
           </div>
 

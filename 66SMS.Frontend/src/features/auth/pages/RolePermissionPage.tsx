@@ -193,9 +193,6 @@ export default function RolePermissionPage() {
     <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
       <div className="mb-5">
         <h1 className="m-0 text-xl font-bold text-kit-heading">Phân quyền theo vai trò</h1>
-        <p className="mb-0 mt-1 text-sm text-kit-muted">
-          Quản lý vai trò, quyền hạn và gán quyền cho từng vai trò.
-        </p>
       </div>
 
       {isLoading ? (
@@ -231,7 +228,7 @@ export default function RolePermissionPage() {
               ) : (
                 <Card className="mb-0! border border-kit">
                   <CardBody className="p-12 text-center text-sm text-kit-muted">
-                    Chọn một vai trò bên trái để xem và chỉnh sửa quyền
+                    Chọn một vai trò
                   </CardBody>
                 </Card>
               )}

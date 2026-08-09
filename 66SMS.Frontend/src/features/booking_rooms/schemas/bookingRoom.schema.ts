@@ -1,22 +1,21 @@
 import { z } from "zod";
-import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
 const bookingRoomFieldsSchema = z.object({
   name: z
     .string()
-    .nonempty(VALIDATION_MSG.required("Tên phòng"))
-    .max(100, VALIDATION_MSG.max(100)),
+    .nonempty("Tên phòng không được để trống")
+    .max(100, "Tối đa 100 ký tự"),
   imageUrl: z.string().optional().or(z.literal("")),
   note: z
     .string()
-    .max(500, VALIDATION_MSG.max(500))
+    .max(500, "Tối đa 500 ký tự")
     .optional()
     .or(z.literal("")),
   status: z.coerce.number().optional(),
 });
 
 export const createBookingRoomSchema = bookingRoomFieldsSchema.extend({
-  salonId: z.coerce.number().min(1, VALIDATION_MSG.selectRequired("chi nhánh")),
+  salonId: z.coerce.number().min(1, "Vui lòng chọn chi nhánh"),
 });
 
 export const updateBookingRoomFormSchema = bookingRoomFieldsSchema;

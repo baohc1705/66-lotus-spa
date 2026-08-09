@@ -3,22 +3,22 @@ import {
   useReactTable,
   getCoreRowModel,
   getExpandedRowModel,
+  type Row,
 } from "@tanstack/react-table";
 import { Plus, Trash2, ArrowLeft, History } from "lucide-react";
 
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
-import { TableEmptyState } from "@/shared/components/DataTable/TableEmptyState";
-import { TableSelectionBar } from "@/shared/components/DataTable/TableSelectionBar";
-import { Button } from "@/shared/components/ui/button";
-import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
+import { Pagination } from "@/shared/components/Pagination";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { Button } from "@/shared/elements/Button";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { TableSelectionBar } from "@/shared/tables/TableSelectionBar";
+import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
+import { useRowSelection } from "@/shared/hooks/useRowSelection";
 
 import { TreatmentCourseFormDialog } from "../components/TreatmentCourseFormDialog";
 import { TreatmentCourseDetailExpanded } from "../components/TreatmentCourseDetailExpanded";
@@ -37,7 +37,6 @@ import {
   useRestoreTreatmentCourse,
 } from "../hooks/useTreatmentCourses";
 import { useTreatmentCourseListState } from "../hooks/useTreatmentCourseListState";
-import { useRowSelection } from "@/shared/hooks/useRowSelection";
 import type { TreatmentCourseDto } from "../types/treatmentCourse.types";
 
 const ENTITY = "liệu trình";
@@ -88,14 +87,17 @@ export function TreatmentCourseListPage() {
   const paged = courseResult?.data;
   const courses = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
+  const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
-  const pageIds = useMemo(
-    () =>
-      courses
-        .map((c: TreatmentCourseDto) => c.id)
-        .filter((id): id is number => id !== null && id !== undefined),
-    [courses],
-  );
+  const pageIds: number[] = [];
+  for (let index = 0; index < courses.length; index++) {
+    const id = courses[index].id;
+    if (id === null || id === undefined) continue;
+    pageIds.push(id);
+  }
 
   const {
     selectedRowIds,
@@ -146,6 +148,8 @@ export function TreatmentCourseListPage() {
     columnResizeMode: "onChange",
     state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
+    manualPagination: true,
+    manualSorting: true,
   });
 
   const handleDelete = useCallback(() => {
@@ -190,14 +194,10 @@ export function TreatmentCourseListPage() {
   );
 
   return (
-    <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-      <div className="px-4 pt-4">
-        <DataTableToolbar
-          searchValue={filter}
-          onSearchChange={handleSearchChange}
-          searchPlaceholder="Tìm theo tên, mã liệu trình..."
-        >
-          {selectedCount > 0 && !showDeleted && (
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
+      <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+        <div className="border-b border-kit px-4 pt-4">
+          {selectedCount > 0 && !showDeleted ? (
             <TableSelectionBar
               count={selectedCount}
               onClear={clearSelection}
@@ -208,132 +208,150 @@ export function TreatmentCourseListPage() {
                   role={perm.role}
                 >
                   <Button
-                    variant="destructive"
+                    variant="danger"
                     size="sm"
-                    className="lotus-admin-btn-toolbar"
+                    className="mb-0"
                     onClick={() => setBulkDeleteOpen(true)}
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="h-3.5 w-3.5" />
                     Xóa đã chọn
                   </Button>
                 </PermissionGate>
               }
             />
-          )}
+          ) : null}
 
-          {!showDeleted && (
-            <DataTableViewOptions table={table} columnLabels={columnLabels} />
-          )}
-
-          <PermissionGate
-            resource={perm.resource}
-            action={perm.create}
-            role={perm.role}
+          <DataTableToolbar
+            searchValue={filter}
+            onSearchChange={handleSearchChange}
+            searchPlaceholder="Tìm theo tên, mã liệu trình..."
           >
-            <Button
-              variant="admin"
-              size="sm"
-              onClick={() => setCreateOpen(true)}
-              className="lotus-admin-table-toolbar-btn"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Thêm liệu trình
-            </Button>
-          </PermissionGate>
+            {!showDeleted && (
+              <DataTableViewOptions table={table} columnLabels={columnLabels} />
+            )}
 
-          <PermissionGate
-            resource={perm.resource}
-            action={perm.read}
-            role={perm.role}
-          >
-            <Button
-              variant="admin"
-              size="sm"
-              className="lotus-admin-table-toolbar-btn"
-              onClick={() => handleToggleView(clearSelection)}
-              title={showDeleted ? "Quay lại danh sách" : "Liệu trình đã xóa"}
+            <PermissionGate
+              resource={perm.resource}
+              action={perm.create}
+              role={perm.role}
             >
-              {showDeleted ? (
-                <>
-                  <ArrowLeft className="w-4 h-4" />
-                  {COMMON_MSG.back}
-                </>
-              ) : (
-                <>
-                  <Trash2 className="w-4 h-4" />
-                  {COMMON_MSG.restore}
-                </>
-              )}
-            </Button>
-          </PermissionGate>
-        </DataTableToolbar>
-      </div>
+              <Button
+                variant="primary"
+                size="sm"
+                className="mb-0"
+                onClick={() => setCreateOpen(true)}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Thêm liệu trình
+              </Button>
+            </PermissionGate>
 
-      <DataTable
-        table={table}
-        isLoading={isLoading}
-        loadingRows={
-          pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
-        }
-        onRowClick={showDeleted ? undefined : (row) => row.toggleExpanded()}
-        renderSubComponent={
-          showDeleted
-            ? undefined
-            : ({ row }) =>
-                row.original.id ? (
-                  <TreatmentCourseDetailExpanded
-                    courseId={row.original.id}
-                    onEdit={(course) => setEditTarget(course)}
-                  />
-                ) : null
-        }
-        emptyState={
-          showDeleted ? (
-            <TableEmptyState
-              icon={Trash2}
-              title="Không có liệu trình đã xóa"
-              hint="Các liệu trình bị xóa sẽ hiển thị tại đây."
-            />
-          ) : (
-            <TableEmptyState
-              icon={History}
-              title="Chưa có liệu trình"
-              hint="Thêm liệu trình mới để bắt đầu quản lý."
-              action={
-                <PermissionGate
-                  resource={perm.resource}
-                  action={perm.create}
-                  role={perm.role}
-                >
-                  <Button
-                    variant="admin"
-                    size="sm"
-                    onClick={() => setCreateOpen(true)}
-                    className="mt-1 text-xs"
+            <PermissionGate
+              resource={perm.resource}
+              action={perm.read}
+              role={perm.role}
+            >
+              <Button
+                variant="secondary"
+                size="sm"
+                className="mb-0"
+                onClick={() => handleToggleView(clearSelection)}
+              >
+                {showDeleted ? (
+                  <>
+                    <ArrowLeft className="h-4 w-4" />
+                    Quay lại
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4" />
+                    Khôi phục
+                  </>
+                )}
+              </Button>
+            </PermissionGate>
+          </DataTableToolbar>
+        </div>
+
+        <DataTable
+          table={table}
+          isLoading={isLoading}
+          loadingRows={
+            pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
+          }
+          renderExpandedRow={
+            showDeleted
+              ? undefined
+              : ({ row }: { row: Row<TreatmentCourseDto> }) =>
+                  row.original.id ? (
+                    <TreatmentCourseDetailExpanded
+                      courseId={row.original.id}
+                      onEdit={(course) => setEditTarget(course)}
+                    />
+                  ) : null
+          }
+          emptyState={
+            showDeleted ? (
+              <TableEmptyState
+                icon={Trash2}
+                title="Không có liệu trình đã xóa"
+              />
+            ) : (
+              <TableEmptyState
+                icon={History}
+                title="Chưa có liệu trình"
+                action={
+                  <PermissionGate
+                    resource={perm.resource}
+                    action={perm.create}
+                    role={perm.role}
                   >
-                    <Plus className="w-3.5 h-3.5" />
-                    Thêm liệu trình
-                  </Button>
-                </PermissionGate>
-              }
-            />
-          )
-        }
-        pagination={
-          paged && totalCount > 0 ? (
-            <DataTablePagination
-              pageIndex={paged.pageIndex}
-              pageSize={paged.pageSize}
-              totalCount={paged.totalCount}
-              totalPages={paged.totalPages}
-              hasPreviousPage={paged.hasPreviousPage}
-              hasNextPage={paged.hasNextPage}
-              onPageChange={setPageIndex}
-              onPageSizeChange={handlePageSizeChange}
-            />
-          ) : null
-        }
-      />
+                    <Button
+                      variant="admin"
+                      size="sm"
+                      className="mb-0"
+                      onClick={() => setCreateOpen(true)}
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Thêm liệu trình
+                    </Button>
+                  </PermissionGate>
+                }
+              />
+            )
+          }
+          pagination={
+            paged && totalCount > 0 ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <div className="flex items-center gap-3 text-xs text-kit-muted">
+                  <span>
+                    {rangeStart}-{rangeEnd} / {totalCount}
+                  </span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) =>
+                      handlePageSizeChange(Number(e.target.value))
+                    }
+                    className="h-8 cursor-pointer rounded border border-kit bg-kit-white px-2 text-xs text-kit-heading outline-none focus:border-kit-primary"
+                  >
+                    {[5, 10, 20].map((size: number) => (
+                      <option key={size} value={size}>
+                        {size} / trang
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <Pagination
+                  page={safePage}
+                  pageCount={totalPages}
+                  onPageChange={setPageIndex}
+                  size="sm"
+                />
+              </div>
+            ) : null
+          }
+        />
+      </TablePageShell>
 
       <TreatmentCourseFormDialog
         open={createOpen}
@@ -352,9 +370,9 @@ export function TreatmentCourseListPage() {
         open={bulkDeleteOpen}
         onOpenChange={setBulkDeleteOpen}
         onConfirm={handleBulkDelete}
-        title={CONFIRM_MSG.bulkDeleteTitle(ENTITY)}
-        description={CONFIRM_MSG.bulkDeleteDescription(selectedCount, ENTITY)}
-        confirmLabel={COMMON_MSG.delete}
+        title={`Xóa ${ENTITY} đã chọn`}
+        description={`Bạn có chắc muốn xóa ${selectedCount} ${ENTITY} đã chọn?`}
+        confirmLabel="Xóa"
         loading={deleteMultiplesMutation.isPending}
         variant="danger"
       />
@@ -365,12 +383,9 @@ export function TreatmentCourseListPage() {
           if (!open) setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
-        title={CONFIRM_MSG.deleteTitle(ENTITY)}
-        description={CONFIRM_MSG.deleteDescription(
-          ENTITY,
-          deleteTarget?.name ?? "",
-        )}
-        confirmLabel={COMMON_MSG.delete}
+        title={`Xóa ${ENTITY}`}
+        description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget?.name ?? ""}"? Hành động này không thể hoàn tác.`}
+        confirmLabel="Xóa"
         loading={deleteMutation.isPending}
         variant="danger"
       />
@@ -381,15 +396,12 @@ export function TreatmentCourseListPage() {
           if (!open) setRestoreTarget(null);
         }}
         onConfirm={handleRestore}
-        title={CONFIRM_MSG.restoreTitle(ENTITY_SUBJECT)}
-        description={CONFIRM_MSG.restoreDescription(
-          ENTITY_SUBJECT,
-          restoreTarget?.name ?? "",
-        )}
-        confirmLabel={COMMON_MSG.restore}
+        title={`Khôi phục ${ENTITY_SUBJECT}`}
+        description={`Bạn có chắc muốn khôi phục ${ENTITY_SUBJECT} "${restoreTarget?.name ?? ""}"? ${ENTITY_SUBJECT} sẽ hiển thị lại trong danh sách chính.`}
+        confirmLabel="Khôi phục"
         loading={restoreMutation.isPending}
         variant="default"
       />
-    </TablePageShell>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, type FieldErrors, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Briefcase, KeyRound, Loader2, User } from "lucide-react";
@@ -11,7 +11,6 @@ import { ImageUpload } from "@/shared/forms/ImageUpload";
 import { Input } from "@/shared/forms/Input";
 import { SearchableSelect } from "@/shared/forms/SearchableSelect";
 import { Select } from "@/shared/forms/Select";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { parseToDateInput } from "@/shared/utils/date.utils";
 import {
@@ -523,7 +522,7 @@ export function StaffFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending || isUploading}
             >
-              {COMMON_MSG.cancel}
+              Hủy
             </Button>
             <Button
               type="submit"

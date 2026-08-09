@@ -1,4 +1,4 @@
-﻿import { useForm, type Resolver } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import {
   useCreateBookingRoom,
   useUpdateBookingRoom,
@@ -28,7 +28,6 @@ import { Select } from "@/shared/forms/Select";
 import { Switch } from "@/shared/forms/Switch";
 import { Textarea } from "@/shared/forms/Textarea";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 interface BookingRoomFormDialogProps {
   open: boolean;
@@ -224,7 +223,7 @@ export function BookingRoomFormDialog({
             onClick={() => onOpenChange(false)}
             disabled={isPending}
           >
-            {COMMON_MSG.cancel}
+            Hủy
           </Button>
           <Button
             type="submit"

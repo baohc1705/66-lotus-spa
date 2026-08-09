@@ -149,7 +149,7 @@ export function BookingContactStep() {
 
       if (result.success) {
         setCreatedBookingIds(result.bookingIds || []);
-        toast.success("Đặt lịch thành công! Cảm ơn bạn đã tin tưởng.");
+        toast.success("Đặt lịch thành công!");
         nextStep();
       } else if (lockedIds.length > 0) {
         await releaseSlotLockMutation(lockedIds).catch(() => undefined);

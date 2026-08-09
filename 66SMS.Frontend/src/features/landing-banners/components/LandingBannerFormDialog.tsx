@@ -12,7 +12,6 @@ import { ImageUpload } from "@/shared/forms/ImageUpload";
 import { Input } from "@/shared/forms/Input";
 import { Select } from "@/shared/forms/Select";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 import {
   useCreateLandingBannerMutation,
@@ -274,7 +273,7 @@ export function LandingBannerFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              {COMMON_MSG.cancel}
+              Hủy
             </Button>
             <Button
               type="submit"

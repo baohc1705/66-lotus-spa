@@ -84,7 +84,7 @@ export function WalletManagementPage() {
       },
       {
         accessorKey: "customerId",
-        header: "Mã KH",
+        header: "Mã khách",
         cell: ({ row }) => (
           <MutedSmallCell value={`#${row.original.customerId}`} />
         ),
@@ -185,7 +185,6 @@ export function WalletManagementPage() {
             <TableEmptyState
               icon={Wallet}
               title="Không tìm thấy dữ liệu ví"
-              hint="Hãy thử thay đổi từ khóa tìm kiếm khác."
             />
           }
         />

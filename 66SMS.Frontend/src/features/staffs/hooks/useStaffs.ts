@@ -2,8 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/shared/components/kitToast";
 import type { AxiosError } from "axios";
 import { staffApi } from "../api/staff.api";
-import { TOAST_MSG } from "@/shared/constants/toast.messages";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type { PageRequest, Result } from "@/shared/types/common.types";
 import type {
   CreateStaffPayload,
@@ -66,13 +64,13 @@ export function useCreateStaffMutation() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: STAFF_KEYS.all });
-        toast.success(TOAST_MSG.createSuccess(ENTITY));
+        toast.success(`Tạo ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
+      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi tạo ${ENTITY}`));
     },
   });
 }
@@ -90,14 +88,14 @@ export function useUpdateStaffMutation() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: STAFF_KEYS.all });
-        toast.success(TOAST_MSG.updateSuccess(ENTITY));
+        toast.success(`Cập nhật ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
       toast.error(
-        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+        getErrorMessage(error, `Có lỗi xảy ra khi cập nhật ${ENTITY}`),
       );
     },
   });
@@ -110,13 +108,13 @@ export function useDeleteStaffMutation() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: STAFF_KEYS.all });
-        toast.success(TOAST_MSG.deleteSuccess(ENTITY));
+        toast.success(`Xóa ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
+      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi xóa ${ENTITY}`));
     },
   });
 }
@@ -139,14 +137,14 @@ export function useCreateStaffServicesMutation() {
         qc.invalidateQueries({ queryKey: STAFF_SERVICE_KEYS.all });
         toast.success("Phân công dịch vụ thành công");
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
       toast.error(
         getErrorMessage(
           error,
-          TOAST_MSG.actionError("phân công", STAFF_SERVICE_ENTITY),
+          `Có lỗi xảy ra khi phân công ${STAFF_SERVICE_ENTITY}`,
         ),
       );
     },
@@ -166,16 +164,16 @@ export function useUpdateStaffServiceMutation() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: STAFF_SERVICE_KEYS.all });
-        toast.success(TOAST_MSG.updateSuccess(STAFF_SERVICE_ENTITY));
+        toast.success(`Cập nhật ${STAFF_SERVICE_ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
       toast.error(
         getErrorMessage(
           error,
-          TOAST_MSG.actionError("cập nhật", STAFF_SERVICE_ENTITY),
+          `Có lỗi xảy ra khi cập nhật ${STAFF_SERVICE_ENTITY}`,
         ),
       );
     },
@@ -191,14 +189,14 @@ export function useDeleteStaffServicesMutation() {
         qc.invalidateQueries({ queryKey: STAFF_SERVICE_KEYS.all });
         toast.success("Đã gỡ phân công dịch vụ");
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
       toast.error(
         getErrorMessage(
           error,
-          TOAST_MSG.actionError("gỡ", STAFF_SERVICE_ENTITY),
+          `Có lỗi xảy ra khi gỡ ${STAFF_SERVICE_ENTITY}`,
         ),
       );
     },

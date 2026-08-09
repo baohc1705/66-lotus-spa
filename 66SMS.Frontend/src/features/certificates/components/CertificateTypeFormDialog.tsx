@@ -10,7 +10,6 @@ import { FormSection } from "@/shared/forms/FormSection";
 import { Input } from "@/shared/forms/Input";
 import { Select } from "@/shared/forms/Select";
 import { Textarea } from "@/shared/forms/Textarea";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 import {
   useCreateCertificateType,
@@ -168,7 +167,7 @@ export function CertificateTypeFormDialog({ open, onOpenChange, item }: Props) {
             onClick={() => onOpenChange(false)}
             disabled={isPending}
           >
-            {COMMON_MSG.cancel}
+            Hủy
           </Button>
           <Button
             type="submit"

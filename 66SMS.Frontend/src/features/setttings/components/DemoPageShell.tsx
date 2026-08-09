@@ -6,7 +6,6 @@ type DemoSectionProps = {
   children: ReactNode;
 };
 
-/** Architect: .main-card.card > .card-body > h5.card-title */
 export function DemoSection(props: DemoSectionProps) {
   return (
     <div className="main-card mb-3 rounded bg-kit-white shadow-kit-card">
@@ -27,7 +26,6 @@ type DemoPageShellProps = {
   children: ReactNode;
 };
 
-/** Architect: .app-page-title (full-bleed under content) */
 export function DemoPageShell(props: DemoPageShellProps) {
   const Icon = props.icon ?? LayoutGrid;
 
@@ -61,7 +59,6 @@ export function DemoPageShell(props: DemoPageShellProps) {
   );
 }
 
-/** Architect .header-icon.icon-gradient — dung class gradient-* trong utilities */
 export function HeaderIcon(props: {
   gradient?:
     | "plum-plate"

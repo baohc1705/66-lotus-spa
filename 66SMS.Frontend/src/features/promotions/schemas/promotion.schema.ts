@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
 const emptyToUndefined = (v: unknown) =>
   v === "" || v === null || v === undefined ? undefined : v;
@@ -26,15 +25,15 @@ export const promotionSchema = z
   .object({
     code: z
       .string()
-      .min(1, VALIDATION_MSG.required("Mã khuyến mãi"))
-      .max(50, VALIDATION_MSG.max(50)),
+      .min(1, "Mã khuyến mãi không được để trống")
+      .max(50, "Tối đa 50 ký tự"),
     name: z
       .string()
-      .min(1, VALIDATION_MSG.required("Tên chương trình"))
-      .max(200, VALIDATION_MSG.max(200)),
+      .min(1, "Tên chương trình không được để trống")
+      .max(200, "Tối đa 200 ký tự"),
     description: z
       .string()
-      .max(500, VALIDATION_MSG.max(500))
+      .max(500, "Tối đa 500 ký tự")
       .optional()
       .or(z.literal("")),
     discountType: z.coerce.number().min(1).max(3),
@@ -44,8 +43,8 @@ export const promotionSchema = z
     buyQuantity: optionalNumber,
     getQuantity: optionalNumber,
     usageLimit: optionalUsageLimit,
-    startDate: z.string().min(1, VALIDATION_MSG.required("Ngày bắt đầu")),
-    endDate: z.string().min(1, VALIDATION_MSG.required("Ngày kết thúc")),
+    startDate: z.string().min(1, "Ngày bắt đầu không được để trống"),
+    endDate: z.string().min(1, "Ngày kết thúc không được để trống"),
     status: z.coerce.number().optional(),
   })
   .refine(

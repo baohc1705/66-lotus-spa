@@ -23,13 +23,9 @@ type ModalProps = {
   children: ReactNode;
   footer?: ReactNode;
   size?: ModalSize;
-  /** Body cuộn khi nội dung vượt max-height (mặc định bật) */
   scrollable?: boolean;
-  /** Ép cao gần bằng màn hình (form rất dài nếu cần) */
   fullHeight?: boolean;
-  /** Căn giữa theo chiều dọc */
   centered?: boolean;
-  /** Màu header / footer */
   tone?: ModalTone;
 };
 

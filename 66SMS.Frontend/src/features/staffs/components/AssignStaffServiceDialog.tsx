@@ -5,7 +5,6 @@ import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/elements/Button";
 import { FormSection } from "@/shared/forms/FormSection";
 import { Input } from "@/shared/forms/Input";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { formatCurrency } from "@/shared/utils/currency";
 import { useAdminServices } from "@/features/services/hooks/useServices";
 import type { ServiceListDto } from "@/features/services/types/service.types";
@@ -142,10 +141,6 @@ export function AssignStaffServiceDialog({
     );
   }
 
-  const subtitle = staff?.fullName
-    ? `Chọn dịch vụ cho nhân viên ${staff.fullName}${staff.code ? ` (${staff.code})` : ""}`
-    : "Chọn dịch vụ để phân công cho nhân viên";
-
   return (
     <Modal
       open={open}
@@ -154,8 +149,6 @@ export function AssignStaffServiceDialog({
       size="lg"
       scrollable
     >
-      <p className="mb-3 text-sm text-kit-muted">{subtitle}</p>
-
       <FormSection icon={Scissors} title="Chọn dịch vụ">
         <div className="mb-3 flex items-center gap-2">
           <div className="relative min-w-0 flex-1">
@@ -281,7 +274,7 @@ export function AssignStaffServiceDialog({
           onClick={handleClose}
           disabled={createMutation.isPending}
         >
-          {COMMON_MSG.cancel}
+          Hủy
         </Button>
         <Button
           type="button"

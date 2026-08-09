@@ -20,7 +20,6 @@ export type {
   ViewType,
 };
 
-/** calendarkit chi bat 24h khi locale.code === "fr"; van dung localize tieng Viet. */
 const VI_LOCALE: Locale = { ...vi, code: "fr" };
 
 const WEEKDAYS_VI = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
@@ -126,7 +125,6 @@ function localizeMiniCalendar(root: HTMLElement) {
   });
 }
 
-/** Hex giong --kit-* (blue-600, gray-500, ...) — calendarkit chi nhan hex/rgb, khong nhan var(). */
 const KIT_COLORS = {
   primary: "#2563eb",
   secondary: "#6b7280",

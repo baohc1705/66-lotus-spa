@@ -113,7 +113,6 @@ export function MembershipCardListPage() {
             <TableEmptyState
               icon={CreditCard}
               title="Chưa có thẻ thành viên"
-              hint="Thẻ sẽ tự động được tạo khi khách hàng mới được đăng ký."
             />
           }
           pagination={

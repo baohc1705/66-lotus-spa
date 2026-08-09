@@ -6,7 +6,6 @@ import { Button } from "@/shared/elements/Button";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Tooltip } from "@/shared/components/Tooltip";
 import { MutedCell, NameCell, TextCell } from "@/shared/tables/TableCells";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 import { CATEGORY_COLUMN_LABELS } from "./useActiveCategoryColumns";
 import { PRODUCT_CATEGORY_PERM } from "../constants/productCategory.permissions";
@@ -51,7 +50,7 @@ export function useDeletedCategoryColumns({
             action={perm.update}
             role={perm.role}
           >
-            <Tooltip text={COMMON_MSG.restore}>
+            <Tooltip text="Khôi phục">
               <Button
                 size="icon-sm"
                 variant="outline-success"

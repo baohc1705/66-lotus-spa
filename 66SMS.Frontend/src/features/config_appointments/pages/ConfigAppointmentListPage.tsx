@@ -12,8 +12,6 @@ import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
 import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
 import { TableEmptyState } from "@/shared/tables/TableEmptyState";
 import { TablePageShell } from "@/shared/tables/TablePageShell";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 
 import { ConfigAppointmentFormDialog } from "../components/ConfigAppointmentFormDialog";
@@ -135,7 +133,6 @@ export function ConfigAppointmentListPage() {
             <TableEmptyState
               icon={Settings}
               title="Chưa có cấu hình lịch hẹn"
-              hint="Thêm cấu hình phần trăm cọc và khung giờ cho từng chi nhánh."
               action={
                 <PermissionGate resource={perm.resource} action={perm.create}>
                   <Button
@@ -206,13 +203,10 @@ export function ConfigAppointmentListPage() {
           onOpenChange={(open) => {
             if (!open) setDeleteTarget(null);
           }}
-          title={CONFIRM_MSG.deleteTitle(ENTITY)}
-          description={CONFIRM_MSG.deleteDescription(
-            ENTITY,
-            deleteTarget.salonName ?? `#${deleteTarget.id}`,
-          )}
+          title={`Xóa ${ENTITY}`}
+          description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget.salonName ?? `#${deleteTarget.id}`}"? Hành động này không thể hoàn tác.`}
           onConfirm={handleDelete}
-          confirmLabel={COMMON_MSG.delete}
+          confirmLabel="Xóa"
           loading={deleteMutation.isPending}
           variant="danger"
         />

@@ -41,7 +41,6 @@ export function PayrollStatsMonthTable({
       <TableEmptyState
         icon={CalendarHeart}
         title="Chưa có lịch hẹn đã thanh toán"
-        hint="Không có hóa đơn paid trong tháng này."
       />
     );
   }

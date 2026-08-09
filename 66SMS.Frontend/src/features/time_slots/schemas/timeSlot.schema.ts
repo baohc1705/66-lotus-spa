@@ -1,12 +1,11 @@
 import { z } from "zod";
-import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
 const timeSlotBaseSchema = z
   .object({
     startTime: z
       .string()
-      .nonempty(VALIDATION_MSG.required("Thời gian bắt đầu")),
-    endTime: z.string().nonempty(VALIDATION_MSG.required("Thời gian kết thúc")),
+      .nonempty("Thời gian bắt đầu không được để trống"),
+    endTime: z.string().nonempty("Thời gian kết thúc không được để trống"),
   })
   .refine(
     (data) => {

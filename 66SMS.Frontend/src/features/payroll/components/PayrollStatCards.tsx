@@ -85,7 +85,7 @@ export function PayrollStatCards({
       <StatCard
         title="Hoa hồng kỳ"
         value={dash ?? formatCurrency(summary?.totalCommission ?? 0)}
-        description="Theo hóa đơn paid"
+        description="Theo hóa đơn đã thanh toán"
         tone="happy-green"
         valueTone="white"
       />

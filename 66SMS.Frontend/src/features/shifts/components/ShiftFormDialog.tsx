@@ -1,4 +1,4 @@
-﻿import { useEffect } from "react";
+import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Clock, Info } from "lucide-react";
@@ -9,7 +9,6 @@ import { FormField } from "@/shared/forms/FormField";
 import { FormSection } from "@/shared/forms/FormSection";
 import { Input } from "@/shared/forms/Input";
 import { Textarea } from "@/shared/forms/Textarea";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { formatDate } from "@/shared/utils/date.utils";
 
 import { useCreateShift, useUpdateShift } from "../hooks/useShifts";
@@ -237,7 +236,7 @@ export function ShiftFormDialog({
             onClick={() => onOpenChange(false)}
             disabled={isPending}
           >
-            {COMMON_MSG.cancel}
+            Hủy
           </Button>
           <Button
             type="submit"

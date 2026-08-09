@@ -15,11 +15,11 @@ export const TrustedByStrip = () => {
   return (
     <section
       id="trusted"
-      className="border-b border-warm-100 bg-rose-50/80 py-7 sm:py-8"
+      className="border-b border-warm-100 bg-rose-50/80 py-4 sm:py-5"
       aria-label="Đối tác tin tưởng"
     >
       <div className="landing-container">
-        <div className="mb-5 flex items-center gap-3">
+        <div className="mb-3 flex items-center gap-3">
           <span className="shrink-0 font-geist text-sm font-semibold uppercase tracking-[0.16em] text-gold-600">
             Được tin tưởng bởi
           </span>

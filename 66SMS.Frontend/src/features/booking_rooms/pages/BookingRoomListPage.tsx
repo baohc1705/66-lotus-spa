@@ -14,8 +14,6 @@ import { DataTable } from "@/shared/tables/DataTable";
 import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
 import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
 import { TablePageShell } from "@/shared/tables/TablePageShell";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 
 import { BookingRoomDetailExpanded } from "../components/BookingRoomDetailExpanded";
@@ -227,13 +225,10 @@ export function BookingRoomListPage() {
           onOpenChange={(open) => {
             if (!open) setDeleteTarget(null);
           }}
-          title={CONFIRM_MSG.deleteTitle(ENTITY)}
-          description={CONFIRM_MSG.deleteDescription(
-            ENTITY,
-            deleteTarget.name ?? "",
-          )}
+          title={`Xóa ${ENTITY}`}
+          description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget.name ?? ""}"? Hành động này không thể hoàn tác.`}
           onConfirm={handleDelete}
-          confirmLabel={COMMON_MSG.delete}
+          confirmLabel="Xóa"
           loading={deleteMutation.isPending}
         />
       )}

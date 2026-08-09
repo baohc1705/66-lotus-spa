@@ -116,91 +116,93 @@ export function CashierPage() {
   };
 
   return (
-    <div className="relative flex h-screen w-full flex-col overflow-hidden bg-kit-page font-sans text-sm text-kit-body">
+    <div className="relative flex h-screen w-full flex-col bg-kit-page font-sans text-sm text-kit-body">
       <CashierHeader activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {activeTab === "invoices" ? (
-        <CashierPOS
-          checkoutInvoice={pendingCheckoutInvoice}
-          onClearCheckoutInvoice={() => setPendingCheckoutInvoice(null)}
-        />
-      ) : (
-        <>
-          <div className="relative z-10 flex min-h-0 min-w-0 w-full flex-1 overflow-hidden p-2">
-            <CashierCalendar
-              date={currentDate}
-              viewMode={viewMode}
-              columns={calendarQuery.data?.columns ?? []}
-              bookings={calendarQuery.data?.bookings ?? []}
-              isLoading={calendarQuery.isLoading}
-              isError={calendarQuery.isError}
-              errorMessage={calendarQuery.error}
-              onDateChange={setCurrentDate}
-              onViewChange={setViewMode}
-              onBookingClick={handleBookingClick}
-              onEmptySlotClick={handleAddBooking}
-              onRetry={() => calendarQuery.refetch()}
-              onAddBooking={handleAddBooking}
-              onOpenStaffAvailability={() => setStaffAvailOpen(true)}
-              onOpenPositionAvailability={() => setPositionAvailOpen(true)}
+      <div className="relative z-10 flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-hidden">
+        {activeTab === "invoices" ? (
+          <CashierPOS
+            checkoutInvoice={pendingCheckoutInvoice}
+            onClearCheckoutInvoice={() => setPendingCheckoutInvoice(null)}
+          />
+        ) : (
+          <>
+            <div className="relative z-10 flex min-h-0 min-w-0 w-full flex-1 overflow-hidden p-2">
+              <CashierCalendar
+                date={currentDate}
+                viewMode={viewMode}
+                columns={calendarQuery.data?.columns ?? []}
+                bookings={calendarQuery.data?.bookings ?? []}
+                isLoading={calendarQuery.isLoading}
+                isError={calendarQuery.isError}
+                errorMessage={calendarQuery.error}
+                onDateChange={setCurrentDate}
+                onViewChange={setViewMode}
+                onBookingClick={handleBookingClick}
+                onEmptySlotClick={handleAddBooking}
+                onRetry={() => calendarQuery.refetch()}
+                onAddBooking={handleAddBooking}
+                onOpenStaffAvailability={() => setStaffAvailOpen(true)}
+                onOpenPositionAvailability={() => setPositionAvailOpen(true)}
+              />
+            </div>
+
+            <CashierInvoiceSidebar
+              booking={selectedBooking}
+              isOpen={isSidebarOpen}
+              onClose={() => {
+                setIsSidebarOpen(false);
+                setSelectedBooking(null);
+              }}
+              salonId={salonId}
+              isPaying={isPaying}
+              onPayInvoice={handlePayInvoice}
+              onAssignPosition={async (bookingId, positionId) => {
+                const res = await cashierApi.assignPosition(
+                  bookingId,
+                  positionId,
+                );
+                if (!res.isSuccess) {
+                  throw new Error(res.message || "Không thể gán vị trí");
+                }
+              }}
+              onAssignStaff={async (bookingId, staffId) => {
+                const res = await cashierApi.assignStaff(bookingId, staffId);
+                if (!res.isSuccess) {
+                  throw new Error(res.message || "Không thể đổi nhân viên");
+                }
+              }}
+              onStatusUpdated={async () => {
+                setIsSidebarOpen(false);
+                setSelectedBooking(null);
+                await calendarQuery.refetch();
+              }}
             />
-          </div>
 
-          <CashierInvoiceSidebar
-            booking={selectedBooking}
-            isOpen={isSidebarOpen}
-            onClose={() => {
-              setIsSidebarOpen(false);
-              setSelectedBooking(null);
-            }}
-            salonId={salonId}
-            isPaying={isPaying}
-            onPayInvoice={handlePayInvoice}
-            onAssignPosition={async (bookingId, positionId) => {
-              const res = await cashierApi.assignPosition(
-                bookingId,
-                positionId,
-              );
-              if (!res.isSuccess) {
-                throw new Error(res.message || "Không thể gán vị trí");
-              }
-            }}
-            onAssignStaff={async (bookingId, staffId) => {
-              const res = await cashierApi.assignStaff(bookingId, staffId);
-              if (!res.isSuccess) {
-                throw new Error(res.message || "Không thể đổi nhân viên");
-              }
-            }}
-            onStatusUpdated={async () => {
-              setIsSidebarOpen(false);
-              setSelectedBooking(null);
-              await calendarQuery.refetch();
-            }}
-          />
+            <CashierBookingModal
+              isOpen={isBookingModalOpen}
+              onClose={() => {
+                setIsBookingModalOpen(false);
+                calendarQuery.refetch();
+              }}
+            />
 
-          <CashierBookingModal
-            isOpen={isBookingModalOpen}
-            onClose={() => {
-              setIsBookingModalOpen(false);
-              calendarQuery.refetch();
-            }}
-          />
+            <StaffAvailabilityDialog
+              open={staffAvailOpen}
+              onOpenChange={setStaffAvailOpen}
+              currentDate={currentDate}
+              salonId={salonId}
+            />
 
-          <StaffAvailabilityDialog
-            open={staffAvailOpen}
-            onOpenChange={setStaffAvailOpen}
-            currentDate={currentDate}
-            salonId={salonId}
-          />
-
-          <PositionAvailabilityDialog
-            open={positionAvailOpen}
-            onOpenChange={setPositionAvailOpen}
-            currentDate={currentDate}
-            salonId={salonId}
-          />
-        </>
-      )}
+            <PositionAvailabilityDialog
+              open={positionAvailOpen}
+              onOpenChange={setPositionAvailOpen}
+              currentDate={currentDate}
+              salonId={salonId}
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 }

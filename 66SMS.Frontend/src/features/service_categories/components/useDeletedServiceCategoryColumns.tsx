@@ -1,4 +1,4 @@
-﻿import { useMemo } from "react";
+import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { RotateCcw } from "lucide-react";
 
@@ -6,7 +6,6 @@ import { Button } from "@/shared/elements/Button";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Tooltip } from "@/shared/components/Tooltip";
 import { MutedCell, NameCell, TextCell } from "@/shared/tables/TableCells";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 import { SERVICE_CATEGORY_COLUMN_LABELS } from "./useActiveServiceCategoryColumns";
 import { SERVICE_CATEGORY_PERM } from "../constants/serviceCategory.permissions";
@@ -87,7 +86,7 @@ export function useDeletedServiceCategoryColumns({
             action={perm.update}
             role={perm.role}
           >
-            <Tooltip text={COMMON_MSG.restore}>
+            <Tooltip text="Khôi phục">
               <Button
                 size="icon-sm"
                 variant="outline-success"

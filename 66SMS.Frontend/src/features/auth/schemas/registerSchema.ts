@@ -7,7 +7,7 @@ const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@
 
 export const registerSchema = z.object({
   fullName: z.string().min(1, 'Họ tên không được để trống').max(100, 'Tối đa 100 ký tự'),
-  phone: z.string().min(1, 'SĐT không được để trống').regex(VIETNAM_PHONE_REGEX, 'SĐT không hợp lệ'),
+  phone: z.string().min(1, 'Số điện thoại không được để trống').regex(VIETNAM_PHONE_REGEX, 'Số điện thoại không hợp lệ'),
   userName: z.string().min(1, 'Tên tài khoản không được để trống').max(50, 'Tối đa 50 ký tự')
     .regex(USERNAME_REGEX, 'Chỉ chấp nhận chữ, số và dấu gạch dưới'),
   email: z.string().min(1, 'Email không được để trống').max(100, 'Tối đa 100 ký tự')

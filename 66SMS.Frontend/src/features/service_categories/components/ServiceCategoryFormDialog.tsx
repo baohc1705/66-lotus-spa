@@ -1,4 +1,4 @@
-﻿import { useForm, type Resolver } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import {
   useCreateServiceCategory,
   useUpdateServiceCategory,
@@ -24,7 +24,6 @@ import { Switch } from "@/shared/forms/Switch";
 import { Textarea } from "@/shared/forms/Textarea";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { StatusActive } from "@/shared/constants/status.enum";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 interface ServiceCategoryFormDialogProps {
   open: boolean;
@@ -220,7 +219,7 @@ export function ServiceCategoryFormDialog({
             onClick={() => onOpenChange(false)}
             disabled={isPending || isUploading}
           >
-            {COMMON_MSG.cancel}
+            Hủy
           </Button>
           <Button
             type="submit"

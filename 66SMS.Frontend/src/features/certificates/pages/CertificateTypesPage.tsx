@@ -11,8 +11,6 @@ import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
 import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
 import { TableEmptyState } from "@/shared/tables/TableEmptyState";
 import { TablePageShell } from "@/shared/tables/TablePageShell";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 
 import { CertificateTypeFormDialog } from "../components/CertificateTypeFormDialog";
@@ -134,7 +132,6 @@ export function CertificateTypesPage() {
             <TableEmptyState
               icon={Award}
               title="Chưa có loại chứng chỉ"
-              hint="Thêm loại chứng chỉ để quản lý bằng cấp nhân viên."
               action={
                 <PermissionGate resource={perm.resource} action={perm.create}>
                   <Button
@@ -202,12 +199,9 @@ export function CertificateTypesPage() {
           if (!open) setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
-        title={CONFIRM_MSG.deleteTitle(ENTITY)}
-        description={CONFIRM_MSG.deleteDescription(
-          ENTITY,
-          deleteTarget?.name ?? "",
-        )}
-        confirmLabel={COMMON_MSG.delete}
+        title={`Xóa ${ENTITY}`}
+        description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget?.name ?? ""}"? Hành động này không thể hoàn tác.`}
+        confirmLabel="Xóa"
         loading={deleteMutation.isPending}
         variant="danger"
       />

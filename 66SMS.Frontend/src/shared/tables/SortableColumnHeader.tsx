@@ -6,7 +6,6 @@ type SortableColumnHeaderProps = {
   orderBy?: string;
   isDescending: boolean;
   onSort: (column: string) => void;
-  /** Giữ prop cũ; màu chữ luôn inherit từ th (header primary = trắng) */
   onPrimary?: boolean;
 };
 

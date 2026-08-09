@@ -461,9 +461,6 @@ export function AttendanceDailyDialog(props: AttendanceDailyDialogProps) {
           <p className="font-semibold">
             Bạn chưa ghi nhận bắt đầu ca làm việc (Check-in).
           </p>
-          <p className="mt-1 text-xs opacity-80">
-            Bấm nút &quot;Check-in&quot; ở dưới để bắt đầu ca làm việc của bạn.
-          </p>
         </Alert>
       );
     } else if (!attendance.checkOutAt) {
@@ -475,9 +472,6 @@ export function AttendanceDailyDialog(props: AttendanceDailyDialogProps) {
             <span className="font-bold">
               {toLocalTimeOnly(attendance.checkInAt)}
             </span>
-          </p>
-          <p className="mt-1 text-xs opacity-85">
-            Bấm nút &quot;Check-out&quot; ở dưới để kết thúc ca làm việc.
           </p>
         </Alert>
       );

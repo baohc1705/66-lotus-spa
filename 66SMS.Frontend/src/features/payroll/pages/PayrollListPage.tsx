@@ -102,7 +102,7 @@ export function PayrollListPage() {
         .filter((staff: StaffDto) => staff.id != null)
         .map((staff: StaffDto) => ({
           value: String(staff.id),
-          label: staff.fullName ?? `NV #${staff.id}`,
+          label: staff.fullName ?? `Nhân viên #${staff.id}`,
         })),
     [staffs],
   );
@@ -378,7 +378,6 @@ export function PayrollListPage() {
             <TableEmptyState
               icon={Wallet}
               title="Chưa có bảng lương"
-              hint="Bấm Tính lương để tạo bảng lương cho nhân viên."
               action={
                 <Button
                   variant="primary"

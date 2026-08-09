@@ -16,7 +16,7 @@ import {
   registerSchema,
   type RegisterFormData,
 } from "@/features/auth/schemas/registerSchema";
-import { Input } from "@/shared/components/ui/input";
+import { Input } from "@/shared/forms/Input";
 import { toast } from "@/shared/components/kitToast";
 import { useRegister } from "@/features/auth/hooks/useRegister";
 import { useSendOtp } from "@/features/auth/hooks/useSendOtp";

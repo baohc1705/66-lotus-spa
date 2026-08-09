@@ -1,4 +1,4 @@
-﻿import { useEffect } from "react";
+import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -8,7 +8,6 @@ import { FormField } from "@/shared/forms/FormField";
 import { Input } from "@/shared/forms/Input";
 import { Select } from "@/shared/forms/Select";
 import { Textarea } from "@/shared/forms/Textarea";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 import {
   useCreateMembershipTier,
@@ -191,7 +190,7 @@ export function MembershipTierFormDialog({
             onClick={() => onOpenChange(false)}
             disabled={isPending}
           >
-            {COMMON_MSG.cancel}
+            Hủy
           </Button>
           <Button
             type="submit"

@@ -50,5 +50,4 @@ export const kitToast = {
   info: (message: string, title?: string) => push(message, "info", title),
 };
 
-/** Alias thay `import { toast } from "sonner"` */
 export const toast = kitToast;

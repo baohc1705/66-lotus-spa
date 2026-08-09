@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { User, ShoppingBag } from "lucide-react";
@@ -13,7 +13,6 @@ import { Textarea } from "@/shared/forms/Textarea";
 import { ImageUpload } from "@/shared/forms/ImageUpload";
 import { SearchableSelect } from "@/shared/forms/SearchableSelect";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { parseToDateInput } from "@/shared/utils/date.utils";
 import axiosInstance from "@/shared/api/axiosInstance";
 
@@ -334,7 +333,7 @@ export function CustomerFormDialog({
             onClick={() => onOpenChange(false)}
             disabled={isPending}
           >
-            {COMMON_MSG.cancel}
+            Hủy
           </Button>
           <Button
             type="submit"

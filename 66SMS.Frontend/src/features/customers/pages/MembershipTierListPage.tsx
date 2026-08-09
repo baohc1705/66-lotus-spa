@@ -16,8 +16,6 @@ import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
 import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
 import { TableEmptyState } from "@/shared/tables/TableEmptyState";
 import { TablePageShell } from "@/shared/tables/TablePageShell";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 
 import { MembershipTierDetailExpanded } from "../components/MembershipTierDetailExpanded";
@@ -152,7 +150,6 @@ export function MembershipTierListPage() {
             <TableEmptyState
               icon={Crown}
               title="Chưa có loại thẻ"
-              hint="Thêm loại thẻ thành viên để phân hạng khách hàng."
               action={
                 <PermissionGate resource={perm.resource} action={perm.create}>
                   <Button
@@ -223,13 +220,9 @@ export function MembershipTierListPage() {
             if (!open) setDeleteTarget(null);
           }}
           onConfirm={handleDelete}
-          title={CONFIRM_MSG.deleteTitle(ENTITY)}
-          description={CONFIRM_MSG.deleteDescription(
-            ENTITY,
-            deleteTarget?.name ?? "",
-            "Các khách hàng đang thuộc hạng thẻ này có thể bị ảnh hưởng.",
-          )}
-          confirmLabel={COMMON_MSG.delete}
+          title={`Xóa ${ENTITY}`}
+          description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget?.name ?? ""}"? Các khách hàng đang thuộc hạng thẻ này có thể bị ảnh hưởng. Hành động này không thể hoàn tác.`}
+          confirmLabel="Xóa"
           loading={deleteMutation.isPending}
           variant="danger"
         />

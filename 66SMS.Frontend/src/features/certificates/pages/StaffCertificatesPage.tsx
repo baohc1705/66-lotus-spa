@@ -17,8 +17,6 @@ import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
 import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
 import { TableEmptyState } from "@/shared/tables/TableEmptyState";
 import { TablePageShell } from "@/shared/tables/TablePageShell";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 
 import { CertificateTypeSidebar } from "../components/CertificateTypeSidebar";
@@ -229,7 +227,6 @@ export function StaffCertificatesPage({ staffId }: Props) {
                 <TableEmptyState
                   icon={ShieldCheck}
                   title="Chưa có chứng chỉ"
-                  hint="Thêm chứng chỉ để quản lý bằng cấp nhân viên."
                   action={
                     <PermissionGate
                       resource={perm.resource}
@@ -304,12 +301,9 @@ export function StaffCertificatesPage({ staffId }: Props) {
           if (!open) setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
-        title={CONFIRM_MSG.deleteTitle(ENTITY)}
-        description={CONFIRM_MSG.deleteDescription(
-          ENTITY,
-          deleteTarget?.certificateName ?? "",
-        )}
-        confirmLabel={COMMON_MSG.delete}
+        title={`Xóa ${ENTITY}`}
+        description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget?.certificateName ?? ""}"? Hành động này không thể hoàn tác.`}
+        confirmLabel="Xóa"
         loading={deleteMutation.isPending}
         variant="danger"
       />

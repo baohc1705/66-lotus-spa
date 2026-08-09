@@ -1,12 +1,11 @@
 import { z } from "zod";
-import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 import { SERVICE_DURATION_OPTIONS } from "../constants/service.durations";
 
 export const serviceProductSchema = z.object({
   id: z.number().optional(),
   productId: z.coerce
     .number()
-    .min(1, VALIDATION_MSG.selectRequired("sản phẩm")),
+    .min(1, "Vui lòng chọn sản phẩm"),
   quantityUsed: z.coerce.number().min(1, "Số lượng phải lớn hơn 0"),
   note: z.string().optional(),
   unitCost: z.coerce.number().optional(),
@@ -17,35 +16,35 @@ const durationValues = [...SERVICE_DURATION_OPTIONS] as number[];
 const serviceBaseSchema = z.object({
   categoryId: z.coerce
     .number()
-    .min(1, VALIDATION_MSG.selectRequired("nhóm dịch vụ")),
-  code: z.string().max(50, VALIDATION_MSG.max(50)).optional().or(z.literal("")),
+    .min(1, "Vui lòng chọn nhóm dịch vụ"),
+  code: z.string().max(50, "Tối đa 50 ký tự").optional().or(z.literal("")),
   name: z
     .string()
-    .nonempty(VALIDATION_MSG.required("Tên dịch vụ"))
-    .max(100, VALIDATION_MSG.max(100)),
+    .nonempty("Tên dịch vụ không được để trống")
+    .max(100, "Tối đa 100 ký tự"),
   description: z
     .string()
-    .max(500, VALIDATION_MSG.max(500))
+    .max(500, "Tối đa 500 ký tự")
     .optional()
     .or(z.literal("")),
   content: z.string().optional().or(z.literal("")),
   durationMins: z.coerce
     .number()
     .refine((v) => durationValues.includes(v), "Chọn thời gian hợp lệ"),
-  costPrice: z.coerce.number().min(0, VALIDATION_MSG.notNegative("Giá cơ bản")),
+  costPrice: z.coerce.number().min(0, "Giá cơ bản không được âm"),
   minSellingPrice: z.coerce
     .number()
-    .min(0, VALIDATION_MSG.notNegative("Giá bán tối thiểu"))
+    .min(0, "Giá bán tối thiểu không được âm")
     .optional(),
   sellingPrice: z.coerce
     .number()
-    .min(0, VALIDATION_MSG.notNegative("Giá bán")),
+    .min(0, "Giá bán không được âm"),
   commissionRate: z.coerce
     .number()
-    .min(0, VALIDATION_MSG.min(0))
+    .min(0, "Phải lớn hơn hoặc bằng 0")
     .max(100, "Tỷ lệ hoa hồng từ 0-100")
     .optional(),
-  sortOrder: z.coerce.number().min(0, VALIDATION_MSG.min(0)).optional(),
+  sortOrder: z.coerce.number().min(0, "Phải lớn hơn hoặc bằng 0").optional(),
   status: z.coerce.number().optional(),
   imageUrl: z.string().optional().or(z.literal("")),
   serviceProducts: z.array(serviceProductSchema).optional(),
@@ -54,7 +53,7 @@ const serviceBaseSchema = z.object({
 export const serviceFormSchema = serviceBaseSchema.extend({
   desiredProfitPercent: z.coerce
     .number()
-    .min(0, VALIDATION_MSG.notNegative("% lãi mong muốn"))
+    .min(0, "% lãi mong muốn không được âm")
     .default(20),
 });
 

@@ -39,7 +39,7 @@ export function BookingSuccessTicket() {
         {isLoading && createdBookingIds.length > 0 ? (
           <div className="mb-6 flex items-center justify-center gap-2 text-sm text-warm-600">
             <Loader2 className="h-4 w-4 animate-spin" />
-            Đang tải thông tin lịch hẹn...
+            Đang tải lịch hẹn...
           </div>
         ) : createdBookings.length > 0 ? (
           <div className="mb-6 flex flex-col gap-3">

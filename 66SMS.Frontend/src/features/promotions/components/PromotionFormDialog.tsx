@@ -1,4 +1,4 @@
-﻿import { useEffect } from "react";
+import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Tag } from "lucide-react";
@@ -10,7 +10,6 @@ import { FormRow } from "@/shared/forms/FormRow";
 import { FormSection } from "@/shared/forms/FormSection";
 import { Input } from "@/shared/forms/Input";
 import { Select } from "@/shared/forms/Select";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import {
   localDateTimeToUtc,
   toDatetimeLocalInput,
@@ -337,7 +336,7 @@ export function PromotionFormDialog({
             onClick={() => onOpenChange(false)}
             disabled={isPending}
           >
-            {COMMON_MSG.cancel}
+            Hủy
           </Button>
           <Button
             type="submit"

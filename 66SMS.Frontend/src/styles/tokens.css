@@ -173,7 +173,7 @@
 }
 
 .landing-section {
-  --section-pad-y: clamp(2.5rem, 5vw, 3.75rem);
+  --section-pad-y: clamp(1.75rem, 3.5vw, 2.5rem);
   padding-top: var(--section-pad-y);
   padding-bottom: var(--section-pad-y);
 }
@@ -182,7 +182,7 @@
   width: 100%;
   max-width: 80rem;
   margin-inline: auto;
-  padding-inline: clamp(1rem, 3vw, 2rem);
+  padding-inline: clamp(1rem, 2.5vw, 1.5rem);
 }
 
 .lotus-panel {

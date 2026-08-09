@@ -155,7 +155,7 @@ export function PayrollStatsPage() {
         .filter((staff: StaffDto) => staff.id != null)
         .map((staff: StaffDto) => ({
           value: String(staff.id),
-          label: staff.fullName ?? `NV #${staff.id}`,
+          label: staff.fullName ?? `Nhân viên #${staff.id}`,
         })),
     [staffOptions],
   );
@@ -173,7 +173,6 @@ export function PayrollStatsPage() {
         <TableEmptyState
           icon={UserRound}
           title="Chưa gắn hồ sơ nhân viên"
-          hint="Tài khoản chưa liên kết staff nên không xem được thống kê lương."
         />
       </div>
     );
@@ -209,7 +208,6 @@ export function PayrollStatsPage() {
               <TableEmptyState
                 icon={UserRound}
                 title="Chưa chọn nhân viên"
-                hint="Chọn nhân viên để xem thống kê lương và hoa hồng."
               />
             </div>
           ) : isLoading ? (
@@ -221,7 +219,6 @@ export function PayrollStatsPage() {
               <TableEmptyState
                 icon={RefreshCw}
                 title="Không tải được thống kê"
-                hint="Thử tải lại hoặc kiểm tra kết nối API."
                 action={
                   <Button
                     variant="primary"
@@ -240,7 +237,6 @@ export function PayrollStatsPage() {
               <TableEmptyState
                 icon={CalendarHeart}
                 title="Chưa có lịch hẹn đã thanh toán"
-                hint="Không có hóa đơn paid trong tháng này."
               />
             </div>
           ) : viewMode !== "month" && appointments.length === 0 ? (
@@ -248,7 +244,6 @@ export function PayrollStatsPage() {
               <TableEmptyState
                 icon={CalendarHeart}
                 title="Chưa có lịch hẹn đã thanh toán"
-                hint="Kỳ này chưa có hóa đơn paid gắn hoa hồng cho nhân viên."
               />
             </div>
           ) : viewMode === "day" ? (

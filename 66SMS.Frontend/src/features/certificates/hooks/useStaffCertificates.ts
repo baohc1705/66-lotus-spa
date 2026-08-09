@@ -8,8 +8,6 @@ import type {
   UpdateStaffCertificatePayload,
 } from "../types/certificate.types";
 import type { Result } from "@/shared/types/common.types";
-import { TOAST_MSG } from "@/shared/constants/toast.messages";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 
 const ENTITY = "chứng chỉ";
@@ -46,13 +44,13 @@ export function useCreateStaffCertificate() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: STAFF_CERTIFICATE_KEYS.lists() });
-        toast.success(TOAST_MSG.createSuccess(ENTITY));
+        toast.success(`Tạo ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
+      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi tạo ${ENTITY}`));
     },
   });
 }
@@ -70,14 +68,14 @@ export function useUpdateStaffCertificate() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: STAFF_CERTIFICATE_KEYS.all });
-        toast.success(TOAST_MSG.updateSuccess(ENTITY));
+        toast.success(`Cập nhật ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
       toast.error(
-        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+        getErrorMessage(error, `Có lỗi xảy ra khi cập nhật ${ENTITY}`),
       );
     },
   });
@@ -90,13 +88,13 @@ export function useDeleteStaffCertificate() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: STAFF_CERTIFICATE_KEYS.all });
-        toast.success(TOAST_MSG.deleteSuccess(ENTITY));
+        toast.success(`Xóa ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
+      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi xóa ${ENTITY}`));
     },
   });
 }

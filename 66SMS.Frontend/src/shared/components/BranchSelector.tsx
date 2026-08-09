@@ -1,28 +1,18 @@
-import { useMemo, useEffect } from "react";
-import { MapPin } from "lucide-react";
+import { useEffect } from "react";
+import { ChevronDown, MapPin } from "lucide-react";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
 import { useQuery } from "@tanstack/react-query";
 import { staffSalonApi } from "@/features/staff_salons/api/staff-salon.api";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/components/ui/select";
+import { Dropdown, type DropdownItem } from "@/shared/elements/Dropdown";
 
 type BranchSelectorProps = {
   variant?: "dark" | "light";
 };
 
-const triggerClassByVariant = {
-  dark:
-    "h-8 w-full rounded border border-white/25 bg-transparent px-3 py-1 text-xs text-white " +
-    "hover:bg-transparent focus:bg-transparent focus:ring-0 data-[state=open]:bg-transparent",
-  light:
-    "h-9 w-full rounded-md border border-kit bg-kit-page px-3 py-1 text-xs text-kit-heading " +
-    "hover:bg-white focus:bg-white focus:ring-0 data-[state=open]:bg-white",
+type SalonOption = {
+  id: number;
+  name: string;
 };
 
 const loadingClassByVariant = {
@@ -40,6 +30,61 @@ const singleClassByVariant = {
   light: "border-kit text-kit-heading bg-kit-page",
 };
 
+function getAssignedSalons(
+  isAdmin: boolean,
+  staffSalonsResult: { data?: { items?: Array<{ salonId?: number | null; salonName?: string | null }> } } | undefined,
+  managedSalonId: number | null,
+  managedSalonName: string | undefined,
+): SalonOption[] {
+  if (isAdmin) return [];
+
+  const list: SalonOption[] = [];
+  const seenIds = new Set<number>();
+  const items = staffSalonsResult?.data?.items ?? [];
+
+  for (let index = 0; index < items.length; index++) {
+    const item = items[index];
+    if (item.salonId === undefined || item.salonId === null) continue;
+    if (seenIds.has(item.salonId)) continue;
+    seenIds.add(item.salonId);
+    list.push({
+      id: item.salonId,
+      name: item.salonName || "Chi nhánh #" + item.salonId,
+    });
+  }
+
+  if (list.length === 0 && managedSalonId) {
+    list.push({
+      id: managedSalonId,
+      name: managedSalonName || "Chi nhánh quản lý",
+    });
+  }
+
+  return list;
+}
+
+function findSalonName(salons: SalonOption[], salonId: number | null): string | null {
+  if (salonId === null) return null;
+  for (let index = 0; index < salons.length; index++) {
+    if (salons[index].id === salonId) return salons[index].name;
+  }
+  return null;
+}
+
+function BranchDropdownTrigger({ label }: { label: string }) {
+  return (
+    <span className="inline-flex min-w-0 max-w-full items-center gap-1">
+      <span className="min-w-0 truncate whitespace-nowrap">{label}</span>
+      <ChevronDown className="size-3.5 shrink-0 opacity-80" />
+    </span>
+  );
+}
+
+const dropdownClassName =
+  "mb-0! mr-0! block w-full min-w-0 max-w-full " +
+  "[&>button]:flex [&>button]:w-full [&>button]:max-w-full " +
+  "[&>button]:min-w-0 [&>button]:justify-between [&>button]:overflow-hidden";
+
 export function BranchSelector({ variant = "dark" }: BranchSelectorProps) {
   const {
     user,
@@ -50,9 +95,10 @@ export function BranchSelector({ variant = "dark" }: BranchSelectorProps) {
     mySalon,
   } = useAuthStore();
   const isAdmin = hasRole("Admin");
-  const triggerClass = triggerClassByVariant[variant];
+  const dropdownVariant = variant === "dark" ? "outline-light" : "outline-secondary";
 
-  const { data: allSalons = [], isLoading: isLoadingAllSalons } = useActiveSalons();
+  const { data: allSalons = [], isLoading: isLoadingAllSalons } =
+    useActiveSalons();
 
   const staffId = user?.staffInfo?.id;
   const { data: staffSalonsResult, isLoading: isLoadingStaffSalons } = useQuery({
@@ -67,33 +113,12 @@ export function BranchSelector({ variant = "dark" }: BranchSelectorProps) {
     enabled: !isAdmin && !!staffId,
   });
 
-  const assignedSalons = useMemo(() => {
-    if (isAdmin) return [];
-
-    const list: Array<{ id: number; name: string }> = [];
-    const seenIds = new Set<number>();
-
-    (staffSalonsResult?.data?.items ?? []).forEach((item) => {
-      if (item.salonId !== undefined && item.salonId !== null) {
-        if (!seenIds.has(item.salonId)) {
-          seenIds.add(item.salonId);
-          list.push({
-            id: item.salonId,
-            name: item.salonName || `Chi nhánh #${item.salonId}`,
-          });
-        }
-      }
-    });
-
-    if (list.length === 0 && managedSalonId) {
-      list.push({
-        id: managedSalonId,
-        name: mySalon?.salonName || "Chi nhánh quản lý",
-      });
-    }
-
-    return list;
-  }, [isAdmin, staffSalonsResult, managedSalonId, mySalon?.salonName]);
+  const assignedSalons = getAssignedSalons(
+    isAdmin,
+    staffSalonsResult,
+    managedSalonId,
+    mySalon?.salonName,
+  );
 
   useEffect(() => {
     if (isAdmin) return;
@@ -103,17 +128,33 @@ export function BranchSelector({ variant = "dark" }: BranchSelectorProps) {
       if (selectedSalonId !== singleSalonId) {
         setSelectedSalonId(singleSalonId);
       }
-    } else if (assignedSalons.length > 1) {
-      const isSelectedValid = assignedSalons.some((s) => s.id === selectedSalonId);
+      return;
+    }
+
+    if (assignedSalons.length > 1) {
+      let isSelectedValid = false;
+      for (let index = 0; index < assignedSalons.length; index++) {
+        if (assignedSalons[index].id === selectedSalonId) {
+          isSelectedValid = true;
+          break;
+        }
+      }
       if (!isSelectedValid) {
         setSelectedSalonId(assignedSalons[0].id);
       }
-    } else if (managedSalonId) {
-      if (selectedSalonId !== managedSalonId) {
-        setSelectedSalonId(managedSalonId);
-      }
+      return;
     }
-  }, [isAdmin, assignedSalons, selectedSalonId, setSelectedSalonId, managedSalonId]);
+
+    if (managedSalonId && selectedSalonId !== managedSalonId) {
+      setSelectedSalonId(managedSalonId);
+    }
+  }, [
+    isAdmin,
+    assignedSalons,
+    selectedSalonId,
+    setSelectedSalonId,
+    managedSalonId,
+  ]);
 
   const isLoading = isAdmin ? isLoadingAllSalons : isLoadingStaffSalons;
 
@@ -132,33 +173,45 @@ export function BranchSelector({ variant = "dark" }: BranchSelectorProps) {
   }
 
   if (isAdmin) {
-    const value = selectedSalonId !== null ? selectedSalonId.toString() : "all";
+    const adminOptions: SalonOption[] = [];
+    for (let index = 0; index < allSalons.length; index++) {
+      const salon = allSalons[index];
+      if (salon.id === undefined || salon.id === null) continue;
+      adminOptions.push({
+        id: salon.id,
+        name: salon.name || "Chi nhánh #" + salon.id,
+      });
+    }
+
+    const selectedName =
+      findSalonName(adminOptions, selectedSalonId) ?? "Tất cả chi nhánh";
+
+    const items: DropdownItem[] = [
+      {
+        type: "item",
+        label: "Tất cả chi nhánh",
+        onClick: () => setSelectedSalonId(null),
+      },
+    ];
+
+    for (let index = 0; index < adminOptions.length; index++) {
+      const salon = adminOptions[index];
+      items.push({
+        type: "item",
+        label: salon.name,
+        onClick: () => setSelectedSalonId(salon.id),
+      });
+    }
 
     return (
-      <Select
-        value={value}
-        onValueChange={(val: string) => {
-          if (val === "all") setSelectedSalonId(null);
-          else setSelectedSalonId(parseInt(val, 10));
-        }}
-      >
-        <SelectTrigger className={triggerClass}>
-          <div className="flex items-center gap-1.5 truncate">
-            <MapPin className="size-3.5 shrink-0 opacity-80" />
-            <SelectValue placeholder="Chọn chi nhánh" />
-          </div>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all" className="text-xs">
-            Tất cả chi nhánh
-          </SelectItem>
-          {allSalons.map((salon) => (
-            <SelectItem key={salon.id} value={salon.id?.toString() ?? ""} className="text-xs">
-              {salon.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <Dropdown
+        className={dropdownClassName}
+        variant={dropdownVariant}
+        size="sm"
+        label={selectedName}
+        trigger={<BranchDropdownTrigger label={selectedName} />}
+        items={items}
+      />
     );
   }
 
@@ -190,26 +243,27 @@ export function BranchSelector({ variant = "dark" }: BranchSelectorProps) {
     );
   }
 
-  const value = selectedSalonId !== null ? selectedSalonId.toString() : "";
+  const selectedName =
+    findSalonName(assignedSalons, selectedSalonId) ?? assignedSalons[0].name;
+
+  const items: DropdownItem[] = [];
+  for (let index = 0; index < assignedSalons.length; index++) {
+    const salon = assignedSalons[index];
+    items.push({
+      type: "item",
+      label: salon.name,
+      onClick: () => setSelectedSalonId(salon.id),
+    });
+  }
 
   return (
-    <Select
-      value={value}
-      onValueChange={(val: string) => setSelectedSalonId(parseInt(val, 10))}
-    >
-      <SelectTrigger className={triggerClass}>
-        <div className="flex items-center gap-1.5 truncate">
-          <MapPin className="size-3.5 shrink-0 opacity-80" />
-          <SelectValue placeholder="Chọn chi nhánh" />
-        </div>
-      </SelectTrigger>
-      <SelectContent>
-        {assignedSalons.map((salon) => (
-          <SelectItem key={salon.id} value={salon.id.toString()} className="text-xs">
-            {salon.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <Dropdown
+      className={dropdownClassName}
+      variant={dropdownVariant}
+      size="sm"
+      label={selectedName}
+      trigger={<BranchDropdownTrigger label={selectedName} />}
+      items={items}
+    />
   );
 }

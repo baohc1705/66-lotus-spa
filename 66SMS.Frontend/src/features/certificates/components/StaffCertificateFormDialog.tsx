@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ShieldCheck } from "lucide-react";
@@ -11,7 +11,6 @@ import { ImageUpload } from "@/shared/forms/ImageUpload";
 import { Input } from "@/shared/forms/Input";
 import { Select } from "@/shared/forms/Select";
 import { Textarea } from "@/shared/forms/Textarea";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { parseToDateInput } from "@/shared/utils/date.utils";
 import type { StaffDto } from "@/features/staffs/types/staff.types";
@@ -324,7 +323,7 @@ export function StaffCertificateFormDialog({
             onClick={() => onOpenChange(false)}
             disabled={isPending || isUploading}
           >
-            {COMMON_MSG.cancel}
+            Hủy
           </Button>
           <Button
             type="submit"

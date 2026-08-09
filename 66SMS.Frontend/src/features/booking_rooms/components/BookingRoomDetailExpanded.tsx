@@ -136,7 +136,7 @@ export function BookingRoomDetailExpanded({
         </>
       ) : positions.length === 0 ? (
         <p className="py-6 text-center text-sm text-kit-muted">
-          Chưa có vị trí nào được thiết lập trong phòng này
+          Chưa có vị trí
         </p>
       ) : (
         <div className="overflow-x-auto rounded border border-kit bg-kit-white">

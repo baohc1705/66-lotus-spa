@@ -44,7 +44,6 @@ export function SettingsSidebar(props: SettingsSidebarProps) {
   }, [pathname]);
 
   function toggleMenu(label: string) {
-    // Architect metisMenu: only one parent open; click again closes it
     setOpenLabel((prev) => (prev === label ? null : label));
   }
 

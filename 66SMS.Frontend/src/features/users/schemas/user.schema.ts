@@ -1,23 +1,22 @@
 import { z } from "zod";
-import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
 export const createSchema = z
   .object({
     userName: z
       .string()
-      .min(1, VALIDATION_MSG.required("Tên tài khoản"))
+      .min(1, "Tên tài khoản không được để trống")
       .min(3, "Tối thiểu 3 ký tự"),
     email: z
       .string()
-      .min(1, VALIDATION_MSG.required("Email"))
+      .min(1, "Email không được để trống")
       .email("Email không hợp lệ"),
     password: z
       .string()
-      .min(1, VALIDATION_MSG.required("Mật khẩu"))
+      .min(1, "Mật khẩu không được để trống")
       .min(6, "Tối thiểu 6 ký tự"),
     confirmPassword: z
       .string()
-      .min(1, VALIDATION_MSG.required("Xác nhận mật khẩu")),
+      .min(1, "Xác nhận mật khẩu không được để trống"),
     role: z.string().optional(),
   })
   .refine((d) => d.password === d.confirmPassword, {

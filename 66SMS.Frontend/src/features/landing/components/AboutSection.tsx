@@ -8,22 +8,22 @@ const SLIDES = [
   {
     subtitle: "Đơn vị tiên phong về dịch vụ Spa",
     description:
-      "Hoa Sen Spa mang đến không gian thư giãn chuẩn 5 sao với liệu trình chăm sóc từ thiên nhiên. Đội ngũ kỹ thuật viên giàu kinh nghiệm, sản phẩm cao cấp và dịch vụ tận tâm giúp bạn tái tạo năng lượng mỗi ngày.",
+      "Hoa Sen Spa mang không gian thư giãn với liệu trình từ thiên nhiên, kỹ thuật viên giàu kinh nghiệm và dịch vụ tận tâm.",
   },
   {
     subtitle: "Liệu trình từ sen Đồng Tháp",
     description:
-      "Chúng tôi chọn nguyên liệu sen tự nhiên, kết hợp kỹ thuật trị liệu nhẹ nhàng để mang lại cảm giác thư thái sâu — từ làn da đến tinh thần.",
+      "Nguyên liệu sen tự nhiên kết hợp trị liệu nhẹ nhàng, mang lại cảm giác thư thái từ làn da đến tinh thần.",
   },
   {
     subtitle: "Không gian chuẩn thư giãn",
     description:
-      "Mỗi phòng được thiết kế ấm áp, riêng tư với hương thơm dịu và ánh sáng mềm, giúp bạn tạm gác lại nhịp sống hối hả và trở về với chính mình.",
+      "Phòng ấm áp, riêng tư với hương thơm dịu và ánh sáng mềm, giúp bạn tạm gác nhịp sống hối hả.",
   },
   {
     subtitle: "Đội ngũ kỹ thuật viên tâm huyết",
     description:
-      "Kỹ thuật viên được đào tạo bài bản, lắng nghe nhu cầu của bạn để cá nhân hóa liệu trình — chăm sóc đúng chỗ, đúng lúc, đúng người.",
+      "Kỹ thuật viên được đào tạo bài bản, lắng nghe nhu cầu để cá nhân hóa liệu trình cho bạn.",
   },
 ];
 
@@ -41,7 +41,7 @@ export const AboutSection = () => {
     >
       <div className="grid w-full lg:grid-cols-2">
         <motion.div
-          className="relative flex min-h-[420px] flex-col justify-center bg-rose-600 px-8 py-12 sm:px-12 sm:py-14 lg:min-h-[560px] lg:px-16 lg:py-20 xl:px-24"
+          className="relative flex min-h-[360px] flex-col justify-center bg-rose-600 px-6 py-10 sm:px-10 sm:py-12 lg:min-h-[440px] lg:px-14 lg:py-14 xl:px-20"
           initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.25 }}
@@ -70,16 +70,16 @@ export const AboutSection = () => {
               className="mt-4 justify-center lg:justify-start"
             />
 
-            <h3 className="mt-6 font-geist text-lg font-semibold text-white sm:text-xl">
+            <h3 className="mt-4 font-geist text-lg font-semibold text-white sm:text-xl">
               {slide.subtitle}
             </h3>
 
-            <p className="mt-4 font-geist text-base leading-[1.75] text-white/90">
+            <p className="mt-3 font-geist text-base leading-[1.75] text-white/90">
               {slide.description}
             </p>
 
             <div
-              className="mt-10 flex items-center justify-center gap-3 lg:justify-start"
+              className="mt-7 flex items-center justify-center gap-3 lg:justify-start"
               role="tablist"
               aria-label="Các lý do chọn Sen Spa"
             >
@@ -112,7 +112,7 @@ export const AboutSection = () => {
         </motion.div>
 
         <motion.div
-          className="relative min-h-[320px] lg:min-h-[560px]"
+          className="relative min-h-[280px] lg:min-h-[440px]"
           initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
 const VIETNAM_PHONE_REGEX = /^(0[2-9]|84[2-9])\d{8}$/;
 
@@ -8,30 +7,30 @@ const staffBaseSchema = z.object({
 
   fullName: z
     .string()
-    .min(1, VALIDATION_MSG.required("Họ tên"))
-    .max(100, VALIDATION_MSG.max(100)),
+    .min(1, "Họ tên không được để trống")
+    .max(100, "Tối đa 100 ký tự"),
   phone: z
     .string()
-    .min(1, VALIDATION_MSG.required("SĐT"))
-    .regex(VIETNAM_PHONE_REGEX, "SĐT không hợp lệ"),
+    .min(1, "Số điện thoại không được để trống")
+    .regex(VIETNAM_PHONE_REGEX, "Số điện thoại không hợp lệ"),
   avatarUrl: z.string().optional().or(z.literal("")),
   dateOfBirth: z.string().optional().or(z.literal("")),
   gender: z.coerce.number().min(0).optional(),
   nationalId: z
     .string()
-    .max(20, VALIDATION_MSG.max(20))
+    .max(20, "Tối đa 20 ký tự")
     .optional()
     .or(z.literal("")),
 
   hireDate: z.string().optional().or(z.literal("")),
   contractType: z
     .string()
-    .max(50, VALIDATION_MSG.max(50))
+    .max(50, "Tối đa 50 ký tự")
     .optional()
     .or(z.literal("")),
   basicSalary: z.coerce
     .number()
-    .min(0, VALIDATION_MSG.notNegative("Lương"))
+    .min(0, "Lương không được âm")
     .optional(),
   salaryType: z.coerce.number().min(1).max(2).optional(),
   status: z.coerce.number().min(0).optional(),

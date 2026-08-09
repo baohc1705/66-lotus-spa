@@ -1,4 +1,4 @@
-﻿import { useForm, type Resolver } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import {
   useCreateBookingPosition,
   useUpdateBookingPosition,
@@ -26,7 +26,6 @@ import { Input } from "@/shared/forms/Input";
 import { SearchableSelect } from "@/shared/forms/SearchableSelect";
 import { Switch } from "@/shared/forms/Switch";
 import { Textarea } from "@/shared/forms/Textarea";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 interface BookingPositionFormDialogProps {
   open: boolean;
@@ -206,7 +205,7 @@ export function BookingPositionFormDialog({
             onClick={() => onOpenChange(false)}
             disabled={isPending}
           >
-            {COMMON_MSG.cancel}
+            Hủy
           </Button>
           <Button
             type="submit"

@@ -14,8 +14,6 @@ import {
   TableHeaderCell,
   TableRow,
 } from "@/shared/tables/Table";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { formatCurrency } from "@/shared/utils/currency";
 
@@ -93,9 +91,6 @@ export function StaffServicesTab({
           <p className="text-sm font-medium text-kit-heading">
             Chưa có dịch vụ thực hiện
           </p>
-          <p className="text-xs">
-            Phân công dịch vụ để nhân viên có thể nhận lịch tương ứng.
-          </p>
         </div>
       ) : (
         <div className="overflow-x-auto rounded border border-kit bg-kit-white">
@@ -103,7 +98,7 @@ export function StaffServicesTab({
             <TableHead>
               <TableRow>
                 <TableHeaderCell>#</TableHeaderCell>
-                <TableHeaderCell>Mã DV</TableHeaderCell>
+                <TableHeaderCell>Mã dịch vụ</TableHeaderCell>
                 <TableHeaderCell>Tên dịch vụ</TableHeaderCell>
                 <TableHeaderCell>Thời lượng</TableHeaderCell>
                 <TableHeaderCell>Giá vốn</TableHeaderCell>
@@ -190,16 +185,13 @@ export function StaffServicesTab({
           if (!open) setRemoveTarget(null);
         }}
         onConfirm={handleRemove}
-        title={CONFIRM_MSG.deleteTitle("phân công dịch vụ")}
+        title="Xóa phân công dịch vụ"
         description={
           staffName
             ? `Gỡ dịch vụ "${removeTarget?.serName ?? ""}" khỏi nhân viên ${staffName}?`
-            : CONFIRM_MSG.deleteDescription(
-                "phân công dịch vụ",
-                removeTarget?.serName ?? "",
-              )
+            : `Bạn có chắc muốn xóa phân công dịch vụ "${removeTarget?.serName ?? ""}"? Hành động này không thể hoàn tác.`
         }
-        confirmLabel={COMMON_MSG.delete}
+        confirmLabel="Xóa"
         loading={deleteMutation.isPending}
         variant="danger"
       />

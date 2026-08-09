@@ -83,7 +83,6 @@ function clampPage(value: number, pageCount: number): number | null {
   return n;
 }
 
-/** Cua so: dau [1 2 3 ... N], giua [1 ... p-1 p p+1 ... N], cuoi doi xung */
 function buildPageItems(page: number, pageCount: number): PageItem[] {
   if (pageCount <= 0) return [];
   if (pageCount <= 7) {

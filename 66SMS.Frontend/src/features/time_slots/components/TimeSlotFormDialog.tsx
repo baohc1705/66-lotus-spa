@@ -1,4 +1,4 @@
-﻿import { useEffect } from "react";
+import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Clock } from "lucide-react";
@@ -8,7 +8,6 @@ import { Button } from "@/shared/elements/Button";
 import { FormField } from "@/shared/forms/FormField";
 import { FormSection } from "@/shared/forms/FormSection";
 import { Input } from "@/shared/forms/Input";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { toLocalTimeOnly } from "@/shared/utils/date.utils";
 
 import { useCreateTimeSlot, useUpdateTimeSlot } from "../hooks/useTimeSlots";
@@ -145,7 +144,7 @@ export function TimeSlotFormDialog({
             onClick={() => onOpenChange(false)}
             disabled={isPending}
           >
-            {COMMON_MSG.cancel}
+            Hủy
           </Button>
           <Button
             type="submit"

@@ -184,8 +184,8 @@ function resolveButtonVariant(
   }
   if (key === "outline-light") {
     return outlineStyle(
-      "text-kit-dark hover:bg-kit-light",
-      "border border-kit",
+      "text-kit-white hover:bg-kit-white hover:text-kit-dark",
+      "border border-white/40",
       borderless,
     );
   }
@@ -232,7 +232,6 @@ function resolveButtonShadow(variant: ButtonVariant | string): string {
   return "";
 }
 
-/** Dung cho Tabs / Dropdown (cung style Button) */
 // eslint-disable-next-line react-refresh/only-export-components -- Tabs/Dropdown can style chung, khong tach file
 export { resolveButtonVariant, resolveButtonSize };
 
@@ -248,6 +247,7 @@ type ButtonProps = {
   borderless?: boolean;
   shadow?: boolean;
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
+  form?: string;
   className?: string;
   children?: ReactNode;
   onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
@@ -267,6 +267,7 @@ export function Button({
   borderless = false,
   shadow = false,
   type = "button",
+  form,
   className = "",
   children,
   onClick,
@@ -278,7 +279,6 @@ export function Button({
     "inline-flex items-center justify-center gap-0 font-medium leading-normal " +
     "font-sans transition-all disabled:opacity-65 disabled:cursor-not-allowed ";
 
-  // Chi them margin mac dinh khi caller khong tu set mb-/mr-.
   if (className.indexOf("mb-") < 0) {
     buttonClass += "mb-2 ";
   }
@@ -298,6 +298,7 @@ export function Button({
   return (
     <button
       type={type}
+      form={form}
       disabled={isDisabled}
       onClick={onClick}
       title={title}

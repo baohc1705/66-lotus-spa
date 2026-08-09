@@ -3,7 +3,7 @@ import type { LucideIcon } from "lucide-react";
 type TableEmptyStateProps = {
   icon: LucideIcon;
   title: string;
-  hint: string;
+  hint?: string;
   action?: React.ReactNode;
 };
 
@@ -20,7 +20,9 @@ export function TableEmptyState({
       </div>
       <div className={action ? "" : "text-center"}>
         <p className="text-sm font-semibold text-kit-heading">{title}</p>
-        <p className="mt-0.5 text-xs text-kit-muted">{hint}</p>
+        {hint ? (
+          <p className="mt-0.5 text-xs text-kit-muted">{hint}</p>
+        ) : null}
       </div>
       {action}
     </div>

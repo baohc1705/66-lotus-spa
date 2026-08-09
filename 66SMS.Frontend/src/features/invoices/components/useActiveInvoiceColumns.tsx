@@ -24,7 +24,7 @@ import {
 } from "../types/invoice.types";
 
 export const INVOICE_COLUMN_LABELS = {
-  invoiceCode: "Mã HĐ",
+  invoiceCode: "Mã hóa đơn",
   customerName: "Khách hàng",
   totalAmount: "Tổng tiền",
   paymentMethod: "Hình thức",

@@ -51,7 +51,7 @@ export const SpaceGallerySection = () => {
           titleId="space-heading"
           dark
           variant="lotus"
-          className="mb-8"
+          className="mb-6"
         />
 
         <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-3 md:grid-rows-[140px_140px_140px] lg:grid-rows-[160px_160px_160px]">

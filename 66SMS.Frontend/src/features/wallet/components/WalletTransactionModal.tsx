@@ -104,10 +104,6 @@ export function WalletTransactionModal({
       scrollable
       fullHeight
     >
-      <p className="mb-3 text-sm text-kit-muted">
-        Lịch sử giao dịch và biến động số dư của ví khách hàng.
-      </p>
-
       <div className="mb-3 flex items-center justify-between gap-2">
         <h3 className="m-0 text-sm font-semibold text-kit-heading">
           Lịch sử giao dịch

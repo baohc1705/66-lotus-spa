@@ -12,8 +12,6 @@ import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
 import { TableEmptyState } from "@/shared/tables/TableEmptyState";
 import { TablePageShell } from "@/shared/tables/TablePageShell";
 import { TableSelectionBar } from "@/shared/tables/TableSelectionBar";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 import { useRowSelection } from "@/shared/hooks/useRowSelection";
 
@@ -250,12 +248,12 @@ export function ProductCategoryListPage() {
                 {showDeleted ? (
                   <>
                     <ArrowLeft className="h-4 w-4" />
-                    {COMMON_MSG.back}
+                    Quay lại
                   </>
                 ) : (
                   <>
                     <Trash2 className="h-4 w-4" />
-                    {COMMON_MSG.restore}
+                    Khôi phục
                   </>
                 )}
               </Button>
@@ -274,13 +272,11 @@ export function ProductCategoryListPage() {
               <TableEmptyState
                 icon={Trash2}
                 title="Không có danh mục đã xóa"
-                hint="Các danh mục bị xóa sẽ hiển thị tại đây."
               />
             ) : (
               <TableEmptyState
                 icon={Box}
                 title="Chưa có danh mục sản phẩm"
-                hint="Thêm danh mục mới để phân loại sản phẩm."
                 action={
                   <PermissionGate
                     resource={perm.resource}
@@ -351,13 +347,9 @@ export function ProductCategoryListPage() {
         open={bulkDeleteOpen}
         onOpenChange={setBulkDeleteOpen}
         onConfirm={handleBulkDelete}
-        title={CONFIRM_MSG.bulkDeleteTitle(ENTITY)}
-        description={CONFIRM_MSG.bulkDeleteDescription(
-          selectedCount,
-          ENTITY,
-          BULK_DELETE_WARNING,
-        )}
-        confirmLabel={COMMON_MSG.delete}
+        title={`Xóa ${ENTITY} đã chọn`}
+        description={`Bạn có chắc muốn xóa ${selectedCount} ${ENTITY} đã chọn?${BULK_DELETE_WARNING ? ` ${BULK_DELETE_WARNING}` : ""}`}
+        confirmLabel="Xóa"
         loading={deleteMultiplesMutation.isPending}
         variant="danger"
       />
@@ -368,13 +360,9 @@ export function ProductCategoryListPage() {
           if (!open) setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
-        title={CONFIRM_MSG.deleteTitle(ENTITY)}
-        description={CONFIRM_MSG.deleteDescription(
-          ENTITY,
-          deleteTarget?.name ?? "",
-          DELETE_WARNING,
-        )}
-        confirmLabel={COMMON_MSG.delete}
+        title={`Xóa ${ENTITY}`}
+        description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget?.name ?? ""}"?${DELETE_WARNING ? ` ${DELETE_WARNING}` : ""} Hành động này không thể hoàn tác.`}
+        confirmLabel="Xóa"
         loading={deleteMutation.isPending}
         variant="danger"
       />
@@ -385,12 +373,9 @@ export function ProductCategoryListPage() {
           if (!open) setRestoreTarget(null);
         }}
         onConfirm={handleRestore}
-        title={CONFIRM_MSG.restoreTitle(ENTITY_SUBJECT)}
-        description={CONFIRM_MSG.restoreDescription(
-          ENTITY_SUBJECT,
-          restoreTarget?.name ?? "",
-        )}
-        confirmLabel={COMMON_MSG.restore}
+        title={`Khôi phục ${ENTITY_SUBJECT}`}
+        description={`Bạn có chắc muốn khôi phục ${ENTITY_SUBJECT} "${restoreTarget?.name ?? ""}"? ${ENTITY_SUBJECT} sẽ hiển thị lại trong danh sách chính.`}
+        confirmLabel="Khôi phục"
         loading={restoreMutation.isPending}
         variant="default"
       />

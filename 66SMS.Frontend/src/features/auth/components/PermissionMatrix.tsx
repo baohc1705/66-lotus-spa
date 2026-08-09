@@ -90,7 +90,7 @@ export function PermissionMatrix({
 
         {allPermissions.length === 0 ? (
           <p className="p-6 text-center text-sm text-kit-muted">
-            Chưa có quyền nào — hãy tạo quyền ở bảng bên dưới
+            Chưa có quyền
           </p>
         ) : (
           <div className="overflow-x-auto">

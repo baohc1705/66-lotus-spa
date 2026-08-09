@@ -1,20 +1,13 @@
 import { useMemo } from "react";
 import type { ColumnDef, Row } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
-import { Checkbox } from "@/shared/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
+import { Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/shared/elements/Button";
+import { Checkbox } from "@/shared/forms/Checkbox";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { IndexCell } from "@/shared/components/DataTable/TableCells";
+import { Tooltip } from "@/shared/components/Tooltip";
+import { SortableColumnHeader } from "@/shared/tables/SortableColumnHeader";
+import { IndexCell } from "@/shared/tables/TableCells";
 import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { USER_PERM } from "../constants/user.permissions";
 import type { UserDto } from "../types/user.types";
 
@@ -65,24 +58,30 @@ export function useActiveUserColumns({
       {
         id: "select",
         header: () => (
-          <Checkbox
-            checked={headerChecked}
-            onCheckedChange={onToggleAll}
-            aria-label="Select all"
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              className="mb-0"
+              checked={headerChecked === true}
+              indeterminate={headerChecked === "indeterminate"}
+              onChange={(checked: boolean) => onToggleAll(checked)}
+              aria-label="Select all"
+            />
+          </div>
         ),
         cell: ({ row }) => {
           const user = row.original;
           return (
-            <Checkbox
-              checked={user.id != null && selectedRowIds.has(user.id)}
-              onCheckedChange={(checked) => {
-                if (user.id == null) return;
-                onToggleOne(user.id, checked === true);
-              }}
-              aria-label={`Select row`}
-              onClick={(e) => e.stopPropagation()}
-            />
+            <div onClick={(e) => e.stopPropagation()}>
+              <Checkbox
+                className="mb-0"
+                checked={user.id != null && selectedRowIds.has(user.id)}
+                onChange={(checked: boolean) => {
+                  if (user.id == null) return;
+                  onToggleOne(user.id, checked);
+                }}
+                aria-label="Select row"
+              />
+            </div>
           );
         },
         size: 40,
@@ -113,7 +112,7 @@ export function useActiveUserColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="font-semibold text-lotus-deep">
+          <span className="font-semibold text-kit-heading">
             {row.original.username}
           </span>
         ),
@@ -131,7 +130,7 @@ export function useActiveUserColumns({
           />
         ),
         cell: ({ row }) => (
-          <span className="text-lotus-deep/80">{row.original.email}</span>
+          <span className="text-kit-body">{row.original.email}</span>
         ),
         size: 220,
       },
@@ -149,57 +148,59 @@ export function useActiveUserColumns({
       {
         accessorKey: "roles",
         header: cols.roles,
-        cell: ({ row }) => (
-          <span className="text-lotus-deep/80">
-            {row.original.roles?.join(", ") || "—"}
-          </span>
-        ),
+        cell: ({ row }) => {
+          const roles = row.original.roles;
+          if (!roles || roles.length === 0) {
+            return <span className="text-kit-body">—</span>;
+          }
+          return (
+            <span className="text-kit-body">{roles.join(", ")}</span>
+          );
+        },
         size: 150,
       },
       {
         id: "actions",
-        header: "",
+        header: "Thao tác",
         cell: ({ row }) => {
           const user = row.original;
           return (
-            <div onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <div
+              className="flex items-center gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <PermissionGate resource={perm.resource} action={perm.update}>
+                <Tooltip text="Sửa">
                   <Button
-                    variant="ghost"
                     size="icon-sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    variant="outline-primary"
+                    className="mb-0 mr-0"
+                    onClick={() => onEdit(user)}
                   >
-                    <MoreHorizontal className="w-4 h-4" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <PermissionGate resource={perm.resource} action={perm.update}>
-                    <DropdownMenuItem onClick={() => onEdit(user)}>
-                      <Pencil className="w-4 h-4" />
-                      {COMMON_MSG.edit}
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                  <PermissionGate
-                    resource={perm.resource}
-                    action={perm.delete}
-                    role={perm.role}
+                </Tooltip>
+              </PermissionGate>
+              <PermissionGate
+                resource={perm.resource}
+                action={perm.delete}
+                role={perm.role}
+              >
+                <Tooltip text="Xóa">
+                  <Button
+                    size="icon-sm"
+                    variant="outline-danger"
+                    className="mb-0 mr-0"
+                    onClick={() => onDelete(user)}
                   >
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={() => onDelete(user)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Xóa người dùng
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </Tooltip>
+              </PermissionGate>
             </div>
           );
         },
-        size: 50,
+        size: 100,
         enableResizing: false,
       },
     ],

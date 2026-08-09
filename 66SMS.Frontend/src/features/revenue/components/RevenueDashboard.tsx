@@ -212,7 +212,7 @@ export function RevenueDashboard() {
               className={`h-9 px-3 bg-white border border-adminGray-100 rounded-admin flex items-center gap-1.5 hover:bg-adminGray-50 transition-colors text-xs font-semibold text-adminInk ${
                 exportBranchMutation.isPending ? "opacity-50" : ""
               }`}
-              title="Xuất Excel doanh thu chi nhánh (KTV + dịch vụ)"
+              title="Xuất Excel doanh thu chi nhánh (nhân viên + dịch vụ)"
             >
               <Download
                 className={`w-3.5 h-3.5 text-adminGray-400 ${exportBranchMutation.isPending ? "animate-pulse" : ""}`}

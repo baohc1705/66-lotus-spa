@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -7,7 +7,6 @@ import { Button } from "@/shared/elements/Button";
 import { FormField } from "@/shared/forms/FormField";
 import { Input } from "@/shared/forms/Input";
 import { Select } from "@/shared/forms/Select";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import {
   toDatetimeLocalInput,
   localDateTimeToUtc,
@@ -172,7 +171,7 @@ export function MembershipCardFormDialog({
             onClick={() => onOpenChange(false)}
             disabled={isPending}
           >
-            {COMMON_MSG.cancel}
+            Hủy
           </Button>
           <Button
             type="submit"

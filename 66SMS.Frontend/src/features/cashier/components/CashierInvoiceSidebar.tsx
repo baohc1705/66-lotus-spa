@@ -55,7 +55,6 @@ type StatusOption = {
   dotClass: string;
 };
 
-// Mapping mau / nhan giong filter calendar.
 const STATUS_OPTIONS: StatusOption[] = [
   {
     value: APPOINTMENT_STATUS.PENDING,
@@ -318,7 +317,7 @@ function CashierInvoiceSidebarForm({
     if (currentId) {
       options.push({
         value: currentId,
-        label: booking.staffName || "NV #" + currentId,
+        label: booking.staffName || "Nhân viên #" + currentId,
       });
       seen.add(currentId);
     }
@@ -441,7 +440,7 @@ function CashierInvoiceSidebarForm({
           );
           return;
         }
-        toast.success(rescheduleRes.message || "Đã đổi ngày/giờ lịch hẹn");
+        toast.success(rescheduleRes.message || "Đã đổi lịch hẹn");
       }
 
       if (staffChanged) {
@@ -619,7 +618,7 @@ function CashierInvoiceSidebarForm({
     if (!resolvedSlotId || !booking.serviceId) {
       return (
         <p className="text-xs text-kit-muted">
-          Thiếu slot/dịch vụ để lọc NV rảnh
+          Thiếu dịch vụ để lọc NV rảnh
         </p>
       );
     }
@@ -663,7 +662,7 @@ function CashierInvoiceSidebarForm({
         }
         options={positionOptions}
         placeholder="Chọn vị trí..."
-        searchPlaceholder="Tìm phòng / vị trí..."
+        searchPlaceholder="Tìm vị trí..."
         className="w-full"
       />
     );
@@ -685,7 +684,7 @@ function CashierInvoiceSidebarForm({
     <Modal
       open
       onClose={onClose}
-      title={"Lịch hẹn (Mã: " + code + ")"}
+      title={`Lịch hẹn (Mã: ${code})`}
       size="xl"
       scrollable
       tone="primary"
@@ -819,7 +818,7 @@ function CashierInvoiceSidebarForm({
                 <Input value={booking.serviceName || "—"} readOnly />
               </FormField>
               <FormField label="Nhân viên">{renderStaffField()}</FormField>
-              <FormField label="Phòng / chỗ ngồi">
+              <FormField label="Chỗ ngồi">
                 {renderPositionField()}
               </FormField>
             </div>

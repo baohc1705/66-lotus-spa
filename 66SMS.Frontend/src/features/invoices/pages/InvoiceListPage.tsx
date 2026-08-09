@@ -204,7 +204,6 @@ export function InvoiceListPage() {
                 <TableEmptyState
                   icon={Receipt}
                   title="Chưa có hóa đơn"
-                  hint="Hóa đơn được tạo từ quầy thu ngân."
                 />
               }
               pagination={

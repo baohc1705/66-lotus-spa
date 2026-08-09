@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
 const emptyToUndefined = (v: unknown) =>
   v === "" || v === null || v === undefined ? undefined : v;
@@ -8,9 +7,9 @@ const configAppointmentBaseSchema = z
   .object({
     salonId: z.coerce
       .number()
-      .min(1, VALIDATION_MSG.selectRequired("chi nhánh")),
+      .min(1, "Vui lòng chọn chi nhánh"),
     depositPercent: z.coerce
-      .number({ error: VALIDATION_MSG.required("Phần trăm cọc") })
+      .number({ error: "Phần trăm cọc không được để trống" })
       .min(0, "Phần trăm cọc phải từ 0 đến 100")
       .max(100, "Phần trăm cọc phải từ 0 đến 100"),
     startTime: z.preprocess(emptyToUndefined, z.string().optional()),

@@ -1,4 +1,4 @@
-﻿import { useForm, type Resolver } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { Box } from "lucide-react";
@@ -11,7 +11,6 @@ import { Input } from "@/shared/forms/Input";
 import { Switch } from "@/shared/forms/Switch";
 import { Textarea } from "@/shared/forms/Textarea";
 import { StatusActive } from "@/shared/constants/status.enum";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 import {
   useCreateProductCategory,
@@ -181,7 +180,7 @@ export function ProductCategoryFormDialog({
             onClick={() => onOpenChange(false)}
             disabled={isPending}
           >
-            {COMMON_MSG.cancel}
+            Hủy
           </Button>
           <Button
             type="submit"

@@ -103,7 +103,6 @@ export function getIsoWeekStart(date: Date): Date {
   return next;
 }
 
-/** 7 ngay T2 -> CN cua tuan chua date. */
 export function getWeekDays(date: Date): Date[] {
   const start = getIsoWeekStart(date);
   const days: Date[] = [];
@@ -282,7 +281,6 @@ export function getBookingsCountOnDay(
   return count;
 }
 
-/** Loc lich 1 ngay theo trang thai, sap xep theo gio. */
 export function getFilteredBookingsForDay(
   bookings: CashierBooking[],
   date: Date,
@@ -314,7 +312,6 @@ export function getFilteredBookingsForDay(
   return result;
 }
 
-/** View tuan theo NV: lich cua 1 nhan vien trong 1 ngay. */
 export function getBookingsForStaffDay(
   bookings: CashierBooking[],
   staffId: string,

@@ -3,8 +3,6 @@ import type { PageRequest, Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/shared/components/kitToast";
 import type { AxiosError } from "axios";
-import { TOAST_MSG } from "@/shared/constants/toast.messages";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type {
@@ -46,13 +44,13 @@ export function useCreateShift() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: SHIFT_KEYS.all });
-        toast.success(TOAST_MSG.createSuccess(ENTITY));
+        toast.success(`Tạo ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
+      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi tạo ${ENTITY}`));
     },
   });
 }
@@ -70,14 +68,14 @@ export function useUpdateShift() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: SHIFT_KEYS.all });
-        toast.success(TOAST_MSG.updateSuccess(ENTITY));
+        toast.success(`Cập nhật ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
       toast.error(
-        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+        getErrorMessage(error, `Có lỗi xảy ra khi cập nhật ${ENTITY}`),
       );
     },
   });
@@ -90,13 +88,13 @@ export function useDeleteShift() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: SHIFT_KEYS.all });
-        toast.success(TOAST_MSG.deleteSuccess(ENTITY));
+        toast.success(`Xóa ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
+      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi xóa ${ENTITY}`));
     },
   });
 }

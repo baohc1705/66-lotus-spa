@@ -1,4 +1,4 @@
-﻿import { useAdminProducts } from "@/features/products/hooks/useProducts";
+import { useAdminProducts } from "@/features/products/hooks/useProducts";
 import type { ProductDto } from "@/features/products/types/product.types";
 import { ServiceCategoryFormDialog } from "@/features/service_categories/components/ServiceCategoryFormDialog";
 import { useServiceCategories } from "@/features/service_categories/hooks/useServiceCategories";
@@ -20,7 +20,6 @@ import { SearchableSelect } from "@/shared/forms/SearchableSelect";
 import { Select } from "@/shared/forms/Select";
 import { Switch } from "@/shared/forms/Switch";
 import { Textarea } from "@/shared/forms/Textarea";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { formatCurrency } from "@/shared/utils/currency";
@@ -904,7 +903,7 @@ export function ServiceFormDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={isPending || isUploading}
               >
-                {COMMON_MSG.cancel}
+                Hủy
               </Button>
               <Button
                 type="submit"

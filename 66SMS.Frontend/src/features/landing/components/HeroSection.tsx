@@ -52,7 +52,7 @@ const FALLBACK_SLIDES: HeroSlide[] = [
     brand: "Hoa Sen Spa · Đồng Tháp",
     title: "Tĩnh lặng",
     subtitle:
-      "Không gian chăm sóc sức khỏe và sắc đẹp giữa lòng thành phố, nơi mỗi liệu trình là một hành trình phục hồi.",
+      "Không gian chăm sóc sức khỏe và sắc đẹp giữa lòng thành phố.",
     ctaPrimary: "Đặt lịch ngay",
     ctaPrimaryHref: "/dat-lich",
     ctaSecondary: "Khám phá",
@@ -64,7 +64,7 @@ const FALLBACK_SLIDES: HeroSlide[] = [
     brand: "Trị Liệu Chuyên Sâu",
     title: "Phục hồi",
     subtitle:
-      "Các liệu pháp massage ấn huyệt kết hợp thảo dược phương Đông giúp xua tan mệt mỏi, tái tạo sinh khí.",
+      "Massage ấn huyệt kết hợp thảo dược, giúp xua tan mệt mỏi.",
     ctaPrimary: "Xem dịch vụ",
     ctaPrimaryHref: "#services",
     ctaSecondary: "Đặt lịch",
@@ -76,7 +76,7 @@ const FALLBACK_SLIDES: HeroSlide[] = [
     brand: "Chăm Sóc Làn Da",
     title: "Đánh thức vẻ đẹp",
     subtitle:
-      "Phác đồ chăm sóc da chuẩn y khoa kết hợp mỹ phẩm hữu cơ, mang lại làn da tươi trẻ và khỏe mạnh tự nhiên.",
+      "Chăm sóc da chuẩn y khoa kết hợp mỹ phẩm hữu cơ.",
     ctaPrimary: "Khám phá facial",
     ctaPrimaryHref: "#services",
     ctaSecondary: "Đặt lịch",
@@ -238,7 +238,7 @@ export const HeroSection = () => {
         </div>
       )}
 
-      <div className="landing-container relative z-10 pb-20 pt-28 md:pb-28 md:pt-32">
+      <div className="landing-container relative z-10 pb-14 pt-24 md:pb-20 md:pt-28">
         <AnimatePresence mode="wait">
           <motion.div
             key={safeIndex}
@@ -271,7 +271,7 @@ export const HeroSection = () => {
 
             <motion.p
               variants={textVariants}
-              className="mb-6 max-w-lg font-sans text-base leading-relaxed text-white/80 md:mb-8 md:text-lg"
+              className="mb-4 max-w-lg font-sans text-base leading-relaxed text-white/80 md:mb-6 md:text-lg"
             >
               {current.subtitle}
             </motion.p>

@@ -19,7 +19,7 @@ export function PermissionListPanel({
     <Card className="mb-0! overflow-hidden border border-kit">
       <CardHeader className="h-auto justify-between py-3">
         <div className="text-sm font-bold text-kit-heading">
-          Quản lý quyền hệ thống
+          Danh sách quyền
           <span className="ml-2 text-xs font-medium text-kit-muted">
             {permissions.length} quyền
           </span>
@@ -32,7 +32,7 @@ export function PermissionListPanel({
 
       <div className="max-h-64 w-full overflow-x-auto overflow-y-auto">
         {permissions.length === 0 ? (
-          <p className="p-6 text-center text-sm text-kit-muted">Chưa có quyền nào</p>
+          <p className="p-6 text-center text-sm text-kit-muted">Chưa có quyền</p>
         ) : (
           <table className="w-full min-w-[500px] border-collapse">
             <thead>

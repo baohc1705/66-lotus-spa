@@ -12,8 +12,6 @@ import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
 import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
 import { TableEmptyState } from "@/shared/tables/TableEmptyState";
 import { TablePageShell } from "@/shared/tables/TablePageShell";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 
 import { PromotionFormDialog } from "../components/PromotionFormDialog";
@@ -129,7 +127,6 @@ export function PromotionListPage() {
             <TableEmptyState
               icon={Tag}
               title="Chưa có khuyến mãi"
-              hint="Thêm chương trình khuyến mãi để áp dụng giảm giá cho khách hàng."
               action={
                 <PermissionGate resource={perm.resource} action={perm.create}>
                   <Button
@@ -201,12 +198,9 @@ export function PromotionListPage() {
             if (!open) setDeleteTarget(null);
           }}
           onConfirm={handleDelete}
-          title={CONFIRM_MSG.deleteTitle(ENTITY)}
-          description={CONFIRM_MSG.deleteDescription(
-            ENTITY,
-            deleteTarget?.code ?? "",
-          )}
-          confirmLabel={COMMON_MSG.delete}
+          title={`Xóa ${ENTITY}`}
+          description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget?.code ?? ""}"? Hành động này không thể hoàn tác.`}
+          confirmLabel="Xóa"
           loading={deleteMutation.isPending}
           variant="danger"
         />

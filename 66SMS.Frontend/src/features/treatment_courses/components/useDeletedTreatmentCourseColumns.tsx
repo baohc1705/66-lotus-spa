@@ -2,14 +2,15 @@ import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { RotateCcw } from "lucide-react";
 
-import { Button } from "@/shared/components/ui/button";
+import { Button } from "@/shared/elements/Button";
+import { Badge } from "@/shared/elements/Badge";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { Tooltip } from "@/shared/components/Tooltip";
 import {
   DateTimeCell,
   IndexCell,
   PriceCell,
-} from "@/shared/components/DataTable/TableCells";
+} from "@/shared/tables/TableCells";
 
 import { TREATMENT_COURSE_COLUMN_LABELS } from "./useActiveTreatmentCourseColumns";
 import { TREATMENT_COURSE_PERM } from "../constants/treatmentCourse.permissions";
@@ -48,9 +49,9 @@ export function useDeletedTreatmentCourseColumns({
         accessorKey: "code",
         header: cols.code,
         cell: ({ row }) => (
-          <span className="font-mono text-xs px-2 py-1 bg-adminGray-100 rounded text-adminGray-600">
+          <Badge variant="secondary" soft>
             {row.original.code ?? "—"}
-          </span>
+          </Badge>
         ),
         size: 100,
       },
@@ -59,14 +60,14 @@ export function useDeletedTreatmentCourseColumns({
         header: cols.name,
         cell: ({ row }) => (
           <div>
-            <p className="text-sm font-semibold text-adminInk truncate max-w-[200px]">
+            <p className="max-w-[200px] truncate text-sm font-semibold text-kit-heading">
               {row.original.name ?? "—"}
             </p>
-            {row.original.categoryName && (
-              <p className="text-xs text-adminGray-600">
+            {row.original.categoryName ? (
+              <p className="text-xs text-kit-muted">
                 {row.original.categoryName}
               </p>
-            )}
+            ) : null}
           </div>
         ),
         size: 240,
@@ -75,7 +76,7 @@ export function useDeletedTreatmentCourseColumns({
         accessorKey: "totalSessions",
         header: cols.totalSessions,
         cell: ({ row }) => (
-          <span className="font-semibold text-adminInk">
+          <span className="font-semibold text-kit-heading">
             {row.original.totalSessions ?? 0}
           </span>
         ),
@@ -101,25 +102,26 @@ export function useDeletedTreatmentCourseColumns({
       },
       {
         id: "actions",
-        header: "",
+        header: "Thao tác",
         cell: ({ row }) => (
           <PermissionGate
             resource={perm.resource}
             action={perm.update}
             role={perm.role}
           >
-            <Button
-              variant="outline"
-              size="sm"
-              className="lotus-admin-table-toolbar-btn"
-              onClick={() => onRestore(row.original)}
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              {COMMON_MSG.restore}
-            </Button>
+            <Tooltip text="Khôi phục">
+              <Button
+                size="icon-sm"
+                variant="outline-success"
+                className="mb-0 mr-0"
+                onClick={() => onRestore(row.original)}
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+              </Button>
+            </Tooltip>
           </PermissionGate>
         ),
-        size: 120,
+        size: 80,
         enableResizing: false,
       },
     ],

@@ -184,7 +184,6 @@ function BookingCard(props: {
   onClick: () => void;
   sideIndex?: number;
   sideCount?: number;
-  /** View tuan chia doi: chi 1 hang gio + ten KH. */
   compact?: boolean;
 }) {
   const booking = props.booking;
@@ -208,7 +207,6 @@ function BookingCard(props: {
   }
   const slotCount = getBookingSlotCount(booking);
 
-  // Gap 1px giua cac card; z-1 de khong de header/sidebar/dropdown.
   let leftCss = "1px";
   let rightCss = "1px";
   let widthCss = "";
@@ -219,7 +217,6 @@ function BookingCard(props: {
     widthCss = "calc(" + widthPercent + "% - 2px)";
   }
 
-  // Chu noi tren nen solid: warning dung chu toi, con lai chu trang.
   let nameClass = "font-bold leading-tight text-kit-white";
   let mutedClass = "text-2xs leading-tight text-kit-white/85";
   let timeClass = "leading-tight text-kit-white/95";

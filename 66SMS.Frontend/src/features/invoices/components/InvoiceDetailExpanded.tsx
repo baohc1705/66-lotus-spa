@@ -164,7 +164,7 @@ export function InvoiceDetailExpanded({ invoiceId, onCancel }: Props) {
                 <TableHeaderCell className="text-right">
                   Thành tiền
                 </TableHeaderCell>
-                <TableHeaderCell>KTV</TableHeaderCell>
+                <TableHeaderCell>Kỹ thuật viên</TableHeaderCell>
               </TableRow>
             </TableHead>
             <TableBody>

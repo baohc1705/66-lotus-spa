@@ -11,8 +11,6 @@ import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
 import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
 import { TableEmptyState } from "@/shared/tables/TableEmptyState";
 import { TablePageShell } from "@/shared/tables/TablePageShell";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 import { toLocalTimeOnly } from "@/shared/utils/date.utils";
 
@@ -137,7 +135,6 @@ export function TimeSlotListPage() {
             <TableEmptyState
               icon={Clock}
               title="Chưa có khung giờ"
-              hint="Thêm khung giờ để quản lý lịch đặt dịch vụ."
               action={
                 <PermissionGate resource={perm.resource} action={perm.create}>
                   <Button
@@ -208,10 +205,10 @@ export function TimeSlotListPage() {
           onOpenChange={(open) => {
             if (!open) setDeleteTarget(null);
           }}
-          title={CONFIRM_MSG.deleteTitle(ENTITY)}
-          description={CONFIRM_MSG.deleteDescription(ENTITY, deleteLabel)}
+          title={`Xóa ${ENTITY}`}
+          description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteLabel}"? Hành động này không thể hoàn tác.`}
           onConfirm={handleDelete}
-          confirmLabel={COMMON_MSG.delete}
+          confirmLabel="Xóa"
           loading={deleteMutation.isPending}
           variant="danger"
         />

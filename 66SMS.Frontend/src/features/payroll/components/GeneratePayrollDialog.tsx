@@ -88,7 +88,7 @@ export function GeneratePayrollDialog({
     .filter((staff: StaffDto) => staff.id != null)
     .map((staff: StaffDto) => ({
       value: String(staff.id),
-      label: staff.fullName ?? `NV #${staff.id}`,
+      label: staff.fullName ?? `Nhân viên #${staff.id}`,
     }));
 
   const monthOptions = months.map((month: number) => ({
@@ -110,10 +110,6 @@ export function GeneratePayrollDialog({
       scrollable
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-1">
-        <p className="mb-3 text-sm text-kit-muted">
-          Lương cơ bản + hoa hồng làm dịch vụ của nhân viên trong kỳ.
-        </p>
-
         <FormSection icon={Calculator} title="Kỳ lương">
           <FormField label="Nhân viên *" error={errors.staffId?.message}>
             <SearchableSelect

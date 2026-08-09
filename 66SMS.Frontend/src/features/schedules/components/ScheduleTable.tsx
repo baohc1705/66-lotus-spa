@@ -217,7 +217,6 @@ export function ScheduleTable({
             <TableEmptyState
               icon={Clock}
               title="Không có ca làm việc"
-              hint="Không có ca làm việc nào trong tuần này."
             />
           </TableCell>
         </TableRow>
@@ -326,7 +325,6 @@ export function ScheduleTable({
             <TableEmptyState
               icon={Clock}
               title="Không có nhân viên"
-              hint="Không có nhân viên nào để hiển thị lịch."
             />
           </TableCell>
         </TableRow>
@@ -374,7 +372,6 @@ export function ScheduleTable({
             <TableEmptyState
               icon={Clock}
               title="Chưa chọn nhân viên"
-              hint="Vui lòng chọn nhân viên để xem lịch cá nhân."
             />
           </TableCell>
         </TableRow>

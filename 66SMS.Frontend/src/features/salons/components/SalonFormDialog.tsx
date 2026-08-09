@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Building2, MapPin, FileText, Loader2 } from "lucide-react";
@@ -15,7 +15,6 @@ import { Checkbox } from "@/shared/forms/Checkbox";
 import { ImageUpload } from "@/shared/forms/ImageUpload";
 import { SearchableSelect } from "@/shared/forms/SearchableSelect";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 import {
   useCreateSalonMutation,
@@ -40,7 +39,6 @@ import type {
 interface SalonFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Có salonId thì edit mode, form load getDetail (đủ field kể cả description). */
   salonId?: number | null;
 }
 
@@ -312,7 +310,7 @@ export function SalonFormDialog({
             </div>
             <FormField
               label="Trụ sở chính"
-              tooltip="Chỉ một chi nhánh được đánh dấu trụ sở chính. Dùng để hiển thị địa chỉ/SĐT trên landing page."
+              tooltip="Chỉ một chi nhánh là trụ sở chính."
             >
               <Checkbox
                 id="salon-is-primary"
@@ -340,7 +338,7 @@ export function SalonFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              {COMMON_MSG.cancel}
+              Hủy
             </Button>
             <Button
               type="submit"

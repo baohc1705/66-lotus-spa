@@ -10,7 +10,6 @@ import { FormRow } from "@/shared/forms/FormRow";
 import { FormSection } from "@/shared/forms/FormSection";
 import { Input } from "@/shared/forms/Input";
 import { Select } from "@/shared/forms/Select";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { parseToDateInput } from "@/shared/utils/date.utils";
 
 import { useStaffs } from "@/features/staffs/hooks/useStaffs";
@@ -175,7 +174,7 @@ export function StaffSalonFormDialog({
               onClick={handleClose}
               disabled={isPending}
             >
-              {COMMON_MSG.cancel}
+              Hủy
             </Button>
             <Button
               type="submit"
@@ -232,7 +231,7 @@ export function StaffSalonFormDialog({
               onClick={handleClose}
               disabled={isPending}
             >
-              {COMMON_MSG.cancel}
+              Hủy
             </Button>
             <Button
               type="submit"

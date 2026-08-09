@@ -1,5 +1,4 @@
 import { X } from "lucide-react";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 type TableSelectionBarProps = {
   count: number;
@@ -14,13 +13,13 @@ export function TableSelectionBar({
 }: TableSelectionBarProps) {
   return (
     <div className="soft-kit-primary mb-3 flex items-center gap-2 rounded-md border px-3 py-2 text-sm">
-      <span>{COMMON_MSG.selected(count)}</span>
+      <span>Đã chọn {count}</span>
       {actions}
       <button
         type="button"
         onClick={onClear}
         className="ml-1 transition-colors hover:text-kit-heading"
-        title={COMMON_MSG.clearSelection}
+        title="Bỏ chọn tất cả"
       >
         <X className="h-3.5 w-3.5" />
       </button>

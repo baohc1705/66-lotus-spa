@@ -9,7 +9,6 @@ type MapEmbedProps = {
   title?: string;
   className?: string;
   height?: number | string;
-  /** Keep for demo page compatibility; ignored when lat/lng provided */
   src?: string;
 };
 
@@ -23,7 +22,6 @@ const markerIcon = L.icon({
   shadowSize: [41, 41],
 });
 
-/** Architect .map-container (height 300px) — interactive Leaflet map */
 export function MapEmbed({
   lat = 35.6895,
   lng = 139.6917,
@@ -39,7 +37,6 @@ export function MapEmbed({
   useEffect(() => {
     if (!rootRef.current || mapRef.current) return;
 
-    // If only OSM embed src given (legacy), still prefer lat/lng when set
     const map = L.map(rootRef.current).setView([lat, lng], zoom);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',

@@ -10,7 +10,6 @@ import { FormRow } from "@/shared/forms/FormRow";
 import { FormSection } from "@/shared/forms/FormSection";
 import { Input } from "@/shared/forms/Input";
 import { Select } from "@/shared/forms/Select";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { toLocalTimeOnly } from "@/shared/utils/date.utils";
 
 import { useAuthStore } from "@/features/auth/stores/authStore";
@@ -197,7 +196,7 @@ export function ConfigAppointmentFormDialog({
 
             <FormField
               label="Phút mỗi khung"
-              tooltip="Độ dài mỗi slot (phút)"
+              tooltip="Độ dài mỗi khung giờ (phút)"
               error={errors.slotMinutes?.message}
             >
               <Input
@@ -245,7 +244,7 @@ export function ConfigAppointmentFormDialog({
             onClick={() => onOpenChange(false)}
             disabled={isPending}
           >
-            {COMMON_MSG.cancel}
+            Hủy
           </Button>
           <Button
             type="submit"

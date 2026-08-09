@@ -7,7 +7,7 @@ import {
   loginSchema,
   type LoginFormData,
 } from "@/features/auth/schemas/loginSchema";
-import { Input } from "@/shared/components/ui/input";
+import { Input } from "@/shared/forms/Input";
 import { Link } from "react-router-dom";
 
 export const LoginForm = () => {

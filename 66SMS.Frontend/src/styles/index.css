@@ -2,7 +2,6 @@
 @source "../../node_modules/calendarkit-pro/dist/**/*.{js,mjs}";
 @import '@fontsource-variable/geist';
 @import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
 @import './admin.css';
 @import './admin.utilities.css';
 @import './tokens.css';

@@ -333,7 +333,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
       let statusText = tech.status || "";
       if (!statusText) {
         if (isReady) {
-          statusText = "Còn " + slotsLeft + " slot";
+          statusText = "Còn " + slotsLeft + " khung giờ";
         } else {
           statusText = "Nghỉ hôm nay";
         }
@@ -582,7 +582,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                   <Input
                     value={selectedCustomer?.phone ?? ""}
                     readOnly
-                    placeholder="SĐT"
+                    placeholder="Số điện thoại"
                   />
                 </FormField>
               </FormRow>
@@ -638,7 +638,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                 ) : null}
                 {serviceId && techniciansQuery.isLoading ? (
                   <p className="py-3 text-center text-xs text-kit-muted">
-                    Đang tải danh sách KTV...
+                    Đang tải kỹ thuật viên...
                   </p>
                 ) : null}
                 {serviceId &&
@@ -722,7 +722,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                   }
                   options={positionOptions}
                   placeholder="Không chọn"
-                  searchPlaceholder="Tìm phòng / vị trí..."
+                  searchPlaceholder="Tìm vị trí..."
                   disabled={!salonId}
                   className="w-full"
                 />

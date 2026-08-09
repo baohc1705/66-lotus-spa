@@ -15,8 +15,6 @@ import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
 import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
 import { TablePageShell } from "@/shared/tables/TablePageShell";
 import { TableEmptyState } from "@/shared/tables/TableEmptyState";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 
 import { SalonFormDialog } from "../components/SalonFormDialog";
@@ -110,7 +108,7 @@ export function SalonListPage() {
           <DataTableToolbar
             searchValue={filter}
             onSearchChange={handleSearchChange}
-            searchPlaceholder="Tìm theo tên, mã, SĐT..."
+            searchPlaceholder="Tìm theo tên, mã, Số điện thoại..."
           >
             <DataTableViewOptions table={table} columnLabels={columnLabels} />
             <PermissionGate
@@ -150,7 +148,6 @@ export function SalonListPage() {
             <TableEmptyState
               icon={Building2}
               title="Chưa có chi nhánh"
-              hint="Thêm chi nhánh để bắt đầu quản lý hệ thống."
               action={
                 <PermissionGate
                   resource={perm.resource}
@@ -214,12 +211,9 @@ export function SalonListPage() {
           if (!open) setDeleteTarget(null);
         }}
         onConfirm={handleConfirmDelete}
-        title={CONFIRM_MSG.deleteTitle(ENTITY)}
-        description={CONFIRM_MSG.deleteDescription(
-          ENTITY,
-          deleteTarget?.name ?? "",
-        )}
-        confirmLabel={COMMON_MSG.delete}
+        title={`Xóa ${ENTITY}`}
+        description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget?.name ?? ""}"? Hành động này không thể hoàn tác.`}
+        confirmLabel="Xóa"
         loading={deleteMutation.isPending}
         variant="danger"
       />

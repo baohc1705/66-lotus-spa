@@ -5,8 +5,8 @@ import {
   type ChangePasswordFormValues,
 } from "../schemas/profile.schemas";
 import { useChangePassword } from "../hooks/useChangePassword";
-import { Button } from "@/shared/components/ui/button";
-import { Lock, Loader2 } from "lucide-react";
+import { Button } from "@/shared/elements/Button";
+import { Lock } from "lucide-react";
 
 export function SecurityForm() {
   const { mutate, isPending } = useChangePassword();
@@ -92,17 +92,10 @@ export function SecurityForm() {
         <div className="pt-3">
           <Button
             type="submit"
-            disabled={isPending}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-md shadow-xs bg-lotus-rose hover:bg-lotus-rose/90 text-white"
+            loading={isPending}
+            className="mb-0 w-full sm:w-auto px-6 py-2.5 rounded-md shadow-xs bg-lotus-rose hover:bg-lotus-rose/90 text-white"
           >
-            {isPending ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Đang xử lý...
-              </span>
-            ) : (
-              "Cập nhật mật khẩu"
-            )}
+            Cập nhật mật khẩu
           </Button>
         </div>
       </form>

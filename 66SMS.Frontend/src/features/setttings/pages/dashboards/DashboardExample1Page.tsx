@@ -272,7 +272,6 @@ export function DashboardExample1Page() {
       subtitle="This is an example dashboard created using build-in elements and components."
       icon={Car}
     >
-      {/* Gradient widgets — 4th card hidden on xl+ (Architect d-xl-none) */}
       <div className="grid gap-x-6 md:grid-cols-2 xl:grid-cols-3">
         <StatCard
           tone="midnight-bloom"

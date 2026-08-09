@@ -8,7 +8,6 @@ function sizeClass(size: InputSize): string {
   return "px-3 py-1.5 text-sm";
 }
 
-/** Dung chung cho Textarea / Select / SearchableSelect */
 // eslint-disable-next-line react-refresh/only-export-components -- form controls dung chung style
 export function inputControlClass(opts: {
   inputSize?: InputSize;

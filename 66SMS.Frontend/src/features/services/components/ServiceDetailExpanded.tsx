@@ -198,7 +198,7 @@ export function ServiceDetailExpanded({
         content:
           products.length === 0 ? (
             <p className="py-6 text-center text-sm text-kit-muted">
-              Chưa có sản phẩm tiêu hao nào được cấu hình cho dịch vụ này
+              Chưa có sản phẩm tiêu hao
             </p>
           ) : (
             <div className="overflow-x-auto rounded border border-kit bg-kit-white">

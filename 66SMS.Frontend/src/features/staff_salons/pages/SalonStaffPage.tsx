@@ -93,9 +93,6 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
           <p className="text-sm font-medium text-kit-heading">
             Chưa có nhân viên
           </p>
-          <p className="text-xs">
-            Gán nhân viên vào chi nhánh để bắt đầu.
-          </p>
           <Button
             variant="admin"
             size="sm"

@@ -16,11 +16,11 @@ export function BookingSalonStep() {
 
       {isLoading ? (
         <div className="py-10 text-center text-sm text-warm-600">
-          Đang tải danh sách chi nhánh...
+          Đang tải chi nhánh...
         </div>
       ) : salons.length === 0 ? (
         <div className="py-10 text-center text-sm text-warm-600">
-          Hiện không có chi nhánh nào đang hoạt động.
+          Chưa có chi nhánh đang hoạt động.
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

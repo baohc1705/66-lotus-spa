@@ -19,7 +19,7 @@ import type { MembershipCardDto } from "../types/membershipCard.types";
 
 export const MEMBERSHIP_CARD_COLUMN_LABELS = {
   id: "Mã hệ thống",
-  customerId: "Mã KH",
+  customerId: "Mã khách",
   cardCode: "Mã thẻ",
   customerName: "Khách hàng",
   membershipTierId: "Mã loại thẻ",

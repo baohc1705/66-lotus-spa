@@ -10,7 +10,6 @@ import { FormField } from "@/shared/forms/FormField";
 import { bookingApi } from "@/features/booking/api/booking.api";
 import { useActivePromotions } from "@/features/booking/hooks/useBookingData";
 import type { ActivePromotionDto } from "@/features/booking/types/booking.types";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type { Result } from "@/shared/types/common.types";
 import { cn } from "@/lib/utils";
 
@@ -123,7 +122,7 @@ export function CashierPromotionModal({
             className="mb-0"
             onClick={handleClose}
           >
-            {COMMON_MSG.cancel}
+            Hủy
           </Button>
           {tab === "manual" && (
             <Button

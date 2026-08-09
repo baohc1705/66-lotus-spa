@@ -1,19 +1,18 @@
 import { z } from "zod";
-import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
 const landingBannerBaseSchema = z.object({
   title: z
     .string()
-    .min(1, VALIDATION_MSG.required("Tiêu đề"))
-    .max(200, VALIDATION_MSG.max(200)),
+    .min(1, "Tiêu đề không được để trống")
+    .max(200, "Tối đa 200 ký tự"),
   subtitle: z
     .string()
-    .max(1000, VALIDATION_MSG.max(1000))
+    .max(1000, "Tối đa 1000 ký tự")
     .optional()
     .or(z.literal("")),
   brandLabel: z
     .string()
-    .max(200, VALIDATION_MSG.max(200))
+    .max(200, "Tối đa 200 ký tự")
     .optional()
     .or(z.literal("")),
   imageUrl: z.string().optional().or(z.literal("")),
@@ -32,7 +31,7 @@ export const updateLandingBannerSchema = landingBannerBaseSchema
   .extend({
     title: z
       .string()
-      .min(1, VALIDATION_MSG.required("Tiêu đề"))
+      .min(1, "Tiêu đề không được để trống")
       .max(200)
       .optional(),
   });

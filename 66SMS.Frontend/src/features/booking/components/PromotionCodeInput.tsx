@@ -94,7 +94,7 @@ export function PromotionCodeInput({
     clearPromotion();
     setInputCode("");
     setError("");
-    toast.info("Đã hủy bỏ mã khuyến mãi");
+    toast.info("Đã hủy mã khuyến mãi");
   };
 
   if (appliedPromotion) {

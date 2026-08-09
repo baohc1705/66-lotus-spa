@@ -90,7 +90,6 @@ export function AccountListPage() {
             <TableEmptyState
               icon={UserRound}
               title="Chưa có tài khoản"
-              hint="Danh sách tài khoản đăng nhập sẽ hiển thị tại đây."
             />
           }
           pagination={

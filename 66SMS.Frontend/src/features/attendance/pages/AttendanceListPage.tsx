@@ -498,7 +498,6 @@ export function AttendanceListPage() {
                       <TableEmptyState
                         icon={Clock}
                         title="Không có ca làm việc"
-                        hint="Không có ca làm việc nào hoạt động trong tuần này."
                       />
                     </TableCell>
                   </TableRow>

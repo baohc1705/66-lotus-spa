@@ -34,7 +34,6 @@ export function Table({
       "bg-kit-dark text-kit-white " +
       "[&_th]:bg-kit-dark [&_td]:bg-kit-dark [&_th]:font-bold [&_th]:text-kit-white [&_td]:text-kit-white ";
   } else {
-    // Không gắn màu chữ th ở đây — DataTable/TableHead tự set (tránh đè text-kit-white header primary)
     tableClass += "bg-kit-white text-kit-body [&_th]:font-bold ";
   }
 

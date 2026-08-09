@@ -21,7 +21,7 @@ export const LotusDivider = ({
 
   return (
     <div
-      className={`mt-4 flex items-center justify-center gap-3 sm:mt-5 sm:gap-4 ${className}`}
+      className={`mt-3 flex items-center justify-center gap-3 sm:mt-4 sm:gap-4 ${className}`}
       aria-hidden="true"
     >
       <span className="h-[1.5px] w-20 sm:w-32 md:w-44" style={lineStyle} />

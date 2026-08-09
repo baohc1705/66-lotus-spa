@@ -1,4 +1,3 @@
-/** Khớp backend StatusActiveEnum */
 export const StatusActive = {
   Inactive: 0,
   Active: 1,

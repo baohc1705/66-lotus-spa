@@ -107,7 +107,7 @@ export function CashierHeader({
 
       <div className="flex shrink-0 items-center gap-2 text-xs font-medium">
         {isAdmin ? (
-          <div className="w-36 shrink-0 border-l border-white/20 pl-2.5 sm:w-40 md:w-44">
+          <div className="w-36 min-w-0 shrink-0 border-l border-white/20 pl-2.5 sm:w-40 md:w-44">
             <BranchSelector />
           </div>
         ) : (
