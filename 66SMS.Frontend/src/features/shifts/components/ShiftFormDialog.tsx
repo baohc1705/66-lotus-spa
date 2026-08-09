@@ -1,4 +1,17 @@
-﻿import { useForm, type Resolver } from "react-hook-form";
+﻿import { useEffect } from "react";
+import { useForm, type Resolver } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Clock, Info } from "lucide-react";
+
+import { Modal } from "@/shared/components/Modal";
+import { Button } from "@/shared/elements/Button";
+import { FormField } from "@/shared/forms/FormField";
+import { FormSection } from "@/shared/forms/FormSection";
+import { Input } from "@/shared/forms/Input";
+import { Textarea } from "@/shared/forms/Textarea";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { formatDate } from "@/shared/utils/date.utils";
+
 import { useCreateShift, useUpdateShift } from "../hooks/useShifts";
 import type { ShiftDTO } from "../types/shift.types";
 import {
@@ -7,30 +20,34 @@ import {
   type CreateShiftFormValues,
   type UpdateShiftFormValues,
 } from "../schemas/shift.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
-import { formatDate } from "@/shared/utils/date.utils";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
-import { FormSection } from "@/shared/components/forms/FormSection";
-import { Clock, Info } from "lucide-react";
-import { FormField } from "@/shared/components/forms/FormField";
-import { Input } from "@/shared/components/ui/input";
-import { Textarea } from "@/shared/components/ui/textarea";
 
 interface ShiftFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   shift?: ShiftDTO | null;
+}
+
+function getDefaultValues(shift?: ShiftDTO | null): CreateShiftFormValues {
+  if (shift) {
+    const currentPeriod = shift.shiftPeriodDTOs?.[0];
+    return {
+      name: shift.name ?? "",
+      description: shift.description ?? "",
+      shiftStart: currentPeriod?.shiftStart?.substring(0, 5) ?? "08:00",
+      shiftEnd: currentPeriod?.shiftEnd?.substring(0, 5) ?? "17:00",
+      effectiveFrom:
+        currentPeriod?.effectiveFrom ?? formatDate().format("YYYY-MM-DD"),
+      effectiveTo: currentPeriod?.effectiveTo ?? "",
+    };
+  }
+  return {
+    name: "",
+    description: "",
+    shiftStart: "08:00",
+    shiftEnd: "17:00",
+    effectiveFrom: formatDate().format("YYYY-MM-DD"),
+    effectiveTo: "",
+  };
 }
 
 export function ShiftFormDialog({
@@ -43,24 +60,20 @@ export function ShiftFormDialog({
   const updateMutation = useUpdateShift();
   const isPending = createMutation.isPending || updateMutation.isPending;
 
-  const form = useForm<CreateShiftFormValues | UpdateShiftFormValues>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<CreateShiftFormValues | UpdateShiftFormValues>({
     resolver: zodResolver(
       isEdit ? updateShiftSchema : createShiftSchema,
     ) as Resolver<CreateShiftFormValues | UpdateShiftFormValues>,
     defaultValues: getDefaultValues(shift),
   });
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = form;
-
   useEffect(() => {
-    if (open) {
-      reset(getDefaultValues(shift));
-    }
+    if (open) reset(getDefaultValues(shift));
   }, [open, shift, reset]);
 
   const onSubmit = (data: CreateShiftFormValues | UpdateShiftFormValues) => {
@@ -71,12 +84,10 @@ export function ShiftFormDialog({
 
     if (isEdit && shift?.id) {
       const currentPeriod = shift.shiftPeriodDTOs?.[0];
-
       const currentShiftStart = currentPeriod?.shiftStart?.substring(0, 5);
       const currentShiftEnd = currentPeriod?.shiftEnd?.substring(0, 5);
       const currentEffectiveFrom = currentPeriod?.effectiveFrom;
       const currentEffectiveTo = currentPeriod?.effectiveTo || "";
-
       const formEffectiveTo = data.effectiveTo || "";
 
       const isTimeChanged =
@@ -107,140 +118,138 @@ export function ShiftFormDialog({
           },
         },
       );
-    } else {
-      createMutation.mutate(
-        {
-          name: data.name,
-          description: data.description,
-          shiftPeriod: {
-            shiftStart: shiftStartStr,
-            shiftEnd: shiftEndStr,
-            effectiveFrom: data.effectiveFrom,
-            effectiveTo: data.effectiveTo || undefined,
-          },
-        },
-        {
-          onSuccess: (result) => {
-            if (result.isSuccess) onOpenChange(false);
-          },
-        },
-      );
+      return;
     }
+
+    createMutation.mutate(
+      {
+        name: data.name,
+        description: data.description,
+        shiftPeriod: {
+          shiftStart: shiftStartStr,
+          shiftEnd: shiftEndStr,
+          effectiveFrom: data.effectiveFrom,
+          effectiveTo: data.effectiveTo || undefined,
+        },
+      },
+      {
+        onSuccess: (result) => {
+          if (result.isSuccess) onOpenChange(false);
+        },
+      },
+    );
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px]">
-        <DialogHeader>
-          <DialogTitle>
-            {isEdit ? "Chỉnh sửa ca làm việc" : "Thêm ca làm việc mới"}
-          </DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? `Chỉnh sửa thông tin ca. Lịch sử ca cũ sẽ được lưu lại.`
-              : "Điền thông tin để tạo ca làm việc mới."}
-          </DialogDescription>
-        </DialogHeader>
+    <Modal
+      open={open}
+      onClose={() => onOpenChange(false)}
+      title={isEdit ? "Chỉnh sửa ca làm việc" : "Thêm ca làm việc mới"}
+      size="lg"
+      scrollable
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+        <FormSection icon={Info} title="Thông tin cơ bản">
+          <FormField
+            label="Tên ca *"
+            tooltip="Vui lòng nhập tên ca (VD: Ca Sáng)"
+            error={errors.name?.message}
+          >
+            <Input
+              {...register("name")}
+              placeholder="Ca Sáng"
+              invalid={!!errors.name}
+            />
+          </FormField>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <FormSection icon={Info} title="Thông tin cơ bản">
-            <div className="grid grid-cols-1 gap-2">
-              <FormField
-                label="Tên ca"
-                tooltip="Vui lòng nhập tên ca (VD: Ca Sáng)"
-                error={errors.name?.message}
-              >
-                <Input {...register("name")} placeholder="Ca Sáng" />
-              </FormField>
+          <FormField
+            label="Mô tả"
+            tooltip="Mô tả chi tiết ca làm việc"
+            error={errors.description?.message}
+          >
+            <Textarea
+              {...register("description")}
+              placeholder="Mô tả chi tiết"
+              rows={3}
+              invalid={!!errors.description}
+            />
+          </FormField>
+        </FormSection>
 
-              <FormField
-                label="Mô tả"
-                tooltip="Mô tả chi tiết ca làm việc"
-                error={errors.description?.message}
-              >
-                <Textarea
-                  {...register("description")}
-                  placeholder="Mô tả chi tiết"
-                />
-              </FormField>
-            </div>
-          </FormSection>
-
-          <FormSection icon={Clock} title="Thời gian làm việc">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <FormField
-                label="Giờ bắt đầu"
-                tooltip="Giờ bắt đầu làm việc"
-                error={errors.shiftStart?.message}
-              >
-                <Input type="time" {...register("shiftStart")} />
-              </FormField>
-
-              <FormField
-                label="Giờ kết thúc"
-                tooltip="Giờ kết thúc làm việc"
-                error={errors.shiftEnd?.message}
-              >
-                <Input type="time" {...register("shiftEnd")} />
-              </FormField>
-
-              <FormField
-                label="Ngày bắt đầu áp dụng"
-                tooltip="Ngày ca làm việc này bắt đầu có hiệu lực"
-                error={errors.effectiveFrom?.message}
-              >
-                <Input type="date" {...register("effectiveFrom")} />
-              </FormField>
-
-              <FormField
-                label="Ngày kết thúc áp dụng"
-                tooltip="Bỏ trống nếu áp dụng vô thời hạn"
-                error={errors.effectiveTo?.message}
-              >
-                <Input type="date" {...register("effectiveTo")} />
-              </FormField>
-            </div>
-          </FormSection>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
+        <FormSection icon={Clock} title="Thời gian làm việc">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <FormField
+              label="Giờ bắt đầu *"
+              tooltip="Giờ bắt đầu làm việc"
+              error={errors.shiftStart?.message}
             >
-              {COMMON_MSG.cancel}
-            </Button>
-            <Button type="submit" variant="admin" size="sm" loading={isPending}>
-              {isEdit ? "Cập nhật" : "Tạo ca làm việc"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-}
+              <Input
+                type="time"
+                {...register("shiftStart")}
+                invalid={!!errors.shiftStart}
+              />
+            </FormField>
 
-function getDefaultValues(shift?: ShiftDTO | null): CreateShiftFormValues {
-  if (shift) {
-    const currentPeriod = shift.shiftPeriodDTOs?.[0];
-    return {
-      name: shift.name ?? "",
-      description: shift.description ?? "",
-      shiftStart: currentPeriod?.shiftStart?.substring(0, 5) ?? "08:00",
-      shiftEnd: currentPeriod?.shiftEnd?.substring(0, 5) ?? "17:00",
-      effectiveFrom:
-        currentPeriod?.effectiveFrom ?? formatDate().format("YYYY-MM-DD"),
-      effectiveTo: currentPeriod?.effectiveTo ?? "",
-    };
-  }
-  return {
-    name: "",
-    description: "",
-    shiftStart: "08:00",
-    shiftEnd: "17:00",
-    effectiveFrom: formatDate().format("YYYY-MM-DD"),
-    effectiveTo: "",
-  };
+            <FormField
+              label="Giờ kết thúc *"
+              tooltip="Giờ kết thúc làm việc"
+              error={errors.shiftEnd?.message}
+            >
+              <Input
+                type="time"
+                {...register("shiftEnd")}
+                invalid={!!errors.shiftEnd}
+              />
+            </FormField>
+
+            <FormField
+              label="Ngày bắt đầu áp dụng *"
+              tooltip="Ngày ca làm việc này bắt đầu có hiệu lực"
+              error={errors.effectiveFrom?.message}
+            >
+              <Input
+                type="date"
+                {...register("effectiveFrom")}
+                invalid={!!errors.effectiveFrom}
+              />
+            </FormField>
+
+            <FormField
+              label="Ngày kết thúc áp dụng"
+              tooltip="Bỏ trống nếu áp dụng vô thời hạn"
+              error={errors.effectiveTo?.message}
+            >
+              <Input
+                type="date"
+                {...register("effectiveTo")}
+                invalid={!!errors.effectiveTo}
+              />
+            </FormField>
+          </div>
+        </FormSection>
+
+        <div className="flex justify-end gap-2 border-t border-kit pt-3">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="mb-0"
+            onClick={() => onOpenChange(false)}
+            disabled={isPending}
+          >
+            {COMMON_MSG.cancel}
+          </Button>
+          <Button
+            type="submit"
+            variant="admin"
+            size="sm"
+            className="mb-0"
+            loading={isPending}
+          >
+            {isEdit ? "Cập nhật" : "Tạo ca làm việc"}
+          </Button>
+        </div>
+      </form>
+    </Modal>
+  );
 }

@@ -4,33 +4,36 @@ import {
   getCoreRowModel,
   getExpandedRowModel,
 } from "@tanstack/react-table";
-import { Plus } from "lucide-react";
+import { Briefcase, Plus } from "lucide-react";
 
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { Button } from "@/shared/components/ui/button";
-import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
-import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
+import { Pagination } from "@/shared/components/Pagination";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { Button } from "@/shared/elements/Button";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
+import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
 import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
+import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 
-import { ShiftFormDialog } from "../components/ShiftFormDialog";
 import { ShiftDetailExpanded } from "../components/ShiftDetailExpanded";
-import { useShiftListState } from "../hooks/useShiftListState";
+import { ShiftFormDialog } from "../components/ShiftFormDialog";
 import {
   SHIFT_COLUMN_LABELS,
   useActiveShiftColumns,
 } from "../components/useActiveShiftColumns";
 import { SHIFT_PERM } from "../constants/shift.permissions";
+import { useShiftListState } from "../hooks/useShiftListState";
 import { useAdminShifts, useDeleteShift } from "../hooks/useShifts";
 
 const ENTITY = "ca làm việc";
 
 export function ShiftListPage() {
+  "use no memo";
+
   const perm = SHIFT_PERM;
   const listState = useShiftListState();
 
@@ -64,6 +67,10 @@ export function ShiftListPage() {
   const paged = shiftResult?.data;
   const shifts = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
+  const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
   const activeColumns = useActiveShiftColumns({
     pageIndex,
@@ -75,15 +82,15 @@ export function ShiftListPage() {
     onDelete: setDeleteTarget,
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: shifts,
     columns: activeColumns,
-    state: {
-      columnVisibility,
-    },
+    state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
+    getRowCanExpand: () => true,
     manualPagination: true,
     manualSorting: true,
   });
@@ -101,51 +108,90 @@ export function ShiftListPage() {
   };
 
   return (
-    <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-      <DataTableToolbar
-        searchPlaceholder="Tìm kiếm ca..."
-        searchValue={filter}
-        onSearchChange={handleSearchChange}
-      >
-        <DataTableViewOptions table={table} columnLabels={columnLabels} />
-        <div className="flex items-center gap-2 ml-auto">
-          <PermissionGate resource={perm.resource} action={perm.create}>
-            <Button
-              variant="admin"
-              size="sm"
-              onClick={() => setCreateOpen(true)}
-              className="lotus-admin-table-toolbar-btn"
-            >
-              <Plus className="w-4 h-4" />
-              Thêm ca làm việc
-            </Button>
-          </PermissionGate>
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
+      <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+        <div className="border-b border-kit px-3 pt-3">
+          <DataTableToolbar
+            searchPlaceholder="Tìm kiếm ca..."
+            searchValue={filter}
+            onSearchChange={handleSearchChange}
+          >
+            <DataTableViewOptions table={table} columnLabels={columnLabels} />
+            <PermissionGate resource={perm.resource} action={perm.create}>
+              <Button
+                variant="primary"
+                size="sm"
+                className="mb-0"
+                onClick={() => setCreateOpen(true)}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Thêm ca làm việc
+              </Button>
+            </PermissionGate>
+          </DataTableToolbar>
         </div>
-      </DataTableToolbar>
 
-      <div className="lotus-admin-table-page-card">
         <DataTable
           table={table}
           isLoading={isLoading}
           loadingRows={DEFAULT_LOADING_ROWS}
-          renderSubComponent={({ row }) =>
+          renderExpandedRow={({ row }) =>
             row.original.id ? (
               <ShiftDetailExpanded shift={row.original} />
             ) : null
           }
+          emptyState={
+            <TableEmptyState
+              icon={Briefcase}
+              title="Chưa có ca làm việc"
+              hint="Thêm ca làm việc để xếp lịch nhân viên."
+              action={
+                <PermissionGate resource={perm.resource} action={perm.create}>
+                  <Button
+                    variant="admin"
+                    size="sm"
+                    className="mb-0"
+                    onClick={() => setCreateOpen(true)}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Thêm ca làm việc
+                  </Button>
+                </PermissionGate>
+              }
+            />
+          }
+          pagination={
+            totalCount > 0 ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <div className="flex items-center gap-3 text-xs text-kit-muted">
+                  <span>
+                    {rangeStart}-{rangeEnd} / {totalCount}
+                  </span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) =>
+                      handlePageSizeChange(Number(e.target.value))
+                    }
+                    className="h-8 cursor-pointer rounded border border-kit bg-kit-white px-2 text-xs text-kit-heading outline-none focus:border-kit-primary"
+                  >
+                    {[5, 10, 20].map((size: number) => (
+                      <option key={size} value={size}>
+                        {size} / trang
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <Pagination
+                  page={safePage}
+                  pageCount={totalPages}
+                  onPageChange={listState.setPageIndex}
+                  size="sm"
+                />
+              </div>
+            ) : null
+          }
         />
-      </div>
-
-      <DataTablePagination
-        pageIndex={pageIndex}
-        pageSize={pageSize}
-        totalCount={totalCount}
-        totalPages={paged?.totalPages ?? 0}
-        hasPreviousPage={paged?.hasPreviousPage ?? false}
-        hasNextPage={paged?.hasNextPage ?? false}
-        onPageChange={listState.setPageIndex}
-        onPageSizeChange={handlePageSizeChange}
-      />
+      </TablePageShell>
 
       <ShiftFormDialog
         open={createOpen}
@@ -153,7 +199,7 @@ export function ShiftListPage() {
         shift={null}
       />
 
-      {editTarget && (
+      {editTarget ? (
         <ShiftFormDialog
           open={!!editTarget}
           onOpenChange={(open) => {
@@ -161,9 +207,9 @@ export function ShiftListPage() {
           }}
           shift={editTarget}
         />
-      )}
+      ) : null}
 
-      {deleteTarget && (
+      {deleteTarget ? (
         <ConfirmDialog
           open={!!deleteTarget}
           onOpenChange={(open) => {
@@ -177,8 +223,9 @@ export function ShiftListPage() {
           onConfirm={handleDelete}
           confirmLabel={COMMON_MSG.delete}
           loading={deleteMutation.isPending}
+          variant="danger"
         />
-      )}
-    </TablePageShell>
+      ) : null}
+    </div>
   );
 }

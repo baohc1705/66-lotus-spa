@@ -1,25 +1,19 @@
 import { useState, useMemo } from "react";
 import { User, Search, CheckSquare, Square } from "lucide-react";
 import { toast } from "@/shared/components/kitToast";
+import { Modal } from "@/shared/components/Modal";
+import { Button } from "@/shared/elements/Button";
+import { FormSection } from "@/shared/forms/FormSection";
+import { Input } from "@/shared/forms/Input";
 import { formatDate } from "@/shared/utils/date.utils";
+import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useStaffs } from "@/features/staffs/hooks/useStaffs";
-import { useBulkCreateWorkSchedule } from "../hooks/useSchedules";
+import type { StaffDto } from "@/features/staffs/types/staff.types";
 import type {
   ShiftDTO,
   ShiftPeriodDTO,
 } from "@/features/shifts/types/shift.types";
-import { useAuthStore } from "@/features/auth/stores/authStore";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
-import { FormSection } from "@/shared/components/forms/FormSection";
+import { useBulkCreateWorkSchedule } from "../hooks/useSchedules";
 
 const WEEKDAYS = [
   { value: 1, label: "Thứ 2" },
@@ -67,62 +61,68 @@ export function AddStaffDialog({
   const availableStaffs = useMemo(
     () =>
       (staffsData?.data?.items || []).filter(
-        (s) => !existingStaffIds.includes(s.id!),
+        (staff: StaffDto) => !existingStaffIds.includes(staff.id!),
       ),
     [staffsData, existingStaffIds],
   );
 
   const filteredStaffs = useMemo(() => {
-    const q = searchText.toLowerCase().trim();
-    if (!q) return availableStaffs;
+    const query = searchText.toLowerCase().trim();
+    if (!query) return availableStaffs;
     return availableStaffs.filter(
-      (s) =>
-        s.fullName?.toLowerCase().includes(q) ||
-        s.code?.toLowerCase().includes(q),
+      (staff: StaffDto) =>
+        staff.fullName?.toLowerCase().includes(query) ||
+        staff.code?.toLowerCase().includes(query),
     );
   }, [availableStaffs, searchText]);
 
   if (!date || !shift || !shiftPeriod) return null;
 
-  const toggleStaff = (id: number) => {
+  function toggleStaff(id: number) {
     setValidationError("");
     setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     );
-  };
+  }
 
-  const toggleAll = () => {
+  function toggleAll() {
     setValidationError("");
-    const allFilteredIds = filteredStaffs.map((s) => s.id!);
-    const allSelected = allFilteredIds.every((id) => selectedIds.includes(id));
+    const allFilteredIds = filteredStaffs.map((staff: StaffDto) => staff.id!);
+    const allSelected = allFilteredIds.every((id: number) =>
+      selectedIds.includes(id),
+    );
     if (allSelected) {
       setSelectedIds((prev) =>
         prev.filter((id) => !allFilteredIds.includes(id)),
       );
-    } else {
-      setSelectedIds((prev) => [
-        ...prev,
-        ...allFilteredIds.filter((id) => !prev.includes(id)),
-      ]);
+      return;
     }
-  };
+    setSelectedIds((prev) => [
+      ...prev,
+      ...allFilteredIds.filter((id: number) => !prev.includes(id)),
+    ]);
+  }
 
   const allFilteredSelected =
     filteredStaffs.length > 0 &&
-    filteredStaffs.every((s) => selectedIds.includes(s.id!));
+    filteredStaffs.every((staff: StaffDto) =>
+      selectedIds.includes(staff.id!),
+    );
 
-  const onSubmit = () => {
+  function onSubmit() {
     if (selectedIds.length === 0) {
       setValidationError("Vui lòng chọn ít nhất 1 nhân viên");
       return;
     }
 
-    const schedules = selectedIds.map((staffId) => {
-      const staff = staffsData?.data?.items?.find((s) => s.id === staffId);
+    const schedules = selectedIds.map((staffId: number) => {
+      const staff = staffsData?.data?.items?.find(
+        (item: StaffDto) => item.id === staffId,
+      );
       return {
         staffId,
-        shiftPeriodId: shiftPeriod.id,
-        workDate: date,
+        shiftPeriodId: shiftPeriod!.id,
+        workDate: date!,
         salonId: salonId || staff?.salonId || undefined,
       };
     });
@@ -130,8 +130,8 @@ export function AddStaffDialog({
     bulkCreate(
       { schedules },
       {
-        onSuccess: (res) => {
-          if (res.isSuccess) {
+        onSuccess: (result) => {
+          if (result.isSuccess) {
             toast.success(
               `Đã phân lịch cho ${selectedIds.length} nhân viên thành công!`,
             );
@@ -140,139 +140,140 @@ export function AddStaffDialog({
         },
       },
     );
-  };
+  }
 
   const utilDate = formatDate(date);
-  const dayName = WEEKDAYS.find((w) => w.value === utilDate.day())?.label || "";
+  const dayName =
+    WEEKDAYS.find((day) => day.value === utilDate.day())?.label || "";
   const subTitle = `Ca: ${shift.name} (${shiftPeriod.shiftStart?.substring(0, 5)} - ${shiftPeriod.shiftEnd?.substring(0, 5)}) | ${dayName}, ${utilDate.format("DD/MM/YYYY")}`;
 
   return (
-    <Dialog
-      open={true}
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
+    <Modal
+      open
+      onClose={onClose}
+      title="Thêm lịch làm việc"
+      size="md"
+      scrollable
     >
-      <DialogContent className="sm:max-w-[560px]">
-        <DialogHeader>
-          <DialogTitle>Thêm lịch làm việc</DialogTitle>
-          <DialogDescription>{subTitle}</DialogDescription>
-        </DialogHeader>
+      <div className="space-y-3">
+        <p className="text-xs text-kit-muted">{subTitle}</p>
 
-        <div className="space-y-5">
-          <FormSection icon={User} title="Chọn nhân viên">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="relative flex-1">
-                <Search
-                  size={14}
-                  className="absolute left-2.5 top-1/2 -translate-y-1/2 text-adminGray-400"
-                />
-                <input
-                  type="text"
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  placeholder="Tìm theo tên hoặc mã nhân viên..."
-                  className="w-full pl-8 pr-3 py-1.5 border border-adminGray-100 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-adminGreen-600 bg-white"
-                />
+        <FormSection icon={User} title="Chọn nhân viên">
+          <div className="mb-3 flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search
+                size={14}
+                className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-kit-muted"
+              />
+              <Input
+                type="text"
+                inputSize="sm"
+                value={searchText}
+                onChange={(e: { target: { value: string } }) =>
+                  setSearchText(e.target.value)
+                }
+                placeholder="Tìm theo tên hoặc mã nhân viên..."
+                className="pl-8"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={toggleAll}
+              disabled={filteredStaffs.length === 0}
+              className="flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold text-kit-primary transition-colors hover:text-kit-heading disabled:opacity-40"
+            >
+              {allFilteredSelected ? (
+                <CheckSquare size={14} />
+              ) : (
+                <Square size={14} />
+              )}
+              {allFilteredSelected ? "Bỏ chọn tất cả" : "Chọn tất cả"}
+            </button>
+          </div>
+
+          <div className="overflow-hidden rounded border border-kit">
+            {isLoadingStaffs ? (
+              <div className="py-8 text-center text-sm text-kit-muted">
+                Đang tải danh sách nhân viên...
               </div>
-              <button
-                type="button"
-                onClick={toggleAll}
-                disabled={filteredStaffs.length === 0}
-                className="flex items-center gap-1.5 text-xs font-semibold text-adminGreen-600 hover:text-adminInk transition-colors whitespace-nowrap disabled:opacity-40"
-              >
-                {allFilteredSelected ? (
-                  <CheckSquare size={14} />
-                ) : (
-                  <Square size={14} />
-                )}
-                {allFilteredSelected ? "Bỏ chọn tất cả" : "Chọn tất cả"}
-              </button>
-            </div>
-
-            <div className="border border-adminGray-100 rounded-lg overflow-hidden">
-              {isLoadingStaffs ? (
-                <div className="py-8 text-center text-sm text-adminGray-400">
-                  Đang tải danh sách nhân viên...
-                </div>
-              ) : filteredStaffs.length === 0 ? (
-                <div className="py-8 text-center text-sm text-adminGray-400">
-                  {searchText
-                    ? "Không tìm thấy nhân viên phù hợp"
-                    : "Tất cả nhân viên đã được xếp ca này"}
-                </div>
-              ) : (
-                <ul className="divide-y divide-adminGray-100 max-h-[260px] overflow-y-auto">
-                  {filteredStaffs.map((staff) => {
-                    const isSelected = selectedIds.includes(staff.id!);
-                    return (
-                      <li key={staff.id}>
-                        <button
-                          type="button"
-                          onClick={() => toggleStaff(staff.id!)}
-                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-adminGray-50 ${
-                            isSelected ? "bg-adminGray-50/40" : ""
-                          }`}
+            ) : filteredStaffs.length === 0 ? (
+              <div className="py-8 text-center text-sm text-kit-muted">
+                {searchText
+                  ? "Không tìm thấy nhân viên phù hợp"
+                  : "Tất cả nhân viên đã được xếp ca này"}
+              </div>
+            ) : (
+              <ul className="max-h-65 divide-y divide-kit overflow-y-auto">
+                {filteredStaffs.map((staff: StaffDto) => {
+                  const isSelected = selectedIds.includes(staff.id!);
+                  return (
+                    <li key={staff.id}>
+                      <button
+                        type="button"
+                        onClick={() => toggleStaff(staff.id!)}
+                        className={
+                          "flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-kit-page " +
+                          (isSelected ? "bg-kit-page/60" : "")
+                        }
+                      >
+                        <div
+                          className={
+                            "flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors " +
+                            (isSelected
+                              ? "border-kit-primary bg-kit-primary"
+                              : "border-kit")
+                          }
                         >
-                          <div
-                            className={`w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors ${
-                              isSelected
-                                ? "bg-adminGreen-600 border-adminGreen-600"
-                                : "border-adminGray-300"
-                            }`}
-                          >
-                            {isSelected && (
-                              <svg
-                                viewBox="0 0 12 12"
-                                className="w-3 h-3 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                              >
-                                <polyline points="2,6 5,9 10,3" />
-                              </svg>
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <span className="text-sm font-medium text-adminInk truncate block">
-                              {staff.fullName}
+                          {isSelected ? (
+                            <svg
+                              viewBox="0 0 12 12"
+                              className="h-3 w-3 text-kit-white"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                            >
+                              <polyline points="2,6 5,9 10,3" />
+                            </svg>
+                          ) : null}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <span className="block truncate text-sm font-medium text-kit-heading">
+                            {staff.fullName}
+                          </span>
+                          {staff.code ? (
+                            <span className="text-xs text-kit-muted">
+                              {staff.code}
                             </span>
-                            {staff.code && (
-                              <span className="text-xs text-adminGray-400">
-                                {staff.code}
-                              </span>
-                            )}
-                          </div>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
+                          ) : null}
+                        </div>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
 
-            <div className="mt-2 flex items-center justify-between min-h-[20px]">
-              {selectedIds.length > 0 ? (
-                <span className="text-xs text-adminGreen-600 font-medium">
-                  Đã chọn {selectedIds.length} nhân viên
-                </span>
-              ) : (
-                <span />
-              )}
-              {validationError && (
-                <span className="text-xs text-state-danger-text">
-                  {validationError}
-                </span>
-              )}
-            </div>
-          </FormSection>
-        </div>
+          <div className="mt-2 flex min-h-5 items-center justify-between">
+            {selectedIds.length > 0 ? (
+              <span className="text-xs font-medium text-kit-primary">
+                Đã chọn {selectedIds.length} nhân viên
+              </span>
+            ) : (
+              <span />
+            )}
+            {validationError ? (
+              <span className="text-xs text-kit-danger">{validationError}</span>
+            ) : null}
+          </div>
+        </FormSection>
 
-        <DialogFooter>
+        <div className="flex justify-end gap-2 border-t border-kit pt-3">
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             size="sm"
+            className="mb-0"
             onClick={onClose}
             disabled={isPending}
           >
@@ -282,13 +283,14 @@ export function AddStaffDialog({
             type="button"
             variant="admin"
             size="sm"
+            className="mb-0"
             loading={isPending}
             onClick={onSubmit}
           >
             Lưu ({selectedIds.length})
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+      </div>
+    </Modal>
   );
 }
