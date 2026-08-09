@@ -2,28 +2,33 @@ import type { PermissionDTO } from '@/features/auth/types/auth.types';
 
 export function groupByResource(permissions: PermissionDTO[]): Record<string, PermissionDTO[]> {
   const map: Record<string, PermissionDTO[]> = {};
-  for (const p of permissions) {
-    if (!map[p.resource]) map[p.resource] = [];
-    map[p.resource].push(p);
+  for (const permission of permissions) {
+    if (!map[permission.resource]) map[permission.resource] = [];
+    map[permission.resource].push(permission);
   }
   return map;
 }
 
 const ACTION_ORDER = ['create', 'read', 'update', 'delete'];
+
 export function getSortedActions(permissions: PermissionDTO[]): string[] {
-  const acts = Array.from(new Set(permissions.map(p => p.action.toLowerCase())));
-  return acts.sort((a, b) => {
-    const ia = ACTION_ORDER.indexOf(a), ib = ACTION_ORDER.indexOf(b);
-    if (ia === -1 && ib === -1) return a.localeCompare(b);
-    if (ia === -1) return 1; if (ib === -1) return -1;
-    return ia - ib;
+  const actions = Array.from(
+    new Set(permissions.map((permission: PermissionDTO) => permission.action.toLowerCase())),
+  );
+  return actions.sort((actionA: string, actionB: string) => {
+    const indexA = ACTION_ORDER.indexOf(actionA);
+    const indexB = ACTION_ORDER.indexOf(actionB);
+    if (indexA === -1 && indexB === -1) return actionA.localeCompare(actionB);
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
   });
 }
 
 export const ROLE_COLORS = [
-  { bg: 'var(--admin-green-600)', light: 'var(--admin-green-50)' },
-  { bg: 'var(--admin-gold-700)', light: 'var(--admin-gold-100)' },
-  { bg: 'var(--state-info-solid)', light: 'var(--state-info-bg)' },
-  { bg: 'var(--state-warning-solid)', light: 'var(--state-warning-bg)' },
-  { bg: 'var(--admin-green-700)', light: 'var(--admin-green-100)' },
+  { bg: 'var(--kit-primary)', light: 'var(--kit-soft-primary-bg)' },
+  { bg: 'var(--kit-success)', light: 'var(--kit-soft-success-bg)' },
+  { bg: 'var(--kit-info)', light: 'var(--kit-soft-info-bg)' },
+  { bg: 'var(--kit-warning)', light: 'var(--kit-soft-warning-bg)' },
+  { bg: 'var(--kit-alt)', light: 'var(--kit-soft-alternate-bg)' },
 ];

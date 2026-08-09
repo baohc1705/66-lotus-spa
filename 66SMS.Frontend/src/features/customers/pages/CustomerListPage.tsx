@@ -118,7 +118,7 @@ export function CustomerListPage() {
   }, [restoreTarget, restoreMutation, setRestoreTarget]);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden gap-2">
+    <div className="flex h-full flex-col gap-2 overflow-hidden font-sans text-sm text-kit-body">
       <div className="shrink-0">
         <CustomerStatCards
           totalCustomers={totalCount}
@@ -129,7 +129,7 @@ export function CustomerListPage() {
         />
       </div>
 
-      <div className="grid grid-cols-12 gap-2 flex-1 min-h-0 overflow-hidden">
+      <div className="grid min-h-0 flex-1 grid-cols-12 gap-2 overflow-hidden">
         <div className="col-span-3 h-full overflow-hidden">
           <CustomerCrmList
             customers={customers}

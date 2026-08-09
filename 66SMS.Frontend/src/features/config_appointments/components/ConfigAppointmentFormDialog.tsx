@@ -1,13 +1,25 @@
-import { AdminInput } from "@/shared/components/forms/AdminInput";
+import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Settings } from "lucide-react";
+
+import { Modal } from "@/shared/components/Modal";
+import { Button } from "@/shared/elements/Button";
+import { FormField } from "@/shared/forms/FormField";
+import { FormRow } from "@/shared/forms/FormRow";
+import { FormSection } from "@/shared/forms/FormSection";
+import { Input } from "@/shared/forms/Input";
+import { Select } from "@/shared/forms/Select";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { toLocalTimeOnly } from "@/shared/utils/date.utils";
+
+import { useAuthStore } from "@/features/auth/stores/authStore";
+import { useAdminSalons } from "@/features/salons/hooks/useSalons";
+import type { SalonDTO } from "@/features/salons/types/salon.types";
 import {
   useCreateConfigAppointment,
   useUpdateConfigAppointment,
 } from "../hooks/useConfigAppointments";
-import { useAdminSalons } from "@/features/salons/hooks/useSalons";
-import { useAuthStore } from "@/features/auth/stores/authStore";
-import type { ConfigAppointmentDTO } from "../types/config_appointment.types";
-import type { SalonDTO } from "@/features/salons/types/salon.types";
 import {
   createConfigAppointmentSchema,
   updateConfigAppointmentSchema,
@@ -15,34 +27,41 @@ import {
   type ConfigAppointmentFormValues,
   type UpdateConfigAppointmentPayload,
 } from "../schemas/configAppointment.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
-import { FormSection } from "@/shared/components/forms/FormSection";
-import { Settings } from "lucide-react";
-import { FormField } from "@/shared/components/forms/FormField";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/shared/components/ui/select";
-import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
+import type { ConfigAppointmentDTO } from "../types/config_appointment.types";
 
 interface ConfigAppointmentFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   configAppointment?: ConfigAppointmentDTO | null;
+}
+
+function getDefaultValues(
+  configAppointment?: ConfigAppointmentDTO | null,
+  effectiveSalonId?: number | null,
+): ConfigAppointmentFormValues {
+  if (configAppointment) {
+    return {
+      salonId: configAppointment.salonId ?? 0,
+      depositPercent: configAppointment.depositPercent ?? 20,
+      startTime: toLocalTimeOnly(configAppointment.startTime),
+      endTime: toLocalTimeOnly(configAppointment.endTime),
+      slotMinutes: configAppointment.slotMinutes ?? undefined,
+    };
+  }
+
+  return {
+    salonId: effectiveSalonId ?? 0,
+    depositPercent: 20,
+    startTime: "08:00",
+    endTime: "21:00",
+    slotMinutes: 30,
+  };
+}
+
+function formatTimeSpan(time?: string) {
+  if (!time) return undefined;
+  if (time.split(":").length === 2) return `${time}:00`;
+  return time;
 }
 
 export function ConfigAppointmentFormDialog({
@@ -55,19 +74,24 @@ export function ConfigAppointmentFormDialog({
   const updateMutation = useUpdateConfigAppointment();
   const isPending = createMutation.isPending || updateMutation.isPending;
 
-  const effectiveSalonId = useAuthStore((s) => s.getEffectiveSalonId());
+  const effectiveSalonId = useAuthStore((state) => state.getEffectiveSalonId());
   const { data: salonsResult } = useAdminSalons(
     { pageIndex: 1, pageSize: 100 },
     open && !isEdit,
   );
   const salons = salonsResult?.data?.items ?? [];
 
-  const form = useForm<ConfigAppointmentFormValues>({
-    resolver: zodResolver(
-      isEdit ? updateConfigAppointmentSchema : createConfigAppointmentSchema,
-    ) as Resolver<ConfigAppointmentFormValues>,
-    defaultValues: getDefaultValues(configAppointment, effectiveSalonId),
-  });
+  const salonOptions = salons.map((salon: SalonDTO) => ({
+    value: String(salon.id),
+    label: salon.name ?? "",
+  }));
+
+  let salonPlaceholder = "Chọn chi nhánh...";
+  if (salonsResult === undefined) {
+    salonPlaceholder = "Đang tải chi nhánh...";
+  } else if (salons.length === 0) {
+    salonPlaceholder = "Không có chi nhánh";
+  }
 
   const {
     register,
@@ -76,7 +100,14 @@ export function ConfigAppointmentFormDialog({
     reset,
     setValue,
     watch,
-  } = form;
+  } = useForm<ConfigAppointmentFormValues>({
+    resolver: zodResolver(
+      isEdit ? updateConfigAppointmentSchema : createConfigAppointmentSchema,
+    ) as Resolver<ConfigAppointmentFormValues>,
+    defaultValues: getDefaultValues(configAppointment, effectiveSalonId),
+  });
+
+  const salonIdValue = watch("salonId");
 
   useEffect(() => {
     if (open) {
@@ -84,13 +115,7 @@ export function ConfigAppointmentFormDialog({
     }
   }, [open, configAppointment, effectiveSalonId, reset]);
 
-  const formatTimeSpan = (t?: string) => {
-    if (!t) return undefined;
-    if (t.split(":").length === 2) return `${t}:00`;
-    return t;
-  };
-
-  const onSubmit = (data: ConfigAppointmentFormValues) => {
+  function onSubmit(data: ConfigAppointmentFormValues) {
     const payload = {
       salonId: data.salonId,
       depositPercent: data.depositPercent,
@@ -111,167 +136,128 @@ export function ConfigAppointmentFormDialog({
           },
         },
       );
-    } else {
-      createMutation.mutate(payload as CreateConfigAppointmentPayload, {
-        onSuccess: (result) => {
-          if (result.isSuccess) onOpenChange(false);
-        },
-      });
+      return;
     }
-  };
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[560px]">
-        <DialogHeader>
-          <DialogTitle>
-            {isEdit ? "Chỉnh sửa cấu hình lịch hẹn" : "Thêm cấu hình lịch hẹn"}
-          </DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? "Cập nhật phần trăm cọc và khung giờ theo chi nhánh"
-              : "Thiết lập phần trăm cọc và khung giờ cho từng chi nhánh"}
-          </DialogDescription>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <FormSection icon={Settings} title="Thông tin cấu hình">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {!isEdit && (
-                <FormField
-                  label="Chi nhánh *"
-                  tooltip="Mỗi chi nhánh chỉ có một cấu hình"
-                  error={errors.salonId?.message}
-                  className="sm:col-span-2"
-                >
-                  <Select
-                    value={watch("salonId")?.toString() ?? ""}
-                    onValueChange={(v) =>
-                      setValue("salonId", Number(v), { shouldValidate: true })
-                    }
-                  >
-                    <AdminSelectTrigger>
-                      <SelectValue
-                        placeholder={
-                          salonsResult === undefined
-                            ? "Đang tải chi nhánh..."
-                            : salons.length === 0
-                              ? "Không có chi nhánh"
-                              : "Chọn chi nhánh..."
-                        }
-                      />
-                    </AdminSelectTrigger>
-                    <SelectContent>
-                      {salons.map((s: SalonDTO) => (
-                        <SelectItem key={s.id} value={String(s.id)}>
-                          {s.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
-              )}
-
-              {isEdit && (
-                <FormField label="Chi nhánh" className="sm:col-span-2">
-                  <AdminInput
-                    value={configAppointment?.salonName ?? ""}
-                    disabled
-                  />
-                </FormField>
-              )}
-
-              <FormField
-                label="Phần trăm cọc (%) *"
-                tooltip="Tỉ lệ cọc khi khách đặt lịch online"
-                error={errors.depositPercent?.message}
-              >
-                <AdminInput
-                  type="number"
-                  min={0}
-                  max={100}
-                  {...register("depositPercent")}
-                />
-              </FormField>
-
-              <FormField
-                label="Phút mỗi khung"
-                tooltip="Độ dài mỗi slot (phút)"
-                error={errors.slotMinutes?.message}
-              >
-                <AdminInput
-                  type="number"
-                  min={1}
-                  {...register("slotMinutes")}
-                />
-              </FormField>
-
-              <FormField
-                label="Giờ mở cửa"
-                tooltip="Giờ bắt đầu nhận lịch trong ngày"
-                error={errors.startTime?.message}
-              >
-                <AdminInput type="time" {...register("startTime")} />
-              </FormField>
-
-              <FormField
-                label="Giờ đóng cửa"
-                tooltip="Giờ kết thúc nhận lịch trong ngày"
-                error={errors.endTime?.message}
-              >
-                <AdminInput type="time" {...register("endTime")} />
-              </FormField>
-            </div>
-          </FormSection>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
-            >
-              {COMMON_MSG.cancel}
-            </Button>
-            <Button type="submit" variant="admin" size="sm" loading={isPending}>
-              {isEdit ? "Cập nhật" : "Tạo cấu hình"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function getDefaultValues(
-  configAppointment?: ConfigAppointmentDTO | null,
-  effectiveSalonId?: number | null,
-): ConfigAppointmentFormValues {
-  const sliceTime = (t?: string | null) => {
-    if (!t) return "";
-    const parts = t.split(":");
-    if (parts.length >= 2) {
-      return `${parts[0].padStart(2, "0")}:${parts[1].padStart(2, "0")}`;
-    }
-    return t;
-  };
-
-  if (configAppointment) {
-    return {
-      salonId: configAppointment.salonId ?? 0,
-      depositPercent: configAppointment.depositPercent ?? 20,
-      startTime: sliceTime(configAppointment.startTime),
-      endTime: sliceTime(configAppointment.endTime),
-      slotMinutes: configAppointment.slotMinutes ?? undefined,
-    };
+    createMutation.mutate(payload as CreateConfigAppointmentPayload, {
+      onSuccess: (result) => {
+        if (result.isSuccess) onOpenChange(false);
+      },
+    });
   }
 
-  return {
-    salonId: effectiveSalonId ?? 0,
-    depositPercent: 20,
-    startTime: "08:00",
-    endTime: "21:00",
-    slotMinutes: 30,
-  };
+  return (
+    <Modal
+      open={open}
+      onClose={() => onOpenChange(false)}
+      title={isEdit ? "Chỉnh sửa cấu hình lịch hẹn" : "Thêm cấu hình lịch hẹn"}
+      size="lg"
+      scrollable
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <FormSection icon={Settings} title="Thông tin cấu hình">
+          {!isEdit ? (
+            <FormField
+              label="Chi nhánh *"
+              tooltip="Mỗi chi nhánh chỉ có một cấu hình"
+              error={errors.salonId?.message}
+            >
+              <Select
+                value={salonIdValue ? String(salonIdValue) : ""}
+                onChange={(event) =>
+                  setValue("salonId", Number(event.target.value), {
+                    shouldValidate: true,
+                  })
+                }
+                options={salonOptions}
+                placeholder={salonPlaceholder}
+                invalid={!!errors.salonId}
+              />
+            </FormField>
+          ) : (
+            <FormField label="Chi nhánh">
+              <Input value={configAppointment?.salonName ?? ""} disabled />
+            </FormField>
+          )}
+
+          <FormRow>
+            <FormField
+              label="Phần trăm cọc (%) *"
+              tooltip="Tỉ lệ cọc khi khách đặt lịch online"
+              error={errors.depositPercent?.message}
+            >
+              <Input
+                type="number"
+                min={0}
+                max={100}
+                {...register("depositPercent")}
+                invalid={!!errors.depositPercent}
+              />
+            </FormField>
+
+            <FormField
+              label="Phút mỗi khung"
+              tooltip="Độ dài mỗi slot (phút)"
+              error={errors.slotMinutes?.message}
+            >
+              <Input
+                type="number"
+                min={1}
+                {...register("slotMinutes")}
+                invalid={!!errors.slotMinutes}
+              />
+            </FormField>
+          </FormRow>
+
+          <FormRow>
+            <FormField
+              label="Giờ mở cửa"
+              tooltip="Giờ bắt đầu nhận lịch trong ngày"
+              error={errors.startTime?.message}
+            >
+              <Input
+                type="time"
+                {...register("startTime")}
+                invalid={!!errors.startTime}
+              />
+            </FormField>
+
+            <FormField
+              label="Giờ đóng cửa"
+              tooltip="Giờ kết thúc nhận lịch trong ngày"
+              error={errors.endTime?.message}
+            >
+              <Input
+                type="time"
+                {...register("endTime")}
+                invalid={!!errors.endTime}
+              />
+            </FormField>
+          </FormRow>
+        </FormSection>
+
+        <div className="flex justify-end gap-2 border-t border-kit pt-3">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="mb-0"
+            onClick={() => onOpenChange(false)}
+            disabled={isPending}
+          >
+            {COMMON_MSG.cancel}
+          </Button>
+          <Button
+            type="submit"
+            variant="admin"
+            size="sm"
+            className="mb-0"
+            loading={isPending}
+          >
+            {isEdit ? "Cập nhật" : "Tạo cấu hình"}
+          </Button>
+        </div>
+      </form>
+    </Modal>
+  );
 }

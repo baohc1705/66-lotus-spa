@@ -1,7 +1,18 @@
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import type { RoleDTO } from '@/features/auth/types/auth.types';
+import { Button } from '@/shared/elements/Button';
+import { Card, CardBody, CardTitle } from '@/shared/elements/Card';
+import { ListGroup, ListGroupItem } from '@/shared/elements/ListGroup';
 import { ROLE_COLORS } from './rolePermissionHelpers';
 
-export function RoleList({ roles, activeRoleId, onSelectRole, onCreateRole, onEditRole, onDeleteRole }: {
+export function RoleList({
+  roles,
+  activeRoleId,
+  onSelectRole,
+  onCreateRole,
+  onEditRole,
+  onDeleteRole,
+}: {
   roles: RoleDTO[];
   activeRoleId: number | null;
   onSelectRole: (id: number) => void;
@@ -10,80 +21,109 @@ export function RoleList({ roles, activeRoleId, onSelectRole, onCreateRole, onEd
   onDeleteRole: (role: RoleDTO) => void;
 }) {
   return (
-    <aside className="w-[260px] shrink-0 flex flex-col gap-2">
-      <button
-        className="w-full py-2.5 rounded-lg bg-adminGreen-600 text-white font-semibold text-sm cursor-pointer border-0 hover:opacity-90"
-        onClick={onCreateRole}
-      >
-        + Tạo vai trò
-      </button>
+    <aside className="flex w-[260px] shrink-0 flex-col gap-2">
+      <Button variant="primary" size="sm" block className="mb-0! mr-0!" onClick={onCreateRole}>
+        <Plus className="mr-1 h-4 w-4" />
+        Tạo vai trò
+      </Button>
 
-      {roles.map((role, idx) => {
-        const color = ROLE_COLORS[idx % ROLE_COLORS.length];
-        const isSelected = role.id === activeRoleId;
-        return (
-          <div key={role.id} className="relative">
-            <div
-              onClick={() => onSelectRole(role.id)}
-              className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl cursor-pointer transition-all"
-              style={{
-                border: isSelected ? `1.5px solid ${color.bg}` : '1.5px solid var(--border)',
-                background: isSelected ? color.light : 'var(--admin-bg-surface)',
-                boxShadow: isSelected ? '0 2px 8px color-mix(in srgb, var(--admin-green-600) 20%, transparent)' : '0 1px 3px color-mix(in srgb, var(--admin-ink) 4%, transparent)',
-              }}
+      <ListGroup>
+        {roles.map((role: RoleDTO, index: number) => {
+          const color = ROLE_COLORS[index % ROLE_COLORS.length];
+          const isSelected = role.id === activeRoleId;
+          const memberCount = role.roleUsers?.length ?? 0;
+          const permissionCount = role.rolePermissions?.length ?? 0;
+
+          return (
+            <ListGroupItem
+              key={role.id}
+              active={isSelected}
+              className="gap-2 px-3 py-2.5"
             >
-              <div
-                className="w-9 h-9 rounded-lg shrink-0 flex items-center justify-center text-white font-bold text-sm"
-                style={{ background: color.bg }}
+              <button
+                type="button"
+                className="flex min-w-0 flex-1 cursor-pointer items-center gap-2.5 border-0 bg-transparent p-0 text-left"
+                onClick={() => onSelectRole(role.id)}
               >
-                {role.name.charAt(0).toUpperCase()}
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-bold text-adminInk truncate">{role.name}</div>
-                <div className="text-xs text-adminGray-600 mt-0.5">
-                  {role.roleUsers?.length ?? 0} thành viên · {role.rolePermissions?.length ?? 0} quyền
+                <div
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded text-sm font-bold text-kit-white"
+                  style={{ background: color.bg }}
+                >
+                  {role.name.charAt(0).toUpperCase()}
                 </div>
-              </div>
+                <div className="min-w-0 flex-1">
+                  <div
+                    className={
+                      'truncate text-sm font-semibold ' +
+                      (isSelected ? 'text-kit-white' : 'text-kit-heading')
+                    }
+                  >
+                    {role.name}
+                  </div>
+                  <div
+                    className={
+                      'mt-0.5 text-xs ' + (isSelected ? 'text-kit-white/80' : 'text-kit-muted')
+                    }
+                  >
+                    {memberCount} thành viên · {permissionCount} quyền
+                  </div>
+                </div>
+              </button>
 
-              <div className="flex flex-col gap-1 shrink-0" onClick={e => e.stopPropagation()}>
-                <button
+              <div className="flex shrink-0 flex-col gap-0.5">
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className={
+                    'mb-0! mr-0! h-7 w-7 ' +
+                    (isSelected
+                      ? 'text-kit-white hover:bg-kit-white/15'
+                      : 'text-kit-primary hover:bg-kit-page')
+                  }
                   title="Sửa vai trò"
                   onClick={() => onEditRole(role)}
-                  className="bg-transparent border-0 cursor-pointer text-sm text-adminGreen-600 px-1 py-0.5 rounded hover:bg-adminGreen-50 leading-none"
                 >
-                  ✎
-                </button>
-                <button
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className={
+                    'mb-0! mr-0! h-7 w-7 ' +
+                    (isSelected
+                      ? 'text-kit-white hover:bg-kit-white/15'
+                      : 'text-kit-danger hover:bg-kit-page')
+                  }
                   title="Xóa vai trò"
                   onClick={() => onDeleteRole(role)}
-                  className="bg-transparent border-0 cursor-pointer text-sm text-lotus-error px-1 py-0.5 rounded hover:bg-state-danger-bg leading-none"
                 >
-                  ✕
-                </button>
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
               </div>
+            </ListGroupItem>
+          );
+        })}
+      </ListGroup>
+
+      <Card className="mb-0! border border-kit">
+        <CardBody className="p-3">
+          <CardTitle className="mb-2 text-[10px] tracking-widest">Chú thích</CardTitle>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 shrink-0 rounded bg-kit-success" />
+              <span className="text-xs text-kit-muted">Quyền được cấp</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 shrink-0 rounded border border-kit bg-kit-white" />
+              <span className="text-xs text-kit-muted">Chưa cấp quyền</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 shrink-0 rounded bg-kit-warning" />
+              <span className="text-xs text-kit-muted">Một phần</span>
             </div>
           </div>
-        );
-      })}
-
-      <div className="mt-1 bg-white border border-border rounded-xl p-3">
-        <div className="text-2xs font-bold uppercase tracking-widest text-adminGray-600 mb-2">Chú thích</div>
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-adminGreen-600 shrink-0" />
-            <span className="text-xs text-adminGray-600">Quyền được cấp</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded border border-border bg-white shrink-0" />
-            <span className="text-xs text-adminGray-600">Chưa cấp quyền</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-adminGold-600 shrink-0" />
-            <span className="text-xs text-adminGray-600">Một phần</span>
-          </div>
-        </div>
-      </div>
+        </CardBody>
+      </Card>
     </aside>
   );
 }

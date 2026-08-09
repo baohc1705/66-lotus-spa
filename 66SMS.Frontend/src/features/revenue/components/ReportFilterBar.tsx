@@ -72,7 +72,7 @@ export function ReportFilterBar({
 
   return (
     <div className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded border border-kit bg-kit-white p-2.5 shadow-kit-card">
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
         {showSalon && isAdmin ? (
           <Dropdown
             variant="outline-secondary"
@@ -132,25 +132,29 @@ export function ReportFilterBar({
           />
         ) : null}
 
-        <Input
-          type="date"
-          inputSize="sm"
-          className="h-8 w-auto cursor-pointer font-semibold"
-          value={from}
-          onChange={(e: { target: { value: string } }) =>
-            onFromChange(e.target.value)
-          }
-        />
-        <span className="text-kit-muted">–</span>
-        <Input
-          type="date"
-          inputSize="sm"
-          className="h-8 w-auto cursor-pointer font-semibold"
-          value={to}
-          onChange={(e: { target: { value: string } }) =>
-            onToChange(e.target.value)
-          }
-        />
+        <div className="inline-flex h-8 shrink-0 items-stretch overflow-hidden rounded border border-kit bg-kit-white">
+          <Input
+            type="date"
+            inputSize="sm"
+            className="h-full !w-[9.75rem] shrink-0 cursor-pointer rounded-none border-0 font-semibold shadow-none focus:ring-0"
+            value={from}
+            onChange={(e: { target: { value: string } }) =>
+              onFromChange(e.target.value)
+            }
+          />
+          <span className="inline-flex items-center border-x border-kit bg-kit-page px-2 text-xs text-kit-muted select-none">
+            –
+          </span>
+          <Input
+            type="date"
+            inputSize="sm"
+            className="h-full !w-[9.75rem] shrink-0 cursor-pointer rounded-none border-0 font-semibold shadow-none focus:ring-0"
+            value={to}
+            onChange={(e: { target: { value: string } }) =>
+              onToChange(e.target.value)
+            }
+          />
+        </div>
       </div>
 
       <Button

@@ -3,7 +3,6 @@ import { useTableQueryParams } from "@/shared/hooks/useTableQueryParams";
 
 export function useInvoiceListState(salonId: number | null) {
   const table = useTableQueryParams();
-  const [createOpen, setCreateOpen] = useState(false);
   const [cancelTarget, setCancelTarget] = useState<number | null>(null);
 
   const [selectedStatus, setSelectedStatus] = useState<number | null>(null);
@@ -51,8 +50,6 @@ export function useInvoiceListState(salonId: number | null) {
   return {
     ...table,
     queryParams,
-    createOpen,
-    setCreateOpen,
     cancelTarget,
     setCancelTarget,
     selectedStatus,

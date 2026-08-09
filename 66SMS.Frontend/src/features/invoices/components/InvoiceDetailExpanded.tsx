@@ -1,10 +1,33 @@
-import { useInvoiceDetail } from "../hooks/useInvoices";
-import type { InvoiceItemDto } from "../types/invoice.types";
-import { INVOICE_ITEM_TYPE, INVOICE_STATUS } from "../types/invoice.types";
-import { Ban, Printer } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
+import { useState } from "react";
+import { Ban, Printer, Receipt } from "lucide-react";
+
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { Button } from "@/shared/elements/Button";
+import { Nav, NavItem, NavLink } from "@/shared/elements/Nav";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "@/shared/tables/Table";
+import {
+  TableDetailActions,
+  TableDetailExpanded,
+  TableDetailField,
+  TableDetailGrid,
+  TableDetailHeader,
+} from "@/shared/tables/TableDetailExpanded";
 import { formatCurrency } from "@/shared/utils/currency";
+
+import { INVOICE_PERM } from "../constants/invoice.permissions";
+import { useInvoiceDetail } from "../hooks/useInvoices";
+import {
+  INVOICE_ITEM_TYPE,
+  INVOICE_STATUS,
+  type InvoiceItemDto,
+} from "../types/invoice.types";
 
 interface Props {
   invoiceId: number;
@@ -19,192 +42,189 @@ const ITEM_TYPE_LABEL: Record<number, string> = {
 
 export function InvoiceDetailExpanded({ invoiceId, onCancel }: Props) {
   const { data, isLoading } = useInvoiceDetail(invoiceId);
-  const inv = data?.data;
+  const invoice = data?.data;
+  const [tab, setTab] = useState<"money" | "detail">("money");
 
-  if (isLoading)
+  if (isLoading) {
     return (
-      <div className="p-4 text-sm text-adminGray-600 animate-pulse">
-        Đang tải chi tiết...
-      </div>
+      <TableDetailExpanded>
+        <p className="text-sm text-kit-muted">Đang tải chi tiết...</p>
+      </TableDetailExpanded>
     );
-  if (!inv)
-    return (
-      <div className="p-4 text-sm text-state-danger-text">
-        Không tải được chi tiết.
-      </div>
-    );
+  }
 
-  const items = inv.items ?? [];
+  if (!invoice) {
+    return (
+      <TableDetailExpanded>
+        <p className="text-sm text-kit-muted">Không tải được chi tiết.</p>
+      </TableDetailExpanded>
+    );
+  }
+
+  const items = invoice.items ?? [];
   const canCancel =
-    inv.status !== INVOICE_STATUS.CANCELLED &&
-    inv.status !== INVOICE_STATUS.REFUNDED;
+    invoice.status !== INVOICE_STATUS.CANCELLED &&
+    invoice.status !== INVOICE_STATUS.REFUNDED;
+
+  const customerLabel =
+    (invoice.customerName ?? "Khách vãng lai") +
+    (invoice.customerPhone ? ` (${invoice.customerPhone})` : "");
 
   return (
-    <div className="px-6 py-4 bg-adminGray-50/30 border-t border-adminGray-100">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-3 flex-wrap">
-          <span className="text-xs font-semibold text-adminInk font-mono">
-            {inv.invoiceCode}
-          </span>
-          <span className="text-xs text-adminGray-600">•</span>
-          <span className="text-xs text-adminGray-600">
-            {inv.customerName ?? "Khách vãng lai"}
-            {inv.customerPhone ? ` (${inv.customerPhone})` : ""}
-          </span>
-          {inv.salonName && (
-            <>
-              <span className="text-xs text-adminGray-600">•</span>
-              <span className="text-xs text-adminGray-600">
-                {inv.salonName}
-              </span>
-            </>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => window.print()}
-            className="text-xs gap-1.5"
-          >
-            <Printer className="w-3.5 h-3.5" /> In
-          </Button>
-          {canCancel && inv.id && (
-            <PermissionGate resource="invoices" action="update">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onCancel(inv.id!)}
-                className="text-xs gap-1.5 text-state-danger-text hover:text-state-danger-text hover:bg-state-danger-bg"
-              >
-                <Ban className="w-3.5 h-3.5" /> Hủy
-              </Button>
-            </PermissionGate>
-          )}
-        </div>
-      </div>
+    <TableDetailExpanded maxHeightClass="max-h-100">
+      <TableDetailHeader
+        icon={<Receipt className="h-5 w-5 text-kit-primary" />}
+        title={invoice.invoiceCode ?? "Hóa đơn"}
+        subtitle={
+          customerLabel + (invoice.salonName ? ` · ${invoice.salonName}` : "")
+        }
+      />
 
-      {items.length === 0 ? (
-        <p className="text-sm text-adminGray-600">Không có dòng nào.</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-adminGray-100">
-                <th className="text-left py-2 pr-4 text-adminGray-600 font-semibold w-24">
-                  Loại
-                </th>
-                <th className="text-left py-2 pr-4 text-adminGray-600 font-semibold">
-                  Mặt hàng
-                </th>
-                <th className="text-right py-2 pr-4 text-adminGray-600 font-semibold w-24">
-                  Đơn giá
-                </th>
-                <th className="text-center py-2 pr-4 text-adminGray-600 font-semibold w-14">
-                  SL
-                </th>
-                <th className="text-right py-2 pr-4 text-adminGray-600 font-semibold w-24">
-                  Giảm
-                </th>
-                <th className="text-right py-2 pr-4 text-adminGray-600 font-semibold w-28">
-                  Thành tiền
-                </th>
-                <th className="text-left py-2 text-adminGray-600 font-semibold">
-                  KTV
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item: InvoiceItemDto) => (
-                <tr
-                  key={item.id}
-                  className="border-b border-adminGray-100 last:border-0 hover:bg-adminGray-50/50"
-                >
-                  <td className="py-2 pr-4 text-adminGray-600">
-                    {ITEM_TYPE_LABEL[item.itemType ?? 0] ?? "—"}
-                  </td>
-                  <td className="py-2 pr-4 text-adminInk font-medium">
-                    {item.itemName ?? "—"}
-                  </td>
-                  <td className="py-2 pr-4 text-right text-adminGray-600">
-                    {formatCurrency(item.unitPrice)}
-                  </td>
-                  <td className="py-2 pr-4 text-center text-adminGray-600">
-                    {item.quantity ?? 1}
-                  </td>
-                  <td className="py-2 pr-4 text-right text-adminGray-600">
-                    {formatCurrency(item.discountAmount)}
-                  </td>
-                  <td className="py-2 pr-4 text-right font-semibold text-adminInk">
-                    {formatCurrency(item.lineTotal)}
-                  </td>
-                  <td className="py-2 text-adminGray-600">
-                    {item.staffName ?? "—"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <Nav pills className="mb-2">
+        <NavItem>
+          <NavLink active={tab === "money"} onClick={() => setTab("money")}>
+            Tiền
+          </NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink active={tab === "detail"} onClick={() => setTab("detail")}>
+            Chi tiết ({items.length})
+          </NavLink>
+        </NavItem>
+      </Nav>
 
-      <div className="mt-4 flex justify-end">
-        <div className="w-full sm:w-72 text-xs space-y-1">
-          <Row label="Tạm tính" value={formatCurrency(inv.subTotal)} />
-          {(inv.discountAmount ?? 0) > 0 && (
-            <Row
+      {tab === "money" ? (
+        <TableDetailGrid cols={2}>
+          <TableDetailField
+            label="Tạm tính"
+            value={formatCurrency(invoice.subTotal)}
+          />
+          {(invoice.discountAmount ?? 0) > 0 ? (
+            <TableDetailField
               label="Giảm giá"
-              value={`-${formatCurrency(inv.discountAmount)}`}
+              value={`-${formatCurrency(invoice.discountAmount)}`}
             />
-          )}
-          {(inv.membershipDiscountAmount ?? 0) > 0 && (
-            <Row
+          ) : null}
+          {(invoice.membershipDiscountAmount ?? 0) > 0 ? (
+            <TableDetailField
               label="Giảm hạng TV"
-              value={`-${formatCurrency(inv.membershipDiscountAmount)}`}
+              value={`-${formatCurrency(invoice.membershipDiscountAmount)}`}
             />
-          )}
-          {(inv.loyaltyPointsValue ?? 0) > 0 && (
-            <Row
-              label={`Điểm dùng (${inv.loyaltyPointsUsed ?? 0}đ)`}
-              value={`-${formatCurrency(inv.loyaltyPointsValue)}`}
+          ) : null}
+          {(invoice.loyaltyPointsValue ?? 0) > 0 ? (
+            <TableDetailField
+              label={`Điểm dùng (${invoice.loyaltyPointsUsed ?? 0}đ)`}
+              value={`-${formatCurrency(invoice.loyaltyPointsValue)}`}
             />
-          )}
-          {(inv.taxAmount ?? 0) > 0 && (
-            <Row label="Thuế" value={`+${formatCurrency(inv.taxAmount)}`} />
-          )}
-          <div className="flex justify-between border-t border-adminGray-100 pt-1 text-sm">
-            <span className="font-semibold text-adminInk">Tổng</span>
-            <strong className="text-adminGreen-600">
-              {formatCurrency(inv.totalAmount)}
-            </strong>
-          </div>
-          <Row label="Khách trả" value={formatCurrency(inv.paidAmount)} />
-          {(inv.changeAmount ?? 0) > 0 && (
-            <Row label="Tiền thối" value={formatCurrency(inv.changeAmount)} />
-          )}
-          {(inv.loyaltyPointsEarned ?? 0) > 0 && (
-            <Row
+          ) : null}
+          {(invoice.taxAmount ?? 0) > 0 ? (
+            <TableDetailField
+              label="Thuế"
+              value={`+${formatCurrency(invoice.taxAmount)}`}
+            />
+          ) : null}
+          <TableDetailField
+            label="Tổng"
+            value={formatCurrency(invoice.totalAmount)}
+          />
+          <TableDetailField
+            label="Khách trả"
+            value={formatCurrency(invoice.paidAmount)}
+          />
+          {(invoice.changeAmount ?? 0) > 0 ? (
+            <TableDetailField
+              label="Tiền thối"
+              value={formatCurrency(invoice.changeAmount)}
+            />
+          ) : null}
+          {(invoice.loyaltyPointsEarned ?? 0) > 0 ? (
+            <TableDetailField
               label="Điểm tích lũy"
-              value={`+${inv.loyaltyPointsEarned} điểm`}
+              value={`+${invoice.loyaltyPointsEarned} điểm`}
             />
-          )}
-        </div>
-      </div>
-
-      {inv.note && (
-        <p className="mt-3 text-xs text-adminGray-600 italic">
-          Ghi chú: {inv.note}
+          ) : null}
+          {invoice.note ? (
+            <TableDetailField label="Ghi chú" value={invoice.note} />
+          ) : null}
+        </TableDetailGrid>
+      ) : items.length === 0 ? (
+        <p className="py-4 text-center text-sm text-kit-muted">
+          Không có dòng nào.
         </p>
+      ) : (
+        <div className="overflow-x-auto rounded border border-kit bg-kit-white">
+          <Table size="sm" hover>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Loại</TableHeaderCell>
+                <TableHeaderCell>Mặt hàng</TableHeaderCell>
+                <TableHeaderCell className="text-right">Đơn giá</TableHeaderCell>
+                <TableHeaderCell className="text-center">SL</TableHeaderCell>
+                <TableHeaderCell className="text-right">Giảm</TableHeaderCell>
+                <TableHeaderCell className="text-right">
+                  Thành tiền
+                </TableHeaderCell>
+                <TableHeaderCell>KTV</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {items.map((item: InvoiceItemDto) => (
+                <TableRow key={item.id}>
+                  <TableCell className="text-kit-muted">
+                    {ITEM_TYPE_LABEL[item.itemType ?? 0] ?? "—"}
+                  </TableCell>
+                  <TableCell className="font-medium text-kit-heading">
+                    {item.itemName ?? "—"}
+                  </TableCell>
+                  <TableCell className="text-right text-kit-muted">
+                    {formatCurrency(item.unitPrice)}
+                  </TableCell>
+                  <TableCell className="text-center text-kit-muted">
+                    {item.quantity ?? 1}
+                  </TableCell>
+                  <TableCell className="text-right text-kit-muted">
+                    {formatCurrency(item.discountAmount)}
+                  </TableCell>
+                  <TableCell className="text-right font-semibold text-kit-heading">
+                    {formatCurrency(item.lineTotal)}
+                  </TableCell>
+                  <TableCell className="text-kit-muted">
+                    {item.staffName ?? "—"}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       )}
-    </div>
-  );
-}
 
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between">
-      <span className="text-adminGray-600">{label}</span>
-      <span className="text-adminInk">{value}</span>
-    </div>
+      <TableDetailActions>
+        <Button
+          variant="secondary"
+          size="sm"
+          className="mb-0"
+          onClick={() => window.print()}
+        >
+          <Printer className="h-3.5 w-3.5" />
+          In
+        </Button>
+        {canCancel && invoice.id ? (
+          <PermissionGate
+            resource={INVOICE_PERM.resource}
+            action={INVOICE_PERM.update}
+          >
+            <Button
+              variant="outline-danger"
+              size="sm"
+              className="mb-0"
+              onClick={() => onCancel(invoice.id!)}
+            >
+              <Ban className="h-3.5 w-3.5" />
+              Hủy
+            </Button>
+          </PermissionGate>
+        ) : null}
+      </TableDetailActions>
+    </TableDetailExpanded>
   );
 }

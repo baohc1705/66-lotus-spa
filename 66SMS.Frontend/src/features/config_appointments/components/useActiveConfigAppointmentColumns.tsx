@@ -1,18 +1,18 @@
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
+import { Pencil, Trash2 } from "lucide-react";
+
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { IndexCell } from "@/shared/components/DataTable/TableCells";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { Tooltip } from "@/shared/components/Tooltip";
+import { Button } from "@/shared/elements/Button";
+import { SortableColumnHeader } from "@/shared/tables/SortableColumnHeader";
+import {
+  IndexCell,
+  NameCell,
+  TextCell,
+} from "@/shared/tables/TableCells";
+import { toLocalTimeOnly } from "@/shared/utils/date.utils";
+
 import { CONFIG_APPOINTMENT_PERM } from "../constants/config_appointment.permissions";
 import type { ConfigAppointmentDTO } from "../types/config_appointment.types";
 
@@ -46,11 +46,6 @@ export function useActiveConfigAppointmentColumns({
   const cols = CONFIG_APPOINTMENT_COLUMN_LABELS;
   const perm = CONFIG_APPOINTMENT_PERM;
 
-  const formatDisplayTime = (t?: string | null) => {
-    if (!t) return "—";
-    return t.substring(0, 5);
-  };
-
   return useMemo<ColumnDef<ConfigAppointmentDTO>[]>(
     () => [
       {
@@ -75,13 +70,10 @@ export function useActiveConfigAppointmentColumns({
             orderBy={orderBy}
             isDescending={isDescending}
             onSort={onSort}
+            onPrimary
           />
         ),
-        cell: ({ row }) => (
-          <span className="font-semibold text-adminInk">
-            {row.original.salonName ?? "—"}
-          </span>
-        ),
+        cell: ({ row }) => <NameCell value={row.original.salonName} />,
         size: 180,
       },
       {
@@ -95,13 +87,11 @@ export function useActiveConfigAppointmentColumns({
             onSort={onSort}
           />
         ),
-        cell: ({ row }) => (
-          <span className="font-semibold text-adminInk">
-            {row.original.depositPercent != null
-              ? `${row.original.depositPercent}%`
-              : "—"}
-          </span>
-        ),
+        cell: ({ row }) => {
+          const depositPercent = row.original.depositPercent;
+          if (depositPercent == null) return <TextCell value={null} />;
+          return <TextCell value={`${depositPercent}%`} />;
+        },
         size: 120,
       },
       {
@@ -115,11 +105,10 @@ export function useActiveConfigAppointmentColumns({
             onSort={onSort}
           />
         ),
-        cell: ({ row }) => (
-          <span className="text-adminInk">
-            {formatDisplayTime(row.original.startTime)}
-          </span>
-        ),
+        cell: ({ row }) => {
+          const time = toLocalTimeOnly(row.original.startTime);
+          return <TextCell value={time || null} />;
+        },
         size: 100,
       },
       {
@@ -133,11 +122,10 @@ export function useActiveConfigAppointmentColumns({
             onSort={onSort}
           />
         ),
-        cell: ({ row }) => (
-          <span className="text-adminInk">
-            {formatDisplayTime(row.original.endTime)}
-          </span>
-        ),
+        cell: ({ row }) => {
+          const time = toLocalTimeOnly(row.original.endTime);
+          return <TextCell value={time || null} />;
+        },
         size: 100,
       },
       {
@@ -151,55 +139,51 @@ export function useActiveConfigAppointmentColumns({
             onSort={onSort}
           />
         ),
-        cell: ({ row }) => (
-          <span className="text-adminInk">
-            {row.original.slotMinutes != null
-              ? `${row.original.slotMinutes} phút`
-              : "—"}
-          </span>
-        ),
+        cell: ({ row }) => {
+          const slotMinutes = row.original.slotMinutes;
+          if (slotMinutes == null) return <TextCell value={null} />;
+          return <TextCell value={`${slotMinutes} phút`} />;
+        },
         size: 110,
       },
       {
         id: "actions",
-        header: "",
+        header: "Thao tác",
         cell: ({ row }) => {
           const item = row.original;
           return (
-            <div onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <div
+              className="flex items-center gap-1"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <PermissionGate resource={perm.resource} action={perm.update}>
+                <Tooltip text="Sửa">
                   <Button
-                    variant="ghost"
                     size="icon-sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    variant="outline-primary"
+                    className="mb-0 mr-0"
+                    onClick={() => onEdit(item)}
                   >
-                    <MoreHorizontal className="w-4 h-4" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <PermissionGate resource={perm.resource} action={perm.update}>
-                    <DropdownMenuItem onClick={() => onEdit(item)}>
-                      <Pencil className="w-4 h-4" />
-                      {COMMON_MSG.edit}
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                  <PermissionGate resource={perm.resource} action={perm.delete}>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={() => onDelete(item)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Xóa cấu hình
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </Tooltip>
+              </PermissionGate>
+              <PermissionGate resource={perm.resource} action={perm.delete}>
+                <Tooltip text="Xóa">
+                  <Button
+                    size="icon-sm"
+                    variant="outline-danger"
+                    className="mb-0 mr-0"
+                    onClick={() => onDelete(item)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </Tooltip>
+              </PermissionGate>
             </div>
           );
         },
-        size: 50,
+        size: 100,
         enableResizing: false,
       },
     ],

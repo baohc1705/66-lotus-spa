@@ -1,66 +1,89 @@
+import { Plus } from 'lucide-react';
 import type { PermissionDTO } from '@/features/auth/types/auth.types';
+import { Badge } from '@/shared/elements/Badge';
+import { Button } from '@/shared/elements/Button';
+import { Card, CardHeader } from '@/shared/elements/Card';
 
-export function PermissionListPanel({ permissions, onAdd, onEdit, onDelete }: {
+export function PermissionListPanel({
+  permissions,
+  onAdd,
+  onEdit,
+  onDelete,
+}: {
   permissions: PermissionDTO[];
   onAdd: () => void;
-  onEdit: (p: PermissionDTO) => void;
-  onDelete: (p: PermissionDTO) => void;
+  onEdit: (permission: PermissionDTO) => void;
+  onDelete: (permission: PermissionDTO) => void;
 }) {
   return (
-    <div className="bg-white border border-border rounded-xl overflow-hidden">
-      <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-        <div className="text-sm font-bold text-adminInk">
+    <Card className="mb-0! overflow-hidden border border-kit">
+      <CardHeader className="h-auto justify-between py-3">
+        <div className="text-sm font-bold text-kit-heading">
           Quản lý quyền hệ thống
-          <span className="ml-2 text-xs font-medium text-adminGray-600">{permissions.length} quyền</span>
+          <span className="ml-2 text-xs font-medium text-kit-muted">
+            {permissions.length} quyền
+          </span>
         </div>
-        <button
-          className="px-3 py-1.5 rounded-lg bg-adminGreen-600 text-white font-semibold text-xs cursor-pointer border-0 hover:opacity-90"
-          onClick={onAdd}
-        >
-          + Tạo quyền
-        </button>
-      </div>
+        <Button variant="primary" size="sm" className="mb-0! mr-0!" onClick={onAdd}>
+          <Plus className="mr-1 h-3.5 w-3.5" />
+          Tạo quyền
+        </Button>
+      </CardHeader>
 
-      <div className="max-h-64 overflow-y-auto overflow-x-auto w-full">
+      <div className="max-h-64 w-full overflow-x-auto overflow-y-auto">
         {permissions.length === 0 ? (
-          <p className="p-6 text-center text-adminGray-600 text-sm">Chưa có quyền nào</p>
+          <p className="p-6 text-center text-sm text-kit-muted">Chưa có quyền nào</p>
         ) : (
-          <table className="w-full border-collapse min-w-[500px]">
+          <table className="w-full min-w-[500px] border-collapse">
             <thead>
-              <tr className="bg-adminGray-50">
-                {['Tên quyền', 'Resource', 'Action', ''].map(h => (
+              <tr className="bg-kit-page">
+                {['Tên quyền', 'Resource', 'Action', ''].map((header: string) => (
                   <th
-                    key={h}
-                    className="px-3 py-2 text-left text-xs font-bold text-adminGray-600 uppercase tracking-wide border-b border-border"
+                    key={header || 'actions'}
+                    className="border-b border-kit px-3 py-2 text-left text-xs font-bold uppercase tracking-wide text-kit-muted"
                   >
-                    {h}
+                    {header}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {permissions.map((p, i) => (
-                <tr key={p.id} className={i % 2 === 0 ? 'bg-white' : 'bg-adminGray-50/40'}>
-                  <td className="px-3 py-2 text-xs font-semibold text-adminInk border-b border-border">{p.name}</td>
-                  <td className="px-3 py-2 border-b border-border">
-                    <span className="text-xs bg-adminGreen-50 text-adminGreen-600 rounded px-2 py-0.5 font-semibold">{p.resource}</span>
+              {permissions.map((permission: PermissionDTO, index: number) => (
+                <tr
+                  key={permission.id}
+                  className={index % 2 === 0 ? 'bg-kit-white' : 'bg-kit-page/40'}
+                >
+                  <td className="border-b border-kit px-3 py-2 text-xs font-semibold text-kit-heading">
+                    {permission.name}
                   </td>
-                  <td className="px-3 py-2 border-b border-border">
-                    <span className="text-xs bg-adminGray-50 text-adminGray-600 rounded px-2 py-0.5 font-semibold">{p.action}</span>
+                  <td className="border-b border-kit px-3 py-2">
+                    <Badge variant="success" soft className="normal-case">
+                      {permission.resource}
+                    </Badge>
                   </td>
-                  <td className="px-3 py-2 border-b border-border text-right whitespace-nowrap">
-                    <button
-                      className="text-xs text-adminGreen-600 font-semibold mr-3 bg-transparent border-0 cursor-pointer hover:underline"
-                      onClick={() => onEdit(p)}
+                  <td className="border-b border-kit px-3 py-2">
+                    <Badge variant="secondary" soft className="normal-case">
+                      {permission.action}
+                    </Badge>
+                  </td>
+                  <td className="whitespace-nowrap border-b border-kit px-3 py-2 text-right">
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="mb-0! mr-2! px-0! py-0!"
+                      onClick={() => onEdit(permission)}
                     >
                       Sửa
-                    </button>
-                    <button
-                      className="text-xs text-lotus-error font-semibold bg-transparent border-0 cursor-pointer hover:underline"
-                      onClick={() => onDelete(p)}
+                    </Button>
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      borderless
+                      className="mb-0! mr-0! px-0! py-0!"
+                      onClick={() => onDelete(permission)}
                     >
                       Xóa
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -68,6 +91,6 @@ export function PermissionListPanel({ permissions, onAdd, onEdit, onDelete }: {
           </table>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

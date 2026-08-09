@@ -1,20 +1,21 @@
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
+import { Pencil, Trash2 } from "lucide-react";
+
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
-import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { IndexCell, PriceCell } from "@/shared/components/DataTable/TableCells";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { Tooltip } from "@/shared/components/Tooltip";
+import { Badge } from "@/shared/elements/Badge";
+import { Button } from "@/shared/elements/Button";
+import { SortableColumnHeader } from "@/shared/tables/SortableColumnHeader";
+import {
+  IndexCell,
+  MutedSmallCell,
+  NameCell,
+  PriceCell,
+  TextCell,
+} from "@/shared/tables/TableCells";
 import { formatDateTimeDisplay } from "@/shared/utils/date.utils";
+
 import { PROMOTION_PERM } from "../constants/promotion.permissions";
 import type { PromotionDto } from "../types/promotion.types";
 
@@ -27,19 +28,62 @@ export const PROMOTION_COLUMN_LABELS = {
   status: "Trạng thái",
 } as const;
 
-const PROMOTION_STATUS_MAP: StatusMap = {
-  "1": { label: "Hoạt động", variant: "success", dot: true },
-  "0": { label: "Không HĐ", variant: "error" },
-};
+function discountTypeBadge(discountType: number | null | undefined) {
+  if (discountType === 1) {
+    return (
+      <Badge variant="info" soft>
+        Giảm %
+      </Badge>
+    );
+  }
+  if (discountType === 2) {
+    return (
+      <Badge variant="warning" soft>
+        Giảm tiền
+      </Badge>
+    );
+  }
+  if (discountType === 3) {
+    return (
+      <Badge variant="primary" soft>
+        Mua X tặng Y
+      </Badge>
+    );
+  }
+  return <TextCell value={null} />;
+}
 
-const DISCOUNT_TYPE_MAP: Record<string, { label: string; color: string }> = {
-  "1": { label: "Giảm %", color: "bg-state-info-bg text-state-info-text" },
-  "2": {
-    label: "Giảm tiền",
-    color: "bg-state-warning-bg text-state-warning-text",
-  },
-  "3": { label: "Mua X tặng Y", color: "bg-adminGold-100 text-adminGold-700" },
-};
+function statusBadge(status: number | null | undefined) {
+  if (status === 1) {
+    return (
+      <Badge variant="success" soft>
+        Hoạt động
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="secondary" soft>
+      Không HĐ
+    </Badge>
+  );
+}
+
+function renderDiscountValue(promotion: PromotionDto) {
+  if (promotion.discountType === 1) {
+    return <TextCell value={`${promotion.discountValue ?? 0}%`} />;
+  }
+  if (promotion.discountType === 2) {
+    return <PriceCell value={promotion.discountValue} />;
+  }
+  if (promotion.discountType === 3) {
+    return (
+      <TextCell
+        value={`Mua ${promotion.buyQuantity} tặng ${promotion.getQuantity}`}
+      />
+    );
+  }
+  return <TextCell value={null} />;
+}
 
 interface UseActivePromotionColumnsParams {
   pageIndex: number;
@@ -89,11 +133,7 @@ export function useActivePromotionColumns({
             onSort={onSort}
           />
         ),
-        cell: ({ row }) => (
-          <span className="font-mono text-xs font-semibold text-adminInk">
-            {row.original.code ?? "—"}
-          </span>
-        ),
+        cell: ({ row }) => <NameCell value={row.original.code} />,
         size: 120,
       },
       {
@@ -105,51 +145,22 @@ export function useActivePromotionColumns({
             orderBy={orderBy}
             isDescending={isDescending}
             onSort={onSort}
+            onPrimary
           />
         ),
-        cell: ({ row }) => (
-          <span className="text-sm font-semibold text-adminInk truncate max-w-[200px] block">
-            {row.original.name ?? "—"}
-          </span>
-        ),
+        cell: ({ row }) => <NameCell value={row.original.name} />,
         size: 220,
       },
       {
         accessorKey: "discountType",
         header: cols.discountType,
-        cell: ({ row }) => {
-          const type = row.original.discountType?.toString() ?? "";
-          const info = DISCOUNT_TYPE_MAP[type];
-          if (!info) return <span className="text-adminGray-600">—</span>;
-          return (
-            <span
-              className={`px-2 py-0.5 rounded-full text-xs font-semibold ${info.color}`}
-            >
-              {info.label}
-            </span>
-          );
-        },
+        cell: ({ row }) => discountTypeBadge(row.original.discountType),
         size: 120,
       },
       {
         id: "discountValue",
         header: cols.discountValue,
-        cell: ({ row }) => {
-          const p = row.original;
-          if (p.discountType === 1)
-            return (
-              <span className="text-adminInk">{p.discountValue ?? 0}%</span>
-            );
-          if (p.discountType === 2)
-            return <PriceCell value={p.discountValue} />;
-          if (p.discountType === 3)
-            return (
-              <span className="text-adminInk">
-                Mua {p.buyQuantity} tặng {p.getQuantity}
-              </span>
-            );
-          return <span>—</span>;
-        },
+        cell: ({ row }) => renderDiscountValue(row.original),
         size: 140,
       },
       {
@@ -164,11 +175,17 @@ export function useActivePromotionColumns({
           />
         ),
         cell: ({ row }) => {
-          const p = row.original;
+          const promotion = row.original;
           return (
-            <div className="text-xs text-adminInk/70 leading-5">
-              <div>{formatDateTimeDisplay(p.startDate)}</div>
-              <div>→ {formatDateTimeDisplay(p.endDate)}</div>
+            <div className="leading-5">
+              <MutedSmallCell
+                value={formatDateTimeDisplay(promotion.startDate)}
+              />
+              <div>
+                <MutedSmallCell
+                  value={`đến ${formatDateTimeDisplay(promotion.endDate)}`}
+                />
+              </div>
             </div>
           );
         },
@@ -177,54 +194,47 @@ export function useActivePromotionColumns({
       {
         accessorKey: "status",
         header: cols.status,
-        cell: ({ row }) => (
-          <StatusBadge
-            status={row.original.status?.toString() ?? null}
-            statusMap={PROMOTION_STATUS_MAP}
-          />
-        ),
+        cell: ({ row }) => statusBadge(row.original.status),
         size: 110,
       },
       {
         id: "actions",
-        header: "",
+        header: "Thao tác",
         cell: ({ row }) => {
-          const p = row.original;
+          const promotion = row.original;
           return (
-            <div onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <div
+              className="flex items-center gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <PermissionGate resource={perm.resource} action={perm.update}>
+                <Tooltip text="Sửa">
                   <Button
-                    variant="ghost"
                     size="icon-sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    variant="outline-primary"
+                    className="mb-0 mr-0"
+                    onClick={() => onEdit(promotion)}
                   >
-                    <MoreHorizontal className="w-4 h-4" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <PermissionGate resource={perm.resource} action={perm.update}>
-                    <DropdownMenuItem onClick={() => onEdit(p)}>
-                      <Pencil className="w-4 h-4" />
-                      {COMMON_MSG.edit}
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                  <PermissionGate resource={perm.resource} action={perm.delete}>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={() => onDelete(p)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Xóa
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </Tooltip>
+              </PermissionGate>
+              <PermissionGate resource={perm.resource} action={perm.delete}>
+                <Tooltip text="Xóa">
+                  <Button
+                    size="icon-sm"
+                    variant="outline-danger"
+                    className="mb-0 mr-0"
+                    onClick={() => onDelete(promotion)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </Tooltip>
+              </PermissionGate>
             </div>
           );
         },
-        size: 50,
+        size: 100,
         enableResizing: false,
       },
     ],

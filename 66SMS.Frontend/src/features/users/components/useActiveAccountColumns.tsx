@@ -1,17 +1,17 @@
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { CheckCircle2, XCircle } from "lucide-react";
 
-import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
+import { Badge } from "@/shared/elements/Badge";
+import { SortableColumnHeader } from "@/shared/tables/SortableColumnHeader";
 import {
   DateTimeCell,
   IndexCell,
   MutedCell,
   MutedSmallCell,
-} from "@/shared/components/DataTable/TableCells";
-import { StatusBadge } from "@/shared/components/StatusBadge";
+  NameCell,
+  TextCell,
+} from "@/shared/tables/TableCells";
 
-import { USER_STATUS_MAP } from "./useActiveUserColumns";
 import type { UserAccountDto } from "../types/user.types";
 
 export const ACCOUNT_COLUMN_LABELS = {
@@ -24,6 +24,36 @@ export const ACCOUNT_COLUMN_LABELS = {
   lastLoginAt: "Đăng nhập cuối",
   createdAt: "Ngày tạo",
 } as const;
+
+function statusBadge(status: string | number | null | undefined) {
+  if (Number(status) === 1) {
+    return (
+      <Badge variant="success" soft>
+        Hoạt động
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="danger" soft>
+      Vô hiệu hóa
+    </Badge>
+  );
+}
+
+function emailConfirmedBadge(confirmed: boolean | null | undefined) {
+  if (confirmed) {
+    return (
+      <Badge variant="success" soft>
+        Đã xác nhận
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="secondary" soft>
+      Chưa xác nhận
+    </Badge>
+  );
+}
 
 interface UseActiveAccountColumnsParams {
   pageIndex: number;
@@ -68,11 +98,7 @@ export function useActiveAccountColumns({
             onSort={onSort}
           />
         ),
-        cell: ({ row }) => (
-          <span className="font-semibold text-lotus-deep">
-            {row.original.username}
-          </span>
-        ),
+        cell: ({ row }) => <NameCell value={row.original.username} />,
         size: 150,
       },
       {
@@ -86,9 +112,7 @@ export function useActiveAccountColumns({
             onSort={onSort}
           />
         ),
-        cell: ({ row }) => (
-          <span className="text-lotus-deep/80">{row.original.email}</span>
-        ),
+        cell: ({ row }) => <TextCell value={row.original.email} />,
         size: 220,
       },
       {
@@ -100,29 +124,13 @@ export function useActiveAccountColumns({
       {
         accessorKey: "isEmailConfirmed",
         header: cols.isEmailConfirmed,
-        cell: ({ row }) =>
-          row.original.isEmailConfirmed ? (
-            <span className="inline-flex items-center gap-1 text-xs text-adminGreen-600">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              Đã xác nhận
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1 text-xs text-lotus-deep/50">
-              <XCircle className="w-3.5 h-3.5" />
-              Chưa xác nhận
-            </span>
-          ),
+        cell: ({ row }) => emailConfirmedBadge(row.original.isEmailConfirmed),
         size: 140,
       },
       {
         accessorKey: "status",
         header: cols.status,
-        cell: ({ row }) => (
-          <StatusBadge
-            status={String(row.original.status)}
-            statusMap={USER_STATUS_MAP}
-          />
-        ),
+        cell: ({ row }) => statusBadge(row.original.status),
         size: 120,
       },
       {

@@ -1,15 +1,18 @@
-import { Button } from "@/shared/components/ui/button";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/shared/components/ui/tabs";
-import { formatDisplayDate } from "@/shared/utils/date.utils";
-import { GENDER_MAP, STATUS_MAP } from "@/shared/constants/display.const";
+import { useState } from "react";
 import { FileText, Pencil, Trash2, User } from "lucide-react";
+
 import { FallbackImage } from "@/shared/components/FallbackImage";
+import { TabNav } from "@/shared/components/Tabs";
+import { Badge, type BadgeVariant } from "@/shared/elements/Badge";
+import { Button } from "@/shared/elements/Button";
+import { Card, CardBody } from "@/shared/elements/Card";
+import {
+  TableDetailField,
+  TableDetailGrid,
+} from "@/shared/tables/TableDetailExpanded";
+import { GENDER_MAP, STATUS_MAP } from "@/shared/constants/display.const";
+import { formatDisplayDate } from "@/shared/utils/date.utils";
+
 import { useCustomerDetail } from "../hooks/useCustomers";
 import type { CustomerDto } from "../types/customer.types";
 
@@ -19,6 +22,20 @@ interface CustomerCrmDetailProps {
   onDelete: (customer: CustomerDto) => void;
 }
 
+function statusBadge(status: number | null | undefined) {
+  if (status == null) return "—";
+  const label = STATUS_MAP[status] || "—";
+  let variant: BadgeVariant = "secondary";
+  if (status === 1) variant = "success";
+  else if (status === 2) variant = "warning";
+  else if (status === 0) variant = "danger";
+  return (
+    <Badge variant={variant} soft className="normal-case">
+      {label}
+    </Badge>
+  );
+}
+
 export function CustomerCrmDetail({
   customerId,
   onEdit,
@@ -26,33 +43,20 @@ export function CustomerCrmDetail({
 }: CustomerCrmDetailProps) {
   const { data: result, isLoading } = useCustomerDetail(customerId);
   const customer = result?.data;
+  const [tab, setTab] = useState("personal");
 
   if (isLoading) {
     return (
-      <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden p-6 space-y-4 shadow-xs">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-6 w-48" />
-          <div className="flex gap-2">
-            <Skeleton className="h-9 w-16" />
-            <Skeleton className="h-9 w-16" />
-          </div>
-        </div>
-        <div className="flex items-center gap-4 py-4">
-          <Skeleton className="w-16 h-16 rounded-full" />
-          <div className="space-y-2">
-            <Skeleton className="h-5 w-32" />
-            <Skeleton className="h-4 w-48" />
-          </div>
-        </div>
-        <Skeleton className="h-40 w-full" />
+      <div className="flex h-full flex-col items-center justify-center rounded border border-kit bg-kit-white p-6 text-kit-muted shadow-kit-card">
+        <p className="text-sm">Đang tải thông tin khách hàng...</p>
       </div>
     );
   }
 
   if (!customerId || !customer) {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-white border border-adminGray-100 rounded shadow-xs p-6 text-center text-adminGray-400">
-        <User className="w-12 h-12 text-adminGray-300 mb-2 stroke-[1.5]" />
+      <div className="flex h-full flex-col items-center justify-center rounded border border-kit bg-kit-white p-6 text-center text-kit-muted shadow-kit-card">
+        <User className="mb-2 h-12 w-12 stroke-[1.5] text-kit-muted/60" />
         <p className="text-sm font-medium">
           Chọn một khách hàng để xem chi tiết
         </p>
@@ -63,49 +67,51 @@ export function CustomerCrmDetail({
   const code = customer.id ? `CS${String(customer.id).padStart(6, "0")}` : "—";
 
   return (
-    <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-xs">
-      <div className="p-4 border-b border-adminGray-100 flex items-center justify-between shrink-0">
-        <h3 className="text-sm font-bold text-adminInk truncate">
+    <div className="flex h-full flex-col overflow-hidden rounded border border-kit bg-kit-white shadow-kit-card">
+      <div className="flex shrink-0 items-center justify-between border-b border-kit p-4">
+        <h3 className="truncate text-sm font-bold text-kit-heading">
           Thông tin khách hàng -{" "}
-          <span className="font-mono text-adminGray-600">{code}</span>
+          <span className="font-mono text-kit-body">{code}</span>
         </h3>
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex shrink-0 items-center gap-1.5">
           <Button
+            type="button"
             size="sm"
-            variant="outline"
-            className="h-8 text-xs text-state-danger-text hover:text-state-danger-text hover:bg-state-danger-bg border-state-danger-border"
+            variant="outline-danger"
+            className="mb-0"
             onClick={() => onDelete(customer)}
           >
-            <Trash2 className="w-3.5 h-3.5 mr-1" />
+            <Trash2 className="mr-1 h-3.5 w-3.5" />
             Xóa
           </Button>
           <Button
+            type="button"
             size="sm"
-            variant="admin"
-            className="h-8 text-xs bg-lotus-primary hover:bg-lotus-primary/90 text-white font-semibold"
+            variant="primary"
+            className="mb-0"
             onClick={() => onEdit(customer)}
           >
-            <Pencil className="w-3.5 h-3.5 mr-1" />
+            <Pencil className="mr-1 h-3.5 w-3.5" />
             Sửa
           </Button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
         <div className="flex items-start gap-4">
-          <div className="w-16 h-16 rounded-full bg-adminGray-100 flex items-center justify-center shrink-0 overflow-hidden shadow-inner border border-adminGray-100">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-kit bg-kit-page">
             <FallbackImage
               kind="customer"
               src={customer.avatarUrl}
               alt={customer.fullName || ""}
-              className="w-16 h-16 object-cover"
+              className="h-16 w-16 object-cover"
             />
           </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="text-lg font-bold text-adminInk truncate">
+          <div className="min-w-0 flex-1">
+            <h4 className="truncate text-lg font-bold text-kit-heading">
               {customer.fullName || "—"}
             </h4>
-            <div className="text-xs text-adminGray-600 mt-1 space-y-0.5">
+            <div className="mt-1 space-y-0.5 text-xs text-kit-body">
               <p>
                 Lần mua đầu:{" "}
                 {customer.firstPurchaseAt
@@ -120,121 +126,74 @@ export function CustomerCrmDetail({
               </p>
             </div>
           </div>
-          <div className="flex flex-col items-center justify-center w-14 h-14 rounded-full bg-lotus-secondary text-white shadow-xs shrink-0">
-            <span className="text-base font-black leading-none">
-              {customer.loyaltyPoint ?? 0}
-            </span>
-            <span className="text-2xs mt-0.5 uppercase tracking-wider font-semibold">
-              Điểm
-            </span>
-          </div>
+          <Badge variant="warning" className="shrink-0 normal-case">
+            {customer.loyaltyPoint ?? 0} điểm
+          </Badge>
         </div>
 
-        <Tabs defaultValue="personal" className="w-full flex flex-col">
-          <TabsList className="w-full justify-start rounded-none border-b border-adminGray-100 bg-transparent p-0 h-9">
-            <TabsTrigger
-              value="personal"
-              className="rounded-none border-b-2 border-transparent bg-transparent px-4 pb-2 pt-2 text-xs font-semibold text-adminGray-600 hover:text-adminInk data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:shadow-none"
-            >
-              Thông tin cá nhân
-            </TabsTrigger>
-            <TabsTrigger
-              value="note"
-              className="rounded-none border-b-2 border-transparent bg-transparent px-4 pb-2 pt-2 text-xs font-semibold text-adminGray-600 hover:text-adminInk data-[state=active]:border-adminGreen-600 data-[state=active]:text-adminGreen-600 data-[state=active]:shadow-none"
-            >
-              Ghi chú
-            </TabsTrigger>
-          </TabsList>
+        <TabNav
+          variant="nav-pills"
+          activeId={tab}
+          onChange={setTab}
+          items={[
+            { id: "personal", label: "Thông tin cá nhân" },
+            { id: "note", label: "Ghi chú" },
+          ]}
+        />
 
-          <TabsContent
-            value="personal"
-            className="pt-3 border-0 m-0 outline-hidden"
-          >
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-xs">
-              <DetailFieldItem label="Mã khách hàng" value={code} />
-              <DetailFieldItem label="Số điện thoại" value={customer.phone} />
-              <DetailFieldItem label="Email" value={customer.email} />
-              <DetailFieldItem
-                label="Giới tính"
-                value={
-                  customer.gender !== null
-                    ? GENDER_MAP[customer.gender] || "Khác"
-                    : "—"
-                }
-              />
-              <DetailFieldItem
-                label="Ngày sinh"
-                value={
-                  customer.dateOfBirth
-                    ? formatDisplayDate(customer.dateOfBirth)
-                    : "—"
-                }
-              />
-              <DetailFieldItem
-                label="Nguồn giới thiệu"
-                value={customer.source}
-              />
-              <DetailFieldItem
-                label="Trạng thái"
-                value={
-                  customer.status !== null
-                    ? STATUS_MAP[customer.status] || "—"
-                    : "—"
-                }
-              />
-              <DetailFieldItem
-                label="Điểm tích lũy"
-                value={String(customer.loyaltyPoint ?? 0)}
-              />
-              <DetailFieldItem
-                label="Địa chỉ"
-                value={customer.fullAddress}
-                className="col-span-2"
-              />
-            </div>
-          </TabsContent>
+        {tab === "personal" ? (
+          <TableDetailGrid cols={2}>
+            <TableDetailField label="Mã khách hàng" value={code} />
+            <TableDetailField label="Số điện thoại" value={customer.phone} />
+            <TableDetailField label="Email" value={customer.email} />
+            <TableDetailField
+              label="Giới tính"
+              value={
+                customer.gender !== null
+                  ? GENDER_MAP[customer.gender] || "Khác"
+                  : "—"
+              }
+            />
+            <TableDetailField
+              label="Ngày sinh"
+              value={
+                customer.dateOfBirth
+                  ? formatDisplayDate(customer.dateOfBirth)
+                  : "—"
+              }
+            />
+            <TableDetailField
+              label="Nguồn giới thiệu"
+              value={customer.source}
+            />
+            <TableDetailField
+              label="Trạng thái"
+              value={statusBadge(customer.status)}
+            />
+            <TableDetailField
+              label="Điểm tích lũy"
+              value={String(customer.loyaltyPoint ?? 0)}
+            />
+            <TableDetailField label="Địa chỉ" value={customer.fullAddress} />
+          </TableDetailGrid>
+        ) : null}
 
-          <TabsContent
-            value="note"
-            className="pt-3 m-0 outline-hidden text-xs text-adminGray-600"
-          >
-            <div className="bg-adminGray-50 rounded p-3 min-h-24 border border-adminGray-100 flex items-start gap-2">
-              <FileText className="w-4 h-4 text-adminGray-400 shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <span className="font-bold text-adminInk block mb-1">
-                  Ghi chú:
-                </span>
-                <p className="text-adminGray-600 italic">
+        {tab === "note" ? (
+          <Card className="mb-0 shadow-none">
+            <CardBody className="flex items-start gap-2 p-3">
+              <FileText className="mt-0.5 h-4 w-4 shrink-0 text-kit-muted" />
+              <div className="min-w-0 flex-1">
+                <p className="mb-1 text-xs font-bold text-kit-heading">
+                  Ghi chú
+                </p>
+                <p className="mb-0 text-xs italic text-kit-body">
                   {customer.note || "Không có ghi chú nào"}
                 </p>
               </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+            </CardBody>
+          </Card>
+        ) : null}
       </div>
-    </div>
-  );
-}
-
-function DetailFieldItem({
-  label,
-  value,
-  className = "",
-}: {
-  label: string;
-  value: string | null | undefined;
-  className?: string;
-}) {
-  return (
-    <div
-      className={`space-y-0.5 border-b border-adminGray-100/60 pb-1.5 last:border-b-0 ${className}`}
-    >
-      <span className="text-2xs text-adminGray-400 font-bold uppercase tracking-wider block">
-        {label}
-      </span>
-      <span className="font-semibold text-adminInk truncate block">
-        {value || "—"}
-      </span>
     </div>
   );
 }

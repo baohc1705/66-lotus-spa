@@ -1,24 +1,37 @@
-import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
-import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/shared/components/ui/select";
+import { useState } from "react";
 import {
   ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
   Plus,
   Search,
   SlidersHorizontal,
   Trash2,
 } from "lucide-react";
-import { useState } from "react";
-import type { CustomerDto } from "../types/customer.types";
+
+import { Pagination } from "@/shared/components/Pagination";
 import { FallbackImage } from "@/shared/components/FallbackImage";
+import { Badge } from "@/shared/elements/Badge";
+import { Button } from "@/shared/elements/Button";
+import { ListGroup, ListGroupItem } from "@/shared/elements/ListGroup";
+import { Input } from "@/shared/forms/Input";
+import { InputGroup, InputGroupText } from "@/shared/forms/InputGroup";
+import { Select } from "@/shared/forms/Select";
+
+import type { CustomerDto } from "../types/customer.types";
+
+const GENDER_OPTIONS = [
+  { value: "all", label: "Tất cả" },
+  { value: "0", label: "Nam" },
+  { value: "1", label: "Nữ" },
+  { value: "2", label: "Khác" },
+];
+
+const SOURCE_OPTIONS = [
+  { value: "all", label: "Tất cả" },
+  { value: "Walk-in", label: "Đến trực tiếp" },
+  { value: "Online", label: "Online" },
+  { value: "Referral", label: "Giới thiệu" },
+  { value: "Social Media", label: "Mạng xã hội" },
+];
 
 interface CustomerCrmListProps {
   customers: CustomerDto[];
@@ -62,35 +75,40 @@ export function CustomerCrmList({
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
 
   return (
-    <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-xs">
-      <div className="p-3 border-b border-adminGray-100 space-y-2">
+    <div className="flex h-full flex-col overflow-hidden rounded border border-kit bg-kit-white shadow-kit-card">
+      <div className="space-y-2 border-b border-kit p-3">
         <div className="flex items-center gap-1.5">
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-adminGray-400" />
+          <InputGroup size="sm" className="min-w-0 flex-1">
+            <InputGroupText className="px-2">
+              <Search className="h-4 w-4 text-kit-muted" />
+            </InputGroupText>
             <Input
               type="text"
               placeholder="Tìm kiếm khách hàng..."
               value={filter}
-              onChange={(e) => onFilterChange(e.target.value)}
-              className="pl-8 text-sm h-9 focus-visible:ring-adminGreen-600"
+              onChange={(event) => onFilterChange(event.target.value)}
+              inputSize="sm"
+              className="rounded-l-none border-l-0"
             />
-          </div>
+          </InputGroup>
 
           <Button
-            variant="outline"
-            size="icon"
+            type="button"
+            variant={showAdvancedFilter ? "outline-primary" : "outline"}
+            size="icon-sm"
+            className="mb-0 mr-0 shrink-0"
             onClick={() => setShowAdvancedFilter(!showAdvancedFilter)}
-            className={`h-9 w-9 shrink-0 ${showAdvancedFilter ? "bg-adminGreen-100 border-adminGreen-600 text-adminGreen-600" : "text-adminGray-600"}`}
             title="Tìm nâng cao"
           >
             <SlidersHorizontal className="h-4 w-4" />
           </Button>
 
           <Button
-            variant="outline"
-            size="icon"
+            type="button"
+            variant={showDeleted ? "outline-warning" : "outline"}
+            size="icon-sm"
+            className="mb-0 mr-0 shrink-0"
             onClick={onToggleDeleted}
-            className={`h-9 w-9 shrink-0 ${showDeleted ? "bg-state-warning-bg border-state-warning-border text-state-warning-text" : "text-adminGray-600"}`}
             title={
               showDeleted ? "Xem danh sách hoạt động" : "Xem danh sách đã xóa"
             }
@@ -103,158 +121,136 @@ export function CustomerCrmList({
           </Button>
         </div>
 
-        {showAdvancedFilter && (
-          <div className="grid grid-cols-2 gap-2 pt-1 border-t border-adminGray-100 animate-in fade-in slide-in-from-top-1 duration-200">
+        {showAdvancedFilter ? (
+          <div className="grid grid-cols-2 gap-2 border-t border-kit pt-2">
             <div>
-              <label className="text-2xs font-bold text-adminGray-400 block mb-1 uppercase">
+              <label className="mb-1 block text-2xs font-bold uppercase text-kit-muted">
                 Giới tính
               </label>
               <Select
                 value={
                   selectedGender === null ? "all" : selectedGender.toString()
                 }
-                onValueChange={(val) =>
-                  onSelectGender(val === "all" ? null : parseInt(val))
+                onChange={(event) =>
+                  onSelectGender(
+                    event.target.value === "all"
+                      ? null
+                      : Number(event.target.value),
+                  )
                 }
-              >
-                <AdminSelectTrigger className="h-8 text-xs">
-                  <SelectValue placeholder="Tất cả" />
-                </AdminSelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tất cả</SelectItem>
-                  <SelectItem value="0">Nam</SelectItem>
-                  <SelectItem value="1">Nữ</SelectItem>
-                  <SelectItem value="2">Khác</SelectItem>
-                </SelectContent>
-              </Select>
+                options={GENDER_OPTIONS}
+                inputSize="sm"
+              />
             </div>
             <div>
-              <label className="text-2xs font-bold text-adminGray-400 block mb-1 uppercase">
+              <label className="mb-1 block text-2xs font-bold uppercase text-kit-muted">
                 Nguồn khách
               </label>
               <Select
                 value={selectedSource || "all"}
-                onValueChange={(val) =>
-                  onSelectSource(val === "all" ? null : val)
+                onChange={(event) =>
+                  onSelectSource(
+                    event.target.value === "all" ? null : event.target.value,
+                  )
                 }
-              >
-                <AdminSelectTrigger className="h-8 text-xs">
-                  <SelectValue placeholder="Tất cả" />
-                </AdminSelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tất cả</SelectItem>
-                  <SelectItem value="Walk-in">Đến trực tiếp</SelectItem>
-                  <SelectItem value="Online">Online</SelectItem>
-                  <SelectItem value="Referral">Giới thiệu</SelectItem>
-                  <SelectItem value="Social Media">Mạng xã hội</SelectItem>
-                </SelectContent>
-              </Select>
+                options={SOURCE_OPTIONS}
+                inputSize="sm"
+              />
             </div>
           </div>
-        )}
+        ) : null}
 
         <div className="flex items-center justify-between gap-2 pt-1">
-          <span className="text-xs text-adminGray-400 font-medium">
+          <span className="text-xs font-medium text-kit-muted">
             {showDeleted ? "Khách hàng đã xóa" : "Khách hàng hoạt động"}
           </span>
-          {!showDeleted && (
+          {!showDeleted ? (
             <Button
-              variant="admin"
+              type="button"
+              variant="primary"
               size="sm"
+              className="mb-0"
               onClick={onAdd}
-              className="h-8 px-2.5 text-xs bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white flex items-center gap-1 shadow-xs font-semibold"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="mr-1 h-3.5 w-3.5" />
               Thêm
             </Button>
-          )}
+          ) : null}
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-adminGray-100">
+      <div className="min-h-0 flex-1 overflow-y-auto">
         {isLoading ? (
-          <div className="p-4 text-center text-xs text-adminGray-400">
+          <p className="p-4 text-center text-xs text-kit-muted">
             Đang tải danh sách...
-          </div>
+          </p>
         ) : customers.length === 0 ? (
-          <div className="p-8 text-center text-xs text-adminGray-400">
+          <p className="p-8 text-center text-xs text-kit-muted">
             Không tìm thấy khách hàng nào
-          </div>
+          </p>
         ) : (
-          customers.map((cust) => {
-            const isSelected = cust.id === selectedId;
-            const code = cust.id
-              ? `CS${String(cust.id).padStart(6, "0")}`
-              : "—";
-            return (
-              <div
-                key={cust.id}
-                onClick={() => cust.id && onSelect(cust.id)}
-                className={`flex items-center gap-3 p-3 cursor-pointer transition-all duration-150 border-l-[3px] ${
-                  isSelected
-                    ? "bg-adminGreen-50 border-l-[3px] border-l-lotus-leaf font-medium "
-                    : "hover:bg-adminGray-50 border-l-transparent"
-                }`}
-              >
-                <div className="w-10 h-10 rounded-full bg-adminGray-100 flex items-center justify-center shrink-0 overflow-hidden shadow-inner border border-adminGray-100">
-                  <FallbackImage
-                    kind="customer"
-                    src={cust.avatarUrl}
-                    alt=""
-                    className="w-10 h-10 object-cover"
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <span
-                      className={`text-sm font-bold truncate ${isSelected ? "text-adminGreen-600" : "text-adminInk"}`}
-                    >
-                      {cust.fullName || "—"}
-                    </span>
-                    <span className="text-2xs text-adminGray-400 font-mono shrink-0">
-                      {code}
-                    </span>
+          <ListGroup flush>
+            {customers.map((customer: CustomerDto) => {
+              const isSelected = customer.id === selectedId;
+              const code = customer.id
+                ? `CS${String(customer.id).padStart(6, "0")}`
+                : "—";
+
+              return (
+                <ListGroupItem
+                  key={customer.id}
+                  action
+                  active={isSelected}
+                  onClick={() => {
+                    if (customer.id) onSelect(customer.id);
+                  }}
+                  className="gap-2 px-3 py-2.5"
+                >
+                  <div className="flex min-w-0 flex-1 items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-kit bg-kit-page">
+                      <FallbackImage
+                        kind="customer"
+                        src={customer.avatarUrl}
+                        alt=""
+                        className="h-10 w-10 object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1 text-left">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="truncate text-sm font-bold">
+                          {customer.fullName || "—"}
+                        </span>
+                        <span className="shrink-0 font-mono text-2xs opacity-80">
+                          {code}
+                        </span>
+                      </div>
+                      <div className="mt-0.5 truncate text-xs opacity-90">
+                        {customer.phone || "—"}
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between text-xs text-adminGray-600 mt-0.5">
-                    <span className="truncate">{cust.phone || "—"}</span>
-                    {cust.loyaltyPoint != null && cust.loyaltyPoint > 0 && (
-                      <span className="text-2xs font-semibold bg-state-warning-bg text-state-warning-text border border-state-warning-border/50 px-1 rounded">
-                        {cust.loyaltyPoint} điểm
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })
+                  {customer.loyaltyPoint != null && customer.loyaltyPoint > 0 ? (
+                    <Badge variant="warning" soft className="shrink-0 normal-case">
+                      {customer.loyaltyPoint} điểm
+                    </Badge>
+                  ) : null}
+                </ListGroupItem>
+              );
+            })}
+          </ListGroup>
         )}
       </div>
 
-      {totalPages > 1 && (
-        <div className="p-2 border-t border-adminGray-100 bg-adminGray-50/50 flex items-center justify-between text-xs text-adminGray-600">
-          <Button
-            variant="ghost"
-            size="icon"
-            disabled={pageIndex === 1 || isLoading}
-            onClick={() => onPageChange(pageIndex - 1)}
-            className="h-7 w-7 text-adminGray-600 hover:text-adminInk"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="font-medium">
-            Trang {pageIndex} / {totalPages}
-          </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            disabled={pageIndex === totalPages || isLoading}
-            onClick={() => onPageChange(pageIndex + 1)}
-            className="h-7 w-7 text-adminGray-600 hover:text-adminInk"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+      {totalPages > 1 ? (
+        <div className="flex justify-center border-t border-kit bg-kit-page/50 p-2">
+          <Pagination
+            page={pageIndex}
+            pageCount={totalPages}
+            onPageChange={onPageChange}
+            size="sm"
+          />
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

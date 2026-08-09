@@ -1,10 +1,18 @@
 import type { RoleDTO, PermissionDTO } from '@/features/auth/types/auth.types';
+import { Button } from '@/shared/elements/Button';
+import { Card, CardBody, CardHeader } from '@/shared/elements/Card';
 import { cn } from '@/lib/utils';
 
 function CheckIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M2 6l3 3 5-5"
+        stroke="#fff"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -17,7 +25,20 @@ function DashIcon() {
   );
 }
 
-export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, grouped, resources, actions, isDirty, isSaving, onTogglePermission, onToggleResource, onSave, onUndo }: {
+export function PermissionMatrix({
+  selectedRole,
+  allPermissions,
+  checkedIds,
+  grouped,
+  resources,
+  actions,
+  isDirty,
+  isSaving,
+  onTogglePermission,
+  onToggleResource,
+  onSave,
+  onUndo,
+}: {
   selectedRole: RoleDTO;
   allPermissions: PermissionDTO[];
   checkedIds: Set<number>;
@@ -33,103 +54,134 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
 }) {
   return (
     <div className="flex flex-col gap-3">
-      <div className="bg-white border border-border rounded-xl overflow-hidden">
-        <div className="h-1.5 bg-adminGreen-600" />
-        <div className="px-4 py-3.5 flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl shrink-0 bg-adminGreen-600 text-white font-bold text-lg flex items-center justify-center">
+      <Card className="mb-0! overflow-hidden border border-kit">
+        <div className="h-1.5 bg-kit-primary" />
+        <CardBody className="flex items-center gap-3.5 px-4 py-3.5">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded bg-kit-primary text-lg font-bold text-kit-white">
             {selectedRole.name.charAt(0).toUpperCase()}
           </div>
-          <div className="flex-1">
-            <h2 className="text-base font-bold text-adminInk mb-0.5">{selectedRole.name}</h2>
-            <p className="text-xs text-adminGray-600">{selectedRole.desctiption || 'Không có mô tả'}</p>
+          <div className="min-w-0 flex-1">
+            <h2 className="mb-0.5 text-base font-bold text-kit-heading">{selectedRole.name}</h2>
+            <p className="m-0 text-xs text-kit-muted">
+              {selectedRole.desctiption || 'Không có mô tả'}
+            </p>
           </div>
-          <div className="flex gap-2.5 shrink-0">
-            <div className="text-center bg-adminGray-50 border border-border rounded-lg px-3.5 py-1.5">
-              <div className="text-base font-bold text-adminInk leading-none">{selectedRole.roleUsers?.length ?? 0}</div>
-              <div className="text-2xs text-adminGray-600 mt-0.5">thành viên</div>
+          <div className="flex shrink-0 gap-2.5">
+            <div className="rounded border border-kit bg-kit-page px-3.5 py-1.5 text-center">
+              <div className="text-base font-bold leading-none text-kit-heading">
+                {selectedRole.roleUsers?.length ?? 0}
+              </div>
+              <div className="mt-0.5 text-[10px] text-kit-muted">thành viên</div>
             </div>
-            <div className="text-center bg-adminGreen-50 border border-adminGreen-600/30 rounded-lg px-3.5 py-1.5">
-              <div className="text-base font-bold text-adminGreen-600 leading-none">{checkedIds.size}</div>
-              <div className="text-2xs text-adminGray-600 mt-0.5">quyền</div>
+            <div className="rounded border border-kit-primary/30 bg-kit-page px-3.5 py-1.5 text-center">
+              <div className="text-base font-bold leading-none text-kit-primary">
+                {checkedIds.size}
+              </div>
+              <div className="mt-0.5 text-[10px] text-kit-muted">quyền</div>
             </div>
           </div>
-        </div>
-      </div>
+        </CardBody>
+      </Card>
 
-      <div className="bg-white border border-border rounded-xl overflow-hidden">
-        <div className="px-4 py-3 border-b border-border">
-          <div className="text-sm font-bold text-adminInk">Ma trận quyền</div>
-        </div>
+      <Card className="mb-0! overflow-hidden border border-kit">
+        <CardHeader className="h-auto py-3">
+          <div className="text-sm font-bold text-kit-heading">Ma trận quyền</div>
+        </CardHeader>
 
         {allPermissions.length === 0 ? (
-          <p className="p-6 text-center text-adminGray-600 text-sm">Chưa có quyền nào — hãy tạo quyền ở bảng bên dưới</p>
+          <p className="p-6 text-center text-sm text-kit-muted">
+            Chưa có quyền nào — hãy tạo quyền ở bảng bên dưới
+          </p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse min-w-[400px]">
+            <table className="w-full min-w-[400px] border-collapse">
               <thead>
-                <tr className="bg-adminGray-50">
-                  <th className="px-3.5 py-2.5 text-left text-xs font-bold text-adminGray-600 uppercase tracking-wide border-b border-border w-44">
+                <tr className="bg-kit-page">
+                  <th className="w-44 border-b border-kit px-3.5 py-2.5 text-left text-xs font-bold uppercase tracking-wide text-kit-muted">
                     Tài nguyên
                   </th>
-                  <th className="px-2 py-2.5 text-center text-xs font-bold text-adminGray-600 uppercase tracking-wide border-b border-border min-w-[70px]">
+                  <th className="min-w-[70px] border-b border-kit px-2 py-2.5 text-center text-xs font-bold uppercase tracking-wide text-kit-muted">
                     Tất cả
                   </th>
-                  {actions.map(a => (
-                    <th key={a} className="px-2 py-2.5 text-center text-xs font-bold text-adminGray-600 uppercase tracking-wide border-b border-border min-w-[76px]">
-                      {a}
+                  {actions.map((action: string) => (
+                    <th
+                      key={action}
+                      className="min-w-[76px] border-b border-kit px-2 py-2.5 text-center text-xs font-bold uppercase tracking-wide text-kit-muted"
+                    >
+                      {action}
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {resources.map((resource, ri) => {
-                  const resourcePerms = grouped[resource] ?? [];
-                  const allChecked = resourcePerms.length > 0 && resourcePerms.every(p => checkedIds.has(p.id));
-                  const someChecked = !allChecked && resourcePerms.some(p => checkedIds.has(p.id));
+                {resources.map((resource: string, rowIndex: number) => {
+                  const resourcePermissions = grouped[resource] ?? [];
+                  const allChecked =
+                    resourcePermissions.length > 0 &&
+                    resourcePermissions.every((permission: PermissionDTO) =>
+                      checkedIds.has(permission.id),
+                    );
+                  const someChecked =
+                    !allChecked &&
+                    resourcePermissions.some((permission: PermissionDTO) =>
+                      checkedIds.has(permission.id),
+                    );
 
                   return (
-                    <tr key={resource} className={ri % 2 === 0 ? 'bg-white' : 'bg-adminGray-50/30'}>
-                      <td className="px-3.5 py-2.5 text-sm font-semibold text-adminInk border-b border-border">
+                    <tr
+                      key={resource}
+                      className={rowIndex % 2 === 0 ? 'bg-kit-white' : 'bg-kit-page/40'}
+                    >
+                      <td className="border-b border-kit px-3.5 py-2.5 text-sm font-semibold text-kit-heading">
                         {resource}
                       </td>
 
-                      <td className="px-2 py-2.5 text-center border-b border-border">
+                      <td className="border-b border-kit px-2 py-2.5 text-center">
                         <button
+                          type="button"
                           onClick={() => onToggleResource(resource)}
                           title={allChecked ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
                           className={cn(
-                            'inline-flex items-center justify-center w-[22px] h-[22px] rounded-[5px] cursor-pointer transition-all',
-                            allChecked && 'bg-adminGreen-600 border-0 shadow-xs',
-                            someChecked && 'bg-adminGold-600 border-0 shadow-xs',
-                            !allChecked && !someChecked && 'bg-white border-[1.5px] border-border',
+                            'inline-flex h-[22px] w-[22px] cursor-pointer items-center justify-center rounded-[5px] transition-all',
+                            allChecked && 'border-0 bg-kit-success shadow-xs',
+                            someChecked && 'border-0 bg-kit-warning shadow-xs',
+                            !allChecked &&
+                              !someChecked &&
+                              'border-[1.5px] border-kit bg-kit-white',
                           )}
                         >
-                          {allChecked && <CheckIcon />}
-                          {someChecked && <DashIcon />}
+                          {allChecked ? <CheckIcon /> : null}
+                          {someChecked ? <DashIcon /> : null}
                         </button>
                       </td>
 
-                      {actions.map(act => {
-                        const perm = grouped[resource]?.find(p => p.action.toLowerCase() === act);
-                        if (!perm) return (
-                          <td key={act} className="px-2 py-2.5 text-center border-b border-border">
-                            <span className="inline-block w-5 h-5 rounded-[5px] bg-adminGray-50" />
-                          </td>
+                      {actions.map((action: string) => {
+                        const permission = grouped[resource]?.find(
+                          (item: PermissionDTO) => item.action.toLowerCase() === action,
                         );
-                        const checked = checkedIds.has(perm.id);
+                        if (!permission) {
+                          return (
+                            <td key={action} className="border-b border-kit px-2 py-2.5 text-center">
+                              <span className="inline-block h-5 w-5 rounded-[5px] bg-kit-page" />
+                            </td>
+                          );
+                        }
+
+                        const checked = checkedIds.has(permission.id);
                         return (
-                          <td key={act} className="px-2 py-2.5 text-center border-b border-border">
+                          <td key={action} className="border-b border-kit px-2 py-2.5 text-center">
                             <button
-                              onClick={() => onTogglePermission(perm.id)}
-                              title={perm.name}
+                              type="button"
+                              onClick={() => onTogglePermission(permission.id)}
+                              title={permission.name}
                               className={cn(
-                                'inline-flex items-center justify-center w-[22px] h-[22px] rounded-[5px] cursor-pointer transition-all',
+                                'inline-flex h-[22px] w-[22px] cursor-pointer items-center justify-center rounded-[5px] transition-all',
                                 checked
-                                  ? 'bg-adminGreen-600 border-0 shadow-xs'
-                                  : 'bg-white border-[1.5px] border-border',
+                                  ? 'border-0 bg-kit-success shadow-xs'
+                                  : 'border-[1.5px] border-kit bg-kit-white',
                               )}
                             >
-                              {checked && <CheckIcon />}
+                              {checked ? <CheckIcon /> : null}
                             </button>
                           </td>
                         );
@@ -141,29 +193,29 @@ export function PermissionMatrix({ selectedRole, allPermissions, checkedIds, gro
             </table>
           </div>
         )}
-      </div>
+      </Card>
 
-      <div className="flex justify-end gap-2.5">
-        {isDirty && (
-          <button
-            className="px-4 py-2 rounded-lg border border-border bg-white text-adminInk font-semibold text-sm cursor-pointer hover:bg-adminGray-50"
+      <div className="flex justify-end gap-2">
+        {isDirty ? (
+          <Button
+            variant="outline-secondary"
+            size="sm"
+            className="mb-0! mr-0!"
             onClick={onUndo}
           >
             Hoàn tác
-          </button>
-        )}
-        <button
+          </Button>
+        ) : null}
+        <Button
+          variant="primary"
+          size="sm"
+          className="mb-0! mr-0!"
           onClick={onSave}
-          disabled={!isDirty || isSaving}
-          className={cn(
-            'px-5 py-2 rounded-lg text-white font-semibold text-sm border-0 transition-colors',
-            isDirty
-              ? 'bg-adminGreen-600 cursor-pointer hover:bg-adminGreen-500'
-              : 'bg-adminGreen-200 cursor-not-allowed',
-          )}
+          disabled={!isDirty}
+          loading={isSaving}
         >
-          {isSaving ? 'Đang lưu...' : 'Lưu thay đổi'}
-        </button>
+          Lưu thay đổi
+        </Button>
       </div>
     </div>
   );

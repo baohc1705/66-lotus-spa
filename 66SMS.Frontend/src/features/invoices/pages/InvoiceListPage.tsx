@@ -3,44 +3,38 @@ import {
   getExpandedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Plus, Receipt } from "lucide-react";
-import { motion } from "motion/react";
+import { Receipt } from "lucide-react";
 import { useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { Button } from "@/shared/components/ui/button";
+import { Pagination } from "@/shared/components/Pagination";
+import { Select } from "@/shared/forms/Select";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
+import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
-import { containerVariants } from "@/shared/motion/pageVariants";
 
 import { InvoiceDetailExpanded } from "../components/InvoiceDetailExpanded";
 import { InvoiceFilterSidebar } from "../components/InvoiceFilterSidebar";
-import { InvoiceFormDialog } from "../components/InvoiceFormDialog";
 import { InvoiceStatCards } from "../components/InvoiceStatCards";
 import {
   INVOICE_COLUMN_LABELS,
   useActiveInvoiceColumns,
 } from "../components/useActiveInvoiceColumns";
-import { INVOICE_PERM } from "../constants/invoice.permissions";
 import { useInvoiceListState } from "../hooks/useInvoiceListState";
 import { useAdminInvoices, useCancelInvoice } from "../hooks/useInvoices";
-import { INVOICE_STATUS } from "../types/invoice.types";
+import { INVOICE_STATUS, type InvoiceDto } from "../types/invoice.types";
 
 export function InvoiceListPage() {
-  const perm = INVOICE_PERM;
-  const salonId = useAuthStore((s) => s.getEffectiveSalonId());
+  const salonId = useAuthStore((state) => state.getEffectiveSalonId());
   const listState = useInvoiceListState(salonId);
 
   const {
     queryParams,
-    createOpen,
-    setCreateOpen,
     cancelTarget,
     setCancelTarget,
     selectedStatus,
@@ -73,6 +67,10 @@ export function InvoiceListPage() {
   const paged = result?.data;
   const invoices = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
+  const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
   const allInvoices = useMemo(
     () => allInvoicesResult?.data?.items ?? [],
@@ -82,39 +80,49 @@ export function InvoiceListPage() {
   const paidRevenue = useMemo(
     () =>
       allInvoices
-        .filter((inv) => inv.status === INVOICE_STATUS.PAID)
-        .reduce((sum, inv) => sum + (inv.totalAmount ?? 0), 0),
+        .filter(
+          (invoice: InvoiceDto) => invoice.status === INVOICE_STATUS.PAID,
+        )
+        .reduce(
+          (sum: number, invoice: InvoiceDto) =>
+            sum + (invoice.totalAmount ?? 0),
+          0,
+        ),
     [allInvoices],
   );
 
   const paidCount = useMemo(
     () =>
-      allInvoices.filter((inv) => inv.status === INVOICE_STATUS.PAID).length,
+      allInvoices.filter(
+        (invoice: InvoiceDto) => invoice.status === INVOICE_STATUS.PAID,
+      ).length,
     [allInvoices],
   );
 
   const unpaidCount = useMemo(
     () =>
-      allInvoices.filter((inv) => inv.status === INVOICE_STATUS.UNPAID).length,
+      allInvoices.filter(
+        (invoice: InvoiceDto) => invoice.status === INVOICE_STATUS.UNPAID,
+      ).length,
     [allInvoices],
   );
 
   const cancelledCount = useMemo(
     () =>
-      allInvoices.filter((inv) => inv.status === INVOICE_STATUS.CANCELLED)
-        .length,
+      allInvoices.filter(
+        (invoice: InvoiceDto) => invoice.status === INVOICE_STATUS.CANCELLED,
+      ).length,
     [allInvoices],
   );
 
-  const handleCancel = () => {
-    if (cancelTarget) {
-      cancelMutation.mutate(cancelTarget, {
-        onSuccess: (res) => {
-          if (res.isSuccess) setCancelTarget(null);
-        },
-      });
-    }
-  };
+  function handleCancel() {
+    if (!cancelTarget) return;
+    cancelMutation.mutate(cancelTarget, {
+      onSuccess: (response) => {
+        if (response.isSuccess) setCancelTarget(null);
+      },
+    });
+  }
 
   const activeColumns = useActiveInvoiceColumns({
     pageIndex,
@@ -128,9 +136,7 @@ export function InvoiceListPage() {
   const table = useReactTable({
     data: invoices,
     columns: activeColumns,
-    state: {
-      columnVisibility,
-    },
+    state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
@@ -147,122 +153,96 @@ export function InvoiceListPage() {
   const isSidebarMode = layoutMode === "sidebar";
 
   return (
-    <div className="flex h-full overflow-hidden gap-2">
-      {!isSidebarMode && (
-        <InvoiceFilterSidebar
-          selectedStatus={selectedStatus}
-          onSelectStatus={handleSelectStatus}
-          selectedPaymentMethod={selectedPaymentMethod}
-          onSelectPaymentMethod={handleSelectPaymentMethod}
-          onReset={handleResetFilters}
-        />
-      )}
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
+      <InvoiceStatCards
+        paidRevenue={paidRevenue}
+        paidCount={paidCount}
+        unpaidCount={unpaidCount}
+        cancelledCount={cancelledCount}
+        isLoading={isLoading && allInvoices.length === 0}
+      />
 
-      <div className="flex-1 min-w-0 flex flex-col gap-2 overflow-hidden">
-        <div className="shrink-0">
-          <InvoiceStatCards
-            paidRevenue={paidRevenue}
-            paidCount={paidCount}
-            unpaidCount={unpaidCount}
-            cancelledCount={cancelledCount}
-            isLoading={isLoading}
+      <div className="flex flex-col items-start gap-3 md:flex-row">
+        {!isSidebarMode ? (
+          <InvoiceFilterSidebar
+            selectedStatus={selectedStatus}
+            onSelectStatus={handleSelectStatus}
+            selectedPaymentMethod={selectedPaymentMethod}
+            onSelectPaymentMethod={handleSelectPaymentMethod}
+            onReset={handleResetFilters}
           />
-        </div>
+        ) : null}
 
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={containerVariants}
-          className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative"
-        >
-          {isFetching && !isLoading && (
-            <div className="lotus-admin-table-fetch-bar">
-              <div className="lotus-admin-table-fetch-bar-inner" />
+        <div className="w-full min-w-0 flex-1">
+          <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+            <div className="border-b border-kit px-4 pt-4">
+              <DataTableToolbar
+                searchPlaceholder="Tìm theo mã, tên khách hàng..."
+                searchValue={filter}
+                onSearchChange={handleSearchChange}
+              >
+                <DataTableViewOptions
+                  table={table}
+                  columnLabels={columnLabels}
+                />
+              </DataTableToolbar>
             </div>
-          )}
 
-          <div className="px-4 pt-3 shrink-0">
-            <DataTableToolbar
-              searchPlaceholder="Tìm theo mã, tên khách hàng..."
-              searchValue={filter}
-              onSearchChange={handleSearchChange}
-            >
-              <DataTableViewOptions table={table} columnLabels={columnLabels} />
-              <div className="flex items-center gap-2 ml-auto">
-                <PermissionGate resource={perm.resource} action={perm.create}>
-                  <Button
-                    variant="admin"
-                    size="sm"
-                    onClick={() => setCreateOpen(true)}
-                    className="lotus-admin-table-toolbar-btn"
-                  >
-                    <Plus className="w-4 h-4" /> Lập hóa đơn
-                  </Button>
-                </PermissionGate>
-              </div>
-            </DataTableToolbar>
-          </div>
-
-          <DataTable
-            table={table}
-            isLoading={isLoading}
-            loadingRows={
-              pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
-            }
-            renderSubComponent={({ row }) =>
-              row.original.id ? (
-                <InvoiceDetailExpanded
-                  invoiceId={row.original.id}
-                  onCancel={(id) => setCancelTarget(id)}
+            <DataTable
+              table={table}
+              isLoading={isLoading}
+              loadingRows={DEFAULT_LOADING_ROWS}
+              renderExpandedRow={({ row }) =>
+                row.original.id ? (
+                  <InvoiceDetailExpanded
+                    invoiceId={row.original.id}
+                    onCancel={(id) => setCancelTarget(id)}
+                  />
+                ) : null
+              }
+              emptyState={
+                <TableEmptyState
+                  icon={Receipt}
+                  title="Chưa có hóa đơn"
+                  hint="Hóa đơn được tạo từ quầy thu ngân."
                 />
-              ) : null
-            }
-            emptyState={
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-14 h-14 rounded-2xl bg-adminGray-50 flex items-center justify-center">
-                  <Receipt className="w-7 h-7 text-adminGray-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-adminInk">
-                    Chưa có hóa đơn
-                  </p>
-                  <p className="text-xs text-adminGray-600 mt-0.5">
-                    Lập hóa đơn mới để bắt đầu.
-                  </p>
-                </div>
-                <PermissionGate resource={perm.resource} action="create">
-                  <Button
-                    variant="admin"
-                    size="sm"
-                    onClick={() => setCreateOpen(true)}
-                    className="mt-1 text-xs"
-                  >
-                    <Plus className="w-3.5 h-3.5" /> Lập hóa đơn
-                  </Button>
-                </PermissionGate>
-              </div>
-            }
-            pagination={
-              paged && totalCount > 0 ? (
-                <DataTablePagination
-                  pageIndex={pageIndex}
-                  pageSize={pageSize}
-                  totalCount={totalCount}
-                  totalPages={paged?.totalPages ?? 0}
-                  hasPreviousPage={paged?.hasPreviousPage ?? false}
-                  hasNextPage={paged?.hasNextPage ?? false}
-                  onPageChange={listState.setPageIndex}
-                  onPageSizeChange={handlePageSizeChange}
-                />
-              ) : null
-            }
-          />
-        </motion.div>
+              }
+              pagination={
+                totalCount > 0 ? (
+                  <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                    <div className="flex items-center gap-3 text-xs text-kit-muted">
+                      <span>
+                        {rangeStart}-{rangeEnd} / {totalCount}
+                      </span>
+                      <Select
+                        value={String(pageSize)}
+                        onChange={(event) =>
+                          handlePageSizeChange(Number(event.target.value))
+                        }
+                        options={[
+                          { value: "5", label: "5 / trang" },
+                          { value: "10", label: "10 / trang" },
+                          { value: "20", label: "20 / trang" },
+                        ]}
+                        inputSize="sm"
+                        className="w-auto min-w-28"
+                      />
+                    </div>
+                    <Pagination
+                      page={safePage}
+                      pageCount={totalPages}
+                      onPageChange={listState.setPageIndex}
+                      size="sm"
+                    />
+                  </div>
+                ) : null
+              }
+            />
+          </TablePageShell>
+        </div>
       </div>
 
-      <InvoiceFormDialog open={createOpen} onOpenChange={setCreateOpen} />
-
-      {cancelTarget && (
+      {cancelTarget ? (
         <ConfirmDialog
           open={cancelTarget !== null}
           onOpenChange={(open) => {
@@ -275,7 +255,7 @@ export function InvoiceListPage() {
           loading={cancelMutation.isPending}
           variant="danger"
         />
-      )}
+      ) : null}
     </div>
   );
 }

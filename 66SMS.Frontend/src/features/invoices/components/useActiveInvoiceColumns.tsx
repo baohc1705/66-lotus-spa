@@ -1,22 +1,21 @@
 ﻿import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Ban, Eye } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
+import { Ban, Eye } from "lucide-react";
+
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
-import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
+import { Tooltip } from "@/shared/components/Tooltip";
+import { Badge } from "@/shared/elements/Badge";
+import { Button } from "@/shared/elements/Button";
+import { SortableColumnHeader } from "@/shared/tables/SortableColumnHeader";
 import {
-  IndexCell,
-  PriceCell,
   DateTimeCell,
-} from "@/shared/components/DataTable/TableCells";
+  IndexCell,
+  MutedSmallCell,
+  NameCell,
+  PriceCell,
+  TextCell,
+} from "@/shared/tables/TableCells";
+
 import { INVOICE_PERM } from "../constants/invoice.permissions";
 import {
   INVOICE_STATUS,
@@ -33,20 +32,55 @@ export const INVOICE_COLUMN_LABELS = {
   issuedAt: "Ngày lập",
 } as const;
 
-const STATUS_MAP: StatusMap = {
-  "0": { label: "Nháp", variant: "outline" },
-  "1": { label: "Chưa TT", variant: "warning" },
-  "2": { label: "Đã TT", variant: "success", dot: true },
-  "3": { label: "Đã hủy", variant: "error" },
-  "4": { label: "Hoàn tiền", variant: "outline" },
-};
-
 const PAYMENT_LABEL: Record<number, string> = {
   [PAYMENT_METHOD.CASH]: "Tiền mặt",
   [PAYMENT_METHOD.BANK_TRANSFER]: "Chuyển khoản",
   [PAYMENT_METHOD.WALLET]: "Ví",
   [PAYMENT_METHOD.VNPAY]: "VNPay",
 };
+
+function statusBadge(status: number | null | undefined) {
+  if (status === INVOICE_STATUS.DRAFT) {
+    return (
+      <Badge variant="secondary" soft>
+        Nháp
+      </Badge>
+    );
+  }
+  if (status === INVOICE_STATUS.UNPAID) {
+    return (
+      <Badge variant="warning" soft>
+        Chưa TT
+      </Badge>
+    );
+  }
+  if (status === INVOICE_STATUS.PAID) {
+    return (
+      <Badge variant="success" soft>
+        Đã TT
+      </Badge>
+    );
+  }
+  if (status === INVOICE_STATUS.CANCELLED) {
+    return (
+      <Badge variant="danger" soft>
+        Đã hủy
+      </Badge>
+    );
+  }
+  if (status === INVOICE_STATUS.REFUNDED) {
+    return (
+      <Badge variant="secondary" soft>
+        Hoàn tiền
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="secondary" soft>
+      —
+    </Badge>
+  );
+}
 
 interface UseActiveInvoiceColumnsParams {
   pageIndex: number;
@@ -94,26 +128,18 @@ export function useActiveInvoiceColumns({
             onSort={onSort}
           />
         ),
-        cell: ({ row }) => (
-          <span className=" text-xs text-adminGray-600">
-            {row.original.invoiceCode ?? "—"}
-          </span>
-        ),
+        cell: ({ row }) => <NameCell value={row.original.invoiceCode} />,
         size: 170,
       },
       {
         accessorKey: "customerName",
         header: cols.customerName,
         cell: ({ row }) => (
-          <div>
-            <p className="text-sm font-semibold text-adminInk truncate max-w-44">
-              {row.original.customerName ?? "Khách vãng lai"}
-            </p>
-            {row.original.customerPhone && (
-              <p className="text-xs text-adminGray-600">
-                {row.original.customerPhone}
-              </p>
-            )}
+          <div className="leading-5">
+            <NameCell value={row.original.customerName ?? "Khách vãng lai"} />
+            {row.original.customerPhone ? (
+              <MutedSmallCell value={row.original.customerPhone} />
+            ) : null}
           </div>
         ),
         size: 200,
@@ -136,21 +162,16 @@ export function useActiveInvoiceColumns({
         accessorKey: "paymentMethod",
         header: cols.paymentMethod,
         cell: ({ row }) => (
-          <span className="text-xs text-adminGray-600">
-            {PAYMENT_LABEL[row.original.paymentMethod ?? 0] ?? "—"}
-          </span>
+          <TextCell
+            value={PAYMENT_LABEL[row.original.paymentMethod ?? 0] ?? null}
+          />
         ),
         size: 110,
       },
       {
         accessorKey: "status",
         header: cols.status,
-        cell: ({ row }) => (
-          <StatusBadge
-            status={String(row.original.status ?? 1)}
-            statusMap={STATUS_MAP}
-          />
-        ),
+        cell: ({ row }) => statusBadge(row.original.status),
         size: 110,
       },
       {
@@ -169,49 +190,46 @@ export function useActiveInvoiceColumns({
       },
       {
         id: "actions",
-        header: "",
+        header: "Thao tác",
         cell: ({ row }) => {
-          const inv = row.original;
+          const invoice = row.original;
           const canCancel =
-            inv.status !== INVOICE_STATUS.CANCELLED &&
-            inv.status !== INVOICE_STATUS.REFUNDED;
+            invoice.status !== INVOICE_STATUS.CANCELLED &&
+            invoice.status !== INVOICE_STATUS.REFUNDED;
+
           return (
-            <div onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <MoreHorizontal className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => row.toggleExpanded()}>
-                    <Eye className="w-4 h-4" />
-                    {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
-                  </DropdownMenuItem>
-                  {canCancel && inv.id && (
-                    <PermissionGate
-                      resource={perm.resource}
-                      action={perm.update}
+            <div
+              className="flex items-center gap-1"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <Tooltip text={row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}>
+                <Button
+                  size="icon-sm"
+                  variant="outline-info"
+                  className="mb-0 mr-0"
+                  onClick={() => row.toggleExpanded()}
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                </Button>
+              </Tooltip>
+              {canCancel && invoice.id ? (
+                <PermissionGate resource={perm.resource} action={perm.update}>
+                  <Tooltip text="Hủy hóa đơn">
+                    <Button
+                      size="icon-sm"
+                      variant="outline-danger"
+                      className="mb-0 mr-0"
+                      onClick={() => onCancel(invoice.id!)}
                     >
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        variant="destructive"
-                        onClick={() => onCancel(inv.id!)}
-                      >
-                        <Ban className="w-4 h-4" /> Hủy hóa đơn
-                      </DropdownMenuItem>
-                    </PermissionGate>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                      <Ban className="h-3.5 w-3.5" />
+                    </Button>
+                  </Tooltip>
+                </PermissionGate>
+              ) : null}
             </div>
           );
         },
-        size: 50,
+        size: 100,
         enableResizing: false,
       },
     ],

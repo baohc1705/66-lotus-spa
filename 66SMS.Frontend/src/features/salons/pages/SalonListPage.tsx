@@ -5,14 +5,20 @@ import {
   getExpandedRowModel,
 } from "@tanstack/react-table";
 import { Plus, Building2 } from "lucide-react";
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { Button } from "@/shared/components/ui/button";
+
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
-import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
+import { Pagination } from "@/shared/components/Pagination";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { Button } from "@/shared/elements/Button";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
+import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
+import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
+
 import { SalonFormDialog } from "../components/SalonFormDialog";
 import { SalonDetailExpanded } from "../components/SalonDetailExpanded";
 import { useAdminSalons, useDeleteSalonMutation } from "../hooks/useSalons";
@@ -22,8 +28,6 @@ import {
   SALON_COLUMN_LABELS,
 } from "../components/useActiveSalonColumns";
 import { SALON_PERM } from "../constants/salon.permissions";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 const ENTITY = "chi nhánh";
 
@@ -62,6 +66,8 @@ export function SalonListPage() {
   const paged = salonsResult?.data;
   const salons = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
 
   const handleConfirmDelete = () => {
     if (deleteTarget?.id) {
@@ -92,14 +98,15 @@ export function SalonListPage() {
     getRowCanExpand: () => true,
     enableMultiRowSelection: false,
     columnResizeMode: "onChange",
+    manualPagination: true,
     state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
   });
 
   return (
-    <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-      <div className="bg-white/70 backdrop-blur-md rounded-admin border border-adminGray-100/30 overflow-hidden relative">
-        <div className="px-4 pt-4">
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
+      <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+        <div className="border-b border-kit px-4 pt-4">
           <DataTableToolbar
             searchValue={filter}
             onSearchChange={handleSearchChange}
@@ -114,10 +121,10 @@ export function SalonListPage() {
               <Button
                 variant="admin"
                 size="sm"
+                className="mb-0"
                 onClick={() => setCreateOpen(true)}
-                className="lotus-admin-table-toolbar-btn"
               >
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="h-4 w-4" />
                 Thêm chi nhánh
               </Button>
             </PermissionGate>
@@ -127,9 +134,9 @@ export function SalonListPage() {
         <DataTable
           table={table}
           isLoading={isLoading}
-          loadingRows={pageSize > 5 ? 5 : pageSize}
+          loadingRows={DEFAULT_LOADING_ROWS}
           onRowClick={(row) => row.toggleExpanded()}
-          renderSubComponent={({ row }) =>
+          renderExpandedRow={({ row }) =>
             row.original.id ? (
               <SalonDetailExpanded
                 salonId={row.original.id}
@@ -140,51 +147,56 @@ export function SalonListPage() {
             ) : null
           }
           emptyState={
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-adminGray-50 flex items-center justify-center">
-                <Building2 className="w-7 h-7 text-adminGreen-600" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-adminInk">
-                  Chưa có chi nhánh
-                </p>
-                <p className="text-xs text-adminGray-600 mt-0.5">
-                  Thêm chi nhánh để bắt đầu quản lý hệ thống.
-                </p>
-              </div>
-              <PermissionGate
-                resource={perm.resource}
-                action={perm.create}
-                role={perm.role}
-              >
-                <Button
-                  variant="admin"
-                  size="sm"
-                  onClick={() => setCreateOpen(true)}
-                  className="mt-1 text-xs"
+            <TableEmptyState
+              icon={Building2}
+              title="Chưa có chi nhánh"
+              hint="Thêm chi nhánh để bắt đầu quản lý hệ thống."
+              action={
+                <PermissionGate
+                  resource={perm.resource}
+                  action={perm.create}
+                  role={perm.role}
                 >
-                  <Plus className="w-3.5 h-3.5" />
-                  Thêm chi nhánh
-                </Button>
-              </PermissionGate>
-            </div>
+                  <Button
+                    variant="admin"
+                    size="sm"
+                    className="mb-0"
+                    onClick={() => setCreateOpen(true)}
+                  >
+                    <Plus className="h-4 w-4" />
+                    Thêm chi nhánh
+                  </Button>
+                </PermissionGate>
+              }
+            />
           }
           pagination={
-            paged && totalCount > 0 ? (
-              <DataTablePagination
-                pageIndex={paged.pageIndex}
-                pageSize={paged.pageSize}
-                totalCount={paged.totalCount}
-                totalPages={paged.totalPages}
-                hasPreviousPage={paged.hasPreviousPage}
-                hasNextPage={paged.hasNextPage}
-                onPageChange={setPageIndex}
-                onPageSizeChange={handlePageSizeChange}
-              />
+            totalCount > 0 ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <select
+                  value={pageSize}
+                  onChange={(e) =>
+                    handlePageSizeChange(Number(e.target.value))
+                  }
+                  className="h-8 cursor-pointer rounded border border-kit bg-kit-white px-2 text-xs text-kit-heading outline-none focus:border-kit-primary"
+                >
+                  {[5, 10, 20].map((size: number) => (
+                    <option key={size} value={size}>
+                      {size} / trang
+                    </option>
+                  ))}
+                </select>
+                <Pagination
+                  page={safePage}
+                  pageCount={totalPages}
+                  onPageChange={setPageIndex}
+                  size="sm"
+                />
+              </div>
             ) : null
           }
         />
-      </div>
+      </TablePageShell>
 
       <SalonFormDialog open={createOpen} onOpenChange={setCreateOpen} />
 
@@ -211,6 +223,6 @@ export function SalonListPage() {
         loading={deleteMutation.isPending}
         variant="danger"
       />
-    </TablePageShell>
+    </div>
   );
 }

@@ -1,22 +1,19 @@
 import { useMemo } from "react";
-import type { ColumnDef, Row } from "@tanstack/react-table";
-import { MoreHorizontal, Eye, Pencil, CreditCard } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
+import type { ColumnDef } from "@tanstack/react-table";
+import { CreditCard, Eye, Pencil } from "lucide-react";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { IndexCell } from "@/shared/components/DataTable/TableCells";
-import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { Tooltip } from "@/shared/components/Tooltip";
+import { Badge } from "@/shared/elements/Badge";
+import { Button } from "@/shared/elements/Button";
+import { SortableColumnHeader } from "@/shared/tables/SortableColumnHeader";
 import {
-  formatDateTimeDisplay,
-  formatDisplayDate,
-} from "@/shared/utils/date.utils";
+  DateTimeCell,
+  IndexCell,
+  MutedSmallCell,
+  NameCell,
+  TextCell,
+} from "@/shared/tables/TableCells";
+import { formatDisplayDate } from "@/shared/utils/date.utils";
 import { CUSTOMER_PERM } from "../constants/customer.permissions";
 import type { MembershipCardDto } from "../types/membershipCard.types";
 
@@ -34,11 +31,34 @@ export const MEMBERSHIP_CARD_COLUMN_LABELS = {
   updatedAt: "Ngày cập nhật",
 } as const;
 
-export const CARD_STATUS_MAP: StatusMap = {
-  "1": { label: "Hoạt động", variant: "success", dot: true },
-  "2": { label: "Hết hạn", variant: "warning" },
-  "3": { label: "Đã thu hồi", variant: "error" },
-};
+function cardStatusBadge(status: number) {
+  if (status === 1) {
+    return (
+      <Badge variant="success" soft>
+        Hoạt động
+      </Badge>
+    );
+  }
+  if (status === 2) {
+    return (
+      <Badge variant="warning" soft>
+        Hết hạn
+      </Badge>
+    );
+  }
+  if (status === 3) {
+    return (
+      <Badge variant="danger" soft>
+        Đã thu hồi
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="secondary" soft>
+      Không rõ
+    </Badge>
+  );
+}
 
 interface UseActiveMembershipCardColumnsParams {
   pageIndex: number;
@@ -78,20 +98,14 @@ export function useActiveMembershipCardColumns({
       {
         accessorKey: "id",
         header: cols.id,
-        cell: ({ row }) => (
-          <span className="text-2xs font-mono font-bold text-adminGray-600">
-            #{row.original.id}
-          </span>
-        ),
+        cell: ({ row }) => <MutedSmallCell value={`#${row.original.id}`} />,
         size: 80,
       },
       {
         accessorKey: "customerId",
         header: cols.customerId,
         cell: ({ row }) => (
-          <span className="text-2xs font-mono text-adminGray-600">
-            #{row.original.customerId}
-          </span>
+          <MutedSmallCell value={`#${row.original.customerId}`} />
         ),
         size: 80,
       },
@@ -104,14 +118,13 @@ export function useActiveMembershipCardColumns({
             orderBy={orderBy}
             isDescending={isDescending}
             onSort={onSort}
+            onPrimary
           />
         ),
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
-            <CreditCard className="w-4 h-4 text-adminGold-600" />
-            <span className="font-bold text-adminInk">
-              {row.original.cardCode}
-            </span>
+            <CreditCard className="h-4 w-4 text-kit-primary" />
+            <NameCell value={row.original.cardCode} />
           </div>
         ),
         size: 150,
@@ -119,42 +132,40 @@ export function useActiveMembershipCardColumns({
       {
         accessorKey: "customerName",
         header: cols.customerName,
-        cell: ({ row }) => (
-          <span className="font-semibold text-adminInk/80">
-            {row.original.customerName ?? "—"}
-          </span>
-        ),
+        cell: ({ row }) => <NameCell value={row.original.customerName} />,
         size: 180,
       },
       {
         accessorKey: "membershipTierId",
         header: cols.membershipTierId,
         cell: ({ row }) => (
-          <span className="text-2xs font-mono text-adminGray-600">
-            #{row.original.membershipTierId}
-          </span>
+          <MutedSmallCell
+            value={
+              row.original.membershipTierId != null
+                ? `#${row.original.membershipTierId}`
+                : null
+            }
+          />
         ),
         size: 80,
       },
       {
         accessorKey: "tierName",
         header: cols.tierName,
-        cell: ({ row }) => (
-          <span className="text-adminInk/80 font-medium">
-            {row.original.tierName ?? "—"}
-          </span>
-        ),
+        cell: ({ row }) => <TextCell value={row.original.tierName} />,
         size: 120,
       },
       {
         accessorKey: "issuedAt",
         header: cols.issuedAt,
         cell: ({ row }) => (
-          <span className="text-adminInk/80 text-sm">
-            {row.original.issuedAt
-              ? formatDisplayDate(row.original.issuedAt)
-              : "—"}
-          </span>
+          <TextCell
+            value={
+              row.original.issuedAt
+                ? formatDisplayDate(row.original.issuedAt)
+                : null
+            }
+          />
         ),
         size: 110,
       },
@@ -162,84 +173,68 @@ export function useActiveMembershipCardColumns({
         accessorKey: "expiresAt",
         header: cols.expiresAt,
         cell: ({ row }) => (
-          <span className="text-adminInk/80 text-sm">
-            {row.original.expiresAt
-              ? formatDisplayDate(row.original.expiresAt)
-              : "Vĩnh viễn"}
-          </span>
+          <TextCell
+            value={
+              row.original.expiresAt
+                ? formatDisplayDate(row.original.expiresAt)
+                : "Vĩnh viễn"
+            }
+          />
         ),
         size: 110,
       },
       {
         accessorKey: "status",
         header: cols.status,
-        cell: ({ row }) => (
-          <StatusBadge
-            status={String(row.original.status)}
-            statusMap={CARD_STATUS_MAP}
-          />
-        ),
+        cell: ({ row }) => cardStatusBadge(row.original.status),
         size: 120,
       },
       {
         accessorKey: "createdAt",
         header: cols.createdAt,
-        cell: ({ row }) => (
-          <span className="text-adminInk/80 text-sm">
-            {formatDateTimeDisplay(row.original.createdAt)}
-          </span>
-        ),
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
         size: 110,
       },
-      // {
-      //   accessorKey: "updatedAt",
-      //   header: cols.updatedAt,
-      //   cell: ({ row }) => (
-      //     <span className="text-adminInk/80 text-sm">
-      //       {formatDateTimeDisplay(row.original.)}
-      //     </span>
-      //   ),
-      //   size: 110,
-      // },
       {
         id: "actions",
-        header: "",
+        header: "Thao tác",
         cell: ({ row }) => {
           const card = row.original;
+          const expanded = row.getIsExpanded();
           return (
-            <div onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <div
+              className="flex items-center gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Tooltip text={expanded ? "Đóng chi tiết" : "Xem chi tiết"}>
+                <Button
+                  size="icon-sm"
+                  variant="outline-info"
+                  className="mb-0 mr-0"
+                  onClick={() => row.toggleExpanded()}
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                </Button>
+              </Tooltip>
+              <PermissionGate resource={perm.resource} action={perm.update}>
+                <Tooltip text="Sửa">
                   <Button
-                    variant="ghost"
                     size="icon-sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    variant="outline-primary"
+                    className="mb-0 mr-0"
+                    onClick={() => onEdit(card)}
                   >
-                    <MoreHorizontal className="w-4 h-4" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => row.toggleExpanded()}>
-                    <Eye className="w-4 h-4 mr-2" />
-                    {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
-                  </DropdownMenuItem>
-                  <PermissionGate resource={perm.resource} action={perm.update}>
-                    <DropdownMenuItem onClick={() => onEdit(card)}>
-                      <Pencil className="w-4 h-4 mr-2" />
-                      {COMMON_MSG.edit}
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </Tooltip>
+              </PermissionGate>
             </div>
           );
         },
-        size: 50,
+        size: 100,
         enableResizing: false,
       },
     ],
     [pageIndex, pageSize, orderBy, isDescending, onSort, onEdit, cols, perm],
   );
 }
-
-export type MembershipCardTableRow = Row<MembershipCardDto>;
