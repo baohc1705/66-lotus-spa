@@ -37,8 +37,16 @@ export const updateStaffCertificateSchema = staffCertificateBaseSchema
 
 export type CreateStaffCertificatePayload = z.infer<
   typeof createStaffCertificateSchema
->;
+> & {
+  imageBase64?: string;
+};
+
 export type UpdateStaffCertificatePayload = z.infer<
   typeof updateStaffCertificateSchema
+> & {
+  imageBase64?: string;
+};
+
+export type StaffCertificateFormValues = z.infer<
+  typeof createStaffCertificateSchema
 >;
-export type StaffCertificateFormValues = CreateStaffCertificatePayload;

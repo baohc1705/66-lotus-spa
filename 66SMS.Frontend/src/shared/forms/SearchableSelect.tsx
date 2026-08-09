@@ -117,10 +117,6 @@ export function SearchableSelect({
     setQuery("");
   }
 
-  const openUp =
-    menuBox != null &&
-    menuBox.top < (rootRef.current?.getBoundingClientRect().top ?? 0);
-
   return (
     <div ref={rootRef} className={"relative " + className}>
       <button

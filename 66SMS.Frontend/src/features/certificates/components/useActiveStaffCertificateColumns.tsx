@@ -1,21 +1,14 @@
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Trash2, Eye } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
+import { Eye, Pencil, Trash2 } from "lucide-react";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { IndexCell } from "@/shared/components/DataTable/TableCells";
-import { CertificateStatusBadge, ExpiryBadge } from "./CertificateStatusBadge";
+import { Tooltip } from "@/shared/components/Tooltip";
+import { Button } from "@/shared/elements/Button";
+import { IndexCell, NameCell, TextCell } from "@/shared/tables/TableCells";
 import { formatDisplayDate } from "@/shared/utils/date.utils";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { CERTIFICATE_PERM } from "../constants/certificate.permissions";
 import type { StaffCertificateDTO } from "../types/certificate.types";
+import { CertificateStatusBadge, ExpiryBadge } from "./CertificateStatusBadge";
 
 export const STAFF_CERTIFICATE_COLUMN_LABELS = {
   staffName: "Nhân viên",
@@ -60,11 +53,7 @@ export function useActiveStaffCertificateColumns({
       {
         accessorKey: "staffName",
         header: cols.staffName,
-        cell: ({ row }) => (
-          <span className="font-semibold text-adminInk">
-            {row.original.staffName}
-          </span>
-        ),
+        cell: ({ row }) => <NameCell value={row.original.staffName} />,
         size: 160,
       },
       {
@@ -72,12 +61,10 @@ export function useActiveStaffCertificateColumns({
         header: cols.certificateName,
         cell: ({ row }) => (
           <div>
-            <p className="text-sm font-medium text-adminInk">
+            <p className="text-sm font-medium text-kit-heading">
               {row.original.certificateName}
             </p>
-            <p className="text-xs text-adminGray-600">
-              {row.original.typeName}
-            </p>
+            <p className="text-xs text-kit-muted">{row.original.typeName}</p>
           </div>
         ),
         size: 220,
@@ -86,9 +73,7 @@ export function useActiveStaffCertificateColumns({
         accessorKey: "issuingOrganization",
         header: cols.issuingOrganization,
         cell: ({ row }) => (
-          <span className="text-xs text-adminInk/80">
-            {row.original.issuingOrganization}
-          </span>
+          <TextCell value={row.original.issuingOrganization} />
         ),
         size: 180,
       },
@@ -96,7 +81,7 @@ export function useActiveStaffCertificateColumns({
         accessorKey: "issuedDate",
         header: cols.issuedDate,
         cell: ({ row }) => (
-          <span className="text-xs text-adminInk/70">
+          <span className="text-xs text-kit-muted">
             {formatDisplayDate(row.original.issuedDate)}
           </span>
         ),
@@ -120,52 +105,57 @@ export function useActiveStaffCertificateColumns({
       },
       {
         id: "actions",
-        header: "",
+        header: "Thao tác",
         cell: ({ row }) => {
           const cert = row.original;
+          const expanded = row.getIsExpanded();
           return (
-            <div onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <div
+              className="flex items-center gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Tooltip text={expanded ? "Đóng chi tiết" : "Xem chi tiết"}>
+                <Button
+                  size="icon-sm"
+                  variant="outline-info"
+                  className="mb-0 mr-0"
+                  onClick={() => row.toggleExpanded()}
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                </Button>
+              </Tooltip>
+              <PermissionGate resource={perm.resource} action={perm.update}>
+                <Tooltip text="Sửa">
                   <Button
-                    variant="ghost"
                     size="icon-sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    variant="outline-primary"
+                    className="mb-0 mr-0"
+                    onClick={() => onEdit(cert)}
                   >
-                    <MoreHorizontal className="w-4 h-4" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => row.toggleExpanded()}>
-                    <Eye className="w-4 h-4 mr-2" />
-                    {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
-                  </DropdownMenuItem>
-                  <PermissionGate resource={perm.resource} action={perm.update}>
-                    <DropdownMenuItem onClick={() => onEdit(cert)}>
-                      <Pencil className="w-4 h-4 mr-2" />
-                      {COMMON_MSG.edit}
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                  <PermissionGate
-                    resource={perm.resource}
-                    action={perm.delete}
-                    role={perm.role}
+                </Tooltip>
+              </PermissionGate>
+              <PermissionGate
+                resource={perm.resource}
+                action={perm.delete}
+                role={perm.role}
+              >
+                <Tooltip text="Xóa">
+                  <Button
+                    size="icon-sm"
+                    variant="outline-danger"
+                    className="mb-0 mr-0"
+                    onClick={() => onDelete(cert)}
                   >
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={() => onDelete(cert)}
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Xóa
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </Tooltip>
+              </PermissionGate>
             </div>
           );
         },
-        size: 50,
+        size: 120,
         enableResizing: false,
       },
     ],

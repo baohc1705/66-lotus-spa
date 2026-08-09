@@ -1,4 +1,4 @@
-import { Badge } from "@/shared/components/ui/badge";
+import { Badge, type BadgeVariant } from "@/shared/elements/Badge";
 import { formatDisplayDate } from "@/shared/utils/date.utils";
 
 interface Props {
@@ -6,42 +6,26 @@ interface Props {
   expiryDate?: string;
 }
 
+const STATUS_CONFIG: Record<
+  number,
+  { label: string; variant: BadgeVariant }
+> = {
+  0: { label: "Chờ xác minh", variant: "warning" },
+  1: { label: "Hiệu lực", variant: "success" },
+  2: { label: "Hết hạn", variant: "danger" },
+  3: { label: "Đã thu hồi", variant: "secondary" },
+};
+
 export function CertificateStatusBadge({ status }: Props) {
   if (status === 9 || status === undefined) return null;
 
-  const statusLabels: Record<number, { label: string; className: string }> = {
-    0: {
-      label: "Chờ xác minh",
-      className:
-        "bg-state-warning-bg text-state-warning-text border-state-warning-border",
-    },
-    1: {
-      label: "Hiệu lực",
-      className:
-        "bg-state-success-bg text-state-success-text border-state-success-border",
-    },
-    2: {
-      label: "Hết hạn",
-      className:
-        "bg-state-danger-bg text-state-danger-text border-state-danger-border",
-    },
-    3: {
-      label: "Đã thu hồi",
-      className:
-        "bg-state-neutral-bg text-state-neutral-text border-state-neutral-border",
-    },
-  };
-
-  const config = statusLabels[status] ?? {
+  const config = STATUS_CONFIG[status] ?? {
     label: "Không rõ",
-    className: "bg-state-neutral-bg text-state-neutral-text",
+    variant: "secondary" as BadgeVariant,
   };
 
   return (
-    <Badge
-      variant="outline"
-      className={`text-xs font-medium ${config.className}`}
-    >
+    <Badge variant={config.variant} soft>
       {config.label}
     </Badge>
   );
@@ -49,7 +33,7 @@ export function CertificateStatusBadge({ status }: Props) {
 
 export function ExpiryBadge({ expiryDate }: { expiryDate?: string }) {
   if (!expiryDate) {
-    return <span className="text-xs text-adminGray-400">Không hết hạn</span>;
+    return <span className="text-xs text-kit-muted">Không hết hạn</span>;
   }
 
   const expiry = new Date(expiryDate);
@@ -60,20 +44,20 @@ export function ExpiryBadge({ expiryDate }: { expiryDate?: string }) {
 
   if (diffDays < 0) {
     return (
-      <span className="text-xs font-medium text-state-danger-text">
+      <span className="text-xs font-medium text-kit-danger">
         {formatDisplayDate(expiryDate)} (Hết hạn)
       </span>
     );
   }
   if (diffDays <= 30) {
     return (
-      <span className="text-xs font-medium text-state-warning-text">
+      <span className="text-xs font-medium text-kit-warning">
         {formatDisplayDate(expiryDate)} (còn {diffDays} ngày)
       </span>
     );
   }
   return (
-    <span className="text-xs text-adminGray-600">
+    <span className="text-xs text-kit-muted">
       {formatDisplayDate(expiryDate)}
     </span>
   );
