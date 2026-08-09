@@ -1,28 +1,21 @@
-import { AdminInput } from '@/shared/components/forms/AdminInput';
-import { AdminSelectTrigger } from '@/shared/components/forms/AdminSelectTrigger';
-import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
-import { Button } from "@/shared/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
-import { AlertCircle, Calendar, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-
-import { Label } from "@/shared/components/ui/label";
+import { AlertCircle, CalendarDays, Clock } from "lucide-react";
 
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import type { WorkScheduleDTO } from "@/features/schedules/types/schedule.types";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/shared/components/ui/select";
+import { Alert } from "@/shared/components/Alert";
+import { Modal } from "@/shared/components/Modal";
+import { TabNav } from "@/shared/components/Tabs";
+import { toast } from "@/shared/components/kitToast";
+import { Badge } from "@/shared/elements/Badge";
+import { Button } from "@/shared/elements/Button";
+import { Checkbox } from "@/shared/forms/Checkbox";
+import { FormField } from "@/shared/forms/FormField";
+import { Input } from "@/shared/forms/Input";
+import { Radio } from "@/shared/forms/Radio";
+import { Select } from "@/shared/forms/Select";
+import { Textarea } from "@/shared/forms/Textarea";
 import {
   formatDate,
   formatDisplayDate,
@@ -30,7 +23,7 @@ import {
   toLocalDateOnly,
   toLocalTimeOnly,
 } from "@/shared/utils/date.utils";
-import { toast } from "@/shared/components/kitToast";
+
 import {
   useCheckIn,
   useCheckOut,
@@ -39,37 +32,87 @@ import {
 } from "../hooks/useAttendances";
 import type { AttendanceDto } from "../types/attendance.types";
 
-interface AttendanceDailyDialogProps {
+type AttendanceDailyDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   schedule: WorkScheduleDTO;
   attendance: AttendanceDto | null;
   onSuccess?: () => void;
-}
+};
 
-type ModeType = "working" | "paid_leave" | "unpaid_leave";
+type AttendanceMode = "working" | "paid_leave" | "unpaid_leave";
+type DialogTab = "attendance" | "history";
 
-interface FormFields {
-  mode: ModeType;
+type AttendanceFormValues = {
+  mode: AttendanceMode;
   subStatus: string;
   checkInEnabled: boolean;
   checkInTime: string;
   checkOutEnabled: boolean;
   checkOutTime: string;
   note: string;
-}
+};
 
-function todayIsoDate(): string {
+function getTodayDateText(): string {
   return formatDate().format("YYYY-MM-DD");
 }
 
-export function AttendanceDailyDialog({
-  open,
-  onOpenChange,
-  schedule,
-  attendance,
-  onSuccess,
-}: AttendanceDailyDialogProps) {
+function getDefaultShiftTime(
+  schedule: WorkScheduleDTO,
+  field: "shiftStart" | "shiftEnd",
+  fallback: string,
+): string {
+  const firstPeriod = schedule.shift?.shiftPeriodDTOs?.[0];
+  const rawTime = firstPeriod?.[field];
+  if (!rawTime) {
+    return fallback;
+  }
+  return rawTime.substring(0, 5);
+}
+
+function getModeFromStatus(status: number | null): {
+  mode: AttendanceMode;
+  subStatus: string;
+} {
+  if (status === 4 || status === 5) {
+    return { mode: "paid_leave", subStatus: String(status) };
+  }
+  if (status === 3 || status === 6) {
+    return { mode: "unpaid_leave", subStatus: String(status) };
+  }
+  return { mode: "working", subStatus: "4" };
+}
+
+function getTargetStatus(values: AttendanceFormValues): number {
+  if (values.mode === "paid_leave" || values.mode === "unpaid_leave") {
+    return Number(values.subStatus);
+  }
+
+  if (values.checkInEnabled && values.checkOutEnabled) {
+    return 2;
+  }
+  if (values.checkInEnabled) {
+    return 1;
+  }
+  return 1;
+}
+
+function getSubmitButtonLabel(
+  isAdminOrManager: boolean,
+  attendance: AttendanceDto | null,
+): string {
+  if (isAdminOrManager) {
+    return "Lưu";
+  }
+  if (!attendance) {
+    return "Check-in";
+  }
+  return "Check-out";
+}
+
+export function AttendanceDailyDialog(props: AttendanceDailyDialogProps) {
+  const { open, onOpenChange, schedule, attendance, onSuccess } = props;
+
   const { hasRole } = useAuthStore();
   const isAdminOrManager = hasRole("Admin") || hasRole("Manager");
 
@@ -78,576 +121,675 @@ export function AttendanceDailyDialog({
   const updateMutation = useUpdateAttendance();
   const createManualMutation = useCreateManualAttendance();
 
-  const [activeTab, setActiveTab] = useState<"attendance" | "history">("attendance");
+  const [activeTab, setActiveTab] = useState<DialogTab>("attendance");
 
-  const { register, handleSubmit, watch, setValue, reset } = useForm<FormFields>({
-    defaultValues: {
-      mode: "working",
-      subStatus: "4",
-      checkInEnabled: true,
-      checkInTime: "09:00",
-      checkOutEnabled: false,
-      checkOutTime: "15:00",
-      note: "",
-    },
-  });
+  const { register, handleSubmit, watch, setValue, reset } =
+    useForm<AttendanceFormValues>({
+      defaultValues: {
+        mode: "working",
+        subStatus: "4",
+        checkInEnabled: true,
+        checkInTime: "09:00",
+        checkOutEnabled: false,
+        checkOutTime: "15:00",
+        note: "",
+      },
+    });
 
   const mode = watch("mode");
   const subStatus = watch("subStatus");
   const checkInEnabled = watch("checkInEnabled");
   const checkOutEnabled = watch("checkOutEnabled");
+  const note = watch("note");
 
-  const scheduleDateStr = schedule.workDate
-    ? toLocalDateOnly(
-        typeof schedule.workDate === "string" ? schedule.workDate : null,
-      )
-    : "";
-  const isToday = scheduleDateStr === todayIsoDate();
+  let scheduleDateText = "";
+  if (typeof schedule.workDate === "string") {
+    scheduleDateText = toLocalDateOnly(schedule.workDate);
+  }
+  const isToday = scheduleDateText === getTodayDateText();
 
   useEffect(() => {
-    if (open) {
-      setActiveTab("attendance");
-      
-      const defaultStart = schedule.shift?.shiftPeriodDTOs?.[0]?.shiftStart?.substring(0, 5) || "09:00";
-      const defaultEnd = schedule.shift?.shiftPeriodDTOs?.[0]?.shiftEnd?.substring(0, 5) || "15:00";
-
-      if (attendance) {
-        let currentMode: ModeType;
-        let currentSub = "4";
-        const statusVal = attendance.status;
-
-        if (statusVal === 4 || statusVal === 5) {
-          currentMode = "paid_leave";
-          currentSub = String(statusVal);
-        } else if (statusVal === 3 || statusVal === 6) {
-          currentMode = "unpaid_leave";
-          currentSub = String(statusVal);
-        } else {
-          currentMode = "working";
-        }
-
-        const hasIn = !!attendance.checkInAt;
-        const hasOut = !!attendance.checkOutAt;
-
-        reset({
-          mode: currentMode,
-          subStatus: currentSub,
-          checkInEnabled: hasIn,
-          checkInTime: hasIn ? toLocalTimeOnly(attendance.checkInAt) : defaultStart,
-          checkOutEnabled: hasOut,
-          checkOutTime: hasOut ? toLocalTimeOnly(attendance.checkOutAt) : defaultEnd,
-          note: attendance.note ?? "",
-        });
-      } else {
-        reset({
-          mode: "working",
-          subStatus: "4",
-          checkInEnabled: true,
-          checkInTime: defaultStart,
-          checkOutEnabled: false,
-          checkOutTime: defaultEnd,
-          note: "",
-        });
-      }
-    }
-  }, [open, attendance, schedule, reset]);
-
-  const combineDateAndTime = (timeStr: string): string => {
-    if (!scheduleDateStr) return "";
-    return localDateTimeToUtc(scheduleDateStr, timeStr);
-  };
-
-  const handleFormSubmit = (data: FormFields) => {
-    if (!schedule.staffId) return;
-
-    if (!isAdminOrManager) {
-      if (!isToday) return;
-
-      if (!attendance) {
-        checkInMutation.mutate(
-          {
-            staffId: schedule.staffId,
-            workScheduleId: schedule.id!,
-            note: data.note || undefined,
-          },
-          {
-            onSuccess: (res) => {
-              if (res.isSuccess) {
-                onOpenChange(false);
-                onSuccess?.();
-              }
-            },
-          }
-        );
-      } else if (!attendance.checkOutAt) {
-        checkOutMutation.mutate(
-          {
-            staffId: schedule.staffId,
-            workScheduleId: schedule.id!,
-          },
-          {
-            onSuccess: (res) => {
-              if (res.isSuccess) {
-                onOpenChange(false);
-                onSuccess?.();
-              }
-            },
-          }
-        );
-      }
+    if (!open) {
       return;
     }
 
-    let targetStatus = 1;
-    if (data.mode === "working") {
-      if (data.checkInEnabled && data.checkOutEnabled) {
-        targetStatus = 2;
-      } else if (data.checkInEnabled) {
-        targetStatus = 1;
-      }
-    } else if (data.mode === "paid_leave") {
-      targetStatus = Number(data.subStatus);
-    } else {
-      targetStatus = Number(data.subStatus);
+    setActiveTab("attendance");
+
+    const defaultStart = getDefaultShiftTime(schedule, "shiftStart", "09:00");
+    const defaultEnd = getDefaultShiftTime(schedule, "shiftEnd", "15:00");
+
+    if (!attendance) {
+      reset({
+        mode: "working",
+        subStatus: "4",
+        checkInEnabled: true,
+        checkInTime: defaultStart,
+        checkOutEnabled: false,
+        checkOutTime: defaultEnd,
+        note: "",
+      });
+      return;
     }
 
-    const payloadCheckInAt = data.checkInEnabled ? combineDateAndTime(data.checkInTime) : undefined;
-    const payloadCheckOutAt = data.checkOutEnabled ? combineDateAndTime(data.checkOutTime) : undefined;
+    const modeInfo = getModeFromStatus(attendance.status);
+    const hasCheckIn = attendance.checkInAt != null;
+    const hasCheckOut = attendance.checkOutAt != null;
+
+    reset({
+      mode: modeInfo.mode,
+      subStatus: modeInfo.subStatus,
+      checkInEnabled: hasCheckIn,
+      checkInTime: hasCheckIn
+        ? toLocalTimeOnly(attendance.checkInAt)
+        : defaultStart,
+      checkOutEnabled: hasCheckOut,
+      checkOutTime: hasCheckOut
+        ? toLocalTimeOnly(attendance.checkOutAt)
+        : defaultEnd,
+      note: attendance.note ?? "",
+    });
+  }, [open, attendance, schedule, reset]);
+
+  function combineDateAndTime(timeText: string): string {
+    if (!scheduleDateText) {
+      return "";
+    }
+    return localDateTimeToUtc(scheduleDateText, timeText);
+  }
+
+  function closeAndRefresh() {
+    onOpenChange(false);
+    if (onSuccess) {
+      onSuccess();
+    }
+  }
+
+  function submitStaffCheckIn(values: AttendanceFormValues) {
+    if (!schedule.staffId || !schedule.id) {
+      return;
+    }
+
+    checkInMutation.mutate(
+      {
+        staffId: schedule.staffId,
+        workScheduleId: schedule.id,
+        note: values.note || undefined,
+      },
+      {
+        onSuccess: (result) => {
+          if (result.isSuccess) {
+            closeAndRefresh();
+          }
+        },
+      },
+    );
+  }
+
+  function submitStaffCheckOut() {
+    if (!schedule.staffId || !schedule.id) {
+      return;
+    }
+
+    checkOutMutation.mutate(
+      {
+        staffId: schedule.staffId,
+        workScheduleId: schedule.id,
+      },
+      {
+        onSuccess: (result) => {
+          if (result.isSuccess) {
+            closeAndRefresh();
+          }
+        },
+      },
+    );
+  }
+
+  function submitStaffForm(values: AttendanceFormValues) {
+    if (!isToday) {
+      return;
+    }
+
+    if (!attendance) {
+      submitStaffCheckIn(values);
+      return;
+    }
+
+    if (!attendance.checkOutAt) {
+      submitStaffCheckOut();
+    }
+  }
+
+  function submitAdminUpdate(
+    values: AttendanceFormValues,
+    targetStatus: number,
+    checkInAt: string | undefined,
+    checkOutAt: string | undefined,
+  ) {
+    if (!attendance?.id) {
+      return;
+    }
+
+    updateMutation.mutate(
+      {
+        id: attendance.id,
+        payload: {
+          checkInAt: checkInAt,
+          checkOutAt: checkOutAt,
+          status: targetStatus,
+          note: values.note || undefined,
+        },
+      },
+      {
+        onSuccess: (result) => {
+          if (result.isSuccess) {
+            closeAndRefresh();
+          }
+        },
+      },
+    );
+  }
+
+  function submitAdminCreateWorking(
+    values: AttendanceFormValues,
+    targetStatus: number,
+    checkInAt: string | undefined,
+    checkOutAt: string | undefined,
+  ) {
+    if (!isToday) {
+      toast.error(
+        "Hệ thống chỉ hỗ trợ ghi nhận đi làm (Check-in) cho ngày hôm nay. Đối với ngày trong quá khứ/tương lai, vui lòng chọn hình thức Nghỉ.",
+      );
+      return;
+    }
+
+    if (!schedule.staffId || !schedule.id) {
+      return;
+    }
+
+    checkInMutation.mutate(
+      {
+        staffId: schedule.staffId,
+        workScheduleId: schedule.id,
+        note: values.note || undefined,
+      },
+      {
+        onSuccess: (result) => {
+          if (!result.isSuccess || !result.data) {
+            return;
+          }
+
+          const newAttendanceId = result.data;
+          const needExtraUpdate =
+            (values.checkInEnabled && values.checkInTime !== "09:00") ||
+            values.checkOutEnabled;
+
+          if (!needExtraUpdate) {
+            closeAndRefresh();
+            return;
+          }
+
+          updateMutation.mutate(
+            {
+              id: newAttendanceId,
+              payload: {
+                checkInAt: checkInAt,
+                checkOutAt: checkOutAt,
+                status: targetStatus,
+                note: values.note || undefined,
+              },
+            },
+            {
+              onSuccess: (updateResult) => {
+                if (updateResult.isSuccess) {
+                  closeAndRefresh();
+                }
+              },
+            },
+          );
+        },
+      },
+    );
+  }
+
+  function submitAdminCreateLeave(
+    values: AttendanceFormValues,
+    targetStatus: number,
+  ) {
+    if (!schedule.staffId) {
+      return;
+    }
+
+    createManualMutation.mutate(
+      {
+        staffId: schedule.staffId,
+        workScheduleId: schedule.id ?? undefined,
+        workDate: scheduleDateText,
+        status: targetStatus,
+        note: values.note || undefined,
+      },
+      {
+        onSuccess: (result) => {
+          if (result.isSuccess) {
+            closeAndRefresh();
+          }
+        },
+      },
+    );
+  }
+
+  function submitAdminForm(values: AttendanceFormValues) {
+    if (!schedule.staffId) {
+      return;
+    }
+
+    const targetStatus = getTargetStatus(values);
+    const checkInAt = values.checkInEnabled
+      ? combineDateAndTime(values.checkInTime)
+      : undefined;
+    const checkOutAt = values.checkOutEnabled
+      ? combineDateAndTime(values.checkOutTime)
+      : undefined;
 
     if (attendance?.id) {
-      updateMutation.mutate(
-        {
-          id: attendance.id,
-          payload: {
-            checkInAt: payloadCheckInAt || undefined,
-            checkOutAt: payloadCheckOutAt || undefined,
-            status: targetStatus,
-            note: data.note || undefined,
-          },
-        },
-        {
-          onSuccess: (res) => {
-            if (res.isSuccess) {
-              onOpenChange(false);
-              onSuccess?.();
-            }
-          },
-        }
-      );
-    } else {
-      if (data.mode === "working") {
-        if (!isToday) {
-          toast.error("Hệ thống chỉ hỗ trợ ghi nhận đi làm (Check-in) cho ngày hôm nay. Đối với ngày trong quá khứ/tương lai, vui lòng chọn hình thức Nghỉ.");
-          return;
-        }
-
-        checkInMutation.mutate(
-          {
-            staffId: schedule.staffId,
-            workScheduleId: schedule.id!,
-            note: data.note || undefined,
-          },
-          {
-            onSuccess: (res) => {
-              if (res.isSuccess && res.data) {
-                const newId = res.data; 
-                const needsUpdate =
-                  (data.checkInEnabled && data.checkInTime !== "09:00") ||
-                  data.checkOutEnabled;
-
-                if (needsUpdate) {
-                  updateMutation.mutate(
-                    {
-                      id: newId,
-                      payload: {
-                        checkInAt: payloadCheckInAt || undefined,
-                        checkOutAt: payloadCheckOutAt || undefined,
-                        status: targetStatus,
-                        note: data.note || undefined,
-                      },
-                    },
-                    {
-                      onSuccess: (updateRes) => {
-                        if (updateRes.isSuccess) {
-                          onOpenChange(false);
-                          onSuccess?.();
-                        }
-                      },
-                    }
-                  );
-                } else {
-                  onOpenChange(false);
-                  onSuccess?.();
-                }
-              }
-            },
-          }
-        );
-      } else {
-        createManualMutation.mutate(
-          {
-            staffId: schedule.staffId,
-            workScheduleId: schedule.id ?? undefined,
-            workDate: scheduleDateStr,
-            status: targetStatus,
-            note: data.note || undefined,
-          },
-          {
-            onSuccess: (res) => {
-              if (res.isSuccess) {
-                onOpenChange(false);
-                onSuccess?.();
-              }
-            },
-          }
-        );
-      }
+      submitAdminUpdate(values, targetStatus, checkInAt, checkOutAt);
+      return;
     }
-  };
 
-  const isPending =
+    if (values.mode === "working") {
+      submitAdminCreateWorking(values, targetStatus, checkInAt, checkOutAt);
+      return;
+    }
+
+    submitAdminCreateLeave(values, targetStatus);
+  }
+
+  function handleFormSubmit(values: AttendanceFormValues) {
+    if (!isAdminOrManager) {
+      submitStaffForm(values);
+      return;
+    }
+    submitAdminForm(values);
+  }
+
+  const isSaving =
     checkInMutation.isPending ||
     checkOutMutation.isPending ||
     updateMutation.isPending ||
     createManualMutation.isPending;
 
+  let canShowSubmit = false;
+  if (activeTab === "attendance") {
+    if (isAdminOrManager) {
+      canShowSubmit = true;
+    } else if (isToday && (!attendance || !attendance.checkOutAt)) {
+      canShowSubmit = true;
+    }
+  }
+
+  const shiftName = schedule.shift?.name ?? "Ca";
+  const shiftStart =
+    schedule.shift?.shiftPeriodDTOs?.[0]?.shiftStart?.substring(0, 5) ??
+    "--:--";
+  const shiftEnd =
+    schedule.shift?.shiftPeriodDTOs?.[0]?.shiftEnd?.substring(0, 5) ?? "--:--";
+  const shiftLabel =
+    shiftName + " (" + shiftStart + " - " + shiftEnd + ")";
+
+  const timeFieldsDisabled = !isToday && !attendance;
+
+  function renderStaffForm() {
+    if (!isToday) {
+      return (
+        <Alert variant="warning">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="mt-0.5 size-4 shrink-0" />
+            <span>
+              Lịch làm việc này thuộc ngày khác. Bạn không thể tự chấm công hoặc
+              thay đổi giờ của ngày đã qua / ngày sắp tới.
+            </span>
+          </div>
+        </Alert>
+      );
+    }
+
+    let statusAlert = null;
+
+    if (!attendance) {
+      statusAlert = (
+        <Alert variant="warning">
+          <p className="font-semibold">
+            Bạn chưa ghi nhận bắt đầu ca làm việc (Check-in).
+          </p>
+          <p className="mt-1 text-xs opacity-80">
+            Bấm nút &quot;Check-in&quot; ở dưới để bắt đầu ca làm việc của bạn.
+          </p>
+        </Alert>
+      );
+    } else if (!attendance.checkOutAt) {
+      statusAlert = (
+        <Alert variant="success">
+          <p className="font-semibold">Bạn đã Check-in thành công!</p>
+          <p className="mt-1 text-xs opacity-80">
+            Thời gian vào:{" "}
+            <span className="font-bold">
+              {toLocalTimeOnly(attendance.checkInAt)}
+            </span>
+          </p>
+          <p className="mt-1 text-xs opacity-85">
+            Bấm nút &quot;Check-out&quot; ở dưới để kết thúc ca làm việc.
+          </p>
+        </Alert>
+      );
+    } else {
+      statusAlert = (
+        <Alert variant="secondary">
+          <p className="font-semibold text-kit-heading">
+            Bạn đã hoàn thành chấm công ngày hôm nay!
+          </p>
+          <p className="mt-1 text-xs">
+            Giờ vào:{" "}
+            <span className="font-semibold">
+              {toLocalTimeOnly(attendance.checkInAt)}
+            </span>
+          </p>
+          <p className="text-xs">
+            Giờ ra:{" "}
+            <span className="font-semibold">
+              {toLocalTimeOnly(attendance.checkOutAt)}
+            </span>
+          </p>
+        </Alert>
+      );
+    }
+
+    const canEditNote = !attendance || !attendance.checkOutAt;
+
+    return (
+      <div className="space-y-3">
+        {statusAlert}
+        {canEditNote ? (
+          <FormField label="Ghi chú (không bắt buộc)">
+            <Textarea
+              placeholder="Nhập ghi chú chấm công (nếu có)..."
+              rows={3}
+              {...register("note")}
+            />
+          </FormField>
+        ) : null}
+      </div>
+    );
+  }
+
+  function renderAdminForm() {
+    return (
+      <div className="space-y-3">
+        {!isToday && !attendance ? (
+          <Alert variant="warning">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="mt-0.5 size-4 shrink-0" />
+              <span>
+                Hệ thống chỉ cho phép ghi nhận{" "}
+                <strong>Đi làm (Check-in)</strong> vào ngày hiện tại. Đối với
+                ngày trong quá khứ/tương lai, vui lòng chọn hình thức Nghỉ.
+              </span>
+            </div>
+          </Alert>
+        ) : null}
+
+        <FormField label="Loại chấm công">
+          <div className="flex flex-wrap gap-2">
+            <Radio
+              name="mode"
+              value="working"
+              label="Đi làm"
+              tone="success"
+              inline
+              checked={mode === "working"}
+              onChange={(value: string) =>
+                setValue("mode", value as AttendanceMode)
+              }
+            />
+            <Radio
+              name="mode"
+              value="paid_leave"
+              label="Nghỉ có phép"
+              tone="info"
+              inline
+              checked={mode === "paid_leave"}
+              onChange={(value: string) =>
+                setValue("mode", value as AttendanceMode)
+              }
+            />
+            <Radio
+              name="mode"
+              value="unpaid_leave"
+              label="Nghỉ không phép"
+              tone="danger"
+              inline
+              checked={mode === "unpaid_leave"}
+              onChange={(value: string) =>
+                setValue("mode", value as AttendanceMode)
+              }
+            />
+          </div>
+        </FormField>
+
+        {mode === "paid_leave" ? (
+          <FormField label="Chi tiết phép">
+            <Select
+              value={subStatus}
+              onChange={(event) => setValue("subStatus", event.target.value)}
+              options={[
+                { value: "4", label: "Nghỉ phép hưởng lương (1 công)" },
+                { value: "5", label: "Nghỉ lễ (1 công)" },
+              ]}
+            />
+          </FormField>
+        ) : null}
+
+        {mode === "unpaid_leave" ? (
+          <FormField label="Chi tiết nghỉ">
+            <Select
+              value={subStatus}
+              onChange={(event) => setValue("subStatus", event.target.value)}
+              options={[
+                { value: "3", label: "Vắng / nghỉ không lương (0 công)" },
+                { value: "6", label: "Nghỉ không lương (0 công)" },
+              ]}
+            />
+          </FormField>
+        ) : null}
+
+        {mode === "working" ? (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-2 rounded border border-kit bg-kit-page/50 p-3">
+              <Checkbox
+                id="check-in-enabled"
+                label="Giờ vào"
+                checked={checkInEnabled}
+                disabled={timeFieldsDisabled}
+                onChange={(checked: boolean) =>
+                  setValue("checkInEnabled", checked)
+                }
+              />
+              <Input
+                type="time"
+                {...register("checkInTime")}
+                disabled={!checkInEnabled || timeFieldsDisabled}
+              />
+            </div>
+            <div className="space-y-2 rounded border border-kit bg-kit-page/50 p-3">
+              <Checkbox
+                id="check-out-enabled"
+                label="Giờ ra"
+                checked={checkOutEnabled}
+                disabled={timeFieldsDisabled}
+                onChange={(checked: boolean) =>
+                  setValue("checkOutEnabled", checked)
+                }
+              />
+              <Input
+                type="time"
+                {...register("checkOutTime")}
+                disabled={!checkOutEnabled || timeFieldsDisabled}
+              />
+            </div>
+          </div>
+        ) : null}
+
+        <FormField label="Ghi chú">
+          <Textarea
+            placeholder="Nhập ghi chú chấm công..."
+            rows={3}
+            value={note}
+            onChange={(event) => setValue("note", event.target.value)}
+          />
+        </FormField>
+      </div>
+    );
+  }
+
+  function renderHistoryTab() {
+    if (!attendance) {
+      return (
+        <p className="py-8 text-center text-sm text-kit-muted">
+          Chưa có lịch sử chấm công cho ngày này.
+        </p>
+      );
+    }
+
+    const checkInText = attendance.checkInAt
+      ? toLocalTimeOnly(attendance.checkInAt)
+      : "—";
+    const checkOutText = attendance.checkOutAt
+      ? toLocalTimeOnly(attendance.checkOutAt)
+      : "—";
+    const noteText = attendance.note || "Không có ghi chú";
+    const workedHours = attendance.workedHours ?? 0;
+
+    return (
+      <div className="space-y-2 rounded border border-kit bg-kit-page/50 p-4 text-sm">
+        <div className="flex items-center justify-between border-b border-kit pb-2">
+          <span className="text-kit-muted">Người chấm công:</span>
+          <span className="font-semibold text-kit-heading">
+            {attendance.staffName}
+          </span>
+        </div>
+        <div className="flex items-center justify-between border-b border-kit pb-2">
+          <span className="text-kit-muted">Giờ Check-in:</span>
+          <span className="font-semibold text-kit-heading">{checkInText}</span>
+        </div>
+        <div className="flex items-center justify-between border-b border-kit pb-2">
+          <span className="text-kit-muted">Giờ Check-out:</span>
+          <span className="font-semibold text-kit-heading">{checkOutText}</span>
+        </div>
+        <div className="flex items-center justify-between border-b border-kit pb-2">
+          <span className="text-kit-muted">Số giờ làm:</span>
+          <span className="font-semibold text-kit-success">
+            {workedHours} giờ
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-kit-muted">Ghi chú:</span>
+          <span className="italic text-kit-heading">{noteText}</span>
+        </div>
+      </div>
+    );
+  }
+
+  function renderMainContent() {
+    if (activeTab === "history") {
+      return <div className="py-1">{renderHistoryTab()}</div>;
+    }
+
+    if (!isAdminOrManager) {
+      return renderStaffForm();
+    }
+
+    return renderAdminForm();
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden border-adminGray-100/50 rounded-2xl">
-        <DialogHeader className="p-5 pb-0">
-          <div className="flex items-center justify-between">
-            <div>
-              <DialogTitle className="text-lg font-bold text-adminInk">Chấm công</DialogTitle>
-              <div className="flex items-center gap-2 mt-1.5">
-                <span className="text-sm font-semibold text-adminInk">{schedule.staffName}</span>
-                <span className="text-xs text-adminGray-400 font-mono">NV{String(schedule.staffId).padStart(5, "0")}</span>
-                {attendance ? (
-                  <span className="px-2 py-0.5 rounded-full text-2xs font-semibold bg-state-success-bg text-state-success-text border border-state-success-border">
-                    Đã chấm công
-                  </span>
-                ) : (
-                  <span className="px-2 py-0.5 rounded-full text-2xs font-semibold bg-state-warning-bg text-state-warning-text border border-state-warning-border">
-                    Chưa chấm công
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        </DialogHeader>
+    <Modal
+      open={open}
+      onClose={() => onOpenChange(false)}
+      title="Chấm công"
+      size="md"
+      scrollable
+    >
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <span className="text-sm font-semibold text-kit-heading">
+          {schedule.staffName}
+        </span>
+        <span className="text-xs text-kit-muted">
+          NV{String(schedule.staffId).padStart(5, "0")}
+        </span>
+        {attendance ? (
+          <Badge variant="success" soft>
+            Đã chấm công
+          </Badge>
+        ) : (
+          <Badge variant="warning" soft>
+            Chưa chấm công
+          </Badge>
+        )}
+      </div>
 
-        <div className="p-5 pb-2 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm border-b border-adminGray-100 mt-2 bg-adminGray-50/50">
-          <div className="flex items-center gap-2 text-adminGray-600">
-            <Calendar size={15} className="text-adminGray-600" />
-            <span className="font-medium text-adminGray-600">Thời gian:</span>
-            <span className="font-semibold text-adminInk">
-              {formatDisplayDate(scheduleDateStr)}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-adminGray-600">
-            <Clock size={15} className="text-adminGray-600" />
-            <span className="font-medium text-adminGray-600">Ca làm việc:</span>
-            <span className="font-semibold text-adminInk bg-white border border-adminGray-100/60 px-2 py-0.5 rounded shadow-xs">
-              {schedule.shift?.name} ({schedule.shift?.shiftPeriodDTOs?.[0]?.shiftStart?.substring(0, 5)} - {schedule.shift?.shiftPeriodDTOs?.[0]?.shiftEnd?.substring(0, 5)})
-            </span>
-          </div>
+      <div className="mb-3 grid grid-cols-1 gap-2 rounded border border-kit bg-kit-page p-3 text-sm sm:grid-cols-2">
+        <div className="flex items-center gap-2 text-kit-body">
+          <CalendarDays className="size-4 shrink-0 text-kit-muted" />
+          <span className="text-kit-muted">Thời gian:</span>
+          <span className="font-medium text-kit-heading">
+            {formatDisplayDate(scheduleDateText)}
+          </span>
         </div>
-
-        <div className="flex border-b border-adminGray-100 px-5 bg-white">
-          <button
-            type="button"
-            onClick={() => setActiveTab("attendance")}
-            className={`py-3 text-sm font-semibold border-b-2 transition-colors ${
-              activeTab === "attendance"
-                ? "border-adminGreen-600 text-adminGreen-600"
-                : "border-transparent text-adminGray-400 hover:text-adminGray-600"
-            }`}
-          >
-            Chấm công
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("history")}
-            className={`py-3 px-6 text-sm font-semibold border-b-2 transition-colors ${
-              activeTab === "history"
-                ? "border-adminGreen-600 text-adminGreen-600"
-                : "border-transparent text-adminGray-400 hover:text-adminGray-600"
-            }`}
-          >
-            Lịch sử chấm công
-          </button>
+        <div className="flex items-center gap-2 text-kit-body">
+          <Clock className="size-4 shrink-0 text-kit-muted" />
+          <span className="text-kit-muted">Ca:</span>
+          <span className="rounded border border-kit bg-kit-white px-2 py-0.5 text-xs font-medium text-kit-heading">
+            {shiftLabel}
+          </span>
         </div>
+      </div>
 
-        <form onSubmit={handleSubmit(handleFormSubmit)}>
-          <div className="p-5 space-y-4 max-h-[350px] overflow-y-auto">
-            {activeTab === "attendance" ? (
-              !isAdminOrManager ? (
-                <div className="space-y-4">
-                  {!isToday ? (
-                    <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-state-warning-bg border border-state-warning-border text-state-warning-text text-sm leading-relaxed">
-                      <AlertCircle size={16} className="shrink-0 mt-0.5 text-state-warning-text" />
-                      <span>
-                        Lịch làm việc này thuộc ngày khác. Bạn không thể thực hiện tự chấm công hoặc thay đổi giờ của ngày đã qua / ngày sắp tới.
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {!attendance ? (
-                        <div className="bg-state-warning-bg border border-state-warning-border p-4 rounded-2xl text-sm text-state-warning-text space-y-2">
-                          <p className="font-semibold">Bạn chưa ghi nhận bắt đầu ca làm việc (Check-in).</p>
-                          <p className="text-xs opacity-80">Bấm nút "Check-in" ở dưới để bắt đầu ca làm việc của bạn.</p>
-                        </div>
-                      ) : !attendance.checkOutAt ? (
-                        <div className="bg-adminGreen-50 border border-adminGreen-600/30 p-4 rounded-2xl text-sm text-adminGreen-600 space-y-2">
-                          <p className="font-semibold">Bạn đã Check-in thành công!</p>
-                          <p className="text-xs opacity-80">
-                            Thời gian vào: <span className="font-mono font-bold">{toLocalTimeOnly(attendance.checkInAt)}</span>
-                          </p>
-                          <p className="text-xs opacity-85">Bấm nút "Check-out" ở dưới để kết thúc ca làm việc của bạn.</p>
-                        </div>
-                      ) : (
-                        <div className="bg-adminGray-50 border border-adminGray-100 p-4 rounded-2xl text-sm text-adminGray-600 space-y-1.5">
-                          <p className="font-bold text-adminInk">Bạn đã hoàn thành chấm công ngày hôm nay!</p>
-                          <p className="text-xs">Giờ vào: <span className="font-mono font-semibold">{toLocalTimeOnly(attendance.checkInAt)}</span></p>
-                          <p className="text-xs">Giờ ra: <span className="font-mono font-semibold">{toLocalTimeOnly(attendance.checkOutAt)}</span></p>
-                        </div>
-                      )}
+      <TabNav
+        variant="body"
+        className="mb-3"
+        activeId={activeTab}
+        onChange={(tabId: string) => setActiveTab(tabId as DialogTab)}
+        items={[
+          { id: "attendance", label: "Chấm công" },
+          { id: "history", label: "Lịch sử chấm công" },
+        ]}
+      />
 
-                      {(!attendance || !attendance.checkOutAt) && (
-                        <div className="space-y-1.5">
-                          <Label className="text-xs font-bold text-adminGray-600 uppercase tracking-wider">
-                            Ghi chú (Không bắt buộc)
-                          </Label>
-                          <AdminTextarea
-                            placeholder="Nhập ghi chú chấm công (nếu có)..."
-                            className="border-adminGray-100/80 rounded-xl min-h-[80px] text-sm"
-                            {...register("note")}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <>
-                  {!isToday && !attendance && (
-                    <div className="flex items-start gap-2.5 p-3 rounded-xl bg-state-warning-bg border border-state-warning-border text-state-warning-text text-xs leading-relaxed">
-                      <AlertCircle size={16} className="shrink-0 mt-0.5 text-state-warning-text" />
-                      <span>
-                        Hệ thống chỉ cho phép ghi nhận <strong>Đi làm (Check-in)</strong> vào ngày hiện tại. Đối với ngày trong quá khứ/tương lai, vui lòng chọn hình thức Nghỉ.
-                      </span>
-                    </div>
-                  )}
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-3">
+        {renderMainContent()}
 
-                  <div className="space-y-2">
-                    <Label className="text-xs font-bold text-adminGray-600 uppercase tracking-wider">
-                      Loại chấm công
-                    </Label>
-                    <div className="grid grid-cols-3 gap-2">
-                      <label
-                        className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-sm font-semibold cursor-pointer transition-all ${
-                          mode === "working"
-                            ? "bg-adminGreen-50 border-adminGreen-600 text-adminGreen-600 shadow-xs"
-                            : "border-adminGray-100/80 bg-white text-adminGray-600 hover:bg-adminGray-50"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          value="working"
-                          className="sr-only"
-                          {...register("mode")}
-                        />
-                        Đi làm
-                      </label>
-
-                      <label
-                        className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-sm font-semibold cursor-pointer transition-all ${
-                          mode === "paid_leave"
-                            ? "bg-adminGreen-50 border-adminGreen-600 text-adminGreen-600 shadow-xs"
-                            : "border-adminGray-100/80 bg-white text-adminGray-600 hover:bg-adminGray-50"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          value="paid_leave"
-                          className="sr-only"
-                          {...register("mode")}
-                        />
-                        Nghỉ có phép
-                      </label>
-
-                      <label
-                        className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-sm font-semibold cursor-pointer transition-all ${
-                          mode === "unpaid_leave"
-                            ? "bg-adminGreen-50 border-adminGreen-600 text-adminGreen-600 shadow-xs"
-                            : "border-adminGray-100/80 bg-white text-adminGray-600 hover:bg-adminGray-50"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          value="unpaid_leave"
-                          className="sr-only"
-                          {...register("mode")}
-                        />
-                        Nghỉ không phép
-                      </label>
-                    </div>
-                  </div>
-
-                  {mode === "paid_leave" && (
-                    <div className="space-y-1.5 animate-in slide-in-from-top-1 duration-200">
-                      <Label className="text-xs font-semibold text-adminGray-600">Chi tiết phép</Label>
-                      <Select
-                        value={subStatus}
-                        onValueChange={(val) => setValue("subStatus", val)}
-                      >
-                        <AdminSelectTrigger className="h-10 text-sm border-adminGray-100/80 rounded-xl">
-                          <SelectValue />
-                        </AdminSelectTrigger>
-                        <SelectContent className="rounded-xl">
-                          <SelectItem value="4">Nghỉ phép hưởng lương (1 công)</SelectItem>
-                          <SelectItem value="5">Nghỉ lễ (1 công)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {mode === "unpaid_leave" && (
-                    <div className="space-y-1.5 animate-in slide-in-from-top-1 duration-200">
-                      <Label className="text-xs font-semibold text-adminGray-600">Chi tiết nghỉ</Label>
-                      <Select
-                        value={subStatus}
-                        onValueChange={(val) => setValue("subStatus", val)}
-                      >
-                        <AdminSelectTrigger className="h-10 text-sm border-adminGray-100/80 rounded-xl">
-                          <SelectValue />
-                        </AdminSelectTrigger>
-                        <SelectContent className="rounded-xl">
-                          <SelectItem value="3">Vắng / nghỉ không lương (0 công)</SelectItem>
-                          <SelectItem value="6">Nghỉ không lương (0 công)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {mode === "working" && (
-                    <div className="grid grid-cols-2 gap-4 pt-1 animate-in slide-in-from-top-1 duration-200">
-                      <div className="space-y-2 border border-adminGray-100/70 p-3.5 rounded-2xl bg-white/50">
-                        <label className="flex items-center gap-2 cursor-pointer select-none">
-                          <input
-                            type="checkbox"
-                            className="rounded text-adminGreen-600 focus:ring-adminGreen-600 border-adminGray-300 w-4 h-4"
-                            {...register("checkInEnabled")}
-                            disabled={!isToday && !attendance}
-                          />
-                          <span className="text-sm font-bold text-adminInk">Giờ vào</span>
-                        </label>
-                        <AdminInput
-                          type="time"
-                          className="h-10 text-sm border-adminGray-100/80 rounded-xl"
-                          {...register("checkInTime")}
-                          disabled={!checkInEnabled || (!isToday && !attendance)}
-                        />
-                      </div>
-
-                      <div className="space-y-2 border border-adminGray-100/70 p-3.5 rounded-2xl bg-white/50">
-                        <label className="flex items-center gap-2 cursor-pointer select-none">
-                          <input
-                            type="checkbox"
-                            className="rounded text-adminGreen-600 focus:ring-adminGreen-600 border-adminGray-300 w-4 h-4"
-                            {...register("checkOutEnabled")}
-                            disabled={!isToday && !attendance}
-                          />
-                          <span className="text-sm font-bold text-adminInk">Giờ ra</span>
-                        </label>
-                        <AdminInput
-                          type="time"
-                          className="h-10 text-sm border-adminGray-100/80 rounded-xl"
-                          {...register("checkOutTime")}
-                          disabled={!checkOutEnabled || (!isToday && !attendance)}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-adminGray-600 uppercase tracking-wider">
-                      Ghi chú
-                    </Label>
-                    <AdminTextarea
-                      placeholder="Nhập ghi chú chấm công..."
-                      className="border-adminGray-100/80 rounded-xl min-h-[80px] text-sm"
-                      {...register("note")}
-                    />
-                  </div>
-                </>
-              )
-            ) : (
-              <div className="space-y-3 py-2">
-                {attendance ? (
-                  <div className="border border-adminGray-100/60 rounded-xl p-4 bg-adminGray-50/50 space-y-2.5 text-sm">
-                    <div className="flex items-center justify-between border-b border-adminGray-100 pb-2">
-                      <span className="font-semibold text-adminGray-600">Người chấm công:</span>
-                      <span className="font-bold text-adminInk">{attendance.staffName}</span>
-                    </div>
-                    <div className="flex items-center justify-between border-b border-adminGray-100 pb-2">
-                      <span className="font-semibold text-adminGray-600">Giờ Check-in:</span>
-                      <span className="font-mono text-adminInk font-semibold">
-                        {attendance.checkInAt ? toLocalTimeOnly(attendance.checkInAt) : "—"}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between border-b border-adminGray-100 pb-2">
-                      <span className="font-semibold text-adminGray-600">Giờ Check-out:</span>
-                      <span className="font-mono text-adminInk font-semibold">
-                        {attendance.checkOutAt ? toLocalTimeOnly(attendance.checkOutAt) : "—"}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between border-b border-adminGray-100 pb-2">
-                      <span className="font-semibold text-adminGray-600">Số giờ làm:</span>
-                      <span className="font-bold text-adminGreen-600">{attendance.workedHours ?? 0} giờ</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-adminGray-600">Ghi chú:</span>
-                      <span className="text-adminInk italic">{attendance.note || "Không có ghi chú"}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-adminGray-400 text-sm font-medium">
-                    Chưa có lịch sử chấm công cho ngày này.
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <DialogFooter className="p-5 border-t border-adminGray-100 bg-adminGray-50/50 flex items-center justify-between gap-3">
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => onOpenChange(false)}
-                className="h-9 px-4 rounded-xl text-sm"
-              >
-                Bỏ qua
-              </Button>
-            </div>
-            
-            {activeTab === "attendance" && (
-              isAdminOrManager || (isToday && (!attendance || !attendance.checkOutAt)) ? (
-                <Button
-                  type="submit"
-                  variant="admin"
-                  size="sm"
-                  className="h-9 px-5 rounded-xl text-sm"
-                  loading={isPending}
-                >
-                  {isAdminOrManager ? "Lưu" : !attendance ? "Check-in" : "Check-out"}
-                </Button>
-              ) : null
-            )}
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        <div className="flex justify-end gap-2 border-t border-kit pt-3">
+          <Button
+            type="button"
+            variant="outline-secondary"
+            size="sm"
+            className="mb-0"
+            onClick={() => onOpenChange(false)}
+          >
+            Bỏ qua
+          </Button>
+          {canShowSubmit ? (
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              className="mb-0"
+              loading={isSaving}
+            >
+              {getSubmitButtonLabel(isAdminOrManager, attendance)}
+            </Button>
+          ) : null}
+        </div>
+      </form>
+    </Modal>
   );
 }
