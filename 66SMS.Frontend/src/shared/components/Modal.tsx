@@ -152,7 +152,7 @@ export function Modal({
       }
     >
       <div
-        className="modal-backdrop absolute inset-0 bg-kit-dark/50"
+        className="modal-backdrop absolute inset-0 bg-black/50"
         onClick={onClose}
         aria-hidden
       />

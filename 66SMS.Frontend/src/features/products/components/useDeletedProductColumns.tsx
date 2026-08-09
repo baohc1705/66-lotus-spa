@@ -2,30 +2,24 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { RotateCcw } from "lucide-react";
 
-import { Button } from "@/shared/components/ui/button";
-import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import {
-  DateTimeCell,
-  IndexCell,
-  PriceCell,
-  TextCell,
-} from "@/shared/components/DataTable/TableCells";
 import { FallbackImage } from "@/shared/components/FallbackImage";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { Tooltip } from "@/shared/components/Tooltip";
+import { Badge } from "@/shared/elements/Badge";
+import { Button } from "@/shared/elements/Button";
+import { DateTimeCell, TextCell } from "@/shared/tables/TableCells";
+import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { formatCurrency } from "@/shared/utils/currency";
 
 import { PRODUCT_COLUMN_LABELS } from "./useActiveProductColumns";
 import { PRODUCT_PERM } from "../constants/product.permissions";
 import type { ProductDto } from "../types/product.types";
 
 interface UseDeletedProductColumnsParams {
-  pageIndex: number;
-  pageSize: number;
   onRestore: (item: ProductDto) => void;
 }
 
 export function useDeletedProductColumns({
-  pageIndex,
-  pageSize,
   onRestore,
 }: UseDeletedProductColumnsParams) {
   const cols = PRODUCT_COLUMN_LABELS;
@@ -34,61 +28,56 @@ export function useDeletedProductColumns({
   return useMemo<ColumnDef<ProductDto>[]>(
     () => [
       {
-        id: "index",
-        header: "#",
-        cell: ({ row }) => (
-          <IndexCell
-            pageIndex={pageIndex}
-            pageSize={pageSize}
-            rowIndex={row.index}
-          />
-        ),
-        size: 50,
-        enableResizing: false,
-      },
-      {
         accessorKey: "code",
         header: cols.code,
         cell: ({ row }) => (
-          <span className="text-adminInk/80 font-medium">
+          <Badge variant="secondary" soft>
             {row.original.code ?? "—"}
-          </span>
+          </Badge>
         ),
         size: 100,
       },
       {
+        id: "imageUrl",
+        accessorKey: "imageUrl",
+        header: cols.imageUrl,
+        cell: ({ row }) => (
+          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-md border border-kit bg-kit-page">
+            <FallbackImage
+              kind="product"
+              src={row.original.imageUrl}
+              alt=""
+              className="h-10 w-10 object-cover"
+            />
+          </div>
+        ),
+        size: 72,
+        enableResizing: false,
+      },
+      {
         accessorKey: "name",
         header: cols.name,
-        cell: ({ row }) => {
-          const prod = row.original;
-          return (
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-adminGray-100 flex items-center justify-center shrink-0 overflow-hidden">
-                <FallbackImage
-                  kind="product"
-                  src={prod.imageUrl}
-                  alt=""
-                  className="w-8 h-8 object-cover"
-                />
-              </div>
-              <span className="text-sm font-semibold text-adminInk truncate max-w-44">
-                {prod.name ?? "—"}
-              </span>
-            </div>
-          );
-        },
-        size: 250,
+        cell: ({ row }) => (
+          <span className="font-medium text-kit-heading">
+            {row.original.name ?? "—"}
+          </span>
+        ),
+        size: 180,
       },
       {
         accessorKey: "categoryName",
         header: cols.categoryName,
         cell: ({ row }) => <TextCell value={row.original.categoryName} />,
-        size: 120,
+        size: 140,
       },
       {
         accessorKey: "sellingPrice",
         header: cols.sellingPrice,
-        cell: ({ row }) => <PriceCell value={row.original.sellingPrice} />,
+        cell: ({ row }) => (
+          <span className="text-sm font-bold text-kit-primary">
+            {formatCurrency(row.original.sellingPrice)}
+          </span>
+        ),
         size: 120,
       },
       {
@@ -99,28 +88,29 @@ export function useDeletedProductColumns({
       },
       {
         id: "actions",
-        header: "",
+        header: "Thao tác",
         cell: ({ row }) => (
           <PermissionGate
             resource={perm.resource}
             action={perm.update}
             role={perm.role}
           >
-            <Button
-              variant="outline"
-              size="sm"
-              className="lotus-admin-table-toolbar-btn"
-              onClick={() => onRestore(row.original)}
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              {COMMON_MSG.restore}
-            </Button>
+            <Tooltip text={COMMON_MSG.restore}>
+              <Button
+                size="icon-sm"
+                variant="outline-success"
+                className="mb-0 mr-0"
+                onClick={() => onRestore(row.original)}
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+              </Button>
+            </Tooltip>
           </PermissionGate>
         ),
-        size: 120,
+        size: 80,
         enableResizing: false,
       },
     ],
-    [pageIndex, pageSize, onRestore, cols, perm],
+    [onRestore, cols, perm],
   );
 }
