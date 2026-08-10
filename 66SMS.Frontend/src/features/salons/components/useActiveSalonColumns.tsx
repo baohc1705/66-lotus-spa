@@ -1,18 +1,17 @@
 import { useMemo } from "react";
 import type { ColumnDef, Row } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Trash2, Eye } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
+import { Pencil, Trash2, Eye } from "lucide-react";
+import { Button } from "@/shared/elements/Button";
+import { Badge } from "@/shared/elements/Badge";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { IndexCell } from "@/shared/components/DataTable/TableCells";
+import { Tooltip } from "@/shared/components/Tooltip";
+import {
+  IndexCell,
+  NameCell,
+  TextCell,
+  MutedSmallCell,
+} from "@/shared/tables/TableCells";
 import { SalonStatusBadge } from "./SalonStatusBadge";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import { SALON_PERM } from "../constants/salon.permissions";
 import type { SalonListItem } from "../types/salon.types";
 
@@ -59,40 +58,28 @@ export function useActiveSalonColumns({
       {
         accessorKey: "code",
         header: cols.code,
-        cell: ({ row }) => (
-          <span className="text-xs bg-adminGray-100 px-1.5 py-0.5 rounded text-adminInk">
-            {row.original.code}
-          </span>
-        ),
+        cell: ({ row }) => <MutedSmallCell value={row.original.code} />,
         size: 100,
       },
       {
         accessorKey: "name",
         header: cols.name,
-        cell: ({ row }) => (
-          <span className="font-bold text-adminInk">{row.original.name}</span>
-        ),
+        cell: ({ row }) => <NameCell value={row.original.name} />,
         size: 200,
       },
       {
         accessorKey: "phone",
         header: cols.phone,
-        cell: ({ row }) => (
-          <span className="text-adminInk/80">{row.original.phone}</span>
-        ),
+        cell: ({ row }) => <TextCell value={row.original.phone} />,
         size: 130,
       },
       {
         accessorKey: "fullAddress",
         header: cols.fullAddress,
         cell: ({ row }) => (
-          <span
-            className="text-adminInk/70 text-xs block truncate"
-            style={{ maxWidth: 250 }}
-            title={row.original.fullAddress}
-          >
-            {row.original.fullAddress || row.original.streetAddress || "—"}
-          </span>
+          <TextCell
+            value={row.original.fullAddress || row.original.streetAddress}
+          />
         ),
         size: 260,
       },
@@ -101,11 +88,11 @@ export function useActiveSalonColumns({
         header: cols.isPrimary,
         cell: ({ row }) =>
           row.original.isPrimary ? (
-            <span className="text-xs font-medium text-adminGreen-700 bg-adminGreen-50 px-1.5 py-0.5 rounded">
+            <Badge variant="success" soft>
               Trụ sở chính
-            </span>
+            </Badge>
           ) : (
-            <span className="text-adminInk/40 text-xs">—</span>
+            <span className="text-xs text-kit-muted">—</span>
           ),
         size: 120,
       },
@@ -117,52 +104,57 @@ export function useActiveSalonColumns({
       },
       {
         id: "actions",
-        header: "",
+        header: "Thao tác",
         cell: ({ row }) => {
           const salon = row.original;
+          const expanded = row.getIsExpanded();
           return (
-            <div onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <div
+              className="flex items-center gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Tooltip text={expanded ? "Đóng chi tiết" : "Xem chi tiết"}>
+                <Button
+                  size="icon-sm"
+                  variant="outline-info"
+                  className="mb-0 mr-0"
+                  onClick={() => row.toggleExpanded()}
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                </Button>
+              </Tooltip>
+              <PermissionGate resource={perm.resource} action={perm.update}>
+                <Tooltip text="Sửa">
                   <Button
-                    variant="ghost"
                     size="icon-sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    variant="outline-primary"
+                    className="mb-0 mr-0"
+                    onClick={() => onEdit(salon)}
                   >
-                    <MoreHorizontal className="w-4 h-4" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => row.toggleExpanded()}>
-                    <Eye className="w-4 h-4 mr-2" />
-                    {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
-                  </DropdownMenuItem>
-                  <PermissionGate resource={perm.resource} action={perm.update}>
-                    <DropdownMenuItem onClick={() => onEdit(salon)}>
-                      <Pencil className="w-4 h-4 mr-2" />
-                      {COMMON_MSG.edit}
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                  <PermissionGate
-                    resource={perm.resource}
-                    action={perm.delete}
-                    role={perm.role}
+                </Tooltip>
+              </PermissionGate>
+              <PermissionGate
+                resource={perm.resource}
+                action={perm.delete}
+                role={perm.role}
+              >
+                <Tooltip text="Xóa">
+                  <Button
+                    size="icon-sm"
+                    variant="outline-danger"
+                    className="mb-0 mr-0"
+                    onClick={() => onDelete(salon)}
                   >
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={() => onDelete(salon)}
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Xóa chi nhánh
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </Tooltip>
+              </PermissionGate>
             </div>
           );
         },
-        size: 50,
+        size: 120,
         enableResizing: false,
       },
     ],

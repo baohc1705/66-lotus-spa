@@ -99,11 +99,11 @@ export function BookingServiceStep() {
       <div className="flex flex-col gap-4 max-h-[500px] overflow-y-auto scrollbar-thin">
         {isLoading ? (
           <div className="text-center py-12 text-warm-600">
-            Đang tải danh sách dịch vụ...
+            Đang tải dịch vụ...
           </div>
         ) : isError ? (
           <div className="text-center py-12 text-error-text text-sm">
-            Không tải được dịch vụ. Vui lòng thử lại sau.
+            Không tải được dịch vụ. Thử lại sau.
           </div>
         ) : Object.keys(groupedServices).length > 0 ? (
           Object.entries(groupedServices).map(([categoryName, items]) => (
@@ -162,7 +162,7 @@ export function BookingServiceStep() {
           <div className="rounded-sm border border-warm-100 bg-warm-50 py-12 text-center">
             <HelpCircle className="w-8 h-8 text-warm-400 mx-auto mb-2" />
             <p className="text-warm-600 text-sm">
-              Không tìm thấy dịch vụ làm đẹp nào tương thích.
+              Không tìm thấy dịch vụ.
             </p>
           </div>
         )}

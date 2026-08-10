@@ -67,11 +67,11 @@ export const FooterSection = () => {
   };
 
   return (
-    <footer id="footer" className="bg-ink pb-8 pt-12 text-white">
+    <footer id="footer" className="bg-ink pb-6 pt-8 text-white">
       <div className="landing-container">
-        <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
+        <div className="grid gap-8 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-5">
-            <div className="mb-5 flex items-center gap-3">
+            <div className="mb-4 flex items-center gap-3">
               <img
                 src={logoUrl}
                 alt={name}
@@ -84,9 +84,8 @@ export const FooterSection = () => {
                 {name}
               </span>
             </div>
-            <p className="mb-8 max-w-sm font-geist text-sm leading-relaxed text-white/55">
-              Không gian chăm sóc sức khỏe và sắc đẹp tại Cao Lãnh — nơi cơ thể
-              tìm về sự tĩnh lặng.
+            <p className="mb-5 max-w-sm font-geist text-sm leading-relaxed text-white/55">
+              Không gian chăm sóc sức khỏe và sắc đẹp tại Cao Lãnh.
             </p>
 
             <div className="space-y-3">

@@ -7,7 +7,7 @@ import type { Result } from "@/shared/types/common.types";
 import type { AxiosError } from "axios";
 import { CheckCircle2, Loader2, Sparkles, Ticket, X } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import { bookingApi } from "../api/booking.api";
 import { useBookingStore } from "../stores/bookingStore";
 
@@ -94,7 +94,7 @@ export function PromotionCodeInput({
     clearPromotion();
     setInputCode("");
     setError("");
-    toast.info("Đã hủy bỏ mã khuyến mãi");
+    toast.info("Đã hủy mã khuyến mãi");
   };
 
   if (appliedPromotion) {

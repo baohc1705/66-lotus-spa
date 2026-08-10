@@ -4,9 +4,7 @@ import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { timeSlotApi } from "@/features/time_slots/api/timeSlot.api";
 import type { PageRequest, Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { TOAST_MSG } from "@/shared/constants/toast.messages";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { toast } from "@/shared/components/kitToast";
 import type {
   CreateTimeSlotPayload,
   UpdateTimeSlotPayload,
@@ -46,13 +44,13 @@ export function useCreateTimeSlot() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: TIME_SLOT_KEYS.all });
-        toast.success(TOAST_MSG.createSuccess(ENTITY));
+        toast.success(`Tạo ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
+      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi tạo ${ENTITY}`));
     },
   });
 }
@@ -70,14 +68,14 @@ export function useUpdateTimeSlot() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: TIME_SLOT_KEYS.all });
-        toast.success(TOAST_MSG.updateSuccess(ENTITY));
+        toast.success(`Cập nhật ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
       toast.error(
-        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+        getErrorMessage(error, `Có lỗi xảy ra khi cập nhật ${ENTITY}`),
       );
     },
   });
@@ -90,13 +88,13 @@ export function useDeleteTimeSlot() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: TIME_SLOT_KEYS.all });
-        toast.success(TOAST_MSG.deleteSuccess(ENTITY));
+        toast.success(`Xóa ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
+      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi xóa ${ENTITY}`));
     },
   });
 }

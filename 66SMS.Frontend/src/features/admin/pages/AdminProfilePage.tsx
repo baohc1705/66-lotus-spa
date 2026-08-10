@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "motion/react";
-import { User, Lock, Loader2, Camera, Save } from "lucide-react";
+import { User, Lock, Loader2, Save } from "lucide-react";
 import { useProfile } from "@/features/profile/hooks/useProfile";
 import { useChangePassword } from "@/features/profile/hooks/useChangePassword";
 import { useUpdateStaffMutation } from "@/features/staffs/hooks/useStaffs";
@@ -17,23 +17,33 @@ import { formatDisplayDate, parseToDateInput } from "@/shared/utils/date.utils";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { Button } from "@/shared/components/ui/button";
-import { FormField } from "@/shared/components/forms/FormField";
-import { AdminInput } from "@/shared/components/forms/AdminInput";
-import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
+import { toast } from "@/shared/components/kitToast";
+import { Button } from "@/shared/elements/Button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/shared/components/ui/select";
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+} from "@/shared/elements/Card";
+import { ListGroup, ListGroupItem } from "@/shared/elements/ListGroup";
+import { FormField } from "@/shared/forms/FormField";
+import { FormRow } from "@/shared/forms/FormRow";
+import { FormSection } from "@/shared/forms/FormSection";
+import { ImageUpload } from "@/shared/forms/ImageUpload";
+import { Input } from "@/shared/forms/Input";
+import { Select } from "@/shared/forms/Select";
 import { containerVariants, itemVariants } from "@/shared/motion/pageVariants";
+
+const GENDER_OPTIONS = [
+  { value: "0", label: "Nam" },
+  { value: "1", label: "Nữ" },
+  { value: "2", label: "Khác" },
+];
 
 export function AdminProfilePage() {
   const [activeTab, setActiveTab] = useState<"profile" | "security">("profile");
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
-  const [localAvatarPreview, setLocalAvatarPreview] = useState<string | null>(null);
+  const [avatarKey, setAvatarKey] = useState(0);
   const qc = useQueryClient();
   const { data: profile, isLoading, isError } = useProfile();
 
@@ -45,7 +55,6 @@ export function AdminProfilePage() {
 
   const { mySalon } = useAuthStore();
 
-  // Profile form
   const {
     register: registerProfile,
     handleSubmit: handleSubmitProfile,
@@ -81,11 +90,10 @@ export function AdminProfilePage() {
     if (profile) {
       resetProfile(getInitialProfileValues());
       setPendingAvatarFile(null);
-      setLocalAvatarPreview(null);
+      setAvatarKey((key) => key + 1);
     }
   }, [profile, resetProfile, getInitialProfileValues]);
 
-  // Security form
   const {
     register: registerSecurity,
     handleSubmit: handleSubmitSecurity,
@@ -128,7 +136,7 @@ export function AdminProfilePage() {
         onSuccess: (res) => {
           if (res.isSuccess) {
             setPendingAvatarFile(null);
-            setLocalAvatarPreview(null);
+            setAvatarKey((key) => key + 1);
             qc.invalidateQueries({ queryKey: ["profile"] });
           }
         },
@@ -146,20 +154,15 @@ export function AdminProfilePage() {
     });
   };
 
-  const handleAvatarClick = () => {
-    const fileInput = document.getElementById("admin-avatar-upload-input");
-    fileInput?.click();
-  };
-
-  const handleAvatarChange = (e: { target: { files: FileList | null } }) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleAvatarFileChange = (file: File | null) => {
     setPendingAvatarFile(file);
-    setLocalAvatarPreview(URL.createObjectURL(file));
-    toast.success("Đã chọn ảnh mới. Đừng quên bấm Lưu thông tin!");
+    if (file) {
+      toast.success("Đã chọn ảnh mới. Đừng quên bấm Lưu thông tin!");
+    }
   };
 
-  const avatarUrl = localAvatarPreview ?? watchProfile("profilePhotoUrl");
+  const genderValue = watchProfile("gender");
+  const avatarUrl = watchProfile("profilePhotoUrl");
 
   if (!isLoading && profile?.profileType === "Customer") {
     return <Navigate to="/profile" replace />;
@@ -167,22 +170,22 @@ export function AdminProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="h-[400px] flex items-center justify-center min-h-[500px]">
-        <Loader2 className="w-8 h-8 text-adminGreen-600 animate-spin" />
+      <div className="flex min-h-[500px] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-kit-primary" />
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="h-[400px] flex flex-col items-center justify-center text-center min-h-[500px]">
-        <p className="text-state-danger-text font-medium mb-4">
+      <div className="flex min-h-[500px] flex-col items-center justify-center text-center">
+        <p className="mb-4 font-medium text-kit-danger">
           Không thể tải thông tin tài khoản
         </p>
         <Button
           variant="link"
           onClick={() => window.location.reload()}
-          className="text-adminGreen-600 font-semibold"
+          className="mb-0 mr-0 font-semibold"
         >
           Thử lại
         </Button>
@@ -191,301 +194,271 @@ export function AdminProfilePage() {
   }
 
   return (
-    <div className="w-full font-sans antialiased text-adminInk">
+    <div className="w-full font-sans text-kit-body antialiased">
       <motion.div
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="flex flex-col lg:flex-row gap-2"
+        className="flex flex-col gap-3 lg:flex-row"
       >
         <motion.div
           variants={itemVariants}
-          className="w-full lg:w-[260px] shrink-0 flex flex-col gap-2"
+          className="flex w-full shrink-0 flex-col gap-3 lg:w-[260px]"
         >
-          <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-xs p-6 flex flex-col items-center">
-            <input
-              id="admin-avatar-upload-input"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleAvatarChange}
-            />
-            <div
-              onClick={handleAvatarClick}
-              className="relative w-36 h-36 rounded-full border border-adminGray-100/50 p-1 bg-white cursor-pointer group shrink-0 shadow-inner"
-            >
-              <div className="w-full h-full rounded-full overflow-hidden bg-white relative flex items-center justify-center">
-                {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt="Profile"
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-adminGray-50 rounded-full text-adminGray-300">
-                    <User className="w-16 h-16" />
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full duration-300">
-                  <Camera className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-            <h3 className="mt-4 text-base font-bold text-adminInk font-sans text-center truncate w-full">
-              {profile?.fullName || profile?.username || "Người dùng"}
-            </h3>
-          </div>
+          <Card className="mb-0">
+            <CardBody className="flex flex-col items-center py-6">
+              <ImageUpload
+                key={avatarKey}
+                value={avatarUrl || profile?.avatarUrl}
+                onFileChange={handleAvatarFileChange}
+                shape="circle"
+                size="lg"
+                label="Đổi ảnh đại diện"
+              />
+              <h3 className="mt-4 w-full truncate text-center font-sans text-base font-bold text-kit-heading">
+                {profile?.fullName || profile?.username || "Người dùng"}
+              </h3>
+            </CardBody>
+          </Card>
 
-          <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-xs overflow-hidden">
-            <div className="px-4 py-2.5 border-b border-adminGray-100/30 bg-adminGray-50/50">
-              <span className="text-xs font-bold text-adminGray-600 uppercase tracking-wider block">
-                Menu
-              </span>
-            </div>
-            <nav className="flex flex-col p-1.5 space-y-0.5">
-              <button
-                type="button"
-                onClick={() => setActiveTab("profile")}
-                className={`lotus-admin-sidebar-item ${
-                  activeTab === "profile"
-                    ? "is-active font-semibold"
-                    : "hover:text-adminGreen-600 border-l-[3px] border-transparent"
-                }`}
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <User className="w-4 h-4 shrink-0 text-adminGray-400" />
-                  <span>Thông tin tài khoản</span>
-                </div>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab("security")}
-                className={`lotus-admin-sidebar-item ${
-                  activeTab === "security"
-                    ? "is-active font-semibold"
-                    : "hover:text-adminGreen-600 border-l-[3px] border-transparent"
-                }`}
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <Lock className="w-4 h-4 shrink-0 text-adminGray-400" />
-                  <span>Đổi mật khẩu</span>
-                </div>
-              </button>
-            </nav>
-          </div>
+          <Card className="mb-0">
+            <CardHeader className="h-auto py-2.5">
+              <CardTitle className="mb-0 text-xs tracking-wider">Menu</CardTitle>
+            </CardHeader>
+            <CardBody className="p-2">
+              <ListGroup flush className="rounded border-0">
+                <ListGroupItem
+                  action
+                  active={activeTab === "profile"}
+                  tone={activeTab === "profile" ? "primary" : "default"}
+                  onClick={() => setActiveTab("profile")}
+                >
+                  <span className="flex items-center gap-2">
+                    <User className="h-4 w-4 shrink-0" />
+                    Thông tin tài khoản
+                  </span>
+                </ListGroupItem>
+                <ListGroupItem
+                  action
+                  active={activeTab === "security"}
+                  tone={activeTab === "security" ? "primary" : "default"}
+                  onClick={() => setActiveTab("security")}
+                >
+                  <span className="flex items-center gap-2">
+                    <Lock className="h-4 w-4 shrink-0" />
+                    Đổi mật khẩu
+                  </span>
+                </ListGroupItem>
+              </ListGroup>
+            </CardBody>
+          </Card>
         </motion.div>
 
-        <motion.div variants={itemVariants} className="grow">
+        <motion.div variants={itemVariants} className="min-w-0 grow">
           {activeTab === "profile" ? (
-            <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-xs overflow-hidden min-h-[500px]">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-adminGray-100/30 bg-adminGray-50/50">
-                <span className="font-bold text-sm md:text-base text-adminInk">
+            <Card className="mb-0 min-h-[500px]">
+              <CardHeader className="justify-between gap-2">
+                <span className="text-sm font-bold text-kit-heading md:text-base">
                   Thông tin tài khoản
                 </span>
                 <Button
                   type="submit"
                   form="profile-form"
                   disabled={isProfilePending}
-                  variant="admin"
+                  variant="primary"
                   size="sm"
                   loading={isProfilePending}
-                  className="flex items-center gap-1.5"
+                  className="mb-0 mr-0"
                 >
-                  {!isProfilePending && <Save className="w-3.5 h-3.5" />}
+                  {!isProfilePending ? <Save className="mr-1.5 h-3.5 w-3.5" /> : null}
                   Lưu thông tin
                 </Button>
-              </div>
+              </CardHeader>
 
-              <div className="p-6 md:p-8">
+              <CardBody className="p-6 md:p-8">
                 <form
                   id="profile-form"
                   onSubmit={handleSubmitProfile(onSubmitProfile)}
                   className="space-y-6"
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <FormField label="Email đăng nhập">
-                      <AdminInput
-                        type="text"
-                        value={profile?.email || ""}
-                        readOnly
-                        disabled
-                      />
-                    </FormField>
+                  <FormSection icon={User} title="Thông tin cá nhân">
+                    <FormRow>
+                      <FormField label="Email đăng nhập">
+                        <Input
+                          type="text"
+                          value={profile?.email || ""}
+                          readOnly
+                          disabled
+                        />
+                      </FormField>
 
-                    <FormField
-                      label="Họ tên *"
-                      error={errorsProfile.fullName?.message}
-                    >
-                      <AdminInput
-                        type="text"
-                        {...registerProfile("fullName")}
-                      />
-                    </FormField>
-
-                    <FormField label="Email liên lạc">
-                      <AdminInput
-                        type="text"
-                        value={profile?.email || ""}
-                        readOnly
-                        disabled
-                      />
-                    </FormField>
-
-                    <FormField
-                      label="Điện thoại *"
-                      error={errorsProfile.phoneNumber?.message}
-                    >
-                      <AdminInput
-                        type="text"
-                        {...registerProfile("phoneNumber")}
-                      />
-                    </FormField>
-
-                    <FormField
-                      label="Giới tính"
-                      error={errorsProfile.gender?.message}
-                    >
-                      <Select
-                        value={
-                          watchProfile("gender") !== null &&
-                          watchProfile("gender") !== undefined
-                            ? watchProfile("gender")!.toString()
-                            : ""
-                        }
-                        onValueChange={(val) =>
-                          setValueProfile(
-                            "gender",
-                            val === "" ? null : Number(val),
-                            { shouldValidate: true, shouldDirty: true },
-                          )
-                        }
+                      <FormField
+                        label="Họ tên"
+                        required
+                        error={errorsProfile.fullName?.message}
                       >
-                        <AdminSelectTrigger>
-                          <SelectValue placeholder="Chọn giới tính" />
-                        </AdminSelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="0">Nam</SelectItem>
-                          <SelectItem value="1">Nữ</SelectItem>
-                          <SelectItem value="2">Khác</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormField>
+                        <Input type="text" {...registerProfile("fullName")} />
+                      </FormField>
 
-                    <FormField
-                      label="Ngày sinh"
-                      error={errorsProfile.dateOfBirth?.message}
-                    >
-                      <AdminInput
-                        type="date"
-                        {...registerProfile("dateOfBirth")}
-                      />
-                    </FormField>
-                  </div>
+                      <FormField label="Email liên lạc">
+                        <Input
+                          type="text"
+                          value={profile?.email || ""}
+                          readOnly
+                          disabled
+                        />
+                      </FormField>
+
+                      <FormField
+                        label="Điện thoại"
+                        required
+                        error={errorsProfile.phoneNumber?.message}
+                      >
+                        <Input type="text" {...registerProfile("phoneNumber")} />
+                      </FormField>
+
+                      <FormField
+                        label="Giới tính"
+                        error={errorsProfile.gender?.message}
+                      >
+                        <Select
+                          value={
+                            genderValue !== null && genderValue !== undefined
+                              ? String(genderValue)
+                              : ""
+                          }
+                          onChange={(event) =>
+                            setValueProfile(
+                              "gender",
+                              event.target.value === ""
+                                ? null
+                                : Number(event.target.value),
+                              { shouldValidate: true, shouldDirty: true },
+                            )
+                          }
+                          options={GENDER_OPTIONS}
+                          placeholder="Chọn giới tính"
+                        />
+                      </FormField>
+
+                      <FormField
+                        label="Ngày sinh"
+                        error={errorsProfile.dateOfBirth?.message}
+                      >
+                        <Input
+                          type="date"
+                          {...registerProfile("dateOfBirth")}
+                        />
+                      </FormField>
+                    </FormRow>
+                  </FormSection>
                 </form>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 mt-8 border-t border-adminGray-100/30 text-left">
+                <div className="mt-8 grid grid-cols-2 gap-6 border-t border-kit pt-6 text-left md:grid-cols-4">
                   <div>
-                    <span className="text-2xs font-semibold text-adminGray-600 uppercase tracking-wider block mb-1">
+                    <span className="mb-1 block text-2xs font-semibold uppercase tracking-wider text-kit-muted">
                       Chi nhánh
                     </span>
-                    <span className="text-sm font-bold text-adminInk block">
+                    <span className="block text-sm font-bold text-kit-heading">
                       {mySalon?.salonName || "HoaSenSpa TPHCM"}
-                    </span>
-                    <span className="text-2xs text-adminGray-600 block mt-0.5">
-                      Đồng Tháp
                     </span>
                   </div>
                   <div>
-                    <span className="text-2xs font-semibold text-adminGray-600 uppercase tracking-wider block mb-1">
+                    <span className="mb-1 block text-2xs font-semibold uppercase tracking-wider text-kit-muted">
                       Quyền hạn
                     </span>
-                    <span className="text-sm font-bold text-adminInk block">
+                    <span className="block text-sm font-bold text-kit-heading">
                       {profile?.roles?.[0] || "Admin"}
                     </span>
                   </div>
-                  {profile?.staffInfo && (
+                  {profile?.staffInfo ? (
                     <>
                       <div>
-                        <span className="text-2xs font-semibold text-adminGray-600 uppercase tracking-wider block mb-1">
+                        <span className="mb-1 block text-2xs font-semibold uppercase tracking-wider text-kit-muted">
                           Mã nhân viên
                         </span>
-                        <span className="text-sm font-bold text-adminInk block">
+                        <span className="block text-sm font-bold text-kit-heading">
                           {profile.staffInfo.code || "---"}
                         </span>
                       </div>
                       <div>
-                        <span className="text-2xs font-semibold text-adminGray-600 uppercase tracking-wider block mb-1">
+                        <span className="mb-1 block text-2xs font-semibold uppercase tracking-wider text-kit-muted">
                           Ngày vào làm
                         </span>
-                        <span className="text-sm font-bold text-adminInk block">
+                        <span className="block text-sm font-bold text-kit-heading">
                           {formatDisplayDate(profile.staffInfo.hireDate)}
                         </span>
                       </div>
                     </>
-                  )}
+                  ) : null}
                 </div>
-              </div>
-            </div>
+              </CardBody>
+            </Card>
           ) : (
-            <div className="bg-white rounded-admin border border-adminGray-100/30 shadow-xs overflow-hidden min-h-[500px]">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-adminGray-100/30 bg-adminGray-50/50">
-                <span className="font-bold text-sm md:text-base text-adminInk">
+            <Card className="mb-0 min-h-[500px]">
+              <CardHeader className="justify-between gap-2">
+                <span className="text-sm font-bold text-kit-heading md:text-base">
                   Đổi mật khẩu
                 </span>
                 <Button
                   type="submit"
                   form="security-form"
                   disabled={isSecurityPending}
-                  variant="admin"
+                  variant="primary"
                   size="sm"
                   loading={isSecurityPending}
-                  className="flex items-center gap-1.5"
+                  className="mb-0 mr-0"
                 >
-                  {!isSecurityPending && <Save className="w-3.5 h-3.5" />}
+                  {!isSecurityPending ? <Save className="mr-1.5 h-3.5 w-3.5" /> : null}
                   Cập nhật mật khẩu
                 </Button>
-              </div>
+              </CardHeader>
 
-              <div className="p-6 md:p-8 text-left">
+              <CardBody className="p-6 text-left md:p-8">
                 <form
                   id="security-form"
                   onSubmit={handleSubmitSecurity(onSubmitSecurity)}
-                  className="space-y-5 max-w-xl"
+                  className="max-w-xl space-y-3"
                 >
-                  <FormField
-                    label="Mật khẩu hiện tại *"
-                    error={errorsSecurity.currentPassword?.message}
-                  >
-                    <AdminInput
-                      type="password"
-                      {...registerSecurity("currentPassword")}
-                    />
-                  </FormField>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <FormSection icon={Lock} title="Bảo mật">
                     <FormField
-                      label="Mật khẩu mới *"
-                      error={errorsSecurity.newPassword?.message}
+                      label="Mật khẩu hiện tại"
+                      required
+                      error={errorsSecurity.currentPassword?.message}
                     >
-                      <AdminInput
+                      <Input
                         type="password"
-                        {...registerSecurity("newPassword")}
+                        {...registerSecurity("currentPassword")}
                       />
                     </FormField>
 
-                    <FormField
-                      label="Xác nhận mật khẩu *"
-                      error={errorsSecurity.confirmPassword?.message}
-                    >
-                      <AdminInput
-                        type="password"
-                        {...registerSecurity("confirmPassword")}
-                      />
-                    </FormField>
-                  </div>
+                    <FormRow>
+                      <FormField
+                        label="Mật khẩu mới"
+                        required
+                        error={errorsSecurity.newPassword?.message}
+                      >
+                        <Input
+                          type="password"
+                          {...registerSecurity("newPassword")}
+                        />
+                      </FormField>
+
+                      <FormField
+                        label="Xác nhận mật khẩu"
+                        required
+                        error={errorsSecurity.confirmPassword?.message}
+                      >
+                        <Input
+                          type="password"
+                          {...registerSecurity("confirmPassword")}
+                        />
+                      </FormField>
+                    </FormRow>
+                  </FormSection>
                 </form>
-              </div>
-            </div>
+              </CardBody>
+            </Card>
           )}
         </motion.div>
       </motion.div>

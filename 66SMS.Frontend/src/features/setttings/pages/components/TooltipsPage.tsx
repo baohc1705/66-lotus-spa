@@ -53,6 +53,23 @@ export function TooltipsPage() {
             </Tooltip>
           </div>
         </DemoSection>
+
+        <DemoSection title="Light Tooltips">
+          <div className="text-center">
+            <Tooltip text="Tooltip on top" placement="top" variant="light">
+              <Button variant="outline-primary">Tooltip on top</Button>
+            </Tooltip>
+            <Tooltip text="Tooltip on right" placement="right" variant="light">
+              <Button variant="outline-primary">Tooltip on right</Button>
+            </Tooltip>
+            <Tooltip text="Tooltip on bottom" placement="bottom" variant="light">
+              <Button variant="outline-primary">Tooltip on bottom</Button>
+            </Tooltip>
+            <Tooltip text="Tooltip on left" placement="left" variant="light">
+              <Button variant="outline-primary">Tooltip on left</Button>
+            </Tooltip>
+          </div>
+        </DemoSection>
       </div>
     </DemoPageShell>
   );

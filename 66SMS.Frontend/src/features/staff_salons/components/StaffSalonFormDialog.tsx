@@ -1,23 +1,19 @@
-import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/shared/components/ui/select";
+import { Users } from "lucide-react";
+
+import { Modal } from "@/shared/components/Modal";
+import { Button } from "@/shared/elements/Button";
+import { FormField } from "@/shared/forms/FormField";
+import { FormRow } from "@/shared/forms/FormRow";
+import { FormSection } from "@/shared/forms/FormSection";
+import { Input } from "@/shared/forms/Input";
+import { Select } from "@/shared/forms/Select";
+import { parseToDateInput } from "@/shared/utils/date.utils";
+
+import { useStaffs } from "@/features/staffs/hooks/useStaffs";
+import type { StaffDto } from "@/features/staffs/types/staff.types";
 import {
   useCreateStaffSalon,
   useUpdateStaffSalon,
@@ -29,8 +25,6 @@ import {
   type UpdateStaffSalonFormValues,
 } from "../schemas/staff-salon.schema";
 import type { StaffSalonDTO } from "../types/staff-salon.types";
-import { useStaffs } from "@/features/staffs/hooks/useStaffs";
-import { parseToDateInput } from "@/shared/utils/date.utils";
 
 interface StaffSalonFormDialogProps {
   open: boolean;
@@ -38,6 +32,11 @@ interface StaffSalonFormDialogProps {
   salonId: number;
   staffSalon?: StaffSalonDTO | null;
 }
+
+const STATUS_OPTIONS = [
+  { value: "0", label: "Không hoạt động" },
+  { value: "1", label: "Đang làm việc" },
+];
 
 export function StaffSalonFormDialog({
   open,
@@ -53,6 +52,11 @@ export function StaffSalonFormDialog({
   const { data: staffsData } = useStaffs({ pageIndex: 1, pageSize: 200 });
   const staffList = staffsData?.data?.items ?? [];
 
+  const staffOptions = staffList.map((staff: StaffDto) => ({
+    value: String(staff.id ?? ""),
+    label: `${staff.fullName ?? "—"} (${staff.code ?? "—"})`,
+  }));
+
   const createForm = useForm<CreateStaffSalonFormValues>({
     resolver: zodResolver(
       createStaffSalonSchema,
@@ -67,6 +71,7 @@ export function StaffSalonFormDialog({
   });
 
   useEffect(() => {
+    if (!open) return;
     if (staffSalon && isEdit) {
       updateForm.reset({
         isManager: staffSalon.isManager ?? false,
@@ -77,13 +82,13 @@ export function StaffSalonFormDialog({
     } else {
       createForm.reset({ salonId, isManager: false, startDate: "" });
     }
-  }, [staffSalon, isEdit, salonId, createForm, updateForm]);
+  }, [open, staffSalon, isEdit, salonId, createForm, updateForm]);
 
   function handleClose() {
     onOpenChange(false);
   }
 
-  async function onCreateSubmit(values: CreateStaffSalonFormValues) {
+  function onCreateSubmit(values: CreateStaffSalonFormValues) {
     createMutation.mutate(
       {
         staffId: values.staffId,
@@ -94,159 +99,152 @@ export function StaffSalonFormDialog({
         status: values.status,
       },
       {
-        onSuccess: (r) => {
-          if (r.isSuccess) handleClose();
+        onSuccess: (result) => {
+          if (result.isSuccess) handleClose();
         },
       },
     );
   }
 
-  async function onUpdateSubmit(values: UpdateStaffSalonFormValues) {
+  function onUpdateSubmit(values: UpdateStaffSalonFormValues) {
     if (!staffSalon?.id) return;
     updateMutation.mutate(
       { id: staffSalon.id, payload: values },
       {
-        onSuccess: (r) => {
-          if (r.isSuccess) handleClose();
+        onSuccess: (result) => {
+          if (result.isSuccess) handleClose();
         },
       },
     );
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>
-            {isEdit
-              ? "Cập nhật nhân viên chi nhánh"
-              : "Gán nhân viên vào chi nhánh"}
-          </DialogTitle>
-        </DialogHeader>
-
-        {isEdit ? (
-          <form
-            onSubmit={updateForm.handleSubmit(onUpdateSubmit)}
-            className="space-y-4"
-          >
-            {/* <div className="flex items-center gap-3">
-              <Label>Quản lý chi nhánh</Label>
-              <Switch
-                checked={updateForm.watch('isManager') ?? false}
-                onCheckedChange={(v) => updateForm.setValue('isManager', v)}
-              />
-            </div> */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="u-startDate">Ngày bắt đầu</Label>
-                <Input
-                  id="u-startDate"
-                  type="date"
-                  {...updateForm.register("startDate")}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="u-endDate">Ngày kết thúc</Label>
-                <Input
-                  id="u-endDate"
-                  type="date"
-                  {...updateForm.register("endDate")}
-                />
-              </div>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Trạng thái</Label>
+    <Modal
+      open={open}
+      onClose={handleClose}
+      title={
+        isEdit
+          ? "Cập nhật nhân viên chi nhánh"
+          : "Gán nhân viên vào chi nhánh"
+      }
+      size="md"
+      scrollable
+    >
+      {isEdit ? (
+        <form
+          onSubmit={updateForm.handleSubmit(onUpdateSubmit)}
+          className="space-y-4"
+        >
+          <FormSection icon={Users} title="Thông tin phân công">
+            <FormRow>
+              <FormField
+                label="Ngày bắt đầu"
+                error={updateForm.formState.errors.startDate?.message}
+              >
+                <Input type="date" {...updateForm.register("startDate")} />
+              </FormField>
+              <FormField
+                label="Ngày kết thúc"
+                error={updateForm.formState.errors.endDate?.message}
+              >
+                <Input type="date" {...updateForm.register("endDate")} />
+              </FormField>
+            </FormRow>
+            <FormField
+              label="Trạng thái"
+              error={updateForm.formState.errors.status?.message}
+            >
               <Select
                 value={String(updateForm.watch("status") ?? "")}
-                onValueChange={(v) => updateForm.setValue("status", Number(v))}
-              >
-                <AdminSelectTrigger>
-                  <SelectValue placeholder="Chọn trạng thái" />
-                </AdminSelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0">Không hoạt động</SelectItem>
-                  <SelectItem value="1">Đang làm việc</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleClose}>
-                Hủy
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending ? "Đang lưu..." : "Cập nhật"}
-              </Button>
-            </DialogFooter>
-          </form>
-        ) : (
-          <form
-            onSubmit={createForm.handleSubmit(onCreateSubmit)}
-            className="space-y-4"
-          >
-            <div className="space-y-1.5">
-              <Label>Nhân viên</Label>
+                onChange={(event) =>
+                  updateForm.setValue("status", Number(event.target.value))
+                }
+                options={STATUS_OPTIONS}
+                placeholder="Chọn trạng thái"
+              />
+            </FormField>
+          </FormSection>
+
+          <div className="flex justify-end gap-2 border-t border-kit pt-3">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="mb-0"
+              onClick={handleClose}
+              disabled={isPending}
+            >
+              Hủy
+            </Button>
+            <Button
+              type="submit"
+              variant="admin"
+              size="sm"
+              className="mb-0"
+              loading={isPending}
+            >
+              Cập nhật
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <form
+          onSubmit={createForm.handleSubmit(onCreateSubmit)}
+          className="space-y-4"
+        >
+          <FormSection icon={Users} title="Thông tin phân công">
+            <FormField
+              label="Nhân viên *"
+              error={createForm.formState.errors.staffId?.message}
+            >
               <Select
                 value={String(createForm.watch("staffId") ?? "")}
-                onValueChange={(v) => createForm.setValue("staffId", Number(v))}
-              >
-                <AdminSelectTrigger>
-                  <SelectValue placeholder="Chọn nhân viên" />
-                </AdminSelectTrigger>
-                <SelectContent>
-                  {staffList.map((s) => (
-                    <SelectItem key={s.id} value={String(s.id)}>
-                      {s.fullName} ({s.code})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {createForm.formState.errors.staffId && (
-                <p className="text-xs text-state-danger-text">
-                  {createForm.formState.errors.staffId.message}
-                </p>
-              )}
-            </div>
-            {/* <div className="flex items-center gap-3">
-              <Label>Quản lý chi nhánh</Label>
-              <Switch
-                checked={createForm.watch('isManager') ?? false}
-                onCheckedChange={(v) => createForm.setValue('isManager', v)}
+                onChange={(event) =>
+                  createForm.setValue("staffId", Number(event.target.value))
+                }
+                options={staffOptions}
+                placeholder="Chọn nhân viên"
               />
-            </div> */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="c-startDate">Ngày bắt đầu *</Label>
-                <Input
-                  id="c-startDate"
-                  type="date"
-                  {...createForm.register("startDate")}
-                />
-                {createForm.formState.errors.startDate && (
-                  <p className="text-xs text-state-danger-text">
-                    {createForm.formState.errors.startDate.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="c-endDate">Ngày kết thúc</Label>
-                <Input
-                  id="c-endDate"
-                  type="date"
-                  {...createForm.register("endDate")}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleClose}>
-                Hủy
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending ? "Đang lưu..." : "Gán nhân viên"}
-              </Button>
-            </DialogFooter>
-          </form>
-        )}
-      </DialogContent>
-    </Dialog>
+            </FormField>
+            <FormRow>
+              <FormField
+                label="Ngày bắt đầu *"
+                error={createForm.formState.errors.startDate?.message}
+              >
+                <Input type="date" {...createForm.register("startDate")} />
+              </FormField>
+              <FormField
+                label="Ngày kết thúc"
+                error={createForm.formState.errors.endDate?.message}
+              >
+                <Input type="date" {...createForm.register("endDate")} />
+              </FormField>
+            </FormRow>
+          </FormSection>
+
+          <div className="flex justify-end gap-2 border-t border-kit pt-3">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="mb-0"
+              onClick={handleClose}
+              disabled={isPending}
+            >
+              Hủy
+            </Button>
+            <Button
+              type="submit"
+              variant="admin"
+              size="sm"
+              className="mb-0"
+              loading={isPending}
+            >
+              Gán nhân viên
+            </Button>
+          </div>
+        </form>
+      )}
+    </Modal>
   );
 }

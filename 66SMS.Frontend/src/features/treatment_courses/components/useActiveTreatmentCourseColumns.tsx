@@ -1,27 +1,21 @@
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { UseMutationResult } from "@tanstack/react-query";
-import { MoreHorizontal, Pencil, Trash2, Eye } from "lucide-react";
+import { Pencil, Trash2, Eye } from "lucide-react";
 
-import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
+import { Button } from "@/shared/elements/Button";
+import { Badge } from "@/shared/elements/Badge";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { Checkbox } from "@/shared/components/ui/checkbox";
-import { Switch } from "@/shared/components/ui/switch";
-import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
+import { Tooltip } from "@/shared/components/Tooltip";
+import { Checkbox } from "@/shared/forms/Checkbox";
+import { Switch } from "@/shared/forms/Switch";
+import { SortableColumnHeader } from "@/shared/tables/SortableColumnHeader";
 import {
   DateTimeCell,
   IndexCell,
   PriceCell,
-} from "@/shared/components/DataTable/TableCells";
+} from "@/shared/tables/TableCells";
 import { StatusActive } from "@/shared/constants/status.enum";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type { Result } from "@/shared/types/common.types";
 
 import { TREATMENT_COURSE_PERM } from "../constants/treatmentCourse.permissions";
@@ -78,28 +72,34 @@ export function useActiveTreatmentCourseColumns({
       {
         id: "select",
         header: () => (
-          <Checkbox
-            checked={headerChecked}
-            onCheckedChange={onToggleAll}
-            aria-label="Select all"
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              className="mb-0"
+              checked={headerChecked === true}
+              indeterminate={headerChecked === "indeterminate"}
+              onChange={(checked: boolean) => onToggleAll(checked)}
+              aria-label="Select all"
+            />
+          </div>
         ),
         cell: ({ row }) => {
           const item = row.original;
           return (
-            <Checkbox
-              checked={
-                item.id !== undefined &&
-                item.id !== null &&
-                selectedRowIds.has(item.id)
-              }
-              onCheckedChange={(checked) => {
-                if (item.id === undefined || item.id === null) return;
-                onToggleOne(item.id, checked === true);
-              }}
-              aria-label="Select row"
-              onClick={(e) => e.stopPropagation()}
-            />
+            <div onClick={(e) => e.stopPropagation()}>
+              <Checkbox
+                className="mb-0"
+                checked={
+                  item.id !== undefined &&
+                  item.id !== null &&
+                  selectedRowIds.has(item.id)
+                }
+                onChange={(checked: boolean) => {
+                  if (item.id === undefined || item.id === null) return;
+                  onToggleOne(item.id, checked);
+                }}
+                aria-label="Select row"
+              />
+            </div>
           );
         },
         size: 40,
@@ -127,12 +127,13 @@ export function useActiveTreatmentCourseColumns({
             orderBy={orderBy}
             isDescending={isDescending}
             onSort={onSort}
+            onPrimary
           />
         ),
         cell: ({ row }) => (
-          <span className="font-mono text-xs px-2 py-1 bg-adminGray-100 rounded text-adminGray-600">
+          <Badge variant="secondary" soft>
             {row.original.code ?? "—"}
-          </span>
+          </Badge>
         ),
         size: 100,
       },
@@ -145,18 +146,19 @@ export function useActiveTreatmentCourseColumns({
             orderBy={orderBy}
             isDescending={isDescending}
             onSort={onSort}
+            onPrimary
           />
         ),
         cell: ({ row }) => (
           <div>
-            <p className="text-sm font-semibold text-adminInk truncate max-w-[200px]">
+            <p className="max-w-[200px] truncate text-sm font-semibold text-kit-heading">
               {row.original.name ?? "—"}
             </p>
-            {row.original.categoryName && (
-              <p className="text-xs text-adminGray-600">
+            {row.original.categoryName ? (
+              <p className="text-xs text-kit-muted">
                 {row.original.categoryName}
               </p>
-            )}
+            ) : null}
           </div>
         ),
         size: 240,
@@ -165,7 +167,7 @@ export function useActiveTreatmentCourseColumns({
         accessorKey: "totalSessions",
         header: cols.totalSessions,
         cell: ({ row }) => (
-          <span className="font-semibold text-adminInk">
+          <span className="font-semibold text-kit-heading">
             {row.original.totalSessions ?? 0}
           </span>
         ),
@@ -195,17 +197,16 @@ export function useActiveTreatmentCourseColumns({
             >
               <Switch
                 checked={item.status === StatusActive.Active}
-                onCheckedChange={(checked) => {
-                  if (item.id) {
-                    updateMutation.mutate({
-                      id: item.id,
-                      payload: {
-                        status: checked
-                          ? StatusActive.Active
-                          : StatusActive.Inactive,
-                      },
-                    });
-                  }
+                onChange={(checked: boolean) => {
+                  if (!item.id) return;
+                  updateMutation.mutate({
+                    id: item.id,
+                    payload: {
+                      status: checked
+                        ? StatusActive.Active
+                        : StatusActive.Inactive,
+                    },
+                  });
                 }}
                 disabled={updateMutation.isPending}
               />
@@ -222,52 +223,57 @@ export function useActiveTreatmentCourseColumns({
       },
       {
         id: "actions",
-        header: "",
+        header: "Thao tác",
         cell: ({ row }) => {
           const item = row.original;
+          const expanded = row.getIsExpanded();
           return (
-            <div onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <div
+              className="flex items-center gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Tooltip text={expanded ? "Đóng chi tiết" : "Xem chi tiết"}>
+                <Button
+                  size="icon-sm"
+                  variant="outline-info"
+                  className="mb-0 mr-0"
+                  onClick={() => row.toggleExpanded()}
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                </Button>
+              </Tooltip>
+              <PermissionGate resource={perm.resource} action={perm.update}>
+                <Tooltip text="Sửa">
                   <Button
-                    variant="ghost"
                     size="icon-sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    variant="outline-primary"
+                    className="mb-0 mr-0"
+                    onClick={() => onEdit(item)}
                   >
-                    <MoreHorizontal className="w-4 h-4" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => row.toggleExpanded()}>
-                    <Eye className="w-4 h-4" />
-                    {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
-                  </DropdownMenuItem>
-                  <PermissionGate resource={perm.resource} action={perm.update}>
-                    <DropdownMenuItem onClick={() => onEdit(item)}>
-                      <Pencil className="w-4 h-4" />
-                      {COMMON_MSG.edit}
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                  <PermissionGate
-                    resource={perm.resource}
-                    action={perm.delete}
-                    role={perm.role}
+                </Tooltip>
+              </PermissionGate>
+              <PermissionGate
+                resource={perm.resource}
+                action={perm.delete}
+                role={perm.role}
+              >
+                <Tooltip text="Xóa">
+                  <Button
+                    size="icon-sm"
+                    variant="outline-danger"
+                    className="mb-0 mr-0"
+                    onClick={() => onDelete(item)}
                   >
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={() => onDelete(item)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Xóa liệu trình
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </Tooltip>
+              </PermissionGate>
             </div>
           );
         },
-        size: 50,
+        size: 130,
         enableResizing: false,
       },
     ],

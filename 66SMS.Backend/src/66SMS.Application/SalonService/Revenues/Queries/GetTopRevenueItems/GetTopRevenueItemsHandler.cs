@@ -32,8 +32,6 @@ namespace _66SMS.Application.SalonService.Revenues.Queries.GetTopRevenueItems
                 request.Limit,
                 cancellationToken);
 
-            var total = rows.Sum(r => r.Revenue);
-
             var data = rows.Select(r => new TopRevenueItemDto
             {
                 ItemId = r.ItemId,
@@ -41,9 +39,7 @@ namespace _66SMS.Application.SalonService.Revenues.Queries.GetTopRevenueItems
                 ItemType = r.ItemType,
                 Quantity = r.Quantity,
                 Revenue = r.Revenue,
-                Percent = total > 0
-                    ? Math.Round(r.Revenue * 100 / total, 0)
-                    : 0,
+                Percent = r.Percent,
             }).ToList();
 
             return Result<List<TopRevenueItemDto>>.Success(data);

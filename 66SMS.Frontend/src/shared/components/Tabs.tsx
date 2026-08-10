@@ -2,12 +2,10 @@
 import {
   Button,
   ButtonGroup,
-} from "@/shared/elements/Button";
-import {
   resolveButtonVariant,
   resolveButtonSize,
   type ButtonVariant,
-} from "@/shared/elements/buttonStyles";
+} from "@/shared/elements/Button";
 
 export type TabItem = {
   id: string;
@@ -75,7 +73,7 @@ export function TabNav({
     return (
       <ul
         className={
-          "body-tabs body-tabs-layout tabs-animated body-tabs-animated nav mb-4 " +
+          "body-tabs body-tabs-layout tabs-animated body-tabs-animated nav mb-2 " +
           "flex list-none flex-wrap border-b border-kit p-0 " +
           className
         }
@@ -90,9 +88,9 @@ export function TabNav({
                 aria-selected={active}
                 onClick={() => onChange(item.id)}
                 className={
-                  "nav-link relative mr-4 border-0 bg-transparent px-2.5 py-2.5 " +
+                  "nav-link relative mr-3 border-0 bg-transparent px-2 py-1.5 " +
                   "text-sm font-normal transition-colors " +
-                  "before:absolute before:bottom-0 before:left-0 before:block before:h-1 before:w-full " +
+                  "before:absolute before:bottom-0 before:left-0 before:block before:h-0.5 before:w-full " +
                   "before:origin-center before:rounded before:bg-kit-primary before:transition-transform before:duration-200 " +
                   (active
                     ? "text-kit-primary before:scale-x-100"

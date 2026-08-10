@@ -1,23 +1,22 @@
 import { z } from "zod";
-import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
 const certificateTypeBaseSchema = z.object({
   code: z
     .string()
-    .min(1, VALIDATION_MSG.required("Mã loại chứng chỉ"))
-    .max(50, VALIDATION_MSG.max(50)),
+    .min(1, "Mã loại chứng chỉ không được để trống")
+    .max(50, "Tối đa 50 ký tự"),
   name: z
     .string()
-    .min(1, VALIDATION_MSG.required("Tên loại chứng chỉ"))
-    .max(100, VALIDATION_MSG.max(100)),
+    .min(1, "Tên loại chứng chỉ không được để trống")
+    .max(100, "Tối đa 100 ký tự"),
   description: z
     .string()
-    .max(500, VALIDATION_MSG.max(500))
+    .max(500, "Tối đa 500 ký tự")
     .optional()
     .or(z.literal("")),
   sortOrder: z.coerce
     .number()
-    .min(0, VALIDATION_MSG.notNegative("Thứ tự hiển thị"))
+    .min(0, "Thứ tự hiển thị không được âm")
     .optional()
     .default(0),
   status: z.coerce.number().min(0).optional().default(1),

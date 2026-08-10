@@ -1,22 +1,19 @@
-import { useState } from "react";
 import {
   Menu,
-  Plus,
-  Calendar as CalendarIcon,
   MapPin,
-  ReceiptText,
   LogOut,
   User,
   Settings,
   Home,
 } from "lucide-react";
-import { Link } from "react-router-dom";
-import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 import { Logo } from "@/shared/components/Logo";
+import { BranchSelector } from "@/shared/components/BranchSelector";
+import { TabNav } from "@/shared/components/Tabs";
+import { Dropdown, type DropdownItem } from "@/shared/elements/Dropdown";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useLogout } from "@/features/auth/hooks/useLogout";
 import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
-import { BranchSelector } from "@/shared/components/BranchSelector";
 import { NotificationBell } from "@/features/notifications";
 
 interface CashierHeaderProps {
@@ -28,7 +25,7 @@ export function CashierHeader({
   activeTab = "calendar",
   onTabChange,
 }: CashierHeaderProps) {
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const navigate = useNavigate();
   const { user, hasRole, getEffectiveSalonId } = useAuthStore();
   const isAdmin = hasRole("Admin");
   const isEmployee = hasRole("Staff");
@@ -41,146 +38,112 @@ export function CashierHeader({
   const salonLabel = activeSalon
     ? activeSalon.name
     : salonId
-      ? `Chi nhánh #${salonId}`
+      ? "Chi nhánh #" + salonId
       : "Tất cả chi nhánh";
-
-  const handleLogoutClick = () => {
-    setIsProfileOpen(false);
-    logoutMutation.mutate();
-  };
 
   const cashierName = user?.username || "Thu ngân";
 
+  const profileItems: DropdownItem[] = [
+    {
+      type: "header",
+      label: user?.username || "Tài khoản",
+    },
+    {
+      type: "item",
+      label: "Trang chủ",
+      icon: <Home className="h-3.5 w-3.5" />,
+      onClick: () => navigate("/"),
+    },
+  ];
+
+  if (isAdmin || isEmployee || isReceptionist) {
+    profileItems.push({
+      type: "item",
+      label: "Trang quản trị",
+      icon: <Settings className="h-3.5 w-3.5" />,
+      onClick: () => navigate("/admin"),
+    });
+  }
+
+  profileItems.push(
+    {
+      type: "item",
+      label: "Hồ sơ cá nhân",
+      icon: <User className="h-3.5 w-3.5" />,
+      onClick: () => navigate("/admin/profile"),
+    },
+    { type: "divider" },
+    {
+      type: "item",
+      label: "Đăng xuất",
+      icon: <LogOut className="h-3.5 w-3.5" />,
+      danger: true,
+      onClick: () => logoutMutation.mutate(),
+    },
+  );
+
   return (
-    <header className="lotus-cashier-header h-15 py-3 border-b border-adminGreen-900/40 text-white flex items-center justify-between px-4 sticky top-0 z-50 shadow-md font-sans">
-      <div className="flex items-center gap-4 h-full">
-        <div className="mr-3 flex items-center scale-90 origin-left">
-          <Logo size="md" showTagline={true} taglineText="Cashier POS" />
+    <header className="sticky top-0 z-50 flex h-14 shrink-0 items-center justify-between border-b border-white/10 bg-kit-dark px-4 font-sans text-kit-white shadow-md">
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex shrink-0 items-center">
+          <Logo size="md" variant="light" showTagline taglineText="Cashier POS" />
         </div>
 
-        <div className="flex items-center h-full gap-0.5">
-          <button
-            onClick={() => onTabChange?.("calendar")}
-            className={cn(
-              "flex items-center gap-1.5 h-full px-2.5 text-xs font-semibold transition-colors border-b-2 whitespace-nowrap",
-              activeTab === "calendar"
-                ? "border-adminGold-600 bg-white/15 text-white"
-                : "border-transparent hover:bg-white/10 text-white/80 hover:text-white",
-            )}
-          >
-            <CalendarIcon className="w-3.5 h-3.5" />
-            Lịch dịch vụ
-          </button>
-
-          <button
-            onClick={() => onTabChange?.("invoices")}
-            className={cn(
-              "flex items-center gap-1.5 h-full px-2.5 text-xs font-semibold transition-colors border-b-2 whitespace-nowrap",
-              activeTab === "invoices"
-                ? "border-adminGold-600 bg-white/15 text-white"
-                : "border-transparent hover:bg-white/10 text-white/80 hover:text-white",
-            )}
-          >
-            <ReceiptText className="w-3.5 h-3.5" />
-            Hóa đơn
-            <div className="ml-0.5 w-4 h-4 rounded-[3px] bg-adminGold-600 text-adminGreen-950 flex items-center justify-center shadow-xs">
-              <Plus className="w-2.5 h-2.5 font-bold" />
-            </div>
-          </button>
-        </div>
+        <TabNav
+          className="mb-0"
+          variant="btn-outline-primary"
+          activeId={activeTab}
+          onChange={(id) => {
+            if (id === "calendar" || id === "invoices") {
+              onTabChange?.(id);
+            }
+          }}
+          items={[
+            { id: "calendar", label: "Lịch dịch vụ" },
+            { id: "invoices", label: "Hóa đơn" },
+          ]}
+        />
       </div>
 
-      <div className="flex items-center gap-2.5 text-xs font-medium">
+      <div className="flex shrink-0 items-center gap-2 text-xs font-medium">
         {isAdmin ? (
-          <div className="w-36 sm:w-40 md:w-44 shrink-0 border-l border-white/20 pl-2.5">
+          <div className="w-36 min-w-0 shrink-0 border-l border-white/20 pl-2.5 sm:w-40 md:w-44">
             <BranchSelector />
           </div>
         ) : (
-          <div className="flex items-center gap-1 text-white/90 border-l border-white/20 pl-2.5 text-xs whitespace-nowrap">
-            <MapPin className="w-3.5 h-3.5 text-adminGold-100" />
-            <span className="hidden lg:inline">{salonLabel}</span>
+          <div className="flex items-center gap-1 whitespace-nowrap border-l border-white/20 pl-2.5 text-xs text-white/90">
+            <MapPin className="h-3.5 w-3.5 text-kit-info" />
+            <span className="hidden max-w-40 truncate lg:inline">
+              {salonLabel}
+            </span>
           </div>
         )}
 
-        <div className="border-l border-white/20 pl-2.5">
+        <div className="flex items-center border-l border-white/20 pl-2.5">
           <NotificationBell />
         </div>
 
-        <div className="border-l border-white/20 pl-2.5 flex items-center gap-2 relative">
-          <button
-            onClick={() => setIsProfileOpen(!isProfileOpen)}
-            className="flex items-center gap-2 text-left hover:opacity-90 transition-opacity focus:outline-hidden"
-          >
-            <div className="text-right hidden sm:block">
-              <div className="text-2xs text-adminGold-100 font-bold uppercase tracking-wider">
-                Thu ngân
-              </div>
-              <div className="leading-none text-white font-bold text-xs whitespace-nowrap">
-                {cashierName}
-              </div>
+        <div className="flex items-center gap-2 border-l border-white/20 pl-2.5">
+          <div className="hidden text-right sm:block">
+            <div className="text-2xs font-bold uppercase tracking-wider text-white/70">
+              Thu ngân
             </div>
-            <div className="w-7 h-7 flex items-center justify-center rounded-[3px] bg-white/10 text-white border border-white/20 hover:bg-white/20 hover:shadow-xs transition-all duration-300">
-              <Menu className="w-4 h-4" />
+            <div className="whitespace-nowrap text-xs font-bold leading-none text-kit-white">
+              {cashierName}
             </div>
-          </button>
-
-          {isProfileOpen && (
-            <>
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setIsProfileOpen(false)}
-              />
-              <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-[3px] shadow-lg py-1.5 z-50 border border-adminGray-100 text-adminInk">
-                <div className="px-4 py-2 border-b border-adminGray-100 mb-1.5">
-                  <p className="text-xs font-bold text-adminInk truncate">
-                    {user?.username || "Tài khoản"}
-                  </p>
-                  <p className="text-2xs text-adminGray-600 truncate">
-                    {user?.email || ""}
-                  </p>
-                </div>
-
-                <Link
-                  to="/"
-                  onClick={() => setIsProfileOpen(false)}
-                  className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-adminInk/70 hover:bg-adminGray-50 hover:text-adminGreen-600 transition-colors whitespace-nowrap"
-                >
-                  <Home className="w-3.5 h-3.5" />
-                  Trang chủ
-                </Link>
-
-                {(isAdmin || isEmployee || isReceptionist) && (
-                  <Link
-                    to="/admin"
-                    onClick={() => setIsProfileOpen(false)}
-                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-adminInk/70 hover:bg-adminGray-50 hover:text-adminGreen-600 transition-colors whitespace-nowrap"
-                  >
-                    <Settings className="w-3.5 h-3.5" />
-                    Trang quản trị
-                  </Link>
-                )}
-
-                <Link
-                  to="/admin/profile"
-                  onClick={() => setIsProfileOpen(false)}
-                  className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-adminInk/70 hover:bg-adminGray-50 hover:text-adminGreen-600 transition-colors whitespace-nowrap"
-                >
-                  <User className="w-3.5 h-3.5" />
-                  Hồ sơ cá nhân
-                </Link>
-
-                <div className="h-px bg-adminGray-100 my-1.5" />
-
-                <button
-                  onClick={handleLogoutClick}
-                  className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-adminGreen-600 hover:bg-adminGreen-600/5 transition-colors text-left whitespace-nowrap"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  Đăng xuất
-                </button>
-              </div>
-            </>
-          )}
+          </div>
+          <Dropdown
+            className="mb-0 mr-0"
+            variant="outline-light"
+            size="sm"
+            menuAlign="right"
+            items={profileItems}
+            trigger={
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded border border-white/20 bg-white/10 text-kit-white">
+                <Menu className="h-4 w-4" />
+              </span>
+            }
+          />
         </div>
       </div>
     </header>

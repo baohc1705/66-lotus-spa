@@ -27,7 +27,6 @@ export function getFallbackImageSrc(kind: FallbackImageKind): string {
   return FALLBACK_SRC[kind];
 }
 
-/** Trả về src hợp lệ; null/rỗng → ảnh static theo loại */
 export function resolveImageSrc(
   src: string | null | undefined,
   kind: FallbackImageKind,
@@ -41,9 +40,6 @@ type FallbackImageProps = Omit<ImgHTMLAttributes<HTMLImageElement>, "src"> & {
   kind: FallbackImageKind;
 };
 
-/**
- * Ảnh có fallback: null / lỗi đường dẫn / load fail → dùng ảnh static trong assets/nulls.
- */
 export function FallbackImage({
   src,
   kind,

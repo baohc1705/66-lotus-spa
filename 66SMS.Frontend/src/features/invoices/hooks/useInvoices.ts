@@ -2,10 +2,8 @@ import type { AxiosError } from "axios";
 import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import { invoiceApi } from "../api/invoice.api";
-import { TOAST_MSG } from "@/shared/constants/toast.messages";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type {
   CreateInvoicePayload,
   GetAllInvoicesQuery,
@@ -46,13 +44,13 @@ export function useCreateInvoice() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: KEYS.lists() });
-        toast.success(TOAST_MSG.createSuccess(ENTITY));
+        toast.success(`Tạo ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("lập", ENTITY)));
+      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi lập ${ENTITY}`));
     },
   });
 }
@@ -64,14 +62,14 @@ export function useCancelInvoice() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: KEYS.all });
-        toast.success(TOAST_MSG.subActionSuccess("Hủy", ENTITY));
+        toast.success(`Hủy ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
       toast.error(
-        getErrorMessage(error, TOAST_MSG.subActionError("hủy", ENTITY)),
+        getErrorMessage(error, `Đã xảy ra lỗi khi hủy ${ENTITY}`),
       );
     },
   });

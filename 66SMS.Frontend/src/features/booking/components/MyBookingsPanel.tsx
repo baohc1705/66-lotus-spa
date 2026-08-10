@@ -1,7 +1,7 @@
 import { formatCurrency } from "@/shared/utils/currency";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import {
   ChevronDown,
   ChevronUp,
@@ -78,7 +78,7 @@ export function MyBookingsPanel() {
   ) => {
     e.stopPropagation();
 
-    const confirmMsg = `Bạn có chắc chắn muốn hoãn lịch hẹn này không?\n\nSố tiền cọc đã thanh toán (${formatCurrency(paidAmount)}) sẽ được tự động hoàn lại vào Ví của bạn để sử dụng cho lần đặt lịch tiếp theo.`;
+    const confirmMsg = `Hủy lịch hẹn này?\n\nTiền cọc (${formatCurrency(paidAmount)}) sẽ hoàn vào ví.`;
 
     if (!window.confirm(confirmMsg)) {
       return;
@@ -88,15 +88,15 @@ export function MyBookingsPanel() {
     try {
       const isSuccess = await bookingApi.postponeBooking(appointmentId);
       if (isSuccess) {
-        toast.success("Hoãn lịch thành công! Tiền cọc đã được hoàn vào ví.");
+        toast.success("Hủy lịch thành công! Tiền cọc đã hoàn vào ví.");
         queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
         queryClient.invalidateQueries({ queryKey: ["my-wallet"] });
         queryClient.invalidateQueries({ queryKey: ["my-wallet-transactions"] });
       } else {
-        toast.error("Không thể hoãn lịch.");
+        toast.error("Không thể hủy lịch.");
       }
     } catch {
-      toast.error("Đã xảy ra lỗi khi hoãn lịch.");
+      toast.error("Đã xảy ra lỗi khi hủy lịch.");
     } finally {
       setIsPostponingId(null);
     }
@@ -165,7 +165,7 @@ export function MyBookingsPanel() {
   if (isError) {
     return (
       <div className="text-center py-10 text-error-text">
-        Không thể tải danh sách lịch hẹn. Vui lòng thử lại sau.
+        Không tải được lịch hẹn. Thử lại sau.
       </div>
     );
   }
@@ -177,9 +177,6 @@ export function MyBookingsPanel() {
           <Calendar className="w-7 h-7 text-gold-600" />
         </div>
         <p className="text-warm-600">Bạn chưa có lịch hẹn nào.</p>
-        <p className="text-sm text-warm-600 mt-1">
-          Các lịch hẹn đã đặt sẽ hiển thị tại đây.
-        </p>
       </div>
     );
   }
@@ -394,7 +391,7 @@ export function MyBookingsPanel() {
                       ) : (
                         <XCircle className="w-3.5 h-3.5" />
                       )}
-                      Hoãn lịch
+                      Hủy lịch
                     </button>
                   )}
                 </div>
@@ -581,7 +578,7 @@ export function MyBookingsPanel() {
         title="Xác nhận thanh toán cọc"
         description={
           <div className="space-y-3 mt-2">
-            <p>Bạn có muốn thanh toán cọc bằng Ví cho lịch hẹn này không?</p>
+            <p>Thanh toán cọc bằng ví cho lịch hẹn này?</p>
             <div className="bg-warm-50 p-3 rounded-md space-y-2 text-sm border border-warm-100">
               <div className="flex justify-between">
                 <span className="text-warm-600">Số tiền cọc:</span>
@@ -597,13 +594,13 @@ export function MyBookingsPanel() {
               </div>
             </div>
             <p className="text-xs text-warm-600 italic">
-              Số dư ví của bạn sẽ bị trừ tương ứng sau khi xác nhận.
+              Số dư ví sẽ bị trừ sau khi xác nhận.
             </p>
           </div>
         }
         loading={isPayingWalletId !== null}
         confirmLabel="Thanh toán"
-        cancelLabel="Hủy bỏ"
+        cancelLabel="Hủy"
       />
     </div>
   );

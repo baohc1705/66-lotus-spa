@@ -4,33 +4,36 @@ import {
   useReactTable,
   getCoreRowModel,
   getExpandedRowModel,
+  type Row,
 } from "@tanstack/react-table";
 import { Plus, ShieldCheck } from "lucide-react";
-import { StaffCertificateDetailExpanded } from "../components/StaffCertificateDetailExpanded";
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { TableEmptyState } from "@/shared/components/DataTable/TableEmptyState";
-import { Button } from "@/shared/components/ui/button";
-import { PermissionGate } from "@/shared/components/security/PermissionGate";
+
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
+import { Pagination } from "@/shared/components/Pagination";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { Button } from "@/shared/elements/Button";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
+import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
+import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
+
+import { CertificateTypeSidebar } from "../components/CertificateTypeSidebar";
+import { StaffCertificateDetailExpanded } from "../components/StaffCertificateDetailExpanded";
 import { StaffCertificateFormDialog } from "../components/StaffCertificateFormDialog";
+import { StaffCertificateStatCards } from "../components/StaffCertificateStatCards";
 import {
   useActiveStaffCertificateColumns,
   STAFF_CERTIFICATE_COLUMN_LABELS,
 } from "../components/useActiveStaffCertificateColumns";
+import { CERTIFICATE_PERM } from "../constants/certificate.permissions";
 import {
   useStaffCertificates,
   useDeleteStaffCertificate,
 } from "../hooks/useStaffCertificates";
 import { useStaffCertificateListState } from "../hooks/useStaffCertificateListState";
-import { CertificateTypeSidebar } from "../components/CertificateTypeSidebar";
-import { StaffCertificateStatCards } from "../components/StaffCertificateStatCards";
-import { CERTIFICATE_PERM } from "../constants/certificate.permissions";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
+import type { StaffCertificateDTO } from "../types/certificate.types";
 
 interface Props {
   staffId?: number;
@@ -39,6 +42,8 @@ interface Props {
 const ENTITY = "chứng chỉ";
 
 export function StaffCertificatesPage({ staffId }: Props) {
+  "use no memo";
+
   const perm = CERTIFICATE_PERM;
   const [searchParams] = useSearchParams();
   const staffIdFromQuery = Number(searchParams.get("staffId"));
@@ -47,6 +52,7 @@ export function StaffCertificatesPage({ staffId }: Props) {
     (Number.isFinite(staffIdFromQuery) && staffIdFromQuery > 0
       ? staffIdFromQuery
       : undefined);
+
   const listState = useStaffCertificateListState();
   const {
     pageIndex,
@@ -92,25 +98,28 @@ export function StaffCertificatesPage({ staffId }: Props) {
 
   const paged = result?.data;
   const items = useMemo(() => paged?.items ?? [], [paged?.items]);
+  const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
+  const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
   const allCerts = useMemo(
     () => allCertsResult?.data?.items ?? [],
     [allCertsResult],
   );
 
-  const totalCertsCount = allCerts.length;
-  const activeCertsCount = useMemo(
-    () => allCerts.filter((c) => c.status === 1).length,
-    [allCerts],
-  );
-  const expiredCertsCount = useMemo(
-    () => allCerts.filter((c) => c.status === 2).length,
-    [allCerts],
-  );
-  const pendingCertsCount = useMemo(
-    () => allCerts.filter((c) => c.status === 0).length,
-    [allCerts],
-  );
+  let totalCertsCount = 0;
+  let activeCertsCount = 0;
+  let expiredCertsCount = 0;
+  let pendingCertsCount = 0;
+  for (const cert of allCerts) {
+    const item: StaffCertificateDTO = cert;
+    totalCertsCount += 1;
+    if (item.status === 1) activeCertsCount += 1;
+    if (item.status === 2) expiredCertsCount += 1;
+    if (item.status === 0) pendingCertsCount += 1;
+  }
 
   const columns = useActiveStaffCertificateColumns({
     pageIndex,
@@ -129,13 +138,14 @@ export function StaffCertificatesPage({ staffId }: Props) {
     columnResizeMode: "onChange",
     state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
+    manualPagination: true,
   });
 
   const handleDelete = () => {
     if (deleteTarget?.id) {
       deleteMutation.mutate(deleteTarget.id, {
-        onSuccess: (r) => {
-          if (r.isSuccess) setDeleteTarget(null);
+        onSuccess: (response) => {
+          if (response.isSuccess) setDeleteTarget(null);
         },
       });
     }
@@ -152,101 +162,121 @@ export function StaffCertificatesPage({ staffId }: Props) {
   const isSidebarMode = layoutMode === "sidebar";
 
   return (
-    <div className="flex h-full overflow-hidden gap-2">
-      {!isSidebarMode && (
-        <CertificateTypeSidebar
-          selectedTypeId={selectedCertificateTypeId}
-          onSelectType={setSelectedCertificateTypeId}
-        />
-      )}
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
+      <StaffCertificateStatCards
+        totalCount={totalCertsCount}
+        activeCount={activeCertsCount}
+        expiredCount={expiredCertsCount}
+        pendingCount={pendingCertsCount}
+        isLoading={isLoadingAll}
+      />
 
-      <div className="flex-1 min-w-0 flex flex-col gap-2 overflow-hidden">
-        <div className="shrink-0">
-          <StaffCertificateStatCards
-            totalCount={totalCertsCount}
-            activeCount={activeCertsCount}
-            expiredCount={expiredCertsCount}
-            pendingCount={pendingCertsCount}
-            isLoading={isLoadingAll}
+      <div className="flex flex-col items-start gap-3 md:flex-row">
+        {!isSidebarMode && (
+          <CertificateTypeSidebar
+            selectedTypeId={selectedCertificateTypeId}
+            onSelectType={setSelectedCertificateTypeId}
           />
-        </div>
+        )}
 
-        <div className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative">
-          {isFetching && !isLoading && (
-            <div className="lotus-admin-table-fetch-bar">
-              <div className="lotus-admin-table-fetch-bar-inner" />
-            </div>
-          )}
-
-          <div className="px-4 pt-4">
-            <DataTableToolbar
-              searchValue={filter}
-              onSearchChange={handleSearchChange}
-              searchPlaceholder="Tìm theo tên chứng chỉ, tổ chức..."
-            >
-              <DataTableViewOptions table={table} columnLabels={columnLabels} />
-              <PermissionGate resource={perm.resource} action={perm.create}>
-                <Button
-                  variant="admin"
-                  size="sm"
-                  onClick={() => setCreateOpen(true)}
-                  className="lotus-admin-table-toolbar-btn"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Thêm chứng chỉ
-                </Button>
-              </PermissionGate>
-            </DataTableToolbar>
-          </div>
-
-          <DataTable
-            table={table}
-            isLoading={isLoading}
-            loadingRows={
-              pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
-            }
-            onRowClick={(row) => row.toggleExpanded()}
-            renderSubComponent={({ row }) => (
-              <StaffCertificateDetailExpanded
-                cert={row.original}
-                onEdit={() => setEditTarget(row.original)}
-              />
-            )}
-            emptyState={
-              <TableEmptyState
-                icon={ShieldCheck}
-                title="Chưa có chứng chỉ"
-                hint="Thêm chứng chỉ để quản lý bằng cấp nhân viên."
-                action={
-                  <PermissionGate resource={perm.resource} action={perm.create}>
-                    <Button
-                      variant="admin"
-                      size="sm"
-                      onClick={() => setCreateOpen(true)}
-                      className="mt-1 text-xs"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      Thêm chứng chỉ
-                    </Button>
-                  </PermissionGate>
-                }
-              />
-            }
-            pagination={
-              paged && paged.totalCount > 0 ? (
-                <DataTablePagination
-                  pageIndex={paged.pageIndex}
-                  pageSize={paged.pageSize}
-                  totalCount={paged.totalCount}
-                  totalPages={paged.totalPages}
-                  hasPreviousPage={paged.hasPreviousPage}
-                  hasNextPage={paged.hasNextPage}
-                  onPageChange={setPageIndex}
-                  onPageSizeChange={handlePageSizeChange}
+        <div className="w-full min-w-0 flex-1">
+          <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+            <div className="border-b border-kit px-3 pt-3">
+              <DataTableToolbar
+                searchValue={filter}
+                onSearchChange={handleSearchChange}
+                searchPlaceholder="Tìm theo tên chứng chỉ, tổ chức..."
+              >
+                <DataTableViewOptions
+                  table={table}
+                  columnLabels={columnLabels}
                 />
-              ) : null
-            }
-          />
+                <PermissionGate resource={perm.resource} action={perm.create}>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="mb-0"
+                    onClick={() => setCreateOpen(true)}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Thêm chứng chỉ
+                  </Button>
+                </PermissionGate>
+              </DataTableToolbar>
+            </div>
+
+            <DataTable
+              table={table}
+              isLoading={isLoading}
+              loadingRows={
+                pageSize > DEFAULT_LOADING_ROWS
+                  ? DEFAULT_LOADING_ROWS
+                  : pageSize
+              }
+              renderExpandedRow={({
+                row,
+              }: {
+                row: Row<StaffCertificateDTO>;
+              }) => (
+                <StaffCertificateDetailExpanded
+                  cert={row.original}
+                  onEdit={() => setEditTarget(row.original)}
+                />
+              )}
+              emptyState={
+                <TableEmptyState
+                  icon={ShieldCheck}
+                  title="Chưa có chứng chỉ"
+                  action={
+                    <PermissionGate
+                      resource={perm.resource}
+                      action={perm.create}
+                    >
+                      <Button
+                        variant="admin"
+                        size="sm"
+                        className="mb-0"
+                        onClick={() => setCreateOpen(true)}
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                        Thêm chứng chỉ
+                      </Button>
+                    </PermissionGate>
+                  }
+                />
+              }
+              pagination={
+                paged && totalCount > 0 ? (
+                  <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                    <div className="flex items-center gap-3 text-xs text-kit-muted">
+                      <span>
+                        {rangeStart}-{rangeEnd} / {totalCount}
+                      </span>
+                      <select
+                        value={pageSize}
+                        onChange={(e) =>
+                          handlePageSizeChange(Number(e.target.value))
+                        }
+                        className="h-8 cursor-pointer rounded border border-kit bg-kit-white px-2 text-xs text-kit-heading outline-none focus:border-kit-primary"
+                      >
+                        {[5, 10, 20].map((size: number) => (
+                          <option key={size} value={size}>
+                            {size} / trang
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <Pagination
+                      page={safePage}
+                      pageCount={totalPages}
+                      onPageChange={setPageIndex}
+                      size="sm"
+                    />
+                  </div>
+                ) : null
+              }
+            />
+          </TablePageShell>
         </div>
       </div>
 
@@ -255,6 +285,7 @@ export function StaffCertificatesPage({ staffId }: Props) {
         onOpenChange={setCreateOpen}
         staffId={effectiveStaffId}
       />
+
       <StaffCertificateFormDialog
         open={!!editTarget}
         onOpenChange={(open) => {
@@ -270,16 +301,14 @@ export function StaffCertificatesPage({ staffId }: Props) {
           if (!open) setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
-        title={CONFIRM_MSG.deleteTitle(ENTITY)}
-        description={CONFIRM_MSG.deleteDescription(
-          ENTITY,
-          deleteTarget?.certificateName ?? "",
-        )}
-        confirmLabel={COMMON_MSG.delete}
+        title={`Xóa ${ENTITY}`}
+        description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget?.certificateName ?? ""}"? Hành động này không thể hoàn tác.`}
+        confirmLabel="Xóa"
         loading={deleteMutation.isPending}
         variant="danger"
       />
     </div>
   );
 }
+
 export default StaffCertificatesPage;

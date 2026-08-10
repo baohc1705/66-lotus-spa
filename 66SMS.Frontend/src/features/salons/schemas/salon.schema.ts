@@ -1,15 +1,14 @@
 import { z } from "zod";
-import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
 const salonBaseSchema = z.object({
   name: z
     .string()
-    .min(1, VALIDATION_MSG.required("Tên chi nhánh"))
-    .max(200, VALIDATION_MSG.max(200)),
+    .min(1, "Tên chi nhánh không được để trống")
+    .max(200, "Tối đa 200 ký tự"),
   phone: z
     .string()
-    .min(1, VALIDATION_MSG.required("Số điện thoại"))
-    .max(20, VALIDATION_MSG.max(20)),
+    .min(1, "Số điện thoại không được để trống")
+    .max(20, "Tối đa 20 ký tự"),
   email: z
     .string()
     .email("Email không hợp lệ")
@@ -34,7 +33,7 @@ export const createSalonSchema = salonBaseSchema;
 export const updateSalonSchema = salonBaseSchema.partial().extend({
   name: z
     .string()
-    .min(1, VALIDATION_MSG.required("Tên chi nhánh"))
+    .min(1, "Tên chi nhánh không được để trống")
     .max(200)
     .optional(),
 });

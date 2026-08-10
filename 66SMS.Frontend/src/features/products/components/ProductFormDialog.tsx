@@ -1,32 +1,34 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useForm,
   useFieldArray,
   Controller,
+  type FieldErrors,
   type Resolver,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/shared/components/ui/select";
-import { FormSection } from "@/shared/components/forms/FormSection";
-import { FormField } from "@/shared/components/forms/FormField";
-import { AdminInput } from "@/shared/components/forms/AdminInput";
-import { AdminCurrencyInput } from "@/shared/components/forms/AdminCurrencyInput";
-import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
-import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
+  Image as ImageIcon,
+  Plus,
+  Camera,
+  Star,
+  X,
+  Loader2,
+} from "lucide-react";
+
+import { Modal } from "@/shared/components/Modal";
+import { Tabs } from "@/shared/components/Tabs";
+import { Button } from "@/shared/elements/Button";
+import { CurrencyInput } from "@/shared/forms/CurrencyInput";
+import { FormField } from "@/shared/forms/FormField";
+import { Input } from "@/shared/forms/Input";
+import { Select } from "@/shared/forms/Select";
+import { Switch } from "@/shared/forms/Switch";
+import { Textarea } from "@/shared/forms/Textarea";
+import { StatusActive } from "@/shared/constants/status.enum";
+import { fileToBase64 } from "@/shared/lib/fileToBase64";
+
+import { ProductCategoryFormDialog } from "@/features/product_categories/components/ProductCategoryFormDialog";
 import { useProductCategories } from "@/features/product_categories/hooks/useProductCategories";
 import type { ProductCategoryDto } from "@/features/product_categories/types/productCategory.types";
 import {
@@ -40,36 +42,19 @@ import {
   type ProductFormValues,
 } from "../schemas/product.schema";
 import type { ProductDto, ProductFullDto } from "../types/product.types";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import {
-  Package,
-  Tag,
-  Box,
-  Image as ImageIcon,
-  Plus,
-  Camera,
-  Star,
-  X,
-  Loader2,
-} from "lucide-react";
-import { fileToBase64 } from "@/shared/lib/fileToBase64";
-import { StatusActive } from "@/shared/constants/status.enum";
 
 interface ProductFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   product?: ProductDto | null;
+  onSuccess?: (product: ProductDto) => void;
 }
-
-const STATUS_OPTIONS = [
-  { value: String(StatusActive.Active), label: "Đang bán" },
-  { value: String(StatusActive.Inactive), label: "Ngừng bán" },
-];
 
 export function ProductFormDialog({
   open,
   onOpenChange,
   product,
+  onSuccess,
 }: ProductFormDialogProps) {
   const isEdit = !!product?.id;
   const createMutation = useCreateProduct();
@@ -80,6 +65,8 @@ export function ProductFormDialog({
     {},
   );
   const [isUploading, setIsUploading] = useState(false);
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("basic");
 
   const detailQuery = useProductDetail(open && isEdit ? product!.id! : null);
   const detail = detailQuery.data?.data;
@@ -120,12 +107,39 @@ export function ProductFormDialog({
     if (!open) return;
     setPendingFiles({});
     setImagePreviews({});
+    setActiveTab("basic");
     if (isEdit) {
       if (formSource) reset(getDefaultValues(formSource));
     } else {
       reset(getDefaultValues(null));
     }
   }, [open, isEdit, formSource, reset]);
+
+  function goToErrorTab(formErrors: FieldErrors<ProductFormValues>) {
+    if (
+      formErrors.name ||
+      formErrors.categoryId ||
+      formErrors.unit ||
+      formErrors.status ||
+      formErrors.description ||
+      formErrors.content
+    ) {
+      setActiveTab("basic");
+      return;
+    }
+    if (
+      formErrors.costPrice ||
+      formErrors.sellingPrice ||
+      formErrors.stockQuantity ||
+      formErrors.minStock
+    ) {
+      setActiveTab("pricing");
+      return;
+    }
+    if (formErrors.images) {
+      setActiveTab("images");
+    }
+  }
 
   const onSubmit = async (data: ProductFormValues) => {
     setIsUploading(true);
@@ -161,14 +175,20 @@ export function ProductFormDialog({
           { id: product.id, payload },
           {
             onSuccess: (result) => {
-              if (result.isSuccess) onOpenChange(false);
+              if (result.isSuccess) {
+                onOpenChange(false);
+                onSuccess?.({ ...product, ...payload });
+              }
             },
           },
         );
       } else {
         createMutation.mutate(payload as CreateProductPayload, {
           onSuccess: (result) => {
-            if (result.isSuccess) onOpenChange(false);
+            if (result.isSuccess) {
+              onOpenChange(false);
+              onSuccess?.(payload as ProductDto);
+            }
           },
         });
       }
@@ -178,322 +198,401 @@ export function ProductFormDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[850px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {isEdit ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới"}
-          </DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? `Cập nhật thông tin sản phẩm ${product?.name ?? ""}`
-              : "Điền thông tin để tạo sản phẩm mới"}
-          </DialogDescription>
-        </DialogHeader>
-
+    <>
+      <Modal
+        open={open}
+        onClose={() => onOpenChange(false)}
+        title={isEdit ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới"}
+        size="xl"
+        scrollable
+      >
         {isEdit && detailQuery.isLoading ? (
-          <div className="flex items-center justify-center py-16 text-adminGray-600 gap-2">
+          <div className="flex items-center justify-center gap-2 py-16 text-kit-muted">
             <Loader2 className="h-5 w-5 animate-spin" />
             <span className="text-sm">Đang tải thông tin sản phẩm...</span>
           </div>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <FormSection icon={Package} title="Thông tin cơ bản">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <FormField
-                  label="Mã sản phẩm"
-                  tooltip={
-                    isEdit
-                      ? "Mã được hệ thống tạo tự động, không chỉnh sửa."
-                      : "Mã sẽ được hệ thống tạo tự động sau khi lưu (PRO000001…)."
-                  }
-                >
-                  <AdminInput
-                    value={
-                      isEdit ? (formSource?.code ?? product?.code ?? "") : ""
-                    }
-                    placeholder={isEdit ? "" : "Tự động tạo"}
-                    disabled
-                    readOnly
-                  />
-                </FormField>
-                <FormField label="Tên sản phẩm *" error={errors.name?.message}>
-                  <AdminInput
-                    {...register("name")}
-                    placeholder="Tên sản phẩm..."
-                  />
-                </FormField>
-                <FormField
-                  label="Danh mục *"
-                  error={errors.categoryId?.message}
-                >
-                  <Select
-                    value={watch("categoryId")?.toString() ?? ""}
-                    onValueChange={(v) => setValue("categoryId", Number(v))}
-                  >
-                    <AdminSelectTrigger>
-                      <SelectValue placeholder="Chọn danh mục" />
-                    </AdminSelectTrigger>
-                    <SelectContent>
-                      {categories.map((cat: ProductCategoryDto) => (
-                        <SelectItem key={cat.id} value={cat.id!.toString()}>
-                          {cat.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
-                <FormField label="Đơn vị tính *" error={errors.unit?.message}>
-                  <AdminInput
-                    {...register("unit")}
-                    placeholder="Cái, Hộp, Chai..."
-                  />
-                </FormField>
-              </div>
-            </FormSection>
-
-            <FormSection icon={Tag} title="Giá bán & Tồn kho">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <FormField label="Giá vốn *" error={errors.costPrice?.message}>
-                  <Controller
-                    name="costPrice"
-                    control={control}
-                    render={({ field }) => (
-                      <AdminCurrencyInput
-                        value={field.value}
-                        onChange={(v) => field.onChange(v ?? 0)}
-                        onBlur={field.onBlur}
-                        placeholder="0"
-                      />
-                    )}
-                  />
-                </FormField>
-                <FormField label="Giá bán" error={errors.sellingPrice?.message}>
-                  <Controller
-                    name="sellingPrice"
-                    control={control}
-                    render={({ field }) => (
-                      <AdminCurrencyInput
-                        value={field.value}
-                        onChange={(v) => field.onChange(v ?? 0)}
-                        onBlur={field.onBlur}
-                        placeholder="0"
-                      />
-                    )}
-                  />
-                </FormField>
-                <FormField
-                  label="Tồn kho *"
-                  error={errors.stockQuantity?.message}
-                >
-                  <AdminInput
-                    {...register("stockQuantity", { valueAsNumber: true })}
-                    type="number"
-                    placeholder="0"
-                  />
-                </FormField>
-                <FormField
-                  label="Tồn kho tối thiểu *"
-                  tooltip="Cảnh báo khi số lượng dưới mức này"
-                  error={errors.minStock?.message}
-                >
-                  <AdminInput
-                    {...register("minStock", { valueAsNumber: true })}
-                    type="number"
-                    placeholder="0"
-                  />
-                </FormField>
-              </div>
-            </FormSection>
-
-            <FormSection icon={ImageIcon} title="Hình ảnh sản phẩm">
-              <div className="flex flex-wrap gap-3">
-                {imageFields.map((field, index) => {
-                  const isPrimary = watch(`images.${index}.isPrimary`);
-                  const preview =
-                    imagePreviews[index] || watch(`images.${index}.url`);
-                  return (
-                    <div
-                      key={field.id}
-                      className="flex flex-col gap-1.5 w-[110px]"
-                    >
-                      <div className="relative group/card">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            document
-                              .getElementById(`product-img-${index}`)
-                              ?.click()
+          <form
+            onSubmit={handleSubmit(onSubmit, goToErrorTab)}
+            className="space-y-3"
+          >
+            <Tabs
+              variant="body"
+              activeId={activeTab}
+              onChange={setActiveTab}
+              tabs={[
+                {
+                  id: "basic",
+                  label: "Thông tin",
+                  content: (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+                        <FormField
+                          label="Mã sản phẩm"
+                          tooltip={
+                            isEdit
+                              ? "Mã được hệ thống tạo tự động, không chỉnh sửa."
+                              : "Mã sẽ được hệ thống tạo tự động sau khi lưu (PRO000001…)."
                           }
-                          className={[
-                            "h-[88px] w-full rounded-lg overflow-hidden transition-all",
-                            preview
-                              ? "border border-adminGray-100 hover:border-adminGreen-600/60"
-                              : "border-2 border-dashed border-adminGray-300 bg-adminGray-50 hover:border-adminGreen-600 hover:bg-adminGreen-50",
-                          ].join(" ")}
                         >
-                          {preview ? (
-                            <>
-                              <img
-                                src={preview}
-                                alt=""
-                                className="h-full w-full object-cover"
-                              />
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/card:opacity-100 transition-opacity rounded-lg">
-                                <Camera className="h-5 w-5 text-white" />
-                              </div>
-                            </>
-                          ) : (
-                            <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-adminGray-400 group-hover/card:text-adminGreen-600 transition-colors">
-                              <ImageIcon className="h-6 w-6" />
-                              <span className="text-2xs font-medium">
-                                Chọn ảnh
-                              </span>
+                          <Input
+                            value={
+                              isEdit
+                                ? (formSource?.code ?? product?.code ?? "")
+                                : ""
+                            }
+                            placeholder={isEdit ? "" : "Tự động tạo"}
+                            disabled
+                            readOnly
+                          />
+                        </FormField>
+
+                        <FormField
+                          label="Tên sản phẩm *"
+                          error={errors.name?.message}
+                        >
+                          <Input
+                            {...register("name")}
+                            placeholder="Tên sản phẩm..."
+                            invalid={!!errors.name}
+                          />
+                        </FormField>
+
+                        <FormField
+                          label="Danh mục *"
+                          error={errors.categoryId?.message}
+                        >
+                          <div className="flex gap-2">
+                            <div className="flex-1">
+                              <Select
+                                value={watch("categoryId")?.toString() || ""}
+                                onChange={(e) =>
+                                  setValue(
+                                    "categoryId",
+                                    Number(e.target.value),
+                                  )
+                                }
+                                invalid={!!errors.categoryId}
+                              >
+                                <option value="">Chọn danh mục</option>
+                                {categories.map((cat: ProductCategoryDto) => (
+                                  <option
+                                    key={cat.id}
+                                    value={cat.id?.toString() || ""}
+                                  >
+                                    {cat.name}
+                                  </option>
+                                ))}
+                              </Select>
                             </div>
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => removeImage(index)}
-                          className="absolute -top-1.5 -right-1.5 z-10 h-5 w-5 rounded-full bg-state-danger-solid text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity hover:bg-state-danger-solid shadow-xs"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                        {isPrimary && (
-                          <div className="absolute bottom-1.5 left-1.5 bg-adminGreen-600 text-white text-2xs font-bold px-1.5 py-0.5 rounded-full leading-none pointer-events-none">
-                            Chính
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="mb-0 shrink-0"
+                              onClick={() => setCategoryOpen(true)}
+                            >
+                              <Plus className="mr-1 h-4 w-4" />
+                              Thêm
+                            </Button>
                           </div>
-                        )}
+                        </FormField>
+
+                        <FormField
+                          label="Đơn vị tính *"
+                          error={errors.unit?.message}
+                        >
+                          <Input
+                            {...register("unit")}
+                            placeholder="Cái, Hộp, Chai..."
+                            invalid={!!errors.unit}
+                          />
+                        </FormField>
+
+                        <FormField
+                          label="Trạng thái"
+                          error={errors.status?.message}
+                        >
+                          <div className="flex h-9 items-center">
+                            <Switch
+                              checked={
+                                watch("status") === StatusActive.Active
+                              }
+                              onChange={(checked: boolean) =>
+                                setValue(
+                                  "status",
+                                  checked
+                                    ? StatusActive.Active
+                                    : StatusActive.Inactive,
+                                )
+                              }
+                            />
+                          </div>
+                        </FormField>
                       </div>
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        className="hidden"
-                        id={`product-img-${index}`}
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          setPendingFiles((prev) => ({
-                            ...prev,
-                            [index]: file,
-                          }));
-                          setImagePreviews((prev) => ({
-                            ...prev,
-                            [index]: URL.createObjectURL(file),
-                          }));
-                        }}
-                      />
+
+                      <div className="grid grid-cols-1 gap-2">
+                        <FormField
+                          label="Mô tả ngắn"
+                          error={errors.description?.message}
+                        >
+                          <Textarea
+                            {...register("description")}
+                            placeholder="Mô tả ngắn gọn về sản phẩm..."
+                            rows={2}
+                            invalid={!!errors.description}
+                          />
+                        </FormField>
+
+                        <FormField
+                          label="Nội dung chi tiết"
+                          error={errors.content?.message}
+                        >
+                          <Textarea
+                            {...register("content")}
+                            placeholder="Bài viết chi tiết sản phẩm..."
+                            rows={4}
+                            invalid={!!errors.content}
+                          />
+                        </FormField>
+                      </div>
+                    </div>
+                  ),
+                },
+                {
+                  id: "pricing",
+                  label: "Giá & tồn kho",
+                  content: (
+                    <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+                      <FormField
+                        label="Giá vốn *"
+                        error={errors.costPrice?.message}
+                      >
+                        <Controller
+                          name="costPrice"
+                          control={control}
+                          render={({ field }) => (
+                            <CurrencyInput
+                              value={field.value}
+                              onChange={(v) => field.onChange(v ?? 0)}
+                              onBlur={field.onBlur}
+                              placeholder="0"
+                              invalid={!!errors.costPrice}
+                            />
+                          )}
+                        />
+                      </FormField>
+
+                      <FormField
+                        label="Giá bán"
+                        error={errors.sellingPrice?.message}
+                      >
+                        <Controller
+                          name="sellingPrice"
+                          control={control}
+                          render={({ field }) => (
+                            <CurrencyInput
+                              value={field.value}
+                              onChange={(v) => field.onChange(v ?? 0)}
+                              onBlur={field.onBlur}
+                              placeholder="0"
+                              invalid={!!errors.sellingPrice}
+                            />
+                          )}
+                        />
+                      </FormField>
+
+                      <FormField
+                        label="Tồn kho *"
+                        error={errors.stockQuantity?.message}
+                      >
+                        <Input
+                          {...register("stockQuantity", {
+                            valueAsNumber: true,
+                          })}
+                          type="number"
+                          placeholder="0"
+                          invalid={!!errors.stockQuantity}
+                        />
+                      </FormField>
+
+                      <FormField
+                        label="Tồn kho tối thiểu *"
+                        tooltip="Cảnh báo khi số lượng dưới mức này"
+                        error={errors.minStock?.message}
+                      >
+                        <Input
+                          {...register("minStock", { valueAsNumber: true })}
+                          type="number"
+                          placeholder="0"
+                          invalid={!!errors.minStock}
+                        />
+                      </FormField>
+                    </div>
+                  ),
+                },
+                {
+                  id: "images",
+                  label: "Hình ảnh",
+                  content: (
+                    <div className="flex flex-wrap gap-3">
+                      {imageFields.map((field, index) => {
+                        const isPrimary = watch(`images.${index}.isPrimary`);
+                        const preview =
+                          imagePreviews[index] ||
+                          watch(`images.${index}.url`);
+                        return (
+                          <div
+                            key={field.id}
+                            className="flex w-[110px] flex-col gap-1.5"
+                          >
+                            <div className="group/card relative">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  document
+                                    .getElementById(`product-img-${index}`)
+                                    ?.click()
+                                }
+                                className={[
+                                  "h-[88px] w-full overflow-hidden rounded-lg transition-all",
+                                  preview
+                                    ? "border border-kit hover:border-kit-primary/60"
+                                    : "border-2 border-dashed border-kit bg-kit-page hover:border-kit-primary hover:bg-kit-primary/5",
+                                ].join(" ")}
+                              >
+                                {preview ? (
+                                  <>
+                                    <img
+                                      src={preview}
+                                      alt=""
+                                      className="h-full w-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/50 opacity-0 transition-opacity group-hover/card:opacity-100">
+                                      <Camera className="h-5 w-5 text-white" />
+                                    </div>
+                                  </>
+                                ) : (
+                                  <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-kit-muted transition-colors group-hover/card:text-kit-primary">
+                                    <ImageIcon className="h-6 w-6" />
+                                    <span className="text-xs font-medium">
+                                      Chọn ảnh
+                                    </span>
+                                  </div>
+                                )}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => removeImage(index)}
+                                className="absolute -top-1.5 -right-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-kit-danger text-white opacity-0 shadow-sm transition-opacity group-hover/card:opacity-100 hover:opacity-90"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                              {isPrimary && (
+                                <div className="pointer-events-none absolute bottom-1.5 left-1.5 rounded-full bg-kit-primary px-1.5 py-0.5 text-[10px] leading-none font-bold text-white">
+                                  Chính
+                                </div>
+                              )}
+                            </div>
+                            <input
+                              type="file"
+                              accept="image/jpeg,image/png,image/webp"
+                              className="hidden"
+                              id={`product-img-${index}`}
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                setPendingFiles((prev) => ({
+                                  ...prev,
+                                  [index]: file,
+                                }));
+                                setImagePreviews((prev) => ({
+                                  ...prev,
+                                  [index]: URL.createObjectURL(file),
+                                }));
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const imgs = getValues("images") || [];
+                                imgs.forEach((_, i) => {
+                                  if (i !== index)
+                                    setValue(`images.${i}.isPrimary`, false);
+                                });
+                                setValue(
+                                  `images.${index}.isPrimary`,
+                                  !isPrimary,
+                                );
+                              }}
+                              className={[
+                                "flex items-center gap-1 self-start text-xs font-medium transition-colors",
+                                isPrimary
+                                  ? "text-kit-primary"
+                                  : "text-kit-muted hover:text-kit-heading",
+                              ].join(" ")}
+                            >
+                              <Star
+                                className={`h-3 w-3 ${isPrimary ? "fill-current" : ""}`}
+                              />
+                              {isPrimary ? "Ảnh chính" : "Đặt chính"}
+                            </button>
+                          </div>
+                        );
+                      })}
+
                       <button
                         type="button"
-                        onClick={() => {
-                          const imgs = getValues("images") || [];
-                          imgs.forEach((_, i) => {
-                            if (i !== index)
-                              setValue(`images.${i}.isPrimary`, false);
-                          });
-                          setValue(`images.${index}.isPrimary`, !isPrimary);
-                        }}
-                        className={[
-                          "flex items-center gap-1 text-xs font-medium transition-colors self-start",
-                          isPrimary
-                            ? "text-adminGreen-600"
-                            : "text-adminGray-400 hover:text-adminGray-600",
-                        ].join(" ")}
+                        onClick={() =>
+                          appendImage({
+                            url: "",
+                            isPrimary: imageFields.length === 0,
+                          })
+                        }
+                        className="flex h-[88px] w-[110px] flex-col items-center justify-center gap-1.5 self-start rounded-lg border-2 border-dashed border-kit text-kit-muted transition-all hover:border-kit-primary hover:bg-kit-primary/5 hover:text-kit-primary"
                       >
-                        <Star
-                          className={`h-3 w-3 ${isPrimary ? "fill-lotus-leaf" : ""}`}
-                        />
-                        {isPrimary ? "Ảnh chính" : "Đặt chính"}
+                        <Plus className="h-5 w-5" />
+                        <span className="text-xs font-medium">Thêm ảnh</span>
                       </button>
                     </div>
-                  );
-                })}
+                  ),
+                },
+              ]}
+            />
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    appendImage({
-                      url: "",
-                      isPrimary: imageFields.length === 0,
-                    })
-                  }
-                  className="flex h-[88px] w-[110px] flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-adminGray-300 text-adminGray-400 transition-all hover:border-adminGreen-600 hover:bg-adminGreen-50 hover:text-adminGreen-600 self-start"
-                >
-                  <Plus className="h-5 w-5" />
-                  <span className="text-2xs font-medium">Thêm ảnh</span>
-                </button>
-              </div>
-            </FormSection>
-
-            <FormSection icon={Box} title="Trạng thái & Chi tiết">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <FormField label="Trạng thái">
-                  <Select
-                    value={watch("status")?.toString() ?? "1"}
-                    onValueChange={(v) => setValue("status", Number(v))}
-                  >
-                    <AdminSelectTrigger>
-                      <SelectValue placeholder="Trạng thái" />
-                    </AdminSelectTrigger>
-                    <SelectContent>
-                      {STATUS_OPTIONS.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
-                <div className="sm:col-span-2">
-                  <FormField
-                    label="Mô tả ngắn"
-                    error={errors.description?.message}
-                  >
-                    <AdminTextarea
-                      {...register("description")}
-                      placeholder="Mô tả ngắn gọn về sản phẩm..."
-                      className="min-h-15 resize-none"
-                    />
-                  </FormField>
-                </div>
-                <div className="sm:col-span-2">
-                  <FormField
-                    label="Nội dung chi tiết"
-                    error={errors.content?.message}
-                  >
-                    <AdminTextarea
-                      {...register("content")}
-                      placeholder="Bài viết chi tiết sản phẩm..."
-                      className="min-h-[100px]"
-                    />
-                  </FormField>
-                </div>
-              </div>
-            </FormSection>
-
-            <DialogFooter>
+            <div className="flex justify-end gap-2 border-t border-kit pt-3">
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 size="sm"
+                className="mb-0"
                 onClick={() => onOpenChange(false)}
                 disabled={isPending || isUploading}
               >
-                {COMMON_MSG.cancel}
+                Hủy
               </Button>
               <Button
                 type="submit"
                 variant="admin"
                 size="sm"
+                className="mb-0"
                 loading={isPending || isUploading}
               >
                 {isEdit ? "Cập nhật" : "Tạo sản phẩm"}
               </Button>
-            </DialogFooter>
+            </div>
           </form>
         )}
-      </DialogContent>
-    </Dialog>
+      </Modal>
+
+      <ProductCategoryFormDialog
+        open={categoryOpen}
+        onOpenChange={setCategoryOpen}
+        onSuccess={(cat) => {
+          if (cat.id) setValue("categoryId", cat.id);
+        }}
+      />
+    </>
   );
 }
 

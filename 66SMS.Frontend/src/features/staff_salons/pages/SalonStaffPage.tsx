@@ -1,33 +1,29 @@
-import { useState, useMemo } from "react";
-import {
-  useReactTable,
-  getCoreRowModel,
-  type ColumnDef,
-  type VisibilityState,
-} from "@tanstack/react-table";
-import { Plus, MoreHorizontal, Pencil, Trash2, Users } from "lucide-react";
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
+import { useMemo, useState } from "react";
+import { Pencil, Plus, Trash2, Users } from "lucide-react";
+
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
+import { Pagination } from "@/shared/components/Pagination";
+import { Tooltip } from "@/shared/components/Tooltip";
+import { Button } from "@/shared/elements/Button";
+import { Select } from "@/shared/forms/Select";
 import {
-  IndexCell,
-  DateTimeCell,
-  MutedSmallCell,
-} from "@/shared/components/DataTable/TableCells";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "@/shared/tables/Table";
+import { EMPTY_CELL } from "@/shared/constants/display.const";
+import {
+  formatDateTimeDisplay,
+  formatDisplayDate,
+} from "@/shared/utils/date.utils";
+
 import { StaffSalonFormDialog } from "../components/StaffSalonFormDialog";
 import { StaffSalonStatusBadge } from "../components/StaffSalonStatusBadge";
-import { useStaffSalons, useDeleteStaffSalon } from "../hooks/useStaffSalons";
+import { useDeleteStaffSalon, useStaffSalons } from "../hooks/useStaffSalons";
 import type { StaffSalonDTO } from "../types/staff-salon.types";
-import { formatDisplayDate } from "@/shared/utils/date.utils";
-import { EMPTY_CELL } from "@/shared/constants/display.const";
 
 interface SalonStaffPageProps {
   salonId: number;
@@ -36,7 +32,6 @@ interface SalonStaffPageProps {
 export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<StaffSalonDTO | null>(null);
@@ -52,156 +47,176 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
   const paged = result?.data;
   const items = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
+  const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
-  const columns: ColumnDef<StaffSalonDTO>[] = [
-    {
-      id: "index",
-      header: "#",
-      cell: ({ row }) => (
-        <IndexCell
-          pageIndex={pageIndex}
-          pageSize={pageSize}
-          rowIndex={row.index}
-        />
-      ),
-      size: 50,
-    },
-    {
-      accessorKey: "staffCode",
-      header: "Mã nhân viên",
-      cell: ({ row }) => (
-        <span className="text-xs bg-adminGray-100 px-1.5 py-0.5 rounded">
-          {row.original.staffCode ?? EMPTY_CELL}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "staffName",
-      header: "Họ tên",
-      cell: ({ row }) => (
-        <span className="font-medium text-sm">
-          {row.original.staffName ?? EMPTY_CELL}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "staffRole",
-      header: "Vai trò",
-      cell: ({ row }) => (
-        <span className="text-xs">{row.original.staffRole ?? EMPTY_CELL}</span>
-      ),
-    },
-    {
-      accessorKey: "startDate",
-      header: "Ngày bắt đầu",
-      cell: ({ row }) => (
-        <MutedSmallCell
-          value={formatDisplayDate(row.original.startDate) || EMPTY_CELL}
-        />
-      ),
-    },
-    {
-      accessorKey: "endDate",
-      header: "Ngày nghỉ",
-      cell: ({ row }) => (
-        <MutedSmallCell
-          value={
-            row.original.endDate
-              ? formatDisplayDate(row.original.endDate)
-              : EMPTY_CELL
-          }
-        />
-      ),
-    },
-    {
-      id: "statusBadge",
-      header: "Trạng thái",
-      cell: ({ row }) => (
-        <StaffSalonStatusBadge
-          status={row.original.status}
-          isManager={row.original.isManager}
-        />
-      ),
-    },
-    {
-      accessorKey: "createdAt",
-      header: "Ngày tạo",
-      cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
-    },
-    {
-      accessorKey: "updatedAt",
-      header: "Cập nhật",
-      cell: ({ row }) => <DateTimeCell value={row.original.updatedAt} />,
-    },
-    {
-      id: "actions",
-      header: "",
-      cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setEditTarget(row.original)}>
-              <Pencil className="h-3.5 w-3.5 mr-2" /> Chỉnh sửa
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-state-danger-text"
-              onClick={() => setDeleteTarget(row.original)}
-            >
-              <Trash2 className="h-3.5 w-3.5 mr-2" /> Xóa
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
-      size: 50,
-    },
-  ];
+  function handlePageSizeChange(size: number) {
+    setPageSize(size);
+    setPageIndex(1);
+  }
 
-  const table = useReactTable({
-    data: items,
-    columns,
-    state: { columnVisibility },
-    onColumnVisibilityChange: setColumnVisibility,
-    getCoreRowModel: getCoreRowModel(),
-    manualPagination: true,
-    pageCount: Math.ceil(totalCount / pageSize),
-  });
+  function handleDelete() {
+    if (!deleteTarget?.id) return;
+    deleteMutation.mutate(deleteTarget.id, {
+      onSuccess: (response) => {
+        if (response.isSuccess) setDeleteTarget(null);
+      },
+    });
+  }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-adminGray-600">
-          <Users className="h-4 w-4" />
-          <span className="text-sm font-medium">Nhân viên chi nhánh</span>
-          <span className="text-xs text-adminGray-400">({totalCount})</span>
+    <div className="space-y-3 font-sans text-sm text-kit-body">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-kit-heading">
+          <Users className="h-4 w-4 text-kit-primary" />
+          <span className="text-sm font-semibold">Nhân viên chi nhánh</span>
+          <span className="text-xs text-kit-muted">({totalCount})</span>
         </div>
-        <div className="flex items-center gap-2">
-          <DataTableViewOptions table={table} />
-          <Button size="sm" onClick={() => setCreateOpen(true)}>
-            <Plus className="h-4 w-4 mr-1.5" /> Gán nhân viên
-          </Button>
-        </div>
+        <Button
+          variant="admin"
+          size="sm"
+          className="mb-0"
+          onClick={() => setCreateOpen(true)}
+        >
+          <Plus className="h-3.5 w-3.5" />
+          Gán nhân viên
+        </Button>
       </div>
 
-      <DataTable table={table} isLoading={isLoading} />
+      {isLoading ? (
+        <p className="py-6 text-center text-sm text-kit-muted">Đang tải...</p>
+      ) : items.length === 0 ? (
+        <div className="flex flex-col items-center gap-2 py-8 text-kit-muted">
+          <Users className="h-8 w-8" />
+          <p className="text-sm font-medium text-kit-heading">
+            Chưa có nhân viên
+          </p>
+          <Button
+            variant="admin"
+            size="sm"
+            className="mb-0"
+            onClick={() => setCreateOpen(true)}
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Gán nhân viên
+          </Button>
+        </div>
+      ) : (
+        <>
+          <div className="overflow-x-auto rounded border border-kit bg-kit-white">
+            <Table size="sm" hover striped>
+              <TableHead>
+                <TableRow>
+                  <TableHeaderCell>#</TableHeaderCell>
+                  <TableHeaderCell>Mã nhân viên</TableHeaderCell>
+                  <TableHeaderCell>Họ tên</TableHeaderCell>
+                  <TableHeaderCell>Vai trò</TableHeaderCell>
+                  <TableHeaderCell>Ngày bắt đầu</TableHeaderCell>
+                  <TableHeaderCell>Ngày nghỉ</TableHeaderCell>
+                  <TableHeaderCell>Trạng thái</TableHeaderCell>
+                  <TableHeaderCell>Ngày tạo</TableHeaderCell>
+                  <TableHeaderCell>Cập nhật</TableHeaderCell>
+                  <TableHeaderCell>Thao tác</TableHeaderCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {items.map((item: StaffSalonDTO, index: number) => (
+                  <TableRow key={item.id ?? `${item.staffId}-${index}`}>
+                    <TableCell className="text-kit-muted">
+                      {(safePage - 1) * pageSize + index + 1}
+                    </TableCell>
+                    <TableCell className="font-medium text-kit-heading">
+                      {item.staffCode ?? EMPTY_CELL}
+                    </TableCell>
+                    <TableCell className="font-medium text-kit-heading">
+                      {item.staffName ?? EMPTY_CELL}
+                    </TableCell>
+                    <TableCell className="text-kit-muted">
+                      {item.staffRole ?? EMPTY_CELL}
+                    </TableCell>
+                    <TableCell className="text-kit-muted">
+                      {formatDisplayDate(item.startDate) || EMPTY_CELL}
+                    </TableCell>
+                    <TableCell className="text-kit-muted">
+                      {item.endDate
+                        ? formatDisplayDate(item.endDate)
+                        : EMPTY_CELL}
+                    </TableCell>
+                    <TableCell>
+                      <StaffSalonStatusBadge
+                        status={item.status}
+                        isManager={item.isManager}
+                      />
+                    </TableCell>
+                    <TableCell className="text-kit-muted">
+                      {formatDateTimeDisplay(item.createdAt)}
+                    </TableCell>
+                    <TableCell className="text-kit-muted">
+                      {item.updatedAt
+                        ? formatDateTimeDisplay(item.updatedAt)
+                        : EMPTY_CELL}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Tooltip text="Sửa">
+                          <Button
+                            size="icon-sm"
+                            variant="outline-primary"
+                            className="mb-0 mr-0"
+                            onClick={() => setEditTarget(item)}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                        </Tooltip>
+                        <Tooltip text="Xóa">
+                          <Button
+                            size="icon-sm"
+                            variant="outline-danger"
+                            className="mb-0 mr-0"
+                            onClick={() => setDeleteTarget(item)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </Tooltip>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
 
-      {totalCount > pageSize && (
-        <DataTablePagination
-          pageIndex={pageIndex}
-          pageSize={pageSize}
-          totalCount={totalCount}
-          totalPages={paged?.totalPages ?? 0}
-          hasPreviousPage={paged?.hasPreviousPage ?? false}
-          hasNextPage={paged?.hasNextPage ?? false}
-          onPageChange={setPageIndex}
-          onPageSizeChange={(s) => {
-            setPageSize(s);
-            setPageIndex(1);
-          }}
-        />
+          {totalCount > 0 ? (
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3 text-xs text-kit-muted">
+                <span>
+                  {rangeStart}-{rangeEnd} / {totalCount}
+                </span>
+                <Select
+                  value={String(pageSize)}
+                  onChange={(event) =>
+                    handlePageSizeChange(Number(event.target.value))
+                  }
+                  options={[
+                    { value: "5", label: "5 / trang" },
+                    { value: "10", label: "10 / trang" },
+                    { value: "20", label: "20 / trang" },
+                  ]}
+                  inputSize="sm"
+                  className="w-auto min-w-28"
+                />
+              </div>
+              <Pagination
+                page={safePage}
+                pageCount={totalPages}
+                onPageChange={setPageIndex}
+                size="sm"
+              />
+            </div>
+          ) : null}
+        </>
       )}
 
       <StaffSalonFormDialog
@@ -210,31 +225,31 @@ export function SalonStaffPage({ salonId }: SalonStaffPageProps) {
         salonId={salonId}
       />
 
-      <StaffSalonFormDialog
-        open={!!editTarget}
-        onOpenChange={(o) => {
-          if (!o) setEditTarget(null);
-        }}
-        salonId={salonId}
-        staffSalon={editTarget}
-      />
+      {editTarget ? (
+        <StaffSalonFormDialog
+          open={!!editTarget}
+          onOpenChange={(open) => {
+            if (!open) setEditTarget(null);
+          }}
+          salonId={salonId}
+          staffSalon={editTarget}
+        />
+      ) : null}
 
-      <ConfirmDialog
-        open={!!deleteTarget}
-        onOpenChange={(o) => {
-          if (!o) setDeleteTarget(null);
-        }}
-        title="Xóa nhân viên khỏi chi nhánh?"
-        description="Hành động này sẽ xóa nhân viên khỏi chi nhánh này."
-        onConfirm={() => {
-          if (deleteTarget?.id) {
-            deleteMutation.mutate(deleteTarget.id, {
-              onSuccess: () => setDeleteTarget(null),
-            });
-          }
-        }}
-        loading={deleteMutation.isPending}
-      />
+      {deleteTarget ? (
+        <ConfirmDialog
+          open={!!deleteTarget}
+          onOpenChange={(open) => {
+            if (!open) setDeleteTarget(null);
+          }}
+          title="Xóa nhân viên khỏi chi nhánh?"
+          description="Hành động này sẽ xóa nhân viên khỏi chi nhánh này."
+          onConfirm={handleDelete}
+          confirmLabel="Xóa"
+          loading={deleteMutation.isPending}
+          variant="danger"
+        />
+      ) : null}
     </div>
   );
 }

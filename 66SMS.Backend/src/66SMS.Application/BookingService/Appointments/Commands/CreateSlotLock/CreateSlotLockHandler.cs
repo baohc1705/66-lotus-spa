@@ -116,7 +116,8 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                             lockRequest.StaffId,
                             salonId: null,
                             excludeLockId: null,
-                            cancellationToken);
+                            excludeAppointmentId: null,
+                            cancellationToken: cancellationToken);
 
                         if (resolved == null)
                         {

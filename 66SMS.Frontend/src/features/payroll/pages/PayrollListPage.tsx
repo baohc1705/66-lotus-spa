@@ -1,37 +1,38 @@
-﻿import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
-import { useAuthStore } from "@/features/auth/stores/authStore";
-import { useSalons } from "@/features/salons/hooks/useSalons";
-import { useAdminStaffs } from "@/features/staffs/hooks/useStaffs";
-import type { StaffDto } from "@/features/staffs/types/staff.types";
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { StatusBadge, type StatusMap } from "@/shared/components/StatusBadge";
-import { Button } from "@/shared/components/ui/button";
-import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
-import { containerVariants } from "@/shared/motion/pageVariants";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/shared/components/ui/select";
+﻿import { Calculator, CheckCircle2, Pencil, Wallet } from "lucide-react";
+import { useMemo, useState } from "react";
 import {
   getCoreRowModel,
   useReactTable,
   type ColumnDef,
 } from "@tanstack/react-table";
-import { Calculator, CheckCircle2, Pencil, Wallet } from "lucide-react";
-import { motion } from "motion/react";
-import { useMemo, useState } from "react";
+
+import { useAuthStore } from "@/features/auth/stores/authStore";
+import { useSalons } from "@/features/salons/hooks/useSalons";
+import { useAdminStaffs } from "@/features/staffs/hooks/useStaffs";
+import type { StaffDto } from "@/features/staffs/types/staff.types";
+import type { SalonListItem } from "@/features/salons/types/salon.types";
+import { Pagination } from "@/shared/components/Pagination";
+import { Badge } from "@/shared/elements/Badge";
+import { Button } from "@/shared/elements/Button";
+import { FormField } from "@/shared/forms/FormField";
+import { SearchableSelect } from "@/shared/forms/SearchableSelect";
+import { Select } from "@/shared/forms/Select";
+import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
+import { DataTable } from "@/shared/tables/DataTable";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
+import {
+  IndexCell,
+  MutedCell,
+  NameCell,
+  PriceCell,
+} from "@/shared/tables/TableCells";
+import { formatCurrency } from "@/shared/utils/currency";
+
 import { EditPayrollDialog } from "../components/EditPayrollDialog";
 import { GeneratePayrollDialog } from "../components/GeneratePayrollDialog";
 import { useConfirmPayroll, usePayrolls } from "../hooks/usePayrolls";
 import type { PayrollDto } from "../types/payroll.types";
-
-const PAYROLL_STATUS_MAP: StatusMap = {
-  "1": { label: "Nháp", variant: "warning" },
-  "2": { label: "Đã chốt", variant: "success", dot: true },
-};
 
 const SALARY_TYPE_LABEL: Record<string, string> = {
   "1": "Theo giờ",
@@ -39,12 +40,9 @@ const SALARY_TYPE_LABEL: Record<string, string> = {
 };
 
 const now = new Date();
-const formatVnd = (v?: number | null) =>
-  v !== null && v !== undefined
-    ? new Intl.NumberFormat("vi-VN").format(v)
-    : "—";
 
 export function PayrollListPage() {
+  "use no memo";
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [staffId, setStaffId] = useState<number | null>(null);
@@ -73,7 +71,7 @@ export function PayrollListPage() {
   );
   const salons = useMemo(() => salonsResult?.data?.items ?? [], [salonsResult]);
 
-  const { data: result, isLoading } = usePayrolls({
+  const { data: result, isLoading, isFetching } = usePayrolls({
     pageIndex,
     pageSize,
     staffId: staffId ?? undefined,
@@ -87,9 +85,62 @@ export function PayrollListPage() {
   const paged = result?.data;
   const items = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
+  const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
-  const months = Array.from({ length: 12 }, (_, i) => i + 1);
-  const years = Array.from({ length: 6 }, (_, i) => now.getFullYear() - i);
+  const months = Array.from({ length: 12 }, (_: unknown, index: number) => index + 1);
+  const years = Array.from(
+    { length: 6 },
+    (_: unknown, index: number) => now.getFullYear() - index,
+  );
+
+  const staffOptions = useMemo(
+    () =>
+      staffs
+        .filter((staff: StaffDto) => staff.id != null)
+        .map((staff: StaffDto) => ({
+          value: String(staff.id),
+          label: staff.fullName ?? `Nhân viên #${staff.id}`,
+        })),
+    [staffs],
+  );
+
+  const salonOptions = useMemo(
+    () => [
+      { value: "all", label: "Tất cả chi nhánh" },
+      ...salons
+        .filter((salon: SalonListItem) => salon.id != null)
+        .map((salon: SalonListItem) => ({
+          value: String(salon.id),
+          label: salon.name ?? `Chi nhánh #${salon.id}`,
+        })),
+    ],
+    [salons],
+  );
+
+  const monthOptions = useMemo(
+    () => [
+      { value: "all", label: "Tất cả" },
+      ...months.map((monthValue: number) => ({
+        value: String(monthValue),
+        label: `Tháng ${monthValue}`,
+      })),
+    ],
+    [months],
+  );
+
+  const yearOptions = useMemo(
+    () => [
+      { value: "all", label: "Tất cả" },
+      ...years.map((yearValue: number) => ({
+        value: String(yearValue),
+        label: String(yearValue),
+      })),
+    ],
+    [years],
+  );
 
   const columns = useMemo<ColumnDef<PayrollDto>[]>(
     () => [
@@ -97,70 +148,72 @@ export function PayrollListPage() {
         id: "index",
         header: "#",
         cell: ({ row }) => (
-          <span className="text-adminGray-600">
-            {(pageIndex - 1) * pageSize + row.index + 1}
-          </span>
+          <IndexCell
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            rowIndex={row.index}
+          />
         ),
         size: 50,
       },
       {
         accessorKey: "staffName",
         header: "Nhân viên",
-        cell: ({ row }) => (
-          <span className="text-sm font-semibold text-adminInk">
-            {row.original.staffName ?? "—"}
-          </span>
-        ),
+        cell: ({ row }) => <NameCell value={row.original.staffName} />,
       },
       {
         id: "period",
         header: "Kỳ lương",
         cell: ({ row }) => (
-          <span className="text-adminInk/80">
-            {row.original.periodMonth}/{row.original.periodYear}
-          </span>
+          <MutedCell
+            value={`${row.original.periodMonth}/${row.original.periodYear}`}
+          />
         ),
       },
       {
         accessorKey: "salaryType",
         header: "Loại lương",
         cell: ({ row }) => (
-          <span className="text-adminInk/70">
-            {SALARY_TYPE_LABEL[String(row.original.salaryType ?? "")] ?? "—"}
-          </span>
+          <MutedCell
+            value={
+              SALARY_TYPE_LABEL[String(row.original.salaryType ?? "")] ?? "—"
+            }
+          />
         ),
       },
       {
         accessorKey: "rate",
         header: "Lương tháng",
-        cell: ({ row }) => <span>{formatVnd(row.original.rate)}</span>,
+        cell: ({ row }) => <PriceCell value={row.original.rate} />,
       },
       {
         accessorKey: "standardWorkDays",
         header: "Công chuẩn",
-        cell: ({ row }) => <span>{row.original.standardWorkDays ?? "—"}</span>,
+        cell: ({ row }) => (
+          <MutedCell value={row.original.standardWorkDays ?? "—"} />
+        ),
       },
       {
         accessorKey: "totalHours",
         header: "Tổng giờ",
-        cell: ({ row }) => <span>{row.original.totalHours ?? 0}</span>,
+        cell: ({ row }) => <MutedCell value={row.original.totalHours ?? 0} />,
       },
       {
         accessorKey: "totalWorkDays",
         header: "Tổng công",
-        cell: ({ row }) => <span>{row.original.totalWorkDays ?? 0}</span>,
+        cell: ({ row }) => <MutedCell value={row.original.totalWorkDays ?? 0} />,
       },
       {
         accessorKey: "baseAmount",
         header: "Lương CB",
-        cell: ({ row }) => <span>{formatVnd(row.original.baseAmount)}</span>,
+        cell: ({ row }) => <PriceCell value={row.original.baseAmount} />,
       },
       {
         accessorKey: "commissionAmount",
         header: "Hoa hồng dịch vụ",
         cell: ({ row }) => (
-          <span className="text-adminGold-600 font-semibold">
-            {formatVnd(row.original.commissionAmount)}
+          <span className="font-semibold text-kit-warning">
+            {formatCurrency(row.original.commissionAmount)}
           </span>
         ),
       },
@@ -168,178 +221,149 @@ export function PayrollListPage() {
         accessorKey: "totalAmount",
         header: "Tổng",
         cell: ({ row }) => (
-          <span className="font-semibold text-adminInk">
-            {formatVnd(row.original.totalAmount)}
+          <span className="font-semibold text-kit-heading">
+            {formatCurrency(row.original.totalAmount)}
           </span>
         ),
       },
       {
         accessorKey: "status",
         header: "Trạng thái",
-        cell: ({ row }) => (
-          <StatusBadge
-            status={row.original.status?.toString() ?? null}
-            statusMap={PAYROLL_STATUS_MAP}
-          />
-        ),
+        cell: ({ row }) => {
+          const status = row.original.status;
+          if (status === 2) {
+            return (
+              <Badge variant="success" soft>
+                Đã chốt
+              </Badge>
+            );
+          }
+          return (
+            <Badge variant="warning" soft>
+              Nháp
+            </Badge>
+          );
+        },
       },
       {
         id: "actions",
         header: "",
         cell: ({ row }) => {
-          const p = row.original;
-          if (!p.id) return null;
+          const payroll = row.original;
+          if (!payroll.id) return null;
           return (
             <div className="flex items-center gap-1.5">
               <Button
-                variant="ghost"
+                type="button"
+                variant="outline-secondary"
                 size="sm"
-                className="gap-1 text-xs h-8 px-2 text-adminInk hover:text-adminInk hover:bg-lotus-stone/10"
-                onClick={() => setEditingPayroll(p)}
+                className="mb-0"
+                onClick={() => setEditingPayroll(payroll)}
               >
-                <Pencil className="w-3.5 h-3.5" /> Sửa
+                <Pencil className="h-3.5 w-3.5" />
+                Sửa
               </Button>
               <Button
-                variant="ghost"
+                type="button"
+                variant="primary"
                 size="sm"
-                className="gap-1 text-xs h-8 px-2 text-adminGreen-600 hover:text-state-success-text hover:bg-adminGreen-50"
-                onClick={() => confirmMutation.mutate(p.id!)}
+                className="mb-0"
                 loading={confirmMutation.isPending}
+                onClick={() => confirmMutation.mutate(payroll.id!)}
               >
-                <CheckCircle2 className="w-3.5 h-3.5" /> Chốt
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                Chốt
               </Button>
             </div>
           );
         },
-        size: 150,
+        size: 180,
       },
     ],
-    [pageIndex, pageSize, confirmMutation, setEditingPayroll],
+    [pageIndex, pageSize, confirmMutation],
   );
 
   const table = useReactTable({
     data: items,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
   });
 
   return (
-    <div className="flex flex-col gap-2 h-full overflow-hidden w-full">
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-        className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative"
-      >
-        <div className="p-4 flex flex-wrap items-end gap-3 border-b border-adminGray-100 shrink-0">
-          <Button
-            variant="admin"
-            size="sm"
-            className="lotus-admin-table-toolbar-btn gap-1.5"
-            onClick={() => setGenerateOpen(true)}
-          >
-            <Calculator className="w-3.5 h-3.5" /> Tính lương
-          </Button>
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
+      <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+        <div className="border-b border-kit px-4 pt-4">
+          <div className="mb-4 flex flex-wrap items-end gap-3">
+            <Button
+              variant="primary"
+              size="sm"
+              className="mb-0"
+              onClick={() => setGenerateOpen(true)}
+            >
+              <Calculator className="h-3.5 w-3.5" />
+              Tính lương
+            </Button>
 
-          <div className="ml-auto flex items-end gap-3">
-            {!headerSalonId && (
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-adminInk/80">
-                  Chi nhánh
-                </label>
-                <Select
-                  value={localSalonId ? String(localSalonId) : "all"}
-                  onValueChange={(v) => {
-                    setLocalSalonId(v === "all" ? null : Number(v));
-                    setStaffId(null);
+            <div className="ml-auto flex flex-wrap items-end gap-3">
+              {!headerSalonId ? (
+                <FormField label="Chi nhánh" className="mb-0 min-w-44">
+                  <Select
+                    inputSize="sm"
+                    value={localSalonId ? String(localSalonId) : "all"}
+                    options={salonOptions}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      setLocalSalonId(value === "all" ? null : Number(value));
+                      setStaffId(null);
+                      setPageIndex(1);
+                    }}
+                  />
+                </FormField>
+              ) : null}
+
+              <FormField label="Nhân viên" className="mb-0 min-w-55">
+                <SearchableSelect
+                  inputSize="sm"
+                  className="w-55"
+                  value={staffId ? String(staffId) : ""}
+                  options={staffOptions}
+                  placeholder="Tất cả nhân viên"
+                  searchPlaceholder="Tìm nhân viên..."
+                  emptyText="Không tìm thấy"
+                  clearable
+                  onChange={(value: string) => {
+                    setStaffId(value ? Number(value) : null);
                     setPageIndex(1);
                   }}
-                >
-                  <AdminSelectTrigger className="w-44">
-                    <SelectValue placeholder="Tất cả" />
-                  </AdminSelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tất cả chi nhánh</SelectItem>
-                    {salons.map((s) => (
-                      <SelectItem key={s.id} value={String(s.id)}>
-                        {s.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-adminInk/80">
-                Nhân viên
-              </label>
-              <Select
-                value={staffId ? String(staffId) : "all"}
-                onValueChange={(v) => {
-                  setStaffId(v === "all" ? null : Number(v));
-                  setPageIndex(1);
-                }}
-              >
-                <AdminSelectTrigger className="w-44">
-                  <SelectValue placeholder="Tất cả" />
-                </AdminSelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tất cả</SelectItem>
-                  {staffs.map((s: StaffDto) => (
-                    <SelectItem key={s.id} value={String(s.id)}>
-                      {s.fullName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-adminInk/80">
-                Tháng
-              </label>
-              <Select
-                value={month ? String(month) : "all"}
-                onValueChange={(v) => {
-                  setMonth(v === "all" ? null : Number(v));
-                  setPageIndex(1);
-                }}
-              >
-                <AdminSelectTrigger className="w-[120px]">
-                  <SelectValue placeholder="Tất cả" />
-                </AdminSelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tất cả</SelectItem>
-                  {months.map((m) => (
-                    <SelectItem key={m} value={String(m)}>
-                      Tháng {m}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-adminInk/80">
-                Năm
-              </label>
-              <Select
-                value={year ? String(year) : "all"}
-                onValueChange={(v) => {
-                  setYear(v === "all" ? null : Number(v));
-                  setPageIndex(1);
-                }}
-              >
-                <AdminSelectTrigger className="w-[120px]">
-                  <SelectValue placeholder="Tất cả" />
-                </AdminSelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tất cả</SelectItem>
-                  {years.map((y) => (
-                    <SelectItem key={y} value={String(y)}>
-                      {y}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                />
+              </FormField>
+
+              <FormField label="Tháng" className="mb-0 min-w-[120px]">
+                <Select
+                  inputSize="sm"
+                  value={month ? String(month) : "all"}
+                  options={monthOptions}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setMonth(value === "all" ? null : Number(value));
+                    setPageIndex(1);
+                  }}
+                />
+              </FormField>
+
+              <FormField label="Năm" className="mb-0 min-w-[120px]">
+                <Select
+                  inputSize="sm"
+                  value={year ? String(year) : "all"}
+                  options={yearOptions}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setYear(value === "all" ? null : Number(value));
+                    setPageIndex(1);
+                  }}
+                />
+              </FormField>
             </div>
           </div>
         </div>
@@ -351,34 +375,55 @@ export function PayrollListPage() {
             pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
           }
           emptyState={
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-adminGray-50 flex items-center justify-center">
-                <Wallet className="w-7 h-7 text-adminGray-600" />
-              </div>
-              <p className="text-sm font-semibold text-adminInk">
-                Chưa có bảng lương
-              </p>
-            </div>
+            <TableEmptyState
+              icon={Wallet}
+              title="Chưa có bảng lương"
+              action={
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="mb-0"
+                  onClick={() => setGenerateOpen(true)}
+                >
+                  <Calculator className="h-3.5 w-3.5" />
+                  Tính lương
+                </Button>
+              }
+            />
           }
           pagination={
             paged && totalCount > 0 ? (
-              <DataTablePagination
-                pageIndex={paged.pageIndex}
-                pageSize={paged.pageSize}
-                totalCount={paged.totalCount}
-                totalPages={paged.totalPages}
-                hasPreviousPage={paged.hasPreviousPage}
-                hasNextPage={paged.hasNextPage}
-                onPageChange={setPageIndex}
-                onPageSizeChange={(size) => {
-                  setPageSize(size);
-                  setPageIndex(1);
-                }}
-              />
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <div className="flex items-center gap-3 text-xs text-kit-muted">
+                  <span>
+                    {rangeStart}-{rangeEnd} / {totalCount}
+                  </span>
+                  <select
+                    value={pageSize}
+                    onChange={(event) => {
+                      setPageSize(Number(event.target.value));
+                      setPageIndex(1);
+                    }}
+                    className="h-8 cursor-pointer rounded border border-kit bg-kit-white px-2 text-xs text-kit-heading outline-none focus:border-kit-primary"
+                  >
+                    {[5, 10, 20].map((size: number) => (
+                      <option key={size} value={size}>
+                        {size} / trang
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <Pagination
+                  page={safePage}
+                  pageCount={totalPages}
+                  onPageChange={setPageIndex}
+                  size="sm"
+                />
+              </div>
             ) : null
           }
         />
-      </motion.div>
+      </TablePageShell>
 
       <GeneratePayrollDialog
         open={generateOpen}

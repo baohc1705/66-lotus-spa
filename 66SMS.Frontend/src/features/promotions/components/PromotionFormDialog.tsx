@@ -1,23 +1,20 @@
-﻿import { useEffect } from "react";
+import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Tag } from "lucide-react";
+
+import { Modal } from "@/shared/components/Modal";
+import { Button } from "@/shared/elements/Button";
+import { FormField } from "@/shared/forms/FormField";
+import { FormRow } from "@/shared/forms/FormRow";
+import { FormSection } from "@/shared/forms/FormSection";
+import { Input } from "@/shared/forms/Input";
+import { Select } from "@/shared/forms/Select";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
-import { AdminInput } from "@/shared/components/forms/AdminInput";
-import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
-import { FormField } from "@/shared/components/forms/FormField";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/shared/components/ui/select";
+  localDateTimeToUtc,
+  toDatetimeLocalInput,
+} from "@/shared/utils/date.utils";
+
 import { useCreatePromotion, useUpdatePromotion } from "../hooks/usePromotions";
 import {
   promotionSchema,
@@ -28,17 +25,22 @@ import {
   STATUS_OPTIONS,
   type PromotionDto,
 } from "../types/promotion.types";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import {
-  toDatetimeLocalInput,
-  localDateTimeToUtc,
-} from "@/shared/utils/date.utils";
 
 interface PromotionFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   promotion?: PromotionDto | null;
 }
+
+const DISCOUNT_TYPE_SELECT_OPTIONS = DISCOUNT_TYPE_OPTIONS.map((opt) => ({
+  value: String(opt.value),
+  label: opt.label,
+}));
+
+const STATUS_SELECT_OPTIONS = STATUS_OPTIONS.map((opt) => ({
+  value: String(opt.value),
+  label: opt.label,
+}));
 
 function getDefaultValues(
   promotion?: PromotionDto | null,
@@ -89,6 +91,9 @@ export function PromotionFormDialog({
   promotion,
 }: PromotionFormDialogProps) {
   const isEdit = !!promotion;
+  const createMutation = useCreatePromotion();
+  const updateMutation = useUpdatePromotion();
+  const isPending = createMutation.isPending || updateMutation.isPending;
 
   const {
     register,
@@ -103,17 +108,13 @@ export function PromotionFormDialog({
   });
 
   const discountType = watch("discountType");
+  const statusValue = watch("status");
 
   useEffect(() => {
     if (open) {
       reset(getDefaultValues(promotion));
     }
   }, [open, promotion, reset]);
-
-  const createMutation = useCreatePromotion();
-  const updateMutation = useUpdatePromotion();
-
-  const isPending = createMutation.isPending || updateMutation.isPending;
 
   function onSubmit(values: PromotionFormValues) {
     const payload = {
@@ -141,198 +142,213 @@ export function PromotionFormDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-adminInk">
-            {isEdit ? "Chỉnh sửa khuyến mãi" : "Thêm khuyến mãi mới"}
-          </DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-2">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+    <Modal
+      open={open}
+      onClose={() => onOpenChange(false)}
+      title={isEdit ? "Chỉnh sửa khuyến mãi" : "Thêm khuyến mãi mới"}
+      size="lg"
+      scrollable
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <FormSection icon={Tag} title="Thông tin khuyến mãi">
+          <FormRow>
             <FormField label="Mã khuyến mãi *" error={errors.code?.message}>
-              <AdminInput {...register("code")} placeholder="VD: SUMMER2025" />
+              <Input
+                {...register("code")}
+                placeholder="VD: SUMMER2025"
+                invalid={!!errors.code}
+              />
             </FormField>
             <FormField label="Tên chương trình *" error={errors.name?.message}>
-              <AdminInput {...register("name")} placeholder="Nhập tên..." />
+              <Input
+                {...register("name")}
+                placeholder="Nhập tên..."
+                invalid={!!errors.name}
+              />
             </FormField>
-          </div>
+          </FormRow>
 
           <FormField label="Mô tả" error={errors.description?.message}>
-            <AdminInput
+            <Input
               {...register("description")}
               placeholder="Mô tả ngắn..."
+              invalid={!!errors.description}
             />
           </FormField>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <FormField label="Kiểu giảm *" error={errors.discountType?.message}>
+          <FormRow>
+            <FormField
+              label="Kiểu giảm *"
+              error={errors.discountType?.message}
+            >
               <Select
                 value={String(discountType)}
-                onValueChange={(val) => setValue("discountType", Number(val))}
-              >
-                <AdminSelectTrigger>
-                  <SelectValue placeholder="Chọn kiểu giảm" />
-                </AdminSelectTrigger>
-                <SelectContent>
-                  {DISCOUNT_TYPE_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={String(opt.value)}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onChange={(e) =>
+                  setValue("discountType", Number(e.target.value))
+                }
+                options={DISCOUNT_TYPE_SELECT_OPTIONS}
+                placeholder="Chọn kiểu giảm"
+              />
             </FormField>
 
             <FormField label="Trạng thái" error={errors.status?.message}>
               <Select
-                value={String(watch("status") ?? 1)}
-                onValueChange={(val) => setValue("status", Number(val))}
-              >
-                <AdminSelectTrigger>
-                  <SelectValue />
-                </AdminSelectTrigger>
-                <SelectContent>
-                  {STATUS_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={String(opt.value)}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                value={String(statusValue ?? 1)}
+                onChange={(e) => setValue("status", Number(e.target.value))}
+                options={STATUS_SELECT_OPTIONS}
+                placeholder="Chọn trạng thái"
+              />
             </FormField>
-          </div>
+          </FormRow>
 
-          {discountType === 1 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {discountType === 1 ? (
+            <FormRow>
               <FormField
                 label="Phần trăm giảm (%) *"
                 error={errors.discountValue?.message}
               >
-                <AdminInput
+                <Input
                   type="number"
                   step="0.01"
                   min="0.01"
                   max="100"
                   {...register("discountValue")}
                   placeholder="VD: 10"
+                  invalid={!!errors.discountValue}
                 />
               </FormField>
               <FormField
                 label="Giảm tối đa (VNĐ)"
                 error={errors.maxDiscountAmount?.message}
               >
-                <AdminInput
+                <Input
                   type="number"
                   min="0"
                   {...register("maxDiscountAmount")}
                   placeholder="Để trống = không giới hạn"
+                  invalid={!!errors.maxDiscountAmount}
                 />
               </FormField>
-            </div>
-          )}
+            </FormRow>
+          ) : null}
 
-          {discountType === 2 && (
+          {discountType === 2 ? (
             <FormField
               label="Số tiền giảm (VNĐ) *"
               error={errors.discountValue?.message}
             >
-              <AdminInput
+              <Input
                 type="number"
                 min="0"
                 {...register("discountValue")}
                 placeholder="VD: 50000"
+                invalid={!!errors.discountValue}
               />
             </FormField>
-          )}
+          ) : null}
 
-          {discountType === 3 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {discountType === 3 ? (
+            <FormRow>
               <FormField
                 label="Số lượng mua (X) *"
                 error={errors.buyQuantity?.message}
               >
-                <AdminInput
+                <Input
                   type="number"
                   min="1"
                   {...register("buyQuantity")}
                   placeholder="VD: 2"
+                  invalid={!!errors.buyQuantity}
                 />
               </FormField>
               <FormField
                 label="Số lượng tặng (Y) *"
                 error={errors.getQuantity?.message}
               >
-                <AdminInput
+                <Input
                   type="number"
                   min="1"
                   {...register("getQuantity")}
                   placeholder="VD: 1"
+                  invalid={!!errors.getQuantity}
                 />
               </FormField>
-            </div>
-          )}
+            </FormRow>
+          ) : null}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <FormRow>
             <FormField
               label="Đơn hàng tối thiểu (VNĐ)"
               error={errors.minOrderValue?.message}
             >
-              <AdminInput
+              <Input
                 type="number"
                 min="0"
                 {...register("minOrderValue")}
                 placeholder="Để trống = không giới hạn"
+                invalid={!!errors.minOrderValue}
               />
             </FormField>
             <FormField
               label="Giới hạn sử dụng"
               error={errors.usageLimit?.message}
             >
-              <AdminInput
+              <Input
                 type="number"
                 min="1"
                 {...register("usageLimit")}
                 placeholder="Để trống = không giới hạn"
+                invalid={!!errors.usageLimit}
               />
             </FormField>
-          </div>
+          </FormRow>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <FormField label="Ngày bắt đầu *" error={errors.startDate?.message}>
-              <AdminInput type="datetime-local" {...register("startDate")} />
+          <FormRow>
+            <FormField
+              label="Ngày bắt đầu *"
+              error={errors.startDate?.message}
+            >
+              <Input
+                type="datetime-local"
+                {...register("startDate")}
+                invalid={!!errors.startDate}
+              />
             </FormField>
-            <FormField label="Ngày kết thúc *" error={errors.endDate?.message}>
-              <AdminInput type="datetime-local" {...register("endDate")} />
+            <FormField
+              label="Ngày kết thúc *"
+              error={errors.endDate?.message}
+            >
+              <Input
+                type="datetime-local"
+                {...register("endDate")}
+                invalid={!!errors.endDate}
+              />
             </FormField>
-          </div>
+          </FormRow>
+        </FormSection>
 
-          <DialogFooter className="pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
-            >
-              {COMMON_MSG.cancel}
-            </Button>
-            <Button
-              type="submit"
-              variant="admin"
-              size="sm"
-              disabled={isPending}
-            >
-              {isPending
-                ? "Đang lưu..."
-                : isEdit
-                  ? "Cập nhật"
-                  : "Tạo khuyến mãi"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        <div className="flex justify-end gap-2 border-t border-kit pt-3">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="mb-0"
+            onClick={() => onOpenChange(false)}
+            disabled={isPending}
+          >
+            Hủy
+          </Button>
+          <Button
+            type="submit"
+            variant="admin"
+            size="sm"
+            className="mb-0"
+            loading={isPending}
+          >
+            {isEdit ? "Cập nhật" : "Tạo khuyến mãi"}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }

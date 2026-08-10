@@ -6,7 +6,16 @@ type ListGroupProps = {
   flush?: boolean;
 };
 
-type ListGroupTone = "default" | "success" | "info" | "warning" | "danger";
+export type ListGroupTone =
+  | "default"
+  | "primary"
+  | "secondary"
+  | "success"
+  | "info"
+  | "warning"
+  | "danger"
+  | "focus"
+  | "alternate";
 
 type ListGroupItemProps = {
   children?: ReactNode;
@@ -20,10 +29,14 @@ type ListGroupItemProps = {
 };
 
 function toneClass(tone: ListGroupTone): string {
+  if (tone === "primary") return "soft-kit-primary ";
+  if (tone === "secondary") return "soft-kit-secondary ";
   if (tone === "success") return "soft-kit-success ";
   if (tone === "info") return "soft-kit-info ";
   if (tone === "warning") return "soft-kit-warning ";
   if (tone === "danger") return "soft-kit-danger ";
+  if (tone === "focus") return "soft-kit-focus ";
+  if (tone === "alternate") return "soft-kit-alternate ";
   return "";
 }
 

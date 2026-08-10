@@ -1,7 +1,16 @@
 ﻿import { createPortal } from "react-dom";
 import type { ReactNode } from "react";
 
-export type ToastVariant = "primary" | "success" | "danger" | "warning" | "info";
+export type ToastVariant =
+  | "primary"
+  | "secondary"
+  | "success"
+  | "danger"
+  | "warning"
+  | "info"
+  | "focus"
+  | "alternate"
+  | "dark";
 
 export type ToastPosition =
   | "top-right"
@@ -26,7 +35,6 @@ type ToastProps = {
   className?: string;
 };
 
-// Architect _toastr.scss base64 icons (same as live demo)
 const ICON_SUCCESS =
   "url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADsSURBVEhLY2AYBfQMgf///3P8+/evAIgvA/FsIF+BavYDDWMBGroaSMMBiE8VC7AZDrIFaMFnii3AZTjUgsUUWUDA8OdAH6iQbQEhw4HyGsPEcKBXBIC4ARhex4G4BsjmweU1soIFaGg/WtoFZRIZdEvIMhxkCCjXIVsATV6gFGACs4Rsw0EGgIIH3QJYJgHSARQZDrWAB+jawzgs+Q2UO49D7jnRSRGoEFRILcdmEMWGI0cm0JJ2QpYA1RDvcmzJEWhABhD/pqrL0S0CWuABKgnRki9lLseS7g2AlqwHWQSKH4oKLrILpRGhEQCw2LiRUIa4lwAAAABJRU5ErkJggg==\")";
 const ICON_ERROR =
@@ -79,6 +87,42 @@ function variantStyle(variant: ToastVariant): {
       shadow: "shadow-kit-toast",
     };
   }
+  if (variant === "secondary") {
+    return {
+      toastClass: "toast-info",
+      bg: "bg-kit-secondary",
+      text: "text-kit-white",
+      icon: ICON_INFO,
+      shadow: "shadow-kit-toast",
+    };
+  }
+  if (variant === "focus") {
+    return {
+      toastClass: "toast-info",
+      bg: "bg-kit-focus",
+      text: "text-kit-white",
+      icon: ICON_INFO,
+      shadow: "shadow-kit-toast",
+    };
+  }
+  if (variant === "alternate") {
+    return {
+      toastClass: "toast-info",
+      bg: "bg-kit-alt",
+      text: "text-kit-white",
+      icon: ICON_INFO,
+      shadow: "shadow-kit-toast",
+    };
+  }
+  if (variant === "dark") {
+    return {
+      toastClass: "toast-info",
+      bg: "bg-kit-dark",
+      text: "text-kit-white",
+      icon: ICON_INFO,
+      shadow: "shadow-kit-toast",
+    };
+  }
   return {
     toastClass: "toast-info",
     bg: "bg-kit-primary",
@@ -88,7 +132,6 @@ function variantStyle(variant: ToastVariant): {
   };
 }
 
-/** Single toast — Architect #toast-container > .toast-* */
 export function Toast({
   open = true,
   title,

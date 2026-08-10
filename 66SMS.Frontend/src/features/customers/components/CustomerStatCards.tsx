@@ -1,5 +1,4 @@
-import { Users, UserCheck, Award, Store } from "lucide-react";
-import { AdminStatCard } from "@/shared/components/AdminStatCard";
+import { StatCard } from "@/shared/widgets/StatCard";
 
 interface CustomerStatCardsProps {
   totalCustomers: number;
@@ -16,36 +15,37 @@ export function CustomerStatCards({
   walkInCustomers,
   isLoading,
 }: CustomerStatCardsProps) {
+  const dash = isLoading ? "—" : undefined;
+
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-      <AdminStatCard
-        label="Tổng số khách hàng"
-        value={totalCustomers}
-        icon={Users}
-        tone="gold"
-        isLoading={isLoading}
+    <div className="mb-3 grid grid-cols-2 gap-2 lg:grid-cols-4">
+      <StatCard
+        title="Tổng số khách hàng"
+        value={dash ?? totalCustomers}
+        description="Trong danh sách"
+        tone="midnight-bloom"
+        valueTone="white"
       />
-      <AdminStatCard
-        label="Khách hàng hoạt động"
-        value={activeCustomers}
-        icon={UserCheck}
-        tone="green"
-        isLoading={isLoading}
+      <StatCard
+        title="Khách hàng hoạt động"
+        value={dash ?? activeCustomers}
+        description="Trạng thái hoạt động"
+        tone="happy-green"
+        valueTone="white"
       />
-      <AdminStatCard
-        label="Tổng điểm tích lũy"
-        value={totalPoints}
-        icon={Award}
-        tone="gold"
-        valueClass="text-adminGold-600"
-        isLoading={isLoading}
+      <StatCard
+        title="Tổng điểm tích lũy"
+        value={dash ?? totalPoints}
+        description="Điểm loyalty"
+        tone="sunny-morning"
+        valueTone="dark"
       />
-      <AdminStatCard
-        label="Khách vãng lai (Walk-in)"
-        value={walkInCustomers}
-        icon={Store}
-        tone="gold"
-        isLoading={isLoading}
+      <StatCard
+        title="Khách vãng lai (Walk-in)"
+        value={dash ?? walkInCustomers}
+        description="Nguồn Walk-in"
+        tone="love-kiss"
+        valueTone="white"
       />
     </div>
   );

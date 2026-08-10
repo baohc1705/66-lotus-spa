@@ -2,29 +2,20 @@ import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { RotateCcw } from "lucide-react";
 
-import { Button } from "@/shared/components/ui/button";
+import { Button } from "@/shared/elements/Button";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import {
-  IndexCell,
-  MutedCell,
-  NameCell,
-  TextCell,
-} from "@/shared/components/DataTable/TableCells";
+import { Tooltip } from "@/shared/components/Tooltip";
+import { MutedCell, NameCell, TextCell } from "@/shared/tables/TableCells";
 
 import { CATEGORY_COLUMN_LABELS } from "./useActiveCategoryColumns";
 import { PRODUCT_CATEGORY_PERM } from "../constants/productCategory.permissions";
 import type { ProductCategoryDto } from "../types/productCategory.types";
 
 interface UseDeletedCategoryColumnsParams {
-  pageIndex: number;
-  pageSize: number;
   onRestore: (item: ProductCategoryDto) => void;
 }
 
 export function useDeletedCategoryColumns({
-  pageIndex,
-  pageSize,
   onRestore,
 }: UseDeletedCategoryColumnsParams) {
   const cols = CATEGORY_COLUMN_LABELS;
@@ -32,19 +23,6 @@ export function useDeletedCategoryColumns({
 
   return useMemo<ColumnDef<ProductCategoryDto>[]>(
     () => [
-      {
-        id: "index",
-        header: "#",
-        cell: ({ row }) => (
-          <IndexCell
-            pageIndex={pageIndex}
-            pageSize={pageSize}
-            rowIndex={row.index}
-          />
-        ),
-        size: 50,
-        enableResizing: false,
-      },
       {
         accessorKey: "name",
         header: cols.name,
@@ -55,7 +33,7 @@ export function useDeletedCategoryColumns({
         accessorKey: "description",
         header: cols.description,
         cell: ({ row }) => <TextCell value={row.original.description} />,
-        size: 300,
+        size: 280,
       },
       {
         accessorKey: "sortOrder",
@@ -65,28 +43,29 @@ export function useDeletedCategoryColumns({
       },
       {
         id: "actions",
-        header: "",
+        header: "Thao tác",
         cell: ({ row }) => (
           <PermissionGate
             resource={perm.resource}
             action={perm.update}
             role={perm.role}
           >
-            <Button
-              variant="outline"
-              size="sm"
-              className="lotus-admin-table-toolbar-btn"
-              onClick={() => onRestore(row.original)}
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              {COMMON_MSG.restore}
-            </Button>
+            <Tooltip text="Khôi phục">
+              <Button
+                size="icon-sm"
+                variant="outline-success"
+                className="mb-0 mr-0"
+                onClick={() => onRestore(row.original)}
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+              </Button>
+            </Tooltip>
           </PermissionGate>
         ),
-        size: 120,
+        size: 80,
         enableResizing: false,
       },
     ],
-    [pageIndex, pageSize, onRestore, cols, perm],
+    [onRestore, cols, perm],
   );
 }

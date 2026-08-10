@@ -15,107 +15,121 @@ BEGIN
     DECLARE @PrevTo   DATE = DATEADD(DAY, -1, @FromDate);
     DECLARE @PrevFrom DATE = DATEADD(DAY, 1 - @Days, @PrevTo);
 
+    ;WITH period_raw AS (
+        SELECT
+            N'current' AS PeriodTag,
+            ISNULL((
+                SELECT SUM(inv.paid_amount)
+                FROM dbo.invoices inv
+                WHERE inv.status = 2
+                  AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
+                  AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
+            ), 0)
+            + CASE WHEN @SalonId IS NULL THEN ISNULL((
+                SELECT SUM(wt.amount)
+                FROM dbo.wallet_transactions wt
+                WHERE wt.type = 3
+                  AND wt.status = 1
+                  AND CAST(SWITCHOFFSET(wt.created_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
+            ), 0) ELSE 0 END AS CashIn,
+
+            ISNULL((
+                SELECT SUM(ii.commission_amount)
+                FROM dbo.invoice_items ii
+                INNER JOIN dbo.invoices inv ON inv.id = ii.invoice_id
+                WHERE ii.status = 1
+                  AND inv.status = 2
+                  AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
+                  AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
+            ), 0)
+            + ISNULL((
+                SELECT SUM(inv.paid_amount)
+                FROM dbo.invoices inv
+                WHERE inv.status = 4
+                  AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
+                  AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
+            ), 0) AS CashOut,
+
+            ISNULL((
+                SELECT SUM(inv.total_amount)
+                FROM dbo.invoices inv
+                WHERE inv.status = 2
+                  AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
+                  AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
+            ), 0) AS GrossRevenue,
+
+            ISNULL((
+                SELECT COUNT(1)
+                FROM dbo.invoices inv
+                WHERE inv.status = 2
+                  AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
+                  AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
+            ), 0) AS TransactionCount
+
+        UNION ALL
+
+        SELECT
+            N'previous' AS PeriodTag,
+            ISNULL((
+                SELECT SUM(inv.paid_amount)
+                FROM dbo.invoices inv
+                WHERE inv.status = 2
+                  AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @PrevFrom AND @PrevTo
+                  AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
+            ), 0)
+            + CASE WHEN @SalonId IS NULL THEN ISNULL((
+                SELECT SUM(wt.amount)
+                FROM dbo.wallet_transactions wt
+                WHERE wt.type = 3
+                  AND wt.status = 1
+                  AND CAST(SWITCHOFFSET(wt.created_at, '+07:00') AS DATE) BETWEEN @PrevFrom AND @PrevTo
+            ), 0) ELSE 0 END AS CashIn,
+
+            ISNULL((
+                SELECT SUM(ii.commission_amount)
+                FROM dbo.invoice_items ii
+                INNER JOIN dbo.invoices inv ON inv.id = ii.invoice_id
+                WHERE ii.status = 1
+                  AND inv.status = 2
+                  AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @PrevFrom AND @PrevTo
+                  AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
+            ), 0)
+            + ISNULL((
+                SELECT SUM(inv.paid_amount)
+                FROM dbo.invoices inv
+                WHERE inv.status = 4
+                  AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @PrevFrom AND @PrevTo
+                  AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
+            ), 0) AS CashOut,
+
+            ISNULL((
+                SELECT SUM(inv.total_amount)
+                FROM dbo.invoices inv
+                WHERE inv.status = 2
+                  AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @PrevFrom AND @PrevTo
+                  AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
+            ), 0) AS GrossRevenue,
+
+            ISNULL((
+                SELECT COUNT(1)
+                FROM dbo.invoices inv
+                WHERE inv.status = 2
+                  AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @PrevFrom AND @PrevTo
+                  AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
+            ), 0) AS TransactionCount
+        WHERE @ComparePrevious = 1
+    )
     SELECT
-        N'current' AS PeriodTag,
-        ISNULL((
-            SELECT SUM(inv.paid_amount)
-            FROM dbo.invoices inv
-            WHERE inv.status = 2
-              AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
-              AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
-        ), 0)
-        + CASE WHEN @SalonId IS NULL THEN ISNULL((
-            SELECT SUM(wt.amount)
-            FROM dbo.wallet_transactions wt
-            WHERE wt.type = 3
-              AND wt.status = 1
-              AND CAST(SWITCHOFFSET(wt.created_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
-        ), 0) ELSE 0 END AS CashIn,
-
-        ISNULL((
-            SELECT SUM(ii.commission_amount)
-            FROM dbo.invoice_items ii
-            INNER JOIN dbo.invoices inv ON inv.id = ii.invoice_id
-            WHERE ii.status = 1
-              AND inv.status = 2
-              AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
-              AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
-        ), 0)
-        + ISNULL((
-            SELECT SUM(inv.paid_amount)
-            FROM dbo.invoices inv
-            WHERE inv.status = 4
-              AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
-              AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
-        ), 0) AS CashOut,
-
-        ISNULL((
-            SELECT SUM(inv.total_amount)
-            FROM dbo.invoices inv
-            WHERE inv.status = 2
-              AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
-              AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
-        ), 0) AS GrossRevenue,
-
-        ISNULL((
-            SELECT COUNT(1)
-            FROM dbo.invoices inv
-            WHERE inv.status = 2
-              AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
-              AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
-        ), 0) AS TransactionCount
-
-    UNION ALL
-
-    SELECT
-        N'previous' AS PeriodTag,
-        ISNULL((
-            SELECT SUM(inv.paid_amount)
-            FROM dbo.invoices inv
-            WHERE inv.status = 2
-              AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @PrevFrom AND @PrevTo
-              AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
-        ), 0)
-        + CASE WHEN @SalonId IS NULL THEN ISNULL((
-            SELECT SUM(wt.amount)
-            FROM dbo.wallet_transactions wt
-            WHERE wt.type = 3
-              AND wt.status = 1
-              AND CAST(SWITCHOFFSET(wt.created_at, '+07:00') AS DATE) BETWEEN @PrevFrom AND @PrevTo
-        ), 0) ELSE 0 END AS CashIn,
-
-        ISNULL((
-            SELECT SUM(ii.commission_amount)
-            FROM dbo.invoice_items ii
-            INNER JOIN dbo.invoices inv ON inv.id = ii.invoice_id
-            WHERE ii.status = 1
-              AND inv.status = 2
-              AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @PrevFrom AND @PrevTo
-              AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
-        ), 0)
-        + ISNULL((
-            SELECT SUM(inv.paid_amount)
-            FROM dbo.invoices inv
-            WHERE inv.status = 4
-              AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @PrevFrom AND @PrevTo
-              AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
-        ), 0) AS CashOut,
-
-        ISNULL((
-            SELECT SUM(inv.total_amount)
-            FROM dbo.invoices inv
-            WHERE inv.status = 2
-              AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @PrevFrom AND @PrevTo
-              AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
-        ), 0) AS GrossRevenue,
-
-        ISNULL((
-            SELECT COUNT(1)
-            FROM dbo.invoices inv
-            WHERE inv.status = 2
-              AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @PrevFrom AND @PrevTo
-              AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
-        ), 0) AS TransactionCount
-    WHERE @ComparePrevious = 1;
+        PeriodTag,
+        CashIn,
+        CashOut,
+        CashIn - CashOut AS NetCashFlow,
+        GrossRevenue,
+        TransactionCount,
+        CASE
+            WHEN TransactionCount > 0 THEN ROUND(GrossRevenue / TransactionCount, 0)
+            ELSE 0
+        END AS AverageOrderValue
+    FROM period_raw;
 END
 GO

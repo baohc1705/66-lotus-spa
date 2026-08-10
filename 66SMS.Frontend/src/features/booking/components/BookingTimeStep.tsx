@@ -6,7 +6,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { useEffect, useMemo } from "react";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import {
   useAvailableBookingDays,
   useTechnicians,
@@ -168,12 +168,11 @@ export function BookingTimeStep() {
             </div>
           ) : loadingTechs ? (
             <div className="col-span-full py-4 text-center text-xs text-warm-600">
-              Đang tải danh sách KTV...
+              Đang tải danh sách kỹ thuật viên...
             </div>
           ) : !hasWorkingTechnicians ? (
             <div className="col-span-full rounded-sm border border-warm-100 bg-warm-50 py-6 text-center text-sm text-warm-600">
-              Không có kỹ thuật viên nào làm việc trong ngày này. Vui lòng chọn
-              ngày khác.
+              Không có kỹ thuật viên làm việc ngày này. Chọn ngày khác.
             </div>
           ) : (
             technicians.map((tech) => {
@@ -213,7 +212,7 @@ export function BookingTimeStep() {
                     </p>
                     <span className="inline-block text-2xs font-bold px-1.5 py-0.5 rounded-sm mt-1.5 bg-success-bg text-success-text">
                       {tech.slotsLeft !== undefined
-                        ? `Còn ${tech.slotsLeft} slot`
+                        ? `Còn ${tech.slotsLeft} khung giờ`
                         : "Sẵn sàng"}
                     </span>
                   </div>

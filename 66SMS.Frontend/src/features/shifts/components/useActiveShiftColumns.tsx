@@ -1,19 +1,12 @@
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Trash2, Eye, Clock } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
+import { Clock, Eye, Pencil, Trash2 } from "lucide-react";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { IndexCell, NameCell } from "@/shared/components/DataTable/TableCells";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { formatDisplayDate } from "@/shared/utils/date.utils";
+import { Tooltip } from "@/shared/components/Tooltip";
+import { Button } from "@/shared/elements/Button";
+import { SortableColumnHeader } from "@/shared/tables/SortableColumnHeader";
+import { IndexCell, NameCell } from "@/shared/tables/TableCells";
+import { formatDisplayDate, toLocalTimeOnly } from "@/shared/utils/date.utils";
 import { SHIFT_PERM } from "../constants/shift.permissions";
 import type { ShiftDTO } from "../types/shift.types";
 
@@ -69,6 +62,7 @@ export function useActiveShiftColumns({
             orderBy={orderBy}
             isDescending={isDescending}
             onSort={onSort}
+            onPrimary
           />
         ),
         cell: ({ row }) => <NameCell value={row.original.name} />,
@@ -81,11 +75,11 @@ export function useActiveShiftColumns({
           const currentPeriod = row.original.shiftPeriodDTOs?.[0];
           if (!currentPeriod) return "—";
           return (
-            <div className="flex items-center gap-1.5 text-adminInk/90">
-              <Clock className="w-4 h-4 text-adminGray-600" />
+            <div className="flex items-center gap-1.5 text-kit-heading">
+              <Clock className="h-4 w-4 text-kit-muted" />
               <span>
-                {currentPeriod.shiftStart?.substring(0, 5)} -{" "}
-                {currentPeriod.shiftEnd?.substring(0, 5)}
+                {toLocalTimeOnly(currentPeriod.shiftStart)} -{" "}
+                {toLocalTimeOnly(currentPeriod.shiftEnd)}
               </span>
             </div>
           );
@@ -103,7 +97,7 @@ export function useActiveShiftColumns({
             ? formatDisplayDate(currentPeriod.effectiveTo)
             : "Vô thời hạn";
           return (
-            <span className="text-adminInk/80 text-sm">
+            <span className="text-sm text-kit-muted">
               {from} - {to}
             </span>
           );
@@ -112,48 +106,53 @@ export function useActiveShiftColumns({
       },
       {
         id: "actions",
-        header: "",
+        header: "Thao tác",
         cell: ({ row }) => {
           const item = row.original;
+          const expanded = row.getIsExpanded();
           return (
-            <div onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <div
+              className="flex items-center gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Tooltip text={expanded ? "Đóng chi tiết" : "Xem chi tiết"}>
+                <Button
+                  size="icon-sm"
+                  variant="outline-info"
+                  className="mb-0 mr-0"
+                  onClick={() => row.toggleExpanded()}
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                </Button>
+              </Tooltip>
+              <PermissionGate resource={perm.resource} action={perm.update}>
+                <Tooltip text="Sửa">
                   <Button
-                    variant="ghost"
                     size="icon-sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    variant="outline-primary"
+                    className="mb-0 mr-0"
+                    onClick={() => onEdit(item)}
                   >
-                    <MoreHorizontal className="w-4 h-4" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => row.toggleExpanded()}>
-                    <Eye className="w-4 h-4" />
-                    {row.getIsExpanded() ? "Đóng chi tiết" : "Xem chi tiết"}
-                  </DropdownMenuItem>
-                  <PermissionGate resource={perm.resource} action={perm.update}>
-                    <DropdownMenuItem onClick={() => onEdit(item)}>
-                      <Pencil className="w-4 h-4" />
-                      {COMMON_MSG.edit}
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                  <PermissionGate resource={perm.resource} action={perm.delete}>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={() => onDelete(item)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Xóa ca
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </Tooltip>
+              </PermissionGate>
+              <PermissionGate resource={perm.resource} action={perm.delete}>
+                <Tooltip text="Xóa">
+                  <Button
+                    size="icon-sm"
+                    variant="outline-danger"
+                    className="mb-0 mr-0"
+                    onClick={() => onDelete(item)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </Tooltip>
+              </PermissionGate>
             </div>
           );
         },
-        size: 50,
+        size: 120,
         enableResizing: false,
       },
     ],

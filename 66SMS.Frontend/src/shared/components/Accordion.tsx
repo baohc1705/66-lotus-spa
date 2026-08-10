@@ -6,13 +6,37 @@ export type AccordionItem = {
   content: ReactNode;
 };
 
+export type AccordionTone =
+  | "primary"
+  | "secondary"
+  | "success"
+  | "info"
+  | "warning"
+  | "danger"
+  | "focus"
+  | "alternate"
+  | "dark";
+
 type AccordionProps = {
   items: AccordionItem[];
   className?: string;
   allowMultiple?: boolean;
   wrapper?: boolean;
   defaultOpenId?: string;
+  tone?: AccordionTone;
 };
+
+function toneText(tone: AccordionTone): string {
+  if (tone === "secondary") return "text-kit-secondary";
+  if (tone === "success") return "text-kit-success";
+  if (tone === "info") return "text-kit-info";
+  if (tone === "warning") return "text-kit-warning";
+  if (tone === "danger") return "text-kit-danger";
+  if (tone === "focus") return "text-kit-focus";
+  if (tone === "alternate") return "text-kit-alt";
+  if (tone === "dark") return "text-kit-dark";
+  return "text-kit-primary";
+}
 
 export function Accordion({
   items,
@@ -20,9 +44,11 @@ export function Accordion({
   allowMultiple = false,
   wrapper = false,
   defaultOpenId,
+  tone = "primary",
 }: AccordionProps) {
   const initial = defaultOpenId ?? items[0]?.id;
   const [openIds, setOpenIds] = useState<string[]>(initial ? [initial] : []);
+  const linkTone = toneText(tone);
 
   function toggle(id: string) {
     setOpenIds((prev: string[]) => {
@@ -45,12 +71,15 @@ export function Accordion({
         {items.map((item: AccordionItem) => {
           const isOpen = openIds.includes(item.id);
           return (
-            <div key={item.id} className="card border-0 bg-white shadow-none">
+            <div key={item.id} className="card border-0 bg-kit-white shadow-none">
               <div className="card-header h-auto border-0 p-4">
                 <button
                   type="button"
                   onClick={() => toggle(item.id)}
-                  className="btn btn-link m-0 w-full p-0 text-left text-sm font-medium text-kit-primary no-underline hover:no-underline"
+                  className={
+                    "btn btn-link m-0 w-full p-0 text-left text-sm font-medium no-underline hover:no-underline " +
+                    linkTone
+                  }
                   aria-expanded={isOpen}
                 >
                   <h5 className="m-0 p-0 text-sm font-normal normal-case text-inherit">
@@ -79,7 +108,9 @@ export function Accordion({
             <button
               type="button"
               onClick={() => toggle(item.id)}
-              className="btn btn-link m-0 block p-0 text-left text-sm font-medium text-kit-primary"
+              className={
+                "btn btn-link m-0 block p-0 text-left text-sm font-medium " + linkTone
+              }
               aria-expanded={isOpen}
             >
               {item.title}

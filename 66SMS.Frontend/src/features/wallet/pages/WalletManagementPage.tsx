@@ -1,44 +1,45 @@
-import { formatCurrency } from "@/shared/utils/currency";
-import {
-  formatDateTimeDisplay,
-  formatDisplayDate,
-} from "@/shared/utils/date.utils";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getAdminWallets } from "../api/wallet.api";
-import type { AdminWalletDto } from "../types/wallet.types";
-import { WalletTransactionModal } from "../components/WalletTransactionModal";
-import { Wallet } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
 import {
   getCoreRowModel,
   useReactTable,
   type ColumnDef,
 } from "@tanstack/react-table";
-import { motion } from "motion/react";
-import { containerVariants } from "@/shared/motion/pageVariants";
-import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
+import { Eye, Wallet } from "lucide-react";
 
-const WALLET_STATUS_MAP: Record<number, { label: string; className: string }> =
-  {
-    1: {
-      label: "Hoạt động",
-      className:
-        "bg-state-success-bg text-state-success-text border-state-success-border",
-    },
-    2: {
-      label: "Đang khóa",
-      className:
-        "bg-state-danger-bg text-state-danger-text border-state-danger-border",
-    },
-    3: {
-      label: "Đã đóng",
-      className:
-        "bg-state-neutral-bg text-state-neutral-text border-state-neutral-border",
-    },
-  };
+import { Tooltip } from "@/shared/components/Tooltip";
+import { Badge, type BadgeVariant } from "@/shared/elements/Badge";
+import { Button } from "@/shared/elements/Button";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
+import { IndexCell, MutedSmallCell, NameCell, PriceCell, TextCell } from "@/shared/tables/TableCells";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
+import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
+import {
+  formatDateTimeDisplay,
+  formatDisplayDate,
+} from "@/shared/utils/date.utils";
+
+import { WalletTransactionModal } from "../components/WalletTransactionModal";
+import { getAdminWallets } from "../api/wallet.api";
+import type { AdminWalletDto } from "../types/wallet.types";
+
+function walletStatusBadge(status: number) {
+  let label = "Không rõ";
+  let variant: BadgeVariant = "secondary";
+  if (status === 1) {
+    label = "Hoạt động";
+    variant = "success";
+  } else if (status === 2) {
+    label = "Đang khóa";
+    variant = "danger";
+  } else if (status === 3) {
+    label = "Đã đóng";
+    variant = "dark";
+  }
+  return <Badge variant={variant}>{label}</Badge>;
+}
 
 export function WalletManagementPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -55,13 +56,14 @@ export function WalletManagementPage() {
   const wallets = useMemo(() => response?.data || [], [response]);
 
   const filteredWallets = useMemo(() => {
-    return wallets.filter(
-      (w: AdminWalletDto) =>
-        (w.customerName || "")
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        (w.customerPhone || "").includes(searchTerm),
-    );
+    const keyword = searchTerm.toLowerCase();
+    return wallets.filter((wallet: AdminWalletDto) => {
+      const nameMatch = (wallet.customerName || "")
+        .toLowerCase()
+        .includes(keyword);
+      const phoneMatch = (wallet.customerPhone || "").includes(searchTerm);
+      return nameMatch || phoneMatch;
+    });
   }, [wallets, searchTerm]);
 
   const columns = useMemo<ColumnDef<AdminWalletDto>[]>(
@@ -70,126 +72,92 @@ export function WalletManagementPage() {
         id: "index",
         header: "#",
         cell: ({ row }) => (
-          <span className="text-adminGray-600 text-xs font-medium">
-            {row.index + 1}
-          </span>
+          <IndexCell pageIndex={1} pageSize={filteredWallets.length} rowIndex={row.index} />
         ),
         size: 50,
       },
       {
         accessorKey: "id",
         header: "Mã ví",
-        cell: ({ row }) => (
-          <span className="text-2xs font-mono font-bold text-adminGray-600">
-            #{row.original.id}
-          </span>
-        ),
+        cell: ({ row }) => <MutedSmallCell value={`#${row.original.id}`} />,
         size: 70,
       },
       {
         accessorKey: "customerId",
-        header: "Mã KH",
+        header: "Mã khách",
         cell: ({ row }) => (
-          <span className="text-2xs font-mono text-adminGray-600">
-            #{row.original.customerId}
-          </span>
+          <MutedSmallCell value={`#${row.original.customerId}`} />
         ),
         size: 70,
       },
       {
         accessorKey: "customerName",
         header: "Khách hàng",
-        cell: ({ row }) => (
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-full bg-adminGreen-50/35 flex items-center justify-center text-adminGreen-600 font-bold shrink-0 text-xs uppercase">
-              {(row.original.customerName || "K").charAt(0)}
-            </div>
-            <span className="text-sm font-semibold text-adminInk">
-              {row.original.customerName}
-            </span>
-          </div>
-        ),
+        cell: ({ row }) => <NameCell value={row.original.customerName} />,
       },
       {
         accessorKey: "customerPhone",
         header: "Số điện thoại",
-        cell: ({ row }) => (
-          <span className="text-adminInk/80 text-xs">
-            {row.original.customerPhone}
-          </span>
-        ),
+        cell: ({ row }) => <TextCell value={row.original.customerPhone} />,
       },
       {
         accessorKey: "balance",
         header: "Số dư ví",
-        cell: ({ row }) => (
-          <span className="font-bold text-adminGreen-600 text-sm">
-            {formatCurrency(row.original.balance)}
-          </span>
-        ),
+        cell: ({ row }) => <PriceCell value={row.original.balance} />,
       },
       {
         accessorKey: "status",
         header: "Trạng thái",
-        cell: ({ row }) => {
-          const statusVal = row.original.status;
-          const statusInfo = WALLET_STATUS_MAP[statusVal] || {
-            label: "Không rõ",
-            className: "bg-adminGray-50 text-adminInk border-adminGray-100/50",
-          };
-          return (
-            <span
-              className={`text-2xs font-bold px-1.5 py-0.5 rounded border ${statusInfo.className}`}
-            >
-              {statusInfo.label}
-            </span>
-          );
-        },
+        cell: ({ row }) => walletStatusBadge(row.original.status),
       },
       {
         accessorKey: "createdAt",
         header: "Ngày tạo ví",
         cell: ({ row }) => (
-          <span className="text-adminGray-600 text-2xs">
-            {formatDisplayDate(row.original.createdAt)}
-          </span>
+          <MutedSmallCell value={formatDisplayDate(row.original.createdAt)} />
         ),
       },
       {
         id: "updatedAt",
         header: "Cập nhật lần cuối",
         cell: ({ row }) => (
-          <span className="text-adminGray-600 text-2xs">
-            {formatDateTimeDisplay(
+          <MutedSmallCell
+            value={formatDateTimeDisplay(
               row.original.updatedAt || row.original.createdAt,
             )}
-          </span>
+          />
         ),
       },
       {
         id: "actions",
         header: "",
         cell: ({ row }) => (
-          <div className="flex justify-end pr-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-adminGreen-600 hover:text-adminGreen-600/80 font-bold text-xs h-8 hover:bg-adminGreen-50"
-              onClick={() =>
-                setSelectedWallet({
-                  id: row.original.id,
-                  name: row.original.customerName,
-                })
-              }
-            >
-              Chi tiết
-            </Button>
+          <div
+            className="flex items-center justify-end gap-1"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <Tooltip text="Chi tiết">
+              <Button
+                type="button"
+                size="icon-sm"
+                variant="outline-info"
+                className="mb-0 mr-0"
+                onClick={() =>
+                  setSelectedWallet({
+                    id: row.original.id,
+                    name: row.original.customerName,
+                  })
+                }
+              >
+                <Eye className="h-3.5 w-3.5" />
+              </Button>
+            </Tooltip>
           </div>
         ),
-        size: 90,
+        size: 60,
       },
     ],
-    [setSelectedWallet],
+    [filteredWallets.length],
   );
 
   const table = useReactTable({
@@ -199,31 +167,9 @@ export function WalletManagementPage() {
   });
 
   return (
-    <div className="flex flex-col gap-2 h-full overflow-hidden w-full">
-      <div className="shrink-0 bg-white p-4 rounded border border-adminGray-100/30 shadow-xs flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-adminGreen-50/20 text-adminGreen-600 rounded-xl">
-            <Wallet className="w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-adminInk leading-tight">
-              Quản lý Ví Khách Hàng
-            </h1>
-            <p className="text-xs text-adminGray-600 mt-0.5">
-              Xem danh sách ví của khách hàng và quản lý các giao dịch nạp / trừ
-              tiền thủ công.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-        className="lotus-admin-table-page-card flex-1 min-h-0 flex flex-col overflow-hidden relative"
-      >
-        <div className="px-4 pt-3 shrink-0">
+    <div className="space-y-3 pb-6 font-sans text-sm text-kit-body">
+      <TablePageShell isLoading={isLoading}>
+        <div className="border-b border-kit px-4 pt-4">
           <DataTableToolbar
             searchValue={searchTerm}
             onSearchChange={setSearchTerm}
@@ -236,22 +182,13 @@ export function WalletManagementPage() {
           isLoading={isLoading}
           loadingRows={DEFAULT_LOADING_ROWS}
           emptyState={
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-adminGray-50 flex items-center justify-center">
-                <Wallet className="w-7 h-7 text-adminGray-600" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-adminInk">
-                  Không tìm thấy dữ liệu ví
-                </p>
-                <p className="text-xs text-adminGray-600 mt-0.5">
-                  Hãy thử thay đổi từ khóa tìm kiếm khác.
-                </p>
-              </div>
-            </div>
+            <TableEmptyState
+              icon={Wallet}
+              title="Không tìm thấy dữ liệu ví"
+            />
           }
         />
-      </motion.div>
+      </TablePageShell>
 
       <WalletTransactionModal
         walletId={selectedWallet?.id || null}

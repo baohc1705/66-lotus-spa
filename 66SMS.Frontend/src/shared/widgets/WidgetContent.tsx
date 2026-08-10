@@ -1,6 +1,5 @@
 ﻿import type { ReactNode } from "react";
 
-/** Tên khớp utility `gradient-*` trong admin.utilities.css */
 export type WidgetGradient =
   | "happy-green"
   | "premium-dark"

@@ -1,36 +1,34 @@
-import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import { ArrowLeft, Box, Plus, Trash2 } from "lucide-react";
 import { useCallback, useMemo } from "react";
+import { useReactTable, getCoreRowModel } from "@tanstack/react-table";
+import { Plus, Trash2, ArrowLeft, Box } from "lucide-react";
 
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { TableEmptyState } from "@/shared/components/DataTable/TableEmptyState";
-import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
-import { TableSelectionBar } from "@/shared/components/DataTable/TableSelectionBar";
+import { Pagination } from "@/shared/components/Pagination";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { Button } from "@/shared/components/ui/button";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
+import { Button } from "@/shared/elements/Button";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
+import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
+import { TableSelectionBar } from "@/shared/tables/TableSelectionBar";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
-
 import { useRowSelection } from "@/shared/hooks/useRowSelection";
+
 import { ProductCategoryFormDialog } from "../components/ProductCategoryFormDialog";
 import {
-  CATEGORY_COLUMN_LABELS,
   useActiveCategoryColumns,
+  CATEGORY_COLUMN_LABELS,
 } from "../components/useActiveCategoryColumns";
 import { useDeletedCategoryColumns } from "../components/useDeletedCategoryColumns";
 import { PRODUCT_CATEGORY_PERM } from "../constants/productCategory.permissions";
 import {
+  useProductCategories,
   useDeletedProductCategories,
   useDeleteProductCategory,
   useDeleteProductCategoryMultiples,
-  useProductCategories,
-  useRestoreProductCategory,
   useUpdateProductCategory,
+  useRestoreProductCategory,
 } from "../hooks/useProductCategories";
 import { useProductCategoryListState } from "../hooks/useProductCategoryListState";
 import type { ProductCategoryDto } from "../types/productCategory.types";
@@ -42,6 +40,7 @@ const BULK_DELETE_WARNING =
   "Các sản phẩm thuộc các danh mục này có thể bị ảnh hưởng.";
 
 export function ProductCategoryListPage() {
+  "use no memo";
   const perm = PRODUCT_CATEGORY_PERM;
 
   const listState = useProductCategoryListState();
@@ -86,6 +85,10 @@ export function ProductCategoryListPage() {
   const paged = categoryResult?.data;
   const categories = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
+  const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
   const pageIds = useMemo(
     () =>
@@ -110,8 +113,6 @@ export function ProductCategoryListPage() {
   const restoreMutation = useRestoreProductCategory();
 
   const activeColumns = useActiveCategoryColumns({
-    pageIndex,
-    pageSize,
     orderBy,
     isDescending,
     onSort: handleSort,
@@ -125,8 +126,6 @@ export function ProductCategoryListPage() {
   });
 
   const deletedColumns = useDeletedCategoryColumns({
-    pageIndex,
-    pageSize,
     onRestore: setRestoreTarget,
   });
 
@@ -140,6 +139,8 @@ export function ProductCategoryListPage() {
     columnResizeMode: "onChange",
     state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
+    manualPagination: true,
+    manualSorting: true,
   });
 
   const handleDelete = useCallback(() => {
@@ -181,14 +182,10 @@ export function ProductCategoryListPage() {
   const columnLabels = useMemo(() => ({ ...CATEGORY_COLUMN_LABELS }), []);
 
   return (
-    <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-      <div className="px-4 pt-4">
-        <DataTableToolbar
-          searchValue={filter}
-          onSearchChange={handleSearchChange}
-          searchPlaceholder="Tìm kiếm danh mục..."
-        >
-          {selectedCount > 0 && !showDeleted && (
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
+      <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+        <div className="border-b border-kit px-4 pt-4">
+          {selectedCount > 0 && !showDeleted ? (
             <TableSelectionBar
               count={selectedCount}
               onClear={clearSelection}
@@ -199,120 +196,139 @@ export function ProductCategoryListPage() {
                   role={perm.role}
                 >
                   <Button
-                    variant="destructive"
+                    variant="danger"
                     size="sm"
-                    className="lotus-admin-btn-toolbar"
+                    className="mb-0"
                     onClick={() => setBulkDeleteOpen(true)}
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="h-3.5 w-3.5" />
                     Xóa đã chọn
                   </Button>
                 </PermissionGate>
               }
             />
-          )}
+          ) : null}
 
-          {!showDeleted && (
-            <DataTableViewOptions table={table} columnLabels={columnLabels} />
-          )}
-
-          <PermissionGate
-            resource={perm.resource}
-            action={perm.create}
-            role={perm.role}
+          <DataTableToolbar
+            searchValue={filter}
+            onSearchChange={handleSearchChange}
+            searchPlaceholder="Tìm kiếm danh mục..."
           >
-            <Button
-              variant="admin"
-              size="sm"
-              onClick={() => setCreateOpen(true)}
-              className="lotus-admin-table-toolbar-btn"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Thêm danh mục
-            </Button>
-          </PermissionGate>
+            {!showDeleted && (
+              <DataTableViewOptions table={table} columnLabels={columnLabels} />
+            )}
 
-          <PermissionGate
-            resource={perm.resource}
-            action={perm.read}
-            role={perm.role}
-          >
-            <Button
-              variant="admin"
-              size="sm"
-              className="lotus-admin-table-toolbar-btn"
-              onClick={() => handleToggleView(clearSelection)}
-              title={showDeleted ? "Quay lại danh sách" : "Danh mục đã xóa"}
+            <PermissionGate
+              resource={perm.resource}
+              action={perm.create}
+              role={perm.role}
             >
-              {showDeleted ? (
-                <>
-                  <ArrowLeft className="w-4 h-4" />
-                  {COMMON_MSG.back}
-                </>
-              ) : (
-                <>
-                  <Trash2 className="w-4 h-4" />
-                  {COMMON_MSG.restore}
-                </>
-              )}
-            </Button>
-          </PermissionGate>
-        </DataTableToolbar>
-      </div>
+              <Button
+                variant="primary"
+                size="sm"
+                className="mb-0"
+                onClick={() => setCreateOpen(true)}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Thêm danh mục
+              </Button>
+            </PermissionGate>
 
-      <DataTable
-        table={table}
-        isLoading={isLoading}
-        loadingRows={
-          pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
-        }
-        emptyState={
-          showDeleted ? (
-            <TableEmptyState
-              icon={Trash2}
-              title="Không có danh mục đã xóa"
-              hint="Các danh mục bị xóa sẽ hiển thị tại đây."
-            />
-          ) : (
-            <TableEmptyState
-              icon={Box}
-              title="Chưa có danh mục sản phẩm"
-              hint="Thêm danh mục mới để phân loại sản phẩm."
-              action={
-                <PermissionGate
-                  resource={perm.resource}
-                  action={perm.create}
-                  role={perm.role}
-                >
-                  <Button
-                    variant="admin"
-                    size="sm"
-                    onClick={() => setCreateOpen(true)}
-                    className="mt-1 text-xs"
+            <PermissionGate
+              resource={perm.resource}
+              action={perm.read}
+              role={perm.role}
+            >
+              <Button
+                variant="secondary"
+                size="sm"
+                className="mb-0"
+                onClick={() => handleToggleView(clearSelection)}
+              >
+                {showDeleted ? (
+                  <>
+                    <ArrowLeft className="h-4 w-4" />
+                    Quay lại
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4" />
+                    Khôi phục
+                  </>
+                )}
+              </Button>
+            </PermissionGate>
+          </DataTableToolbar>
+        </div>
+
+        <DataTable
+          table={table}
+          isLoading={isLoading}
+          loadingRows={
+            pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
+          }
+          emptyState={
+            showDeleted ? (
+              <TableEmptyState
+                icon={Trash2}
+                title="Không có danh mục đã xóa"
+              />
+            ) : (
+              <TableEmptyState
+                icon={Box}
+                title="Chưa có danh mục sản phẩm"
+                action={
+                  <PermissionGate
+                    resource={perm.resource}
+                    action={perm.create}
+                    role={perm.role}
                   >
-                    <Plus className="w-3.5 h-3.5" />
-                    Thêm danh mục
-                  </Button>
-                </PermissionGate>
-              }
-            />
-          )
-        }
-        pagination={
-          paged && totalCount > 0 ? (
-            <DataTablePagination
-              pageIndex={paged.pageIndex}
-              pageSize={paged.pageSize}
-              totalCount={paged.totalCount}
-              totalPages={paged.totalPages}
-              hasPreviousPage={paged.hasPreviousPage}
-              hasNextPage={paged.hasNextPage}
-              onPageChange={setPageIndex}
-              onPageSizeChange={handlePageSizeChange}
-            />
-          ) : null
-        }
-      />
+                    <Button
+                      variant="admin"
+                      size="sm"
+                      className="mb-0"
+                      onClick={() => setCreateOpen(true)}
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Thêm danh mục
+                    </Button>
+                  </PermissionGate>
+                }
+              />
+            )
+          }
+          pagination={
+            paged && totalCount > 0 ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <div className="flex items-center gap-3 text-xs text-kit-muted">
+                  <span>
+                    {rangeStart}-{rangeEnd} / {totalCount}
+                  </span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) =>
+                      handlePageSizeChange(Number(e.target.value))
+                    }
+                    className="h-8 cursor-pointer rounded border border-kit bg-kit-white px-2 text-xs text-kit-heading outline-none focus:border-kit-primary"
+                  >
+                    {[5, 10, 20].map((size: number) => (
+                      <option key={size} value={size}>
+                        {size} / trang
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <Pagination
+                  page={safePage}
+                  pageCount={totalPages}
+                  onPageChange={setPageIndex}
+                  size="sm"
+                />
+              </div>
+            ) : null
+          }
+        />
+      </TablePageShell>
 
       <ProductCategoryFormDialog
         open={createOpen}
@@ -331,13 +347,9 @@ export function ProductCategoryListPage() {
         open={bulkDeleteOpen}
         onOpenChange={setBulkDeleteOpen}
         onConfirm={handleBulkDelete}
-        title={CONFIRM_MSG.bulkDeleteTitle(ENTITY)}
-        description={CONFIRM_MSG.bulkDeleteDescription(
-          selectedCount,
-          ENTITY,
-          BULK_DELETE_WARNING,
-        )}
-        confirmLabel={COMMON_MSG.delete}
+        title={`Xóa ${ENTITY} đã chọn`}
+        description={`Bạn có chắc muốn xóa ${selectedCount} ${ENTITY} đã chọn?${BULK_DELETE_WARNING ? ` ${BULK_DELETE_WARNING}` : ""}`}
+        confirmLabel="Xóa"
         loading={deleteMultiplesMutation.isPending}
         variant="danger"
       />
@@ -348,13 +360,9 @@ export function ProductCategoryListPage() {
           if (!open) setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
-        title={CONFIRM_MSG.deleteTitle(ENTITY)}
-        description={CONFIRM_MSG.deleteDescription(
-          ENTITY,
-          deleteTarget?.name ?? "",
-          DELETE_WARNING,
-        )}
-        confirmLabel={COMMON_MSG.delete}
+        title={`Xóa ${ENTITY}`}
+        description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget?.name ?? ""}"?${DELETE_WARNING ? ` ${DELETE_WARNING}` : ""} Hành động này không thể hoàn tác.`}
+        confirmLabel="Xóa"
         loading={deleteMutation.isPending}
         variant="danger"
       />
@@ -365,15 +373,12 @@ export function ProductCategoryListPage() {
           if (!open) setRestoreTarget(null);
         }}
         onConfirm={handleRestore}
-        title={CONFIRM_MSG.restoreTitle(ENTITY_SUBJECT)}
-        description={CONFIRM_MSG.restoreDescription(
-          ENTITY_SUBJECT,
-          restoreTarget?.name ?? "",
-        )}
-        confirmLabel={COMMON_MSG.restore}
+        title={`Khôi phục ${ENTITY_SUBJECT}`}
+        description={`Bạn có chắc muốn khôi phục ${ENTITY_SUBJECT} "${restoreTarget?.name ?? ""}"? ${ENTITY_SUBJECT} sẽ hiển thị lại trong danh sách chính.`}
+        confirmLabel="Khôi phục"
         loading={restoreMutation.isPending}
         variant="default"
       />
-    </TablePageShell>
+    </div>
   );
 }

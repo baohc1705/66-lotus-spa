@@ -1,28 +1,20 @@
-export function RolePermissionModal({ title, onClose, children }: {
+import type { ReactNode } from 'react';
+import { Modal } from '@/shared/components/Modal';
+
+export function RolePermissionModal({
+  title,
+  onClose,
+  children,
+  footer,
+}: {
   title: string;
   onClose: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
+  footer?: ReactNode;
 }) {
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-lotus-deep/30"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-xl p-6 w-[420px] max-w-[95vw] shadow-jade-lg"
-        onClick={e => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="text-base font-bold text-adminInk">{title}</h3>
-          <button
-            onClick={onClose}
-            className="text-xl leading-none text-adminGray-600 hover:text-adminInk bg-transparent border-0 cursor-pointer"
-          >
-            ×
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
+    <Modal open onClose={onClose} title={title} size="md" centered footer={footer}>
+      {children}
+    </Modal>
   );
 }

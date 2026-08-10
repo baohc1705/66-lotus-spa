@@ -1,25 +1,33 @@
 import { useState } from "react";
+import { Calendar } from "lucide-react";
+
+import { Pagination } from "@/shared/components/Pagination";
+import { Badge, type BadgeVariant } from "@/shared/elements/Badge";
+import { Card, CardBody } from "@/shared/elements/Card";
 import {
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  MapPin,
-} from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { formatCurrency } from "@/shared/utils/currency";
-import { formatDisplayDate } from "@/shared/utils/date.utils";
-import {
-  APPOINTMENT_STATUS_DOT_CLASS,
+  APPOINTMENT_STATUS,
   APPOINTMENT_STATUS_LABELS,
 } from "@/features/booking/constants/appointment.constants";
 import type { AppointmentDto } from "@/features/booking/types/booking.types";
-import { useCustomerDetail } from "../hooks/useCustomers";
+import { formatCurrency } from "@/shared/utils/currency";
+import { formatDisplayDate } from "@/shared/utils/date.utils";
+
 import { useCustomerAppointments } from "../hooks/useCustomerAppointments";
+import { useCustomerDetail } from "../hooks/useCustomers";
 
 interface CustomerCrmAppointmentsProps {
   customerId: number | null;
+}
+
+function getStatusBadgeVariant(status: number): BadgeVariant {
+  if (status === APPOINTMENT_STATUS.PENDING) return "secondary";
+  if (status === APPOINTMENT_STATUS.CONFIRMED) return "primary";
+  if (status === APPOINTMENT_STATUS.WAITING) return "warning";
+  if (status === APPOINTMENT_STATUS.IN_SERVICE) return "info";
+  if (status === APPOINTMENT_STATUS.COMPLETED) return "success";
+  if (status === APPOINTMENT_STATUS.CANCELLED) return "danger";
+  if (status === APPOINTMENT_STATUS.NO_SHOW) return "dark";
+  return "secondary";
 }
 
 export function CustomerCrmAppointments({
@@ -37,12 +45,12 @@ export function CustomerCrmAppointments({
 
   const appointments = paged?.items ?? [];
   const totalCount = paged?.totalCount ?? 0;
-  const totalPages = paged?.totalPages ?? 1;
+  const totalPages = Math.max(1, paged?.totalPages ?? 1);
 
   if (!customerId) {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-white border border-adminGray-100 rounded shadow-xs p-6 text-center text-adminGray-400">
-        <Calendar className="w-12 h-12 text-adminGray-300 mb-2 stroke-[1.5]" />
+      <div className="flex h-full flex-col items-center justify-center rounded border border-kit bg-kit-white p-6 text-center text-kit-muted shadow-kit-card">
+        <Calendar className="mb-2 h-12 w-12 stroke-[1.5] text-kit-muted/60" />
         <p className="text-sm font-medium">
           Chọn một khách hàng để xem lịch hẹn
         </p>
@@ -52,20 +60,17 @@ export function CustomerCrmAppointments({
 
   if (isLoadingCustomer || isLoadingAppointments) {
     return (
-      <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-xs p-4 space-y-3">
-        <Skeleton className="h-5 w-32" />
-        <Skeleton className="h-20 w-full" />
-        <Skeleton className="h-20 w-full" />
-        <Skeleton className="h-20 w-full" />
+      <div className="flex h-full flex-col items-center justify-center rounded border border-kit bg-kit-white p-6 text-kit-muted shadow-kit-card">
+        <p className="text-sm">Đang tải lịch hẹn...</p>
       </div>
     );
   }
 
   if (!userId) {
     return (
-      <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-xs">
+      <div className="flex h-full flex-col overflow-hidden rounded border border-kit bg-kit-white shadow-kit-card">
         <Header count={0} />
-        <div className="flex-1 flex items-center justify-center p-6 text-center text-adminGray-400 text-xs">
+        <div className="flex flex-1 items-center justify-center p-6 text-center text-xs text-kit-muted">
           Khách hàng chưa có tài khoản nên chưa có lịch hẹn trên hệ thống
         </div>
       </div>
@@ -73,14 +78,14 @@ export function CustomerCrmAppointments({
   }
 
   return (
-    <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-xs">
+    <div className="flex h-full flex-col overflow-hidden rounded border border-kit bg-kit-white shadow-kit-card">
       <Header count={totalCount} />
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2.5">
+      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
         {appointments.length === 0 ? (
-          <div className="text-center py-10 text-adminGray-400 text-xs italic">
+          <p className="py-10 text-center text-xs italic text-kit-muted">
             Chưa có lịch hẹn nào
-          </div>
+          </p>
         ) : (
           appointments.map((item: AppointmentDto) => (
             <AppointmentCard key={item.id} appointment={item} />
@@ -88,45 +93,30 @@ export function CustomerCrmAppointments({
         )}
       </div>
 
-      {totalPages > 1 && (
-        <div className="p-2 border-t border-adminGray-100 bg-adminGray-50/50 flex items-center justify-between text-xs text-adminGray-600 shrink-0">
-          <Button
-            variant="ghost"
-            size="icon"
-            disabled={pageIndex === 1}
-            onClick={() => setPageIndex(pageIndex - 1)}
-            className="h-7 w-7 text-adminGray-600 hover:text-adminInk"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="font-medium">
-            Trang {pageIndex} / {totalPages}
-          </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            disabled={pageIndex === totalPages}
-            onClick={() => setPageIndex(pageIndex + 1)}
-            className="h-7 w-7 text-adminGray-600 hover:text-adminInk"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+      {totalPages > 1 ? (
+        <div className="flex shrink-0 justify-center border-t border-kit bg-kit-page/50 p-2">
+          <Pagination
+            page={pageIndex}
+            pageCount={totalPages}
+            onPageChange={setPageIndex}
+            size="sm"
+          />
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
 
 function Header({ count }: { count: number }) {
   return (
-    <div className="p-3 border-b border-adminGray-100 shrink-0 flex items-center justify-between">
-      <h3 className="text-sm font-bold text-adminInk flex items-center gap-1.5">
-        <Calendar className="w-4 h-4 text-adminGreen-600" />
+    <div className="flex shrink-0 items-center justify-between border-b border-kit p-3">
+      <h3 className="mb-0 flex items-center gap-1.5 text-sm font-bold text-kit-heading">
+        <Calendar className="h-4 w-4 text-kit-primary" />
         Lịch hẹn
       </h3>
-      <span className="text-2xs font-semibold bg-adminGray-100 text-adminGray-600 px-2 py-0.5 rounded">
+      <Badge variant="secondary" soft className="normal-case">
         {count}
-      </span>
+      </Badge>
     </div>
   );
 }
@@ -134,7 +124,7 @@ function Header({ count }: { count: number }) {
 function AppointmentCard({ appointment }: { appointment: AppointmentDto }) {
   const status = appointment.status ?? 0;
   const statusLabel = APPOINTMENT_STATUS_LABELS[status] ?? "Không rõ";
-  const statusDot = APPOINTMENT_STATUS_DOT_CLASS[status] ?? "bg-adminGray-300";
+  const badgeVariant = getStatusBadgeVariant(status);
 
   const startTime = appointment.timeSlotStartTime
     ? appointment.timeSlotStartTime.substring(0, 5)
@@ -142,64 +132,76 @@ function AppointmentCard({ appointment }: { appointment: AppointmentDto }) {
   const endTime = appointment.timeSlotEndTime
     ? appointment.timeSlotEndTime.substring(0, 5)
     : null;
-  const timeLabel =
-    startTime && endTime
-      ? `${startTime} - ${endTime}`
-      : startTime || "Chưa xếp giờ";
 
-  const services =
+  const dateLabel = appointment.appointmentDate
+    ? formatDisplayDate(appointment.appointmentDate)
+    : null;
+
+  let whenLabel = "Chưa xếp lịch";
+  if (dateLabel && startTime && endTime) {
+    whenLabel = `${dateLabel}, ${startTime}-${endTime}`;
+  } else if (dateLabel && startTime) {
+    whenLabel = `${dateLabel}, ${startTime}`;
+  } else if (dateLabel) {
+    whenLabel = dateLabel;
+  } else if (startTime && endTime) {
+    whenLabel = `${startTime}-${endTime}`;
+  }
+
+  const serviceName =
     appointment.serviceNames && appointment.serviceNames.length > 0
       ? appointment.serviceNames.join(", ")
-      : null;
+      : appointment.appointmentCode || `#${appointment.id}`;
+
+  const code = appointment.appointmentCode || `#${appointment.id}`;
+  const hasMoney =
+    appointment.totalAmount != null || appointment.paidAmount != null;
 
   return (
-    <div className="border border-adminGray-100 rounded-lg p-2.5 bg-adminGray-50/40 text-xs space-y-1.5">
-      <div className="flex justify-between items-start gap-2">
-        <div className="min-w-0">
-          <p className="font-bold text-adminInk truncate">
-            {appointment.appointmentCode || `#${appointment.id}`}
-          </p>
-          <p className="text-adminGray-600 mt-0.5 flex items-center gap-1">
-            <Calendar className="w-3 h-3 shrink-0" />
-            {appointment.appointmentDate
-              ? formatDisplayDate(appointment.appointmentDate)
-              : "—"}
-          </p>
-        </div>
-        <span className="inline-flex items-center gap-1 text-2xs font-semibold bg-white border border-adminGray-100 text-adminInk px-1.5 py-0.5 rounded shrink-0">
-          <span className={`w-1.5 h-1.5 rounded-full ${statusDot}`} />
-          {statusLabel}
-        </span>
-      </div>
+    <div title={code}>
+      <Card className="mb-0 shadow-none" borderTone="secondary">
+        <CardBody className="space-y-1 p-2.5 text-xs">
+          <div className="flex items-start justify-between gap-2">
+            <p className="mb-0 min-w-0 flex-1 truncate font-semibold text-kit-heading">
+              {serviceName}
+            </p>
+            <Badge variant={badgeVariant} soft className="shrink-0 normal-case">
+              {statusLabel}
+            </Badge>
+          </div>
 
-      <p className="text-adminGray-600 flex items-center gap-1">
-        <Clock className="w-3 h-3 shrink-0" />
-        {timeLabel}
-      </p>
+          <p className="mb-0 truncate text-kit-body">{whenLabel}</p>
 
-      {appointment.salonName && (
-        <p className="text-adminGray-600 flex items-center gap-1 truncate">
-          <MapPin className="w-3 h-3 shrink-0" />
-          {appointment.salonName}
-        </p>
-      )}
+          {appointment.staffFullName ? (
+            <p className="mb-0 truncate text-kit-muted">
+              {appointment.staffFullName}
+            </p>
+          ) : null}
 
-      {services && (
-        <p className="text-adminInk font-medium line-clamp-2">{services}</p>
-      )}
+          {appointment.salonName ? (
+            <p className="mb-0 truncate text-kit-muted">
+              {appointment.salonName}
+            </p>
+          ) : null}
 
-      {appointment.staffFullName && (
-        <p className="text-adminGray-600">
-          NV: <span className="text-adminInk">{appointment.staffFullName}</span>
-        </p>
-      )}
-
-      {(appointment.totalAmount != null || appointment.paidAmount != null) && (
-        <div className="flex justify-between pt-1.5 border-t border-adminGray-100 text-adminGray-600">
-          <span>Tổng: {formatCurrency(appointment.totalAmount)}</span>
-          <span>Đã trả: {formatCurrency(appointment.paidAmount)}</span>
-        </div>
-      )}
+          {hasMoney ? (
+            <p className="mb-0 flex items-center justify-between border-t border-kit pt-1 font-medium">
+              <span className="text-kit-heading">
+                {formatCurrency(appointment.totalAmount)}
+              </span>
+              <span
+                className={
+                  (appointment.paidAmount ?? 0) > 0
+                    ? "text-state-success-text"
+                    : "text-kit-muted"
+                }
+              >
+                {formatCurrency(appointment.paidAmount)}
+              </span>
+            </p>
+          ) : null}
+        </CardBody>
+      </Card>
     </div>
   );
 }

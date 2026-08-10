@@ -1,25 +1,17 @@
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
+import { Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/shared/elements/Button";
+import { Switch } from "@/shared/forms/Switch";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { Switch } from "@/shared/components/ui/switch";
-import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import {
-  IndexCell,
-  NameCell,
-  MutedCell,
-} from "@/shared/components/DataTable/TableCells";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { Tooltip } from "@/shared/components/Tooltip";
+import { SortableColumnHeader } from "@/shared/tables/SortableColumnHeader";
+import { NameCell, MutedCell, TextCell } from "@/shared/tables/TableCells";
 import { BOOKING_POSITION_PERM } from "../constants/booking_position.permissions";
-import type { BookingPositionDTO, UpdateBookingPositionPayload } from "../types/booking_position.types";
+import type {
+  BookingPositionDTO,
+  UpdateBookingPositionPayload,
+} from "../types/booking_position.types";
 
 export const BOOKING_POSITION_COLUMN_LABELS = {
   name: "Tên vị trí",
@@ -29,22 +21,21 @@ export const BOOKING_POSITION_COLUMN_LABELS = {
 } as const;
 
 interface UseActiveBookingPositionColumnsParams {
-  pageIndex: number;
-  pageSize: number;
   orderBy?: string;
   isDescending: boolean;
   onSort: (column: string) => void;
   onEdit: (item: BookingPositionDTO) => void;
   onDelete: (item: BookingPositionDTO) => void;
   updateMutation: {
-    mutate: (variables: { id: number; payload: UpdateBookingPositionPayload }) => void;
+    mutate: (variables: {
+      id: number;
+      payload: UpdateBookingPositionPayload;
+    }) => void;
     isPending: boolean;
   };
 }
 
 export function useActiveBookingPositionColumns({
-  pageIndex,
-  pageSize,
   orderBy,
   isDescending,
   onSort,
@@ -58,19 +49,6 @@ export function useActiveBookingPositionColumns({
   return useMemo<ColumnDef<BookingPositionDTO>[]>(
     () => [
       {
-        id: "index",
-        header: "#",
-        cell: ({ row }) => (
-          <IndexCell
-            pageIndex={pageIndex}
-            pageSize={pageSize}
-            rowIndex={row.index}
-          />
-        ),
-        size: 50,
-        enableResizing: false,
-      },
-      {
         accessorKey: "name",
         header: () => (
           <SortableColumnHeader
@@ -79,6 +57,7 @@ export function useActiveBookingPositionColumns({
             orderBy={orderBy}
             isDescending={isDescending}
             onSort={onSort}
+            onPrimary
           />
         ),
         cell: ({ row }) => <NameCell value={row.original.name} />,
@@ -87,7 +66,7 @@ export function useActiveBookingPositionColumns({
       {
         accessorKey: "roomName",
         header: cols.roomName,
-        cell: ({ row }) => <span>{row.original.roomName || "—"}</span>,
+        cell: ({ row }) => <TextCell value={row.original.roomName} />,
         size: 150,
       },
       {
@@ -99,6 +78,7 @@ export function useActiveBookingPositionColumns({
             orderBy={orderBy}
             isDescending={isDescending}
             onSort={onSort}
+            onPrimary
           />
         ),
         cell: ({ row }) => <MutedCell value={row.original.sortOrder} />,
@@ -116,7 +96,7 @@ export function useActiveBookingPositionColumns({
             >
               <Switch
                 checked={item.status === 1}
-                onCheckedChange={(checked) => {
+                onChange={(checked: boolean) => {
                   if (item.id) {
                     updateMutation.mutate({
                       id: item.id,
@@ -135,61 +115,45 @@ export function useActiveBookingPositionColumns({
       },
       {
         id: "actions",
-        header: "",
+        header: "Thao tác",
         cell: ({ row }) => {
           const item = row.original;
           return (
-            <div onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <div
+              className="flex items-center gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <PermissionGate resource={perm.resource} action={perm.update}>
+                <Tooltip text="Sửa">
                   <Button
-                    variant="ghost"
                     size="icon-sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    variant="outline-primary"
+                    className="mb-0 mr-0"
+                    onClick={() => onEdit(item)}
                   >
-                    <MoreHorizontal className="w-4 h-4" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <PermissionGate resource={perm.resource} action={perm.update}>
-                    <DropdownMenuItem onClick={() => onEdit(item)}>
-                      <Pencil className="w-4 h-4" />
-                      {COMMON_MSG.edit}
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                  <PermissionGate
-                    resource={perm.resource}
-                    action={perm.delete}
+                </Tooltip>
+              </PermissionGate>
+              <PermissionGate resource={perm.resource} action={perm.delete}>
+                <Tooltip text="Xóa">
+                  <Button
+                    size="icon-sm"
+                    variant="outline-danger"
+                    className="mb-0 mr-0"
+                    onClick={() => onDelete(item)}
                   >
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={() => onDelete(item)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Xóa vị trí
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </Tooltip>
+              </PermissionGate>
             </div>
           );
         },
-        size: 50,
+        size: 100,
         enableResizing: false,
       },
     ],
-    [
-      pageIndex,
-      pageSize,
-      orderBy,
-      isDescending,
-      onSort,
-      onEdit,
-      onDelete,
-      updateMutation,
-      cols,
-      perm,
-    ],
+    [orderBy, isDescending, onSort, onEdit, onDelete, updateMutation, cols, perm],
   );
 }

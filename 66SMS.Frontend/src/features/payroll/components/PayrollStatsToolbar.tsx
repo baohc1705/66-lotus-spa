@@ -1,30 +1,43 @@
 import { useRef } from "react";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
-import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/shared/components/ui/button";
+
+import { TabNav } from "@/shared/components/Tabs";
+import { Button } from "@/shared/elements/Button";
+import { SearchableSelect } from "@/shared/forms/SearchableSelect";
+import type { SelectOption } from "@/shared/forms/Select";
+
 import type { PayrollStatsViewMode } from "../types/payroll.types";
 
-interface PayrollStatsToolbarProps {
+type PayrollStatsToolbarProps = {
   viewMode: PayrollStatsViewMode;
   onViewModeChange: (mode: PayrollStatsViewMode) => void;
   anchorDate: Date;
   onAnchorDateChange: (date: Date) => void;
   periodLabel: string;
-  staffPicker?: ReactNode;
-}
+  staffOptions?: SelectOption[];
+  staffValue?: string;
+  staffName?: string;
+  staffEditable?: boolean;
+  onStaffChange?: (value: string) => void;
+};
+
+const VIEW_TABS = [
+  { id: "day", label: "Ngày" },
+  { id: "week", label: "Tuần" },
+  { id: "month", label: "Tháng" },
+];
 
 function toDateInputValue(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function toMonthInputValue(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  return `${y}-${m}`;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}`;
 }
 
 export function PayrollStatsToolbar({
@@ -33,119 +46,126 @@ export function PayrollStatsToolbar({
   anchorDate,
   onAnchorDateChange,
   periodLabel,
-  staffPicker,
+  staffOptions = [],
+  staffValue = "",
+  staffName,
+  staffEditable = false,
+  onStaffChange,
 }: PayrollStatsToolbarProps) {
   const pickerRef = useRef<HTMLInputElement>(null);
 
-  const handleToday = () => onAnchorDateChange(new Date());
+  function handleToday() {
+    onAnchorDateChange(new Date());
+  }
 
-  const handlePrev = () => {
+  function handlePrev() {
     const next = new Date(anchorDate);
     if (viewMode === "day") next.setDate(next.getDate() - 1);
     else if (viewMode === "week") next.setDate(next.getDate() - 7);
     else next.setMonth(next.getMonth() - 1);
     onAnchorDateChange(next);
-  };
+  }
 
-  const handleNext = () => {
+  function handleNext() {
     const next = new Date(anchorDate);
     if (viewMode === "day") next.setDate(next.getDate() + 1);
     else if (viewMode === "week") next.setDate(next.getDate() + 7);
     else next.setMonth(next.getMonth() + 1);
     onAnchorDateChange(next);
-  };
+  }
 
-  const openPicker = () => {
-    const el = pickerRef.current;
-    if (!el) return;
-    if (typeof el.showPicker === "function") {
-      el.showPicker();
-    } else {
-      el.focus();
-      el.click();
+  function openPicker() {
+    const element = pickerRef.current;
+    if (!element) return;
+    if (typeof element.showPicker === "function") {
+      element.showPicker();
+      return;
     }
-  };
+    element.focus();
+    element.click();
+  }
 
-  const handlePickerChange = (value: string) => {
+  function handlePickerChange(value: string) {
     if (!value) return;
     if (viewMode === "month") {
-      const [y, m] = value.split("-").map(Number);
-      onAnchorDateChange(new Date(y, m - 1, 1));
+      const [year, month] = value.split("-").map(Number);
+      onAnchorDateChange(new Date(year, month - 1, 1));
       return;
     }
     onAnchorDateChange(new Date(`${value}T12:00:00`));
-  };
-
-  const isToday =
-    viewMode === "day" &&
-    anchorDate.toDateString() === new Date().toDateString();
+  }
 
   return (
-    <div className="px-4 pt-3 pb-3 flex flex-wrap items-end gap-3 border-b border-adminGray-100 shrink-0">
-      <div className="flex items-center bg-adminGray-50 p-0.5 border border-adminGray-100 h-9">
-        {(
-          [
-            ["day", "Ngày"],
-            ["week", "Tuần"],
-            ["month", "Tháng"],
-          ] as const
-        ).map(([mode, label]) => (
-          <button
-            key={mode}
-            type="button"
-            onClick={() => onViewModeChange(mode)}
-            className={cn(
-              "px-3 h-8 text-xs font-semibold transition-colors",
-              viewMode === mode
-                ? "bg-white text-primary shadow-xs border border-adminGray-100"
-                : "text-adminGray-600 hover:text-adminInk",
-            )}
-          >
-            {label}
-          </button>
-        ))}
+    <div className="flex h-14 shrink-0 flex-wrap items-center gap-3 border-b border-kit px-4">
+      <TabNav
+        items={VIEW_TABS}
+        activeId={viewMode}
+        onChange={(id: string) =>
+          onViewModeChange(id as PayrollStatsViewMode)
+        }
+        variant="btn-group-primary"
+        className="mb-0"
+      />
+
+      <div className="flex min-w-0 items-center gap-2">
+        <span className="shrink-0 text-sm text-kit-body">Nhân viên</span>
+        {staffEditable ? (
+          <SearchableSelect
+            className="w-[220px]"
+            inputSize="sm"
+            value={staffValue}
+            options={staffOptions}
+            placeholder="Chọn nhân viên..."
+            searchPlaceholder="Tìm nhân viên..."
+            emptyText="Không tìm thấy"
+            clearable
+            onChange={(value: string) => onStaffChange?.(value)}
+          />
+        ) : (
+          <div className="flex h-8 min-w-40 items-center rounded border border-kit bg-kit-page px-3 text-sm font-medium text-kit-heading">
+            {staffName ?? "—"}
+          </div>
+        )}
       </div>
 
-      {staffPicker}
-
-      <div className="ml-auto flex items-end gap-2">
+      <div className="ml-auto flex items-center gap-2">
         <Button
           type="button"
-          variant={isToday ? "admin" : "outline"}
+          variant="primary"
           size="sm"
-          className="lotus-admin-table-toolbar-btn h-9"
+          className="mb-0! mr-0! h-8"
           onClick={handleToday}
         >
           Hôm nay
         </Button>
 
-        <div className="relative flex items-center bg-adminGray-50 border border-adminGray-100 h-9">
+        <div className="relative flex h-8 items-center rounded border border-kit bg-kit-page">
           <button
             type="button"
             onClick={handlePrev}
-            className="px-2 h-full text-adminGray-600 hover:text-adminInk hover:bg-white transition-colors"
+            className="flex h-full items-center px-2 text-kit-muted transition-colors hover:bg-kit-white hover:text-kit-heading"
             aria-label="Kỳ trước"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="h-4 w-4" />
           </button>
 
           <button
             type="button"
             onClick={openPicker}
-            className="flex items-center gap-1.5 px-2 text-xs font-semibold text-adminInk min-w-[170px] justify-center h-full hover:bg-white transition-colors"
+            className="flex h-full min-w-[170px] items-center justify-center gap-1.5 px-2 text-xs font-semibold text-kit-heading transition-colors hover:bg-kit-white"
             title="Chọn ngày"
           >
-            <Calendar className="w-3.5 h-3.5 text-adminGray-600 shrink-0" />
+            <Calendar className="h-3.5 w-3.5 shrink-0 text-kit-muted" />
             <span className="truncate">{periodLabel}</span>
           </button>
 
           <button
             type="button"
             onClick={handleNext}
-            className="px-2 h-full text-adminGray-600 hover:text-adminInk hover:bg-white transition-colors"
+            className="flex h-full items-center px-2 text-kit-muted transition-colors hover:bg-kit-white hover:text-kit-heading"
             aria-label="Kỳ sau"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="h-4 w-4" />
           </button>
 
           <input
@@ -156,8 +176,8 @@ export function PayrollStatsToolbar({
                 ? toMonthInputValue(anchorDate)
                 : toDateInputValue(anchorDate)
             }
-            onChange={(e) => handlePickerChange(e.target.value)}
-            className="absolute opacity-0 pointer-events-none w-0 h-0"
+            onChange={(event) => handlePickerChange(event.target.value)}
+            className="pointer-events-none absolute h-0 w-0 opacity-0"
             tabIndex={-1}
             aria-hidden
           />

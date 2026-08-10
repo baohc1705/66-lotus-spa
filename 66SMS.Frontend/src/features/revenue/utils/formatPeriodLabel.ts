@@ -1,6 +1,5 @@
 import { formatDisplayDate } from "@/shared/utils/date.utils";
 
-/** Format PeriodKey từ API sang chữ dễ đọc (VD: 2026-07-30 → 30/07/2026). */
 export function formatPeriodLabel(periodKey: string): string {
   if (/^\d{4}-\d{2}-\d{2}$/.test(periodKey)) {
     return formatDisplayDate(periodKey);

@@ -1,12 +1,11 @@
-import { Shield, ShieldCheck, ShieldAlert, Clock } from "lucide-react";
-import { AdminStatCard } from "@/shared/components/AdminStatCard";
+import { StatCard } from "@/shared/widgets/StatCard";
 
 interface StaffCertificateStatCardsProps {
   totalCount: number;
   activeCount: number;
   expiredCount: number;
   pendingCount: number;
-  isLoading: boolean;
+  isLoading?: boolean;
 }
 
 export function StaffCertificateStatCards({
@@ -14,37 +13,39 @@ export function StaffCertificateStatCards({
   activeCount,
   expiredCount,
   pendingCount,
-  isLoading,
+  isLoading = false,
 }: StaffCertificateStatCardsProps) {
+  const dash = isLoading ? "—" : undefined;
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
-      <AdminStatCard
-        label="Tổng chứng chỉ"
-        value={totalCount}
-        icon={Shield}
-        tone="gold"
-        isLoading={isLoading}
+    <div className="mb-3 grid grid-cols-2 gap-2 lg:grid-cols-4">
+      <StatCard
+        title="Tổng chứng chỉ"
+        value={dash ?? totalCount}
+        description="Tất cả chứng chỉ"
+        tone="midnight-bloom"
+        valueTone="white"
       />
-      <AdminStatCard
-        label="Đang hoạt động"
-        value={activeCount}
-        icon={ShieldCheck}
-        tone="green"
-        isLoading={isLoading}
+      <StatCard
+        title="Đang hiệu lực"
+        value={dash ?? activeCount}
+        description="Còn hạn sử dụng"
+        tone="happy-green"
+        valueTone="white"
       />
-      <AdminStatCard
-        label="Hết hạn"
-        value={expiredCount}
-        icon={ShieldAlert}
-        tone="danger"
-        isLoading={isLoading}
+      <StatCard
+        title="Hết hạn"
+        value={dash ?? expiredCount}
+        description="Đã quá hạn"
+        tone="tempting-azure"
+        valueTone="white"
       />
-      <AdminStatCard
-        label="Chờ xác minh"
-        value={pendingCount}
-        icon={Clock}
-        tone="warning"
-        isLoading={isLoading}
+      <StatCard
+        title="Chờ xác minh"
+        value={dash ?? pendingCount}
+        description="Chưa xác nhận"
+        tone="sunny-morning"
+        valueTone="dark"
       />
     </div>
   );

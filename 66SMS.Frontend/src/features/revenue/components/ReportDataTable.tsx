@@ -1,12 +1,12 @@
-import { useMemo, useState } from "react";
-import type { ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import {
   getCoreRowModel,
   useReactTable,
   type ColumnDef,
 } from "@tanstack/react-table";
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
+import { Card, CardBody, CardHeader } from "@/shared/elements/Card";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTablePagination } from "@/shared/tables/DataTablePagination";
 
 export type ReportColumn<T> = {
   key: string;
@@ -54,27 +54,33 @@ export function ReportDataTable<T>({
   });
 
   return (
-    <div className="bg-white border rounded-lg flex flex-col min-h-[360px] overflow-hidden">
-      <div className="text-sm font-bold px-4 pt-4 pb-3">{title}</div>
-      <DataTable
-        table={table}
-        emptyState={<span className="text-slate-400">Không có dữ liệu</span>}
-        pagination={
-          <DataTablePagination
-            pageIndex={currentPage}
-            pageSize={pageSize}
-            totalCount={totalCount}
-            totalPages={totalPages}
-            hasPreviousPage={currentPage > 1}
-            hasNextPage={currentPage < totalPages}
-            onPageChange={setPageIndex}
-            onPageSizeChange={(size: number) => {
-              setPageSize(size);
-              setPageIndex(1);
-            }}
-          />
-        }
-      />
-    </div>
+    <Card className="main-card mb-0 min-h-96 overflow-hidden">
+      <CardHeader>
+        <span className="text-sm font-bold text-kit-heading/70">{title}</span>
+      </CardHeader>
+      <CardBody className="p-0">
+        <DataTable
+          table={table}
+          emptyMessage="Không có dữ liệu"
+          pagination={
+            <div className="border-t border-kit px-3">
+              <DataTablePagination
+                pageIndex={currentPage}
+                pageSize={pageSize}
+                totalCount={totalCount}
+                totalPages={totalPages}
+                hasPreviousPage={currentPage > 1}
+                hasNextPage={currentPage < totalPages}
+                onPageChange={setPageIndex}
+                onPageSizeChange={(size: number) => {
+                  setPageSize(size);
+                  setPageIndex(1);
+                }}
+              />
+            </div>
+          }
+        />
+      </CardBody>
+    </Card>
   );
 }

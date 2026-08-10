@@ -1,31 +1,33 @@
 import { useMemo } from "react";
 import { useReactTable, getCoreRowModel } from "@tanstack/react-table";
-import { Plus } from "lucide-react";
+import { Clock, Plus } from "lucide-react";
 
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { Button } from "@/shared/components/ui/button";
-import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
+import { Pagination } from "@/shared/components/Pagination";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { Button } from "@/shared/elements/Button";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
+import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
+import { toLocalTimeOnly } from "@/shared/utils/date.utils";
 
 import { TimeSlotFormDialog } from "../components/TimeSlotFormDialog";
-import { useTimeSlotListState } from "../hooks/useTimeSlotListState";
 import {
   TIME_SLOT_COLUMN_LABELS,
   useActiveTimeSlotColumns,
 } from "../components/useActiveTimeSlotColumns";
 import { TIME_SLOT_PERM } from "../constants/time_slot.permissions";
+import { useTimeSlotListState } from "../hooks/useTimeSlotListState";
 import { useAdminTimeSlots, useDeleteTimeSlot } from "../hooks/useTimeSlots";
 
-const ENTITY = "khung giá»";
+const ENTITY = "khung giờ";
 
 export function TimeSlotListPage() {
+  "use no memo";
+
   const perm = TIME_SLOT_PERM;
   const listState = useTimeSlotListState();
 
@@ -59,6 +61,10 @@ export function TimeSlotListPage() {
   const paged = timeSlotResult?.data;
   const timeSlots = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
+  const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
   const activeColumns = useActiveTimeSlotColumns({
     pageIndex,
@@ -70,12 +76,11 @@ export function TimeSlotListPage() {
     onDelete: setDeleteTarget,
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: timeSlots,
     columns: activeColumns,
-    state: {
-      columnVisibility,
-    },
+    state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
@@ -94,52 +99,89 @@ export function TimeSlotListPage() {
     }
   };
 
-  const formatDisplayTime = (t?: string) => {
-    if (!t) return "";
-    return t.substring(0, 5);
-  };
+  const deleteLabel = deleteTarget
+    ? `${toLocalTimeOnly(deleteTarget.startTime)} - ${toLocalTimeOnly(deleteTarget.endTime)}`
+    : "";
 
   return (
-    <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-      <DataTableToolbar
-        searchPlaceholder="Tìm kiếm khung giờ..."
-        searchValue={filter}
-        onSearchChange={handleSearchChange}
-      >
-        <DataTableViewOptions table={table} columnLabels={columnLabels} />
-        <div className="flex items-center gap-2 ml-auto">
-          <PermissionGate resource={perm.resource} action={perm.create}>
-            <Button
-              variant="admin"
-              size="sm"
-              onClick={() => setCreateOpen(true)}
-              className="lotus-admin-table-toolbar-btn"
-            >
-              <Plus className="w-4 h-4" />
-              Thêm khung giờ
-            </Button>
-          </PermissionGate>
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
+      <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+        <div className="border-b border-kit px-3 pt-3">
+          <DataTableToolbar
+            searchPlaceholder="Tìm kiếm khung giờ..."
+            searchValue={filter}
+            onSearchChange={handleSearchChange}
+          >
+            <DataTableViewOptions table={table} columnLabels={columnLabels} />
+            <PermissionGate resource={perm.resource} action={perm.create}>
+              <Button
+                variant="primary"
+                size="sm"
+                className="mb-0"
+                onClick={() => setCreateOpen(true)}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Thêm khung giờ
+              </Button>
+            </PermissionGate>
+          </DataTableToolbar>
         </div>
-      </DataTableToolbar>
 
-      <div className="lotus-admin-table-page-card">
         <DataTable
           table={table}
           isLoading={isLoading}
           loadingRows={DEFAULT_LOADING_ROWS}
+          emptyState={
+            <TableEmptyState
+              icon={Clock}
+              title="Chưa có khung giờ"
+              action={
+                <PermissionGate resource={perm.resource} action={perm.create}>
+                  <Button
+                    variant="admin"
+                    size="sm"
+                    className="mb-0"
+                    onClick={() => setCreateOpen(true)}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Thêm khung giờ
+                  </Button>
+                </PermissionGate>
+              }
+            />
+          }
+          pagination={
+            totalCount > 0 ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <div className="flex items-center gap-3 text-xs text-kit-muted">
+                  <span>
+                    {rangeStart}-{rangeEnd} / {totalCount}
+                  </span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) =>
+                      handlePageSizeChange(Number(e.target.value))
+                    }
+                    className="h-8 cursor-pointer rounded border border-kit bg-kit-white px-2 text-xs text-kit-heading outline-none focus:border-kit-primary"
+                  >
+                    {[5, 10, 20].map((size: number) => (
+                      <option key={size} value={size}>
+                        {size} / trang
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <Pagination
+                  page={safePage}
+                  pageCount={totalPages}
+                  onPageChange={listState.setPageIndex}
+                  size="sm"
+                />
+              </div>
+            ) : null
+          }
         />
-      </div>
-
-      <DataTablePagination
-        pageIndex={pageIndex}
-        pageSize={pageSize}
-        totalCount={totalCount}
-        totalPages={paged?.totalPages ?? 0}
-        hasPreviousPage={paged?.hasPreviousPage ?? false}
-        hasNextPage={paged?.hasNextPage ?? false}
-        onPageChange={listState.setPageIndex}
-        onPageSizeChange={handlePageSizeChange}
-      />
+      </TablePageShell>
 
       <TimeSlotFormDialog
         open={createOpen}
@@ -147,7 +189,7 @@ export function TimeSlotListPage() {
         timeSlot={null}
       />
 
-      {editTarget && (
+      {editTarget ? (
         <TimeSlotFormDialog
           open={!!editTarget}
           onOpenChange={(open) => {
@@ -155,24 +197,22 @@ export function TimeSlotListPage() {
           }}
           timeSlot={editTarget}
         />
-      )}
+      ) : null}
 
-      {deleteTarget && (
+      {deleteTarget ? (
         <ConfirmDialog
           open={!!deleteTarget}
           onOpenChange={(open) => {
             if (!open) setDeleteTarget(null);
           }}
-          title={CONFIRM_MSG.deleteTitle(ENTITY)}
-          description={CONFIRM_MSG.deleteDescription(
-            ENTITY,
-            `${formatDisplayTime(deleteTarget.startTime)} - ${formatDisplayTime(deleteTarget.endTime)}`,
-          )}
+          title={`Xóa ${ENTITY}`}
+          description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteLabel}"? Hành động này không thể hoàn tác.`}
           onConfirm={handleDelete}
-          confirmLabel={COMMON_MSG.delete}
+          confirmLabel="Xóa"
           loading={deleteMutation.isPending}
+          variant="danger"
         />
-      )}
-    </TablePageShell>
+      ) : null}
+    </div>
   );
 }

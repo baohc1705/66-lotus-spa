@@ -1,7 +1,14 @@
 import { useState, useMemo } from "react";
 import { Search, Award, ShieldCheck } from "lucide-react";
+import { Badge } from "@/shared/elements/Badge";
+import { ListGroup, ListGroupItem } from "@/shared/elements/ListGroup";
+import { Input } from "@/shared/forms/Input";
 import { useCertificateTypes } from "../hooks/useCertificateTypes";
 import { useStaffCertificates } from "../hooks/useStaffCertificates";
+import type {
+  CertificateTypeDTO,
+  StaffCertificateDTO,
+} from "../types/certificate.types";
 
 interface CertificateTypeSidebarProps {
   selectedTypeId: number | null;
@@ -23,7 +30,7 @@ export function CertificateTypeSidebar({
     () => typesResult?.data?.items ?? [],
     [typesResult?.data?.items],
   );
-  
+
   const { data: allCertsResult } = useStaffCertificates({
     pageIndex: 1,
     pageSize: 10000,
@@ -36,9 +43,13 @@ export function CertificateTypeSidebar({
 
   const countMap = useMemo(() => {
     const map = new Map<number, number>();
-    for (const c of countCerts) {
-      if (c.certificateTypeId != null) {
-        map.set(c.certificateTypeId, (map.get(c.certificateTypeId) ?? 0) + 1);
+    for (const cert of countCerts) {
+      const item: StaffCertificateDTO = cert;
+      if (item.certificateTypeId != null) {
+        map.set(
+          item.certificateTypeId,
+          (map.get(item.certificateTypeId) ?? 0) + 1,
+        );
       }
     }
     return map;
@@ -49,103 +60,71 @@ export function CertificateTypeSidebar({
   const filteredTypes = useMemo(() => {
     if (!searchText.trim()) return types;
     const lower = searchText.toLowerCase();
-    return types.filter((t) => (t.name ?? "").toLowerCase().includes(lower));
+    return types.filter((type: CertificateTypeDTO) =>
+      (type.name ?? "").toLowerCase().includes(lower),
+    );
   }, [types, searchText]);
 
   return (
-    <aside className="w-56 shrink-0 flex flex-col h-full bg-white rounded border border-adminGray-100/60 overflow-hidden">
-      <div className="px-3 pt-3 pb-2 shrink-0">
-        <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-adminGray-400 pointer-events-none" />
-          <input
-            type="text"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Tìm loại chứng chỉ..."
-            className="lotus-admin-sidebar-search"
-          />
-        </div>
+    <div className="flex w-56 shrink-0 flex-col gap-3">
+      <div className="relative">
+        <Search className="pointer-events-none absolute top-1/2 left-2.5 z-10 h-3.5 w-3.5 -translate-y-1/2 text-kit-muted" />
+        <Input
+          type="text"
+          inputSize="sm"
+          value={searchText}
+          onChange={(e: { target: { value: string } }) =>
+            setSearchText(e.target.value)
+          }
+          placeholder="Tìm loại chứng chỉ..."
+          className="h-9 pl-8"
+        />
       </div>
 
-      <nav className="flex-1 flex-col h-full overflow-y-auto custom-scrollbar px-2 pb-2 space-y-0.5">
-        <button
-          type="button"
+      <ListGroup className="mb-0 max-h-96 overflow-y-auto">
+        <ListGroupItem
+          action
+          active={selectedTypeId === null}
           onClick={() => onSelectType(null)}
-          className={`lotus-admin-sidebar-item ${
-            selectedTypeId === null
-              ? "bg-adminGreen-100 text-adminGreen-600 font-semibold border-l-[3px] border-adminGreen-600"
-              : "text-adminInk/70 hover:bg-adminGreen-50 hover:text-adminGreen-600 border-l-[3px] border-transparent"
-          }`}
         >
-          <div className="flex items-center gap-2 min-w-0">
-            <Award
-              className={`w-4 h-4 shrink-0 ${
-                selectedTypeId === null
-                  ? "text-adminGreen-600"
-                  : "text-adminGray-400"
-              }`}
-            />
+          <span className="flex min-w-0 items-center gap-2">
+            <Award className="h-4 w-4 shrink-0" />
             <span className="truncate">Tất cả loại</span>
-          </div>
-          <span
-            className={`lotus-admin-sidebar-badge ${
-              selectedTypeId === null
-                ? "bg-adminGreen-600/20 text-adminGreen-600"
-                : "bg-adminGray-100 text-adminGray-600"
-            }`}
-          >
-            {totalCount}
           </span>
-        </button>
+          <Badge variant={selectedTypeId === null ? "light" : "secondary"} pill>
+            {totalCount}
+          </Badge>
+        </ListGroupItem>
 
-        {isLoadingTypes ? (
-          <div className="space-y-1 px-1 mt-1">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-7 bg-adminGray-100/50 rounded animate-pulse"
-              />
-            ))}
-          </div>
-        ) : (
-          filteredTypes.map((type) => {
-            const isActive = selectedTypeId === type.id;
-            const count = type.id != null ? (countMap.get(type.id) ?? 0) : 0;
-            return (
-              <button
-                key={type.id}
-                type="button"
-                onClick={() => onSelectType(type.id ?? null)}
-                className={`lotus-admin-sidebar-item group ${
-                  isActive
-                    ? "bg-adminGreen-100 text-adminGreen-600 font-semibold border-l-[3px] border-adminGreen-600"
-                    : "text-adminInk/70 hover:bg-adminGreen-50 hover:text-adminGreen-600 border-l-[3px] border-transparent"
-                }`}
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <ShieldCheck
-                    className={`w-4 h-4 shrink-0 ${
-                      isActive
-                        ? "text-adminGreen-600"
-                        : "text-adminGray-400 group-hover:text-adminGray-600"
-                    }`}
-                  />
-                  <span className="truncate">{type.name ?? "—"}</span>
-                </div>
-                <span
-                  className={`lotus-admin-sidebar-badge ${
-                    isActive
-                      ? "bg-adminGreen-600/20 text-adminGreen-600"
-                      : "bg-adminGray-100 text-adminGray-600"
-                  }`}
+        {isLoadingTypes
+          ? Array.from({ length: 4 }).map((_, index: number) => (
+              <ListGroupItem key={index} disabled>
+                <span className="h-4 w-28 animate-pulse rounded bg-kit-page" />
+                <span className="h-4 w-6 animate-pulse rounded-full bg-kit-page" />
+              </ListGroupItem>
+            ))
+          : filteredTypes.map((type: CertificateTypeDTO) => {
+              const isActive = selectedTypeId === type.id;
+              const count =
+                type.id != null ? (countMap.get(type.id) ?? 0) : 0;
+              return (
+                <ListGroupItem
+                  key={type.id}
+                  action
+                  active={isActive}
+                  onClick={() => onSelectType(type.id ?? null)}
                 >
-                  {count}
-                </span>
-              </button>
-            );
-          })
-        )}
-      </nav>
-    </aside>
+                  <span className="flex min-w-0 items-center gap-2">
+                    <ShieldCheck className="h-4 w-4 shrink-0" />
+                    <span className="truncate">{type.name ?? "—"}</span>
+                  </span>
+                  <Badge variant={isActive ? "light" : "secondary"} pill>
+                    {count}
+                  </Badge>
+                </ListGroupItem>
+              );
+            })}
+      </ListGroup>
+    </div>
   );
 }

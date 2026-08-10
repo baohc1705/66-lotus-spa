@@ -1,36 +1,37 @@
 import { useMemo } from "react";
 import {
-  useReactTable,
   getCoreRowModel,
   getExpandedRowModel,
+  useReactTable,
 } from "@tanstack/react-table";
 import { CreditCard } from "lucide-react";
 
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
-import { TableEmptyState } from "@/shared/components/DataTable/TableEmptyState";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
+import { Pagination } from "@/shared/components/Pagination";
+import { Select } from "@/shared/forms/Select";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
+import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 
-import { MembershipCardFormDialog } from "../components/MembershipCardFormDialog";
 import { MembershipCardDetailExpanded } from "../components/MembershipCardDetailExpanded";
+import { MembershipCardFormDialog } from "../components/MembershipCardFormDialog";
 import {
-  useActiveMembershipCardColumns,
   MEMBERSHIP_CARD_COLUMN_LABELS,
+  useActiveMembershipCardColumns,
 } from "../components/useActiveMembershipCardColumns";
-import { useMembershipCards } from "../hooks/useMembershipCards";
 import { useMembershipCardListState } from "../hooks/useMembershipCardListState";
+import { useMembershipCards } from "../hooks/useMembershipCards";
 
 export function MembershipCardListPage() {
   const listState = useMembershipCardListState();
+
   const {
     queryParams,
     editTarget,
     setEditTarget,
     pageIndex,
-    setPageIndex,
     pageSize,
     columnVisibility,
     setColumnVisibility,
@@ -51,6 +52,10 @@ export function MembershipCardListPage() {
   const paged = cardsResult?.data;
   const cards = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
+  const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
   const columns = useActiveMembershipCardColumns({
     pageIndex,
@@ -64,13 +69,13 @@ export function MembershipCardListPage() {
   const table = useReactTable({
     data: cards,
     columns,
+    state: { columnVisibility },
+    onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
     getRowCanExpand: () => true,
-    enableMultiRowSelection: false,
-    columnResizeMode: "onChange",
-    state: { columnVisibility },
-    onColumnVisibilityChange: setColumnVisibility,
+    manualPagination: true,
+    manualSorting: true,
   });
 
   const columnLabels = useMemo(
@@ -79,63 +84,79 @@ export function MembershipCardListPage() {
   );
 
   return (
-    <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-      <div className="px-4 pt-4">
-        <DataTableToolbar
-          searchValue={filter}
-          onSearchChange={handleSearchChange}
-          searchPlaceholder="Tìm mã thẻ, tên khách hàng..."
-        >
-          <DataTableViewOptions table={table} columnLabels={columnLabels} />
-        </DataTableToolbar>
-      </div>
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
+      <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+        <div className="border-b border-kit px-4 pt-4">
+          <DataTableToolbar
+            searchPlaceholder="Tìm mã thẻ, tên khách hàng..."
+            searchValue={filter}
+            onSearchChange={handleSearchChange}
+          >
+            <DataTableViewOptions table={table} columnLabels={columnLabels} />
+          </DataTableToolbar>
+        </div>
 
-      <DataTable
-        table={table}
-        isLoading={isLoading}
-        loadingRows={
-          pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
-        }
-        onRowClick={(row) => row.toggleExpanded()}
-        renderSubComponent={({ row }) =>
-          row.original.id ? (
-            <MembershipCardDetailExpanded
-              cardId={row.original.id}
-              onEdit={(card) => setEditTarget(card)}
+        <DataTable
+          table={table}
+          isLoading={isLoading}
+          loadingRows={DEFAULT_LOADING_ROWS}
+          onRowClick={(row) => row.toggleExpanded()}
+          renderExpandedRow={({ row }) =>
+            row.original.id ? (
+              <MembershipCardDetailExpanded
+                cardId={row.original.id}
+                onEdit={setEditTarget}
+              />
+            ) : null
+          }
+          emptyState={
+            <TableEmptyState
+              icon={CreditCard}
+              title="Chưa có thẻ thành viên"
             />
-          ) : null
-        }
-        emptyState={
-          <TableEmptyState
-            icon={CreditCard}
-            title="Chưa có thẻ thành viên"
-            hint="Thẻ sẽ tự động được tạo khi khách hàng mới được đăng ký."
-          />
-        }
-        pagination={
-          paged && totalCount > 0 ? (
-            <DataTablePagination
-              pageIndex={paged.pageIndex}
-              pageSize={paged.pageSize}
-              totalCount={paged.totalCount}
-              totalPages={paged.totalPages}
-              hasPreviousPage={paged.hasPreviousPage}
-              hasNextPage={paged.hasNextPage}
-              onPageChange={setPageIndex}
-              onPageSizeChange={handlePageSizeChange}
-            />
-          ) : null
-        }
-      />
+          }
+          pagination={
+            totalCount > 0 ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <div className="flex items-center gap-3 text-xs text-kit-muted">
+                  <span>
+                    {rangeStart}-{rangeEnd} / {totalCount}
+                  </span>
+                  <Select
+                    value={String(pageSize)}
+                    onChange={(event) =>
+                      handlePageSizeChange(Number(event.target.value))
+                    }
+                    options={[
+                      { value: "5", label: "5 / trang" },
+                      { value: "10", label: "10 / trang" },
+                      { value: "20", label: "20 / trang" },
+                    ]}
+                    inputSize="sm"
+                    className="w-auto min-w-28"
+                  />
+                </div>
+                <Pagination
+                  page={safePage}
+                  pageCount={totalPages}
+                  onPageChange={listState.setPageIndex}
+                  size="sm"
+                />
+              </div>
+            ) : null
+          }
+        />
+      </TablePageShell>
 
-      <MembershipCardFormDialog
-        open={!!editTarget}
-        onOpenChange={(open) => {
-          if (!open) setEditTarget(null);
-        }}
-        card={editTarget}
-      />
-    </TablePageShell>
+      {editTarget ? (
+        <MembershipCardFormDialog
+          open={!!editTarget}
+          onOpenChange={(open) => {
+            if (!open) setEditTarget(null);
+          }}
+          card={editTarget}
+        />
+      ) : null}
+    </div>
   );
 }
-export default MembershipCardListPage;

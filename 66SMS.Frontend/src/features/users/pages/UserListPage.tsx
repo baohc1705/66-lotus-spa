@@ -2,18 +2,16 @@ import { useCallback, useMemo } from "react";
 import { useReactTable, getCoreRowModel } from "@tanstack/react-table";
 import { Plus, Trash2, Users } from "lucide-react";
 
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
-import { TableEmptyState } from "@/shared/components/DataTable/TableEmptyState";
-import { TableSelectionBar } from "@/shared/components/DataTable/TableSelectionBar";
-import { Button } from "@/shared/components/ui/button";
-import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
+import { Pagination } from "@/shared/components/Pagination";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { Button } from "@/shared/elements/Button";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
+import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
+import { TableSelectionBar } from "@/shared/tables/TableSelectionBar";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 import { useRowSelection } from "@/shared/hooks/useRowSelection";
 
@@ -65,12 +63,18 @@ export function UserListPage() {
   const paged = usersResult?.data;
   const users = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
 
-  const pageIds = useMemo(
-    () =>
-      users.map((u: UserDto) => u.id).filter((id): id is number => id != null),
-    [users],
-  );
+  const pageIds = useMemo(() => {
+    const ids: number[] = [];
+    for (let index = 0; index < users.length; index++) {
+      const user: UserDto = users[index];
+      if (user.id == null) continue;
+      ids.push(user.id);
+    }
+    return ids;
+  }, [users]);
 
   const {
     selectedRowIds,
@@ -104,6 +108,7 @@ export function UserListPage() {
     getCoreRowModel: getCoreRowModel(),
     enableMultiRowSelection: false,
     columnResizeMode: "onChange",
+    manualPagination: true,
     state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
   });
@@ -138,19 +143,10 @@ export function UserListPage() {
   const columnLabels = useMemo(() => ({ ...USER_COLUMN_LABELS }), []);
 
   return (
-    <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-      <div className="px-6 pt-6">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-semibold text-lotus-deep">
-            Quản lý người dùng
-          </h1>
-        </div>
-        <DataTableToolbar
-          searchValue={filter}
-          onSearchChange={handleSearchChange}
-          searchPlaceholder="Tìm theo tài khoản, email..."
-        >
-          {selectedCount > 0 && (
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
+      <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+        <div className="border-b border-kit px-4 pt-4">
+          {selectedCount > 0 ? (
             <TableSelectionBar
               count={selectedCount}
               onClear={clearSelection}
@@ -161,84 +157,100 @@ export function UserListPage() {
                   role={perm.role}
                 >
                   <Button
-                    variant="destructive"
+                    variant="danger"
                     size="sm"
-                    className="text-xs h-7 px-2"
+                    className="mb-0"
                     onClick={() => setBulkDeleteOpen(true)}
                   >
-                    <Trash2 className="w-3.5 h-3.5 animate-pulse" />
+                    <Trash2 className="h-3.5 w-3.5" />
                     Xóa đã chọn
                   </Button>
                 </PermissionGate>
               }
             />
-          )}
+          ) : null}
 
-          <DataTableViewOptions table={table} columnLabels={columnLabels} />
-
-          <PermissionGate
-            resource={perm.resource}
-            action={perm.create}
-            role={perm.role}
+          <DataTableToolbar
+            searchValue={filter}
+            onSearchChange={handleSearchChange}
+            searchPlaceholder="Tìm theo tài khoản, email..."
           >
-            <Button
-              variant="admin"
-              size="sm"
-              onClick={() => setCreateOpen(true)}
-              className="lotus-admin-table-toolbar-btn"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Thêm người dùng
-            </Button>
-          </PermissionGate>
-        </DataTableToolbar>
-      </div>
+            <DataTableViewOptions table={table} columnLabels={columnLabels} />
 
-      <DataTable
-        table={table}
-        isLoading={isLoading}
-        loadingRows={
-          pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
-        }
-        emptyState={
-          <TableEmptyState
-            icon={Users}
-            title="Chưa có người dùng"
-            hint="Thêm tài khoản người dùng mới để quản lý phân quyền."
-            action={
-              <PermissionGate
-                resource={perm.resource}
-                action={perm.create}
-                role={perm.role}
+            <PermissionGate
+              resource={perm.resource}
+              action={perm.create}
+              role={perm.role}
+            >
+              <Button
+                variant="admin"
+                size="sm"
+                className="mb-0"
+                onClick={() => setCreateOpen(true)}
               >
-                <Button
-                  variant="admin"
-                  size="sm"
-                  onClick={() => setCreateOpen(true)}
-                  className="mt-1 text-xs"
+                <Plus className="h-4 w-4" />
+                Thêm người dùng
+              </Button>
+            </PermissionGate>
+          </DataTableToolbar>
+        </div>
+
+        <DataTable
+          table={table}
+          isLoading={isLoading}
+          loadingRows={
+            pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
+          }
+          emptyState={
+            <TableEmptyState
+              icon={Users}
+              title="Chưa có người dùng"
+              action={
+                <PermissionGate
+                  resource={perm.resource}
+                  action={perm.create}
+                  role={perm.role}
                 >
-                  <Plus className="w-3.5 h-3.5" />
-                  Thêm người dùng
-                </Button>
-              </PermissionGate>
-            }
-          />
-        }
-        pagination={
-          paged && totalCount > 0 ? (
-            <DataTablePagination
-              pageIndex={paged.pageIndex}
-              pageSize={paged.pageSize}
-              totalCount={paged.totalCount}
-              totalPages={paged.totalPages}
-              hasPreviousPage={paged.hasPreviousPage}
-              hasNextPage={paged.hasNextPage}
-              onPageChange={setPageIndex}
-              onPageSizeChange={handlePageSizeChange}
+                  <Button
+                    variant="admin"
+                    size="sm"
+                    className="mb-0"
+                    onClick={() => setCreateOpen(true)}
+                  >
+                    <Plus className="h-4 w-4" />
+                    Thêm người dùng
+                  </Button>
+                </PermissionGate>
+              }
             />
-          ) : null
-        }
-      />
+          }
+          pagination={
+            totalCount > 0 ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <select
+                  value={pageSize}
+                  onChange={(e) =>
+                    handlePageSizeChange(Number(e.target.value))
+                  }
+                  className="h-8 cursor-pointer rounded border border-kit bg-kit-white px-2 text-xs text-kit-heading outline-none focus:border-kit-primary"
+                >
+                  {[5, 10, 20].map((size: number) => (
+                    <option key={size} value={size}>
+                      {size} / trang
+                    </option>
+                  ))}
+                </select>
+                <Pagination
+                  page={safePage}
+                  pageCount={totalPages}
+                  onPageChange={setPageIndex}
+                  size="sm"
+                />
+              </div>
+            ) : null
+          }
+        />
+      </TablePageShell>
 
       <UserFormDialog open={createOpen} onOpenChange={setCreateOpen} />
 
@@ -254,9 +266,9 @@ export function UserListPage() {
         open={bulkDeleteOpen}
         onOpenChange={setBulkDeleteOpen}
         onConfirm={handleBulkDelete}
-        title={CONFIRM_MSG.bulkDeleteTitle(ENTITY)}
-        description={CONFIRM_MSG.bulkDeleteDescription(selectedCount, ENTITY)}
-        confirmLabel={COMMON_MSG.delete}
+        title={`Xóa ${ENTITY} đã chọn`}
+        description={`Bạn có chắc muốn xóa ${selectedCount} ${ENTITY} đã chọn?`}
+        confirmLabel="Xóa"
         loading={deleteMultiplesMutation.isPending}
         variant="danger"
       />
@@ -267,16 +279,13 @@ export function UserListPage() {
           if (!open) setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
-        title={CONFIRM_MSG.deleteTitle(ENTITY)}
-        description={CONFIRM_MSG.deleteDescription(
-          ENTITY,
-          deleteTarget?.username ?? "",
-        )}
-        confirmLabel={COMMON_MSG.delete}
+        title={`Xóa ${ENTITY}`}
+        description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget?.username ?? ""}"? Hành động này không thể hoàn tác.`}
+        confirmLabel="Xóa"
         loading={deleteMutation.isPending}
         variant="danger"
       />
-    </TablePageShell>
+    </div>
   );
 }
 export default UserListPage;

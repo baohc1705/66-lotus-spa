@@ -8,7 +8,7 @@ import {
   resetPasswordSchema,
   type ResetPasswordFormData,
 } from '@/features/auth/schemas/forgotPasswordSchema'
-import { Input } from '@/shared/components/ui/input'
+import { Input } from '@/shared/forms/Input'
 
 export const ResetPasswordForm = () => {
   const [searchParams] = useSearchParams()

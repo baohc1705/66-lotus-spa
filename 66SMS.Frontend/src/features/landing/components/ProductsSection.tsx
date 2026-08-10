@@ -27,7 +27,7 @@ export const ProductsSection = () => {
           title="Sản phẩm"
           titleId="products-heading"
           variant="lotus"
-          className="mb-10"
+          className="mb-6"
         />
 
         {isLoading ? (
@@ -40,12 +40,12 @@ export const ProductsSection = () => {
             ))}
           </div>
         ) : isError ? (
-          <p className="py-12 text-center font-geist text-sm text-warm-600">
-            Không tải được danh sách sản phẩm. Vui lòng thử lại sau.
+          <p className="py-8 text-center font-geist text-sm text-warm-600">
+            Không tải được sản phẩm. Thử lại sau.
           </p>
         ) : products.length === 0 ? (
-          <p className="py-12 text-center font-geist text-sm text-warm-600">
-            Hiện chưa có sản phẩm nào.
+          <p className="py-8 text-center font-geist text-sm text-warm-600">
+            Chưa có sản phẩm nào.
           </p>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">

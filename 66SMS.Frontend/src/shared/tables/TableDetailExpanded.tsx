@@ -14,13 +14,13 @@ export function TableDetailExpanded({
   return (
     <div
       className={
-        "w-full overflow-hidden overflow-y-auto bg-kit-page/40 px-3 py-2.5 " +
+        "w-full overflow-hidden overflow-y-auto bg-kit-page/40 px-3 py-2 " +
         maxHeightClass +
         " " +
         className
       }
     >
-      <div className="flex flex-col gap-2">{children}</div>
+      <div className="flex flex-col gap-1.5">{children}</div>
     </div>
   );
 }
@@ -53,15 +53,30 @@ export function TableDetailHeader({
   );
 }
 
+type TableDetailGridCols = 1 | 2 | 3 | 4;
+
+const gridColsClass: Record<TableDetailGridCols, string> = {
+  1: "md:grid-cols-1",
+  2: "md:grid-cols-2",
+  3: "md:grid-cols-3",
+  4: "md:grid-cols-4",
+};
+
 export function TableDetailGrid({
   children,
   className = "",
+  cols = 2,
 }: {
   children: ReactNode;
   className?: string;
+  cols?: TableDetailGridCols;
 }) {
   return (
-    <div className={"grid grid-cols-1 gap-x-6 md:grid-cols-2 " + className}>
+    <div
+      className={
+        "grid grid-cols-1 gap-x-4 gap-y-0 " + gridColsClass[cols] + " " + className
+      }
+    >
       {children}
     </div>
   );
@@ -75,11 +90,11 @@ export function TableDetailField({
   value?: ReactNode;
 }) {
   return (
-    <div className="border-b border-kit py-1.5 last:border-b-0">
+    <div className="border-b border-kit py-1 last:border-b-0">
       <p className="mb-0.5 text-xs text-kit-muted">{label}</p>
-      <p className="truncate text-sm font-medium text-kit-heading">
+      <div className="truncate text-sm font-medium text-kit-heading">
         {value == null || value === "" ? "—" : value}
-      </p>
+      </div>
     </div>
   );
 }

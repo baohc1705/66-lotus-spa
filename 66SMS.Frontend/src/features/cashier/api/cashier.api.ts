@@ -97,6 +97,17 @@ export const cashierApi = {
       >(`/cashier/appointments/${appointmentId}/staff/${staffId}`)
       .then((r) => r.data),
 
+  rescheduleAppointment: (
+    appointmentId: string | number,
+    payload: { appointmentDate: string; slotId: number },
+  ) =>
+    axiosInstance
+      .put<Result<void>>(
+        `/cashier/appointments/${appointmentId}/reschedule`,
+        payload,
+      )
+      .then((r) => r.data),
+
   payBooking: (id: string | number, paymentMethod: string, note?: string) =>
     axiosInstance
       .post<Result<void>>(`/cashier/appointments/${id}/pay`, {

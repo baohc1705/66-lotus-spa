@@ -58,11 +58,13 @@ namespace _66SMS.Persistence.Repositories.Sql
             int? staffId,
             int? salonId,
             int? excludeLockId,
+            int? excludeAppointmentId = null,
             CancellationToken cancellationToken = default)
         {
             object staffParam = staffId.HasValue ? staffId.Value : DBNull.Value;
             object salonParam = salonId.HasValue ? salonId.Value : DBNull.Value;
             object excludeLockParam = excludeLockId.HasValue ? excludeLockId.Value : DBNull.Value;
+            object excludeApptParam = excludeAppointmentId.HasValue ? excludeAppointmentId.Value : DBNull.Value;
             var rows = await applicationDbContext.ExecuteStoredProcedureAsync<ResolveBookingStaffRowDto>(
                 AppointmentConst.SP_RESOLVE_BOOKING_STAFF,
                 cancellationToken,
@@ -71,7 +73,8 @@ namespace _66SMS.Persistence.Repositories.Sql
                 slotId,
                 staffParam,
                 salonParam,
-                excludeLockParam);
+                excludeLockParam,
+                excludeApptParam);
             return rows.FirstOrDefault();
         }
 

@@ -70,10 +70,14 @@ export function ListGroupsPage() {
 
         <DemoSection title="List group contextual classes">
           <ListGroup>
-            <ListGroupItem tone="success">Cras justo odio</ListGroupItem>
-            <ListGroupItem tone="info">Dapibus ac facilisis in</ListGroupItem>
-            <ListGroupItem tone="warning">Morbi leo risus</ListGroupItem>
-            <ListGroupItem tone="danger">Porta ac consectetur ac</ListGroupItem>
+            <ListGroupItem tone="primary">Primary</ListGroupItem>
+            <ListGroupItem tone="secondary">Secondary</ListGroupItem>
+            <ListGroupItem tone="success">Success</ListGroupItem>
+            <ListGroupItem tone="info">Info</ListGroupItem>
+            <ListGroupItem tone="warning">Warning</ListGroupItem>
+            <ListGroupItem tone="danger">Danger</ListGroupItem>
+            <ListGroupItem tone="focus">Focus</ListGroupItem>
+            <ListGroupItem tone="alternate">Alternate</ListGroupItem>
           </ListGroup>
         </DemoSection>
 
@@ -90,10 +94,10 @@ export function ListGroupsPage() {
             </ListGroupItem>
             <ListGroupItem>
               <div>
-                <h5 className="mb-1 text-sm font-normal text-[#343a40]">
+                <h5 className="mb-1 text-sm font-normal text-kit-heading">
                   List group item heading
                 </h5>
-                <p className="mb-0 text-sm text-[#6c757d]">
+                <p className="mb-0 text-sm text-kit-muted">
                   Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus
                   varius blandit.
                 </p>
@@ -101,10 +105,10 @@ export function ListGroupsPage() {
             </ListGroupItem>
             <ListGroupItem>
               <div>
-                <h5 className="mb-1 text-sm font-normal text-[#343a40]">
+                <h5 className="mb-1 text-sm font-normal text-kit-heading">
                   List group item heading
                 </h5>
-                <p className="mb-0 text-sm text-[#6c757d]">
+                <p className="mb-0 text-sm text-kit-muted">
                   Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus
                   varius blandit.
                 </p>

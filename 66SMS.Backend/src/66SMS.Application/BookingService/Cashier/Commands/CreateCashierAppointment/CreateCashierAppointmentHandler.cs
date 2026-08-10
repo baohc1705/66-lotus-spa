@@ -188,7 +188,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
 
                         var staffInfo = await appointmentSqlRepository.ResolveBookingStaffAsync(
                             slotLock.AppointmentDate, mainServiceId, slotLock.SlotId,
-                            slotLock.StaffId, guest.SalonId, slotLock.Id, cancellationToken);
+                            slotLock.StaffId, guest.SalonId, slotLock.Id, null, cancellationToken);
 
                         if (staffInfo == null)
                         {
@@ -208,7 +208,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                         slotId = (int)guest.SlotId!;
                         var staffInfo = await appointmentSqlRepository.ResolveBookingStaffAsync(
                             (DateOnly)guest.AppointmentDate!, mainServiceId, slotId,
-                            guest.StaffId, guest.SalonId, null, cancellationToken);
+                            guest.StaffId, guest.SalonId, null, null, cancellationToken);
 
                         if (staffInfo == null)
                         {

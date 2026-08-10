@@ -68,8 +68,7 @@ export function RevenueByDayPage() {
     }));
 
   return (
-    <div className="space-y-2 p-2">
-      <h1 className="text-lg font-bold">Báo cáo doanh thu theo thời gian</h1>
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
       <ReportFilterBar
         showSalon
         showGrain
@@ -93,34 +92,42 @@ export function RevenueByDayPage() {
         exporting={exportExcel.isPending}
       />
 
-      {stats && (
+      {stats ? (
         <ReportStatCards
           cards={[
             {
               title: "Tổng doanh thu",
+              description: "Thực thu trong kỳ",
               value: formatCurrency(stats.totalRevenue),
-              className: "bg-sky-500",
+              tone: "love-kiss",
+              valueTone: "white",
             },
             {
               title: "Tổng chi",
+              description: "Chi phí trong kỳ",
               value: formatCurrency(stats.totalExpense),
-              className: "bg-rose-500",
+              tone: "premium-dark",
+              valueTone: "warning",
             },
             {
               title: "Số đơn hàng",
+              description: "Hóa đơn đã thanh toán",
               value: String(stats.orderCount),
-              className: "bg-violet-500",
+              tone: "arielle-smile",
+              valueTone: "white",
             },
             {
               title: "Lợi nhuận",
+              description: "Doanh thu trừ chi",
               value: formatCurrency(stats.profit),
-              className: "bg-emerald-500",
+              tone: "happy-green",
+              valueTone: "dark",
             },
           ]}
         />
-      )}
+      ) : null}
 
-      <div className="grid grid-cols-1 xl:grid-cols-5 gap-2">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-5">
         <div className="xl:col-span-2">
           <RevenueVerticalBarChart
             data={chartData}

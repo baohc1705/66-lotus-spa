@@ -4,14 +4,18 @@ import { useTimeSlots } from "@/features/booking/hooks/useBookingData";
 import type { TimeSlotDTO } from "@/features/booking/types/booking.types";
 import { useServices } from "@/features/services/hooks/useServices";
 import type { ServiceDto } from "@/features/services/types/service.types";
-import { SearchableSelect } from "@/shared/components/ui/searchable-select";
+import { Modal } from "@/shared/components/Modal";
+import { Badge } from "@/shared/elements/Badge";
+import { FormField } from "@/shared/forms/FormField";
+import { SearchableSelect } from "@/shared/forms/SearchableSelect";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "@/shared/tables/Table";
 import { formatDate } from "@/shared/utils/date.utils";
 import { useStaffAvailability } from "../hooks/useStaffAvailability";
 import type { StaffAvailabilityDto, StaffAvailabilityStatus } from "../types";
@@ -29,10 +33,12 @@ function statusLabel(status: StaffAvailabilityStatus): string {
   return "Nghỉ";
 }
 
-function statusClass(status: StaffAvailabilityStatus): string {
-  if (status === "available") return "text-adminGreen-600 font-semibold";
-  if (status === "busy") return "text-red-600 font-semibold";
-  return "text-adminGray-600 font-semibold";
+function statusBadgeVariant(
+  status: StaffAvailabilityStatus,
+): "success" | "danger" | "secondary" {
+  if (status === "available") return "success";
+  if (status === "busy") return "danger";
+  return "secondary";
 }
 
 function noteText(row: StaffAvailabilityDto): string {
@@ -101,12 +107,10 @@ export function StaffAvailabilityDialog({
     setSlotId(value ? Number(value) : null);
   };
 
-  const handleOpenChange = (next: boolean) => {
-    if (!next) {
-      setServiceId(null);
-      setSlotId(null);
-    }
-    onOpenChange(next);
+  const handleClose = () => {
+    setServiceId(null);
+    setSlotId(null);
+    onOpenChange(false);
   };
 
   const showLoading =
@@ -114,90 +118,90 @@ export function StaffAvailabilityDialog({
     (serviceId != null && timeSlotsQuery.isFetching);
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-3xl font-sans">
-        <DialogHeader>
-          <DialogTitle className="text-base">Tình trạng nhân viên</DialogTitle>
-          <DialogDescription className="text-xs">
-            Ngày {currentDate.toLocaleDateString("vi-VN")} — chọn dịch vụ và giờ
-            để xem ai rảnh / bận.
-          </DialogDescription>
-        </DialogHeader>
+    <Modal
+      open={open}
+      onClose={handleClose}
+      title="Tình trạng nhân viên"
+      size="lg"
+      scrollable
+    >
+      <p className="text-xs text-kit-muted mb-4">
+        Ngày {currentDate.toLocaleDateString("vi-VN")} — chọn dịch vụ và giờ để
+        xem ai rảnh / bận.
+      </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-adminInk">
-              Dịch vụ
-            </label>
-            <SearchableSelect
-              options={serviceOptions}
-              value={serviceId ? String(serviceId) : ""}
-              onValueChange={handleServiceChange}
-              placeholder="Chọn dịch vụ..."
-              searchPlaceholder="Tìm dịch vụ..."
-            />
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-adminInk">Giờ</label>
-            <SearchableSelect
-              options={slotOptions}
-              value={slotId ? String(slotId) : ""}
-              onValueChange={handleSlotChange}
-              placeholder={
-                serviceId ? "Chọn khung giờ..." : "Chọn dịch vụ trước"
-              }
-              searchPlaceholder="Tìm giờ..."
-              disabled={!serviceId}
-            />
-          </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+        <FormField label="Dịch vụ">
+          <SearchableSelect
+            options={serviceOptions}
+            value={serviceId ? String(serviceId) : ""}
+            onChange={handleServiceChange}
+            placeholder="Chọn dịch vụ..."
+            searchPlaceholder="Tìm dịch vụ..."
+          />
+        </FormField>
+        <FormField label="Giờ">
+          <SearchableSelect
+            options={slotOptions}
+            value={slotId ? String(slotId) : ""}
+            onChange={handleSlotChange}
+            placeholder={
+              serviceId ? "Chọn khung giờ..." : "Chọn dịch vụ trước"
+            }
+            searchPlaceholder="Tìm giờ..."
+            disabled={!serviceId}
+          />
+        </FormField>
+      </div>
+
+      {!serviceId || !slotId ? (
+        <p className="text-xs text-kit-muted py-6 text-center">
+          Chọn dịch vụ và giờ để xem danh sách nhân viên.
+        </p>
+      ) : showLoading ? (
+        <div className="flex items-center justify-center py-10">
+          <Loader2 className="w-6 h-6 text-kit-primary animate-spin" />
         </div>
-
-        {!serviceId || !slotId ? (
-          <p className="text-xs text-adminGray-600 py-6 text-center">
-            Chọn dịch vụ và giờ để xem danh sách nhân viên.
-          </p>
-        ) : showLoading ? (
-          <div className="flex items-center justify-center py-10">
-            <Loader2 className="w-6 h-6 text-adminGreen-600 animate-spin" />
-          </div>
-        ) : availabilityQuery.isError ? (
-          <p className="text-xs text-red-600 py-6 text-center">
-            Không tải được tình trạng nhân viên.
-          </p>
-        ) : rows.length === 0 ? (
-          <p className="text-xs text-adminGray-600 py-6 text-center">
-            Không có nhân viên phù hợp.
-          </p>
-        ) : (
-          <div className="overflow-auto max-h-[50vh] border border-adminGray-100 rounded-[3px]">
-            <table className="w-full text-xs">
-              <thead className="bg-adminGray-50 sticky top-0">
-                <tr className="text-left text-adminInk/80">
-                  <th className="px-3 py-2 font-semibold">Nhân viên</th>
-                  <th className="px-3 py-2 font-semibold w-24">Trạng thái</th>
-                  <th className="px-3 py-2 font-semibold">Ghi chú</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r: StaffAvailabilityDto) => (
-                  <tr
-                    key={r.staffId}
-                    className="border-t border-adminGray-100 hover:bg-adminGray-50/40"
-                  >
-                    <td className="px-3 py-2 text-adminInk">{r.staffName}</td>
-                    <td className={`px-3 py-2 ${statusClass(r.status)}`}>
-                      {statusLabel(r.status)}
-                    </td>
-                    <td className="px-3 py-2 text-adminGray-600">
-                      {noteText(r)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
+      ) : availabilityQuery.isError ? (
+        <p className="text-xs text-kit-danger py-6 text-center">
+          Không tải được tình trạng nhân viên.
+        </p>
+      ) : rows.length === 0 ? (
+        <p className="text-xs text-kit-muted py-6 text-center">
+          Không có nhân viên phù hợp.
+        </p>
+      ) : (
+        <div className="overflow-auto max-h-[50vh] rounded border border-kit">
+          <Table hover striped size="sm">
+            <TableHead className="bg-kit-page sticky top-0">
+              <TableRow>
+                <TableHeaderCell>Nhân viên</TableHeaderCell>
+                <TableHeaderCell className="w-24">Trạng thái</TableHeaderCell>
+                <TableHeaderCell>Ghi chú</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row: StaffAvailabilityDto) => (
+                <TableRow key={row.staffId}>
+                  <TableCell>{row.staffName}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={statusBadgeVariant(row.status)}
+                      soft
+                      pill
+                    >
+                      {statusLabel(row.status)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-kit-muted">
+                    {noteText(row)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </Modal>
   );
 }

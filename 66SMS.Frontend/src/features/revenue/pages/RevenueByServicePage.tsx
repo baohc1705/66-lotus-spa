@@ -52,7 +52,7 @@ export function RevenueByServicePage() {
     },
     {
       key: "avgCommissionRate",
-      header: "Tỷ lệ hoa hồng TB",
+      header: "Tỷ lệ hoa hồng trung bình",
       render: (r) => `${r.avgCommissionRate}%`,
     },
     {
@@ -92,8 +92,7 @@ export function RevenueByServicePage() {
     }));
 
   return (
-    <div className="space-y-2 p-2">
-      <h1 className="text-lg font-bold">Báo cáo doanh thu theo dịch vụ</h1>
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
       <ReportFilterBar
         showSalon
         showCategory
@@ -118,7 +117,7 @@ export function RevenueByServicePage() {
         exporting={exportExcel.isPending}
       />
 
-      <div className="grid grid-cols-1 xl:grid-cols-5 gap-2">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-5">
         <div className="xl:col-span-2">
           <RevenueHorizontalBarChart
             data={chartData}

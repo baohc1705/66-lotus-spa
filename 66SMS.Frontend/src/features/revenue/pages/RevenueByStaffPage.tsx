@@ -2,8 +2,8 @@ import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
 import type { SalonListItem } from "@/features/salons/types/salon.types";
 import { formatCurrency } from "@/shared/utils/currency";
 import {
-    ReportDataTable,
-    type ReportColumn,
+  ReportDataTable,
+  type ReportColumn,
 } from "../components/ReportDataTable";
 import { ReportFilterBar } from "../components/ReportFilterBar";
 import { RevenueHorizontalBarChart } from "../components/RevenueHorizontalBarChart";
@@ -72,8 +72,7 @@ export function RevenueByStaffPage() {
     }));
 
   return (
-    <div className="space-y-2 p-2">
-      <h1 className="text-lg font-bold">Báo cáo doanh thu theo nhân viên</h1>
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
       <ReportFilterBar
         showSalon
         salons={salonOptions}
@@ -93,7 +92,7 @@ export function RevenueByStaffPage() {
         exporting={exportExcel.isPending}
       />
 
-      <div className="grid grid-cols-1 xl:grid-cols-5 gap-2">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-5">
         <div className="xl:col-span-2">
           <RevenueHorizontalBarChart
             data={chartData}

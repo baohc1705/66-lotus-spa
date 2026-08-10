@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Bell, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import type { AxiosError } from "axios";
 import { cn } from "@/lib/utils";
 import { formatDateTimeDisplay } from "@/shared/utils/date.utils";

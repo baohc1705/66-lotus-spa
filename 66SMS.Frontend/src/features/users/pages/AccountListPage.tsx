@@ -2,12 +2,13 @@ import { useMemo } from "react";
 import { useReactTable, getCoreRowModel } from "@tanstack/react-table";
 import { UserRound } from "lucide-react";
 
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
-import { TableEmptyState } from "@/shared/components/DataTable/TableEmptyState";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
+import { Pagination } from "@/shared/components/Pagination";
+import { Select } from "@/shared/forms/Select";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
+import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 
 import {
@@ -18,10 +19,11 @@ import { useGetAllAccounts } from "../hooks/useUsers";
 import { useAccountListState } from "../hooks/useAccountListState";
 
 export function AccountListPage() {
+  const listState = useAccountListState();
+
   const {
     queryParams,
     pageIndex,
-    setPageIndex,
     pageSize,
     columnVisibility,
     setColumnVisibility,
@@ -31,7 +33,7 @@ export function AccountListPage() {
     handlePageSizeChange,
     handleSearchChange,
     filter,
-  } = useAccountListState();
+  } = listState;
 
   const {
     data: accountsResult,
@@ -42,6 +44,10 @@ export function AccountListPage() {
   const paged = accountsResult?.data;
   const accounts = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
+  const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
   const columns = useActiveAccountColumns({
     pageIndex,
@@ -54,10 +60,9 @@ export function AccountListPage() {
   const table = useReactTable({
     data: accounts,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    columnResizeMode: "onChange",
     state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
+    getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
     manualSorting: true,
   });
@@ -65,51 +70,61 @@ export function AccountListPage() {
   const columnLabels = useMemo(() => ({ ...ACCOUNT_COLUMN_LABELS }), []);
 
   return (
-    <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-      <div className="px-6 pt-6">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-semibold text-lotus-deep">
-            Quản lý tài khoản
-          </h1>
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
+      <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+        <div className="border-b border-kit px-4 pt-4">
+          <DataTableToolbar
+            searchValue={filter}
+            onSearchChange={handleSearchChange}
+            searchPlaceholder="Tìm theo tài khoản, email..."
+          >
+            <DataTableViewOptions table={table} columnLabels={columnLabels} />
+          </DataTableToolbar>
         </div>
-        <DataTableToolbar
-          searchValue={filter}
-          onSearchChange={handleSearchChange}
-          searchPlaceholder="Tìm theo tài khoản, email..."
-        >
-          <DataTableViewOptions table={table} columnLabels={columnLabels} />
-        </DataTableToolbar>
-      </div>
 
-      <DataTable
-        table={table}
-        isLoading={isLoading}
-        loadingRows={
-          pageSize > DEFAULT_LOADING_ROWS ? DEFAULT_LOADING_ROWS : pageSize
-        }
-        emptyState={
-          <TableEmptyState
-            icon={UserRound}
-            title="Chưa có tài khoản"
-            hint="Danh sách tài khoản đăng nhập sẽ hiển thị tại đây."
-          />
-        }
-        pagination={
-          paged && totalCount > 0 ? (
-            <DataTablePagination
-              pageIndex={paged.pageIndex}
-              pageSize={paged.pageSize}
-              totalCount={paged.totalCount}
-              totalPages={paged.totalPages}
-              hasPreviousPage={paged.hasPreviousPage}
-              hasNextPage={paged.hasNextPage}
-              onPageChange={setPageIndex}
-              onPageSizeChange={handlePageSizeChange}
+        <DataTable
+          table={table}
+          isLoading={isLoading}
+          loadingRows={DEFAULT_LOADING_ROWS}
+          emptyState={
+            <TableEmptyState
+              icon={UserRound}
+              title="Chưa có tài khoản"
             />
-          ) : null
-        }
-      />
-    </TablePageShell>
+          }
+          pagination={
+            totalCount > 0 ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <div className="flex items-center gap-3 text-xs text-kit-muted">
+                  <span>
+                    {rangeStart}-{rangeEnd} / {totalCount}
+                  </span>
+                  <Select
+                    value={String(pageSize)}
+                    onChange={(event) =>
+                      handlePageSizeChange(Number(event.target.value))
+                    }
+                    options={[
+                      { value: "5", label: "5 / trang" },
+                      { value: "10", label: "10 / trang" },
+                      { value: "20", label: "20 / trang" },
+                    ]}
+                    inputSize="sm"
+                    className="w-auto min-w-28"
+                  />
+                </div>
+                <Pagination
+                  page={safePage}
+                  pageCount={totalPages}
+                  onPageChange={listState.setPageIndex}
+                  size="sm"
+                />
+              </div>
+            ) : null
+          }
+        />
+      </TablePageShell>
+    </div>
   );
 }
 

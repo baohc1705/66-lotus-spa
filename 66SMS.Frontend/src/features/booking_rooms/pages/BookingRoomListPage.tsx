@@ -7,19 +7,18 @@ import { Plus } from "lucide-react";
 import { useMemo } from "react";
 
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
+import { Pagination } from "@/shared/components/Pagination";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { Button } from "@/shared/components/ui/button";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
+import { Button } from "@/shared/elements/Button";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
+import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
 
 import { BookingRoomDetailExpanded } from "../components/BookingRoomDetailExpanded";
 import { BookingRoomFormDialog } from "../components/BookingRoomFormDialog";
+import { BookingRoomStatCards } from "../components/BookingRoomStatCards";
 import {
   BOOKING_ROOM_COLUMN_LABELS,
   useActiveBookingRoomColumns,
@@ -31,6 +30,7 @@ import {
   useDeleteBookingRoom,
   useUpdateBookingRoom,
 } from "../hooks/useBookingRooms";
+import type { BookingRoomDTO } from "../types/booking_room.types";
 
 const ENTITY = "phòng dịch vụ";
 
@@ -64,16 +64,44 @@ export function BookingRoomListPage() {
     isFetching,
   } = useAdminBookingRooms(queryParams);
 
+  const { data: allRoomsResult } = useAdminBookingRooms({
+    pageIndex: 1,
+    pageSize: 10000,
+  });
+
   const deleteMutation = useDeleteBookingRoom();
   const updateMutation = useUpdateBookingRoom();
 
   const paged = roomResult?.data;
   const rooms = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
+
+  const allRooms = useMemo(
+    () => allRoomsResult?.data?.items ?? [],
+    [allRoomsResult],
+  );
+
+  const availablePositions = useMemo(
+    () =>
+      allRooms.reduce(
+        (sum: number, room: BookingRoomDTO) => sum + (room.availableCount ?? 0),
+        0,
+      ),
+    [allRooms],
+  );
+
+  const inServicePositions = useMemo(
+    () =>
+      allRooms.reduce(
+        (sum: number, room: BookingRoomDTO) => sum + (room.inServiceCount ?? 0),
+        0,
+      ),
+    [allRooms],
+  );
 
   const activeColumns = useActiveBookingRoomColumns({
-    pageIndex,
-    pageSize,
     orderBy,
     isDescending,
     onSort: handleSort,
@@ -91,6 +119,7 @@ export function BookingRoomListPage() {
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
+    getRowCanExpand: () => true,
     manualPagination: true,
     manualSorting: true,
   });
@@ -108,34 +137,41 @@ export function BookingRoomListPage() {
   };
 
   return (
-    <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-      <DataTableToolbar
-        searchPlaceholder="Tìm kiếm phòng..."
-        searchValue={filter}
-        onSearchChange={handleSearchChange}
-      >
-        <DataTableViewOptions table={table} columnLabels={columnLabels} />
-        <div className="flex items-center gap-2 ml-auto">
-          <PermissionGate resource={perm.resource} action={perm.create}>
-            <Button
-              variant="admin"
-              size="sm"
-              onClick={() => setCreateOpen(true)}
-              className="lotus-admin-table-toolbar-btn"
-            >
-              <Plus className="w-4 h-4" />
-              Thêm phòng dịch vụ
-            </Button>
-          </PermissionGate>
-        </div>
-      </DataTableToolbar>
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
+      <BookingRoomStatCards
+        totalRooms={allRoomsResult?.data?.totalCount ?? totalCount}
+        availablePositions={availablePositions}
+        inServicePositions={inServicePositions}
+        isLoading={isLoading && allRooms.length === 0}
+      />
 
-      <div className="lotus-admin-table-page-card">
+      <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+        <div className="border-b border-kit px-4 pt-4">
+          <DataTableToolbar
+            searchPlaceholder="Tìm kiếm phòng..."
+            searchValue={filter}
+            onSearchChange={handleSearchChange}
+          >
+            <DataTableViewOptions table={table} columnLabels={columnLabels} />
+            <PermissionGate resource={perm.resource} action={perm.create}>
+              <Button
+                variant="admin"
+                size="sm"
+                className="mb-0"
+                onClick={() => setCreateOpen(true)}
+              >
+                <Plus className="h-4 w-4" />
+                Thêm phòng dịch vụ
+              </Button>
+            </PermissionGate>
+          </DataTableToolbar>
+        </div>
+
         <DataTable
           table={table}
           isLoading={isLoading}
           loadingRows={DEFAULT_LOADING_ROWS}
-          renderSubComponent={({ row }) =>
+          renderExpandedRow={({ row }) =>
             row.original.id ? (
               <BookingRoomDetailExpanded
                 roomId={row.original.id}
@@ -143,19 +179,29 @@ export function BookingRoomListPage() {
               />
             ) : null
           }
+          pagination={
+            <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+              <select
+                value={pageSize}
+                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                className="h-8 cursor-pointer rounded border border-kit bg-kit-white px-2 text-xs text-kit-heading outline-none focus:border-kit-primary"
+              >
+                {[5, 10, 20].map((size: number) => (
+                  <option key={size} value={size}>
+                    {size} / trang
+                  </option>
+                ))}
+              </select>
+              <Pagination
+                page={safePage}
+                pageCount={totalPages}
+                onPageChange={listState.setPageIndex}
+                size="sm"
+              />
+            </div>
+          }
         />
-      </div>
-
-      <DataTablePagination
-        pageIndex={pageIndex}
-        pageSize={pageSize}
-        totalCount={totalCount}
-        totalPages={paged?.totalPages ?? 0}
-        hasPreviousPage={paged?.hasPreviousPage ?? false}
-        hasNextPage={paged?.hasNextPage ?? false}
-        onPageChange={listState.setPageIndex}
-        onPageSizeChange={handlePageSizeChange}
-      />
+      </TablePageShell>
 
       <BookingRoomFormDialog
         open={createOpen}
@@ -179,16 +225,13 @@ export function BookingRoomListPage() {
           onOpenChange={(open) => {
             if (!open) setDeleteTarget(null);
           }}
-          title={CONFIRM_MSG.deleteTitle(ENTITY)}
-          description={CONFIRM_MSG.deleteDescription(
-            ENTITY,
-            deleteTarget.name ?? "",
-          )}
+          title={`Xóa ${ENTITY}`}
+          description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget.name ?? ""}"? Hành động này không thể hoàn tác.`}
           onConfirm={handleDelete}
-          confirmLabel={COMMON_MSG.delete}
+          confirmLabel="Xóa"
           loading={deleteMutation.isPending}
         />
       )}
-    </TablePageShell>
+    </div>
   );
 }

@@ -25,8 +25,6 @@ namespace _66SMS.Application.SalonService.Revenues.Queries.GetRevenueBreakdown
                 request.To,
                 cancellationToken);
 
-            var total = rows.Sum(r => r.Amount);
-
             var dto = new RevenueBreakdownDto
             {
                 ByItemType = rows.Select(r => new RevenueBreakdownItemDto
@@ -34,9 +32,7 @@ namespace _66SMS.Application.SalonService.Revenues.Queries.GetRevenueBreakdown
                     ItemType = r.ItemType,
                     Label = r.Label,
                     Amount = r.Amount,
-                    Percent = total > 0
-                        ? Math.Round(r.Amount * 100 / total, 0)
-                        : 0,
+                    Percent = r.Percent,
                 }).ToList(),
             };
 

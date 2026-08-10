@@ -11,7 +11,7 @@ type SettingsHeaderProps = {
 export function SettingsHeader(props: SettingsHeaderProps) {
   return (
     <header className="app-header z-30 flex h-15 shrink-0 items-center bg-white shadow-sm">
-      {/* Desktop logo + hamburger (Architect header__pane) — md+ */}
+      {/* Desktop logo + hamburger — md+ */}
       <div
         className={
           "app-header__logo hidden h-full shrink-0 items-center border-r border-gray-100 " +

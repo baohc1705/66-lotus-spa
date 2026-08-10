@@ -1,13 +1,6 @@
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import { formatCurrency } from "@/shared/utils/currency";
+import { BarChart } from "@/shared/charts/BarChart";
+import { chartColors } from "@/shared/charts/chartTheme";
+import { Card, CardBody, CardHeader } from "@/shared/elements/Card";
 
 type Point = { label: string; revenue: number };
 
@@ -20,47 +13,32 @@ export function RevenueHorizontalBarChart({
   data,
   title = "Doanh thu",
 }: Props) {
-  const height = Math.max(280, data.length * 36);
+  const chartData = data.map((row: Point) => ({
+    name: row.label.length > 18 ? row.label.slice(0, 18) + "…" : row.label,
+    value: row.revenue,
+  }));
+  const height = Math.max(280, chartData.length * 36);
 
   return (
-    <div
-      className="bg-white border rounded-lg p-4 flex flex-col"
-      style={{ height }}
-    >
-      <div className="text-sm font-bold mb-3">{title}</div>
-      <div className="flex-1 min-h-0">
-        <ResponsiveContainer width="100%" height="100%">
+    <Card className="main-card mb-0 overflow-hidden">
+      <CardHeader>
+        <span className="text-sm font-bold text-kit-heading/70">{title}</span>
+      </CardHeader>
+      <CardBody>
+        {chartData.length === 0 ? (
+          <div className="flex h-72 items-center justify-center text-kit-muted">
+            Chưa có dữ liệu
+          </div>
+        ) : (
           <BarChart
-            layout="vertical"
-            data={data}
-            margin={{ top: 8, right: 16, left: 8, bottom: 0 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-            <XAxis
-              type="number"
-              tick={{ fontSize: 11 }}
-              tickFormatter={(v: unknown) => {
-                const n = Number(v);
-                if (n >= 1000) return `${(n / 1000).toFixed(0)}k`;
-                return `${n}`;
-              }}
-            />
-            <YAxis
-              type="category"
-              dataKey="label"
-              width={120}
-              tick={{ fontSize: 11 }}
-            />
-            <Tooltip
-              formatter={(v: unknown) => [
-                formatCurrency(Number(v)),
-                "Doanh thu",
-              ]}
-            />
-            <Bar dataKey="revenue" fill="var(--admin-green-600)" radius={[0, 3, 3, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
+            data={chartData}
+            dataKey="value"
+            height={height}
+            color={chartColors.primary}
+            layout="horizontal"
+          />
+        )}
+      </CardBody>
+    </Card>
   );
 }

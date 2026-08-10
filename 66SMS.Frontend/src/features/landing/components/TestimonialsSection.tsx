@@ -87,7 +87,7 @@ export const TestimonialsSection = () => {
       />
 
       <div className="landing-container relative z-10">
-        <div className="mb-5 flex justify-center">
+        <div className="mb-3 flex justify-center">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-600/10 px-3.5 py-1.5 font-geist text-xs font-semibold uppercase tracking-[0.14em] text-rose-600">
             <span
               className="h-3.5 w-3.5 bg-rose-600"
@@ -103,7 +103,7 @@ export const TestimonialsSection = () => {
               }}
               aria-hidden="true"
             />
-            Feedback
+            Đánh giá
           </span>
         </div>
 
@@ -111,8 +111,7 @@ export const TestimonialsSection = () => {
           title="Khách hàng nói gì"
           titleId="testimonials-heading"
           variant="lotus"
-          description="Những trải nghiệm thực tế từ khách hàng đã sử dụng dịch vụ của chúng tôi."
-          className="mb-10"
+          className="mb-6"
         />
 
         <div className="hidden gap-5 lg:grid lg:grid-cols-4">
@@ -215,7 +214,7 @@ export const TestimonialsSection = () => {
           </AnimatePresence>
         </div>
 
-        <div className="mt-8 flex items-center justify-center gap-4">
+        <div className="mt-5 flex items-center justify-center gap-4">
           <button
             type="button"
             onClick={goPrev}

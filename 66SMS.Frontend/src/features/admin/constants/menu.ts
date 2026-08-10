@@ -142,12 +142,12 @@ export const MENU_GROUPS: MenuGroup[] = [
           },
         ],
       },
-      {
-        label: "Liệu trình",
-        path: "/admin/treatments",
-        icon: History,
-        allowedRoles: ["Admin", "Manager"],
-      },
+      // {
+      //   label: "Liệu trình",
+      //   path: "/admin/treatments",
+      //   icon: History,
+      //   allowedRoles: ["Admin", "Manager"],
+      // },
     ],
   },
   {

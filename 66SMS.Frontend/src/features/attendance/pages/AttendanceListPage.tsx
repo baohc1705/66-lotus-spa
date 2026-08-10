@@ -1,4 +1,7 @@
-﻿import { useAuthStore } from "@/features/auth/stores/authStore";
+﻿import { useMemo, useState } from "react";
+import { ChevronLeft, ChevronRight, Clock, Search } from "lucide-react";
+
+import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useWorkSchedules } from "@/features/schedules/hooks/useSchedules";
 import type { WorkScheduleDTO } from "@/features/schedules/types/schedule.types";
 import { useShifts } from "@/features/shifts/hooks/useShifts";
@@ -6,489 +9,622 @@ import type {
   ShiftDTO,
   ShiftPeriodDTO,
 } from "@/features/shifts/types/shift.types";
-import { DateUtil, formatDate, toLocalTimeOnly } from "@/shared/utils/date.utils";
-import { ChevronLeft, ChevronRight, Clock, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Button } from "@/shared/elements/Button";
+import { Card, CardBody } from "@/shared/elements/Card";
+import { Checkbox } from "@/shared/forms/Checkbox";
+import { Input } from "@/shared/forms/Input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableResponsive,
+  TableRow,
+} from "@/shared/tables/Table";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
+import {
+  DateUtil,
+  formatDate,
+  toLocalTimeOnly,
+} from "@/shared/utils/date.utils";
+
+import { AttendanceDailyDialog } from "../components/AttendanceDailyDialog";
 import { useAttendances } from "../hooks/useAttendances";
 import type { AttendanceDto } from "../types/attendance.types";
-import { AttendanceDailyDialog } from "../components/AttendanceDailyDialog";
+
+type ShiftPeriodItem = {
+  shift: ShiftDTO;
+  period: ShiftPeriodDTO;
+};
+
+type CardStyle = {
+  className: string;
+  timeText: string;
+  statusText: string;
+  statusClass: string;
+};
+
+const DAY_NAMES = [
+  "Chủ nhật",
+  "Thứ hai",
+  "Thứ ba",
+  "Thứ tư",
+  "Thứ năm",
+  "Thứ sáu",
+  "Thứ bảy",
+];
+
+const CARD_BASE_CLASS =
+  "w-full rounded border px-2.5 py-2 text-left text-xs transition-colors " +
+  "hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-kit-primary/30";
+
+function getCardStyle(attendance: AttendanceDto | null): CardStyle {
+  if (!attendance) {
+    return {
+      className: CARD_BASE_CLASS + " soft-kit-warning border",
+      timeText: "--:--",
+      statusText: "Chưa chấm công",
+      statusClass: "font-semibold",
+    };
+  }
+
+  const status = attendance.status;
+  const hasCheckOut = attendance.checkOutAt != null;
+
+  if (status === 1 || status === 2) {
+    const checkInText = toLocalTimeOnly(attendance.checkInAt) || "--:--";
+    const checkOutText = hasCheckOut
+      ? toLocalTimeOnly(attendance.checkOutAt) || "--:--"
+      : "--:--";
+
+    return {
+      className: CARD_BASE_CLASS + " soft-kit-success border",
+      timeText: checkInText + " - " + checkOutText,
+      statusText: hasCheckOut ? "Đã ra ca" : "Đang làm",
+      statusClass: "font-semibold",
+    };
+  }
+
+  if (status === 4 || status === 5) {
+    return {
+      className: CARD_BASE_CLASS + " soft-kit-info border",
+      timeText: "--:--",
+      statusText: "Nghỉ có phép",
+      statusClass: "font-semibold",
+    };
+  }
+
+  if (status === 3 || status === 6) {
+    return {
+      className: CARD_BASE_CLASS + " soft-kit-danger border",
+      timeText: "--:--",
+      statusText: "Nghỉ không phép",
+      statusClass: "font-semibold",
+    };
+  }
+
+  return {
+    className: CARD_BASE_CLASS + " border-kit bg-kit-white",
+    timeText: "--:--",
+    statusText: "",
+    statusClass: "text-kit-muted",
+  };
+}
+
+function isLeaveStatus(status: number | null): boolean {
+  return status === 3 || status === 4 || status === 5 || status === 6;
+}
+
+function isWorkingStatus(status: number | null): boolean {
+  return status === 1 || status === 2;
+}
+
+function isPeriodActiveOnDate(
+  period: ShiftPeriodDTO,
+  dateText: string,
+): boolean {
+  if (!period.effectiveFrom) {
+    return false;
+  }
+  if (period.effectiveFrom > dateText) {
+    return false;
+  }
+  if (period.effectiveTo && period.effectiveTo < dateText) {
+    return false;
+  }
+  return true;
+}
 
 export function AttendanceListPage() {
-  const salonId = useAuthStore((s) => s.getEffectiveSalonId());
+  const salonId = useAuthStore((state) => state.getEffectiveSalonId());
   const { user, hasRole } = useAuthStore();
   const isAdminOrManager = hasRole("Admin") || hasRole("Manager");
   const currentStaffId = user?.staffInfo?.id;
 
-  const [currentDate, setCurrentDate] = useState<DateUtil>(
+  const [weekStart, setWeekStart] = useState<DateUtil>(
     formatDate().startOf("isoWeek"),
   );
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterMissing, setFilterMissing] = useState(false);
-  const [filterNoAttendance, setFilterNoAttendance] = useState(false);
-  const [filterLeave, setFilterLeave] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [showMissingOnly, setShowMissingOnly] = useState(false);
+  const [showNoAttendanceOnly, setShowNoAttendanceOnly] = useState(false);
+  const [showLeaveOnly, setShowLeaveOnly] = useState(false);
 
   const [selectedSchedule, setSelectedSchedule] =
     useState<WorkScheduleDTO | null>(null);
   const [selectedAttendance, setSelectedAttendance] =
     useState<AttendanceDto | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const startDateStr = currentDate.format("YYYY-MM-DD");
-  const endDateStr = currentDate.endOf("isoWeek").format("YYYY-MM-DD");
+  const startDate = weekStart.format("YYYY-MM-DD");
+  const endDate = weekStart.endOf("isoWeek").format("YYYY-MM-DD");
 
-  const handlePrevWeek = () =>
-    setCurrentDate((prev) => prev.subtract(1, "week"));
-  const handleNextWeek = () => setCurrentDate((prev) => prev.add(1, "week"));
-  const handleThisWeek = () => setCurrentDate(formatDate().startOf("isoWeek"));
+  function goToPreviousWeek() {
+    setWeekStart(weekStart.subtract(1, "week"));
+  }
 
-  const { data: shiftsResult, isLoading: isLoadingShifts } = useShifts({
+  function goToNextWeek() {
+    setWeekStart(weekStart.add(1, "week"));
+  }
+
+  function goToThisWeek() {
+    setWeekStart(formatDate().startOf("isoWeek"));
+  }
+
+  const staffFilter = isAdminOrManager ? undefined : (currentStaffId ?? -1);
+
+  const shiftsQuery = useShifts({
     pageIndex: 1,
     pageSize: 100,
   });
 
-  const {
-    data: schedulesResult,
-    isLoading: isLoadingSchedules,
-    refetch: refetchSchedules,
-  } = useWorkSchedules({
-    startDate: startDateStr,
-    endDate: endDateStr,
+  const schedulesQuery = useWorkSchedules({
+    startDate: startDate,
+    endDate: endDate,
     pageIndex: 1,
     pageSize: 1000,
     salonId: salonId ?? undefined,
-    staffId: isAdminOrManager ? undefined : (currentStaffId ?? -1),
+    staffId: staffFilter,
   });
 
-  const {
-    data: attendancesResult,
-    isLoading: isLoadingAttendances,
-    refetch: refetchAttendances,
-  } = useAttendances({
-    fromDate: startDateStr,
-    toDate: endDateStr,
+  const attendancesQuery = useAttendances({
+    fromDate: startDate,
+    toDate: endDate,
     pageIndex: 1,
     pageSize: 1000,
     salonId: salonId ?? undefined,
-    staffId: isAdminOrManager ? undefined : (currentStaffId ?? -1),
+    staffId: staffFilter,
   });
 
-  const handleRefresh = () => {
-    refetchSchedules();
-    refetchAttendances();
-  };
+  function refreshData() {
+    schedulesQuery.refetch();
+    attendancesQuery.refetch();
+  }
 
-  const days = Array.from({ length: 7 }).map((_, i) =>
-    currentDate.add(i, "day"),
-  );
-  const weekLabel = `Tuần ${currentDate.isoWeek()} (${currentDate.format("DD/MM/YYYY")} - ${currentDate.endOf("isoWeek").format("DD/MM/YYYY")})`;
+  const weekDays: DateUtil[] = [];
+  for (let dayOffset = 0; dayOffset < 7; dayOffset += 1) {
+    weekDays.push(weekStart.add(dayOffset, "day"));
+  }
 
-  const scheduleAttendanceMap = useMemo(() => {
+  const weekLabel =
+    "Tuần " +
+    weekStart.isoWeek() +
+    " (" +
+    weekStart.format("DD/MM/YYYY") +
+    " - " +
+    weekStart.endOf("isoWeek").format("DD/MM/YYYY") +
+    ")";
+
+  const attendanceByScheduleId = useMemo(() => {
     const map = new Map<number, AttendanceDto>();
-    const attendances = attendancesResult?.data?.items ?? [];
-    attendances.forEach((att: AttendanceDto) => {
-      if (att.workScheduleId) {
-        map.set(att.workScheduleId, att);
+    const items = attendancesQuery.data?.data?.items ?? [];
+
+    for (const attendance of items) {
+      if (attendance.workScheduleId) {
+        map.set(attendance.workScheduleId, attendance);
       }
-    });
-    return map;
-  }, [attendancesResult?.data?.items]);
-
-  const filteredWorkSchedules = useMemo(() => {
-    const workSchedules = schedulesResult?.data?.items ?? [];
-
-    let list = workSchedules;
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      list = list.filter((ws) => ws.staffName?.toLowerCase().includes(query));
     }
 
-    const hasActiveFilter =
-      filterMissing || filterNoAttendance || filterLeave;
+    return map;
+  }, [attendancesQuery.data?.data?.items]);
 
-    if (!hasActiveFilter) {
+  const filteredSchedules = useMemo(() => {
+    let list = schedulesQuery.data?.data?.items ?? [];
+
+    if (searchText.trim()) {
+      const keyword = searchText.toLowerCase();
+      list = list.filter((schedule: WorkScheduleDTO) => {
+        const name = schedule.staffName?.toLowerCase() ?? "";
+        return name.includes(keyword);
+      });
+    }
+
+    const hasFilter = showMissingOnly || showNoAttendanceOnly || showLeaveOnly;
+    if (!hasFilter) {
       return list;
     }
 
-    return list.filter((ws: WorkScheduleDTO) => {
-      const att = ws.id ? scheduleAttendanceMap.get(ws.id) : null;
-
-      if (!att) {
-        return filterNoAttendance;
-      }
-
-      const statusVal = att.status;
-
-      if (
-        statusVal === 3 ||
-        statusVal === 4 ||
-        statusVal === 5 ||
-        statusVal === 6
-      ) {
-        return filterLeave;
-      }
-
-      if (statusVal === 1 || statusVal === 2) {
-        if (!att.checkOutAt && filterMissing) return true;
+    return list.filter((schedule: WorkScheduleDTO) => {
+      if (!schedule.id) {
         return false;
+      }
+
+      const attendance = attendanceByScheduleId.get(schedule.id) ?? null;
+
+      if (!attendance) {
+        return showNoAttendanceOnly;
+      }
+
+      if (isLeaveStatus(attendance.status)) {
+        return showLeaveOnly;
+      }
+
+      if (isWorkingStatus(attendance.status)) {
+        const missingCheckOut = !attendance.checkOutAt;
+        return showMissingOnly && missingCheckOut;
       }
 
       return false;
     });
   }, [
-    schedulesResult?.data?.items,
-    searchQuery,
-    scheduleAttendanceMap,
-    filterMissing,
-    filterNoAttendance,
-    filterLeave,
+    schedulesQuery.data?.data?.items,
+    searchText,
+    attendanceByScheduleId,
+    showMissingOnly,
+    showNoAttendanceOnly,
+    showLeaveOnly,
   ]);
 
   const activeShiftPeriods = useMemo(() => {
-    const list: { shift: ShiftDTO; period: ShiftPeriodDTO }[] = [];
-    const shifts = shiftsResult?.data?.items ?? [];
-    shifts.forEach((shift) => {
-      if (shift.shiftPeriodDTOs) {
-        shift.shiftPeriodDTOs.forEach((period) => {
-          const from = period.effectiveFrom;
-          const to = period.effectiveTo;
-          if (from && from <= endDateStr) {
-            if (!to || to >= startDateStr) {
-              list.push({ shift, period });
-            }
-          }
-        });
-      }
-    });
-    return list;
-  }, [shiftsResult?.data?.items, startDateStr, endDateStr]);
+    const result: ShiftPeriodItem[] = [];
+    const shifts = shiftsQuery.data?.data?.items ?? [];
 
-  const shiftDayMap = useMemo(() => {
+    for (const shift of shifts) {
+      const periods = shift.shiftPeriodDTOs ?? [];
+      for (const period of periods) {
+        const fromDate = period.effectiveFrom;
+        const toDate = period.effectiveTo;
+
+        if (!fromDate || fromDate > endDate) {
+          continue;
+        }
+        if (toDate && toDate < startDate) {
+          continue;
+        }
+
+        result.push({ shift: shift, period: period });
+      }
+    }
+
+    return result;
+  }, [shiftsQuery.data?.data?.items, startDate, endDate]);
+
+  const schedulesByPeriodAndDay = useMemo(() => {
     const map = new Map<string, WorkScheduleDTO[]>();
-    filteredWorkSchedules.forEach((ws) => {
-      const dateStr = formatDate(ws.workDate).format("YYYY-MM-DD");
-      if (ws.shiftPeriodId) {
-        const key = `${ws.shiftPeriodId}_${dateStr}`;
-        const existing = map.get(key) || [];
-        map.set(key, [...existing, ws]);
+
+    for (const schedule of filteredSchedules) {
+      if (!schedule.shiftPeriodId || !schedule.workDate) {
+        continue;
       }
-    });
+
+      const dateText = formatDate(schedule.workDate).format("YYYY-MM-DD");
+      const key = schedule.shiftPeriodId + "_" + dateText;
+      const currentList = map.get(key) ?? [];
+      currentList.push(schedule);
+      map.set(key, currentList);
+    }
+
     return map;
-  }, [filteredWorkSchedules]);
+  }, [filteredSchedules]);
 
-  const getDayName = (day: DateUtil) => {
-    const names = [
-      "Chủ nhật",
-      "Thứ hai",
-      "Thứ ba",
-      "Thứ tư",
-      "Thứ năm",
-      "Thứ sáu",
-      "Thứ bảy",
-    ];
-    return names[day.day()];
-  };
+  function openAttendanceDialog(schedule: WorkScheduleDTO) {
+    let scheduleWithShift = schedule;
 
-  const handleCardClick = (ws: WorkScheduleDTO) => {
-    const att = (ws.id ? scheduleAttendanceMap.get(ws.id) : null) ?? null;
-    setSelectedSchedule(ws);
-    setSelectedAttendance(att);
-    setDialogOpen(true);
-  };
+    if (schedule.shiftPeriodId) {
+      const matched = activeShiftPeriods.find((item: ShiftPeriodItem) => {
+        return item.period.id === schedule.shiftPeriodId;
+      });
 
-  const getAttendanceCardDetails = (ws: WorkScheduleDTO) => {
-    const att = ws.id ? scheduleAttendanceMap.get(ws.id) : null;
-
-    const defaultClass =
-      "w-full text-left p-2.5 border rounded-xl transition-all focus:outline-hidden focus:ring-1 shadow-xs";
-
-    if (!att) {
-      return {
-        className: `${defaultClass} bg-state-warning-bg border-state-warning-border hover:border-state-warning-solid focus:ring-state-warning-solid`,
-        timeText: "--:--",
-        statusText: "Chưa chấm công",
-        statusColorClass: "text-state-warning-text font-semibold",
-      };
+      if (matched) {
+        scheduleWithShift = {
+          ...schedule,
+          shift: {
+            ...matched.shift,
+            shiftPeriodDTOs: [matched.period],
+          },
+        };
+      }
     }
 
-    const parseTime = (isoStr: string | null) => {
-      return toLocalTimeOnly(isoStr) || "--:--";
-    };
-
-    const statusVal = att.status;
-
-    if (statusVal === 1 || statusVal === 2) {
-      const hasCheckedOut = !!att.checkOutAt;
-      const checkInStr = parseTime(att.checkInAt);
-      const checkOutStr = hasCheckedOut ? parseTime(att.checkOutAt) : "--:--";
-      const timeText = `${checkInStr} - ${checkOutStr}`;
-
-      return {
-        className: `${defaultClass} bg-adminGreen-50 border-adminGreen-600 hover:border-adminGreen-600 focus:ring-adminGreen-600`,
-        timeText,
-        statusText: hasCheckedOut ? "Đã ra ca" : "Đang làm",
-        statusColorClass: "text-adminGreen-600 font-bold",
-      };
+    let attendance: AttendanceDto | null = null;
+    if (schedule.id) {
+      attendance = attendanceByScheduleId.get(schedule.id) ?? null;
     }
 
-    if (statusVal === 4 || statusVal === 5) {
-      return {
-        className: `${defaultClass} bg-state-info-bg border-state-info-border hover:border-state-info-border focus:ring-state-info-solid`,
-        timeText: "--:--",
-        statusText: "Nghỉ có phép",
-        statusColorClass: "text-state-info-text font-semibold",
-      };
-    }
-      
-    if (statusVal === 3 || statusVal === 6) {
-      return {
-        className: `${defaultClass} bg-state-danger-bg border-state-danger-border hover:border-state-danger-solid focus:ring-state-danger-solid`,
-        timeText: "--:--",
-        statusText: "Nghỉ không phép",
-        statusColorClass: "text-state-danger-text font-bold",
-      };
-    }
-
-    return {
-      className: `${defaultClass} bg-white border-adminGray-100 hover:border-adminGray-400`,
-      timeText: "--:--",
-      statusText: "",
-      statusColorClass: "text-adminGray-600",
-    };
-  };
+    setSelectedSchedule(scheduleWithShift);
+    setSelectedAttendance(attendance);
+    setIsDialogOpen(true);
+  }
 
   const isPageLoading =
-    isLoadingShifts || isLoadingSchedules || isLoadingAttendances;
+    shiftsQuery.isLoading ||
+    schedulesQuery.isLoading ||
+    attendancesQuery.isLoading;
+
+  const isPageFetching =
+    shiftsQuery.isFetching ||
+    schedulesQuery.isFetching ||
+    attendancesQuery.isFetching;
 
   return (
-    <div className="space-y-2">
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-2 rounded border border-adminGray-100/30 shadow-xs">
-        <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto">
-          {isAdminOrManager && (
-            <div className="relative w-full sm:w-64">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-adminGray-400"
-                size={16}
+    <div className="space-y-3">
+      <Card className="main-card mb-0">
+        <CardBody className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex w-full flex-wrap items-center gap-3 xl:w-auto">
+            {isAdminOrManager ? (
+              <div className="relative w-full sm:w-64">
+                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-kit-muted" />
+                <Input
+                  value={searchText}
+                  onChange={(event) => setSearchText(event.target.value)}
+                  placeholder="Tìm kiếm nhân viên..."
+                  className="pl-9"
+                />
+              </div>
+            ) : null}
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Checkbox
+                id="filter-missing"
+                label="Chấm công thiếu"
+                tone="danger"
+                inline
+                checked={showMissingOnly}
+                onChange={setShowMissingOnly}
               />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm kiếm nhân viên..."
-                className="pl-9 pr-4 py-2 bg-white border border-adminGray-100/50 rounded-xl text-sm focus:outline-hidden focus:ring-1 focus:ring-adminGreen-600 w-full transition-all placeholder:text-adminGray-400"
+              <Checkbox
+                id="filter-no-attendance"
+                label="Chưa chấm công"
+                tone="warning"
+                inline
+                checked={showNoAttendanceOnly}
+                onChange={setShowNoAttendanceOnly}
+              />
+              <Checkbox
+                id="filter-leave"
+                label="Nghỉ làm"
+                tone="info"
+                inline
+                checked={showLeaveOnly}
+                onChange={setShowLeaveOnly}
               />
             </div>
-          )}
-
-          <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-adminGray-600">
-            <label className="flex items-center gap-1.5 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={filterMissing}
-                onChange={(e) => setFilterMissing(e.target.checked)}
-                className="rounded-full border-state-danger-border text-state-danger-text focus:ring-state-danger-solid w-3.5 h-3.5"
-              />
-              <span className="text-adminGray-600 hover:text-adminInk">Chấm công thiếu</span>
-            </label>
-            <label className="flex items-center gap-1.5 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={filterNoAttendance}
-                onChange={(e) => setFilterNoAttendance(e.target.checked)}
-                className="rounded-full border-state-warning-border text-adminGold-600 focus:ring-state-warning-solid w-3.5 h-3.5"
-              />
-              <span className="text-adminGray-600 hover:text-adminInk">Chưa chấm công</span>
-            </label>
-            <label className="flex items-center gap-1.5 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={filterLeave}
-                onChange={(e) => setFilterLeave(e.target.checked)}
-                className="rounded-full border-state-info-border text-state-info-text focus:ring-state-info-solid w-3.5 h-3.5"
-              />
-              <span className="text-adminGray-600 hover:text-adminInk">Nghỉ làm</span>
-            </label>
           </div>
-        </div>
-        <div className="flex items-center gap-3 w-full xl:w-auto justify-end">
-          <div className=""></div>
-          <div className="flex items-center bg-white border border-adminGray-100/50 rounded-xl overflow-hidden shadow-xs h-9">
-            <button
-              type="button"
-              onClick={handlePrevWeek}
-              className="px-3 h-full hover:bg-adminGray-50 flex items-center justify-center text-adminGray-400 hover:text-adminGray-600 transition-colors"
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <div className="px-4 text-sm font-bold text-adminInk select-none min-w-48 text-center border-x border-adminGray-100">
-              {weekLabel}
+
+          <div className="flex w-full items-center justify-end gap-2 xl:w-auto">
+            <div className="inline-flex overflow-hidden rounded border border-kit bg-kit-white">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                className="mb-0 mr-0 rounded-none"
+                onClick={goToPreviousWeek}
+                aria-label="Tuần trước"
+              >
+                <ChevronLeft className="size-4" />
+              </Button>
+              <div className="min-w-52 border-x border-kit px-3 py-1.5 text-center text-sm font-semibold text-kit-heading">
+                {weekLabel}
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                className="mb-0 mr-0 rounded-none"
+                onClick={goToNextWeek}
+                aria-label="Tuần sau"
+              >
+                <ChevronRight className="size-4" />
+              </Button>
             </div>
-            <button
+
+            <Button
               type="button"
-              onClick={handleNextWeek}
-              className="px-3 h-full hover:bg-adminGray-50 flex items-center justify-center text-adminGray-400 hover:text-adminGray-600 transition-colors"
+              variant="outline-secondary"
+              size="sm"
+              className="mb-0"
+              onClick={goToThisWeek}
             >
-              <ChevronRight size={16} />
-            </button>
+              Tuần này
+            </Button>
           </div>
+        </CardBody>
+      </Card>
 
-          <button
-            type="button"
-            onClick={handleThisWeek}
-            className="text-sm font-bold text-adminGray-600 hover:text-adminInk border border-adminGray-100/60 hover:bg-adminGray-50 px-4 h-9 rounded-xl transition-all shadow-xs"
-          >
-            Tuần này
-          </button>
-        </div>
-      </div>
-
-      {isPageLoading ? (
-        <div className="flex items-center justify-center py-24 bg-white rounded border border-adminGray-100/30 shadow-xs min-h-[400px]">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 animate-spin rounded-full border-4 border-adminGray-100 border-t-lotus-leaf" />
-            <p className="text-sm font-semibold text-adminGray-600">
+      <TablePageShell isLoading={isPageLoading} isFetching={isPageFetching}>
+        {isPageLoading ? (
+          <div className="flex min-h-100 flex-col items-center justify-center gap-3 py-24">
+            <div className="size-8 animate-spin rounded-full border-4 border-kit border-t-kit-primary" />
+            <p className="text-sm font-medium text-kit-muted">
               Đang tải bảng chấm công tuần...
             </p>
           </div>
-        </div>
-      ) : (
-        <div className="overflow-x-auto border border-adminGray-100/50 bg-white rounded shadow-xs">
-          <table className="w-full text-sm text-left table-fixed min-w-[1000px]">
-            <thead className="bg-adminGray-50 border-b border-adminGray-100/60">
-              <tr>
-                <th className="w-48 py-4 px-4 font-bold text-adminInk border-r border-adminGray-100/50 text-xs uppercase tracking-wider">
-                  Ca làm việc
-                </th>
-                {days.map((day, i) => (
-                  <th
-                    key={i}
-                    className="py-3 px-2 font-bold text-center border-r border-adminGray-100/50 last:border-0"
-                  >
-                    <div
-                      className={`flex flex-col items-center justify-center gap-0.5 ${
-                        day.day() === 0 || day.day() === 6
-                          ? "text-state-danger-text"
-                          : "text-adminInk"
-                      }`}
-                    >
-                      <span className="text-xs font-medium opacity-80 uppercase">
-                        {getDayName(day)}
-                      </span>
-                      <span className="text-sm font-extrabold">
-                        {day.format("DD/MM")}
-                      </span>
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-adminGray-100/40">
-              {activeShiftPeriods.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={8}
-                    className="py-16 text-center text-adminGray-400 font-semibold text-sm"
-                  >
-                    Không có ca làm việc nào hoạt động trong tuần này.
-                  </td>
-                </tr>
-              ) : (
-                activeShiftPeriods.map(({ shift, period }, index) => (
-                  <tr key={`${shift.id}_${period.id}_${index}`}>
-                    <td className="py-4 px-4 border-r border-adminGray-100/50 align-top bg-adminGray-50/20">
-                      <div className="font-extrabold text-adminInk">
-                        {shift.name}
-                      </div>
-                      <div className="text-xs text-adminGray-600 mt-1.5 flex items-center gap-1.5">
-                        <Clock size={12} className="text-adminGray-400" />
-                        <span className="px-1.5 py-0.5 bg-adminGray-100 rounded font-bold text-adminInk">
-                          {period.shiftStart?.substring(0, 5)}
-                        </span>
-                        <span>-</span>
-                        <span className="px-1.5 py-0.5 bg-adminGray-100 rounded font-bold text-adminInk">
-                          {period.shiftEnd?.substring(0, 5)}
-                        </span>
-                      </div>
-                    </td>
+        ) : (
+          <TableResponsive>
+            <Table
+              bordered
+              hover
+              className="min-w-250 table-fixed [&_th]:align-top [&_td]:align-top"
+            >
+              <TableHead className="bg-kit-page">
+                <TableRow>
+                  <TableHeaderCell className="w-48 text-xs uppercase tracking-wide text-kit-heading">
+                    Ca làm việc
+                  </TableHeaderCell>
+                  {weekDays.map((day: DateUtil, dayIndex: number) => {
+                    const isWeekend = day.day() === 0 || day.day() === 6;
+                    const dayColor = isWeekend
+                      ? "text-kit-danger"
+                      : "text-kit-heading";
 
-                    {days.map((day, i) => {
-                      const dateStr = day.format("YYYY-MM-DD");
-                      const isPeriodActiveThisDay =
-                        period.effectiveFrom &&
-                        period.effectiveFrom <= dateStr &&
-                        (!period.effectiveTo || period.effectiveTo >= dateStr);
+                    return (
+                      <TableHeaderCell
+                        key={dayIndex}
+                        className="text-center"
+                      >
+                        <div
+                          className={
+                            "flex flex-col items-center gap-0.5 " + dayColor
+                          }
+                        >
+                          <span className="text-xs font-medium uppercase opacity-80">
+                            {DAY_NAMES[day.day()]}
+                          </span>
+                          <span className="text-sm font-bold">
+                            {day.format("DD/MM")}
+                          </span>
+                        </div>
+                      </TableHeaderCell>
+                    );
+                  })}
+                </TableRow>
+              </TableHead>
 
-                      if (!isPeriodActiveThisDay) {
-                        return (
-                          <td
-                            key={i}
-                            className="py-3 px-2 border-r border-adminGray-100/50 last:border-0 align-top bg-adminGray-50/40"
-                          >
-                            <div className="flex h-full items-center justify-center text-xs text-adminGray-400 italic">
-                              Không áp dụng
-                            </div>
-                          </td>
-                        );
-                      }
-
-                      const key = `${period.id}_${dateStr}`;
-                      const cellSchedules = shiftDayMap.get(key) || [];
+              <TableBody>
+                {activeShiftPeriods.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8}>
+                      <TableEmptyState
+                        icon={Clock}
+                        title="Không có ca làm việc"
+                      />
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  activeShiftPeriods.map(
+                    (item: ShiftPeriodItem, rowIndex: number) => {
+                      const shift = item.shift;
+                      const period = item.period;
+                      const rowKey =
+                        String(shift.id) +
+                        "_" +
+                        String(period.id) +
+                        "_" +
+                        String(rowIndex);
 
                       return (
-                        <td
-                          key={i}
-                          className="py-3 px-2 border-r border-adminGray-100/50 last:border-0 align-top relative hover:bg-adminGray-50/30 transition-all"
-                        >
-                          <div className="flex flex-col gap-2 p-0.5 min-h-[110px]">
-                            {cellSchedules.length === 0 ? (
-                              <div className="text-xs text-adminGray-300 text-center py-10 italic">
-                                Không có lịch
-                              </div>
-                            ) : (
-                              cellSchedules.map((ws) => {
-                                const card = getAttendanceCardDetails(ws);
-                                return (
-                                  <button
-                                    type="button"
-                                    key={ws.id}
-                                    onClick={() => handleCardClick(ws)}
-                                    className={card.className}
-                                  >
-                                    <div className="font-bold text-adminInk text-xs truncate">
-                                      {ws.staffName}
-                                    </div>
-                                    <div className="text-xs font-mono text-adminGray-600 font-semibold mt-1">
-                                      {card.timeText}
-                                    </div>
-                                    <div
-                                      className={`text-2xs mt-1 ${card.statusColorClass}`}
-                                    >
-                                      {card.statusText}
-                                    </div>
-                                  </button>
-                                );
-                              })
-                            )}
-                          </div>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+                        <TableRow key={rowKey}>
+                          <TableCell className="bg-kit-page/40">
+                            <div className="font-semibold text-kit-heading">
+                              {shift.name}
+                            </div>
+                            <div className="mt-1.5 flex items-center gap-1.5 text-xs text-kit-muted">
+                              <Clock className="size-3 text-kit-muted" />
+                              <span className="rounded bg-kit-page px-1.5 py-0.5 font-semibold text-kit-heading">
+                                {period.shiftStart?.substring(0, 5)}
+                              </span>
+                              <span>-</span>
+                              <span className="rounded bg-kit-page px-1.5 py-0.5 font-semibold text-kit-heading">
+                                {period.shiftEnd?.substring(0, 5)}
+                              </span>
+                            </div>
+                          </TableCell>
 
-      {selectedSchedule && dialogOpen && (
+                          {weekDays.map((day: DateUtil, dayIndex: number) => {
+                            const dateText = day.format("YYYY-MM-DD");
+                            const periodIsActive = isPeriodActiveOnDate(
+                              period,
+                              dateText,
+                            );
+
+                            if (!periodIsActive) {
+                              return (
+                                <TableCell
+                                  key={dayIndex}
+                                  className="bg-kit-page/30 text-center text-xs italic text-kit-muted"
+                                >
+                                  Không áp dụng
+                                </TableCell>
+                              );
+                            }
+
+                            const cellKey = period.id + "_" + dateText;
+                            const cellSchedules =
+                              schedulesByPeriodAndDay.get(cellKey) ?? [];
+
+                            return (
+                              <TableCell key={dayIndex}>
+                                <div className="flex min-h-27.5 flex-col gap-2 p-0.5">
+                                  {cellSchedules.length === 0 ? (
+                                    <div className="py-10 text-center text-xs italic text-kit-muted">
+                                      Không có lịch
+                                    </div>
+                                  ) : (
+                                    cellSchedules.map(
+                                      (schedule: WorkScheduleDTO) => {
+                                        let attendance: AttendanceDto | null =
+                                          null;
+                                        if (schedule.id) {
+                                          attendance =
+                                            attendanceByScheduleId.get(
+                                              schedule.id,
+                                            ) ?? null;
+                                        }
+
+                                        const card = getCardStyle(attendance);
+
+                                        return (
+                                          <button
+                                            type="button"
+                                            key={schedule.id}
+                                            onClick={() =>
+                                              openAttendanceDialog(schedule)
+                                            }
+                                            className={card.className}
+                                          >
+                                            <div className="truncate font-semibold text-kit-heading">
+                                              {schedule.staffName}
+                                            </div>
+                                            <div className="mt-1 text-kit-muted">
+                                              {card.timeText}
+                                            </div>
+                                            <div
+                                              className={
+                                                "mt-1 " + card.statusClass
+                                              }
+                                            >
+                                              {card.statusText}
+                                            </div>
+                                          </button>
+                                        );
+                                      },
+                                    )
+                                  )}
+                                </div>
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      );
+                    },
+                  )
+                )}
+              </TableBody>
+            </Table>
+          </TableResponsive>
+        )}
+      </TablePageShell>
+
+      {selectedSchedule && isDialogOpen ? (
         <AttendanceDailyDialog
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
           schedule={selectedSchedule}
           attendance={selectedAttendance}
-          onSuccess={handleRefresh}
+          onSuccess={refreshData}
         />
-      )}
+      ) : null}
     </div>
   );
 }

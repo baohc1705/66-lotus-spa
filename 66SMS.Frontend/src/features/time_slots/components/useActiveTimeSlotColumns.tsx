@@ -1,18 +1,12 @@
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
+import { Pencil, Trash2 } from "lucide-react";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { SortableColumnHeader } from "@/shared/components/DataTable/SortableColumnHeader";
-import { IndexCell } from "@/shared/components/DataTable/TableCells";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { Tooltip } from "@/shared/components/Tooltip";
+import { Button } from "@/shared/elements/Button";
+import { SortableColumnHeader } from "@/shared/tables/SortableColumnHeader";
+import { IndexCell } from "@/shared/tables/TableCells";
+import { toLocalTimeOnly } from "@/shared/utils/date.utils";
 import { TIME_SLOT_PERM } from "../constants/time_slot.permissions";
 import type { TimeSlotDTO } from "../types/time_slot.types";
 
@@ -43,11 +37,6 @@ export function useActiveTimeSlotColumns({
   const cols = TIME_SLOT_COLUMN_LABELS;
   const perm = TIME_SLOT_PERM;
 
-  const formatDisplayTime = (t?: string) => {
-    if (!t) return "—";
-    return t.substring(0, 5);
-  };
-
   return useMemo<ColumnDef<TimeSlotDTO>[]>(
     () => [
       {
@@ -72,11 +61,12 @@ export function useActiveTimeSlotColumns({
             orderBy={orderBy}
             isDescending={isDescending}
             onSort={onSort}
+            onPrimary
           />
         ),
         cell: ({ row }) => (
-          <span className="font-semibold text-adminInk">
-            {formatDisplayTime(row.original.startTime)}
+          <span className="font-semibold text-kit-heading">
+            {toLocalTimeOnly(row.original.startTime) || "—"}
           </span>
         ),
         size: 200,
@@ -90,55 +80,54 @@ export function useActiveTimeSlotColumns({
             orderBy={orderBy}
             isDescending={isDescending}
             onSort={onSort}
+            onPrimary
           />
         ),
         cell: ({ row }) => (
-          <span className="font-semibold text-adminInk">
-            {formatDisplayTime(row.original.endTime)}
+          <span className="font-semibold text-kit-heading">
+            {toLocalTimeOnly(row.original.endTime) || "—"}
           </span>
         ),
         size: 200,
       },
       {
         id: "actions",
-        header: "",
+        header: "Thao tác",
         cell: ({ row }) => {
           const item = row.original;
           return (
-            <div onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <div
+              className="flex items-center gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <PermissionGate resource={perm.resource} action={perm.update}>
+                <Tooltip text="Sửa">
                   <Button
-                    variant="ghost"
                     size="icon-sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    variant="outline-primary"
+                    className="mb-0 mr-0"
+                    onClick={() => onEdit(item)}
                   >
-                    <MoreHorizontal className="w-4 h-4" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <PermissionGate resource={perm.resource} action={perm.update}>
-                    <DropdownMenuItem onClick={() => onEdit(item)}>
-                      <Pencil className="w-4 h-4" />
-                      {COMMON_MSG.edit}
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                  <PermissionGate resource={perm.resource} action={perm.delete}>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={() => onDelete(item)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Xóa khung giờ
-                    </DropdownMenuItem>
-                  </PermissionGate>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </Tooltip>
+              </PermissionGate>
+              <PermissionGate resource={perm.resource} action={perm.delete}>
+                <Tooltip text="Xóa">
+                  <Button
+                    size="icon-sm"
+                    variant="outline-danger"
+                    className="mb-0 mr-0"
+                    onClick={() => onDelete(item)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </Tooltip>
+              </PermissionGate>
             </div>
           );
         },
-        size: 50,
+        size: 100,
         enableResizing: false,
       },
     ],

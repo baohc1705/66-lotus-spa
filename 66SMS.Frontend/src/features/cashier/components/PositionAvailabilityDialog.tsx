@@ -1,12 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
+import { Modal } from "@/shared/components/Modal";
+import { Badge } from "@/shared/elements/Badge";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "@/shared/tables/Table";
 import { formatDate } from "@/shared/utils/date.utils";
 import { cashierApi } from "../api/cashier.api";
 import type { CashierPosition } from "../types";
@@ -39,62 +42,60 @@ export function PositionAvailabilityDialog({
   const rows = positionsQuery.data ?? [];
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl font-sans">
-        <DialogHeader>
-          <DialogTitle className="text-base">Tình trạng vị trí</DialogTitle>
-          <DialogDescription className="text-xs">
-            Ngày {currentDate.toLocaleDateString("vi-VN")} — vị trí trống / đã
-            có lịch.
-          </DialogDescription>
-        </DialogHeader>
+    <Modal
+      open={open}
+      onClose={() => onOpenChange(false)}
+      title="Tình trạng vị trí"
+      size="md"
+      scrollable
+    >
+      <p className="text-xs text-kit-muted mb-4">
+        Ngày {currentDate.toLocaleDateString("vi-VN")} — vị trí trống / đã có
+        lịch.
+      </p>
 
-        {positionsQuery.isFetching ? (
-          <div className="flex items-center justify-center py-10">
-            <Loader2 className="w-6 h-6 text-adminGreen-600 animate-spin" />
-          </div>
-        ) : positionsQuery.isError ? (
-          <p className="text-xs text-red-600 py-6 text-center">
-            Không tải được danh sách vị trí.
-          </p>
-        ) : rows.length === 0 ? (
-          <p className="text-xs text-adminGray-600 py-6 text-center">
-            Không có vị trí nào.
-          </p>
-        ) : (
-          <div className="overflow-auto max-h-[50vh] border border-adminGray-100 rounded-[3px]">
-            <table className="w-full text-xs">
-              <thead className="bg-adminGray-50 sticky top-0">
-                <tr className="text-left text-adminInk/80">
-                  <th className="px-3 py-2 font-semibold">Phòng / Vị trí</th>
-                  <th className="px-3 py-2 font-semibold w-32">Trạng thái</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((p: CashierPosition) => (
-                  <tr
-                    key={p.id}
-                    className="border-t border-adminGray-100 hover:bg-adminGray-50/40"
-                  >
-                    <td className="px-3 py-2 text-adminInk">
-                      {p.roomName} · {p.name}
-                    </td>
-                    <td
-                      className={`px-3 py-2 font-semibold ${
-                        p.isSelectable
-                          ? "text-adminGreen-600"
-                          : "text-red-600"
-                      }`}
+      {positionsQuery.isFetching ? (
+        <div className="flex items-center justify-center py-10">
+          <Loader2 className="w-6 h-6 text-kit-primary animate-spin" />
+        </div>
+      ) : positionsQuery.isError ? (
+        <p className="text-xs text-kit-danger py-6 text-center">
+          Không tải được danh sách vị trí.
+        </p>
+      ) : rows.length === 0 ? (
+        <p className="text-xs text-kit-muted py-6 text-center">
+          Không có vị trí nào.
+        </p>
+      ) : (
+        <div className="overflow-auto max-h-[50vh] rounded border border-kit">
+          <Table hover striped size="sm">
+            <TableHead className="bg-kit-page sticky top-0">
+              <TableRow>
+                <TableHeaderCell>Phòng / Vị trí</TableHeaderCell>
+                <TableHeaderCell className="w-32">Trạng thái</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((position: CashierPosition) => (
+                <TableRow key={position.id}>
+                  <TableCell>
+                    {position.roomName} · {position.name}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={position.isSelectable ? "success" : "danger"}
+                      soft
+                      pill
                     >
-                      {p.statusLabel}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
+                      {position.statusLabel}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </Modal>
   );
 }

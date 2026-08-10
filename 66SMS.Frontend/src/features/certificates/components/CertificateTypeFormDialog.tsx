@@ -1,28 +1,16 @@
-import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
-import { AdminInput } from "@/shared/components/forms/AdminInput";
-import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Award } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/shared/components/ui/select";
-import { FormSection } from "@/shared/components/forms/FormSection";
-import { FormField } from "@/shared/components/forms/FormField";
+import { Modal } from "@/shared/components/Modal";
+import { Button } from "@/shared/elements/Button";
+import { FormField } from "@/shared/forms/FormField";
+import { FormSection } from "@/shared/forms/FormSection";
+import { Input } from "@/shared/forms/Input";
+import { Select } from "@/shared/forms/Select";
+import { Textarea } from "@/shared/forms/Textarea";
+
 import {
   useCreateCertificateType,
   useUpdateCertificateType,
@@ -32,13 +20,17 @@ import {
   type CertificateTypeFormValues,
 } from "../schemas/certificateType.schema";
 import type { CertificateTypeDTO } from "../types/certificate.types";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   item?: CertificateTypeDTO | null;
 }
+
+const STATUS_OPTIONS = [
+  { value: "1", label: "Hoạt động" },
+  { value: "0", label: "Tạm đóng" },
+];
 
 function getDefaults(
   item?: CertificateTypeDTO | null,
@@ -94,96 +86,100 @@ export function CertificateTypeFormDialog({ open, onOpenChange, item }: Props) {
           },
         },
       );
-    } else {
-      createMutation.mutate(payload, {
-        onSuccess: (result) => {
-          if (result.isSuccess) onOpenChange(false);
-        },
-      });
+      return;
     }
+
+    createMutation.mutate(payload, {
+      onSuccess: (result) => {
+        if (result.isSuccess) onOpenChange(false);
+      },
+    });
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>
-            {isEdit ? "Chỉnh sửa loại chứng chỉ" : "Thêm loại chứng chỉ"}
-          </DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? `Cập nhật thông tin loại chứng chỉ "${item?.name ?? ""}"`
-              : "Điền thông tin để tạo loại chứng chỉ mới"}
-          </DialogDescription>
-        </DialogHeader>
+    <Modal
+      open={open}
+      onClose={() => onOpenChange(false)}
+      title={isEdit ? "Chỉnh sửa loại chứng chỉ" : "Thêm loại chứng chỉ"}
+      size="md"
+      scrollable
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+        <FormSection icon={Award} title="Thông tin loại chứng chỉ">
+          <FormField label="Mã loại *" error={errors.code?.message}>
+            <Input
+              {...register("code")}
+              placeholder="MASSAGE"
+              invalid={!!errors.code}
+            />
+          </FormField>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <FormSection icon={Award} title="Thông tin loại chứng chỉ">
-            <div className="space-y-4">
-              <FormField label="Mã loại *" error={errors.code?.message}>
-                <AdminInput {...register("code")} placeholder="MASSAGE" />
-              </FormField>
-              <FormField
-                label="Tên loại chứng chỉ *"
-                error={errors.name?.message}
-              >
-                <AdminInput
-                  {...register("name")}
-                  placeholder="Chứng chỉ Massage Trị liệu"
-                />
-              </FormField>
-              <FormField label="Mô tả" error={errors.description?.message}>
-                <AdminTextarea
-                  {...register("description")}
-                  placeholder="Mô tả loại chứng chỉ..."
-                  className="text-sm min-h-[72px]"
-                />
-              </FormField>
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  label="Thứ tự hiển thị"
-                  error={errors.sortOrder?.message}
-                >
-                  <AdminInput
-                    {...register("sortOrder")}
-                    type="number"
-                    placeholder="0"
-                  />
-                </FormField>
-                <FormField label="Trạng thái" error={errors.status?.message}>
-                  <Select
-                    value={watch("status")?.toString()}
-                    onValueChange={(v) => setValue("status", Number(v))}
-                  >
-                    <AdminSelectTrigger>
-                      <SelectValue placeholder="Chọn trạng thái" />
-                    </AdminSelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">Hoạt động</SelectItem>
-                      <SelectItem value="0">Tạm đóng</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormField>
-              </div>
-            </div>
-          </FormSection>
+          <FormField
+            label="Tên loại chứng chỉ *"
+            error={errors.name?.message}
+          >
+            <Input
+              {...register("name")}
+              placeholder="Chứng chỉ Massage Trị liệu"
+              invalid={!!errors.name}
+            />
+          </FormField>
 
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
+          <FormField label="Mô tả" error={errors.description?.message}>
+            <Textarea
+              {...register("description")}
+              placeholder="Mô tả loại chứng chỉ..."
+              rows={3}
+              invalid={!!errors.description}
+            />
+          </FormField>
+
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <FormField
+              label="Thứ tự hiển thị"
+              error={errors.sortOrder?.message}
             >
-              {COMMON_MSG.cancel}
-            </Button>
-            <Button type="submit" variant="admin" size="sm" loading={isPending}>
-              {isEdit ? "Cập nhật" : "Tạo loại chứng chỉ"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+              <Input
+                {...register("sortOrder")}
+                type="number"
+                placeholder="0"
+                invalid={!!errors.sortOrder}
+              />
+            </FormField>
+
+            <FormField label="Trạng thái" error={errors.status?.message}>
+              <Select
+                value={String(watch("status") ?? 1)}
+                onChange={(e) => setValue("status", Number(e.target.value))}
+                options={STATUS_OPTIONS}
+                invalid={!!errors.status}
+              />
+            </FormField>
+          </div>
+        </FormSection>
+
+        <div className="flex justify-end gap-2 border-t border-kit pt-3">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="mb-0"
+            onClick={() => onOpenChange(false)}
+            disabled={isPending}
+          >
+            Hủy
+          </Button>
+          <Button
+            type="submit"
+            variant="admin"
+            size="sm"
+            className="mb-0"
+            loading={isPending}
+          >
+            {isEdit ? "Cập nhật" : "Tạo loại chứng chỉ"}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }

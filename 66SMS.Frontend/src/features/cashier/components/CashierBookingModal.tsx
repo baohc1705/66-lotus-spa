@@ -3,14 +3,12 @@ import {
   Calendar,
   Check,
   CheckCircle2,
-  Loader2,
   MapPin,
   NotebookPen,
   Search,
   User,
-  X,
 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import type { AxiosError } from "axios";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import {
@@ -32,12 +30,14 @@ import { useSalons } from "@/features/salons/hooks/useSalons";
 import type { SalonListItem } from "@/features/salons/types/salon.types";
 import { useServices } from "@/features/services/hooks/useServices";
 import type { ServiceDto } from "@/features/services/types/service.types";
-import { AdminInput } from "@/shared/components/forms/AdminInput";
-import { AdminTextarea } from "@/shared/components/forms/AdminTextarea";
-import { FormField } from "@/shared/components/forms/FormField";
-import { FormSection } from "@/shared/components/forms/FormSection";
-import { Button } from "@/shared/components/ui/button";
-import { SearchableSelect } from "@/shared/components/ui/searchable-select";
+import { Modal } from "@/shared/components/Modal";
+import { Button } from "@/shared/elements/Button";
+import { FormField } from "@/shared/forms/FormField";
+import { FormRow } from "@/shared/forms/FormRow";
+import { FormSection } from "@/shared/forms/FormSection";
+import { Input } from "@/shared/forms/Input";
+import { SearchableSelect } from "@/shared/forms/SearchableSelect";
+import { Textarea } from "@/shared/forms/Textarea";
 import { FallbackImage } from "@/shared/components/FallbackImage";
 import type { Result } from "@/shared/types/common.types";
 import { formatDate } from "@/shared/utils/date.utils";
@@ -160,13 +160,17 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
   const positionOptions = useMemo(
     () => [
       { value: "none", label: "Không chọn" },
-      ...positions.map((p: CashierPosition) => ({
-        value: String(p.id),
-        label: `${p.name} · ${p.roomName} — ${p.statusLabel}`,
-        disabled: !p.isSelectable,
-      })),
+      ...positions
+        .filter(
+          (position: CashierPosition) =>
+            position.isSelectable || position.id === positionId,
+        )
+        .map((position: CashierPosition) => ({
+          value: String(position.id),
+          label: `${position.name} · ${position.roomName} — ${position.statusLabel}`,
+        })),
     ],
-    [positions],
+    [positions, positionId],
   );
 
   const selectedSalon = useMemo(() => {
@@ -313,404 +317,435 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
     }
   };
 
+  function renderTechnicianList() {
+    const list = [];
+    for (let index = 0; index < technicians.length; index++) {
+      const tech = technicians[index];
+      let isSelected = false;
+      if (selectedTechnician?.isAny === true) {
+        isSelected = !!tech.isAny;
+      } else if (selectedTechnician?.id === tech.id && !tech.isAny) {
+        isSelected = true;
+      }
+
+      const slotsLeft = tech.slotsLeft ?? 0;
+      const isReady = slotsLeft > 0;
+      let statusText = tech.status || "";
+      if (!statusText) {
+        if (isReady) {
+          statusText = "Còn " + slotsLeft + " khung giờ";
+        } else {
+          statusText = "Nghỉ hôm nay";
+        }
+      }
+
+      let cardClass =
+        "relative flex items-center gap-3 rounded border p-3 text-left ";
+      if (isSelected) {
+        cardClass = cardClass + "border-kit-success bg-kit-page";
+      } else {
+        cardClass =
+          cardClass + "border-kit bg-kit-white hover:border-kit-primary";
+      }
+
+      let statusClass =
+        "mt-1 inline-block rounded px-1.5 py-0.5 text-xs font-bold ";
+      if (isReady) {
+        statusClass = statusClass + "bg-kit-page text-kit-success";
+      } else {
+        statusClass = statusClass + "bg-kit-page text-kit-muted";
+      }
+
+      list.push(
+        <button
+          key={tech.id ?? "any"}
+          type="button"
+          onClick={() => handleSelectTechnician(tech)}
+          className={cardClass}
+        >
+          {isSelected ? (
+            <div className="absolute right-0 top-0 flex h-5 w-5 items-center justify-center rounded-bl bg-kit-success">
+              <Check className="h-3 w-3 text-kit-white" />
+            </div>
+          ) : null}
+          <FallbackImage
+            kind="ktv"
+            src={tech.avatar}
+            alt={tech.name}
+            className="h-10 w-10 shrink-0 rounded-full object-cover"
+          />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-kit-heading">
+              {tech.name || "Kỹ thuật viên"}
+            </p>
+            <p className="truncate text-xs text-kit-muted">
+              {tech.role || "Nhân viên"}
+            </p>
+            <span className={statusClass}>{statusText}</span>
+          </div>
+        </button>,
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">{list}</div>
+    );
+  }
+
+  function renderTimeSlotList() {
+    const list = [];
+    for (let index = 0; index < timeSlots.length; index++) {
+      const slot = timeSlots[index];
+      const isSelected = selectedTimeSlot?.slotId === slot.slotId;
+      const slotStatus = (slot.status || "").toLowerCase();
+
+      let label = "Không khả dụng";
+      let isAvailable = false;
+      let classes =
+        "border-kit bg-kit-page text-kit-muted cursor-not-allowed opacity-60";
+
+      if (slotStatus === "available" || slotStatus === "trống") {
+        label = "Chưa có lịch";
+        isAvailable = true;
+        if (isSelected) {
+          classes = "border-kit-success bg-kit-success text-kit-white";
+        } else {
+          classes =
+            "border-kit bg-kit-white text-kit-heading hover:border-kit-success";
+        }
+      } else if (slotStatus === "booked" || slotStatus === "đầy") {
+        label = "Đã đặt";
+        classes =
+          "border-kit bg-kit-page text-kit-danger cursor-not-allowed line-through opacity-70";
+      } else if (slotStatus === "short") {
+        label = "Không đủ giờ";
+      } else if (slotStatus === "outside") {
+        label = "Ngoài giờ";
+      } else if (slotStatus === "break" || slotStatus === "nghỉ") {
+        label = "Nghỉ";
+      }
+
+      list.push(
+        <button
+          key={"slot-" + slot.slotId}
+          type="button"
+          disabled={!isAvailable}
+          onClick={() => setSlotId(slot.slotId)}
+          className={
+            "flex flex-col items-center justify-center gap-0.5 rounded border px-1 py-2 text-center " +
+            classes
+          }
+        >
+          <span className="text-xs font-bold">{slot.time}</span>
+          <span className="text-xs opacity-90">{label}</span>
+        </button>,
+      );
+    }
+
+    return (
+      <div className="grid max-h-60 grid-cols-3 gap-2 overflow-y-auto pr-1 sm:grid-cols-4 md:grid-cols-6">
+        {list}
+      </div>
+    );
+  }
+
+  const footer = success ? undefined : (
+    <div className="flex w-full items-center justify-between gap-3">
+      <div className="flex min-w-0 items-center gap-2 text-xs text-kit-muted">
+        <MapPin className="h-3.5 w-3.5 shrink-0" />
+        <span className="truncate">
+          {selectedSalon?.name ?? "Chưa chọn chi nhánh"}
+        </span>
+      </div>
+      <div className="flex shrink-0 items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="mb-0 mr-0"
+          onClick={onClose}
+          disabled={isSubmitting}
+        >
+          Đóng
+        </Button>
+        <Button
+          type="button"
+          variant="primary"
+          size="sm"
+          className="mb-0 mr-0"
+          onClick={handleSubmit}
+          loading={isSubmitting}
+        >
+          Lưu thông tin
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
     <>
-      <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-xs p-2 sm:p-2">
-        <div className="relative w-full max-w-4xl max-h-[90vh] bg-adminGray-50 shadow-[0_32px_64px_rgba(42,31,26,0.15)] flex flex-col overflow-hidden border border-adminGold-600/20">
-          <div className="shrink-0 flex items-center justify-between px-6 py-4 border-b border-adminGold-600/10 bg-adminGray-50/80 z-10">
-            <h2 className="text-xl font-bold text-adminInk">
-              Thêm Lịch Khách Hàng Mới
-            </h2>
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-adminGold-600/20 hover:bg-adminGold-600/10 text-adminGray-600 hover:text-adminInk transition-all shadow-xs"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar bg-adminGray-50">
-            {success ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <div className="w-20 h-20 bg-adminGreen-100 rounded-full flex items-center justify-center mb-6 border border-adminGreen-200 shadow-xs">
-                  <CheckCircle2 className="w-10 h-10 text-adminGreen-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-adminInk mb-2">
-                  Đặt Lịch Thành Công!
-                </h3>
-                <p className="text-adminGray-600 text-sm mb-8">
-                  Hệ thống đã ghi nhận lịch hẹn cho{" "}
-                  {selectedCustomer?.fullName ?? "khách hàng"}.
-                </p>
-                <div className="flex gap-4">
-                  <Button
-                    variant="outline"
-                    onClick={handleCreateAnother}
-                    className="border-adminGold-600 text-adminInk hover:bg-adminGray-50"
-                  >
-                    Tạo thêm lịch mới
-                  </Button>
-                  <Button
-                    onClick={onClose}
-                    className="bg-adminGreen-600 text-white hover:bg-adminGreen-600/90 shadow-xs"
-                  >
-                    Đóng
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-5 max-w-3xl mx-auto">
-                <FormSection icon={User} title="Khách hàng">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <FormField label="Tìm khách hàng" className="sm:col-span-2">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-adminGray-400" />
-                        <AdminInput
-                          value={customerSearch}
-                          onChange={(e) => {
-                            setCustomerSearch(e.target.value);
-                            setShowCustomerDropdown(true);
-                            if (selectedCustomer) setSelectedCustomer(null);
-                          }}
-                          onFocus={() => setShowCustomerDropdown(true)}
-                          placeholder="Tìm theo tên hoặc số điện thoại"
-                          className="pl-9"
-                        />
-                        {showCustomerDropdown &&
-                          customerSearch.trim().length > 0 && (
-                            <div className="absolute z-20 mt-1 w-full max-h-48 overflow-y-auto rounded-md border border-adminGray-200 bg-white shadow-lg">
-                              {customerList.length === 0 ? (
-                                <p className="px-3 py-2 text-xs text-adminGray-500">
-                                  Không tìm thấy khách hàng
-                                </p>
-                              ) : (
-                                customerList.map((c: CustomerDto) => (
-                                  <button
-                                    key={c.id ?? c.phone}
-                                    type="button"
-                                    className="w-full text-left px-3 py-2 text-sm hover:bg-adminGray-50 border-b border-adminGray-100 last:border-0"
-                                    onClick={() => handleSelectCustomer(c)}
-                                  >
-                                    <span className="font-medium text-adminInk">
-                                      {c.fullName}
-                                    </span>
-                                    <span className="text-adminGray-500 ml-2">
-                                      {c.phone}
-                                    </span>
-                                  </button>
-                                ))
-                              )}
-                            </div>
-                          )}
-                      </div>
-                    </FormField>
-
-                    <FormField label="Họ tên">
-                      <AdminInput
-                        value={selectedCustomer?.fullName ?? ""}
-                        readOnly
-                        placeholder="Chọn khách hàng"
-                      />
-                    </FormField>
-                    <FormField label="Điện thoại">
-                      <AdminInput
-                        value={selectedCustomer?.phone ?? ""}
-                        readOnly
-                        placeholder="SĐT"
-                      />
-                    </FormField>
-                  </div>
-                  <div className="mt-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCreateCustomerOpen(true)}
-                    >
-                      + Thêm khách hàng mới
-                    </Button>
-                  </div>
-                </FormSection>
-
-                <FormSection icon={Calendar} title="Thông tin lịch hẹn">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <FormField label="Chi nhánh *">
-                      <SearchableSelect
-                        value={salonId ? String(salonId) : ""}
-                        onValueChange={handleSalonChange}
-                        options={salonOptions}
-                        placeholder="Chọn chi nhánh"
-                        searchPlaceholder="Tìm chi nhánh..."
-                        className="h-9 w-full"
-                      />
-                    </FormField>
-
-                    <FormField label="Ngày hẹn *">
-                      <AdminInput
-                        type="date"
-                        value={appointmentDate}
-                        onChange={(e) => handleDateChange(e.target.value)}
-                      />
-                    </FormField>
-
-                    <FormField label="Dịch vụ *" className="sm:col-span-2">
-                      <SearchableSelect
-                        value={serviceId ? String(serviceId) : ""}
-                        onValueChange={handleServiceChange}
-                        options={serviceOptions}
-                        placeholder="Chọn dịch vụ"
-                        searchPlaceholder="Tìm dịch vụ..."
-                        className="h-9 w-full"
-                      />
-                    </FormField>
-
-                    <div className="sm:col-span-2 space-y-2">
-                      <p className="lotus-admin-form-label">
-                        Nhân viên phục vụ
-                      </p>
-                      {!serviceId ? (
-                        <p className="text-xs text-adminGray-500 py-3 text-center border border-dashed border-adminGray-200 rounded-md">
-                          Chọn dịch vụ để xem kỹ thuật viên phù hợp
-                        </p>
-                      ) : techniciansQuery.isLoading ? (
-                        <p className="text-xs text-adminGray-500 py-3 text-center">
-                          Đang tải danh sách KTV...
-                        </p>
-                      ) : technicians.length === 0 ? (
-                        <p className="text-xs text-adminGray-500 py-3 text-center border border-adminGray-200 rounded-md bg-adminGray-50">
-                          Không có kỹ thuật viên làm việc trong ngày này
-                        </p>
-                      ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {technicians.map((tech: TechnicianDTO) => {
-                            const isSelected =
-                              selectedTechnician?.isAny === true
-                                ? !!tech.isAny
-                                : selectedTechnician?.id === tech.id &&
-                                  !tech.isAny;
-                            const slotsLeft = tech.slotsLeft ?? 0;
-                            const isReady = slotsLeft > 0;
-                            const statusText =
-                              tech.status ||
-                              (isReady
-                                ? `Còn ${slotsLeft} slot`
-                                : "Nghỉ hôm nay");
-
-                            return (
-                              <button
-                                key={tech.id ?? "any"}
-                                type="button"
-                                onClick={() => handleSelectTechnician(tech)}
-                                className={`relative flex items-center gap-3 rounded-md border p-3 text-left transition-all ${
-                                  isSelected
-                                    ? "border-adminGreen-600 bg-adminGreen-50"
-                                    : "border-adminGray-200 bg-white hover:border-adminGold-600/40"
-                                }`}
-                              >
-                                {isSelected && (
-                                  <div className="absolute top-0 right-0 w-5 h-5 bg-adminGreen-600 rounded-bl-md flex items-center justify-center">
-                                    <Check className="w-3 h-3 text-white" />
-                                  </div>
-                                )}
-                                <FallbackImage
-                                  kind="ktv"
-                                  src={tech.avatar}
-                                  alt={tech.name}
-                                  className="w-10 h-10 rounded-full object-cover shrink-0"
-                                />
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-sm font-semibold text-adminInk truncate">
-                                    {tech.name || "Kỹ thuật viên"}
-                                  </p>
-                                  <p className="text-xs text-adminGray-500 truncate">
-                                    {tech.role || "Nhân viên"}
-                                  </p>
-                                  <span
-                                    className={`inline-block mt-1 text-xs font-bold px-1.5 py-0.5 rounded ${
-                                      isReady
-                                        ? "bg-adminGreen-100 text-adminGreen-800"
-                                        : "bg-adminGray-100 text-adminGray-600"
-                                    }`}
-                                  >
-                                    {statusText}
-                                  </span>
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="sm:col-span-2 space-y-2">
-                      <div className="flex items-center justify-between gap-2 flex-wrap">
-                        <p className="lotus-admin-form-label">
-                          Khung giờ *{" "}
-                          <span className="font-normal text-adminGray-500 normal-case tracking-normal">
-                            — Chọn tham khảo các khung giờ sau
-                          </span>
-                        </p>
-                        <div className="flex items-center gap-3 text-xs text-adminGray-500">
-                          <span className="flex items-center gap-1">
-                            <span className="w-2.5 h-2.5 rounded-full border border-adminGray-300 bg-white inline-block" />
-                            Trống
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <span className="w-2.5 h-2.5 rounded-full bg-red-300 inline-block" />
-                            Đã đặt
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <span className="w-2.5 h-2.5 rounded-full bg-adminGray-300 inline-block" />
-                            Không đủ giờ
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <span className="w-2.5 h-2.5 rounded-full bg-adminGray-200 inline-block" />
-                            Ngoài giờ
-                          </span>
-                        </div>
-                      </div>
-
-                      {!serviceId || !appointmentDate ? (
-                        <p className="text-xs text-adminGray-500 py-3 text-center border border-dashed border-adminGray-200 rounded-md">
-                          Chọn dịch vụ và ngày để xem khung giờ
-                        </p>
-                      ) : timeSlotsQuery.isLoading ? (
-                        <p className="text-xs text-adminGray-500 py-3 text-center">
-                          Đang tải khung giờ...
-                        </p>
-                      ) : timeSlots.length === 0 ? (
-                        <p className="text-xs text-adminGray-500 py-3 text-center border border-adminGray-200 rounded-md bg-adminGray-50">
-                          Không có khung giờ trong ngày này
-                        </p>
-                      ) : (
-                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 max-h-[240px] overflow-y-auto custom-scrollbar pr-1">
-                          {timeSlots.map((slot: TimeSlotDTO) => {
-                            const isSelected =
-                              selectedTimeSlot?.slotId === slot.slotId;
-                            const s = (slot.status || "").toLowerCase();
-                            let label = "Không khả dụng";
-                            let isAvailable = false;
-                            let classes =
-                              "border-adminGray-200 bg-adminGray-50 text-adminGray-400 cursor-not-allowed opacity-60";
-
-                            if (s === "available" || s === "trống") {
-                              label = "Chưa có lịch";
-                              isAvailable = true;
-                              classes = isSelected
-                                ? "border-adminGreen-600 bg-adminGreen-600 text-white"
-                                : "border-adminGray-200 bg-white text-adminInk hover:border-adminGreen-500";
-                            } else if (s === "booked" || s === "đầy") {
-                              label = "Đã đặt";
-                              classes =
-                                "border-red-100 bg-red-50 text-red-600 cursor-not-allowed line-through opacity-70";
-                            } else if (s === "short") {
-                              label = "Không đủ giờ";
-                            } else if (s === "outside") {
-                              label = "Ngoài giờ";
-                            } else if (s === "break" || s === "nghỉ") {
-                              label = "Nghỉ";
-                            }
-
-                            return (
-                              <button
-                                key={`slot-${slot.slotId}`}
-                                type="button"
-                                disabled={!isAvailable}
-                                onClick={() => setSlotId(slot.slotId)}
-                                className={`py-2 px-1 text-center rounded-md border transition-all flex flex-col items-center justify-center gap-0.5 ${classes}`}
-                              >
-                                <span className="text-xs font-bold">
-                                  {slot.time}
-                                </span>
-                                <span className="text-xs opacity-90">
-                                  {label}
-                                </span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-
-                    <FormField label="Phòng / vị trí" className="sm:col-span-2">
-                      <SearchableSelect
-                        value={positionId != null ? String(positionId) : "none"}
-                        onValueChange={(v) =>
-                          setPositionId(v === "none" ? null : Number(v))
-                        }
-                        options={positionOptions}
-                        placeholder="Không chọn"
-                        searchPlaceholder="Tìm phòng / vị trí..."
-                        disabled={!salonId}
-                        className="h-9 w-full"
-                      />
-                      {positionsQuery.isLoading && (
-                        <p className="text-xs text-adminGray-500 mt-1">
-                          Đang tải trạng thái vị trí...
-                        </p>
-                      )}
-                    </FormField>
-                  </div>
-                </FormSection>
-
-                <FormSection icon={NotebookPen} title="Ghi chú">
-                  <FormField label="Ghi chú lịch hẹn">
-                    <AdminTextarea
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                      placeholder="Thông tin ghi chú"
-                      rows={3}
-                    />
-                  </FormField>
-                </FormSection>
-
-                {formError && (
-                  <p className="text-sm text-red-600">{formError}</p>
-                )}
-              </div>
-            )}
-          </div>
-
-          {!success && (
-            <div className="shrink-0 flex items-center justify-between gap-3 px-6 py-4 border-t border-adminGold-600/10 bg-white">
-              <div className="flex items-center gap-2 text-xs text-adminGray-600 min-w-0">
-                <MapPin className="w-3.5 h-3.5 shrink-0" />
-                <span className="truncate">
-                  {selectedSalon?.name ?? "Chưa chọn chi nhánh"}
-                </span>
-              </div>
-              <div className="flex gap-2 shrink-0">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={onClose}
-                  disabled={isSubmitting}
-                >
-                  Đóng
-                </Button>
-                <Button
-                  type="button"
-                  variant="admin"
-                  size="sm"
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin mr-1" />
-                      Đang lưu...
-                    </>
-                  ) : (
-                    "Lưu thông tin"
-                  )}
-                </Button>
-              </div>
+      <Modal
+        open
+        onClose={onClose}
+        title="Thêm Lịch Khách Hàng Mới"
+        size="xl"
+        scrollable
+        tone="primary"
+        footer={footer}
+      >
+        {success ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-kit bg-kit-page">
+              <CheckCircle2 className="h-8 w-8 text-kit-success" />
             </div>
-          )}
-        </div>
-      </div>
+            <h3 className="mb-2 text-xl font-bold text-kit-heading">
+              Đặt Lịch Thành Công!
+            </h3>
+            <p className="mb-6 text-sm text-kit-muted">
+              Hệ thống đã ghi nhận lịch hẹn cho{" "}
+              {selectedCustomer?.fullName ?? "khách hàng"}.
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="mb-0 mr-0"
+                onClick={handleCreateAnother}
+              >
+                Tạo thêm lịch mới
+              </Button>
+              <Button
+                variant="success"
+                size="sm"
+                className="mb-0 mr-0"
+                onClick={onClose}
+              >
+                Đóng
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <FormSection icon={User} title="Khách hàng">
+              <FormField label="Tìm khách hàng">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-kit-muted" />
+                  <Input
+                    value={customerSearch}
+                    onChange={(e) => {
+                      setCustomerSearch(e.target.value);
+                      setShowCustomerDropdown(true);
+                      if (selectedCustomer) setSelectedCustomer(null);
+                    }}
+                    onFocus={() => setShowCustomerDropdown(true)}
+                    placeholder="Tìm theo tên hoặc số điện thoại"
+                    className="pl-9"
+                  />
+                  {showCustomerDropdown &&
+                  customerSearch.trim().length > 0 ? (
+                    <div className="absolute z-20 mt-1 max-h-48 w-full overflow-y-auto rounded border border-kit bg-kit-white shadow-lg">
+                      {customerList.length === 0 ? (
+                        <p className="px-3 py-2 text-xs text-kit-muted">
+                          Không tìm thấy khách hàng
+                        </p>
+                      ) : (
+                        customerList.map((customer: CustomerDto) => (
+                          <button
+                            key={customer.id ?? customer.phone}
+                            type="button"
+                            className="w-full border-b border-kit px-3 py-2 text-left text-sm last:border-0 hover:bg-kit-page"
+                            onClick={() => handleSelectCustomer(customer)}
+                          >
+                            <span className="font-medium text-kit-heading">
+                              {customer.fullName}
+                            </span>
+                            <span className="ml-2 text-kit-muted">
+                              {customer.phone}
+                            </span>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  ) : null}
+                </div>
+              </FormField>
+
+              <FormRow>
+                <FormField label="Họ tên">
+                  <Input
+                    value={selectedCustomer?.fullName ?? ""}
+                    readOnly
+                    placeholder="Chọn khách hàng"
+                  />
+                </FormField>
+                <FormField label="Điện thoại">
+                  <Input
+                    value={selectedCustomer?.phone ?? ""}
+                    readOnly
+                    placeholder="Số điện thoại"
+                  />
+                </FormField>
+              </FormRow>
+
+              <Button
+                type="button"
+                variant="outline-primary"
+                size="sm"
+                className="mb-0 mr-0"
+                onClick={() => setCreateCustomerOpen(true)}
+              >
+                + Thêm khách hàng mới
+              </Button>
+            </FormSection>
+
+            <FormSection icon={Calendar} title="Thông tin lịch hẹn">
+              <FormRow>
+                <FormField label="Chi nhánh" required>
+                  <SearchableSelect
+                    value={salonId ? String(salonId) : ""}
+                    onChange={handleSalonChange}
+                    options={salonOptions}
+                    placeholder="Chọn chi nhánh"
+                    searchPlaceholder="Tìm chi nhánh..."
+                    className="w-full"
+                  />
+                </FormField>
+                <FormField label="Ngày hẹn" required>
+                  <Input
+                    type="date"
+                    value={appointmentDate}
+                    onChange={(e) => handleDateChange(e.target.value)}
+                  />
+                </FormField>
+              </FormRow>
+
+              <FormField label="Dịch vụ" required>
+                <SearchableSelect
+                  value={serviceId ? String(serviceId) : ""}
+                  onChange={handleServiceChange}
+                  options={serviceOptions}
+                  placeholder="Chọn dịch vụ"
+                  searchPlaceholder="Tìm dịch vụ..."
+                  className="w-full"
+                />
+              </FormField>
+
+              <FormField label="Nhân viên phục vụ">
+                {!serviceId ? (
+                  <p className="rounded border border-dashed border-kit py-3 text-center text-xs text-kit-muted">
+                    Chọn dịch vụ để xem kỹ thuật viên phù hợp
+                  </p>
+                ) : null}
+                {serviceId && techniciansQuery.isLoading ? (
+                  <p className="py-3 text-center text-xs text-kit-muted">
+                    Đang tải kỹ thuật viên...
+                  </p>
+                ) : null}
+                {serviceId &&
+                !techniciansQuery.isLoading &&
+                technicians.length === 0 ? (
+                  <p className="rounded border border-kit bg-kit-page py-3 text-center text-xs text-kit-muted">
+                    Không có kỹ thuật viên làm việc trong ngày này
+                  </p>
+                ) : null}
+                {serviceId &&
+                !techniciansQuery.isLoading &&
+                technicians.length > 0
+                  ? renderTechnicianList()
+                  : null}
+              </FormField>
+
+              <FormField
+                label="Khung giờ"
+                required
+                help="Chọn tham khảo các khung giờ sau"
+              >
+                <div className="mb-2 flex flex-wrap items-center gap-3 text-xs text-kit-muted">
+                  <span className="flex items-center gap-1">
+                    <span className="inline-block h-2.5 w-2.5 rounded-full border border-kit bg-kit-white" />
+                    Trống
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="inline-block h-2.5 w-2.5 rounded-full bg-kit-danger" />
+                    Đã đặt
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="inline-block h-2.5 w-2.5 rounded-full bg-kit-muted" />
+                    Không đủ giờ
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="inline-block h-2.5 w-2.5 rounded-full bg-kit-page" />
+                    Ngoài giờ
+                  </span>
+                </div>
+
+                {!serviceId || !appointmentDate ? (
+                  <p className="rounded border border-dashed border-kit py-3 text-center text-xs text-kit-muted">
+                    Chọn dịch vụ và ngày để xem khung giờ
+                  </p>
+                ) : null}
+                {serviceId &&
+                appointmentDate &&
+                timeSlotsQuery.isLoading ? (
+                  <p className="py-3 text-center text-xs text-kit-muted">
+                    Đang tải khung giờ...
+                  </p>
+                ) : null}
+                {serviceId &&
+                appointmentDate &&
+                !timeSlotsQuery.isLoading &&
+                timeSlots.length === 0 ? (
+                  <p className="rounded border border-kit bg-kit-page py-3 text-center text-xs text-kit-muted">
+                    Không có khung giờ trong ngày này
+                  </p>
+                ) : null}
+                {serviceId &&
+                appointmentDate &&
+                !timeSlotsQuery.isLoading &&
+                timeSlots.length > 0
+                  ? renderTimeSlotList()
+                  : null}
+              </FormField>
+
+              <FormField
+                label="Phòng / vị trí"
+                help={
+                  positionsQuery.isLoading
+                    ? "Đang tải trạng thái vị trí..."
+                    : undefined
+                }
+              >
+                <SearchableSelect
+                  value={positionId != null ? String(positionId) : "none"}
+                  onChange={(value) =>
+                    setPositionId(value === "none" ? null : Number(value))
+                  }
+                  options={positionOptions}
+                  placeholder="Không chọn"
+                  searchPlaceholder="Tìm vị trí..."
+                  disabled={!salonId}
+                  className="w-full"
+                />
+              </FormField>
+            </FormSection>
+
+            <FormSection icon={NotebookPen} title="Ghi chú">
+              <FormField label="Ghi chú lịch hẹn">
+                <Textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Thông tin ghi chú"
+                  rows={3}
+                />
+              </FormField>
+            </FormSection>
+
+            {formError ? (
+              <p className="text-sm text-kit-danger">{formError}</p>
+            ) : null}
+          </div>
+        )}
+      </Modal>
 
       <CustomerFormDialog
         open={createCustomerOpen}
@@ -727,7 +762,7 @@ export function CashierBookingModal({
 }: CashierBookingModalProps) {
   const [formKey, setFormKey] = useState(0);
   const [wasOpen, setWasOpen] = useState(false);
-  
+
   if (isOpen && !wasOpen) {
     setWasOpen(true);
     setFormKey((k) => k + 1);

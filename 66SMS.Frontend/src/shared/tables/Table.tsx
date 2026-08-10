@@ -34,8 +34,7 @@ export function Table({
       "bg-kit-dark text-kit-white " +
       "[&_th]:bg-kit-dark [&_td]:bg-kit-dark [&_th]:font-bold [&_th]:text-kit-white [&_td]:text-kit-white ";
   } else {
-    tableClass +=
-      "bg-kit-white text-kit-body [&_th]:font-bold [&_th]:text-kit-muted ";
+    tableClass += "bg-kit-white text-kit-body [&_th]:font-bold ";
   }
 
   const cellBorder = dark ? "border-kit-white/20" : "border-kit";
@@ -93,12 +92,14 @@ export function TableResponsive({
 
 export function TableHead({
   children,
-  className,
+  className = "",
 }: {
   children: ReactNode;
   className?: string;
 }) {
-  return <thead className={className}>{children}</thead>;
+  return (
+    <thead className={"[&_th]:text-kit-muted " + className}>{children}</thead>
+  );
 }
 
 export function TableBody({
@@ -150,24 +151,32 @@ export function TableCell({
   className,
   style,
   colSpan,
+  rowSpan,
   asHeader,
 }: {
   children?: ReactNode;
   className?: string;
   style?: CSSProperties;
   colSpan?: number;
+  rowSpan?: number;
   asHeader?: boolean;
 }) {
   if (asHeader) {
     return (
-      <th colSpan={colSpan} style={style} className={className} scope="row">
+      <th
+        colSpan={colSpan}
+        rowSpan={rowSpan}
+        style={style}
+        className={className}
+        scope="row"
+      >
         {children}
       </th>
     );
   }
 
   return (
-    <td colSpan={colSpan} style={style} className={className}>
+    <td colSpan={colSpan} rowSpan={rowSpan} style={style} className={className}>
       {children}
     </td>
   );

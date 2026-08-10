@@ -127,6 +127,12 @@
     --kit-soft-info-bg: var(--color-sky-100);
     --kit-soft-info-text: var(--color-sky-800);
     --kit-soft-info-border: var(--color-sky-200);
+    --kit-soft-focus-bg: var(--color-slate-100);
+    --kit-soft-focus-text: var(--color-slate-800);
+    --kit-soft-focus-border: var(--color-slate-200);
+    --kit-soft-alternate-bg: var(--color-purple-100);
+    --kit-soft-alternate-text: var(--color-purple-800);
+    --kit-soft-alternate-border: var(--color-purple-200);
   }
 }
 

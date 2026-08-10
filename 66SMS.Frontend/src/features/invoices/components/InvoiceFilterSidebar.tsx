@@ -1,4 +1,8 @@
 import { Filter, RefreshCw } from "lucide-react";
+
+import { Button } from "@/shared/elements/Button";
+import { ListGroup, ListGroupItem } from "@/shared/elements/ListGroup";
+
 import { INVOICE_STATUS, PAYMENT_METHOD } from "../types/invoice.types";
 
 interface InvoiceFilterSidebarProps {
@@ -10,7 +14,7 @@ interface InvoiceFilterSidebarProps {
 }
 
 const STATUS_OPTIONS = [
-  { label: "Tất cả trạng thái", value: null },
+  { label: "Tất cả trạng thái", value: null as number | null },
   { label: "Nháp", value: INVOICE_STATUS.DRAFT },
   { label: "Chưa thanh toán", value: INVOICE_STATUS.UNPAID },
   { label: "Đã thanh toán", value: INVOICE_STATUS.PAID },
@@ -19,7 +23,7 @@ const STATUS_OPTIONS = [
 ];
 
 const METHOD_OPTIONS = [
-  { label: "Tất cả phương thức", value: null },
+  { label: "Tất cả phương thức", value: null as number | null },
   { label: "Tiền mặt", value: PAYMENT_METHOD.CASH },
   { label: "Chuyển khoản", value: PAYMENT_METHOD.BANK_TRANSFER },
   { label: "Ví thành viên", value: PAYMENT_METHOD.WALLET },
@@ -36,77 +40,61 @@ export function InvoiceFilterSidebar({
   const hasFilter = selectedStatus !== null || selectedPaymentMethod !== null;
 
   return (
-    <aside className="w-56 shrink-0 flex flex-col h-full bg-white rounded overflow-hidden">
-      <div className="px-4 py-3 border-b border-adminGray-100 shrink-0 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-adminGold-600" />
-          <span className="text-sm font-bold text-adminInk">
-            Bộ lọc hóa đơn
-          </span>
+    <div className="flex w-56 shrink-0 flex-col gap-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-sm font-semibold text-kit-heading">
+          <Filter className="h-4 w-4 text-kit-primary" />
+          Bộ lọc hóa đơn
         </div>
-        {hasFilter && (
-          <button
+        {hasFilter ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="mb-0 h-7 px-2 text-xs"
             onClick={onReset}
-            className="text-xs text-adminGray-600 hover:text-adminGreen-600 transition-colors flex items-center gap-0.5"
-            title="Xóa tất cả bộ lọc"
           >
-            <RefreshCw className="w-3 h-3" />
+            <RefreshCw className="h-3 w-3" />
             Xóa
-          </button>
-        )}
+          </Button>
+        ) : null}
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-5">
-        <div className="space-y-2">
-          <p className="text-xs font-bold text-adminGray-600 tracking-wider uppercase px-1">
-            Trạng thái
-          </p>
-          <div className="space-y-1">
-            {STATUS_OPTIONS.map((opt) => {
-              const isActive = selectedStatus === opt.value;
-              return (
-                <button
-                  key={String(opt.value)}
-                  type="button"
-                  onClick={() => onSelectStatus(opt.value)}
-                  className={`lotus-admin-sidebar-item ${
-                    isActive
-                      ? "bg-adminGreen-100 text-adminGreen-600 font-semibold"
-                      : "text-adminInk/75 hover:bg-adminGreen-50 hover:text-adminGreen-600"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-xs font-bold text-adminGray-600 tracking-wider uppercase px-1">
-            Phương thức
-          </p>
-          <div className="space-y-1">
-            {METHOD_OPTIONS.map((opt) => {
-              const isActive = selectedPaymentMethod === opt.value;
-              return (
-                <button
-                  key={String(opt.value)}
-                  type="button"
-                  onClick={() => onSelectPaymentMethod(opt.value)}
-                  className={`lotus-admin-sidebar-item ${
-                    isActive
-                      ? "bg-adminGreen-100 text-adminGreen-600 font-semibold"
-                      : "text-adminInk/75 hover:bg-adminGreen-50 hover:text-adminGreen-600"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+      <div className="space-y-1">
+        <p className="px-1 text-xs font-semibold tracking-wide text-kit-muted uppercase">
+          Trạng thái
+        </p>
+        <ListGroup className="mb-0">
+          {STATUS_OPTIONS.map((option) => (
+            <ListGroupItem
+              key={String(option.value)}
+              action
+              active={selectedStatus === option.value}
+              onClick={() => onSelectStatus(option.value)}
+            >
+              <span className="truncate">{option.label}</span>
+            </ListGroupItem>
+          ))}
+        </ListGroup>
       </div>
-    </aside>
+
+      <div className="space-y-1">
+        <p className="px-1 text-xs font-semibold tracking-wide text-kit-muted uppercase">
+          Phương thức
+        </p>
+        <ListGroup className="mb-0">
+          {METHOD_OPTIONS.map((option) => (
+            <ListGroupItem
+              key={String(option.value)}
+              action
+              active={selectedPaymentMethod === option.value}
+              onClick={() => onSelectPaymentMethod(option.value)}
+            >
+              <span className="truncate">{option.label}</span>
+            </ListGroupItem>
+          ))}
+        </ListGroup>
+      </div>
+    </div>
   );
 }

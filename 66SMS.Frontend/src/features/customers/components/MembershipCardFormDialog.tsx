@@ -1,24 +1,17 @@
-﻿import { AdminInput } from "@/shared/components/forms/AdminInput";
-import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import { useEffect, useMemo } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+
+import { Modal } from "@/shared/components/Modal";
+import { Button } from "@/shared/elements/Button";
+import { FormField } from "@/shared/forms/FormField";
+import { Input } from "@/shared/forms/Input";
+import { Select } from "@/shared/forms/Select";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/shared/components/ui/select";
-import { FormField } from "@/shared/components/forms/FormField";
+  toDatetimeLocalInput,
+  localDateTimeToUtc,
+} from "@/shared/utils/date.utils";
+
 import { useUpdateMembershipCard } from "../hooks/useMembershipCards";
 import { useMembershipTiers } from "../hooks/useMembershipTiers";
 import {
@@ -27,11 +20,6 @@ import {
 } from "../schemas/membershipCard.schema";
 import type { MembershipCardDto } from "../types/membershipCard.types";
 import type { MembershipTierDto } from "../types/membershipTier.types";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import {
-  toDatetimeLocalInput,
-  localDateTimeToUtc,
-} from "@/shared/utils/date.utils";
 
 interface MembershipCardFormDialogProps {
   open: boolean;
@@ -53,7 +41,6 @@ export function MembershipCardFormDialog({
   const updateMutation = useUpdateMembershipCard();
   const isPending = updateMutation.isPending;
 
-  // Tier cho select
   const { data: tiersResult } = useMembershipTiers({ pageSize: 100 });
   const tiers = useMemo(
     () => tiersResult?.data?.items ?? [],
@@ -107,93 +94,97 @@ export function MembershipCardFormDialog({
 
   if (!card) return null;
 
+  const tierOptions = tiers.map((tier: MembershipTierDto) => ({
+    value: tier.id!.toString(),
+    label: tier.name,
+  }));
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>Cập nhật thẻ thành viên</DialogTitle>
-          <DialogDescription>
-            {`Chỉnh sửa thông tin thẻ của khách hàng ${card.customerName ?? ""}`}
-          </DialogDescription>
-        </DialogHeader>
+    <Modal
+      open={open}
+      onClose={() => onOpenChange(false)}
+      title="Cập nhật thẻ thành viên"
+      size="md"
+      scrollable
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <FormField label="Mã thẻ *" error={errors.cardCode?.message}>
+            <Input
+              {...register("cardCode")}
+              placeholder="Nhập mã thẻ"
+              invalid={!!errors.cardCode}
+            />
+          </FormField>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <FormField label="Mã thẻ *" error={errors.cardCode?.message}>
-              <AdminInput {...register("cardCode")} placeholder="Nhập mã thẻ" />
-            </FormField>
+          <FormField
+            label="Loại thẻ"
+            error={errors.membershipTierId?.message}
+          >
+            <Select
+              value={watch("membershipTierId")?.toString() ?? ""}
+              onChange={(e) =>
+                setValue("membershipTierId", Number(e.target.value))
+              }
+              options={tierOptions}
+              placeholder="Chọn loại thẻ"
+              invalid={!!errors.membershipTierId}
+            />
+          </FormField>
 
-            <FormField
-              label="Loại thẻ"
-              error={errors.membershipTierId?.message}
-            >
-              <Select
-                value={watch("membershipTierId")?.toString() ?? ""}
-                onValueChange={(v) => setValue("membershipTierId", Number(v))}
-              >
-                <AdminSelectTrigger>
-                  <SelectValue placeholder="Chọn loại thẻ" />
-                </AdminSelectTrigger>
-                <SelectContent>
-                  {tiers.map((tier: MembershipTierDto) => (
-                    <SelectItem key={tier.id} value={tier.id!.toString()}>
-                      {tier.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormField>
+          <FormField label="Ngày cấp" error={errors.issuedAt?.message}>
+            <Input
+              type="datetime-local"
+              {...register("issuedAt")}
+              invalid={!!errors.issuedAt}
+            />
+          </FormField>
 
-            <FormField label="Ngày cấp" error={errors.issuedAt?.message}>
-              <AdminInput type="datetime-local" {...register("issuedAt")} />
-            </FormField>
+          <FormField
+            label="Ngày hết hạn"
+            tooltip="Để trống nếu thẻ có giá trị vĩnh viễn"
+            error={errors.expiresAt?.message}
+          >
+            <Input
+              type="datetime-local"
+              {...register("expiresAt")}
+              invalid={!!errors.expiresAt}
+            />
+          </FormField>
 
-            <FormField
-              label="Ngày hết hạn"
-              tooltip="Để trống nếu thẻ có giá trị vĩnh viễn"
-              error={errors.expiresAt?.message}
-            >
-              <AdminInput type="datetime-local" {...register("expiresAt")} />
-            </FormField>
+          <FormField label="Trạng thái" className="sm:col-span-2">
+            <Select
+              value={watch("status")?.toString() ?? "1"}
+              onChange={(e) => setValue("status", Number(e.target.value))}
+              options={STATUS_OPTIONS}
+              placeholder="Chọn trạng thái"
+            />
+          </FormField>
+        </div>
 
-            <div className="sm:col-span-2">
-              <FormField label="Trạng thái">
-                <Select
-                  value={watch("status")?.toString() ?? "1"}
-                  onValueChange={(v) => setValue("status", Number(v))}
-                >
-                  <AdminSelectTrigger>
-                    <SelectValue placeholder="Chọn trạng thái" />
-                  </AdminSelectTrigger>
-                  <SelectContent>
-                    {STATUS_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
-            >
-              {COMMON_MSG.cancel}
-            </Button>
-            <Button type="submit" variant="admin" size="sm" loading={isPending}>
-              Cập nhật thẻ
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        <div className="flex justify-end gap-2 border-t border-kit pt-3">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="mb-0"
+            onClick={() => onOpenChange(false)}
+            disabled={isPending}
+          >
+            Hủy
+          </Button>
+          <Button
+            type="submit"
+            variant="admin"
+            size="sm"
+            className="mb-0"
+            loading={isPending}
+          >
+            Cập nhật thẻ
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }
 
@@ -204,7 +195,6 @@ function getDefaultValues(
     return {
       membershipTierId: card.membershipTierId ?? undefined,
       cardCode: card.cardCode ?? "",
-      // Đổi UTC từ API sang local cho input datetime-local
       issuedAt: toDatetimeLocalInput(card.issuedAt),
       expiresAt: toDatetimeLocalInput(card.expiresAt),
       status: card.status,

@@ -1,7 +1,6 @@
 const LOCALE = "vi-VN";
 const EMPTY = "—";
 
-/** Kiểm tra chuỗi dạng DateOnly yyyy-MM-dd */
 function isDateOnlyString(val: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(val.trim());
 }

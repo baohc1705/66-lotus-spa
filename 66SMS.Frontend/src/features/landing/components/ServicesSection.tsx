@@ -19,8 +19,10 @@ function formatDuration(mins?: number) {
   if (!mins) return "";
   const hours = Math.floor(mins / 60);
   const remainingMins = mins % 60;
-  if (hours > 0 && remainingMins > 0) return `${hours}h${remainingMins}'`;
-  if (hours > 0) return `${hours}h`;
+  if (hours > 0 && remainingMins > 0) {
+    return `${hours} giờ ${remainingMins} phút`;
+  }
+  if (hours > 0) return `${hours} giờ`;
   return `${mins} phút`;
 }
 
@@ -97,8 +99,7 @@ export const ServicesSection = () => {
           title="Dịch vụ"
           titleId="services-heading"
           variant="lotus"
-          description="Chăm sóc từ tâm – Nâng tầm trải nghiệm"
-          className="mb-10"
+          className="mb-6"
         />
 
         {isLoading ? (
@@ -111,12 +112,12 @@ export const ServicesSection = () => {
             ))}
           </div>
         ) : isError ? (
-          <p className="py-12 text-center font-geist text-sm text-warm-600">
-            Không tải được danh sách dịch vụ. Vui lòng thử lại sau.
+          <p className="py-8 text-center font-geist text-sm text-warm-600">
+            Không tải được dịch vụ. Thử lại sau.
           </p>
         ) : services.length === 0 ? (
-          <p className="py-12 text-center font-geist text-sm text-warm-600">
-            Hiện chưa có dịch vụ nào.
+          <p className="py-8 text-center font-geist text-sm text-warm-600">
+            Chưa có dịch vụ nào.
           </p>
         ) : (
           <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:pb-0 lg:grid-cols-3">

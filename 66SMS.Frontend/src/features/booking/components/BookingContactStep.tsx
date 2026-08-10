@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Phone, Info, ArrowLeft, Loader2, Wallet } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import {
   useMembershipTiers,
@@ -149,7 +149,7 @@ export function BookingContactStep() {
 
       if (result.success) {
         setCreatedBookingIds(result.bookingIds || []);
-        toast.success("Đặt lịch thành công! Cảm ơn bạn đã tin tưởng.");
+        toast.success("Đặt lịch thành công!");
         nextStep();
       } else if (lockedIds.length > 0) {
         await releaseSlotLockMutation(lockedIds).catch(() => undefined);

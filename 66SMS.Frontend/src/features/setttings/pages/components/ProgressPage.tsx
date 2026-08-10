@@ -85,10 +85,14 @@ export function ProgressPage() {
         <div>
           <DemoSection title="Progress color">
             <Progress value={10} />
-            <Progress value={25} tone="success" />
-            <Progress value={50} tone="info" />
-            <Progress value={75} tone="warning" />
-            <Progress value={100} tone="danger" />
+            <Progress value={20} tone="secondary" />
+            <Progress value={30} tone="success" />
+            <Progress value={40} tone="info" />
+            <Progress value={50} tone="warning" />
+            <Progress value={60} tone="danger" />
+            <Progress value={70} tone="focus" />
+            <Progress value={80} tone="alternate" />
+            <Progress value={90} tone="dark" />
           </DemoSection>
 
           <DemoSection title="Progress bar multi">

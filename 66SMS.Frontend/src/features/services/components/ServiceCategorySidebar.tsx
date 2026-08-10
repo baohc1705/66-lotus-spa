@@ -11,10 +11,14 @@ import {
   Tag,
   type LucideIcon,
 } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
+import { Button } from "@/shared/elements/Button";
+import { Badge } from "@/shared/elements/Badge";
+import { ListGroup, ListGroupItem } from "@/shared/elements/ListGroup";
+import { Input } from "@/shared/forms/Input";
 import { useServiceCategories } from "@/features/service_categories/hooks/useServiceCategories";
 import { ServiceCategoryFormDialog } from "@/features/service_categories/components/ServiceCategoryFormDialog";
 import { useAdminServices, useDeletedServices } from "../hooks/useServices";
+import type { ServiceCategoryDto } from "@/features/service_categories/types/serviceCategory.types";
 
 interface ServiceCategorySidebarProps {
   selectedCategoryId: number | null;
@@ -78,119 +82,86 @@ export function ServiceCategorySidebar({
   const filteredCategories = useMemo(() => {
     if (!searchText.trim()) return categories;
     const lower = searchText.toLowerCase();
-    return categories.filter((c) =>
+    return categories.filter((c: ServiceCategoryDto) =>
       (c.name ?? "").toLowerCase().includes(lower),
     );
   }, [categories, searchText]);
 
   return (
     <>
-      <aside className="w-2/12 shrink-0 flex flex-col h-full bg-white rounded overflow-hidden">
-        <div className="px-3 pt-3 pb-2 shrink-0">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-adminGray-400 pointer-events-none" />
-            <input
-              type="text"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              placeholder="Tìm danh mục..."
-              className="lotus-admin-sidebar-search"
-            />
-          </div>
+      <div className="flex w-56 shrink-0 flex-col gap-3">
+        <div className="relative">
+          <Search className="pointer-events-none absolute top-1/2 left-2.5 z-10 h-3.5 w-3.5 -translate-y-1/2 text-kit-muted" />
+          <Input
+            type="text"
+            inputSize="sm"
+            value={searchText}
+            onChange={(e: { target: { value: string } }) =>
+              setSearchText(e.target.value)
+            }
+            placeholder="Tìm danh mục..."
+            className="h-9 pl-8"
+          />
         </div>
 
-        <nav className="flex-1 flex-col h-full overflow-y-auto custom-scrollbar px-2 pb-2 space-y-0.5">
-          <button
-            type="button"
+        <ListGroup className="mb-0 max-h-96 overflow-y-auto">
+          <ListGroupItem
+            action
+            active={selectedCategoryId === null}
             onClick={() => onSelectCategory(null)}
-            className={`lotus-admin-sidebar-item ${
-              selectedCategoryId === null
-                ? "bg-adminGreen-100 text-adminGreen-600 font-semibold border-l-[3px] border-adminGreen-600"
-                : "text-adminInk/70 hover:bg-adminGreen-50 hover:text-adminGreen-600 border-l-[3px] border-transparent"
-            }`}
           >
-            <div className="flex items-center gap-2 min-w-0">
-              <Activity
-                className={`w-4 h-4 shrink-0 ${
-                  selectedCategoryId === null
-                    ? "text-adminGreen-600"
-                    : "text-adminGray-400"
-                }`}
-              />
+            <span className="flex min-w-0 items-center gap-2">
+              <Activity className="h-4 w-4 shrink-0" />
               <span className="truncate">Tất cả dịch vụ</span>
-            </div>
-            <span
-              className={`lotus-admin-sidebar-badge ${
-                selectedCategoryId === null
-                  ? "bg-adminGreen-600/20 text-adminGreen-600"
-                  : "bg-adminGray-100 text-adminGray-600"
-              }`}
+            </span>
+            <Badge
+              variant={selectedCategoryId === null ? "light" : "secondary"}
+              pill
             >
               {totalCount}
-            </span>
-          </button>
+            </Badge>
+          </ListGroupItem>
 
-          {isLoadingCategories ? (
-            <div className="space-y-1 px-1 mt-1">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-7 bg-adminGray-100/50 rounded animate-pulse"
-                />
-              ))}
-            </div>
-          ) : (
-            filteredCategories.map((cat) => {
-              const isActive = selectedCategoryId === cat.id;
-              const count = cat.id != null ? (countMap.get(cat.id) ?? 0) : 0;
-              const Icon = getCategoryIcon(cat.name ?? "");
-              return (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => onSelectCategory(cat.id ?? null)}
-                  className={`lotus-admin-sidebar-item group ${
-                    isActive
-                      ? "bg-adminGreen-100 text-adminGreen-600 font-semibold border-l-[3px] border-adminGreen-600"
-                      : "text-adminInk/70 hover:bg-adminGreen-50 hover:text-adminGreen-600 border-l-[3px] border-transparent"
-                  }`}
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Icon
-                      className={`w-4 h-4 shrink-0 ${
-                        isActive
-                          ? "text-adminGreen-600"
-                          : "text-adminGray-400 group-hover:text-adminGray-600"
-                      }`}
-                    />
-                    <span className="truncate">{cat.name ?? "—"}</span>
-                  </div>
-                  <span
-                    className={`lotus-admin-sidebar-badge ${
-                      isActive
-                        ? "bg-adminGreen-600/20 text-adminGreen-600"
-                        : "bg-adminGray-100 text-adminGray-600"
-                    }`}
+          {isLoadingCategories
+            ? Array.from({ length: 6 }).map((_, i: number) => (
+                <ListGroupItem key={i} disabled>
+                  <span className="h-4 w-28 animate-pulse rounded bg-kit-page" />
+                  <span className="h-4 w-6 animate-pulse rounded-full bg-kit-page" />
+                </ListGroupItem>
+              ))
+            : filteredCategories.map((cat: ServiceCategoryDto) => {
+                const isActive = selectedCategoryId === cat.id;
+                const count = cat.id != null ? (countMap.get(cat.id) ?? 0) : 0;
+                const Icon = getCategoryIcon(cat.name ?? "");
+                return (
+                  <ListGroupItem
+                    key={cat.id}
+                    action
+                    active={isActive}
+                    onClick={() => onSelectCategory(cat.id ?? null)}
                   >
-                    {count}
-                  </span>
-                </button>
-              );
-            })
-          )}
-        </nav>
+                    <span className="flex min-w-0 items-center gap-2">
+                      <Icon className="h-4 w-4 shrink-0" />
+                      <span className="truncate">{cat.name ?? "—"}</span>
+                    </span>
+                    <Badge variant={isActive ? "light" : "secondary"} pill>
+                      {count}
+                    </Badge>
+                  </ListGroupItem>
+                );
+              })}
+        </ListGroup>
 
-        <div className="px-3 py-2 shrink-0 mt-auto">
-          <Button
-            variant="admin"
-            className="lotus-admin-sidebar-add-btn"
-            onClick={() => setCreateCategoryOpen(true)}
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Thêm danh mục
-          </Button>
-        </div>
-      </aside>
+        <Button
+          variant="admin"
+          size="sm"
+          className="mb-0 w-full"
+          onClick={() => setCreateCategoryOpen(true)}
+        >
+          <Plus className="h-3.5 w-3.5" />
+          Thêm danh mục
+        </Button>
+      </div>
 
       <ServiceCategoryFormDialog
         open={createCategoryOpen}

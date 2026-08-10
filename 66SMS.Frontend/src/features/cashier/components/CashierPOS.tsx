@@ -22,25 +22,38 @@ import { useTreatmentCourses } from "@/features/treatment_courses/hooks/useTreat
 import type { TreatmentCourseDto } from "@/features/treatment_courses/types/treatmentCourse.types";
 import { cn } from "@/lib/utils";
 import { FallbackImage } from "@/shared/components/FallbackImage";
+import { toast } from "@/shared/components/kitToast";
+import { Modal } from "@/shared/components/Modal";
+import { TabNav } from "@/shared/components/Tabs";
+import { Button } from "@/shared/elements/Button";
+import { Checkbox } from "@/shared/forms/Checkbox";
+import { CurrencyInput } from "@/shared/forms/CurrencyInput";
+import { FormField } from "@/shared/forms/FormField";
+import { Input } from "@/shared/forms/Input";
+import { Select } from "@/shared/forms/Select";
+import { Textarea } from "@/shared/forms/Textarea";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "@/shared/tables/Table";
 import { formatDate } from "@/shared/utils/date.utils";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowRight,
   Barcode,
-  ChevronDown,
   CreditCard,
   DollarSign,
-  Package,
   Plus,
   Search,
   SlidersHorizontal,
-  Sparkles,
   Trash2,
   User as UserIcon,
-  X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
 
 interface POSOrderItem {
   itemType: number;
@@ -646,152 +659,143 @@ export function CashierPOS({
     if (activeTab === "courses") return null;
     const cats = activeTab === "services" ? serviceCats : productCats;
     return (
-      <div className="flex flex-wrap gap-1.5 mb-3">
-        <button
+      <div className="mb-3 flex flex-wrap gap-1.5">
+        <Button
+          size="sm"
+          pill
+          variant={activeCategoryId === null ? "primary" : "outline"}
+          className="mb-0 mr-0"
           onClick={() => setActiveCategoryId(null)}
-          className={cn(
-            "px-3 py-1 rounded-full text-xs font-semibold tracking-wide border transition-all duration-200",
-            activeCategoryId === null
-              ? "bg-adminGreen-600 text-white border-adminGreen-600 shadow-xs"
-              : "bg-white text-adminGray-600 border-adminGray-100 hover:bg-adminGray-50",
-          )}
         >
           Tất cả
-        </button>
-        {cats.map((c: { id?: number; name?: string }) => (
-          <button
-            key={c.id}
-            onClick={() => setActiveCategoryId(c.id ?? null)}
-            className={cn(
-              "px-3 py-1 rounded-full text-xs font-semibold tracking-wide border transition-all duration-200",
-              activeCategoryId === c.id
-                ? "bg-adminGreen-600 text-white border-adminGreen-600 shadow-xs"
-                : "bg-white text-adminGray-600 border-adminGray-100 hover:bg-adminGray-50",
-            )}
+        </Button>
+        {cats.map((category: { id?: number; name?: string }) => (
+          <Button
+            key={category.id}
+            size="sm"
+            pill
+            variant={activeCategoryId === category.id ? "primary" : "outline"}
+            className="mb-0 mr-0"
+            onClick={() => setActiveCategoryId(category.id ?? null)}
           >
-            {c.name}
-          </button>
+            {category.name}
+          </Button>
         ))}
       </div>
     );
   };
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 min-w-0 w-full bg-adminGray-50 font-sans p-2 gap-2 relative z-10 overflow-hidden">
-      <div className="bg-white border border-adminGray-100 rounded-[3px] p-2 shadow-xs shrink-0 flex items-center justify-between gap-3 relative">
-        <div className="relative w-96 max-w-full">
-          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-            <Search className="w-4 h-4 text-adminGray-400" />
+    <div className="flex-1 flex flex-col min-h-0 min-w-0 w-full bg-kit-page font-sans p-2 gap-2 relative z-10 overflow-hidden">
+      <div className="relative z-20 flex shrink-0 items-center gap-3 rounded border border-kit bg-kit-white p-2 shadow-xs">
+        <div className="relative min-w-0 flex-1">
+          <div className="pointer-events-none absolute inset-y-0 left-3 z-10 flex items-center">
+            <Search className="h-4 w-4 text-kit-muted" />
           </div>
-          <input
+          <Input
             type="text"
             value={customerSearch}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            onChange={(e) => {
               setCustomerSearch(e.target.value);
               setShowCustomerDropdown(true);
             }}
             onFocus={() => setShowCustomerDropdown(true)}
             placeholder="Tìm khách hàng theo tên hoặc số điện thoại"
-            className="w-full text-xs bg-adminGray-50 border border-adminGray-300 rounded-[3px] py-2 pl-9 pr-4 text-adminInk focus:outline-hidden focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 transition shadow-inner"
+            inputSize="sm"
+            className="pl-9"
           />
 
-          {showCustomerDropdown && customerSearch.trim() && (
+          {showCustomerDropdown && customerSearch.trim() ? (
             <>
               <div
                 className="fixed inset-0 z-20"
                 onClick={() => setShowCustomerDropdown(false)}
               />
-              <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-adminGray-100 rounded-[3px] shadow-lg max-h-56 overflow-y-auto z-30 divide-y divide-adminGray-100">
+              <div className="absolute top-full right-0 left-0 z-30 mt-1.5 max-h-56 divide-y divide-kit overflow-y-auto rounded border border-kit bg-kit-white shadow-lg">
                 {customerList.length === 0 ? (
-                  <div className="p-3 text-xs text-adminGray-400 font-medium text-center">
+                  <div className="p-3 text-center text-xs font-medium text-kit-muted">
                     Không tìm thấy khách hàng nào khớp.
                   </div>
                 ) : (
-                  customerList.map((c: CustomerDto) => (
+                  customerList.map((customer: CustomerDto) => (
                     <button
-                      key={c.id}
+                      key={customer.id}
                       type="button"
-                      onClick={() => selectCustomer(c)}
-                      className="w-full text-left p-2.5 text-xs text-adminInk hover:bg-adminGray-50/50 transition flex items-center justify-between"
+                      onClick={() => selectCustomer(customer)}
+                      className="flex w-full items-center justify-between p-2.5 text-left text-xs text-kit-heading hover:bg-kit-page"
                     >
                       <div>
-                        <div className="font-bold flex items-center gap-1.5">
-                          {c.fullName}
-                          <span className="text-2xs text-adminGray-400 font-normal">
-                            (CS{String(c.id).padStart(5, "0")})
+                        <div className="flex items-center gap-1.5 font-bold">
+                          {customer.fullName}
+                          <span className="text-2xs font-normal text-kit-muted">
+                            (CS{String(customer.id).padStart(5, "0")})
                           </span>
                         </div>
-                        <div className="text-xs text-adminGray-600 mt-0.5">
-                          {c.phone}
+                        <div className="mt-0.5 text-xs text-kit-muted">
+                          {customer.phone}
                         </div>
                       </div>
-                      <div className="text-2xs text-adminGold-600 font-bold">
-                        {c.loyaltyPoint ?? 0} điểm
+                      <div className="text-2xs font-bold text-kit-warning">
+                        {customer.loyaltyPoint ?? 0} điểm
                       </div>
                     </button>
                   ))
                 )}
               </div>
             </>
-          )}
+          ) : null}
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleCreateNewOrder}
-            className="flex items-center gap-1.5 bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white px-3.5 py-1.5 rounded-[3px] text-xs font-bold transition shadow-xs"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Tạo Đơn Hàng</span>
-          </button>
-        </div>
+        <Button
+          size="sm"
+          variant="primary"
+          className="mb-0 mr-0 shrink-0"
+          onClick={handleCreateNewOrder}
+        >
+          <Plus className="mr-1.5 h-4 w-4" />
+          Tạo đơn hàng
+        </Button>
       </div>
 
       <div className="flex-1 flex min-h-0 min-w-0 w-full gap-2 relative lg:grid lg:grid-cols-12">
-        <div className="lg:col-span-6 bg-white border border-adminGray-100 rounded-[3px] shadow-xs flex flex-col overflow-hidden h-full">
-          <div className="p-3 bg-white border-b border-adminGray-100 flex items-center justify-between shrink-0 flex-wrap gap-2">
-            <span className="font-bold text-sm text-adminGreen-600">
+        <div className="lg:col-span-6 bg-white border border-kit rounded-[3px] shadow-xs flex flex-col overflow-hidden h-full">
+          <div className="p-3 bg-white border-b border-kit flex items-center justify-between shrink-0 flex-wrap gap-2">
+            <span className="font-bold text-sm text-kit-primary">
               {activeOrder.code}
             </span>
 
             {orders.length > 1 && (
-              <div className="relative">
-                <select
-                  value={activeOrderId}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    setActiveOrderId(e.target.value)
-                  }
-                  className="appearance-none bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white rounded-[3px] py-1 pl-2.5 pr-8 text-xs font-bold shadow-xs focus:outline-hidden cursor-pointer max-w-[220px]"
-                >
-                  {orders.map((o: POSOrder) => (
-                    <option key={o.id} value={o.id}>
-                      {o.customer?.fullName || "Khách vãng lai"}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="w-3.5 h-3.5 text-white absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
+              <Select
+                value={String(activeOrderId)}
+                onChange={(e) => setActiveOrderId(e.target.value)}
+                options={orders.map((order: POSOrder) => ({
+                  value: order.id,
+                  label: order.customer?.fullName || "Khách vãng lai",
+                }))}
+                inputSize="sm"
+                className="mb-0 max-w-[220px]"
+              />
             )}
           </div>
 
-          <div className="p-3 border-b border-adminGray-100 bg-adminGray-50/20 shrink-0 grid grid-cols-12 gap-3 text-xs">
-            <div className="col-span-6 flex items-start gap-2.5 border-r border-adminGray-100 pr-2">
-              <div className="w-10 h-10 rounded-full bg-adminGray-100 border border-adminGray-100 flex items-center justify-center text-adminGray-600 font-bold shrink-0 shadow-inner">
+          <div className="p-3 border-b border-kit bg-kit-page shrink-0 grid grid-cols-12 gap-3 text-xs">
+            <div className="col-span-6 flex items-start gap-2.5 border-r border-kit pr-2">
+              <div className="w-10 h-10 rounded-full bg-kit-page border border-kit flex items-center justify-center text-kit-muted font-bold shrink-0 shadow-inner">
                 {activeOrder.customer?.fullName?.charAt(0) || (
-                  <UserIcon className="w-5 h-5 text-adminGray-400" />
+                  <UserIcon className="w-5 h-5 text-kit-muted" />
                 )}
               </div>
               <div className="space-y-0.5 min-w-0">
-                <div className="font-bold text-adminGreen-600 truncate">
+                <div className="font-bold text-kit-primary truncate">
                   {activeOrder.customer?.fullName || "Khách vãng lai"}
                 </div>
                 {activeOrder.customer?.phone && (
-                  <div className="text-xs text-adminGray-600 font-medium">
+                  <div className="text-xs text-kit-muted font-medium">
                     {activeOrder.customer.phone}
                   </div>
                 )}
                 {activeOrder.customer != null && (
-                  <div className="text-xs text-state-danger-text font-bold">
+                  <div className="text-xs text-kit-danger font-bold">
                     Điểm: {activeOrder.customer.loyaltyPoint ?? 0} điểm
                   </div>
                 )}
@@ -799,15 +803,15 @@ export function CashierPOS({
             </div>
 
             <div className="col-span-6 space-y-1 text-xs">
-              <div className="flex justify-between gap-1 text-adminGray-600">
+              <div className="flex justify-between gap-1 text-kit-muted">
                 <span>Ngày:</span>
-                <span className="font-semibold text-adminInk">
+                <span className="font-semibold text-kit-heading">
                   {formatDate().format("DD/MM/YYYY HH:mm")}
                 </span>
               </div>
-              <div className="flex justify-between gap-1 text-adminGray-600">
+              <div className="flex justify-between gap-1 text-kit-muted">
                 <span>Thu ngân:</span>
-                <span className="font-semibold text-adminInk truncate">
+                <span className="font-semibold text-kit-heading truncate">
                   {cashierName}
                 </span>
               </div>
@@ -816,92 +820,101 @@ export function CashierPOS({
 
           <div className="flex-1 overflow-y-auto min-h-0 bg-white">
             {activeOrder.items.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-adminGray-400 p-6">
-                <div className="w-16 h-16 rounded-full bg-adminGray-50 flex items-center justify-center mb-2.5">
-                  <Barcode className="w-8 h-8 text-adminGray-300" />
+              <div className="h-full flex flex-col items-center justify-center text-kit-muted p-6">
+                <div className="w-16 h-16 rounded-full bg-kit-page flex items-center justify-center mb-2.5">
+                  <Barcode className="w-8 h-8 text-kit-muted" />
                 </div>
-                <p className="text-xs font-semibold text-adminGray-600">
+                <p className="text-xs font-semibold text-kit-muted">
                   Đơn hàng chưa có sản phẩm & dịch vụ nào.
                 </p>
               </div>
             ) : (
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-adminGray-50/80 border-b border-adminGray-100 text-2xs text-adminGray-600 font-bold uppercase tracking-wider sticky top-0 z-10 backdrop-blur-xs">
-                    <th className="py-2.5 px-3">Sản phẩm & dịch vụ</th>
-                    <th className="py-2.5 px-2 text-center w-24">Số lượng</th>
-                    <th className="py-2.5 px-2 text-center w-24">Nhân viên</th>
-                    <th className="py-2.5 px-3 text-right w-28">Thành tiền</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-adminGray-100 text-xs">
+              <Table hover size="sm" className="text-xs">
+                <TableHead className="sticky top-0 z-10 bg-kit-page backdrop-blur-xs">
+                  <TableRow className="text-2xs uppercase tracking-wider">
+                    <TableHeaderCell className="py-2.5 px-3">
+                      Sản phẩm & dịch vụ
+                    </TableHeaderCell>
+                    <TableHeaderCell className="w-24 py-2.5 px-2 text-center">
+                      Số lượng
+                    </TableHeaderCell>
+                    <TableHeaderCell className="w-24 py-2.5 px-2 text-center">
+                      Nhân viên
+                    </TableHeaderCell>
+                    <TableHeaderCell className="w-28 py-2.5 px-3 text-right">
+                      Thành tiền
+                    </TableHeaderCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody className="divide-y divide-kit text-xs">
                   {activeOrder.items.map((item: POSOrderItem) => (
-                    <tr
+                    <TableRow
                       key={`${item.itemType}-${item.id}`}
-                      className="hover:bg-adminGray-50/50 group transition-colors"
+                      className="group transition-colors"
                     >
-                      <td className="py-3 px-3">
-                        <div className="font-bold text-adminInk leading-tight">
+                      <TableCell className="py-3 px-3">
+                        <div className="font-bold text-kit-heading leading-tight">
                           {item.name}
                         </div>
-                        <div className="text-2xs text-adminGray-400 font-medium mt-0.5">
+                        <div className="text-2xs text-kit-muted font-medium mt-0.5">
                           Mã: {item.code} | Giá:{" "}
                           {item.price.toLocaleString("vi-VN")}đ
                         </div>
-                      </td>
-                      <td className="py-3 px-2 text-center">
-                        <div className="flex items-center justify-center border border-adminGray-100 rounded-[3px] bg-white w-20 mx-auto shadow-inner">
-                          <button
+                      </TableCell>
+                      <TableCell className="py-3 px-2 text-center">
+                        <div className="mx-auto flex w-24 items-center justify-center gap-0.5">
+                          <Button
                             type="button"
+                            size="sm"
+                            variant="outline"
+                            className="mb-0 mr-0 px-2 py-0.5"
                             onClick={() =>
                               updateCartItemQuantity(item.itemType, item.id, -1)
                             }
-                            className="px-2 py-1 text-adminGray-600 hover:bg-adminGray-100 hover:text-adminInk font-bold text-xs"
                           >
                             -
-                          </button>
-                          <span className="flex-1 font-bold text-center text-xs text-adminInk select-none">
+                          </Button>
+                          <span className="min-w-6 select-none text-center text-xs font-bold text-kit-heading">
                             {item.quantity}
                           </span>
-                          <button
+                          <Button
                             type="button"
+                            size="sm"
+                            variant="outline"
+                            className="mb-0 mr-0 px-2 py-0.5"
                             onClick={() =>
                               updateCartItemQuantity(item.itemType, item.id, 1)
                             }
-                            className="px-2 py-1 text-adminGray-600 hover:bg-adminGray-100 hover:text-adminInk font-bold text-xs"
                           >
                             +
-                          </button>
+                          </Button>
                         </div>
-                      </td>
-                      <td className="py-3 px-2 text-center relative">
-                        <div className="inline-block relative">
-                          <select
-                            value={item.staffId || ""}
-                            onChange={(
-                              e: React.ChangeEvent<HTMLSelectElement>,
-                            ) => {
-                              const val = e.target.value;
-                              if (val)
-                                updateCartItemStaff(
-                                  item.itemType,
-                                  item.id,
-                                  Number(val),
-                                );
-                            }}
-                            className="appearance-none bg-adminGray-50 border border-adminGray-100 rounded-[3px] py-1 pl-2 pr-6 text-2xs font-bold text-adminInk shadow-xs cursor-pointer hover:bg-adminGray-100 focus:outline-hidden"
-                          >
-                            <option value="">Chọn...</option>
-                            {staffs.map((s: StaffDto) => (
-                              <option key={s.id} value={s.id ?? ""}>
-                                {s.fullName}
-                              </option>
-                            ))}
-                          </select>
-                          <ChevronDown className="w-3 h-3 text-adminGray-600 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                        </div>
-                      </td>
-                      <td className="py-3 px-3 text-right font-bold text-adminInk">
+                      </TableCell>
+                      <TableCell className="py-3 px-2 text-center">
+                        <Select
+                          value={item.staffId ? String(item.staffId) : ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) {
+                              updateCartItemStaff(
+                                item.itemType,
+                                item.id,
+                                Number(val),
+                              );
+                            }
+                          }}
+                          options={[
+                            { value: "", label: "Chọn..." },
+                            ...staffs.map((staff: StaffDto) => ({
+                              value: String(staff.id ?? ""),
+                              label: staff.fullName ?? "",
+                            })),
+                          ]}
+                          inputSize="sm"
+                          className="mb-0"
+                        />
+                      </TableCell>
+                      <TableCell className="py-3 px-3 text-right font-bold text-kit-heading">
                         <div className="flex items-center justify-end gap-1.5">
                           <span>
                             {(item.price * item.quantity).toLocaleString(
@@ -909,8 +922,11 @@ export function CashierPOS({
                             )}
                             đ
                           </span>
-                          <button
+                          <Button
                             type="button"
+                            size="sm"
+                            variant="ghost"
+                            className="mb-0 mr-0 p-1"
                             onClick={() =>
                               updateCartItemQuantity(
                                 item.itemType,
@@ -918,85 +934,82 @@ export function CashierPOS({
                                 -item.quantity,
                               )
                             }
-                            className="p-1 text-adminGray-400 hover:text-lotus-error transition-colors rounded hover:bg-adminGray-100"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
                         </div>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             )}
           </div>
 
-          <div className="p-3 bg-white border-t border-adminGray-100 shrink-0 text-xs space-y-1.5">
-            <div className="flex justify-between items-center text-adminGray-600 font-medium">
+          <div className="p-3 bg-white border-t border-kit shrink-0 text-xs space-y-1.5">
+            <div className="flex justify-between items-center text-kit-muted font-medium">
               <span>Thành tiền</span>
-              <span className="font-bold text-adminInk">
+              <span className="font-bold text-kit-heading">
                 {subTotal.toLocaleString("vi-VN")} đ
               </span>
             </div>
-            <div className="flex justify-between items-center text-adminGray-600 font-medium">
+            <div className="flex justify-between items-center text-kit-muted font-medium">
               <button
                 type="button"
                 onClick={() => setIsDiscountModalOpen(true)}
-                className="text-state-danger-text hover:underline flex items-center gap-0.5"
+                className="text-kit-danger hover:underline flex items-center gap-0.5"
               >
                 {activeOrder.promotionCode
                   ? `KM: ${activeOrder.promotionCode}`
                   : "Giảm giá"}
-                <span className="text-2xs text-adminGray-400 font-normal">
+                <span className="text-2xs text-kit-muted font-normal">
                   ({activeOrder.discountAmount > 0 ? "Đổi" : "Chọn KM"})
                 </span>
               </button>
-              <span className="font-bold text-state-danger-text">
+              <span className="font-bold text-kit-danger">
                 -{activeOrder.discountAmount.toLocaleString("vi-VN")} đ
               </span>
             </div>
-            <div className="flex justify-between items-center text-adminGray-600 font-medium">
-              <span className="text-state-info-text flex items-center gap-0.5">
+            <div className="flex justify-between items-center text-kit-muted font-medium">
+              <span className="text-kit-info flex items-center gap-0.5">
                 Giảm hạng TV
               </span>
-              <span className="font-bold text-adminGreen-600">
+              <span className="font-bold text-kit-primary">
                 -{activeOrder.membershipDiscountAmount.toLocaleString("vi-VN")}{" "}
                 đ
               </span>
             </div>
 
-            <div className="flex justify-between items-center pt-2 border-t border-adminGray-100 text-sm font-bold text-adminInk">
+            <div className="flex justify-between items-center pt-2 border-t border-kit text-sm font-bold text-kit-heading">
               <div className="flex items-center gap-2">
                 <span className="text-base font-bold">Tổng tiền</span>
                 {activeOrder.customer &&
                   (activeOrder.customer.loyaltyPoint ?? 0) > 0 && (
-                    <label className="flex items-center gap-1 text-xs text-adminGray-600 font-normal cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={activeOrder.useLoyaltyPoints}
-                        onChange={toggleLoyaltyPoints}
-                        className="w-3.5 h-3.5 text-adminGreen-600 border-adminGray-300 rounded focus:ring-adminGreen-600"
-                      />
-                      <span>Điểm thưởng: {pointsUsed} điểm</span>
-                    </label>
+                    <Checkbox
+                      checked={activeOrder.useLoyaltyPoints}
+                      onChange={() => toggleLoyaltyPoints()}
+                      label={`Điểm thưởng: ${pointsUsed} điểm`}
+                      inline
+                      className="mb-0 text-xs font-normal text-kit-muted"
+                    />
                   )}
               </div>
-              <span className="text-lg font-bold text-adminGreen-600">
+              <span className="text-lg font-bold text-kit-primary">
                 {totalAmount.toLocaleString("vi-VN")} đ
               </span>
             </div>
 
             {activeOrder.alreadyPaidAmount > 0 && (
               <>
-                <div className="flex justify-between items-center text-adminGray-600 font-medium">
+                <div className="flex justify-between items-center text-kit-muted font-medium">
                   <span>Đã thu (cọc):</span>
-                  <span className="font-bold text-adminGreen-600">
+                  <span className="font-bold text-kit-primary">
                     -{activeOrder.alreadyPaidAmount.toLocaleString("vi-VN")} đ
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-sm font-bold text-adminInk">
+                <div className="flex justify-between items-center text-sm font-bold text-kit-heading">
                   <span>Còn lại cần thu:</span>
-                  <span className="text-lg font-bold text-adminGreen-600">
+                  <span className="text-lg font-bold text-kit-primary">
                     {amountDue.toLocaleString("vi-VN")} đ
                   </span>
                 </div>
@@ -1004,15 +1017,21 @@ export function CashierPOS({
             )}
 
             <div className="flex items-center justify-between gap-1.5 pt-3">
-              <button
+              <Button
+                size="sm"
+                variant="warning"
+                className="mb-0 mr-0"
                 onClick={() => handleRemoveOrder(activeOrderId)}
-                className="bg-state-warning-solid hover:bg-state-warning-solid text-white py-2 px-3 rounded-[3px] flex items-center justify-center gap-1 text-xs font-bold shadow-xs"
               >
-                <Trash2 className="w-3.5 h-3.5" />
-                <span>Hủy</span>
-              </button>
+                <Trash2 className="mr-1 h-3.5 w-3.5" />
+                Hủy
+              </Button>
 
-              <button
+              <Button
+                size="sm"
+                variant="primary"
+                className="mb-0 mr-0"
+                loading={createInvoiceMutation.isPending || isPayingInvoice}
                 onClick={() => {
                   if (activeOrder.items.length === 0) {
                     toast.error("Vui lòng chọn ít nhất 1 mặt hàng.");
@@ -1021,103 +1040,60 @@ export function CashierPOS({
                   setTempPaidAmount(amountDue);
                   setIsCheckoutModalOpen(true);
                 }}
-                disabled={createInvoiceMutation.isPending || isPayingInvoice}
-                className="bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white py-2 px-4 rounded-[3px] flex items-center justify-center gap-1.5 text-xs font-bold shadow-xs disabled:opacity-50"
               >
-                <span>Thanh toán</span>
-              </button>
+                Thanh toán
+              </Button>
             </div>
           </div>
         </div>
 
-        <div className="lg:col-span-6 bg-white border border-adminGray-100 rounded-[3px] shadow-xs flex flex-col overflow-hidden h-full">
-          <div className="p-3 bg-white border-b border-adminGray-100 flex flex-col gap-3 shrink-0">
+        <div className="lg:col-span-6 bg-white border border-kit rounded-[3px] shadow-xs flex flex-col overflow-hidden h-full">
+          <div className="p-3 bg-white border-b border-kit flex flex-col gap-3 shrink-0">
             <div className="relative">
-              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                <Search className="w-4 h-4 text-adminGray-400" />
+              <div className="absolute inset-y-0 left-3 z-10 flex items-center pointer-events-none">
+                <Search className="w-4 h-4 text-kit-muted" />
               </div>
-              <input
+              <Input
                 type="text"
                 value={searchQuery}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setSearchQuery(e.target.value)
-                }
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Quét mã hoặc Tìm kiếm theo tên hoặc mã sản phẩm & dịch vụ"
-                className="w-full text-xs bg-adminGray-50 border border-adminGray-300 rounded-[3px] py-2.5 pl-9 pr-4 text-adminInk focus:outline-hidden focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 transition shadow-inner"
+                inputSize="sm"
+                className="pl-9"
               />
             </div>
 
-            <div className="flex bg-adminGray-100 p-1 rounded-md border border-adminGray-100/60 shadow-xs">
-              <button
-                onClick={() => {
-                  setActiveTab("services");
-                  setActiveCategoryId(null);
-                }}
-                className={cn(
-                  "flex-1 py-2 text-xs font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 focus:outline-hidden",
-                  activeTab === "services"
-                    ? "bg-gradient-to-r from-adminGreen-600 to-adminGreen-700 text-white shadow-md transform scale-[1.02]"
-                    : "text-adminGray-600 hover:bg-adminGray-100/50 hover:text-adminInk",
-                )}
-              >
-                <Sparkles
-                  className={cn(
-                    "w-3.5 h-3.5 transition-transform duration-200",
-                    activeTab === "services" && "animate-pulse",
-                  )}
-                />
-                <span>Dịch vụ</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setActiveTab("products");
-                  setActiveCategoryId(null);
-                }}
-                className={cn(
-                  "flex-1 py-2 text-xs font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 focus:outline-hidden",
-                  activeTab === "products"
-                    ? "bg-gradient-to-r from-adminGreen-600 to-adminGreen-700 text-white shadow-md transform scale-[1.02]"
-                    : "text-adminGray-600 hover:bg-adminGray-100/50 hover:text-adminInk",
-                )}
-              >
-                <Package className="w-3.5 h-3.5" />
-                <span>Sản phẩm</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setActiveTab("courses");
-                  setActiveCategoryId(null);
-                }}
-                className={cn(
-                  "flex-1 py-2 text-xs font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 focus:outline-hidden",
-                  activeTab === "courses"
-                    ? "bg-gradient-to-r from-adminGreen-600 to-adminGreen-700 text-white shadow-md transform scale-[1.02]"
-                    : "text-adminGray-600 hover:bg-adminGray-100/50 hover:text-adminInk",
-                )}
-              >
-                <CreditCard className="w-3.5 h-3.5" />
-                <span>Thẻ dịch vụ</span>
-              </button>
-            </div>
+            <TabNav
+              items={[
+                { id: "services", label: "Dịch vụ" },
+                { id: "products", label: "Sản phẩm" },
+                { id: "courses", label: "Thẻ dịch vụ" },
+              ]}
+              activeId={activeTab}
+              onChange={(id: string) => {
+                setActiveTab(id as "services" | "products" | "courses");
+                setActiveCategoryId(null);
+              }}
+              variant="btn-group-primary"
+              className="w-full"
+            />
 
             {renderCategoryChips()}
           </div>
 
-          <div className="flex-1 overflow-y-auto min-h-0 p-3 bg-adminGray-50/10">
+          <div className="flex-1 overflow-y-auto min-h-0 p-3 bg-kit-page">
             {loadingServices || loadingProducts || loadingCourses ? (
               <div className="grid grid-cols-2 gap-3">
                 {[1, 2, 3, 4].map((i: number) => (
                   <div
                     key={i}
-                    className="bg-white border border-adminGray-100 h-28 rounded-[3px] animate-pulse"
+                    className="bg-white border border-kit h-28 rounded-[3px] animate-pulse"
                   />
                 ))}
               </div>
             ) : filteredCatalogItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center text-adminGray-400 py-12">
-                <SlidersHorizontal className="w-10 h-10 text-adminGray-300 mb-2" />
+              <div className="flex flex-col items-center justify-center text-kit-muted py-12">
+                <SlidersHorizontal className="w-10 h-10 text-kit-muted mb-2" />
                 <p className="text-xs font-semibold">
                   Không tìm thấy kết quả phù hợp
                 </p>
@@ -1157,17 +1133,17 @@ export function CashierPOS({
                         className={cn(
                           "bg-white border rounded-[3px] p-2 flex items-start gap-2.5 cursor-pointer hover:shadow-xs transition-all duration-150 select-none relative min-h-[72px]",
                           cartQty > 0
-                            ? "border-adminGreen-600 ring-1 ring-adminGreen-600/40"
-                            : "border-adminGray-100",
+                            ? "border-kit-primary ring-1 ring-kit-primary/40"
+                            : "border-kit",
                         )}
                       >
                         {cartQty > 0 && (
-                          <div className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-adminGreen-600 text-white flex items-center justify-center text-2xs font-bold shadow-xs z-10">
+                          <div className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-kit-primary text-white flex items-center justify-center text-2xs font-bold shadow-xs z-10">
                             {cartQty}
                           </div>
                         )}
 
-                        <div className="w-12 h-12 rounded-[3px] overflow-hidden bg-adminGray-100 flex items-center justify-center shrink-0 shadow-inner">
+                        <div className="w-12 h-12 rounded-[3px] overflow-hidden bg-kit-page flex items-center justify-center shrink-0 shadow-inner">
                           <FallbackImage
                             kind={itemType === 2 ? "product" : "service"}
                             src={imageUrl}
@@ -1177,13 +1153,13 @@ export function CashierPOS({
                         </div>
 
                         <div className="flex-1 min-w-0 space-y-0.5">
-                          <div className="font-bold text-xs text-adminInk uppercase tracking-wide truncate">
+                          <div className="font-bold text-xs text-kit-heading uppercase tracking-wide truncate">
                             {item.name}
                           </div>
-                          <div className="text-2xs text-adminGray-400 font-medium">
+                          <div className="text-2xs text-kit-muted font-medium">
                             {item.code}
                           </div>
-                          <div className="text-xs font-bold text-adminInk pt-1">
+                          <div className="text-xs font-bold text-kit-heading pt-1">
                             {item.sellingPrice?.toLocaleString("vi-VN")} đ
                           </div>
                         </div>
@@ -1195,7 +1171,7 @@ export function CashierPOS({
             )}
           </div>
 
-          <div className="bg-white border-t border-adminGray-100 p-2.5 text-2xs text-adminGray-600 font-medium flex items-center justify-end shrink-0">
+          <div className="bg-white border-t border-kit p-2.5 text-2xs text-kit-muted font-medium flex items-center justify-end shrink-0">
             <span>Hoa Sen Spa POS © 2026</span>
           </div>
         </div>
@@ -1215,164 +1191,162 @@ export function CashierPOS({
         onClear={clearDiscount}
       />
 
-      {isCheckoutModalOpen && (
-        <div className="fixed inset-0 bg-adminInk/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-adminGray-100 rounded-[3px] shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-4 bg-adminGray-50 border-b border-adminGray-100 flex items-center justify-between">
-              <span className="font-bold text-xs text-adminInk uppercase tracking-wider">
-                Xác nhận thanh toán
+      <Modal
+        open={isCheckoutModalOpen}
+        onClose={() => setIsCheckoutModalOpen(false)}
+        title="Xác nhận thanh toán"
+        size="md"
+        footer={
+          <>
+            <Button
+              size="sm"
+              variant="outline"
+              className="mb-0"
+              onClick={() => setIsCheckoutModalOpen(false)}
+            >
+              Hủy
+            </Button>
+            <Button
+              size="sm"
+              variant="primary"
+              className="mb-0"
+              loading={createInvoiceMutation.isPending || isPayingInvoice}
+              onClick={handleCheckoutSubmit}
+            >
+              Xác nhận & Thu tiền
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div className="rounded border border-kit-primary/10 bg-kit-primary/5 p-3">
+            <div className="flex items-center justify-between text-xs font-semibold text-kit-muted">
+              <span>Khách hàng:</span>
+              <span className="font-bold text-kit-heading">
+                {activeOrder.customer?.fullName || "Khách vãng lai"}
               </span>
-              <button
-                onClick={() => setIsCheckoutModalOpen(false)}
-                className="text-adminGray-400 hover:text-adminGray-600 transition"
-              >
-                <X className="w-4 h-4" />
-              </button>
             </div>
-
-            <div className="p-4 space-y-4">
-              <div className="p-3 bg-adminGreen-50 rounded-[3px] border border-adminGreen-600/10">
-                <div className="flex justify-between items-center text-xs font-semibold text-adminGray-600">
-                  <span>Khách hàng:</span>
-                  <span className="font-bold text-adminInk">
-                    {activeOrder.customer?.fullName || "Khách vãng lai"}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center text-xs font-semibold text-adminGray-600 mt-1">
-                  <span>Tổng tiền hóa đơn:</span>
-                  <span className="font-bold text-adminInk">
-                    {totalAmount.toLocaleString("vi-VN")}đ
-                  </span>
-                </div>
-                {activeOrder.alreadyPaidAmount > 0 && (
-                  <div className="flex justify-between items-center text-xs font-semibold text-adminGray-600 mt-1">
-                    <span>Đã thu (cọc):</span>
-                    <span className="font-bold text-adminGreen-600">
-                      -{activeOrder.alreadyPaidAmount.toLocaleString("vi-VN")}đ
-                    </span>
-                  </div>
-                )}
-                <div className="flex justify-between items-center text-xs font-semibold text-adminGray-600 mt-1">
-                  <span>Số tiền cần thanh toán:</span>
-                  <span className="font-bold text-adminGreen-600 text-sm">
-                    {amountDue.toLocaleString("vi-VN")}đ
-                  </span>
-                </div>
+            <div className="mt-1 flex items-center justify-between text-xs font-semibold text-kit-muted">
+              <span>Tổng tiền hóa đơn:</span>
+              <span className="font-bold text-kit-heading">
+                {totalAmount.toLocaleString("vi-VN")}đ
+              </span>
+            </div>
+            {activeOrder.alreadyPaidAmount > 0 && (
+              <div className="mt-1 flex items-center justify-between text-xs font-semibold text-kit-muted">
+                <span>Đã thu (cọc):</span>
+                <span className="font-bold text-kit-primary">
+                  -{activeOrder.alreadyPaidAmount.toLocaleString("vi-VN")}đ
+                </span>
               </div>
+            )}
+            <div className="mt-1 flex items-center justify-between text-xs font-semibold text-kit-muted">
+              <span>Số tiền cần thanh toán:</span>
+              <span className="text-sm font-bold text-kit-primary">
+                {amountDue.toLocaleString("vi-VN")}đ
+              </span>
+            </div>
+          </div>
 
-              <div className="space-y-2">
-                <label className="text-2xs font-bold text-adminGray-600 uppercase tracking-wider">
-                  Phương thức thanh toán
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    {
-                      method: PAYMENT_METHOD.CASH,
-                      label: "Tiền mặt",
-                      icon: DollarSign,
-                    },
-                    {
-                      method: PAYMENT_METHOD.BANK_TRANSFER,
-                      label: "Chuyển khoản",
-                      icon: ArrowRight,
-                    },
-                    {
-                      method: PAYMENT_METHOD.VNPAY,
-                      label: "VNPAY QR",
-                      icon: CreditCard,
-                    },
-                  ].map((item) => (
-                    <button
-                      key={item.method}
+          <FormField label="Phương thức thanh toán">
+            <div className="grid grid-cols-2 gap-2">
+              {(
+                [
+                  {
+                    method: PAYMENT_METHOD.CASH,
+                    label: "Tiền mặt",
+                    icon: DollarSign,
+                  },
+                  {
+                    method: PAYMENT_METHOD.BANK_TRANSFER,
+                    label: "Chuyển khoản",
+                    icon: ArrowRight,
+                  },
+                  {
+                    method: PAYMENT_METHOD.VNPAY,
+                    label: "VNPAY QR",
+                    icon: CreditCard,
+                  },
+                ] as const
+              ).map(
+                (paymentOption: {
+                  method: number;
+                  label: string;
+                  icon: typeof DollarSign;
+                }) => {
+                  const PaymentIcon = paymentOption.icon;
+                  return (
+                    <Button
+                      key={paymentOption.method}
+                      size="sm"
+                      variant={
+                        activeOrder.paymentMethod === paymentOption.method
+                          ? "primary"
+                          : "outline"
+                      }
+                      className="mb-0 mr-0 justify-start"
                       onClick={() =>
                         setOrders((prev: POSOrder[]) =>
-                          prev.map((o: POSOrder) =>
-                            o.id === activeOrderId
-                              ? { ...o, paymentMethod: item.method }
-                              : o,
+                          prev.map((order: POSOrder) =>
+                            order.id === activeOrderId
+                              ? {
+                                  ...order,
+                                  paymentMethod: paymentOption.method,
+                                }
+                              : order,
                           ),
                         )
                       }
-                      className={cn(
-                        "flex items-center gap-2 p-2.5 border rounded-[3px] text-xs font-bold transition duration-200",
-                        activeOrder.paymentMethod === item.method
-                          ? "border-adminGreen-600 bg-adminGreen-50/40 text-adminGreen-600"
-                          : "border-adminGray-100 bg-white text-adminGray-600 hover:bg-adminGray-50",
-                      )}
                     >
-                      <item.icon className="w-4 h-4 shrink-0" />
-                      <span>{item.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-2xs font-bold text-adminGray-600 uppercase tracking-wider">
-                  Khách thanh toán (VND)
-                </label>
-                <input
-                  type="number"
-                  value={tempPaidAmount}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setTempPaidAmount(Number(e.target.value))
-                  }
-                  className="w-full text-sm border border-adminGray-300 rounded-[3px] p-2 font-bold text-adminInk focus:outline-hidden focus:border-adminGreen-600"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-2xs font-bold text-adminGray-600 uppercase tracking-wider">
-                  Ghi chú đơn hàng
-                </label>
-                <textarea
-                  value={activeOrder.note}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                    const val = e.target.value;
-                    setOrders((prev: POSOrder[]) =>
-                      prev.map((o: POSOrder) =>
-                        o.id === activeOrderId ? { ...o, note: val } : o,
-                      ),
-                    );
-                  }}
-                  placeholder="Ghi chú thêm về dịch vụ, yêu cầu khách hàng..."
-                  rows={2}
-                  className="w-full text-xs border border-adminGray-300 rounded-[3px] p-2 text-adminInk focus:outline-hidden focus:border-adminGreen-600 placeholder:text-adminGray-400"
-                />
-              </div>
-
-              {activeOrder.paymentMethod === PAYMENT_METHOD.CASH &&
-                tempPaidAmount > amountDue && (
-                  <div className="flex justify-between items-center text-xs font-bold text-adminGray-600 border-t border-dashed border-adminGray-100 pt-3">
-                    <span>Tiền thừa trả khách:</span>
-                    <span className="text-adminGreen-600 text-sm font-bold">
-                      {(tempPaidAmount - amountDue).toLocaleString("vi-VN")}đ
-                    </span>
-                  </div>
-                )}
+                      <PaymentIcon className="mr-2 h-4 w-4 shrink-0" />
+                      {paymentOption.label}
+                    </Button>
+                  );
+                },
+              )}
             </div>
+          </FormField>
 
-            <div className="p-3 bg-adminGray-50 border-t border-adminGray-100 flex justify-end gap-2">
-              <button
-                onClick={() => setIsCheckoutModalOpen(false)}
-                className="px-4 py-2 border border-adminGray-100 rounded-[3px] text-xs font-bold text-adminGray-600 hover:bg-adminGray-100 transition"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={handleCheckoutSubmit}
-                disabled={createInvoiceMutation.isPending || isPayingInvoice}
-                className="px-5 py-2 bg-adminGreen-600 text-white rounded-[3px] text-xs font-bold hover:bg-adminGreen-600/90 transition flex items-center gap-1.5 disabled:opacity-50"
-              >
-                {(createInvoiceMutation.isPending || isPayingInvoice) && (
-                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                )}
-                <span>Xác nhận & Thu tiền</span>
-              </button>
-            </div>
-          </div>
+          <FormField label="Khách thanh toán (VND)">
+            <CurrencyInput
+              value={tempPaidAmount}
+              onChange={(value: number | undefined) =>
+                setTempPaidAmount(value ?? 0)
+              }
+              inputSize="sm"
+            />
+          </FormField>
+
+          <FormField label="Ghi chú đơn hàng">
+            <Textarea
+              value={activeOrder.note}
+              onChange={(e) => {
+                const val = e.target.value;
+                setOrders((prev: POSOrder[]) =>
+                  prev.map((order: POSOrder) =>
+                    order.id === activeOrderId
+                      ? { ...order, note: val }
+                      : order,
+                  ),
+                );
+              }}
+              placeholder="Ghi chú thêm về dịch vụ, yêu cầu khách hàng..."
+              rows={2}
+              inputSize="sm"
+            />
+          </FormField>
+
+          {activeOrder.paymentMethod === PAYMENT_METHOD.CASH &&
+            tempPaidAmount > amountDue && (
+              <div className="flex items-center justify-between border-t border-dashed border-kit pt-3 text-xs font-bold text-kit-muted">
+                <span>Tiền thừa trả khách:</span>
+                <span className="text-sm font-bold text-kit-primary">
+                  {(tempPaidAmount - amountDue).toLocaleString("vi-VN")}đ
+                </span>
+              </div>
+            )}
         </div>
-      )}
+      </Modal>
     </div>
   );
 }

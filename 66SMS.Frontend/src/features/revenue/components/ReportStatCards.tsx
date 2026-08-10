@@ -1,26 +1,30 @@
-type StatCard = {
+import { StatCard } from "@/shared/widgets/StatCard";
+import type { WidgetTone, WidgetValueTone } from "@/shared/widgets/WidgetContent";
+
+export type ReportStatCardItem = {
   title: string;
   value: string;
-  className?: string;
+  description?: string;
+  tone?: WidgetTone;
+  valueTone?: WidgetValueTone;
 };
 
 type Props = {
-  cards: StatCard[];
+  cards: ReportStatCardItem[];
 };
 
 export function ReportStatCards({ cards }: Props) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-      {cards.map((card: StatCard) => (
-        <div
+    <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
+      {cards.map((card: ReportStatCardItem) => (
+        <StatCard
           key={card.title}
-          className={`rounded-lg p-4 text-white ${card.className ?? "bg-sky-500"}`}
-        >
-          <div className="text-xs font-semibold uppercase tracking-wide opacity-90">
-            {card.title}
-          </div>
-          <div className="mt-2 text-2xl font-bold">{card.value}</div>
-        </div>
+          title={card.title}
+          value={card.value}
+          description={card.description}
+          tone={card.tone ?? "default"}
+          valueTone={card.valueTone}
+        />
       ))}
     </div>
   );

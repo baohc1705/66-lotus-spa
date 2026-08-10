@@ -22,19 +22,19 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     question: "Tôi cần đặt lịch trước bao lâu?",
     answer:
-      "Nên đặt trước ít nhất 24 giờ, đặc biệt cuối tuần. Bạn đặt online hoặc gọi 0907 95 93 95 — chúng tôi xác nhận trong 2 giờ làm việc.",
+      "Nên đặt trước ít nhất 24 giờ, đặc biệt cuối tuần. Đặt online hoặc gọi 0907 95 93 95.",
     Icon: CalendarDays,
   },
   {
-    question: "Spa có nhận khách walk-in không?",
+    question: "Spa có nhận khách đến trực tiếp không?",
     answer:
-      "Có, nếu còn lịch trống. Đặt trước giúp bạn chọn đúng kỹ thuật viên và khung giờ mong muốn.",
+      "Có, nếu còn lịch trống. Đặt trước giúp chọn đúng kỹ thuật viên và khung giờ.",
     Icon: Footprints,
   },
   {
     question: "Liệu trình có phù hợp khi mang thai?",
     answer:
-      "Có liệu trình prenatal chuyên biệt sau tuần 12, do kỹ thuật viên được chứng nhận thực hiện.",
+      "Có liệu trình dành cho mẹ bầu sau tuần 12, do kỹ thuật viên được chứng nhận thực hiện.",
     Icon: HeartPulse,
   },
   {
@@ -46,7 +46,7 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     question: "Có bán sản phẩm mang về không?",
     answer:
-      "Có — tinh dầu sen, kem dưỡng và serum tại quầy. Khách dùng dịch vụ được giảm 10% lần mua đầu.",
+      "Có — tinh dầu sen, kem dưỡng và serum tại quầy. Khách dùng dịch vụ giảm 10% lần mua đầu.",
     Icon: ShoppingBag,
   },
 ];
@@ -74,7 +74,7 @@ const FaqRow = ({
         onClick={onToggle}
         aria-expanded={isOpen}
         aria-controls={panelId}
-        className="landing-focus-ring flex w-full items-center gap-3 px-4 py-4 text-left sm:gap-4 sm:px-6 sm:py-5"
+        className="landing-focus-ring flex w-full items-center gap-3 px-4 py-3 text-left sm:gap-4 sm:px-5 sm:py-4"
       >
         <span
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-600/12 text-rose-600 sm:h-11 sm:w-11"
@@ -114,7 +114,7 @@ const FaqRow = ({
             transition={{ duration: 0.22 }}
             className="overflow-hidden"
           >
-            <div className="bg-rose-600/8 px-4 py-4 sm:px-6 sm:py-5">
+            <div className="bg-rose-600/8 px-4 py-3 sm:px-5 sm:py-4">
               <p className="pl-[3.25rem] font-geist text-sm leading-[1.7] text-warm-600 sm:pl-[3.75rem]">
                 {item.answer}
               </p>
@@ -140,7 +140,7 @@ export const FaqSection = () => {
           title="Câu hỏi thường gặp"
           titleId="faq-heading"
           variant="lotus"
-          className="mb-10"
+          className="mb-6"
         />
 
         <div className="w-full overflow-hidden border border-card-border bg-surface">

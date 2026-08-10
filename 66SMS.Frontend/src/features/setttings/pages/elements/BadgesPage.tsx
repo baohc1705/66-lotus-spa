@@ -126,9 +126,27 @@ export function BadgesPage() {
           ))}
         </div>
 
-        <hr className="my-4 border-gray-100" />
+        <hr className="my-4 border-kit" />
 
-        <h5 className="mb-2 text-sm font-bold uppercase text-[rgba(36,59,107,0.7)]">
+        <h5 className="mb-2 text-sm font-bold uppercase text-kit-heading">
+          Soft
+        </h5>
+        <div className="flex flex-wrap">
+          {colors.map((item) => (
+            <Badge
+              key={"s-" + item.variant}
+              variant={item.variant}
+              soft
+              className="mb-2 mr-2"
+            >
+              {item.label}
+            </Badge>
+          ))}
+        </div>
+
+        <hr className="my-4 border-kit" />
+
+        <h5 className="mb-2 text-sm font-bold uppercase text-kit-heading">
           Pills
         </h5>
         <div className="flex flex-wrap">
@@ -144,9 +162,9 @@ export function BadgesPage() {
           ))}
         </div>
 
-        <hr className="my-4 border-gray-100" />
+        <hr className="my-4 border-kit" />
 
-        <h5 className="mb-2 text-sm font-bold uppercase text-[rgba(36,59,107,0.7)]">
+        <h5 className="mb-2 text-sm font-bold uppercase text-kit-heading">
           Links
         </h5>
         <div className="flex flex-wrap">

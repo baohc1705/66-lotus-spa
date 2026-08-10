@@ -18,7 +18,7 @@ import {
 type StatCardProps = {
   title: string;
   value: ReactNode;
-  description?: string;
+  description?: ReactNode;
   icon?: ReactNode;
   className?: string;
   tone?: WidgetTone;
@@ -52,8 +52,14 @@ export function StatCard({
 
   const headingBlock = (
     <WidgetContentLeft>
-      <WidgetHeading>{title}</WidgetHeading>
-      {description ? <WidgetSubheading>{description}</WidgetSubheading> : null}
+      <WidgetHeading className={isGradient ? "!opacity-100" : undefined}>
+        {title}
+      </WidgetHeading>
+      {description ? (
+        <WidgetSubheading className={isGradient ? "!opacity-90" : "!opacity-80"}>
+          {description}
+        </WidgetSubheading>
+      ) : null}
     </WidgetContentLeft>
   );
 
@@ -62,7 +68,12 @@ export function StatCard({
       push={!numberFirst}
       className={numberFirst ? "mr-3" : undefined}
     >
-      <WidgetNumbers tone={resolvedValueTone}>{value}</WidgetNumbers>
+      <WidgetNumbers
+        tone={resolvedValueTone}
+        className={isGradient ? "drop-shadow-sm" : undefined}
+      >
+        {value}
+      </WidgetNumbers>
     </WidgetContentRight>
   );
 

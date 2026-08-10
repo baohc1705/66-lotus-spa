@@ -1,6 +1,4 @@
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { useCallback, useMemo, useState } from "react";
 
@@ -118,7 +116,7 @@ export function CustomerListPage() {
   }, [restoreTarget, restoreMutation, setRestoreTarget]);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden gap-2">
+    <div className="flex h-full flex-col gap-2 overflow-hidden font-sans text-sm text-kit-body">
       <div className="shrink-0">
         <CustomerStatCards
           totalCustomers={totalCount}
@@ -129,7 +127,7 @@ export function CustomerListPage() {
         />
       </div>
 
-      <div className="grid grid-cols-12 gap-2 flex-1 min-h-0 overflow-hidden">
+      <div className="grid min-h-0 flex-1 grid-cols-12 gap-2 overflow-hidden">
         <div className="col-span-3 h-full overflow-hidden">
           <CustomerCrmList
             customers={customers}
@@ -185,12 +183,9 @@ export function CustomerListPage() {
           if (!open) setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
-        title={CONFIRM_MSG.deleteTitle(ENTITY)}
-        description={CONFIRM_MSG.deleteDescription(
-          ENTITY,
-          deleteTarget?.fullName ?? "",
-        )}
-        confirmLabel={COMMON_MSG.delete}
+        title={`Xóa ${ENTITY}`}
+        description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget?.fullName ?? ""}"? Hành động này không thể hoàn tác.`}
+        confirmLabel="Xóa"
         loading={deleteMutation.isPending}
         variant="danger"
       />
@@ -201,12 +196,9 @@ export function CustomerListPage() {
           if (!open) setRestoreTarget(null);
         }}
         onConfirm={handleRestore}
-        title={CONFIRM_MSG.restoreTitle(ENTITY_SUBJECT)}
-        description={CONFIRM_MSG.restoreDescription(
-          ENTITY_SUBJECT,
-          restoreTarget?.fullName ?? "",
-        )}
-        confirmLabel={COMMON_MSG.restore}
+        title={`Khôi phục ${ENTITY_SUBJECT}`}
+        description={`Bạn có chắc muốn khôi phục ${ENTITY_SUBJECT} "${restoreTarget?.fullName ?? ""}"? ${ENTITY_SUBJECT} sẽ hiển thị lại trong danh sách chính.`}
+        confirmLabel="Khôi phục"
         loading={restoreMutation.isPending}
         variant="default"
       />

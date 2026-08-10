@@ -1,34 +1,39 @@
 import { useMemo } from "react";
-import { useReactTable, getCoreRowModel } from "@tanstack/react-table";
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { Plus, ImageIcon } from "lucide-react";
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { Button } from "@/shared/components/ui/button";
+
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
-import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
+import { Pagination } from "@/shared/components/Pagination";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { Button } from "@/shared/elements/Button";
+import { Select } from "@/shared/forms/Select";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
+import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
+import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
+
 import { LandingBannerFormDialog } from "../components/LandingBannerFormDialog";
+import {
+  LANDING_BANNER_COLUMN_LABELS,
+  useActiveLandingBannerColumns,
+} from "../components/useActiveLandingBannerColumns";
+import { LANDING_BANNER_PERM } from "../constants/landing-banner.permissions";
 import {
   useAdminLandingBanners,
   useDeleteLandingBannerMutation,
 } from "../hooks/useLandingBanners";
 import { useLandingBannerListState } from "../hooks/useLandingBannerListState";
-import {
-  useActiveLandingBannerColumns,
-  LANDING_BANNER_COLUMN_LABELS,
-} from "../components/useActiveLandingBannerColumns";
-import { LANDING_BANNER_PERM } from "../constants/landing-banner.permissions";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 
 const ENTITY = "banner";
 
 export function LandingBannerListPage() {
   const perm = LANDING_BANNER_PERM;
   const listState = useLandingBannerListState();
+
   const {
+    queryParams,
     pageIndex,
     setPageIndex,
     pageSize,
@@ -49,26 +54,25 @@ export function LandingBannerListPage() {
     data: bannersResult,
     isLoading,
     isFetching,
-  } = useAdminLandingBanners({
-    pageIndex,
-    pageSize,
-    filter: filter || undefined,
-  });
+  } = useAdminLandingBanners(queryParams);
 
   const deleteMutation = useDeleteLandingBannerMutation();
 
   const paged = bannersResult?.data;
   const banners = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
+  const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
   const handleConfirmDelete = () => {
-    if (deleteTarget?.id) {
-      deleteMutation.mutate(deleteTarget.id, {
-        onSuccess: (result) => {
-          if (result.isSuccess) setDeleteTarget(null);
-        },
-      });
-    }
+    if (!deleteTarget?.id) return;
+    deleteMutation.mutate(deleteTarget.id, {
+      onSuccess: (result) => {
+        if (result.isSuccess) setDeleteTarget(null);
+      },
+    });
   };
 
   const columns = useActiveLandingBannerColumns({
@@ -85,17 +89,16 @@ export function LandingBannerListPage() {
   const table = useReactTable({
     data: banners,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    enableMultiRowSelection: false,
-    columnResizeMode: "onChange",
     state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
   });
 
   return (
-    <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-      <div className="bg-white/70 backdrop-blur-md rounded-admin border border-adminGray-100/30 overflow-hidden relative">
-        <div className="px-4 pt-4">
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
+      <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+        <div className="border-b border-kit px-4 pt-4">
           <DataTableToolbar
             searchValue={filter}
             onSearchChange={handleSearchChange}
@@ -106,10 +109,10 @@ export function LandingBannerListPage() {
               <Button
                 variant="admin"
                 size="sm"
+                className="mb-0"
                 onClick={() => setCreateOpen(true)}
-                className="lotus-admin-table-toolbar-btn"
               >
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="h-3.5 w-3.5" />
                 Thêm banner
               </Button>
             </PermissionGate>
@@ -119,49 +122,58 @@ export function LandingBannerListPage() {
         <DataTable
           table={table}
           isLoading={isLoading}
-          loadingRows={pageSize > 5 ? 5 : pageSize}
+          loadingRows={DEFAULT_LOADING_ROWS}
           emptyState={
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-adminGray-50 flex items-center justify-center">
-                <ImageIcon className="w-7 h-7 text-adminGreen-600" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-adminInk">
-                  Chưa có banner
-                </p>
-                <p className="text-xs text-adminGray-600 mt-0.5">
-                  Thêm banner để hiển thị trên Hero trang chủ.
-                </p>
-              </div>
-              <PermissionGate resource={perm.resource} action={perm.create}>
-                <Button
-                  variant="admin"
-                  size="sm"
-                  onClick={() => setCreateOpen(true)}
-                  className="mt-1 text-xs"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Thêm banner
-                </Button>
-              </PermissionGate>
-            </div>
+            <TableEmptyState
+              icon={ImageIcon}
+              title="Chưa có banner"
+              action={
+                <PermissionGate resource={perm.resource} action={perm.create}>
+                  <Button
+                    variant="admin"
+                    size="sm"
+                    className="mb-0"
+                    onClick={() => setCreateOpen(true)}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Thêm banner
+                  </Button>
+                </PermissionGate>
+              }
+            />
           }
           pagination={
-            paged && totalCount > 0 ? (
-              <DataTablePagination
-                pageIndex={paged.pageIndex}
-                pageSize={paged.pageSize}
-                totalCount={paged.totalCount}
-                totalPages={paged.totalPages}
-                hasPreviousPage={paged.hasPreviousPage}
-                hasNextPage={paged.hasNextPage}
-                onPageChange={setPageIndex}
-                onPageSizeChange={handlePageSizeChange}
-              />
+            totalCount > 0 ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <div className="flex items-center gap-3 text-xs text-kit-muted">
+                  <span>
+                    {rangeStart}-{rangeEnd} / {totalCount}
+                  </span>
+                  <Select
+                    value={String(pageSize)}
+                    onChange={(event) =>
+                      handlePageSizeChange(Number(event.target.value))
+                    }
+                    options={[
+                      { value: "5", label: "5 / trang" },
+                      { value: "10", label: "10 / trang" },
+                      { value: "20", label: "20 / trang" },
+                    ]}
+                    inputSize="sm"
+                    className="w-auto min-w-28"
+                  />
+                </div>
+                <Pagination
+                  page={safePage}
+                  pageCount={totalPages}
+                  onPageChange={setPageIndex}
+                  size="sm"
+                />
+              </div>
             ) : null
           }
         />
-      </div>
+      </TablePageShell>
 
       <LandingBannerFormDialog open={createOpen} onOpenChange={setCreateOpen} />
       <LandingBannerFormDialog
@@ -172,21 +184,20 @@ export function LandingBannerListPage() {
         bannerId={editBannerId}
       />
 
-      <ConfirmDialog
-        open={!!deleteTarget}
-        onOpenChange={(open) => {
-          if (!open) setDeleteTarget(null);
-        }}
-        onConfirm={handleConfirmDelete}
-        title={CONFIRM_MSG.deleteTitle(ENTITY)}
-        description={CONFIRM_MSG.deleteDescription(
-          ENTITY,
-          deleteTarget?.title ?? "",
-        )}
-        confirmLabel={COMMON_MSG.delete}
-        loading={deleteMutation.isPending}
-        variant="danger"
-      />
-    </TablePageShell>
+      {deleteTarget ? (
+        <ConfirmDialog
+          open={!!deleteTarget}
+          onOpenChange={(open) => {
+            if (!open) setDeleteTarget(null);
+          }}
+          onConfirm={handleConfirmDelete}
+          title={`Xóa ${ENTITY}`}
+          description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget?.title ?? ""}"? Hành động này không thể hoàn tác.`}
+          confirmLabel="Xóa"
+          loading={deleteMutation.isPending}
+          variant="danger"
+        />
+      ) : null}
+    </div>
   );
 }

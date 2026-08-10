@@ -1,9 +1,8 @@
 import { z } from "zod";
-import { VALIDATION_MSG } from "@/shared/constants/validation.messages";
 
 export const createShiftSchema = z
   .object({
-    name: z.string().min(1, VALIDATION_MSG.required("Tên ca làm việc")),
+    name: z.string().min(1, "Tên ca làm việc không được để trống"),
     description: z.string().optional().or(z.literal("")),
     shiftStart: z
       .string()
@@ -19,7 +18,7 @@ export const createShiftSchema = z
       ),
     effectiveFrom: z
       .string()
-      .min(1, VALIDATION_MSG.selectRequired("ngày áp dụng")),
+      .min(1, "Vui lòng chọn ngày áp dụng"),
     effectiveTo: z.string().optional().or(z.literal("")),
   })
   .refine(

@@ -1,41 +1,42 @@
-import { Package, TrendingUp, Warehouse } from "lucide-react";
-import { AdminStatCard } from "@/shared/components/AdminStatCard";
+import { StatCard } from "@/shared/widgets/StatCard";
 
 interface ProductStatCardsProps {
   totalProducts: number;
   activeProducts: number;
   totalStock: number;
-  isLoading: boolean;
+  isLoading?: boolean;
 }
 
 export function ProductStatCards({
   totalProducts,
   activeProducts,
   totalStock,
-  isLoading,
+  isLoading = false,
 }: ProductStatCardsProps) {
+  const dash = isLoading ? "—" : undefined;
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-      <AdminStatCard
-        label="Tổng số sản phẩm"
-        value={totalProducts}
-        icon={Package}
-        tone="gold"
-        isLoading={isLoading}
+    <div className="mb-3 grid grid-cols-2 gap-2 lg:grid-cols-3">
+      <StatCard
+        title="Tổng sản phẩm"
+        value={dash ?? totalProducts}
+        description="Trong danh sách"
+        tone="midnight-bloom"
+        valueTone="white"
       />
-      <AdminStatCard
-        label="Sản phẩm đang kinh doanh"
-        value={activeProducts}
-        icon={TrendingUp}
-        tone="green"
-        isLoading={isLoading}
+      <StatCard
+        title="Đang kinh doanh"
+        value={dash ?? activeProducts}
+        description="Trạng thái hoạt động"
+        tone="happy-green"
+        valueTone="white"
       />
-      <AdminStatCard
-        label="Tồn kho tổng"
-        value={totalStock}
-        icon={Warehouse}
-        tone="gold"
-        isLoading={isLoading}
+      <StatCard
+        title="Tồn kho tổng"
+        value={dash ?? totalStock}
+        description="Số lượng còn lại"
+        tone="tempting-azure"
+        valueTone="white"
       />
     </div>
   );

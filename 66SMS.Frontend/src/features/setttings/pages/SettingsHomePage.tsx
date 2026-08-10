@@ -20,13 +20,13 @@ export function SettingsHomePage() {
       </div>
 
       <DemoSection title="UI Components Catalog">
-        <p className="mb-4 text-sm text-gray-600">
+        <p className="mb-4 text-sm text-kit-muted">
           Sidebar bên trái mirror{" "}
           <a
             href="https://demo.dashboardpack.com/architectui-html-free/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:underline"
+            className="text-kit-primary hover:underline"
           >
             ArchitectUI Free demo
           </a>
@@ -37,9 +37,9 @@ export function SettingsHomePage() {
           {SETTINGS_MENU.map((section) => (
             <div
               key={section.heading}
-              className="rounded-md border border-gray-200 bg-gray-50 p-4"
+              className="rounded-md border border-kit bg-kit-page p-4"
             >
-              <div className="mb-2 text-xs font-bold uppercase tracking-wide text-blue-600">
+              <div className="mb-2 text-xs font-bold uppercase tracking-wide text-kit-primary">
                 {section.heading}
               </div>
               <ul className="m-0 list-none space-y-1 p-0">
@@ -48,21 +48,21 @@ export function SettingsHomePage() {
                     {item.path ? (
                       <Link
                         to={item.path}
-                        className="block rounded px-2 py-1.5 text-sm text-gray-700 no-underline hover:bg-white hover:text-blue-600"
+                        className="block rounded px-2 py-1.5 text-sm text-kit-body no-underline hover:bg-kit-white hover:text-kit-primary"
                       >
                         {item.label}
                       </Link>
                     ) : (
                       <div>
-                        <div className="px-2 py-1 text-sm font-semibold text-gray-800">
+                        <div className="px-2 py-1 text-sm font-semibold text-kit-heading">
                           {item.label}
                         </div>
-                        <ul className="ml-2 list-none border-l border-blue-200 pl-2">
+                        <ul className="ml-2 list-none border-l border-kit pl-2">
                           {item.children?.map((child) => (
                             <li key={child.path}>
                               <Link
                                 to={child.path}
-                                className="block rounded px-2 py-1 text-sm text-gray-600 no-underline hover:bg-white hover:text-blue-600"
+                                className="block rounded px-2 py-1 text-sm text-kit-muted no-underline hover:bg-kit-white hover:text-kit-primary"
                               >
                                 {child.label}
                               </Link>

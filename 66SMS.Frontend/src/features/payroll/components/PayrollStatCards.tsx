@@ -1,25 +1,19 @@
-import {
-  CalendarCheck,
-  Clock3,
-  Coins,
-  HandCoins,
-  ShoppingBag,
-  Sparkles,
-} from "lucide-react";
-import { AdminStatCard } from "@/shared/components/AdminStatCard";
+import { StatCard } from "@/shared/widgets/StatCard";
+import { formatCurrency } from "@/shared/utils/currency";
+
 import type {
   PayrollCommissionDailySummaryDto,
   PayrollCommissionSummaryDto,
 } from "../types/payroll.types";
 
-interface PayrollStatCardsProps {
+type PayrollStatCardsProps = {
   summary:
     | PayrollCommissionSummaryDto
     | PayrollCommissionDailySummaryDto
     | undefined;
   viewMode: "day" | "week" | "month";
   isLoading: boolean;
-}
+};
 
 function isDailySummary(
   summary: PayrollCommissionSummaryDto | PayrollCommissionDailySummaryDto,
@@ -33,80 +27,81 @@ export function PayrollStatCards({
   isLoading,
 }: PayrollStatCardsProps) {
   const isMonth = viewMode === "month";
+  const dash = isLoading ? "—" : undefined;
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2">
+    <div className="mb-3 grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-5">
       {isMonth ? (
         <>
-          <AdminStatCard
-            label="Tổng đơn hàng"
+          <StatCard
+            title="Tổng đơn hàng"
             value={
-              summary && isDailySummary(summary) ? summary.totalOrders : 0
+              dash ??
+              (summary && isDailySummary(summary) ? summary.totalOrders : 0)
             }
-            icon={ShoppingBag}
-            tone="gold"
-            isLoading={isLoading}
+            description="Trong tháng"
+            tone="sunny-morning"
+            valueTone="dark"
           />
-          <AdminStatCard
-            label="Giờ phục vụ"
+          <StatCard
+            title="Giờ phục vụ"
             value={
-              summary && isDailySummary(summary)
+              dash ??
+              (summary && isDailySummary(summary)
                 ? Number(summary.totalServiceHours).toFixed(1)
-                : "0"
+                : "0")
             }
-            icon={Clock3}
-            tone="info"
-            isLoading={isLoading}
+            description="Tổng giờ"
+            tone="tempting-azure"
+            valueTone="white"
           />
         </>
       ) : (
         <>
-          <AdminStatCard
-            label="Lịch hẹn"
+          <StatCard
+            title="Lịch hẹn"
             value={
-              summary && !isDailySummary(summary)
+              dash ??
+              (summary && !isDailySummary(summary)
                 ? summary.totalAppointments
-                : 0
+                : 0)
             }
-            icon={CalendarCheck}
-            tone="info"
-            isLoading={isLoading}
+            description="Đã thanh toán"
+            tone="tempting-azure"
+            valueTone="white"
           />
-          <AdminStatCard
-            label="Dịch vụ"
+          <StatCard
+            title="Dịch vụ"
             value={
-              summary && !isDailySummary(summary) ? summary.totalServices : 0
+              dash ??
+              (summary && !isDailySummary(summary) ? summary.totalServices : 0)
             }
-            icon={Sparkles}
-            tone="gold"
-            isLoading={isLoading}
+            description="Trong kỳ"
+            tone="sunny-morning"
+            valueTone="dark"
           />
         </>
       )}
-      <AdminStatCard
-        label="Hoa hồng kỳ"
-        value={summary?.totalCommission ?? 0}
-        icon={HandCoins}
-        tone="green"
-        isLoading={isLoading}
-        isCurrency
+      <StatCard
+        title="Hoa hồng kỳ"
+        value={dash ?? formatCurrency(summary?.totalCommission ?? 0)}
+        description="Theo hóa đơn đã thanh toán"
+        tone="happy-green"
+        valueTone="white"
       />
-      <AdminStatCard
-        label="Lương CB tháng"
-        value={summary?.basicSalary ?? 0}
-        icon={Coins}
-        tone="gold"
-        isLoading={isLoading}
-        isCurrency
+      <StatCard
+        title="Lương CB tháng"
+        value={dash ?? formatCurrency(summary?.basicSalary ?? 0)}
+        description="Lương cơ bản"
+        tone="midnight-bloom"
+        valueTone="white"
       />
-      <AdminStatCard
-        label="Ước tính CB + HH"
-        value={summary?.estimatedTotal ?? 0}
-        icon={Coins}
-        tone="green"
-        isLoading={isLoading}
-        isCurrency
-        valueClass="text-primary"
+      <StatCard
+        title="Ước tính CB + HH"
+        value={dash ?? formatCurrency(summary?.estimatedTotal ?? 0)}
+        description="Tạm tính"
+        tone="happy-green"
+        valueTone="white"
       />
     </div>
   );

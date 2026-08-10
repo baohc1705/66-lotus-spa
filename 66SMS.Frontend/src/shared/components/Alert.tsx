@@ -7,6 +7,8 @@ export type AlertVariant =
   | "danger"
   | "warning"
   | "info"
+  | "focus"
+  | "alternate"
   | "light"
   | "dark";
 
@@ -23,14 +25,17 @@ export function Alert({
   onClose,
   className = "",
 }: AlertProps) {
+  const softClass =
+    variant === "alternate" ? "soft-kit-alternate" : "soft-kit-" + variant;
+
   return (
     <div
       className={
         "alert relative mb-3 rounded border px-4 py-3 text-sm font-sans " +
         "alert-" +
         variant +
-        " soft-kit-" +
-        variant +
+        " " +
+        softClass +
         " " +
         className
       }

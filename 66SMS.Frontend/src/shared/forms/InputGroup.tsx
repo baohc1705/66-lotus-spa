@@ -1,5 +1,5 @@
 ﻿import type { ReactNode } from "react";
-import type { InputSize } from "./inputStyles";
+import type { InputSize } from "./Input";
 
 type InputGroupProps = {
   children?: ReactNode;

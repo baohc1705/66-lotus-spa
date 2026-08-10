@@ -8,6 +8,8 @@ export function PaginationPage() {
   const [pageSm, setPageSm] = useState(1);
   const [pageMd, setPageMd] = useState(1);
   const [pageLg, setPageLg] = useState(1);
+  const [pageDanger, setPageDanger] = useState(2);
+  const [pageSuccess, setPageSuccess] = useState(2);
 
   return (
     <DemoPageShell
@@ -21,11 +23,11 @@ export function PaginationPage() {
 
         <DemoSection title="Advanced (jump)">
           <p className="mb-2 text-sm text-kit-muted">
-            Nhap so o o &quot;..&quot; roi Enter de nhay trang.
+            Nhập số vào ô &quot;...&quot; rồi Enter để nhảy trang.
           </p>
           <Pagination
             page={pageAdvanced}
-            pageCount={21}
+            pageCount={20}
             onPageChange={setPageAdvanced}
           />
         </DemoSection>
@@ -36,6 +38,22 @@ export function PaginationPage() {
           <Pagination page={pageMd} pageCount={3} onPageChange={setPageMd} />
           <hr className="my-4 border-kit" />
           <Pagination page={pageLg} pageCount={3} size="lg" onPageChange={setPageLg} />
+        </DemoSection>
+
+        <DemoSection title="Colors">
+          <Pagination
+            page={pageSuccess}
+            pageCount={5}
+            tone="success"
+            onPageChange={setPageSuccess}
+          />
+          <hr className="my-4 border-kit" />
+          <Pagination
+            page={pageDanger}
+            pageCount={5}
+            tone="danger"
+            onPageChange={setPageDanger}
+          />
         </DemoSection>
       </div>
     </DemoPageShell>

@@ -1,11 +1,9 @@
 import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import type { AxiosError } from "axios";
 import { landingBannerApi } from "../api/landing-banner.api";
-import { TOAST_MSG } from "@/shared/constants/toast.messages";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
 import type {
   LandingBannerQueryParams,
   CreateLandingBannerPayload,
@@ -53,13 +51,13 @@ export function useCreateLandingBannerMutation() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: LANDING_BANNER_KEYS.all });
-        toast.success(TOAST_MSG.createSuccess(ENTITY));
+        toast.success(`Tạo ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("tạo", ENTITY)));
+      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi tạo ${ENTITY}`));
     },
   });
 }
@@ -77,14 +75,14 @@ export function useUpdateLandingBannerMutation() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: LANDING_BANNER_KEYS.all });
-        toast.success(TOAST_MSG.updateSuccess(ENTITY));
+        toast.success(`Cập nhật ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
       toast.error(
-        getErrorMessage(error, TOAST_MSG.actionError("cập nhật", ENTITY)),
+        getErrorMessage(error, `Có lỗi xảy ra khi cập nhật ${ENTITY}`),
       );
     },
   });
@@ -97,13 +95,13 @@ export function useDeleteLandingBannerMutation() {
     onSuccess: (result) => {
       if (result.isSuccess) {
         qc.invalidateQueries({ queryKey: LANDING_BANNER_KEYS.all });
-        toast.success(TOAST_MSG.deleteSuccess(ENTITY));
+        toast.success(`Xóa ${ENTITY} thành công`);
       } else {
-        toast.error(result.message || COMMON_MSG.error);
+        toast.error(result.message || "Có lỗi xảy ra");
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, TOAST_MSG.actionError("xóa", ENTITY)));
+      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi xóa ${ENTITY}`));
     },
   });
 }

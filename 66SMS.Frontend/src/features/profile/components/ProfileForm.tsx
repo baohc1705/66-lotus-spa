@@ -11,8 +11,8 @@ import {
   useUpdateCustomer,
 } from "@/features/customers/hooks/useCustomers";
 import type { CustomerDto } from "@/features/customers/types/customer.types";
-import { Button } from "@/shared/components/ui/button";
-import { SearchableSelect } from "@/shared/components/ui/searchable-select";
+import { Button } from "@/shared/elements/Button";
+import { SearchableSelect } from "@/shared/forms/SearchableSelect";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { parseToDateInput } from "@/shared/utils/date.utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,7 +21,6 @@ import {
   Calendar,
   Camera,
   Fingerprint,
-  Loader2,
   Mail,
   MapPin,
   Phone,
@@ -29,7 +28,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@/shared/components/kitToast";
 import { useMyMembershipCard } from "../hooks/useMembershipInfo";
 import { useUpdateProfile } from "../hooks/useUpdateProfile";
 import {
@@ -304,8 +303,8 @@ export function ProfileForm({ initialData, customerDetail }: ProfileFormProps) {
                   </label>
                   <SearchableSelect
                     value={watch("provinceCode") ?? ""}
-                    onValueChange={(v) => {
-                      setValue("provinceCode", v);
+                    onChange={(value: string) => {
+                      setValue("provinceCode", value);
                       setValue("wardCode", "");
                     }}
                     options={(provincesQuery.data?.data ?? []).map(
@@ -327,7 +326,7 @@ export function ProfileForm({ initialData, customerDetail }: ProfileFormProps) {
                   </label>
                   <SearchableSelect
                     value={watch("wardCode") ?? ""}
-                    onValueChange={(v) => setValue("wardCode", v)}
+                    onChange={(value: string) => setValue("wardCode", value)}
                     options={(wardsQuery.data?.data ?? []).map(
                       (w: WardDto) => ({
                         value: w.code ?? "",
@@ -402,17 +401,10 @@ export function ProfileForm({ initialData, customerDetail }: ProfileFormProps) {
             <div className="pt-2 flex justify-end">
               <Button
                 type="submit"
-                disabled={isPending}
-                className="w-full sm:w-auto px-8 py-3 rounded-md shadow-xs bg-lotus-rose hover:bg-lotus-rose/90 text-white"
+                loading={isPending}
+                className="mb-0 w-full sm:w-auto px-8 py-3 rounded-md shadow-xs bg-lotus-rose hover:bg-lotus-rose/90 text-white"
               >
-                {isPending ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Đang lưu...
-                  </span>
-                ) : (
-                  "Lưu thay đổi"
-                )}
+                Lưu thay đổi
               </Button>
             </div>
           </form>

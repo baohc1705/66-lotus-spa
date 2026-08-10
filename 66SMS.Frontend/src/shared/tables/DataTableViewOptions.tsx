@@ -36,7 +36,10 @@ export function DataTableViewOptions<TData>({
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="inline-flex h-9 items-center gap-1.5 rounded-md border border-kit bg-kit-white px-3 text-xs text-kit-body hover:bg-kit-page"
+        className={
+          "box-border inline-flex h-9 items-center gap-1.5 rounded-md border border-kit " +
+          "bg-kit-white px-3 text-xs leading-none text-kit-body hover:bg-kit-page"
+        }
       >
         <SlidersHorizontal className="h-3.5 w-3.5" />
         Cột

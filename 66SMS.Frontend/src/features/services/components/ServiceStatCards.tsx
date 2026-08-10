@@ -1,12 +1,11 @@
-import { Activity, TrendingUp, ImageIcon, Clock } from "lucide-react";
-import { AdminStatCard } from "@/shared/components/AdminStatCard";
+import { StatCard } from "@/shared/widgets/StatCard";
 
 interface ServiceStatCardsProps {
   totalServices: number;
   activeServices: number;
   servicesWithImage: number;
   avgDurationMins: number;
-  isLoading: boolean;
+  isLoading?: boolean;
 }
 
 export function ServiceStatCards({
@@ -14,37 +13,39 @@ export function ServiceStatCards({
   activeServices,
   servicesWithImage,
   avgDurationMins,
-  isLoading,
+  isLoading = false,
 }: ServiceStatCardsProps) {
+  const dash = isLoading ? "—" : undefined;
+
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-      <AdminStatCard
-        label="Tổng số dịch vụ"
-        value={totalServices}
-        icon={Activity}
-        tone="gold"
-        isLoading={isLoading}
+    <div className="mb-3 grid grid-cols-2 gap-2 lg:grid-cols-4">
+      <StatCard
+        title="Tổng dịch vụ"
+        value={dash ?? totalServices}
+        description="Trong danh sách"
+        tone="midnight-bloom"
+        valueTone="white"
       />
-      <AdminStatCard
-        label="Dịch vụ đang kinh doanh"
-        value={activeServices}
-        icon={TrendingUp}
-        tone="green"
-        isLoading={isLoading}
+      <StatCard
+        title="Đang kinh doanh"
+        value={dash ?? activeServices}
+        description="Trạng thái hoạt động"
+        tone="happy-green"
+        valueTone="white"
       />
-      <AdminStatCard
-        label="Dịch vụ có hình ảnh"
-        value={servicesWithImage}
-        icon={ImageIcon}
-        tone="gold"
-        isLoading={isLoading}
+      <StatCard
+        title="Có hình ảnh"
+        value={dash ?? servicesWithImage}
+        description="Đã gắn ảnh"
+        tone="tempting-azure"
+        valueTone="white"
       />
-      <AdminStatCard
-        label="Thời lượng TB (phút)"
-        value={avgDurationMins}
-        icon={Clock}
-        tone="gold"
-        isLoading={isLoading}
+      <StatCard
+        title="Thời lượng TB"
+        value={dash ?? avgDurationMins}
+        description="Phút / dịch vụ"
+        tone="sunny-morning"
+        valueTone="dark"
       />
     </div>
   );

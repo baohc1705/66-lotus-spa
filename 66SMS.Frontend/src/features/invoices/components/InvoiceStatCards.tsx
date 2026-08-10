@@ -1,12 +1,12 @@
-import { Coins, FileCheck, Clock, Ban } from "lucide-react";
-import { AdminStatCard } from "@/shared/components/AdminStatCard";
+import { StatCard } from "@/shared/widgets/StatCard";
+import { formatCurrency } from "@/shared/utils/currency";
 
 interface InvoiceStatCardsProps {
   paidRevenue: number;
   paidCount: number;
   unpaidCount: number;
   cancelledCount: number;
-  isLoading: boolean;
+  isLoading?: boolean;
 }
 
 export function InvoiceStatCards({
@@ -14,39 +14,39 @@ export function InvoiceStatCards({
   paidCount,
   unpaidCount,
   cancelledCount,
-  isLoading,
+  isLoading = false,
 }: InvoiceStatCardsProps) {
+  const dash = isLoading ? "—" : undefined;
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
-      <AdminStatCard
-        label="Doanh thu (Đã TT)"
-        value={paidRevenue}
-        icon={Coins}
-        tone="gold"
-        valueClass="text-adminGold-600"
-        isLoading={isLoading}
-        isCurrency
+    <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+      <StatCard
+        title="Doanh thu (Đã TT)"
+        value={dash ?? formatCurrency(paidRevenue)}
+        description="Tổng tiền đã thanh toán"
+        tone="sunny-morning"
+        valueTone="dark"
       />
-      <AdminStatCard
-        label="Đã thanh toán"
-        value={paidCount}
-        icon={FileCheck}
-        tone="green"
-        isLoading={isLoading}
+      <StatCard
+        title="Đã thanh toán"
+        value={dash ?? paidCount}
+        description="Hóa đơn hoàn tất"
+        tone="happy-green"
+        valueTone="white"
       />
-      <AdminStatCard
-        label="Chưa thanh toán"
-        value={unpaidCount}
-        icon={Clock}
-        tone="warning"
-        isLoading={isLoading}
+      <StatCard
+        title="Chưa thanh toán"
+        value={dash ?? unpaidCount}
+        description="Đang chờ thanh toán"
+        tone="tempting-azure"
+        valueTone="white"
       />
-      <AdminStatCard
-        label="Đã hủy"
-        value={cancelledCount}
-        icon={Ban}
-        tone="danger"
-        isLoading={isLoading}
+      <StatCard
+        title="Đã hủy"
+        value={dash ?? cancelledCount}
+        description="Hóa đơn đã hủy"
+        tone="midnight-bloom"
+        valueTone="white"
       />
     </div>
   );

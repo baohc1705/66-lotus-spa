@@ -1,26 +1,26 @@
 import { useMemo } from "react";
-import { useReactTable, getCoreRowModel } from "@tanstack/react-table";
-import { Plus } from "lucide-react";
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { Plus, Settings } from "lucide-react";
 
-import { DataTable } from "@/shared/components/DataTable/DataTable";
-import { Button } from "@/shared/components/ui/button";
-import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { DataTablePagination } from "@/shared/components/DataTable/DataTablePagination";
-import { DataTableToolbar } from "@/shared/components/DataTable/DataTableToolbar";
-import { DataTableViewOptions } from "@/shared/components/DataTable/DataTableViewOptions";
-import { TablePageShell } from "@/shared/components/DataTable/TablePageShell";
+import { Pagination } from "@/shared/components/Pagination";
+import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { Button } from "@/shared/elements/Button";
+import { Select } from "@/shared/forms/Select";
+import { DataTable } from "@/shared/tables/DataTable";
+import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
+import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
+import { TableEmptyState } from "@/shared/tables/TableEmptyState";
+import { TablePageShell } from "@/shared/tables/TablePageShell";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
-import { CONFIRM_MSG } from "@/shared/constants/confirm.messages";
 
 import { ConfigAppointmentFormDialog } from "../components/ConfigAppointmentFormDialog";
-import { useConfigAppointmentListState } from "../hooks/useConfigAppointmentListState";
 import {
   CONFIG_APPOINTMENT_COLUMN_LABELS,
   useActiveConfigAppointmentColumns,
 } from "../components/useActiveConfigAppointmentColumns";
 import { CONFIG_APPOINTMENT_PERM } from "../constants/config_appointment.permissions";
+import { useConfigAppointmentListState } from "../hooks/useConfigAppointmentListState";
 import {
   useAdminConfigAppointments,
   useDeleteConfigAppointment,
@@ -62,8 +62,12 @@ export function ConfigAppointmentListPage() {
   const paged = result?.data;
   const items = useMemo(() => paged?.items ?? [], [paged?.items]);
   const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
+  const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
-  const activeColumns = useActiveConfigAppointmentColumns({
+  const columns = useActiveConfigAppointmentColumns({
     pageIndex,
     pageSize,
     orderBy,
@@ -75,10 +79,8 @@ export function ConfigAppointmentListPage() {
 
   const table = useReactTable({
     data: items,
-    columns: activeColumns,
-    state: {
-      columnVisibility,
-    },
+    columns,
+    state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
@@ -91,56 +93,93 @@ export function ConfigAppointmentListPage() {
   );
 
   const handleDelete = () => {
-    if (deleteTarget?.id) {
-      deleteMutation.mutate(deleteTarget.id, {
-        onSuccess: (deleteResult) => {
-          if (deleteResult.isSuccess) setDeleteTarget(null);
-        },
-      });
-    }
+    if (!deleteTarget?.id) return;
+    deleteMutation.mutate(deleteTarget.id, {
+      onSuccess: (deleteResult) => {
+        if (deleteResult.isSuccess) setDeleteTarget(null);
+      },
+    });
   };
 
   return (
-    <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-      <DataTableToolbar
-        searchPlaceholder="Tìm kiếm cấu hình..."
-        searchValue={filter}
-        onSearchChange={handleSearchChange}
-      >
-        <DataTableViewOptions table={table} columnLabels={columnLabels} />
-        <div className="flex items-center gap-2 ml-auto">
-          <PermissionGate resource={perm.resource} action={perm.create}>
-            <Button
-              variant="admin"
-              size="sm"
-              onClick={() => setCreateOpen(true)}
-              className="lotus-admin-table-toolbar-btn"
-            >
-              <Plus className="w-4 h-4" />
-              Thêm cấu hình
-            </Button>
-          </PermissionGate>
+    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
+      <TablePageShell isFetching={isFetching} isLoading={isLoading}>
+        <div className="border-b border-kit px-4 pt-4">
+          <DataTableToolbar
+            searchPlaceholder="Tìm kiếm cấu hình..."
+            searchValue={filter}
+            onSearchChange={handleSearchChange}
+          >
+            <DataTableViewOptions table={table} columnLabels={columnLabels} />
+            <PermissionGate resource={perm.resource} action={perm.create}>
+              <Button
+                variant="admin"
+                size="sm"
+                className="mb-0"
+                onClick={() => setCreateOpen(true)}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Thêm cấu hình
+              </Button>
+            </PermissionGate>
+          </DataTableToolbar>
         </div>
-      </DataTableToolbar>
 
-      <div className="lotus-admin-table-page-card">
         <DataTable
           table={table}
           isLoading={isLoading}
           loadingRows={DEFAULT_LOADING_ROWS}
+          emptyState={
+            <TableEmptyState
+              icon={Settings}
+              title="Chưa có cấu hình lịch hẹn"
+              action={
+                <PermissionGate resource={perm.resource} action={perm.create}>
+                  <Button
+                    variant="admin"
+                    size="sm"
+                    className="mb-0"
+                    onClick={() => setCreateOpen(true)}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Thêm cấu hình
+                  </Button>
+                </PermissionGate>
+              }
+            />
+          }
+          pagination={
+            totalCount > 0 ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <div className="flex items-center gap-3 text-xs text-kit-muted">
+                  <span>
+                    {rangeStart}-{rangeEnd} / {totalCount}
+                  </span>
+                  <Select
+                    value={String(pageSize)}
+                    onChange={(event) =>
+                      handlePageSizeChange(Number(event.target.value))
+                    }
+                    options={[
+                      { value: "5", label: "5 / trang" },
+                      { value: "10", label: "10 / trang" },
+                      { value: "20", label: "20 / trang" },
+                    ]}
+                    inputSize="sm"
+                    className="w-auto min-w-28"
+                  />
+                </div>
+                <Pagination
+                  page={safePage}
+                  pageCount={totalPages}
+                  onPageChange={listState.setPageIndex}
+                  size="sm"
+                />
+              </div>
+            ) : null
+          }
         />
-      </div>
-
-      <DataTablePagination
-        pageIndex={pageIndex}
-        pageSize={pageSize}
-        totalCount={totalCount}
-        totalPages={paged?.totalPages ?? 0}
-        hasPreviousPage={paged?.hasPreviousPage ?? false}
-        hasNextPage={paged?.hasNextPage ?? false}
-        onPageChange={listState.setPageIndex}
-        onPageSizeChange={handlePageSizeChange}
-      />
+      </TablePageShell>
 
       <ConfigAppointmentFormDialog
         open={createOpen}
@@ -148,7 +187,7 @@ export function ConfigAppointmentListPage() {
         configAppointment={null}
       />
 
-      {editTarget && (
+      {editTarget ? (
         <ConfigAppointmentFormDialog
           open={!!editTarget}
           onOpenChange={(open) => {
@@ -156,24 +195,22 @@ export function ConfigAppointmentListPage() {
           }}
           configAppointment={editTarget}
         />
-      )}
+      ) : null}
 
-      {deleteTarget && (
+      {deleteTarget ? (
         <ConfirmDialog
           open={!!deleteTarget}
           onOpenChange={(open) => {
             if (!open) setDeleteTarget(null);
           }}
-          title={CONFIRM_MSG.deleteTitle(ENTITY)}
-          description={CONFIRM_MSG.deleteDescription(
-            ENTITY,
-            deleteTarget.salonName ?? `#${deleteTarget.id}`,
-          )}
+          title={`Xóa ${ENTITY}`}
+          description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget.salonName ?? `#${deleteTarget.id}`}"? Hành động này không thể hoàn tác.`}
           onConfirm={handleDelete}
-          confirmLabel={COMMON_MSG.delete}
+          confirmLabel="Xóa"
           loading={deleteMutation.isPending}
+          variant="danger"
         />
-      )}
-    </TablePageShell>
+      ) : null}
+    </div>
   );
 }

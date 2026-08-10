@@ -1,5 +1,3 @@
-﻿import { AdminTextarea } from '@/shared/components/forms/AdminTextarea';
-import { AdminInput } from '@/shared/components/forms/AdminInput';
 import { useForm, type Resolver } from "react-hook-form";
 import {
   useCreateBookingPosition,
@@ -17,23 +15,17 @@ import {
   type UpdateBookingPositionPayload,
 } from "../schemas/bookingPosition.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo } from "react";
+import { MapPin } from "lucide-react";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
-import { FormSection } from "@/shared/components/forms/FormSection";
-import { MapPin, Check, ChevronDown, Search } from "lucide-react";
-import { FormField } from "@/shared/components/forms/FormField";
-import { Switch } from "@/shared/components/ui/switch";
-import { cn } from "@/lib/utils";
-import { COMMON_MSG } from "@/shared/constants/common.messages";
+import { Modal } from "@/shared/components/Modal";
+import { Button } from "@/shared/elements/Button";
+import { FormField } from "@/shared/forms/FormField";
+import { FormSection } from "@/shared/forms/FormSection";
+import { Input } from "@/shared/forms/Input";
+import { SearchableSelect } from "@/shared/forms/SearchableSelect";
+import { Switch } from "@/shared/forms/Switch";
+import { Textarea } from "@/shared/forms/Textarea";
 
 interface BookingPositionFormDialogProps {
   open: boolean;
@@ -61,6 +53,17 @@ export function BookingPositionFormDialog({
   });
   const rooms = roomData?.data?.items || [];
 
+  const roomOptions = useMemo(
+    () =>
+      rooms
+        .filter((r: BookingRoomDTO) => r.id != null)
+        .map((r: BookingRoomDTO) => ({
+          value: String(r.id),
+          label: r.name ?? `Phòng #${r.id}`,
+        })),
+    [rooms],
+  );
+
   const form = useForm<BookingPositionFormValues>({
     resolver: zodResolver(
       isEdit ? updateBookingPositionFormSchema : createBookingPositionSchema,
@@ -79,26 +82,9 @@ export function BookingPositionFormDialog({
 
   const selectedRoomId = watch("roomId");
 
-  // Custom Combobox State
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setDropdownOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   useEffect(() => {
     if (open) {
       reset(getDefaultValues(bookingPosition, defaultRoomId));
-      setSearchQuery("");
-      setDropdownOpen(false);
     }
   }, [open, bookingPosition, defaultRoomId, reset]);
 
@@ -124,158 +110,115 @@ export function BookingPositionFormDialog({
     }
   };
 
-  const filteredRooms = rooms.filter((r: BookingRoomDTO) =>
-    r.name?.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
-  const selectedRoom = rooms.find(
-    (r: BookingRoomDTO) => r.id === selectedRoomId,
-  );
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[850px]">
-        <DialogHeader>
-          <DialogTitle>
-            {isEdit ? "Chỉnh sửa vị trí dịch vụ" : "Thêm vị trí dịch vụ mới"}
-          </DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? `Cập nhật thông tin vị trí ${bookingPosition?.name ?? ""}`
-              : "Điền thông tin để tạo vị trí dịch vụ"}
-          </DialogDescription>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <FormSection icon={MapPin} title="Thông tin vị trí dịch vụ">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              
-              <FormField
-                label="Phòng dịch vụ"
-                tooltip="Chọn phòng mà vị trí này thuộc về"
-                error={errors.roomId?.message}
-              >
-                <div className="relative" ref={dropdownRef}>
-                  <div
-                    className={cn(
-                      "flex w-full items-center justify-between gap-2 rounded-md bg-adminGray-100/80 px-3 py-2 text-sm text-adminInk outline-hidden cursor-pointer border border-transparent hover:bg-adminGray-100 focus-within:bg-white focus-within:ring-2 focus-within:ring-adminGreen-600/30 transition-all",
-                      dropdownOpen && "bg-white ring-2 ring-adminGreen-600/30"
-                    )}
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
-                  >
-                    <span>{selectedRoom ? selectedRoom.name : <span className="text-adminGray-600">Chọn phòng...</span>}</span>
-                    <ChevronDown className="w-4 h-4 text-adminGray-600" />
-                  </div>
-
-                  {dropdownOpen && (
-                    <div className="absolute z-50 mt-1 w-full rounded-md border border-adminGray-100 bg-white shadow-md overflow-hidden">
-                      <div className="flex items-center px-3 py-2 border-b border-adminGray-100 text-adminInk">
-                        <Search className="w-4 h-4 mr-2 text-adminGray-600" />
-                        <input
-                          autoFocus
-                          className="w-full bg-transparent outline-hidden text-sm placeholder:text-adminGray-600"
-                          placeholder="Tìm phòng..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                      </div>
-                      <div className="max-h-48 overflow-y-auto p-1">
-                        {filteredRooms.length === 0 ? (
-                          <div className="px-3 py-2 text-sm text-adminGray-600 text-center">Không tìm thấy phòng</div>
-                        ) : (
-                          filteredRooms.map((room: BookingRoomDTO) => (
-                            <div
-                              key={room.id}
-                              className={cn(
-                                "flex items-center justify-between px-3 py-2 text-sm rounded-sm cursor-pointer hover:bg-adminGray-50/50",
-                                selectedRoomId === room.id ? "bg-adminGray-50/30 text-adminGreen-600 font-medium" : "text-adminInk"
-                              )}
-                              onClick={() => {
-                                setValue("roomId", room.id as number, { shouldValidate: true });
-                                setDropdownOpen(false);
-                                setSearchQuery("");
-                              }}
-                            >
-                              <span>{room.name}</span>
-                              {selectedRoomId === room.id && <Check className="w-4 h-4" />}
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </FormField>
-
-              <FormField
-                label="Tên vị trí"
-                tooltip="Vui lòng nhập vào tên vị trí dịch vụ"
-                error={errors.name?.message}
-              >
-                <AdminInput
-                  {...register("name")}
-                  placeholder="Giường 1"
-                />
-              </FormField>
-
-              <FormField
-                label="Thứ tự hiển thị"
-                tooltip="Số nhỏ sẽ được ưu tiên hiển thị trước"
-                error={errors.sortOrder?.message}
-              >
-                <AdminInput
-                  {...register("sortOrder", { valueAsNumber: true })}
-                  type="number"
-                  placeholder="0"
-                />
-              </FormField>
-
-              <FormField
-                label="Trạng thái"
-                tooltip="Bật để kích hoạt vị trí"
-                error={errors.status?.message}
-              >
-                <div className="flex items-center h-9">
-                  <Switch
-                    checked={watch("status") === 1}
-                    onCheckedChange={(checked) => setValue("status", checked ? 1 : 0)}
-                  />
-                </div>
-              </FormField>
-              
-              <div className="sm:col-span-2">
-                <FormField
-                  label="Ghi chú"
-                  tooltip="Ghi chú không dài quá 500 ký tự"
-                  error={errors.note?.message}
-                >
-                  <AdminTextarea
-                    {...register("note")}
-                    placeholder="Ghi chú ở đây"
-                    className=""
-                  />
-                </FormField>
-              </div>
-            </div>
-          </FormSection>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
+    <Modal
+      open={open}
+      onClose={() => onOpenChange(false)}
+      title={isEdit ? "Chỉnh sửa vị trí dịch vụ" : "Thêm vị trí dịch vụ mới"}
+      size="xl"
+      scrollable
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <FormSection icon={MapPin} title="Thông tin vị trí dịch vụ">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <FormField
+              label="Phòng dịch vụ"
+              tooltip="Chọn phòng mà vị trí này thuộc về"
+              error={errors.roomId?.message}
             >
-              {COMMON_MSG.cancel}
-            </Button>
-            <Button type="submit" variant="admin" size="sm" loading={isPending}>
-              {isEdit ? "Cập nhật" : "Tạo vị trí"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+              <SearchableSelect
+                options={roomOptions}
+                value={selectedRoomId ? String(selectedRoomId) : ""}
+                onChange={(value: string) =>
+                  setValue("roomId", Number(value), { shouldValidate: true })
+                }
+                placeholder="Chọn phòng..."
+                searchPlaceholder="Tìm phòng..."
+                emptyText="Không tìm thấy phòng"
+                invalid={!!errors.roomId}
+                clearable={false}
+              />
+            </FormField>
+
+            <FormField
+              label="Tên vị trí"
+              tooltip="Vui lòng nhập vào tên vị trí dịch vụ"
+              error={errors.name?.message}
+            >
+              <Input
+                {...register("name")}
+                placeholder="Giường 1"
+                invalid={!!errors.name}
+              />
+            </FormField>
+
+            <FormField
+              label="Thứ tự hiển thị"
+              tooltip="Số nhỏ sẽ được ưu tiên hiển thị trước"
+              error={errors.sortOrder?.message}
+            >
+              <Input
+                {...register("sortOrder", { valueAsNumber: true })}
+                type="number"
+                placeholder="0"
+                invalid={!!errors.sortOrder}
+              />
+            </FormField>
+
+            <FormField
+              label="Trạng thái"
+              tooltip="Bật để kích hoạt vị trí"
+              error={errors.status?.message}
+            >
+              <div className="flex h-9 items-center">
+                <Switch
+                  checked={watch("status") === 1}
+                  onChange={(checked: boolean) =>
+                    setValue("status", checked ? 1 : 0)
+                  }
+                />
+              </div>
+            </FormField>
+
+            <FormField
+              label="Ghi chú"
+              tooltip="Ghi chú không dài quá 500 ký tự"
+              error={errors.note?.message}
+              className="sm:col-span-2"
+            >
+              <Textarea
+                {...register("note")}
+                placeholder="Ghi chú ở đây"
+                rows={3}
+                invalid={!!errors.note}
+              />
+            </FormField>
+          </div>
+        </FormSection>
+
+        <div className="flex justify-end gap-2 border-t border-kit pt-3">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="mb-0"
+            onClick={() => onOpenChange(false)}
+            disabled={isPending}
+          >
+            Hủy
+          </Button>
+          <Button
+            type="submit"
+            variant="admin"
+            size="sm"
+            className="mb-0"
+            loading={isPending}
+          >
+            {isEdit ? "Cập nhật" : "Tạo vị trí"}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }
 

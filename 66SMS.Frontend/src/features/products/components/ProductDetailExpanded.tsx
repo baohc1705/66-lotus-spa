@@ -1,11 +1,20 @@
 import { Package, Pencil } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
-import { Skeleton } from "@/shared/components/ui/skeleton";
+
+import { FallbackImage } from "@/shared/components/FallbackImage";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
+import { Button } from "@/shared/elements/Button";
+import {
+  TableDetailActions,
+  TableDetailExpanded,
+  TableDetailField,
+  TableDetailGrid,
+  TableDetailHeader,
+} from "@/shared/tables/TableDetailExpanded";
+import { formatCurrency } from "@/shared/utils/currency";
+
 import { useProductDetail } from "../hooks/useProducts";
 import type { ProductFullDto } from "../types/product.types";
 import { PRODUCT_PERM } from "../constants/product.permissions";
-import { formatCurrency } from "@/shared/utils/currency";
 
 interface ProductDetailExpandedProps {
   productId: number;
@@ -22,27 +31,29 @@ export function ProductDetailExpanded({
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-4 bg-adminGray-50/30">
-        <div className="flex gap-4 mb-4">
-          <Skeleton className="w-14 h-14 rounded-xl" />
+      <TableDetailExpanded>
+        <div className="flex items-center gap-3 pb-2">
+          <div className="h-11 w-11 animate-pulse rounded-lg bg-kit-page" />
           <div className="space-y-2">
-            <Skeleton className="w-48 h-6" />
-            <Skeleton className="w-32 h-4" />
+            <div className="h-4 w-48 animate-pulse rounded bg-kit-page" />
+            <div className="h-3 w-32 animate-pulse rounded bg-kit-page" />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-8 mt-4">
-          <Skeleton className="h-24" />
-          <Skeleton className="h-24" />
+        <div className="mt-2 grid grid-cols-2 gap-4">
+          <div className="h-24 animate-pulse rounded bg-kit-page" />
+          <div className="h-24 animate-pulse rounded bg-kit-page" />
         </div>
-      </div>
+      </TableDetailExpanded>
     );
   }
 
   if (!product) {
     return (
-      <div className="p-6 text-center text-adminGray-600 text-sm bg-adminGray-50/30">
-        Không tìm thấy thông tin sản phẩm
-      </div>
+      <TableDetailExpanded>
+        <p className="py-4 text-center text-sm text-kit-muted">
+          Không tìm thấy thông tin sản phẩm
+        </p>
+      </TableDetailExpanded>
     );
   }
 
@@ -51,88 +62,63 @@ export function ProductDetailExpanded({
     product.images?.[0]?.url;
 
   return (
-    <div className="bg-adminGray-50/30 w-full overflow-hidden max-h-100 overflow-y-auto custom-scrollbar p-4 m-0">
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-4 pb-4 border-b border-adminGray-100/50">
-          <div className="w-16 h-16 rounded-xl bg-adminGray-50/50 flex items-center justify-center shrink-0 overflow-hidden shadow-xs border border-adminGray-100/50 p-1">
-            {primaryImage ? (
-              <img
-                src={primaryImage}
-                alt={product.name ?? ""}
-                className="w-full h-full object-cover rounded-lg"
-              />
-            ) : (
-              <Package className="w-8 h-8 text-adminGray-600" />
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-base font-bold text-adminInk truncate">
-              {product.name ?? "—"}
-            </h3>
-            <p className="text-xs text-adminGray-600 mt-0.5 font-medium">
-              Mã: {product.code || "—"} · Danh mục:{" "}
-              {product.categoryName || "—"}
-            </p>
-          </div>
-        </div>
+    <TableDetailExpanded>
+      <TableDetailHeader
+        icon={
+          primaryImage ? (
+            <FallbackImage
+              kind="product"
+              src={primaryImage}
+              alt={product.name ?? ""}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <Package className="h-6 w-6 text-kit-muted" />
+          )
+        }
+        title={product.name ?? "—"}
+        subtitle={`Mã: ${product.code || "—"} · Danh mục: ${product.categoryName || "—"}`}
+      />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0">
-          <div className="flex flex-col">
-            <DetailField label="Đơn vị tính" value={product.unit} />
-            <DetailField
-              label="Giá vốn"
-              value={formatCurrency(product.costPrice)}
-            />
-            <DetailField
-              label="Giá bán"
-              value={formatCurrency(product.sellingPrice)}
-            />
-            <DetailField
-              label="Tồn kho"
-              value={product.stockQuantity?.toString()}
-            />
-            <DetailField
-              label="Tồn kho tối thiểu"
-              value={product.minStock?.toString()}
-            />
-          </div>
-          <div className="flex flex-col">
-            <DetailField label="Mô tả ngắn" value={product.description} />
-            <DetailField label="Nội dung" value={product.content} />
-          </div>
-        </div>
+      <TableDetailGrid cols={2}>
+        <TableDetailField label="Đơn vị tính" value={product.unit} />
+        <TableDetailField
+          label="Giá vốn"
+          value={formatCurrency(product.costPrice)}
+        />
+        <TableDetailField
+          label="Giá bán"
+          value={
+            <span className="font-bold text-kit-primary">
+              {formatCurrency(product.sellingPrice)}
+            </span>
+          }
+        />
+        <TableDetailField
+          label="Tồn kho"
+          value={product.stockQuantity?.toString()}
+        />
+        <TableDetailField
+          label="Tồn kho tối thiểu"
+          value={product.minStock?.toString()}
+        />
+        <TableDetailField label="Mô tả ngắn" value={product.description} />
+        <TableDetailField label="Nội dung" value={product.content} />
+      </TableDetailGrid>
 
-        <div className="flex items-end justify-end mt-2 pt-4 border-t border-adminGray-100/80">
-          <PermissionGate resource={perm.resource} action={perm.update}>
-            <Button
-              variant="admin"
-              size="sm"
-              onClick={() => onEdit?.(product)}
-              className="bg-adminGreen-600 hover:opacity-90 text-white shadow-xs h-8 px-4 text-sm gap-1.5 rounded-md transition-opacity"
-            >
-              <Pencil className="w-3.5 h-3.5" />
-              Cập nhật
-            </Button>
-          </PermissionGate>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DetailField({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | null | undefined;
-}) {
-  return (
-    <div className="py-3.5 border-b border-adminGray-100/80 last:border-b-0 group">
-      <p className="text-xs text-adminGray-600 mb-1">{label}</p>
-      <p className="text-sm font-medium text-adminInk truncate">
-        {value || "—"}
-      </p>
-    </div>
+      <TableDetailActions>
+        <PermissionGate resource={perm.resource} action={perm.update}>
+          <Button
+            variant="admin"
+            size="sm"
+            className="mb-0"
+            onClick={() => onEdit?.(product)}
+          >
+            <Pencil className="h-3.5 w-3.5" />
+            Cập nhật
+          </Button>
+        </PermissionGate>
+      </TableDetailActions>
+    </TableDetailExpanded>
   );
 }

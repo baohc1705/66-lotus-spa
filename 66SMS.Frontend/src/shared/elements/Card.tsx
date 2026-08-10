@@ -40,9 +40,9 @@ function toneBorder(tone: CardTone): string {
   if (tone === "info") return "border border-kit-info ";
   if (tone === "warning") return "border border-kit-warning ";
   if (tone === "danger") return "border border-kit-danger ";
-  if (tone === "focus") return "border border-slate-700 ";
-  if (tone === "alternate") return "border border-purple-700 ";
-  if (tone === "dark") return "border border-gray-800 ";
+  if (tone === "focus") return "border border-kit-focus ";
+  if (tone === "alternate") return "border border-kit-alt ";
+  if (tone === "dark") return "border border-kit-dark ";
   return "border-0 ";
 }
 

@@ -1,41 +1,21 @@
-import { useLogout } from "@/features/auth/hooks/useLogout";
-import { useAuthStore } from "@/features/auth/stores/authStore";
-import { cn } from "@/lib/utils";
-import { BranchSelector } from "@/shared/components/BranchSelector";
-import { Logo } from "@/shared/components/Logo";
-import { NotificationBell } from "@/features/notifications";
-import { LogOut, Menu, PanelLeft, PanelTop, Settings, ShoppingCart, User } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { LogOut, Menu, Settings, ShoppingCart, User } from "lucide-react";
+import { useLogout } from "@/features/auth/hooks/useLogout";
+import { useAuthStore } from "@/features/auth/stores/authStore";
+import { NotificationBell } from "@/features/notifications";
+import { BranchSelector } from "@/shared/components/BranchSelector";
+import { Logo } from "@/shared/components/Logo";
 import { MENU_ITEMS } from "../constants/menu";
-import { AdminTopNavbar } from "./AdminTopNavbar";
 
-interface AdminHeaderProps {
-  toggleSidebar: () => void;
-  toggleMobileSidebar: () => void;
-  layoutMode: "top-nav" | "sidebar";
-  toggleLayoutMode: () => void;
-}
+type AdminHeaderProps = {
+  sidebarClosed: boolean;
+  mobileOpen: boolean;
+  onToggleSidebar: () => void;
+  onToggleMobile: () => void;
+};
 
-export function AdminHeader({
-  toggleMobileSidebar,
-  layoutMode,
-  toggleLayoutMode,
-}: AdminHeaderProps) {
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-
-  const { user, hasRole } = useAuthStore();
-  const isAdmin = hasRole("Admin");
-  const isReceptionist = hasRole("Receptionist");
-  const logoutMutation = useLogout();
-
-  const handleLogout = () => {
-    logoutMutation.mutate();
-  };
-
-  const location = useLocation();
-
+function getPageTitle(pathname: string): string {
   let currentTitle = "Tổng quan";
 
   const allLinks = MENU_ITEMS.flatMap((item) =>
@@ -47,7 +27,7 @@ export function AdminHeader({
   allLinks.sort((a, b) => b.path.length - a.path.length);
 
   for (const link of allLinks) {
-    if (location.pathname.startsWith(link.path)) {
+    if (pathname.startsWith(link.path)) {
       currentTitle = link.label;
       if (currentTitle === "Danh sách nhân viên")
         currentTitle = "Quản lý nhân viên";
@@ -62,135 +42,164 @@ export function AdminHeader({
     }
   }
 
+  return currentTitle;
+}
+
+function getInitials(name?: string | null): string {
+  if (!name) return "U";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+export function AdminHeader(props: AdminHeaderProps) {
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const location = useLocation();
+  const { user, hasRole } = useAuthStore();
+  const isAdmin = hasRole("Admin");
+  const isReceptionist = hasRole("Receptionist");
+  const logoutMutation = useLogout();
+  const pageTitle = getPageTitle(location.pathname);
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
+
   return (
-    <header className="admin-header h-12 shadow-md flex items-center justify-between px-2 sm:px-4 sticky top-0 z-30 transition-all duration-300">
-      <div className="flex items-center gap-2 sm:gap-4 h-full">
+    <header className="app-header z-30 flex h-15 shrink-0 items-center bg-white shadow-sm">
+      <div
+        className={
+          "app-header__logo hidden h-full shrink-0 items-center border-r border-gray-100 " +
+          "px-5 transition-all duration-300 md:flex " +
+          (props.sidebarClosed ? "w-20 justify-center" : "w-70 justify-between")
+        }
+      >
+        <div className={props.sidebarClosed ? "hidden" : "block"}>
+          <Logo variant="dark" size="sm" showTagline={false} />
+        </div>
         <button
-          onClick={toggleMobileSidebar}
-          className="lg:hidden w-8 h-8 rounded-[4px] bg-white/10 text-white flex items-center justify-center hover:bg-adminGreen-700 transition-all duration-300"
+          type="button"
+          onClick={props.onToggleSidebar}
+          className={
+            "hamburger hamburger--elastic desktop-toggle-nav inline-flex h-8 w-8 items-center " +
+            "justify-center rounded text-kit-muted hover:bg-kit-page " +
+            (props.sidebarClosed ? "is-active" : "")
+          }
+          aria-label="Thu gọn sidebar"
+          aria-pressed={props.sidebarClosed}
         >
-          <Menu className="w-4 h-4" />
+          <Menu className="h-5 w-5" />
         </button>
-
-        {layoutMode === "top-nav" && (
-          <div className="hidden lg:flex items-center shrink-0 mr-1.5">
-            <Logo variant="light" size="sm" showTagline={false} />
-          </div>
-        )}
-
-        <h1 className={cn(
-          "text-sm sm:text-base font-bold text-white ml-1 tracking-tight",
-          layoutMode === "sidebar" ? "block" : "lg:hidden"
-        )}>
-          {currentTitle}
-        </h1>
-
-        {layoutMode === "top-nav" && (
-          <div className="hidden lg:block h-full">
-            <AdminTopNavbar />
-          </div>
-        )}
       </div>
 
-      <div className="flex items-center gap-1.5 sm:gap-2">
-        <div className="w-36 sm:w-44 shrink-0">
-          <BranchSelector />
-        </div>
+      <button
+        type="button"
+        onClick={props.onToggleMobile}
+        className={
+          "mobile-toggle-nav ml-3 inline-flex h-9 w-9 items-center justify-center rounded-md " +
+          "border border-kit text-kit-body hover:bg-kit-page md:hidden " +
+          (props.mobileOpen ? "is-active bg-kit-page" : "")
+        }
+        aria-label="Mở menu"
+        aria-pressed={props.mobileOpen}
+      >
+        <Menu className="h-5 w-5" />
+      </button>
 
-        {(isAdmin || isReceptionist) && (
-          <Link
-            to="/thu-ngan"
-            className="flex items-center gap-1.5 px-3 h-8 rounded-[4px] bg-white/10 text-white border border-white/10 hover:border-white/25 hover:bg-adminGreen-700 transition-all duration-300 font-medium text-xs tracking-wide whitespace-nowrap"
-          >
-            <ShoppingCart className="w-3.5 h-3.5 text-adminGold-100" />
-            <span className="hidden sm:inline">Thu ngân</span>
-          </Link>
-        )}
+      <div className="app-header__content flex h-full flex-1 items-center gap-3 px-4">
+        <h1 className="truncate text-sm font-bold text-kit-heading md:text-base">
+          {pageTitle}
+        </h1>
 
-        <div className="flex items-center gap-1 ml-0.5">
-          <button
-            onClick={toggleLayoutMode}
-            title={layoutMode === "top-nav" ? "Chuyển sang giao diện Sidebar" : "Chuyển sang giao diện Top-Nav"}
-            className="w-8 h-8 rounded-[4px] bg-white/10 text-white border border-white/10 flex items-center justify-center hover:border-white/25 hover:bg-adminGreen-700 transition-all duration-300 relative group"
-          >
-            {layoutMode === "top-nav" ? (
-              <PanelLeft className="w-4 h-4 text-white" />
-            ) : (
-              <PanelTop className="w-4 h-4 text-white" />
-            )}
-          </button>
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
+          <div className="w-36 min-w-0 shrink-0 sm:w-44">
+            <BranchSelector variant="light" />
+          </div>
 
-          <NotificationBell />
+          {(isAdmin || isReceptionist) && (
+            <Link
+              to="/thu-ngan"
+              className={
+                "inline-flex h-9 items-center gap-1.5 rounded-md border border-kit bg-kit-page " +
+                "px-3 text-xs font-medium text-kit-heading no-underline " +
+                "hover:border-kit-primary hover:bg-blue-50 hover:text-kit-primary"
+              }
+            >
+              <ShoppingCart className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Thu ngân</span>
+            </Link>
+          )}
+
+          <NotificationBell variant="light" />
 
           <div className="relative">
             <button
+              type="button"
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="w-8 h-8 rounded-[4px] bg-white/10 text-white flex items-center justify-center hover:bg-adminGreen-700 hover:shadow-md transition-all duration-300 ml-0.5 border border-white/10 overflow-hidden"
+              className="flex items-center gap-2 rounded-md px-1 py-1 hover:bg-kit-page"
+              aria-label="Menu tài khoản"
             >
+              <div className="hidden text-right leading-tight sm:block">
+                <div className="text-sm font-semibold text-kit-heading">
+                  {user?.username || "Tài khoản"}
+                </div>
+              </div>
               {user?.avatarUrl ? (
                 <img
                   src={user.avatarUrl}
                   alt={user.username || "Avatar"}
-                  className="w-full h-full object-cover"
+                  className="h-10 w-10 rounded-full object-cover"
                 />
               ) : (
-                <User className="w-4 h-4 text-white" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-bold text-kit-primary">
+                  {getInitials(user?.username)}
+                </div>
               )}
             </button>
 
-            <AnimatePresence>
-              {isProfileOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40"
+            {isProfileOpen ? (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setIsProfileOpen(false)}
+                />
+                <div className="absolute right-0 z-50 mt-2 flex w-52 flex-col gap-0.5 rounded-md border border-kit bg-white p-2 shadow-lg">
+                  <div className="mb-1.5 border-b border-kit px-3 py-2 sm:hidden">
+                    <p className="text-sm font-semibold text-kit-heading leading-tight">
+                      {user?.username || "Tài khoản"}
+                    </p>
+                  </div>
+                  <Link
+                    to="/admin/profile"
                     onClick={() => setIsProfileOpen(false)}
-                  />
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-2 w-52 bg-white rounded-[4px] shadow-[0_12px_30px_rgba(0,0,0,0.12)] border border-adminGray-100 p-2 z-50 flex flex-col gap-0.5"
+                    className="flex items-center gap-2 rounded-md px-3 py-1.5 text-xs text-kit-body no-underline hover:bg-blue-50 hover:text-kit-primary"
                   >
-                    <div className="px-3 py-2 border-b border-adminGray-100 mb-1.5">
-                      <p className="text-sm font-semibold text-adminInk leading-tight">
-                        {user?.username || "Tài khoản"}
-                      </p>
-                      <p className="text-xs text-adminGray-600 truncate mt-0.5 leading-none">
-                        {user?.email || ""}
-                      </p>
-                    </div>
-                    <Link
-                      to="/admin/profile"
-                      onClick={() => setIsProfileOpen(false)}
-                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-xs text-adminInk/85 hover:text-adminGreen-600 hover:bg-adminGreen-50 transition-all duration-300 font-normal"
-                    >
-                      <User className="w-3.5 h-3.5 text-adminGray-400 group-hover:text-adminGreen-600 group-hover:scale-110 transition-all duration-300" />
-                      <span>Hồ sơ cá nhân</span>
-                    </Link>
-                    <Link
-                      to="/admin/profile"
-                      onClick={() => setIsProfileOpen(false)}
-                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-xs text-adminInk/85 hover:text-adminGreen-600 hover:bg-adminGreen-50 transition-all duration-300 font-normal"
-                    >
-                      <Settings className="w-3.5 h-3.5 text-adminGray-400 group-hover:text-adminGreen-600 group-hover:scale-110 transition-all duration-300" />
-                      <span>Cài đặt tài khoản</span>
-                    </Link>
-                    <div className="h-px bg-adminGray-100 my-1" />
-                    <button
-                      onClick={() => {
-                        setIsProfileOpen(false);
-                        handleLogout();
-                      }}
-                      className="group flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-xs text-state-danger-text hover:bg-state-danger-bg transition-all duration-300 font-normal w-full text-left"
-                    >
-                      <LogOut className="w-3.5 h-3.5 text-state-danger-text/60 group-hover:scale-110 transition-all duration-300" />
-                      <span>Đăng xuất</span>
-                    </button>
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
+                    <User className="h-3.5 w-3.5 text-kit-muted" />
+                    <span>Hồ sơ cá nhân</span>
+                  </Link>
+                  <Link
+                    to="/admin/profile"
+                    onClick={() => setIsProfileOpen(false)}
+                    className="flex items-center gap-2 rounded-md px-3 py-1.5 text-xs text-kit-body no-underline hover:bg-blue-50 hover:text-kit-primary"
+                  >
+                    <Settings className="h-3.5 w-3.5 text-kit-muted" />
+                    <span>Cài đặt tài khoản</span>
+                  </Link>
+                  <div className="my-1 h-px bg-kit" />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      handleLogout();
+                    }}
+                    className="flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-xs text-red-600 hover:bg-red-50"
+                  >
+                    <LogOut className="h-3.5 w-3.5 opacity-70" />
+                    <span>Đăng xuất</span>
+                  </button>
+                </div>
+              </>
+            ) : null}
           </div>
         </div>
       </div>
