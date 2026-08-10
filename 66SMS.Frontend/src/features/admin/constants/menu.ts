@@ -218,12 +218,6 @@ export const MENU_GROUPS: MenuGroup[] = [
             icon: Clock,
             allowedRoles: ["Admin", "Manager"],
           },
-          {
-            label: "Khung giờ",
-            path: "/admin/timeslots",
-            icon: Clock,
-            allowedRoles: ["Admin", "Manager"],
-          },
         ],
       },
       {
@@ -458,12 +452,6 @@ export const TOP_NAV_TABS: ParentTab[] = [
           {
             label: "Quản lý ca",
             path: "/admin/shifts",
-            icon: Clock,
-            allowedRoles: ["Admin", "Manager"],
-          },
-          {
-            label: "Khung giờ",
-            path: "/admin/timeslots",
             icon: Clock,
             allowedRoles: ["Admin", "Manager"],
           },

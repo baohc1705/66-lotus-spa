@@ -261,17 +261,22 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
       return;
     }
 
+    const slotStartTime =
+      selectedTimeSlot?.startTime || selectedTimeSlot?.time || undefined;
+
     try {
       const lockResult = await createSlotLockMutation.mutateAsync({
         locks: [
           {
             slotId: effectiveSlotId,
+            startTime: slotStartTime,
             staffId: selectedTechnician?.isAny
               ? null
               : (selectedTechnician?.id ?? null),
             positionId: positionId,
             appointmentDate,
             serviceId,
+            salonId,
           },
         ],
       });
@@ -290,6 +295,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
               ? null
               : (selectedTechnician?.id ?? null),
             slotId: effectiveSlotId,
+            startTime: slotStartTime,
             appointmentDate,
             salonId,
             positionId: positionId ?? undefined,

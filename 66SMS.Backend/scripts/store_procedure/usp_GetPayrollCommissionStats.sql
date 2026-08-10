@@ -50,7 +50,7 @@ BEGIN
         ap.appointment_code      AS AppointmentCode,
         ap.created_by_user_id    AS AppointmentCreatedByUserId,
         ap.staff_id              AS AppointmentStaffId,
-        ap.slot_id               AS SlotId,
+        CAST(NULL AS INT)            AS SlotId,
         ap.position_id           AS PositionId,
         ap.lock_id               AS LockId,
         ap.salon_id              AS AppointmentSalonId,
@@ -63,8 +63,8 @@ BEGIN
         ap.paid_amount           AS AppointmentPaidAmount,
         ap.deposit_percent       AS DepositPercent,
         ap.completed_at          AS CompletedAt,
-        COALESCE(ap.time_appt_start, ts.start_time) AS SlotStartTime,
-        COALESCE(ap.time_appt_end, ts.end_time)     AS SlotEndTime,
+        ap.time_appt_start       AS SlotStartTime,
+        ap.time_appt_end         AS SlotEndTime,
         (
             SELECT ISNULL(SUM(aps.duration_snapshot), 0)
             FROM dbo.appointment_services AS aps
@@ -78,12 +78,10 @@ BEGIN
         ON st.id = ii.staff_id
     LEFT JOIN dbo.appointments AS ap
         ON ap.id = inv.appointment_id
-    LEFT JOIN dbo.time_slots AS ts
-        ON ts.id = ap.slot_id
     WHERE ii.staff_id = @StaffId
       AND ii.status = 1
       AND inv.status = 2
       AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
-    ORDER BY IssuedLocalDate, COALESCE(ap.time_appt_start, ts.start_time), inv.id, ii.id;
+    ORDER BY IssuedLocalDate, ap.time_appt_start, inv.id, ii.id;
 END
 GO

@@ -2,16 +2,16 @@ IF OBJECT_ID(N'dbo.usp_ResolveBookingStaff', N'P') IS NOT NULL
     DROP PROCEDURE dbo.usp_ResolveBookingStaff;
 GO
 
--- Tim 1 staff nhan duoc slot. @staff_id NULL = bat ky.
--- @exclude_appointment_id: bo qua lich dang doi gio (tranh tu ban minh).
+-- Tim 1 staff nhan duoc khung gio. Bat buoc @start_time; @slot_id giu de tuong thich, khong dung.
 CREATE PROCEDURE dbo.usp_ResolveBookingStaff
     @date                   DATE,
     @service_id             INT,
-    @slot_id                INT,
+    @slot_id                INT = NULL,
     @staff_id               INT = NULL,
     @salon_id               INT = NULL,
     @exclude_lock_id        INT = NULL,
-    @exclude_appointment_id INT = NULL
+    @exclude_appointment_id INT = NULL,
+    @start_time             TIME(7) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -30,9 +30,7 @@ BEGIN
     IF @duration_mins IS NULL
         RETURN;
 
-    SELECT @window_start = start_time
-    FROM dbo.time_slots
-    WHERE id = @slot_id;
+    SET @window_start = @start_time;
 
     IF @window_start IS NULL
         RETURN;
@@ -119,16 +117,16 @@ BEGIN
     WHERE EXISTS (
         SELECT 1
         FROM dbo.appointments a
-        INNER JOIN dbo.time_slots ts ON ts.id = a.slot_id
         LEFT JOIN #appt_mins d ON d.appointment_id = a.id
         WHERE a.staff_id = s.staff_id
           AND a.appointment_date = @date
           AND a.status NOT IN (5, 6, 9)
           AND (@exclude_appointment_id IS NULL OR a.id <> @exclude_appointment_id)
-          AND COALESCE(a.time_appt_start, ts.start_time) < @window_end
+          AND a.time_appt_start IS NOT NULL
+          AND a.time_appt_start < @window_end
           AND COALESCE(
                 CAST(a.time_appt_end AS DATETIME),
-                DATEADD(MINUTE, ISNULL(d.mins, 30), CAST(COALESCE(a.time_appt_start, ts.start_time) AS DATETIME))
+                DATEADD(MINUTE, ISNULL(d.mins, 30), CAST(a.time_appt_start AS DATETIME))
               ) > @window_start_dt
     );
 
@@ -138,17 +136,24 @@ BEGIN
     WHERE EXISTS (
         SELECT 1
         FROM dbo.appointment_slot_locks l
-        INNER JOIN dbo.time_slots ts ON ts.id = l.slot_id
         WHERE l.staff_id = s.staff_id
           AND l.appointment_date = @date
           AND l.status = 1
           AND l.expires_at > @now
           AND (@exclude_lock_id IS NULL OR l.id <> @exclude_lock_id)
-          AND ts.start_time < @window_end
-          AND DATEADD(
-                MINUTE,
-                CASE WHEN l.slots_needed > 0 THEN l.slots_needed ELSE 1 END * 30,
-                CAST(ts.start_time AS DATETIME)
+          AND l.start_time IS NOT NULL
+          AND l.start_time < @window_end
+          AND COALESCE(
+                CAST(l.end_time AS DATETIME),
+                DATEADD(
+                    MINUTE,
+                    ISNULL(
+                        l.duration_mins,
+                        CASE WHEN ISNULL(l.slots_needed, 1) > 0 THEN l.slots_needed ELSE 1 END
+                            * ISNULL(l.slot_minutes, 30)
+                    ),
+                    CAST(l.start_time AS DATETIME)
+                )
               ) > @window_start_dt
     );
 

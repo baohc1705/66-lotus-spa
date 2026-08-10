@@ -4,7 +4,7 @@ import { cashierApi } from "../api/cashier.api";
 export function useStaffAvailability(
   open: boolean,
   date: Date,
-  slotId: number | null,
+  startTime: string | null,
   serviceId: number | null,
   salonId?: number | null,
 ) {
@@ -12,13 +12,17 @@ export function useStaffAvailability(
     queryKey: [
       "cashier-staff-availability",
       date.toDateString(),
-      slotId,
+      startTime,
       serviceId,
       salonId,
     ],
     queryFn: () =>
-      cashierApi.getStaffAvailability(date, slotId!, serviceId!, salonId),
-    enabled: open && slotId != null && serviceId != null && serviceId > 0,
+      cashierApi.getStaffAvailability(date, startTime!, serviceId!, salonId),
+    enabled:
+      open &&
+      !!startTime &&
+      serviceId != null &&
+      serviceId > 0,
     staleTime: 30_000,
   });
 }

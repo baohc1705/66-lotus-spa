@@ -26,7 +26,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
         private readonly IWorkScheduleSqlRepository workScheduleSqlRepository;
         private readonly IPromotionSqlRepository promotionSqlRepository;
         private readonly IConfigAppointmentSqlRepository configAppointmentSqlRepository;
-        private readonly ITimeSlotSqlRepository timeSlotSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IDomainEventPublisher domainEventPublisher;
 
@@ -39,7 +38,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             IWorkScheduleSqlRepository workScheduleSqlRepository,
             IPromotionSqlRepository promotionSqlRepository,
             IConfigAppointmentSqlRepository configAppointmentSqlRepository,
-            ITimeSlotSqlRepository timeSlotSqlRepository,
             ISqlUnitOfWork sqlUnitOfWork,
             IDomainEventPublisher domainEventPublisher)
         {
@@ -51,7 +49,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             this.workScheduleSqlRepository = workScheduleSqlRepository;
             this.promotionSqlRepository = promotionSqlRepository;
             this.configAppointmentSqlRepository = configAppointmentSqlRepository;
-            this.timeSlotSqlRepository = timeSlotSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.domainEventPublisher = domainEventPublisher;
         }
@@ -103,18 +100,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                     .Where(x => lockIds.Contains(x.Id))
                     .ToDictionaryAsync(x => x.Id, cancellationToken);
 
-                var slotIds = guests
-                    .Select(x => x.LockId.HasValue && locks.TryGetValue(x.LockId.Value, out var locked) ? locked.SlotId : x.SlotId)
-                    .Where(id => id.HasValue)
-                    .Select(id => id!.Value)
-                    .Distinct()
-                    .ToList();
-
-                var slotStarts = await timeSlotSqlRepository.AsQueryable(asNoTracking: true)
-                    .Where(x => slotIds.Contains(x.Id))
-                    .Select(x => new { x.Id, x.StartTime })
-                    .ToDictionaryAsync(x => x.Id, x => x.StartTime, cancellationToken);
-
                 var deposits = await AppointmentPaymentCalculator.LoadDepositPercentBySalonAsync(configAppointmentSqlRepository, guests.Select(x => x.SalonId), cancellationToken);
 
                 var salonIds = guests
@@ -145,7 +130,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                     int staffId;
                     int? scheduleId;
                     AppointmentSlotLock? activeLock = null;
-                    int slotId;
 
                     if (guest.LockId.HasValue)
                     {
@@ -159,7 +143,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
 
                         activeLock = slotLock;
                         staffId = slotLock.StaffId;
-                        slotId = slotLock.SlotId;
                         scheduleId = await workScheduleSqlRepository.AsQueryable(asNoTracking: true)
                             .Where(x => x.StaffId == staffId
                                 && x.WorkDate == slotLock.AppointmentDate
@@ -169,16 +152,16 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                     }
                     else
                     {
-                        slotId = (int)guest.SlotId!;
                         var staffInfo = await appointmentSqlRepository.ResolveBookingStaffAsync(
                             (DateOnly)guest.AppointmentDate!,
                             mainServiceId,
-                            slotId,
+                            slotId: null,
                             guest.StaffId,
                             guest.SalonId,
                             null,
                             null,
-                            cancellationToken);
+                            startTime: DateTimeHelper.ParseTimeOnly(guest.StartTime),
+                            cancellationToken: cancellationToken);
 
                         if (staffInfo == null)
                         {
@@ -226,7 +209,15 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                             ErrorCodes.ERR_CONFIG_APPOINTMENT_NOT_FOUND);
                     }
 
-                    TimeOnly? slotStart = slotStarts.TryGetValue(slotId, out var startTime) ? startTime : null;
+                    TimeOnly? slotStart = null;
+                    if (activeLock?.StartTime != null)
+                    {
+                        slotStart = activeLock.StartTime;
+                    }
+                    else
+                    {
+                        slotStart = DateTimeHelper.ParseTimeOnly(guest.StartTime);
+                    }
                     var durationMinutes = appointmentServices.Sum(s => s.DurationSnapshot * s.Quantity);
 
                     var appointment = new Appointment
@@ -236,7 +227,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         StaffId = staffId,
                         SalonId = guest.SalonId,
                         ScheduleId = scheduleId,
-                        SlotId = slotId,
                         PositionId = activeLock != null ? activeLock.PositionId : guest.PositionId,
                         LockId = activeLock?.Id,
                         AppointmentDate = (DateOnly)guest.AppointmentDate!,

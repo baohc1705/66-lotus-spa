@@ -27,6 +27,7 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetTimeSlots
             {
                 SlotId = r.SlotId,
                 Time = r.Time,
+                StartTime = r.Time,
                 Status = r.Status,
             }).ToList();
 

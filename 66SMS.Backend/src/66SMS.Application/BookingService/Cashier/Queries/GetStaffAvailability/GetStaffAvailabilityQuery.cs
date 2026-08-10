@@ -8,6 +8,7 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetStaffAvailability
     {
         public DateOnly? Date { get; set; }
         public int? SlotId { get; set; }
+        public string? StartTime { get; set; }
         public int? ServiceId { get; set; }
         public int? SalonId { get; set; }
     }

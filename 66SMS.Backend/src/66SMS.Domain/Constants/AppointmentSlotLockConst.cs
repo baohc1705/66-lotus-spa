@@ -16,6 +16,12 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_EXPIRES_AT = "expires_at";
         public const string FIELD_RELEASED_AT = "released_at";
         public const string FIELD_STATUS = "status";
+        public const string FIELD_START_TIME = "start_time";
+        public const string FIELD_END_TIME = "end_time";
+        public const string FIELD_SALON_ID = "salon_id";
+        public const string FIELD_DURATION_MINS = "duration_mins";
+        public const string FIELD_SLOT_MINUTES = "slot_minutes";
+        public const string FIELD_SERVICE_ID = "service_id";
         #endregion
 
         #region Status

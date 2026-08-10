@@ -15,6 +15,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
         public int? LockId { get; set; }
         public int? StaffId { get; set; }
         public int? SlotId { get; set; }
+        public string? StartTime { get; set; }
         public DateOnly? AppointmentDate { get; set; }
         public int? PositionId { get; set; }
         public int? SalonId { get; set; }

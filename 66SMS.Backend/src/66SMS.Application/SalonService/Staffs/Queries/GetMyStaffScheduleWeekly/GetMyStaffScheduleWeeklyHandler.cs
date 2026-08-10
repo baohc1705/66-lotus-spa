@@ -40,7 +40,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleWeekl
                     && a.AppointmentDate >= weekStart
                     && a.AppointmentDate <= weekEnd)
                 .OrderBy(a => a.AppointmentDate)
-                .ThenBy(a => a.TimeApptStart ?? a.TimeSlot!.StartTime)
+                .ThenBy(a => a.TimeApptStart)
                 .Select(a => new
                 {
                     a.AppointmentDate,
@@ -53,8 +53,8 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleWeekl
                         ServiceName = string.Join(", ", a.Services!
                             .Where(s => s.Service != null)
                             .Select(s => s.Service!.Name)),
-                        StartTime = a.TimeApptStart ?? a.TimeSlot!.StartTime,
-                        EndTime = a.TimeApptEnd ?? a.TimeSlot!.EndTime,
+                        StartTime = a.TimeApptStart,
+                        EndTime = a.TimeApptEnd,
                         Status = a.Status,
                         PaidAmount = a.PaidAmount,
                         TotalAmount = a.TotalAmount,

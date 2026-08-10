@@ -1,3 +1,4 @@
+using _66SMS.Contract.Helpers;
 using _66SMS.Domain.Constants;
 using FluentValidation;
 
@@ -7,8 +8,8 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetStaffAvailability
     {
         public GetStaffAvailabilityValidator()
         {
-            RuleFor(x => x.SlotId)
-                .GreaterThan(0)
+            RuleFor(x => x.StartTime)
+                .Must(t => DateTimeHelper.ParseTimeOnly(t) != null)
                 .WithMessage(AppointmentConst.MSG_STAFF_AVAILABILITY_SLOT_REQUIRED);
 
             RuleFor(x => x.ServiceId)

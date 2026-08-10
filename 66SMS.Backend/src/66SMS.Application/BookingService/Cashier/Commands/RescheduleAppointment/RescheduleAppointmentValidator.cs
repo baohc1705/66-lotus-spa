@@ -8,8 +8,8 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.RescheduleAppointme
         public RescheduleAppointmentValidator()
         {
             RuleFor(x => x.AppointmentId).GreaterThan(0);
-            RuleFor(x => x.SlotId)
-                .GreaterThan(0)
+            RuleFor(x => x.StartTime)
+                .NotEmpty()
                 .WithMessage(AppointmentConst.MSG_RESCHEDULE_SLOT_REQUIRED);
             RuleFor(x => x.AppointmentDate)
                 .Must(d => d != default)

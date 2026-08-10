@@ -185,7 +185,6 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
             var appointment = await appointmentSqlRepository.AsQueryable(asNoTracking: false)
                 .Include(a => a.Services!)
                     .ThenInclude(s => s.Service)
-                .Include(a => a.TimeSlot)
                 .Include(a => a.CreatedByUser!)
                     .ThenInclude(u => u!.Customer!)
                         .ThenInclude(c => c!.MembershipCard!)
@@ -267,7 +266,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
             if (string.IsNullOrWhiteSpace(customerEmail))
                 return;
 
-            var startTime = appointment.TimeApptStart ?? appointment.TimeSlot?.StartTime;
+            var startTime = appointment.TimeApptStart;
             if (startTime is null)
                 return;
 

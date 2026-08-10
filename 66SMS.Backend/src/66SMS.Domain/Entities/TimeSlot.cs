@@ -6,8 +6,5 @@ namespace _66SMS.Domain.Entities
     {
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
-
-        public ICollection<Appointment>? Appointments { get; set; }
-        public ICollection<AppointmentSlotLock>? SlotLocks { get; set; }
     }
 }

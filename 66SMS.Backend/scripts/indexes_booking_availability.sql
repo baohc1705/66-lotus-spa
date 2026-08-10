@@ -5,7 +5,7 @@ GO
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_appointments_date_status_staff' AND object_id = OBJECT_ID(N'dbo.appointments'))
     CREATE INDEX IX_appointments_date_status_staff
         ON dbo.appointments (appointment_date, status)
-        INCLUDE (staff_id, slot_id);
+        INCLUDE (staff_id, time_appt_start, time_appt_end);
 GO
 
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_work_schedules_date_staff' AND object_id = OBJECT_ID(N'dbo.work_schedules'))
@@ -23,7 +23,7 @@ GO
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_slot_locks_date_active' AND object_id = OBJECT_ID(N'dbo.appointment_slot_locks'))
     CREATE INDEX IX_slot_locks_date_active
         ON dbo.appointment_slot_locks (appointment_date, status, expires_at)
-        INCLUDE (staff_id, slot_id, slots_needed);
+        INCLUDE (staff_id, start_time, end_time, slots_needed);
 GO
 
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_appt_services_appt_status_dur' AND object_id = OBJECT_ID(N'dbo.appointment_services'))

@@ -2,52 +2,52 @@ IF OBJECT_ID(N'dbo.usp_GetStaffAvailability', N'P') IS NOT NULL
     DROP PROCEDURE dbo.usp_GetStaffAvailability;
 GO
 
+-- @SlotId giu de tuong thich, khong dung. Bat buoc @start_time.
 CREATE PROCEDURE dbo.usp_GetStaffAvailability
-    @WorkDate  DATE,
-    @SlotId    INT,
-    @ServiceId INT,
-    @SalonId   INT = NULL
+    @WorkDate   DATE,
+    @SlotId     INT = NULL,
+    @ServiceId  INT,
+    @SalonId    INT = NULL,
+    @start_time TIME(7) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    DECLARE @DurationMins  INT;
-    DECLARE @WindowStart   TIME(7);
-    DECLARE @WindowStartDt DATETIME;
-    DECLARE @WindowEndDt   DATETIME;
-    DECLARE @WindowEndT    TIME(7);
-    DECLARE @Now           DATETIMEOFFSET(7) = SYSDATETIMEOFFSET();
+    DECLARE @duration_mins   INT;
+    DECLARE @window_start    TIME(7);
+    DECLARE @window_start_dt DATETIME;
+    DECLARE @window_end_dt   DATETIME;
+    DECLARE @window_end      TIME(7);
+    DECLARE @now             DATETIMEOFFSET(7) = SYSDATETIMEOFFSET();
 
-    SELECT @DurationMins = duration_mins
+    SELECT @duration_mins = duration_mins
     FROM dbo.services
     WHERE id = @ServiceId AND status = 1;
 
-    IF @DurationMins IS NULL
+    IF @duration_mins IS NULL
         RETURN;
 
-    SELECT @WindowStart = start_time
-    FROM dbo.time_slots
-    WHERE id = @SlotId;
+    SET @window_start = @start_time;
 
-    IF @WindowStart IS NULL
+    IF @window_start IS NULL
         RETURN;
 
-    SET @WindowStartDt = CAST(@WindowStart AS DATETIME);
-    SET @WindowEndDt   = DATEADD(MINUTE, @DurationMins, @WindowStartDt);
-    SET @WindowEndT    = CAST(@WindowEndDt AS TIME(7));
+    SET @window_start_dt = CAST(@window_start AS DATETIME);
+    SET @window_end_dt   = DATEADD(MINUTE, @duration_mins, @window_start_dt);
+    SET @window_end      = CAST(@window_end_dt AS TIME(7));
 
-    CREATE TABLE #Result (
-        StaffId          INT            NOT NULL PRIMARY KEY,
-        StaffName        NVARCHAR(100)  NOT NULL,
-        Avatar           NVARCHAR(500)  NULL,
-        ScheduleId       INT            NULL,
-        InShift          BIT            NOT NULL DEFAULT 0,
-        IsBusy           BIT            NOT NULL DEFAULT 0,
-        BusyCustomerName NVARCHAR(100)  NULL,
-        BusyTimeRange    NVARCHAR(20)   NULL
+    CREATE TABLE #result (
+        staff_id           INT            NOT NULL PRIMARY KEY,
+        staff_name         NVARCHAR(100)  NOT NULL,
+        avatar             NVARCHAR(500)  NULL,
+        schedule_id        INT            NULL,
+        in_shift           BIT            NOT NULL DEFAULT 0,
+        is_busy            BIT            NOT NULL DEFAULT 0,
+        busy_customer_name NVARCHAR(100)  NULL,
+        busy_time_range    NVARCHAR(20)   NULL
     );
 
-    INSERT INTO #Result (StaffId, StaffName, Avatar)
+    INSERT INTO #result (staff_id, staff_name, avatar)
     SELECT
         st.id,
         st.full_name,
@@ -79,29 +79,29 @@ BEGIN
 
     UPDATE r
     SET
-        r.InShift = 1,
-        r.ScheduleId = ws.id
-    FROM #Result r
+        r.in_shift = 1,
+        r.schedule_id = ws.id
+    FROM #result r
     INNER JOIN dbo.work_schedules ws
-        ON ws.staff_id = r.StaffId
+        ON ws.staff_id = r.staff_id
        AND ws.work_date = @WorkDate
        AND ws.status = 1
     INNER JOIN dbo.shift_periods sp
         ON sp.id = ws.shift_period_id
-    WHERE sp.shift_start <= @WindowStart
-      AND sp.shift_end >= @WindowEndT
+    WHERE sp.shift_start <= @window_start
+      AND sp.shift_end >= @window_end
       AND (
             @SalonId IS NULL
             OR ws.salon_id = @SalonId
             OR ws.salon_id IS NULL
           );
 
-    CREATE TABLE #ApptDur (
-        AppointmentId INT NOT NULL PRIMARY KEY,
-        TotalMins     INT NOT NULL
+    CREATE TABLE #appt_dur (
+        appointment_id INT NOT NULL PRIMARY KEY,
+        total_mins     INT NOT NULL
     );
 
-    INSERT INTO #ApptDur (AppointmentId, TotalMins)
+    INSERT INTO #appt_dur (appointment_id, total_mins)
     SELECT
         aps.appointment_id,
         SUM(aps.duration_snapshot * aps.quantity)
@@ -114,35 +114,33 @@ BEGIN
       AND (@SalonId IS NULL OR a.salon_id = @SalonId)
     GROUP BY aps.appointment_id;
 
-    CREATE TABLE #Busy (
-        StaffId          INT            NOT NULL PRIMARY KEY,
-        BusyCustomerName NVARCHAR(100)  NULL,
-        BusyTimeRange    NVARCHAR(20)   NULL
+    CREATE TABLE #busy (
+        staff_id           INT            NOT NULL PRIMARY KEY,
+        busy_customer_name NVARCHAR(100)  NULL,
+        busy_time_range    NVARCHAR(20)   NULL
     );
 
-    INSERT INTO #Busy (StaffId, BusyCustomerName, BusyTimeRange)
+    INSERT INTO #busy (staff_id, busy_customer_name, busy_time_range)
     SELECT
         a.staff_id,
         MIN(COALESCE(c.full_name, stf.full_name, u.username, N'Khách')),
         MIN(
-            CONVERT(varchar(5), COALESCE(a.time_appt_start, ts.start_time), 108)
+            CONVERT(varchar(5), a.time_appt_start, 108)
             + N'-'
             + CONVERT(
                 varchar(5),
                 COALESCE(
                     CAST(a.time_appt_end AS DATETIME),
-                    DATEADD(MINUTE, ISNULL(d.TotalMins, 30), CAST(COALESCE(a.time_appt_start, ts.start_time) AS DATETIME))
+                    DATEADD(MINUTE, ISNULL(d.total_mins, 30), CAST(a.time_appt_start AS DATETIME))
                 ),
                 108
             )
         )
     FROM dbo.appointments a
-    INNER JOIN #Result r
-        ON r.StaffId = a.staff_id
-    INNER JOIN dbo.time_slots ts
-        ON ts.id = a.slot_id
-    LEFT JOIN #ApptDur d
-        ON d.AppointmentId = a.id
+    INNER JOIN #result r
+        ON r.staff_id = a.staff_id
+    LEFT JOIN #appt_dur d
+        ON d.appointment_id = a.id
     INNER JOIN dbo.users u
         ON u.id = a.created_by_user_id
     LEFT JOIN dbo.customers c
@@ -152,68 +150,70 @@ BEGIN
     WHERE a.appointment_date = @WorkDate
       AND a.status NOT IN (5, 6, 9)
       AND (@SalonId IS NULL OR a.salon_id = @SalonId)
-      AND COALESCE(a.time_appt_start, ts.start_time) < @WindowEndT
+      AND a.time_appt_start IS NOT NULL
+      AND a.time_appt_start < @window_end
       AND COALESCE(
             CAST(a.time_appt_end AS DATETIME),
-            DATEADD(MINUTE, ISNULL(d.TotalMins, 30), CAST(COALESCE(a.time_appt_start, ts.start_time) AS DATETIME))
-          ) > @WindowStartDt
+            DATEADD(MINUTE, ISNULL(d.total_mins, 30), CAST(a.time_appt_start AS DATETIME))
+          ) > @window_start_dt
     GROUP BY a.staff_id;
 
     UPDATE r
     SET
-        r.IsBusy = 1,
-        r.BusyCustomerName = b.BusyCustomerName,
-        r.BusyTimeRange = b.BusyTimeRange
-    FROM #Result r
-    INNER JOIN #Busy b ON b.StaffId = r.StaffId;
+        r.is_busy = 1,
+        r.busy_customer_name = b.busy_customer_name,
+        r.busy_time_range = b.busy_time_range
+    FROM #result r
+    INNER JOIN #busy b ON b.staff_id = r.staff_id;
 
     UPDATE r
-    SET r.IsBusy = 1
-    FROM #Result r
+    SET r.is_busy = 1
+    FROM #result r
     INNER JOIN dbo.appointment_slot_locks l
-        ON l.staff_id = r.StaffId
+        ON l.staff_id = r.staff_id
        AND l.appointment_date = @WorkDate
        AND l.status = 1
-       AND l.expires_at > @Now
-    INNER JOIN dbo.time_slots ts
-        ON ts.id = l.slot_id
-    WHERE ts.start_time < @WindowEndT
-      AND DATEADD(
-            MINUTE,
-            CASE WHEN l.slots_needed > 0 THEN l.slots_needed ELSE 1 END * 30,
-            CAST(ts.start_time AS DATETIME)
-          ) > @WindowStartDt;
+       AND l.expires_at > @now
+    WHERE l.start_time IS NOT NULL
+      AND l.start_time < @window_end
+      AND COALESCE(
+            CAST(l.end_time AS DATETIME),
+            DATEADD(
+                MINUTE,
+                ISNULL(l.duration_mins, ISNULL(l.slots_needed, 1) * ISNULL(l.slot_minutes, 30)),
+                CAST(l.start_time AS DATETIME)
+            )
+          ) > @window_start_dt;
 
     SELECT
-        r.StaffId,
-        r.StaffName,
-        r.Avatar,
-        r.ScheduleId,
+        r.staff_id AS StaffId,
+        r.staff_name AS StaffName,
+        r.avatar AS Avatar,
+        r.schedule_id AS ScheduleId,
         CASE
-            WHEN r.InShift = 0 THEN N'off'
-            WHEN r.IsBusy = 1 THEN N'busy'
+            WHEN r.in_shift = 0 THEN N'off'
+            WHEN r.is_busy = 1 THEN N'busy'
             ELSE N'available'
         END AS Status,
         CASE
-            WHEN r.InShift = 0 THEN N'Ngoài giờ làm'
-            WHEN r.IsBusy = 1 AND r.BusyCustomerName IS NOT NULL THEN N'Đang có lịch'
-            WHEN r.IsBusy = 1 THEN N'Đang bị giữ chỗ'
+            WHEN r.in_shift = 0 THEN N'Ngoài giờ làm'
+            WHEN r.is_busy = 1 AND r.busy_customer_name IS NOT NULL THEN N'Đang có lịch'
+            WHEN r.is_busy = 1 THEN N'Đang bị giữ chỗ'
             ELSE NULL
         END AS Reason,
-        CASE WHEN r.IsBusy = 1 THEN r.BusyCustomerName ELSE NULL END AS BusyCustomerName,
-        CASE WHEN r.IsBusy = 1 THEN r.BusyTimeRange ELSE NULL END AS BusyTimeRange
-    FROM #Result r
+        CASE WHEN r.is_busy = 1 THEN r.busy_customer_name ELSE NULL END AS BusyCustomerName,
+        CASE WHEN r.is_busy = 1 THEN r.busy_time_range ELSE NULL END AS BusyTimeRange
+    FROM #result r
     ORDER BY
         CASE
-            WHEN r.InShift = 0 THEN 3
-            WHEN r.IsBusy = 1 THEN 2
+            WHEN r.in_shift = 0 THEN 3
+            WHEN r.is_busy = 1 THEN 2
             ELSE 1
         END,
-        r.StaffName;
+        r.staff_name;
 
-    DROP TABLE #Busy;
-    DROP TABLE #ApptDur;
-    DROP TABLE #Result;
+    DROP TABLE #busy;
+    DROP TABLE #appt_dur;
+    DROP TABLE #result;
 END
 GO
-

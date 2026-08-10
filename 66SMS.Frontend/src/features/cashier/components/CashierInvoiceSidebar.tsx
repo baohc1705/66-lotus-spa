@@ -260,38 +260,45 @@ function CashierInvoiceSidebarForm({
 
   const timeSlotsQuery = useTimeSlots({
     date:
-      canEditAssignment && !booking.slotId
+      canEditAssignment && !booking.startTime
         ? (booking.bookingDate ?? undefined)
         : undefined,
     serviceId: booking.serviceId ?? undefined,
     salonId: salonId ?? undefined,
   });
 
-  const resolvedSlotId = useMemo(() => {
-    if (editSlotId) return editSlotId;
-    if (booking.slotId) return booking.slotId;
-    const slots = timeSlotsQuery.data ?? [];
-    for (let index = 0; index < slots.length; index++) {
-      const slot = slots[index];
-      if (
-        slot.time === booking.startTime ||
-        slot.time.startsWith(booking.startTime)
-      ) {
-        return slot.slotId;
+  const resolvedStartTime = useMemo(() => {
+    if (editSlotId != null) {
+      const rescheduleList = rescheduleSlots;
+      for (let index = 0; index < rescheduleList.length; index++) {
+        if (rescheduleList[index].slotId === editSlotId) {
+          return (
+            rescheduleList[index].startTime ||
+            rescheduleList[index].time ||
+            null
+          );
+        }
+      }
+      const catalog = timeSlotsQuery.data ?? [];
+      for (let index = 0; index < catalog.length; index++) {
+        if (catalog[index].slotId === editSlotId) {
+          return catalog[index].startTime || catalog[index].time || null;
+        }
       }
     }
+    if (booking.startTime) return booking.startTime;
     return null;
   }, [
     editSlotId,
-    booking.slotId,
     booking.startTime,
+    rescheduleSlots,
     timeSlotsQuery.data,
   ]);
 
   const availabilityQuery = useStaffAvailability(
     canEditAssignment,
     bookingDateObj,
-    resolvedSlotId,
+    resolvedStartTime,
     booking.serviceId ?? null,
     salonId,
   );
@@ -426,11 +433,15 @@ function CashierInvoiceSidebarForm({
     setIsSaving(true);
     try {
       if (scheduleChanged && editSlotId != null) {
+        const selectedSlot = rescheduleSlots.find(
+          (slot: TimeSlotDTO) => slot.slotId === editSlotId,
+        );
         const rescheduleRes = await cashierApi.rescheduleAppointment(
           booking.id,
           {
             appointmentDate: editDate,
             slotId: editSlotId,
+            startTime: selectedSlot?.startTime || selectedSlot?.time,
           },
         );
         if (!rescheduleRes.isSuccess) {
@@ -605,7 +616,7 @@ function CashierInvoiceSidebarForm({
 
     if (
       availabilityQuery.isLoading ||
-      (!booking.slotId && timeSlotsQuery.isLoading)
+      (!booking.startTime && timeSlotsQuery.isLoading)
     ) {
       return (
         <div className="flex h-9 items-center gap-1.5 text-sm text-kit-muted">
@@ -615,7 +626,7 @@ function CashierInvoiceSidebarForm({
       );
     }
 
-    if (!resolvedSlotId || !booking.serviceId) {
+    if (!resolvedStartTime || !booking.serviceId) {
       return (
         <p className="text-xs text-kit-muted">
           Thiếu dịch vụ để lọc NV rảnh
