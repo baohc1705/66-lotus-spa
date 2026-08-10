@@ -114,12 +114,19 @@ export function AdminProfilePage() {
       return;
     }
 
+    const salonId = useAuthStore.getState().getEffectiveSalonId() ?? mySalon?.salonId;
+    if (!salonId) {
+      toast.error("Không tìm thấy chi nhánh");
+      return;
+    }
+
     let avatarBase64: string | undefined;
     if (pendingAvatarFile) {
       avatarBase64 = await fileToBase64(pendingAvatarFile);
     }
 
     const payload = {
+      salonId,
       fullName: data.fullName,
       phone: data.phoneNumber,
       gender:
