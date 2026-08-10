@@ -31,6 +31,16 @@ namespace _66SMS.Application.IdentityService.Users.Commands.UpdateUser
 
             mapper.Map(request, user);
 
+            if (request.Status == UserConst.STATUS_ACTIVED)
+            {
+                user.AccessFailedCount = 0;
+                user.LockoutEnd = null;
+            }
+            else if (request.Status == UserConst.STATUS_INACTIVED)
+            {
+                user.LockoutEnd = null;
+            }
+
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {

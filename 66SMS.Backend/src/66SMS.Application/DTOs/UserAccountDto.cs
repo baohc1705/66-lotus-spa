@@ -2,6 +2,7 @@ namespace _66SMS.Application.DTOs;
 
 public class UserAccountDto
 {
+    public int Id { get; set; }
     public string Username { get; set; } = null!;
     public string Email { get; set; } = null!;
     public bool IsEmailConfirmed { get; set; }

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SERVICE_DURATION_OPTIONS } from "../constants/service.durations";
+import { SERVICE_DURATION_VALUES } from "../constants/service.durations";
 
 export const serviceProductSchema = z.object({
   id: z.number().optional(),
@@ -10,8 +10,6 @@ export const serviceProductSchema = z.object({
   note: z.string().optional(),
   unitCost: z.coerce.number().optional(),
 });
-
-const durationValues = [...SERVICE_DURATION_OPTIONS] as number[];
 
 const serviceBaseSchema = z.object({
   categoryId: z.coerce
@@ -30,7 +28,7 @@ const serviceBaseSchema = z.object({
   content: z.string().optional().or(z.literal("")),
   durationMins: z.coerce
     .number()
-    .refine((v) => durationValues.includes(v), "Chọn thời gian hợp lệ"),
+    .refine((value) => SERVICE_DURATION_VALUES.includes(value), "Chọn thời gian hợp lệ"),
   costPrice: z.coerce.number().min(0, "Giá cơ bản không được âm"),
   minSellingPrice: z.coerce
     .number()

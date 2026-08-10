@@ -60,8 +60,26 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Login
             if (userExisted == null)
                 return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_INVALID_CREDENTIALS, ErrorCodes.ERR_AUTH_INVALID_CREDENTIALS);
 
-            if (userExisted.Status == UserConst.STATUS_LOCKED)
-                return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_LOCKOUT_TIMEOUT, ErrorCodes.ERR_AUTH_ACCOUNT_LOCKED);
+            if (userExisted.Status != UserConst.STATUS_ACTIVED)
+            {
+                if (userExisted.LockoutEnd != null && userExisted.LockoutEnd <= DateTimeHelper.UtcNow())
+                {
+                    userExisted.Status = UserConst.STATUS_ACTIVED;
+                    userExisted.AccessFailedCount = 0;
+                    userExisted.LockoutEnd = null;
+                    userSqlRepository.Update(userExisted);
+                    await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+                }
+                else if (userExisted.LockoutEnd != null && userExisted.LockoutEnd > DateTimeHelper.UtcNow())
+                {
+                    var remainingMinutes = GetMinutesLeft(userExisted.LockoutEnd.Value);
+                    return Result<TokenResponseDTO>.BadRequest(string.Format(UserConst.MSG_USER_LOCKOUT_TIMEOUT, remainingMinutes), ErrorCodes.ERR_AUTH_ACCOUNT_LOCKED);
+                }
+                else
+                {
+                    return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_ACCOUNT_DISABLED, ErrorCodes.ERR_USER_ACCOUNT_INACTIVE);
+                }
+            }
 
             if (!passwordHash.Verify(userExisted.PasswordHash, request.Password))
             {
@@ -69,20 +87,25 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Login
 
                 if (userExisted.AccessFailedCount >= jwtOptions.Value.MaxFailedAttempts)
                 {
-                    userExisted.Status = (int)StatusActiveEnum.IACTIVED;
-                    userExisted.LockoutEnd = DateTimeHelper.UtcNow().AddMinutes(jwtOptions.Value.AccessTokenExpiryMinutes);
+                    var lockoutMinutes = jwtOptions.Value.LockoutDurationMinutes;
+                    if (lockoutMinutes < 1) lockoutMinutes = 15;
+                    userExisted.Status = UserConst.STATUS_INACTIVED;
+                    userExisted.LockoutEnd = DateTimeHelper.UtcNow().AddMinutes(lockoutMinutes);
+
+                    userSqlRepository.Update(userExisted);
+                    await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
+
+                    return Result<TokenResponseDTO>.BadRequest(string.Format(UserConst.MSG_USER_ACCOUNT_LOCKED, lockoutMinutes), ErrorCodes.ERR_AUTH_ACCOUNT_LOCKED);
                 }
 
                 userSqlRepository.Update(userExisted);
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
 
-                return userExisted.Status == (int)StatusActiveEnum.IACTIVED
-                    ? Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_ACCOUNT_LOCKED, ErrorCodes.ERR_AUTH_ACCOUNT_LOCKED)
-                    : Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_WRONG_PASSWORD, ErrorCodes.ERR_AUTH_INVALID_CREDENTIALS);
+                return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_WRONG_PASSWORD, ErrorCodes.ERR_AUTH_INVALID_CREDENTIALS);
             }
 
             userExisted.AccessFailedCount = 0;
-            userExisted.Status = (int)StatusActiveEnum.ACTIVED;
+            userExisted.Status = UserConst.STATUS_ACTIVED;
             userExisted.LockoutEnd = null;
             userExisted.LastLoginAt = DateTimeHelper.UtcNow();
             userSqlRepository.Update(userExisted);
@@ -214,6 +237,13 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Login
             }
 
             return profile;
+        }
+
+        private static int GetMinutesLeft(DateTimeOffset lockoutEnd)
+        {
+            var remaining = (int)Math.Ceiling((lockoutEnd - DateTimeHelper.UtcNow()).TotalMinutes);
+            if (remaining < 1) return 1;
+            return remaining;
         }
     }
 }

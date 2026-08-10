@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useForm, type FieldErrors, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Briefcase, KeyRound, Loader2, User } from "lucide-react";
+import { Briefcase, Loader2, User } from "lucide-react";
 
 import { Modal } from "@/shared/components/Modal";
 import { Tabs } from "@/shared/components/Tabs";
 import { Button } from "@/shared/elements/Button";
+import { CurrencyInput } from "@/shared/forms/CurrencyInput";
 import { FormField } from "@/shared/forms/FormField";
 import { ImageUpload } from "@/shared/forms/ImageUpload";
 import { Input } from "@/shared/forms/Input";
@@ -111,8 +112,19 @@ export function StaffFormDialog({
   // eslint-disable-next-line react-hooks/incompatible-library
   const selectedProvince = watch("provinceCode");
   const avatarUrl = watch("avatarUrl");
+  const selectedSalonId = watch("salonId");
   const provincesQuery = useProvinces();
   const wardsQuery = useWardsByProvince(selectedProvince);
+
+  const salonOptions: { value: string; label: string }[] = [];
+  for (let index = 0; index < salons.length; index++) {
+    const salon = salons[index];
+    if (!salon.id) continue;
+    salonOptions.push({
+      value: String(salon.id),
+      label: salon.name ?? "",
+    });
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -374,7 +386,7 @@ export function StaffFormDialog({
               },
               {
                 id: "work",
-                label: "Công việc",
+                label: "Thông tin công việc",
                 content: (
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-sm font-semibold text-kit-heading">
@@ -386,16 +398,20 @@ export function StaffFormDialog({
                       <FormField
                         label="Chi nhánh *"
                         tooltip="Chọn chi nhánh mà nhân viên này thuộc về"
-                        error={
-                          (errors as Record<string, { message?: string }>)
-                            .salonId?.message
-                        }
+                        error={errors.salonId?.message}
                       >
-                        <Select
-                          value={watch("salonId")?.toString() ?? ""}
-                          onChange={(e) =>
-                            setValue("salonId", Number(e.target.value))
-                          }
+                        <SearchableSelect
+                          value={selectedSalonId ? String(selectedSalonId) : ""}
+                          onChange={(value: string) => {
+                            if (!value) {
+                              setValue("salonId", 0, { shouldValidate: true });
+                              return;
+                            }
+                            setValue("salonId", Number(value), {
+                              shouldValidate: true,
+                            });
+                          }}
+                          options={salonOptions}
                           disabled={salonsResult === undefined}
                           placeholder={
                             salonsResult === undefined
@@ -404,14 +420,9 @@ export function StaffFormDialog({
                                 ? "Không có chi nhánh"
                                 : "Chọn chi nhánh..."
                           }
-                        >
-                          <option value="">Chọn chi nhánh</option>
-                          {salons.map((s) => (
-                            <option key={s.id} value={String(s.id)}>
-                              {s.name}
-                            </option>
-                          ))}
-                        </Select>
+                          searchPlaceholder="Tìm chi nhánh..."
+                          invalid={!!errors.salonId}
+                        />
                       </FormField>
 
                       <FormField
@@ -447,13 +458,17 @@ export function StaffFormDialog({
                       </FormField>
 
                       <FormField
-                        label="Đơn giá (theo giờ/ngày tùy loại lương)"
+                        label="Lương cơ bản"
                         error={errors.basicSalary?.message}
                       >
-                        <Input
-                          {...register("basicSalary", { valueAsNumber: true })}
-                          type="number"
-                          placeholder="10000000"
+                        <CurrencyInput
+                          value={watch("basicSalary")}
+                          onChange={(value) =>
+                            setValue("basicSalary", value, {
+                              shouldValidate: true,
+                            })
+                          }
+                          placeholder="10.000.000"
                           invalid={!!errors.basicSalary}
                         />
                       </FormField>
@@ -491,22 +506,6 @@ export function StaffFormDialog({
                         </Select>
                       </FormField>
                     </div>
-
-                    {!isEdit ? (
-                      <div className="flex items-start gap-2.5 rounded-lg border border-kit bg-kit-page px-3.5 py-3 text-xs text-kit-body">
-                        <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-kit-primary" />
-                        <div>
-                          <p className="font-semibold text-kit-heading">
-                            Tài khoản đăng nhập tự động
-                          </p>
-                          <p className="mt-0.5 text-kit-muted">
-                            Tài khoản (tên đăng nhập & mật khẩu mặc định) sẽ
-                            được hệ thống tạo tự động dựa trên mã nhân viên sau
-                            khi bạn nhấn tạo mới.
-                          </p>
-                        </div>
-                      </div>
-                    ) : null}
                   </div>
                 ),
               },
@@ -546,7 +545,7 @@ function getDefaultValues(
 ): StaffFormValues {
   if (staff) {
     return {
-      salonId: staff.salonId ?? managedSalonId ?? undefined,
+      salonId: staff.salonId != null ? staff.salonId : (managedSalonId ?? 0),
       fullName: staff.fullName ?? "",
       phone: staff.phone ?? "",
       dateOfBirth: parseToDateInput(staff.dateOfBirth),
@@ -566,7 +565,7 @@ function getDefaultValues(
     };
   }
   return {
-    salonId: managedSalonId ?? undefined,
+    salonId: managedSalonId ?? 0,
     fullName: "",
     phone: "",
     dateOfBirth: "",

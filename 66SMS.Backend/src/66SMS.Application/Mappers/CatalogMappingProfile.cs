@@ -8,6 +8,7 @@ using _66SMS.Application.CatalogService.ServiceProducts.Commands.CreateServicePr
 using _66SMS.Application.CatalogService.ServiceProducts.Commands.UpdateServiceProducts;
 using _66SMS.Application.CatalogService.Services.Commands.CreateServices;
 using _66SMS.Application.CatalogService.Services.Commands.UpdateServices;
+using _66SMS.Application.CatalogService.StaffCertificates.Commands.CreateStaffCertificate;
 using _66SMS.Application.CatalogService.TreatmentCourses.Commands.CreateTreatmentCourse;
 using _66SMS.Application.CatalogService.TreatmentCourses.Commands.UpdateTreatmentCourse;
 using _66SMS.Application.DTOs;
@@ -65,6 +66,15 @@ namespace _66SMS.Application.Mappers
             CreateMap<UpdateTreatmentCourseCommand, TreatmentCourse>().IgnoreNullValueTypes();
             CreateMap<CreateTreatmentCourseItemDto, TreatmentCourseItem>().IgnoreNullValueTypes();
             CreateMap<UpdateTreatmentCourseItemDto, TreatmentCourseItem>().IgnoreNullValueTypes();
+            #endregion
+
+            #region Staff Certificate
+            CreateMap<CreateStaffCertificateCommand, StaffCertificate>()
+                .ForMember(d => d.IssuedDate, opt => opt.MapFrom(s => DateOnly.Parse(s.IssuedDate!)))
+                .ForMember(d => d.ExpiryDate, opt => opt.MapFrom(s =>
+                    string.IsNullOrEmpty(s.ExpiryDate) ? (DateOnly?)null : DateOnly.Parse(s.ExpiryDate)))
+                .ForMember(d => d.DocumentUrl, opt => opt.Ignore())
+                .IgnoreNullValueTypes();
             #endregion
         }
     }

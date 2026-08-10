@@ -236,14 +236,14 @@ export function SalonFormDialog({
           <FormSection icon={MapPin} title="Địa chỉ">
             <FormRow>
               <FormField
-                label="Tỉnh/Thành phố"
+                label="Tỉnh/Thành phố *"
                 error={errors.provinceCode?.message}
               >
                 <SearchableSelect
                   value={watch("provinceCode") ?? ""}
                   onChange={(value) => {
-                    setValue("provinceCode", value);
-                    setValue("wardCode", "");
+                    setValue("provinceCode", value, { shouldValidate: true });
+                    setValue("wardCode", "", { shouldValidate: true });
                   }}
                   options={provinceOptions}
                   placeholder="Chọn tỉnh/thành phố"
@@ -251,10 +251,12 @@ export function SalonFormDialog({
                   invalid={!!errors.provinceCode}
                 />
               </FormField>
-              <FormField label="Phường/Xã" error={errors.wardCode?.message}>
+              <FormField label="Phường/Xã *" error={errors.wardCode?.message}>
                 <SearchableSelect
                   value={watch("wardCode") ?? ""}
-                  onChange={(value) => setValue("wardCode", value)}
+                  onChange={(value) =>
+                    setValue("wardCode", value, { shouldValidate: true })
+                  }
                   options={wardOptions}
                   placeholder="Chọn phường/xã"
                   searchPlaceholder="Tìm phường/xã..."

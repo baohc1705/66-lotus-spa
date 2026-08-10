@@ -27,6 +27,7 @@ import {
   BarChart,
   Calendar1Icon,
   Home,
+  Scissors,
 } from "lucide-react";
 
 export interface SubMenuItem {
@@ -160,6 +161,12 @@ export const MENU_GROUPS: MenuGroup[] = [
         allowedRoles: ["Admin", "Manager"],
       },
       {
+        label: "Dịch vụ của tôi",
+        path: "/admin/staff/my-services",
+        icon: Scissors,
+        allowedRoles: ["Staff"],
+      },
+      {
         label: "Chấm công",
         path: "/admin/attendance",
         icon: CalendarCheck,
@@ -168,13 +175,13 @@ export const MENU_GROUPS: MenuGroup[] = [
       {
         label: "Lương",
         icon: Wallet,
-        allowedRoles: ["Admin", "Manager", "Staff"],
+        allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
         children: [
           {
             label: "Danh sách",
             path: "/admin/payroll",
             icon: Wallet,
-            allowedRoles: ["Admin", "Manager"],
+            allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
           },
           {
             label: "Thống kê lương",
@@ -187,17 +194,25 @@ export const MENU_GROUPS: MenuGroup[] = [
       {
         label: "Chứng chỉ",
         icon: Award,
-        allowedRoles: ["Admin", "Manager"],
+        allowedRoles: ["Admin", "Manager", "Staff"],
         children: [
           {
             label: "Chứng chỉ nhân viên",
             path: "/admin/staff-certificates",
             icon: ShieldCheck,
+            allowedRoles: ["Admin", "Manager"],
+          },
+          {
+            label: "Nộp chứng chỉ",
+            path: "/admin/my-certificates",
+            icon: Award,
+            allowedRoles: ["Staff"],
           },
           {
             label: "Loại chứng chỉ",
             path: "/admin/certificate-types",
             icon: Award,
+            allowedRoles: ["Admin", "Manager"],
           },
         ],
       },
@@ -421,6 +436,12 @@ export const TOP_NAV_TABS: ParentTab[] = [
             icon: User,
             allowedRoles: ["Admin", "Manager"],
           },
+          {
+            label: "Dịch vụ của tôi",
+            path: "/admin/staff/my-services",
+            icon: Scissors,
+            allowedRoles: ["Staff"],
+          },
         ],
       },
       {
@@ -431,6 +452,12 @@ export const TOP_NAV_TABS: ParentTab[] = [
             path: "/admin/staff-certificates",
             icon: ShieldCheck,
             allowedRoles: ["Admin", "Manager"],
+          },
+          {
+            label: "Nộp chứng chỉ",
+            path: "/admin/my-certificates",
+            icon: Award,
+            allowedRoles: ["Staff"],
           },
           {
             label: "Loại chứng chỉ",

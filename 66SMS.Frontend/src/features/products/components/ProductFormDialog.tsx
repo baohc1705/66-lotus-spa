@@ -36,6 +36,7 @@ import {
   useUpdateProduct,
   useProductDetail,
 } from "../hooks/useProducts";
+import { PRODUCT_UNIT_OPTIONS } from "../types/unit.type";
 import {
   createProductSchema,
   type CreateProductPayload,
@@ -102,6 +103,19 @@ export function ProductFormDialog({
     control,
     name: "images",
   });
+
+  const selectedUnit = watch("unit") ?? "";
+  const unitOptions = [...PRODUCT_UNIT_OPTIONS];
+  let unitInList = false;
+  for (let index = 0; index < PRODUCT_UNIT_OPTIONS.length; index++) {
+    if (PRODUCT_UNIT_OPTIONS[index].value === selectedUnit) {
+      unitInList = true;
+      break;
+    }
+  }
+  if (selectedUnit && !unitInList) {
+    unitOptions.push({ value: selectedUnit, label: selectedUnit });
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -267,10 +281,7 @@ export function ProductFormDialog({
                               <Select
                                 value={watch("categoryId")?.toString() || ""}
                                 onChange={(e) =>
-                                  setValue(
-                                    "categoryId",
-                                    Number(e.target.value),
-                                  )
+                                  setValue("categoryId", Number(e.target.value))
                                 }
                                 invalid={!!errors.categoryId}
                               >
@@ -302,10 +313,16 @@ export function ProductFormDialog({
                           label="Đơn vị tính *"
                           error={errors.unit?.message}
                         >
-                          <Input
-                            {...register("unit")}
-                            placeholder="Cái, Hộp, Chai..."
+                          <Select
+                            value={selectedUnit}
+                            onChange={(event) =>
+                              setValue("unit", event.target.value, {
+                                shouldValidate: true,
+                              })
+                            }
                             invalid={!!errors.unit}
+                            placeholder="Chọn đơn vị tính"
+                            options={unitOptions}
                           />
                         </FormField>
 
@@ -315,9 +332,7 @@ export function ProductFormDialog({
                         >
                           <div className="flex h-9 items-center">
                             <Switch
-                              checked={
-                                watch("status") === StatusActive.Active
-                              }
+                              checked={watch("status") === StatusActive.Active}
                               onChange={(checked: boolean) =>
                                 setValue(
                                   "status",
@@ -439,8 +454,7 @@ export function ProductFormDialog({
                       {imageFields.map((field, index) => {
                         const isPrimary = watch(`images.${index}.isPrimary`);
                         const preview =
-                          imagePreviews[index] ||
-                          watch(`images.${index}.url`);
+                          imagePreviews[index] || watch(`images.${index}.url`);
                         return (
                           <div
                             key={field.id}

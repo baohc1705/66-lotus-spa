@@ -21,6 +21,7 @@ import {
   AccountListPage,
   UsersPage,
   StaffListPage,
+  MyStaffServicesPage,
   StaffAppointmentsPage,
   CustomerListPage,
   MembershipCardListPage,
@@ -154,6 +155,14 @@ export const router = createBrowserRouter([
             element: (
               <WithPageSuspense>
                 <StaffListPage />
+              </WithPageSuspense>
+            ),
+          },
+          {
+            path: "staff/my-services",
+            element: (
+              <WithPageSuspense>
+                <MyStaffServicesPage />
               </WithPageSuspense>
             ),
           },
@@ -326,6 +335,14 @@ export const router = createBrowserRouter([
             element: (
               <WithPageSuspense>
                 <StaffCertificatesPage />
+              </WithPageSuspense>
+            ),
+          },
+          {
+            path: "my-certificates",
+            element: (
+              <WithPageSuspense>
+                <StaffCertificatesPage submitMode />
               </WithPageSuspense>
             ),
           },

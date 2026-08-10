@@ -38,13 +38,13 @@ namespace _66SMS.Application.BookingService.Promotions.Queries.GetDetailPromotio
                     GetQuantity = x.GetQuantity,
                     UsageLimit = x.UsageLimit,
                     UsedCount = x.UsedCount,
-                    StartDate = x.StartDate.ToString("dd/MM/yyyy HH:mm"),
-                    EndDate = x.EndDate.ToString("dd/MM/yyyy HH:mm"),
+                    StartDate = x.StartDate,
+                    EndDate = x.EndDate,
                     Status = x.Status,
                     StatusName = x.Status == PromotionConst.STATUS_ACTIVE ? "Đang hoạt động"
                         : x.Status == PromotionConst.STATUS_INACTIVE ? "Không hoạt động"
                         : "Đã xóa",
-                    CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy HH:mm"),
+                    CreatedAt = x.CreatedAt,
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

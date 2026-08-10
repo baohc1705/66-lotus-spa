@@ -35,6 +35,18 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
+        // Staff tự nộp chứng chỉ (dùng Create handler)
+        [HttpPost("mine")]
+        [Authorize]
+        public async Task<IActionResult> CreateMine([FromBody] CreateStaffCertificateCommand command)
+        {
+            var userId = jwtService.GetUserId();
+            command.UserId = userId;
+            command.CreatedBy = userId;
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
         [HttpPatch("{id}")]
         [PermissionAuthorize("certificate", "update")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateStaffCertificateCommand command)

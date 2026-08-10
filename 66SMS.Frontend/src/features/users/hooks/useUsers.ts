@@ -56,12 +56,12 @@ export function useCreateUser() {
 }
 
 export function useUpdateUser() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: UpdateUserPayload) => usersApi.update(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: USER_KEYS.all });
+        queryClient.invalidateQueries({ queryKey: USER_KEYS.all });
         toast.success(`Cập nhật ${ENTITY} thành công`);
       } else {
         toast.error(result.message || "Có lỗi xảy ra");
@@ -115,6 +115,6 @@ export function useGetAllAccounts(params?: PageRequest) {
   return useQuery({
     queryKey: USER_KEYS.adminList(params ?? {}),
     queryFn: () => usersApi.getAllAccounts(params),
-    staleTime: 1000 * 30, // 30s
+    staleTime: 1000 * 30,
   });
 }

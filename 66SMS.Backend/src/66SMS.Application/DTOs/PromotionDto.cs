@@ -15,10 +15,10 @@ namespace _66SMS.Application.DTOs
         public int? GetQuantity { get; set; }
         public int? UsageLimit { get; set; }
         public int? UsedCount { get; set; }
-        public string? StartDate { get; set; }
-        public string? EndDate { get; set; }
+        public DateTimeOffset StartDate { get; set; }
+        public DateTimeOffset EndDate { get; set; }
         public int? Status { get; set; }
         public string? StatusName { get; set; }
-        public string? CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
     }
 }

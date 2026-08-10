@@ -20,6 +20,10 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.CreateSta
         public string? Note { get; set; }
         public int? Status { get; set; } = StaffCertificateConst.STATUS_PENDING_VERIFICATION;
 
+        /// <summary>Staff tự nộp: set UserId, handler lấy StaffId và status chờ duyệt.</summary>
+        [JsonIgnore]
+        public int? UserId { get; set; }
+
         [JsonIgnore]
         public int? CreatedBy { get; set; }
         [JsonIgnore]

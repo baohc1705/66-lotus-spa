@@ -52,6 +52,13 @@ export const certificateApi = {
       .post<Result<number>>("/staff-certificate", payload)
       .then((r) => r.data),
 
+  createMine: (
+    payload: Omit<CreateStaffCertificatePayload, "staffId" | "status">,
+  ) =>
+    axiosInstance
+      .post<Result<number>>("/staff-certificate/mine", payload)
+      .then((r) => r.data),
+
   update: (id: number, payload: UpdateStaffCertificatePayload) =>
     axiosInstance
       .patch<Result<object>>(`/staff-certificate/${id}`, payload)

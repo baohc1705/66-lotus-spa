@@ -1,4 +1,4 @@
-import { Pencil, ExternalLink, FileText, ShieldCheck } from "lucide-react";
+import { CheckCircle2, Pencil, ExternalLink, FileText, ShieldCheck } from "lucide-react";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Button } from "@/shared/elements/Button";
 import {
@@ -16,10 +16,20 @@ import { CertificateStatusBadge, ExpiryBadge } from "./CertificateStatusBadge";
 interface Props {
   cert: StaffCertificateDTO;
   onEdit: () => void;
+  onApprove?: (cert: StaffCertificateDTO) => void;
+  isApproving?: boolean;
+  submitMode?: boolean;
 }
 
-export function StaffCertificateDetailExpanded({ cert, onEdit }: Props) {
+export function StaffCertificateDetailExpanded({
+  cert,
+  onEdit,
+  onApprove,
+  isApproving = false,
+  submitMode = false,
+}: Props) {
   const perm = CERTIFICATE_PERM;
+  const canApprove = !submitMode && cert.status === 0 && !!onApprove;
 
   const previewIcon = cert.documentUrl ? (
     <img
@@ -85,17 +95,33 @@ export function StaffCertificateDetailExpanded({ cert, onEdit }: Props) {
             Chưa có ảnh scan
           </span>
         )}
-        <PermissionGate resource={perm.resource} action={perm.update}>
-          <Button
-            variant="admin"
-            size="sm"
-            className="mb-0"
-            onClick={onEdit}
-          >
-            <Pencil className="h-3.5 w-3.5" />
-            Chỉnh sửa
-          </Button>
-        </PermissionGate>
+        {canApprove ? (
+          <PermissionGate resource={perm.resource} action={perm.update}>
+            <Button
+              variant="admin"
+              size="sm"
+              className="mb-0"
+              loading={isApproving}
+              onClick={() => onApprove(cert)}
+            >
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Duyệt chứng chỉ
+            </Button>
+          </PermissionGate>
+        ) : null}
+        {!submitMode ? (
+          <PermissionGate resource={perm.resource} action={perm.update}>
+            <Button
+              variant="admin"
+              size="sm"
+              className="mb-0"
+              onClick={onEdit}
+            >
+              <Pencil className="h-3.5 w-3.5" />
+              Chỉnh sửa
+            </Button>
+          </PermissionGate>
+        ) : null}
       </TableDetailActions>
     </TableDetailExpanded>
   );

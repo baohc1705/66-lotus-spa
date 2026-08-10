@@ -8,6 +8,8 @@ using MediatR;
 using System.Data;
 using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Abstractions;
+using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.CreateStaffCertificate
 {
@@ -18,23 +20,41 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.CreateSta
         private readonly ICertificateTypeSqlRepository certificateTypeRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IImageUploadService imageUploadService;
+        private readonly IMapper mapper;
 
         public CreateStaffCertificateHandler(
             IStaffCertificateSqlRepository staffCertificateRepository,
             IStaffSqlRepository staffRepository,
             ICertificateTypeSqlRepository certificateTypeRepository,
             ISqlUnitOfWork sqlUnitOfWork,
-            IImageUploadService imageUploadService)
+            IImageUploadService imageUploadService,
+            IMapper mapper)
         {
             this.staffCertificateRepository = staffCertificateRepository;
             this.staffRepository = staffRepository;
             this.certificateTypeRepository = certificateTypeRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.imageUploadService = imageUploadService;
+            this.mapper = mapper;
         }
 
         public async Task<Result<int>> Handle(CreateStaffCertificateCommand request, CancellationToken cancellationToken)
         {
+            // Staff tự nộp: lấy staff theo user đang login
+            if (request.UserId.HasValue && request.UserId.Value > 0)
+            {
+                var myStaffId = await staffRepository.AsQueryable(asNoTracking: true)
+                    .Where(x => x.UserId == request.UserId.Value && x.Status != StaffConst.STATUS_DELETED)
+                    .Select(x => (int?)x.Id)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (myStaffId == null)
+                    return Result<int>.NotFound(StaffCertificateConst.MSG_NOT_FOUND, ErrorCodes.ERR_STAFF_NOT_FOUND);
+
+                request.StaffId = myStaffId.Value;
+                request.Status = StaffCertificateConst.STATUS_PENDING_VERIFICATION;
+            }
+
             var staff = await staffRepository.FindByIdAsync((int)request.StaffId!, true, cancellationToken);
             if (staff == null)
                 return Result<int>.NotFound(StaffCertificateConst.MSG_NOT_FOUND, ErrorCodes.ERR_STAFF_NOT_FOUND);
@@ -43,20 +63,10 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.CreateSta
             if (certType == null || certType.Status == CertificateTypeConst.STATUS_DELETED)
                 return Result<int>.NotFound(CertificateTypeConst.MSG_NOT_FOUND, ErrorCodes.ERR_CERTIFICATE_TYPE_NOT_FOUND);
 
-            var entity = new StaffCertificate
-            {
-                StaffId = request.StaffId!.Value,
-                CertificateTypeId = request.CertificateTypeId!.Value,
-                CertificateName = request.CertificateName!,
-                CertificateNumber = request.CertificateNumber,
-                IssuingOrganization = request.IssuingOrganization!,
-                IssuedDate = DateOnly.Parse(request.IssuedDate!),
-                ExpiryDate = string.IsNullOrEmpty(request.ExpiryDate) ? null : DateOnly.Parse(request.ExpiryDate),
-                DocumentUrl = string.IsNullOrWhiteSpace(request.ImageBase64) ? request.DocumentUrl : null,
-                Note = request.Note,
-                Status = request.Status ?? StaffCertificateConst.STATUS_PENDING_VERIFICATION,
-                CreatedAt = request.CreatedAt ?? DateTimeHelper.UtcNow(),
-            };
+            StaffCertificate entity = mapper.Map<StaffCertificate>(request);
+            entity.CreatedAt = request.CreatedAt ?? DateTimeHelper.UtcNow();
+            entity.Status = request.Status ?? StaffCertificateConst.STATUS_PENDING_VERIFICATION;
+            entity.DocumentUrl = string.IsNullOrWhiteSpace(request.ImageBase64) ? request.DocumentUrl : null;
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try

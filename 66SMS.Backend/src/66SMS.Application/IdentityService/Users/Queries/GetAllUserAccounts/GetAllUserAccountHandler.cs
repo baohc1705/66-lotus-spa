@@ -2,6 +2,7 @@ using _66SMS.Application.DTOs;
 using _66SMS.Contract.Extensions;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
+using _66SMS.Domain.Constants;
 using MediatR;
 
 namespace _66SMS.Application.IdentityService.Users.Queries.GetAllUserAccounts;
@@ -17,7 +18,8 @@ public class GetAllUserAccountHandler : IRequestHandler<GetAllUserAccountQuery, 
 
     public async Task<Result<PagedResult<UserAccountDto>>> Handle(GetAllUserAccountQuery request, CancellationToken cancellationToken)
     {
-        var query = userSqlRepository.AsQueryable(true);
+        var query = userSqlRepository.AsQueryable(true)
+            .Where(x => x.Status != UserConst.STATUS_DELETED);
 
         if (!string.IsNullOrEmpty(request.Filter))
             query = query.Where(x => x.Username.Contains(request.Filter) ||
@@ -33,6 +35,7 @@ public class GetAllUserAccountHandler : IRequestHandler<GetAllUserAccountQuery, 
 
         var dtoQuery = query.Select(x => new UserAccountDto
         {
+             Id = x.Id,
              Username = x.Username,
              Email = x.Email,
              Role = x.UserRoles!.Select(x => x.Role!.Name).FirstOrDefault(),

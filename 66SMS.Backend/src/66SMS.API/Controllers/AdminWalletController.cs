@@ -25,9 +25,8 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetWallets(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetWallets([FromQuery] GetWalletsQuery query, CancellationToken cancellationToken)
         {
-            var query = new GetWalletsQuery();
             var result = await mediator.Send(query, cancellationToken);
             return HandleResult(result);
         }

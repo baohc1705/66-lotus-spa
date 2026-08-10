@@ -39,10 +39,9 @@ namespace _66SMS.Application.SalonService.Salons.Commands.CreateSalon
                 request.ImageUrl = null;
 
             Salon salon = mapper.Map<Salon>(request);
-
             if (request.IsPrimary != true)
                 salon.IsPrimary = null;
-
+            salon.Code = "";
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {

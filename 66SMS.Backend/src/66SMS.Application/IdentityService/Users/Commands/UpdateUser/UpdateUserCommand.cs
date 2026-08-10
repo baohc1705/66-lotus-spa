@@ -10,7 +10,6 @@ namespace _66SMS.Application.IdentityService.Users.Commands.UpdateUser
     /// </summary>
     public class UpdateUserCommand : IRequest<Result<object>>
     {
-        [JsonIgnore]
         public int? Id { get; set; }
         public string? Username { get; set; }
         public string? Email { get; set; }

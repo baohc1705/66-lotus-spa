@@ -1,12 +1,12 @@
 using _66SMS.Application.DTOs;
+using _66SMS.Contract.Extensions;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.CustomerService.Wallets.Queries.GetWallets
 {
-    public class GetWalletsHandler : IRequestHandler<GetWalletsQuery, Result<IEnumerable<AdminWalletDto>>>
+    public class GetWalletsHandler : IRequestHandler<GetWalletsQuery, Result<PagedResult<AdminWalletDto>>>
     {
         private readonly IWalletSqlRepository walletRepository;
 
@@ -15,10 +15,30 @@ namespace _66SMS.Application.CustomerService.Wallets.Queries.GetWallets
             this.walletRepository = walletRepository;
         }
 
-        public async Task<Result<IEnumerable<AdminWalletDto>>> Handle(GetWalletsQuery request, CancellationToken cancellationToken)
+        public async Task<Result<PagedResult<AdminWalletDto>>> Handle(GetWalletsQuery request, CancellationToken cancellationToken)
         {
-            var wallets = await walletRepository.AsQueryable(asNoTracking: true)
-                .OrderByDescending(w => w.CreatedAt)
+            var query = walletRepository.AsQueryable(asNoTracking: true);
+
+            if (request.CustomerId.HasValue)
+                query = query.Where(x => x.CustomerId == request.CustomerId.Value);
+
+            if (!string.IsNullOrEmpty(request.Filter))
+            {
+                query = query.Where(x =>
+                    (x.Customer != null && x.Customer.FullName.Contains(request.Filter))
+                    || (x.Customer != null && x.Customer.Phone != null && x.Customer.Phone.Contains(request.Filter)));
+            }
+
+            query = request.OrderBy?.ToLower() switch
+            {
+                "balance" => request.IsDescending ? query.OrderByDescending(x => x.Balance) : query.OrderBy(x => x.Balance),
+                "customername" => request.IsDescending
+                    ? query.OrderByDescending(x => x.Customer!.FullName)
+                    : query.OrderBy(x => x.Customer!.FullName),
+                _ => request.IsDescending ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt),
+            };
+
+            var paged = await query
                 .Select(w => new AdminWalletDto
                 {
                     Id = w.Id,
@@ -29,11 +49,11 @@ namespace _66SMS.Application.CustomerService.Wallets.Queries.GetWallets
                     Balance = w.Balance,
                     Status = w.Status,
                     CreatedAt = w.CreatedAt,
-                    UpdatedAt = null
+                    UpdatedAt = null,
                 })
-                .ToListAsync(cancellationToken);
+                .ToPagedAsync(request, cancellationToken);
 
-            return Result<IEnumerable<AdminWalletDto>>.Success(wallets);
+            return Result<PagedResult<AdminWalletDto>>.Success(paged);
         }
     }
 }

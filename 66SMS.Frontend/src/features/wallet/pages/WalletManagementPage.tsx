@@ -7,15 +7,24 @@ import {
 } from "@tanstack/react-table";
 import { Eye, Wallet } from "lucide-react";
 
+import { Pagination } from "@/shared/components/Pagination";
 import { Tooltip } from "@/shared/components/Tooltip";
 import { Badge, type BadgeVariant } from "@/shared/elements/Badge";
 import { Button } from "@/shared/elements/Button";
+import { Select } from "@/shared/forms/Select";
 import { DataTable } from "@/shared/tables/DataTable";
 import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
-import { IndexCell, MutedSmallCell, NameCell, PriceCell, TextCell } from "@/shared/tables/TableCells";
+import {
+  IndexCell,
+  MutedSmallCell,
+  NameCell,
+  PriceCell,
+  TextCell,
+} from "@/shared/tables/TableCells";
 import { TableEmptyState } from "@/shared/tables/TableEmptyState";
 import { TablePageShell } from "@/shared/tables/TablePageShell";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
+import { useTableQueryParams } from "@/shared/hooks/useTableQueryParams";
 import {
   formatDateTimeDisplay,
   formatDisplayDate,
@@ -42,29 +51,33 @@ function walletStatusBadge(status: number) {
 }
 
 export function WalletManagementPage() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const {
+    pageIndex,
+    pageSize,
+    filter,
+    queryParams,
+    setPageIndex,
+    handlePageSizeChange,
+    handleSearchChange,
+  } = useTableQueryParams();
+
   const [selectedWallet, setSelectedWallet] = useState<{
     id: number;
     name: string;
   } | null>(null);
 
-  const { data: response, isLoading } = useQuery({
-    queryKey: ["admin-wallets"],
-    queryFn: getAdminWallets,
+  const { data: response, isLoading, isFetching } = useQuery({
+    queryKey: ["admin-wallets", queryParams],
+    queryFn: () => getAdminWallets(queryParams),
   });
 
-  const wallets = useMemo(() => response?.data || [], [response]);
-
-  const filteredWallets = useMemo(() => {
-    const keyword = searchTerm.toLowerCase();
-    return wallets.filter((wallet: AdminWalletDto) => {
-      const nameMatch = (wallet.customerName || "")
-        .toLowerCase()
-        .includes(keyword);
-      const phoneMatch = (wallet.customerPhone || "").includes(searchTerm);
-      return nameMatch || phoneMatch;
-    });
-  }, [wallets, searchTerm]);
+  const paged = response?.data;
+  const wallets = useMemo(() => paged?.items ?? [], [paged?.items]);
+  const totalCount = paged?.totalCount ?? 0;
+  const totalPages = Math.max(1, paged?.totalPages ?? 0);
+  const safePage = Math.min(pageIndex, totalPages);
+  const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, totalCount);
 
   const columns = useMemo<ColumnDef<AdminWalletDto>[]>(
     () => [
@@ -72,7 +85,11 @@ export function WalletManagementPage() {
         id: "index",
         header: "#",
         cell: ({ row }) => (
-          <IndexCell pageIndex={1} pageSize={filteredWallets.length} rowIndex={row.index} />
+          <IndexCell
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            rowIndex={row.index}
+          />
         ),
         size: 50,
       },
@@ -157,22 +174,23 @@ export function WalletManagementPage() {
         size: 60,
       },
     ],
-    [filteredWallets.length],
+    [pageIndex, pageSize],
   );
 
   const table = useReactTable({
-    data: filteredWallets,
+    data: wallets,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
   });
 
   return (
     <div className="space-y-3 pb-6 font-sans text-sm text-kit-body">
-      <TablePageShell isLoading={isLoading}>
+      <TablePageShell isLoading={isLoading} isFetching={isFetching}>
         <div className="border-b border-kit px-4 pt-4">
           <DataTableToolbar
-            searchValue={searchTerm}
-            onSearchChange={setSearchTerm}
+            searchValue={filter}
+            onSearchChange={handleSearchChange}
             searchPlaceholder="Tìm theo tên hoặc số điện thoại..."
           />
         </div>
@@ -182,10 +200,37 @@ export function WalletManagementPage() {
           isLoading={isLoading}
           loadingRows={DEFAULT_LOADING_ROWS}
           emptyState={
-            <TableEmptyState
-              icon={Wallet}
-              title="Không tìm thấy dữ liệu ví"
-            />
+            <TableEmptyState icon={Wallet} title="Không tìm thấy dữ liệu ví" />
+          }
+          pagination={
+            totalCount > 0 ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <div className="flex items-center gap-3 text-xs text-kit-muted">
+                  <span>
+                    {rangeStart}-{rangeEnd} / {totalCount}
+                  </span>
+                  <Select
+                    value={String(pageSize)}
+                    onChange={(event) =>
+                      handlePageSizeChange(Number(event.target.value))
+                    }
+                    options={[
+                      { value: "5", label: "5 / trang" },
+                      { value: "10", label: "10 / trang" },
+                      { value: "20", label: "20 / trang" },
+                    ]}
+                    inputSize="sm"
+                    className="w-auto min-w-28"
+                  />
+                </div>
+                <Pagination
+                  page={safePage}
+                  pageCount={totalPages}
+                  onPageChange={setPageIndex}
+                  size="sm"
+                />
+              </div>
+            ) : null
           }
         />
       </TablePageShell>

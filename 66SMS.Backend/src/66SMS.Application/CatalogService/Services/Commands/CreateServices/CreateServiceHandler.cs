@@ -1,3 +1,4 @@
+using System.Data;
 using _66SMS.Contract.Abstractions;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -7,7 +8,6 @@ using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Data;
 
 namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
 {
@@ -39,6 +39,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
         public async Task<Result<object>> Handle(CreateServiceCommand request, CancellationToken cancellationToken)
         {
             Service? service = mapper.Map<Service>(request);
+            service.Code = string.Empty;
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try

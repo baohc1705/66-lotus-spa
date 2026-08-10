@@ -80,6 +80,7 @@ export function ServiceDetailExpanded({
 
   const products = service?.serviceProducts ?? [];
   const profitTone = getProfitTone(service?.grossProfit);
+  const canEdit = !!onEdit;
 
   const tabs = useMemo(() => {
     if (!service) return [];
@@ -173,22 +174,24 @@ export function ServiceDetailExpanded({
               <TableDetailField label="Nội dung" value={service.content} />
             ) : null}
 
-            <TableDetailActions>
-              <PermissionGate
-                resource={SERVICE_PERM.resource}
-                action={SERVICE_PERM.update}
-              >
-                <Button
-                  variant="admin"
-                  size="sm"
-                  className="mb-0"
-                  onClick={() => onEdit?.(service)}
+            {canEdit ? (
+              <TableDetailActions>
+                <PermissionGate
+                  resource={SERVICE_PERM.resource}
+                  action={SERVICE_PERM.update}
                 >
-                  <Pencil className="h-3.5 w-3.5" />
-                  Cập nhật
-                </Button>
-              </PermissionGate>
-            </TableDetailActions>
+                  <Button
+                    variant="admin"
+                    size="sm"
+                    className="mb-0"
+                    onClick={() => onEdit?.(service)}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                    Cập nhật
+                  </Button>
+                </PermissionGate>
+              </TableDetailActions>
+            ) : null}
           </>
         ),
       },
@@ -213,9 +216,11 @@ export function ServiceDetailExpanded({
                     <TableHeaderCell>Thành tiền</TableHeaderCell>
                     <TableHeaderCell>Trạng thái</TableHeaderCell>
                     <TableHeaderCell>Ghi chú</TableHeaderCell>
-                    <TableHeaderCell className="w-16 text-center">
-                      Xóa
-                    </TableHeaderCell>
+                    {canEdit ? (
+                      <TableHeaderCell className="w-16 text-center">
+                        Xóa
+                      </TableHeaderCell>
+                    ) : null}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -244,24 +249,26 @@ export function ServiceDetailExpanded({
                       <TableCell className="max-w-xs truncate text-kit-muted">
                         {prod.note || "—"}
                       </TableCell>
-                      <TableCell className="text-center">
-                        <PermissionGate
-                          resource={SERVICE_PERM.resource}
-                          action={SERVICE_PERM.update}
-                        >
-                          <Tooltip text="Xóa sản phẩm khỏi dịch vụ">
-                            <Button
-                              size="icon-sm"
-                              variant="outline-danger"
-                              className="mb-0 mr-0"
-                              disabled={!prod.id}
-                              onClick={() => setDeleteTarget(prod)}
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
-                          </Tooltip>
-                        </PermissionGate>
-                      </TableCell>
+                      {canEdit ? (
+                        <TableCell className="text-center">
+                          <PermissionGate
+                            resource={SERVICE_PERM.resource}
+                            action={SERVICE_PERM.update}
+                          >
+                            <Tooltip text="Xóa sản phẩm khỏi dịch vụ">
+                              <Button
+                                size="icon-sm"
+                                variant="outline-danger"
+                                className="mb-0 mr-0"
+                                disabled={!prod.id}
+                                onClick={() => setDeleteTarget(prod)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </Tooltip>
+                          </PermissionGate>
+                        </TableCell>
+                      ) : null}
                     </TableRow>
                   ))}
                 </TableBody>
@@ -270,7 +277,7 @@ export function ServiceDetailExpanded({
           ),
       },
     ];
-  }, [service, products, profitTone, onEdit]);
+  }, [service, products, profitTone, onEdit, canEdit]);
 
   if (isLoading) {
     return (

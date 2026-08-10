@@ -90,7 +90,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (user == null || user.Status == UserConst.STATUS_LOCKED)
+            if (user == null || user.Status != UserConst.STATUS_ACTIVED)
                 return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_NOT_FOUND, ErrorCodes.ERR_USER_NOT_FOUND);
 
             stored.IsRevoked = true;
