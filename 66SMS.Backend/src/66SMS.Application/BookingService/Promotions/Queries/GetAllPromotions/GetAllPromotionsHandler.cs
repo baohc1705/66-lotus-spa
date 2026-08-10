@@ -24,8 +24,8 @@ namespace _66SMS.Application.BookingService.Promotions.Queries.GetAllPromotions
             if (request.Status.HasValue)
                 query = query.Where(x => x.Status == request.Status.Value);
 
-            if (!string.IsNullOrEmpty(request.Keyword))
-                query = query.Where(x => x.Code.Contains(request.Keyword) || x.Name.Contains(request.Keyword));
+            if (!string.IsNullOrEmpty(request.Filter))
+                query = query.Where(x => x.Code.Contains(request.Filter) || x.Name.Contains(request.Filter));
 
             query = request.OrderBy?.ToLower() switch
             {
@@ -54,13 +54,13 @@ namespace _66SMS.Application.BookingService.Promotions.Queries.GetAllPromotions
                     GetQuantity = x.GetQuantity,
                     UsageLimit = x.UsageLimit,
                     UsedCount = x.UsedCount,
-                    StartDate = x.StartDate.ToString("dd/MM/yyyy HH:mm"),
-                    EndDate = x.EndDate.ToString("dd/MM/yyyy HH:mm"),
+                    StartDate = x.StartDate,
+                    EndDate = x.EndDate,
                     Status = x.Status,
                     StatusName = x.Status == PromotionConst.STATUS_ACTIVE ? "Đang hoạt động"
                         : x.Status == PromotionConst.STATUS_INACTIVE ? "Không hoạt động"
                         : "Đã xóa",
-                    CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy HH:mm"),
+                    CreatedAt = x.CreatedAt,
                 })
                 .ToPagedAsync(request, cancellationToken);
 

@@ -11,5 +11,6 @@ namespace _66SMS.Contract.Settings
         public int AccessTokenExpiryMinutes { get; set; } = 15;
         public int RefreshTokenExpiryDays { get; set; } = 7;
         public int MaxFailedAttempts { get; set; } = 5;
+        public int LockoutDurationMinutes { get; set; } = 15;
     }
 }

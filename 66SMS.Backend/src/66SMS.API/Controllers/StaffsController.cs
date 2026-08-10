@@ -14,6 +14,7 @@ using _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleDaily;
 using _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleWeekly;
 using _66SMS.Contract.Abstractions;
 using _66SMS.Contract.Shared;
+using _66SMS.Domain.Constants;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
@@ -171,7 +172,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPost("services")]
-        [PermissionAuthorize("staffs", "create")]
+        [Authorize(Roles = $"{RoleConst.CODE_ADMIN},{RoleConst.CODE_MANAGER}")]
         public async Task<IActionResult> CreateStaffService([FromBody] CreateStaffServiceCommand command)
         {
             var result = await mediator.Send(command);
@@ -179,7 +180,7 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpPatch("services/{id}")]
-        [PermissionAuthorize("staffs", "update")]
+        [Authorize(Roles = $"{RoleConst.CODE_ADMIN},{RoleConst.CODE_MANAGER}")]
         public async Task<IActionResult> UpdateStaffService(int id, [FromBody] UpdateStaffServiceCommand command)
         {
             command.Id = id;
@@ -188,17 +189,32 @@ namespace _66SMS.API.Controllers
         }
 
         [HttpDelete("services")]
-        [PermissionAuthorize("staffs", "delete")]
+        [Authorize(Roles = $"{RoleConst.CODE_ADMIN},{RoleConst.CODE_MANAGER}")]
         public async Task<IActionResult> DeleteStaffService([FromBody] DeleteStaffServiceCommand command)
         {
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
 
+        // Admin/Manager xem theo staffId; Staff/KTV chỉ xem dịch vụ của mình (giống payroll).
         [HttpGet("services")]
         [PermissionAuthorize("staffs", "read")]
         public async Task<IActionResult> GetAllStaffServices([FromQuery] GetAllStaffServiceQuery query)
         {
+            var profile = jwtService.GetProfile();
+            var isAdmin = profile?.Roles.Any(r =>
+                string.Equals(r, RoleConst.CODE_ADMIN, StringComparison.OrdinalIgnoreCase)) == true;
+            var isManager = profile?.Roles.Any(r =>
+                string.Equals(r, RoleConst.CODE_MANAGER, StringComparison.OrdinalIgnoreCase)) == true;
+
+            if (!isAdmin && !isManager)
+            {
+                var myStaffId = profile?.StaffProfile?.StaffId ?? 0;
+                if (myStaffId <= 0)
+                    return HandleResult(Result<object>.BadRequest("Không tìm thấy hồ sơ nhân viên."));
+                query.StaffId = myStaffId;
+            }
+
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

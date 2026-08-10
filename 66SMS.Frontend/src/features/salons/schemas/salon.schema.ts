@@ -16,8 +16,14 @@ const salonBaseSchema = z.object({
     .optional()
     .or(z.literal("")),
   streetAddress: z.string().max(200).optional().or(z.literal("")),
-  provinceCode: z.string().max(20).optional().or(z.literal("")),
-  wardCode: z.string().max(20).optional().or(z.literal("")),
+  provinceCode: z
+    .string()
+    .min(1, "Tỉnh/Thành phố không được để trống")
+    .max(20, "Tối đa 20 ký tự"),
+  wardCode: z
+    .string()
+    .min(1, "Phường/Xã không được để trống")
+    .max(20, "Tối đa 20 ký tự"),
   fullAddress: z.string().max(500).optional().or(z.literal("")),
   taxCode: z.string().max(20).optional().or(z.literal("")),
   workingDays: z.string().max(64).optional().or(z.literal("")),

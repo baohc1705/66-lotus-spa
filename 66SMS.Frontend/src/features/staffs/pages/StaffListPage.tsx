@@ -335,6 +335,8 @@ export function StaffListPage() {
         cell: ({ row }) => {
           const staff = row.original;
           const expanded = row.getIsExpanded();
+          const isAdmin = hasRole("admin");
+          const isManager = hasRole("manager");
           const items: DropdownItem[] = [
             {
               type: "item",
@@ -344,7 +346,7 @@ export function StaffListPage() {
             },
           ];
 
-          if (hasPermission(perm.resource, perm.update)) {
+          if (hasPermission(perm.resource, perm.update) && isAdmin) {
             items.push({
               type: "item",
               label: "Sửa",
@@ -352,18 +354,13 @@ export function StaffListPage() {
               onClick: () => setEditTarget(staff),
             });
           }
-          if (hasPermission(perm.resource, perm.create)) {
+          if (isAdmin || isManager) {
             items.push({
               type: "item",
               label: "Phân công dịch vụ",
               icon: <Scissors className="h-4 w-4" />,
               onClick: () => setAssignTarget(staff),
             });
-          }
-          if (
-            hasPermission(perm.resource, perm.create) &&
-            (!perm.role || hasRole(perm.role))
-          ) {
             items.push({
               type: "item",
               label: "Xem chứng chỉ",
@@ -372,10 +369,7 @@ export function StaffListPage() {
                 navigate(`/admin/staff-certificates?staffId=${staff.id}`),
             });
           }
-          if (
-            hasPermission(perm.resource, perm.delete) &&
-            (!perm.role || hasRole(perm.role))
-          ) {
+          if (hasPermission(perm.resource, perm.delete) && isAdmin) {
             items.push({ type: "divider" });
             items.push({
               type: "item",

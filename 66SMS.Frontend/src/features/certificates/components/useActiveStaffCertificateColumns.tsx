@@ -24,6 +24,9 @@ interface UseActiveStaffCertificateColumnsParams {
   pageSize: number;
   onEdit: (item: StaffCertificateDTO) => void;
   onDelete: (item: StaffCertificateDTO) => void;
+  onApprove?: (item: StaffCertificateDTO) => void;
+  isApproving?: boolean;
+  submitMode?: boolean;
 }
 
 export function useActiveStaffCertificateColumns({
@@ -31,6 +34,9 @@ export function useActiveStaffCertificateColumns({
   pageSize,
   onEdit,
   onDelete,
+  onApprove,
+  isApproving = false,
+  submitMode = false,
 }: UseActiveStaffCertificateColumnsParams) {
   const cols = STAFF_CERTIFICATE_COLUMN_LABELS;
   const perm = CERTIFICATE_PERM;
@@ -109,6 +115,7 @@ export function useActiveStaffCertificateColumns({
         cell: ({ row }) => {
           const cert = row.original;
           const expanded = row.getIsExpanded();
+
           return (
             <div
               className="flex items-center gap-1"
@@ -124,41 +131,55 @@ export function useActiveStaffCertificateColumns({
                   <Eye className="h-3.5 w-3.5" />
                 </Button>
               </Tooltip>
-              <PermissionGate resource={perm.resource} action={perm.update}>
-                <Tooltip text="Sửa">
-                  <Button
-                    size="icon-sm"
-                    variant="outline-primary"
-                    className="mb-0 mr-0"
-                    onClick={() => onEdit(cert)}
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </Button>
-                </Tooltip>
-              </PermissionGate>
-              <PermissionGate
-                resource={perm.resource}
-                action={perm.delete}
-                role={perm.role}
-              >
-                <Tooltip text="Xóa">
-                  <Button
-                    size="icon-sm"
-                    variant="outline-danger"
-                    className="mb-0 mr-0"
-                    onClick={() => onDelete(cert)}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </Tooltip>
-              </PermissionGate>
+              {!submitMode ? (
+                <PermissionGate resource={perm.resource} action={perm.update}>
+                  <Tooltip text="Sửa">
+                    <Button
+                      size="icon-sm"
+                      variant="outline-primary"
+                      className="mb-0 mr-0"
+                      onClick={() => onEdit(cert)}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  </Tooltip>
+                </PermissionGate>
+              ) : null}
+              {!submitMode ? (
+                <PermissionGate
+                  resource={perm.resource}
+                  action={perm.delete}
+                  role={perm.role}
+                >
+                  <Tooltip text="Xóa">
+                    <Button
+                      size="icon-sm"
+                      variant="outline-danger"
+                      className="mb-0 mr-0"
+                      onClick={() => onDelete(cert)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </Tooltip>
+                </PermissionGate>
+              ) : null}
             </div>
           );
         },
-        size: 120,
+        size: 150,
         enableResizing: false,
       },
     ],
-    [pageIndex, pageSize, onEdit, onDelete, cols, perm],
+    [
+      pageIndex,
+      pageSize,
+      onEdit,
+      onDelete,
+      onApprove,
+      isApproving,
+      submitMode,
+      cols,
+      perm,
+    ],
   );
 }

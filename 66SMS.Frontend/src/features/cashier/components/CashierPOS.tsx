@@ -1,5 +1,4 @@
 import { useAuthStore } from "@/features/auth/stores/authStore";
-import { cashierApi } from "@/features/cashier/api/cashier.api";
 import { CashierPromotionModal } from "@/features/cashier/components/CashierPromotionModal";
 import { useCustomers } from "@/features/customers/hooks/useCustomers";
 import type { CustomerDto } from "@/features/customers/types/customer.types";
@@ -41,19 +40,21 @@ import {
   TableRow,
 } from "@/shared/tables/Table";
 import { formatDate } from "@/shared/utils/date.utils";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
   Barcode,
-  CreditCard,
   DollarSign,
   Plus,
   Search,
   SlidersHorizontal,
   Trash2,
   User as UserIcon,
+  Wallet,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+
+import { getAdminWallets } from "@/features/wallet/api/wallet.api";
 
 interface POSOrderItem {
   itemType: number;
@@ -329,6 +330,31 @@ export function CashierPOS({
     return Math.max(0, totalAmount - (activeOrder.alreadyPaidAmount || 0));
   }, [totalAmount, activeOrder.alreadyPaidAmount]);
 
+  const customerId = activeOrder.customer?.id ?? null;
+  const isWalletPayment =
+    activeOrder.paymentMethod === PAYMENT_METHOD.WALLET;
+  const shouldLoadWallet =
+    isCheckoutModalOpen && isWalletPayment && customerId != null;
+
+  const walletQuery = useQuery({
+    queryKey: ["cashier-customer-wallet", customerId],
+    queryFn: () =>
+      getAdminWallets({
+        pageIndex: 1,
+        pageSize: 1,
+        customerId: customerId ?? undefined,
+      }),
+    enabled: shouldLoadWallet,
+  });
+
+  const walletItem = walletQuery.data?.data?.items?.[0];
+  const walletLoaded = walletQuery.isSuccess;
+  const walletBalance = walletLoaded ? (walletItem?.balance ?? 0) : null;
+  const walletInsufficient =
+    isWalletPayment &&
+    walletBalance != null &&
+    walletBalance < amountDue;
+
   const handleCreateNewOrder = () => {
     const nextNum = orders.length + 1;
     const newId = String(nextNum);
@@ -538,39 +564,6 @@ export function CashierPOS({
       }
       return true;
     };
-
-    if (activeOrder.paymentMethod === PAYMENT_METHOD.VNPAY) {
-      if (activeOrder.appointmentId) {
-        setIsPayingInvoice(true);
-        try {
-          if (activeOrder.invoiceId) {
-            const synced = await syncInvoiceItems(activeOrder.invoiceId);
-            if (!synced) return;
-          }
-          const response = await cashierApi.createVnPayUrl(
-            activeOrder.appointmentId,
-          );
-          if (response.isSuccess && response.data) {
-            window.location.href = response.data;
-            return;
-          }
-          toast.error(
-            response.message ||
-              "Có lỗi xảy ra khi tạo liên kết thanh toán VNPAY",
-          );
-        } catch (err) {
-          console.error("Error creating VNPAY URL", err);
-          toast.error("Lỗi kết nối tới máy chủ");
-        } finally {
-          setIsPayingInvoice(false);
-        }
-      } else {
-        toast.error(
-          "Thanh toán VNPAY hiện tại chỉ khả dụng đối với đơn hàng tạo từ lịch hẹn.",
-        );
-      }
-      return;
-    }
 
     if (activeOrder.invoiceId) {
       setIsPayingInvoice(true);
@@ -1211,6 +1204,11 @@ export function CashierPOS({
               variant="primary"
               className="mb-0"
               loading={createInvoiceMutation.isPending || isPayingInvoice}
+              disabled={
+                (isWalletPayment && !customerId) ||
+                walletInsufficient ||
+                (shouldLoadWallet && walletQuery.isLoading)
+              }
               onClick={handleCheckoutSubmit}
             >
               Xác nhận & Thu tiền
@@ -1249,7 +1247,7 @@ export function CashierPOS({
           </div>
 
           <FormField label="Phương thức thanh toán">
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {(
                 [
                   {
@@ -1263,9 +1261,9 @@ export function CashierPOS({
                     icon: ArrowRight,
                   },
                   {
-                    method: PAYMENT_METHOD.VNPAY,
-                    label: "VNPAY QR",
-                    icon: CreditCard,
+                    method: PAYMENT_METHOD.WALLET,
+                    label: "Ví",
+                    icon: Wallet,
                   },
                 ] as const
               ).map(
@@ -1306,6 +1304,37 @@ export function CashierPOS({
               )}
             </div>
           </FormField>
+
+          {isWalletPayment ? (
+            <div className="rounded border border-kit bg-kit-white px-3 py-2 text-xs">
+              {!customerId ? (
+                <p className="font-medium text-kit-danger">
+                  Cần chọn khách hàng để thanh toán bằng ví.
+                </p>
+              ) : walletQuery.isLoading ? (
+                <p className="text-kit-muted">Đang tải số dư ví...</p>
+              ) : walletQuery.isError ? (
+                <p className="font-medium text-kit-danger">
+                  Không tải được thông tin ví.
+                </p>
+              ) : walletBalance == null ? null : (
+                <>
+                  <div className="flex items-center justify-between font-semibold text-kit-muted">
+                    <span>Số dư ví:</span>
+                    <span className="font-bold text-kit-heading">
+                      {walletBalance.toLocaleString("vi-VN")}đ
+                    </span>
+                  </div>
+                  {walletInsufficient ? (
+                    <p className="mt-1 font-medium text-kit-danger">
+                      Số dư không đủ để thanh toán{" "}
+                      {amountDue.toLocaleString("vi-VN")}đ.
+                    </p>
+                  ) : null}
+                </>
+              )}
+            </div>
+          ) : null}
 
           <FormField label="Khách thanh toán (VND)">
             <CurrencyInput

@@ -20,6 +20,8 @@ namespace _66SMS.Domain.Constants
 
         #region Constraint
         public const int NOTE_MAX_LENGTH = 500;
+        // Khoảng giờ cho phép quanh ca (phút). Đổi số này nếu cần.
+        public const int SHIFT_TIME_BUFFER_MINUTES = 60;
         #endregion
 
         #region Status
@@ -42,6 +44,15 @@ namespace _66SMS.Domain.Constants
         public const string MSG_UPDATE_SUCCESS = "Cập nhật chấm công thành công.";
         public const string MSG_CREATE_MANUAL_SUCCESS = "Tạo bản ghi chấm công thành công.";
         public const string MSG_INVALID_STATUS = "Trạng thái chấm công không hợp lệ.";
+        public const string MSG_CANNOT_CHECK_IN_PAST = "Bạn không thể chấm công ngày đã qua.";
+        public const string MSG_CANNOT_CHECK_IN_FUTURE = "Bạn không thể chấm công ngày trong tương lai.";
+        public const string MSG_CANNOT_CHECK_OUT_PAST = "Bạn không thể check-out ngày đã qua.";
+        public const string MSG_CANNOT_CHECK_OUT_FUTURE = "Bạn không thể check-out ngày trong tương lai.";
+        public const string MSG_CHECK_IN_TOO_EARLY = "Chưa đến giờ check-in. Chỉ được check-in từ trước giờ vào ca 1 giờ.";
+        public const string MSG_CHECK_IN_TOO_LATE = "Đã quá giờ check-in. Chỉ được check-in đến hết giờ ra ca.";
+        public const string MSG_CHECK_OUT_TOO_EARLY = "Chưa đến giờ check-out. Chỉ được check-out từ giờ vào ca.";
+        public const string MSG_CHECK_OUT_TOO_LATE = "Đã quá giờ check-out. Chỉ được check-out đến sau giờ ra ca 1 giờ.";
+        public const string MSG_SHIFT_TIME_REQUIRED = "Ca làm việc chưa có giờ bắt đầu/kết thúc.";
         #endregion
     }
 }

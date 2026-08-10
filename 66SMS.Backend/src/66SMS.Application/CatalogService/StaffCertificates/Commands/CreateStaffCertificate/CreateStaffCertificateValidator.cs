@@ -7,7 +7,10 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.CreateSta
     {
         public CreateStaffCertificateValidator()
         {
-            RuleFor(x => x.StaffId).NotNull().GreaterThan(0);
+            RuleFor(x => x.StaffId)
+                .NotNull().GreaterThan(0)
+                .When(x => x.UserId == null || x.UserId <= 0);
+
             RuleFor(x => x.CertificateTypeId).NotNull().GreaterThan(0);
             RuleFor(x => x.CertificateName).NotNull().NotEmpty().MaximumLength(StaffCertificateConst.CERTIFICATE_NAME_MAX_LENGTH);
             RuleFor(x => x.IssuingOrganization).NotNull().NotEmpty().MaximumLength(StaffCertificateConst.ISSUING_ORGANIZATION_MAX_LENGTH);

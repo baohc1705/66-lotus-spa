@@ -18,6 +18,7 @@ import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
 import { TableEmptyState } from "@/shared/tables/TableEmptyState";
 import { TablePageShell } from "@/shared/tables/TablePageShell";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
+import { useAuthStore } from "@/features/auth/stores/authStore";
 
 import { CertificateTypeSidebar } from "../components/CertificateTypeSidebar";
 import { StaffCertificateDetailExpanded } from "../components/StaffCertificateDetailExpanded";
@@ -31,27 +32,36 @@ import { CERTIFICATE_PERM } from "../constants/certificate.permissions";
 import {
   useStaffCertificates,
   useDeleteStaffCertificate,
+  useUpdateStaffCertificate,
 } from "../hooks/useStaffCertificates";
 import { useStaffCertificateListState } from "../hooks/useStaffCertificateListState";
 import type { StaffCertificateDTO } from "../types/certificate.types";
 
 interface Props {
   staffId?: number;
+  /** Trang nhân viên tự nộp / xem chứng chỉ của mình */
+  submitMode?: boolean;
 }
 
 const ENTITY = "chứng chỉ";
 
-export function StaffCertificatesPage({ staffId }: Props) {
+export function StaffCertificatesPage({ staffId, submitMode = false }: Props) {
   "use no memo";
 
   const perm = CERTIFICATE_PERM;
+  const user = useAuthStore((s) => s.user);
   const [searchParams] = useSearchParams();
   const staffIdFromQuery = Number(searchParams.get("staffId"));
-  const effectiveStaffId =
-    staffId ??
-    (Number.isFinite(staffIdFromQuery) && staffIdFromQuery > 0
-      ? staffIdFromQuery
-      : undefined);
+  const myStaffId = user?.staffInfo?.id;
+
+  let effectiveStaffId = staffId;
+  if (!effectiveStaffId) {
+    if (Number.isFinite(staffIdFromQuery) && staffIdFromQuery > 0) {
+      effectiveStaffId = staffIdFromQuery;
+    } else if (submitMode && myStaffId) {
+      effectiveStaffId = myStaffId;
+    }
+  }
 
   const listState = useStaffCertificateListState();
   const {
@@ -88,6 +98,15 @@ export function StaffCertificatesPage({ staffId }: Props) {
     isFetching,
   } = useStaffCertificates(mergedParams);
   const deleteMutation = useDeleteStaffCertificate();
+  const updateMutation = useUpdateStaffCertificate();
+
+  const handleApprove = (cert: StaffCertificateDTO) => {
+    if (!cert.id) return;
+    updateMutation.mutate({
+      id: cert.id,
+      payload: { status: 1 },
+    });
+  };
 
   const { data: allCertsResult, isLoading: isLoadingAll } =
     useStaffCertificates({
@@ -126,6 +145,9 @@ export function StaffCertificatesPage({ staffId }: Props) {
     pageSize,
     onEdit: setEditTarget,
     onDelete: setDeleteTarget,
+    onApprove: handleApprove,
+    isApproving: updateMutation.isPending,
+    submitMode,
   });
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -161,6 +183,8 @@ export function StaffCertificatesPage({ staffId }: Props) {
   }>();
   const isSidebarMode = layoutMode === "sidebar";
 
+  const addButtonLabel = submitMode ? "Nộp chứng chỉ" : "Thêm chứng chỉ";
+
   return (
     <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
       <StaffCertificateStatCards
@@ -191,7 +215,7 @@ export function StaffCertificatesPage({ staffId }: Props) {
                   table={table}
                   columnLabels={columnLabels}
                 />
-                <PermissionGate resource={perm.resource} action={perm.create}>
+                {submitMode ? (
                   <Button
                     variant="primary"
                     size="sm"
@@ -199,9 +223,21 @@ export function StaffCertificatesPage({ staffId }: Props) {
                     onClick={() => setCreateOpen(true)}
                   >
                     <Plus className="h-3.5 w-3.5" />
-                    Thêm chứng chỉ
+                    {addButtonLabel}
                   </Button>
-                </PermissionGate>
+                ) : (
+                  <PermissionGate resource={perm.resource} action={perm.create}>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="mb-0"
+                      onClick={() => setCreateOpen(true)}
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      {addButtonLabel}
+                    </Button>
+                  </PermissionGate>
+                )}
               </DataTableToolbar>
             </div>
 
@@ -221,17 +257,21 @@ export function StaffCertificatesPage({ staffId }: Props) {
                 <StaffCertificateDetailExpanded
                   cert={row.original}
                   onEdit={() => setEditTarget(row.original)}
+                  onApprove={submitMode ? undefined : handleApprove}
+                  isApproving={updateMutation.isPending}
+                  submitMode={submitMode}
                 />
               )}
               emptyState={
                 <TableEmptyState
                   icon={ShieldCheck}
-                  title="Chưa có chứng chỉ"
+                  title={
+                    submitMode
+                      ? "Bạn chưa nộp chứng chỉ nào"
+                      : "Chưa có chứng chỉ"
+                  }
                   action={
-                    <PermissionGate
-                      resource={perm.resource}
-                      action={perm.create}
-                    >
+                    submitMode ? (
                       <Button
                         variant="admin"
                         size="sm"
@@ -239,9 +279,24 @@ export function StaffCertificatesPage({ staffId }: Props) {
                         onClick={() => setCreateOpen(true)}
                       >
                         <Plus className="h-3.5 w-3.5" />
-                        Thêm chứng chỉ
+                        {addButtonLabel}
                       </Button>
-                    </PermissionGate>
+                    ) : (
+                      <PermissionGate
+                        resource={perm.resource}
+                        action={perm.create}
+                      >
+                        <Button
+                          variant="admin"
+                          size="sm"
+                          className="mb-0"
+                          onClick={() => setCreateOpen(true)}
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                          {addButtonLabel}
+                        </Button>
+                      </PermissionGate>
+                    )
                   }
                 />
               }
@@ -284,29 +339,34 @@ export function StaffCertificatesPage({ staffId }: Props) {
         open={createOpen}
         onOpenChange={setCreateOpen}
         staffId={effectiveStaffId}
+        submitMode={submitMode}
       />
 
-      <StaffCertificateFormDialog
-        open={!!editTarget}
-        onOpenChange={(open) => {
-          if (!open) setEditTarget(null);
-        }}
-        item={editTarget}
-        staffId={effectiveStaffId}
-      />
+      {!submitMode ? (
+        <StaffCertificateFormDialog
+          open={!!editTarget}
+          onOpenChange={(open) => {
+            if (!open) setEditTarget(null);
+          }}
+          item={editTarget}
+          staffId={effectiveStaffId}
+        />
+      ) : null}
 
-      <ConfirmDialog
-        open={!!deleteTarget}
-        onOpenChange={(open) => {
-          if (!open) setDeleteTarget(null);
-        }}
-        onConfirm={handleDelete}
-        title={`Xóa ${ENTITY}`}
-        description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget?.certificateName ?? ""}"? Hành động này không thể hoàn tác.`}
-        confirmLabel="Xóa"
-        loading={deleteMutation.isPending}
-        variant="danger"
-      />
+      {!submitMode ? (
+        <ConfirmDialog
+          open={!!deleteTarget}
+          onOpenChange={(open) => {
+            if (!open) setDeleteTarget(null);
+          }}
+          onConfirm={handleDelete}
+          title={`Xóa ${ENTITY}`}
+          description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget?.certificateName ?? ""}"? Hành động này không thể hoàn tác.`}
+          confirmLabel="Xóa"
+          loading={deleteMutation.isPending}
+          variant="danger"
+        />
+      ) : null}
     </div>
   );
 }

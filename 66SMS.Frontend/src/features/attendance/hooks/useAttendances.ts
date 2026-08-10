@@ -41,7 +41,7 @@ export function useCheckIn() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error));
+      toast.error(getErrorMessage(error, "Không thể check-in"));
     },
   });
 }
@@ -60,7 +60,7 @@ export function useCheckOut() {
       }
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error));
+      toast.error(getErrorMessage(error, "Không thể check-out"));
     },
   });
 }

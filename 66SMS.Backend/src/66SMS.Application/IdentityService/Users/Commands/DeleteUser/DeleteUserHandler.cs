@@ -4,7 +4,6 @@ using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
-using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -30,11 +29,19 @@ namespace _66SMS.Application.IdentityService.Users.Commands.DeleteUser
             {
                 if (request.Id != null)
                 {
+                    if (request.UpdatedBy != null && request.Id == request.UpdatedBy)
+                        return Result<object>.BadRequest(UserConst.MSG_USER_CANNOT_DELETE_SELF, ErrorCodes.ERR_BAD_REQUEST);
+
                     User? user = await userSqlRepository.FindByIdAsync(request.Id.Value, false, cancellationToken);
                     if (user is null)
                         return Result<object>.NotFound(UserConst.MSG_USER_ID_NOT_FOUND, ErrorCodes.ERR_USER_NOT_FOUND);
 
+                    if (user.Status == UserConst.STATUS_DELETED)
+                        return Result<object>.NotFound(UserConst.MSG_USER_ID_NOT_FOUND, ErrorCodes.ERR_USER_NOT_FOUND);
+
                     user.Status = UserConst.STATUS_DELETED;
+                    user.UpdatedAt = DateTimeHelper.UtcNow();
+                    user.UpdatedBy = request.UpdatedBy;
                     userSqlRepository.Update(user);
                     await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 }
@@ -42,16 +49,22 @@ namespace _66SMS.Application.IdentityService.Users.Commands.DeleteUser
                 if (request.Ids != null)
                 {
                     List<int> distinctIds = request.Ids.Distinct().ToList();
+                    if (request.UpdatedBy != null)
+                        distinctIds = distinctIds.Where(id => id != request.UpdatedBy).ToList();
+
+                    if (distinctIds.Count == 0)
+                        return Result<object>.BadRequest(UserConst.MSG_USER_CANNOT_DELETE_SELF, ErrorCodes.ERR_BAD_REQUEST);
 
                     List<User> users = await userSqlRepository
                         .AsQueryable(false)
-                        .Where(x => distinctIds.Contains(x.Id))
+                        .Where(x => distinctIds.Contains(x.Id) && x.Status != UserConst.STATUS_DELETED)
                         .ToListAsync(cancellationToken);
                     if (users.Count == 0)
                         return Result<object>.NotFound(UserConst.MSG_USER_ID_NOT_FOUND, ErrorCodes.ERR_USER_NOT_FOUND);
 
-                    foreach (var user in users)
+                    for (int index = 0; index < users.Count; index++)
                     {
+                        var user = users[index];
                         user.Status = UserConst.STATUS_DELETED;
                         user.UpdatedAt = DateTimeHelper.UtcNow();
                         user.UpdatedBy = request.UpdatedBy;

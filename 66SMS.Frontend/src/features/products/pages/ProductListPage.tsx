@@ -45,7 +45,6 @@ import { formatDateTimeDisplay } from "@/shared/utils/date.utils";
 import { ProductCategorySidebar } from "../components/ProductCategorySidebar";
 import { ProductDetailExpanded } from "../components/ProductDetailExpanded";
 import { ProductFormDialog } from "../components/ProductFormDialog";
-import { ProductStatCards } from "../components/ProductStatCards";
 import { PRODUCT_PERM } from "../constants/product.permissions";
 import { useProductListState } from "../hooks/useProductListState";
 import {
@@ -125,13 +124,6 @@ export function ProductListPage() {
   const safePage = Math.min(pageIndex, totalPages);
   const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
   const rangeEnd = Math.min(safePage * pageSize, totalCount);
-
-  let activeProductCount = 0;
-  let totalStock = 0;
-  for (const p of products) {
-    if (p.status === StatusActive.Active) activeProductCount += 1;
-    totalStock += p.stockQuantity ?? 0;
-  }
 
   const pageIds = products
     .map((p: ProductDto) => p.id)
@@ -540,12 +532,12 @@ export function ProductListPage() {
 
   return (
     <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
-      <ProductStatCards
+      {/* <ProductStatCards
         totalProducts={totalCount}
         activeProducts={activeProductCount}
         totalStock={totalStock}
         isLoading={isLoading}
-      />
+      /> */}
 
       <div className="flex flex-col items-start gap-3 md:flex-row">
         {!isSidebarMode && (

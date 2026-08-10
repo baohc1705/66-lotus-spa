@@ -55,6 +55,26 @@ export function useCreateStaffCertificate() {
   });
 }
 
+export function useCreateMineCertificate() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (
+      payload: Omit<CreateStaffCertificatePayload, "staffId" | "status">,
+    ) => certificateApi.createMine(payload),
+    onSuccess: (result) => {
+      if (result.isSuccess) {
+        qc.invalidateQueries({ queryKey: STAFF_CERTIFICATE_KEYS.lists() });
+        toast.success("Nộp chứng chỉ thành công. Chờ quản lý duyệt.");
+      } else {
+        toast.error(result.message || "Có lỗi xảy ra");
+      }
+    },
+    onError: (error: AxiosError<Result<unknown>>) => {
+      toast.error(getErrorMessage(error, "Có lỗi xảy ra khi nộp chứng chỉ"));
+    },
+  });
+}
+
 export function useUpdateStaffCertificate() {
   const qc = useQueryClient();
   return useMutation({

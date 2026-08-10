@@ -3,7 +3,7 @@ import { z } from "zod";
 const VIETNAM_PHONE_REGEX = /^(0[2-9]|84[2-9])\d{8}$/;
 
 const staffBaseSchema = z.object({
-  salonId: z.coerce.number().optional(),
+  salonId: z.coerce.number().min(1, "Vui lòng chọn chi nhánh"),
 
   fullName: z
     .string()
@@ -43,7 +43,9 @@ const staffBaseSchema = z.object({
 });
 
 export const createStaffSchema = staffBaseSchema;
-export const updateStaffSchema = staffBaseSchema.partial();
+export const updateStaffSchema = staffBaseSchema.partial().required({
+  salonId: true,
+});
 
 export type CreateStaffPayload = z.infer<typeof createStaffSchema>;
 export type UpdateStaffPayload = z.infer<typeof updateStaffSchema>;

@@ -27,11 +27,6 @@ function parseFromApi(val?: string | null): Date | null {
   const d = new Date(s);
   if (!Number.isNaN(d.getTime())) return d;
 
-  if (s.includes("/") && s.length === 10) {
-    const [day, month, year] = s.split("/");
-    return parseDateOnlyLocal(`${year}-${month}-${day}`);
-  }
-
   return null;
 }
 

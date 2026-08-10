@@ -1,14 +1,17 @@
 import axiosInstance from "@/shared/api/axiosInstance";
-import type { Result } from "@/shared/types/common.types";
+import type { PageRequest, PagedResult, Result } from "@/shared/types/common.types";
 import type {
   AdminWalletDto,
   AdminWalletTransactionDto,
   WalletTransactionDto,
 } from "../types/wallet.types";
 
-export const getAdminWallets = async () => {
-  const response = await axiosInstance.get<Result<AdminWalletDto[]>>(
+export const getAdminWallets = async (
+  params: PageRequest & { customerId?: number | null },
+) => {
+  const response = await axiosInstance.get<Result<PagedResult<AdminWalletDto>>>(
     "/admin/wallets",
+    { params },
   );
   return response.data;
 };
@@ -48,8 +51,11 @@ export const getMyWalletTransactions = async () => {
 export const getWalletTopUpVnPayUrl = async (
   amount: number,
 ): Promise<string> => {
-  const { data } = await axiosInstance.get<Result<string>>("/users/me/wallet/top-up-vnpay-url", {
-    params: { amount },
-  });
+  const { data } = await axiosInstance.get<Result<string>>(
+    "/users/me/wallet/top-up-vnpay-url",
+    {
+      params: { amount },
+    },
+  );
   return data.data || "";
 };

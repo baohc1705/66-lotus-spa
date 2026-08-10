@@ -9,7 +9,7 @@ namespace _66SMS.Application.BookingService.Helpers
     // Áp dụng kết quả thanh toán VNPay thành công vào lịch hẹn (cọc hoặc thanh toán cuối)
     public static class AppointmentPaymentApplyService
     {
-        public static Result<object> ApplyVnPaySuccess(
+        public static Result<bool> ApplyVnPaySuccess(
             Appointment appointment,
             int phase,
             string transactionId,
@@ -18,14 +18,14 @@ namespace _66SMS.Application.BookingService.Helpers
             if (phase == AppointmentPaymentConst.PHASE_DEPOSIT)
             {
                 if (AppointmentPaymentCalculator.HasDepositPaid(appointment))
-                    return Result<object>.Success(false, "Đã thanh toán cọc trước đó");
+                    return Result<bool>.Success(false, "Đã thanh toán cọc trước đó");
 
                 if (!AppointmentStatusTransitions.CanPayDeposit(appointment))
-                    return Result<object>.BadRequest("Lỗi: Không ở trạng thái chờ cọc hoặc đã cọc.");
+                    return Result<bool>.BadRequest("Lỗi: Không ở trạng thái chờ cọc hoặc đã cọc.");
 
                 var percent = depositPercent ?? appointment.DepositPercent;
                 if (percent == null)
-                    return Result<object>.BadRequest(
+                    return Result<bool>.BadRequest(
                         ConfigAppointmentConst.MSG_DEPOSIT_PERCENT_NOT_CONFIGURED,
                         ErrorCodes.ERR_CONFIG_APPOINTMENT_NOT_FOUND);
 
@@ -36,32 +36,32 @@ namespace _66SMS.Application.BookingService.Helpers
                 if (!AppointmentPaymentRecorder.TryRecordPayment(
                     appointment, AppointmentPaymentConst.PHASE_DEPOSIT, depositAmount,
                     AppointmentPaymentConst.METHOD_BANK_TRANSFER, transactionId, null, out var error))
-                    return Result<object>.BadRequest(error!);
+                    return Result<bool>.BadRequest(error!);
 
                 appointment.Status = AppointmentConst.STATUS_WAITING;
                 appointment.UpdatedAt = DateTimeHelper.UtcNow();
                 appointment.UpdatedBy = appointment.CreatedByUserId;
 
-                return Result<object>.Success(true, "Thanh toán cọc thành công");
+                return Result<bool>.Success(true, "Thanh toán cọc thành công");
             }
 
             if (AppointmentPaymentCalculator.IsFullyPaid(appointment))
-                return Result<object>.Success(false, "Đã thanh toán phần còn lại trước đó");
+                return Result<bool>.Success(false, "Đã thanh toán phần còn lại trước đó");
 
             if (!AppointmentStatusTransitions.CanPayBalance(appointment.Status))
-                return Result<object>.BadRequest("Lỗi: Không ở trạng thái chờ thanh toán.");
+                return Result<bool>.BadRequest("Lỗi: Không ở trạng thái chờ thanh toán.");
 
             var balanceAmount = AppointmentPaymentCalculator.GetRemainingAmount(appointment);
 
             if (!AppointmentPaymentRecorder.TryRecordPayment(
                 appointment, AppointmentPaymentConst.PHASE_FINAL_PAYMENT, balanceAmount,
                 AppointmentPaymentConst.METHOD_BANK_TRANSFER, transactionId, null, out var balanceErr))
-                return Result<object>.BadRequest(balanceErr!);
+                return Result<bool>.BadRequest(balanceErr!);
 
             appointment.UpdatedAt = DateTimeHelper.UtcNow();
             appointment.UpdatedBy = appointment.CreatedByUserId;
 
-            return Result<object>.Success(true, "Thanh toán phần còn lại thành công");
+            return Result<bool>.Success(true, "Thanh toán phần còn lại thành công");
         }
     }
 }

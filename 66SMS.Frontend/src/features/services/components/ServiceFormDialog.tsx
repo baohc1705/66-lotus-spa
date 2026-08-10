@@ -192,6 +192,7 @@ export function ServiceFormDialog({
   const watchCommissionRate = watch("commissionRate") || 0;
   const watchDesiredProfit = watch("desiredProfitPercent") || 0;
   const watchSellingPrice = watch("sellingPrice") || 0;
+  const selectedDuration = watch("durationMins");
 
   let productCost = 0;
   if (watchProducts && watchProducts.length > 0) {
@@ -363,147 +364,127 @@ export function ServiceFormDialog({
                           />
                         </div>
 
-                          <FormField
-                            label="Mã dịch vụ"
-                            tooltip={
+                        <FormField
+                          label="Mã dịch vụ"
+                          tooltip={
+                            isEdit
+                              ? "Mã được hệ thống tạo tự động, không chỉnh sửa."
+                              : "Mã sẽ được hệ thống tạo tự động sau khi lưu."
+                          }
+                        >
+                          <Input
+                            value={
                               isEdit
-                                ? "Mã được hệ thống tạo tự động, không chỉnh sửa."
-                                : "Mã sẽ được hệ thống tạo tự động sau khi lưu."
+                                ? (formSource?.code ?? service?.code ?? "")
+                                : ""
                             }
-                          >
-                            <Input
-                              value={
-                                isEdit
-                                  ? (formSource?.code ?? service?.code ?? "")
-                                  : ""
-                              }
-                              placeholder={isEdit ? "" : "Tự động tạo"}
-                              disabled
-                              readOnly
-                            />
-                          </FormField>
+                            placeholder={isEdit ? "" : "Tự động tạo"}
+                            disabled
+                            readOnly
+                          />
+                        </FormField>
 
-                          <FormField
-                            label="Tên dịch vụ *"
-                            error={errors.name?.message}
-                          >
-                            <Input
-                              {...register("name")}
-                              placeholder="Nhập tên dịch vụ"
-                              invalid={!!errors.name}
-                            />
-                          </FormField>
+                        <FormField
+                          label="Tên dịch vụ *"
+                          error={errors.name?.message}
+                        >
+                          <Input
+                            {...register("name")}
+                            placeholder="Nhập tên dịch vụ"
+                            invalid={!!errors.name}
+                          />
+                        </FormField>
 
-                          <FormField
-                            label="Nhóm dịch vụ *"
-                            error={errors.categoryId?.message}
-                          >
-                            <div className="flex gap-2">
-                              <div className="flex-1">
-                                <Select
-                                  value={watch("categoryId")?.toString() || ""}
-                                  onChange={(e) =>
-                                    setValue(
-                                      "categoryId",
-                                      Number(e.target.value),
-                                    )
-                                  }
-                                  invalid={!!errors.categoryId}
-                                >
-                                  <option value="">Chọn nhóm dịch vụ</option>
-                                  {categories.map((c: ServiceCategoryDto) => (
-                                    <option
-                                      key={c.id}
-                                      value={c.id?.toString() || ""}
-                                    >
-                                      {c.name}
-                                    </option>
-                                  ))}
-                                </Select>
-                              </div>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                className="mb-0 shrink-0"
-                                onClick={() => setCategoryOpen(true)}
+                        <FormField
+                          label="Nhóm dịch vụ *"
+                          error={errors.categoryId?.message}
+                        >
+                          <div className="flex gap-2">
+                            <div className="flex-1">
+                              <Select
+                                value={watch("categoryId")?.toString() || ""}
+                                onChange={(e) =>
+                                  setValue("categoryId", Number(e.target.value))
+                                }
+                                invalid={!!errors.categoryId}
                               >
-                                <Plus className="mr-1 h-4 w-4" />
-                                Thêm
-                              </Button>
+                                <option value="">Chọn nhóm dịch vụ</option>
+                                {categories.map((c: ServiceCategoryDto) => (
+                                  <option
+                                    key={c.id}
+                                    value={c.id?.toString() || ""}
+                                  >
+                                    {c.name}
+                                  </option>
+                                ))}
+                              </Select>
                             </div>
-                          </FormField>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="mb-0 shrink-0"
+                              onClick={() => setCategoryOpen(true)}
+                            >
+                              <Plus className="mr-1 h-4 w-4" />
+                              Thêm
+                            </Button>
+                          </div>
+                        </FormField>
 
-                          <FormField
-                            label="Thời gian (phút)"
-                            error={errors.durationMins?.message}
-                          >
-                            <Controller
-                              name="durationMins"
-                              control={control}
-                              render={({ field }) => (
-                                <Select
-                                  value={
-                                    field.value ? String(field.value) : ""
-                                  }
-                                  onChange={(e) =>
-                                    field.onChange(Number(e.target.value))
-                                  }
-                                  invalid={!!errors.durationMins}
-                                >
-                                  <option value="">Chọn thời gian</option>
-                                  {SERVICE_DURATION_OPTIONS.map((mins) => (
-                                    <option key={mins} value={String(mins)}>
-                                      {mins} phút
-                                    </option>
-                                  ))}
-                                  {field.value &&
-                                    !(
-                                      SERVICE_DURATION_OPTIONS as readonly number[]
-                                    ).includes(field.value) && (
-                                      <option value={String(field.value)}>
-                                        {field.value} phút
-                                      </option>
-                                    )}
-                                </Select>
-                              )}
+                        <FormField
+                          label="Thời gian (phút)"
+                          error={errors.durationMins?.message}
+                        >
+                          <Select
+                            value={
+                              selectedDuration ? String(selectedDuration) : ""
+                            }
+                            onChange={(event) =>
+                              setValue(
+                                "durationMins",
+                                Number(event.target.value),
+                                { shouldValidate: true },
+                              )
+                            }
+                            invalid={!!errors.durationMins}
+                            placeholder="Chọn thời gian"
+                            options={SERVICE_DURATION_OPTIONS}
+                          />
+                        </FormField>
+
+                        <FormField
+                          label="Thứ tự hiển thị"
+                          error={errors.sortOrder?.message}
+                        >
+                          <Input
+                            {...register("sortOrder", {
+                              valueAsNumber: true,
+                            })}
+                            type="number"
+                            placeholder="0"
+                            invalid={!!errors.sortOrder}
+                          />
+                        </FormField>
+
+                        <FormField
+                          label="Trạng thái"
+                          error={errors.status?.message}
+                        >
+                          <div className="flex h-9 items-center">
+                            <Switch
+                              checked={watch("status") === StatusActive.Active}
+                              onChange={(checked: boolean) =>
+                                setValue(
+                                  "status",
+                                  checked
+                                    ? StatusActive.Active
+                                    : StatusActive.Inactive,
+                                )
+                              }
                             />
-                          </FormField>
-
-                          <FormField
-                            label="Thứ tự hiển thị"
-                            error={errors.sortOrder?.message}
-                          >
-                            <Input
-                              {...register("sortOrder", {
-                                valueAsNumber: true,
-                              })}
-                              type="number"
-                              placeholder="0"
-                              invalid={!!errors.sortOrder}
-                            />
-                          </FormField>
-
-                          <FormField
-                            label="Trạng thái"
-                            error={errors.status?.message}
-                          >
-                            <div className="flex h-9 items-center">
-                              <Switch
-                                checked={
-                                  watch("status") === StatusActive.Active
-                                }
-                                onChange={(checked: boolean) =>
-                                  setValue(
-                                    "status",
-                                    checked
-                                      ? StatusActive.Active
-                                      : StatusActive.Inactive,
-                                  )
-                                }
-                              />
-                            </div>
-                          </FormField>
+                          </div>
+                        </FormField>
                       </div>
 
                       <div className="grid grid-cols-1 gap-2">
@@ -525,7 +506,7 @@ export function ServiceFormDialog({
                           <Textarea
                             {...register("content")}
                             placeholder="Nội dung chi tiết dịch vụ..."
-                            className="min-h-[100px]"
+                            className="min-h-25"
                             invalid={!!errors.content}
                           />
                         </FormField>
@@ -538,124 +519,118 @@ export function ServiceFormDialog({
                   label: "Sản phẩm",
                   content: (
                     <div className="space-y-4">
-                        {productFields.map((field, index) => {
-                          const errorObj = errors.serviceProducts?.[index];
-                          const productId = watch(
-                            `serviceProducts.${index}.productId`,
-                          );
-                          const quantity =
-                            watch(
-                              `serviceProducts.${index}.quantityUsed`,
-                            ) || 0;
-                          const selectedProduct = products.find(
-                            (p: ProductDto) => p.id === productId,
-                          );
-                          const unitCost =
-                            watch(`serviceProducts.${index}.unitCost`) ??
-                            selectedProduct?.costPrice ??
-                            0;
-                          const lineTotal = unitCost * quantity;
+                      {productFields.map((field, index) => {
+                        const errorObj = errors.serviceProducts?.[index];
+                        const productId = watch(
+                          `serviceProducts.${index}.productId`,
+                        );
+                        const quantity =
+                          watch(`serviceProducts.${index}.quantityUsed`) || 0;
+                        const selectedProduct = products.find(
+                          (p: ProductDto) => p.id === productId,
+                        );
+                        const unitCost =
+                          watch(`serviceProducts.${index}.unitCost`) ??
+                          selectedProduct?.costPrice ??
+                          0;
+                        const lineTotal = unitCost * quantity;
 
-                          return (
-                            <div
-                              key={field.id}
-                              className="grid grid-cols-12 items-start gap-3 rounded-lg border border-kit bg-kit-page/50 p-3"
-                            >
-                              <div className="col-span-4">
-                                <SearchableSelect
-                                  value={productId?.toString() || ""}
-                                  onChange={(val: string) => {
-                                    const id = parseInt(val);
-                                    const prod = products.find(
-                                      (p: ProductDto) => p.id === id,
-                                    );
-                                    setValue(
-                                      `serviceProducts.${index}.productId`,
-                                      id,
-                                    );
-                                    setValue(
-                                      `serviceProducts.${index}.unitCost`,
-                                      prod?.costPrice ?? 0,
-                                    );
-                                  }}
-                                  options={productOptions}
-                                  placeholder="Chọn sản phẩm"
-                                  searchPlaceholder="Tìm sản phẩm..."
-                                  clearable={false}
-                                  invalid={!!errorObj?.productId}
-                                />
-                                {errorObj?.productId && (
-                                  <span className="mt-1 block text-xs text-kit-danger">
-                                    {errorObj.productId.message}
-                                  </span>
+                        return (
+                          <div
+                            key={field.id}
+                            className="grid grid-cols-12 items-start gap-3 rounded-lg border border-kit bg-kit-page/50 p-3"
+                          >
+                            <div className="col-span-4">
+                              <SearchableSelect
+                                value={productId?.toString() || ""}
+                                onChange={(val: string) => {
+                                  const id = parseInt(val);
+                                  const prod = products.find(
+                                    (p: ProductDto) => p.id === id,
+                                  );
+                                  setValue(
+                                    `serviceProducts.${index}.productId`,
+                                    id,
+                                  );
+                                  setValue(
+                                    `serviceProducts.${index}.unitCost`,
+                                    prod?.costPrice ?? 0,
+                                  );
+                                }}
+                                options={productOptions}
+                                placeholder="Chọn sản phẩm"
+                                searchPlaceholder="Tìm sản phẩm..."
+                                clearable={false}
+                                invalid={!!errorObj?.productId}
+                              />
+                              {errorObj?.productId && (
+                                <span className="mt-1 block text-xs text-kit-danger">
+                                  {errorObj.productId.message}
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="col-span-2">
+                              <Input
+                                {...register(
+                                  `serviceProducts.${index}.quantityUsed`,
+                                  { valueAsNumber: true },
                                 )}
-                              </div>
+                                type="number"
+                                placeholder="SL"
+                                invalid={!!errorObj?.quantityUsed}
+                              />
+                              {errorObj?.quantityUsed && (
+                                <span className="mt-1 block text-xs text-kit-danger">
+                                  {errorObj.quantityUsed.message}
+                                </span>
+                              )}
+                            </div>
 
-                              <div className="col-span-2">
-                                <Input
-                                  {...register(
-                                    `serviceProducts.${index}.quantityUsed`,
-                                    { valueAsNumber: true },
-                                  )}
-                                  type="number"
-                                  placeholder="SL"
-                                  invalid={!!errorObj?.quantityUsed}
-                                />
-                                {errorObj?.quantityUsed && (
-                                  <span className="mt-1 block text-xs text-kit-danger">
-                                    {errorObj.quantityUsed.message}
-                                  </span>
-                                )}
-                              </div>
-
-                              <div className="col-span-3">
-                                <div className="flex h-9 items-center justify-end rounded border border-kit bg-kit-page px-3 text-xs font-medium text-kit-heading">
-                                  {formatCurrency(
-                                    lineTotal > 0 ? lineTotal : 0,
-                                  )}
-                                </div>
-                              </div>
-
-                              <div className="col-span-2">
-                                <Input
-                                  {...register(
-                                    `serviceProducts.${index}.note`,
-                                  )}
-                                  placeholder="Ghi chú"
-                                />
-                              </div>
-
-                              <div className="col-span-1 flex justify-end">
-                                <Button
-                                  type="button"
-                                  variant="outline-danger"
-                                  size="icon-sm"
-                                  className="mb-0"
-                                  onClick={() => removeProduct(index)}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
+                            <div className="col-span-3">
+                              <div className="flex h-9 items-center justify-end rounded border border-kit bg-kit-page px-3 text-xs font-medium text-kit-heading">
+                                {formatCurrency(lineTotal > 0 ? lineTotal : 0)}
                               </div>
                             </div>
-                          );
-                        })}
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="mb-0 w-full border-dashed"
-                          onClick={() =>
-                            appendProduct({
-                              productId: 0,
-                              quantityUsed: 1,
-                              unitCost: 0,
-                              note: "",
-                            })
-                          }
-                        >
-                          <Plus className="mr-2 h-4 w-4" />
-                          Thêm sản phẩm
-                        </Button>
+
+                            <div className="col-span-2">
+                              <Input
+                                {...register(`serviceProducts.${index}.note`)}
+                                placeholder="Ghi chú"
+                              />
+                            </div>
+
+                            <div className="col-span-1 flex justify-end">
+                              <Button
+                                type="button"
+                                variant="outline-danger"
+                                size="icon-sm"
+                                className="mb-0"
+                                onClick={() => removeProduct(index)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="mb-0 w-full border-dashed"
+                        onClick={() =>
+                          appendProduct({
+                            productId: 0,
+                            quantityUsed: 1,
+                            unitCost: 0,
+                            note: "",
+                          })
+                        }
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Thêm sản phẩm
+                      </Button>
                     </div>
                   ),
                 },
@@ -664,230 +639,223 @@ export function ServiceFormDialog({
                   label: "Định giá",
                   content: (
                     <div className="space-y-4">
-                        <div>
-                          <p className="mb-2 text-xs font-semibold text-kit-muted">
-                            Chi phí
-                          </p>
-                          <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
-                            <FormField
-                              label="Giá vốn *"
-                              tooltip="Chi phí gốc của dịch vụ (chưa gồm sản phẩm tiêu hao)"
-                              error={errors.costPrice?.message}
-                            >
-                              <Controller
-                                name="costPrice"
-                                control={control}
-                                render={({ field }) => (
-                                  <CurrencyInput
-                                    value={field.value}
-                                    onChange={(v) => field.onChange(v ?? 0)}
-                                    onBlur={field.onBlur}
-                                    placeholder="0"
-                                    invalid={!!errors.costPrice}
-                                  />
-                                )}
-                              />
-                            </FormField>
-
-                            <FormField
-                              label="Chi phí tiêu hao"
-                              tooltip="Tự tính từ sản phẩm tiêu hao ở tab Sản phẩm"
-                            >
-                              <div className="flex h-9 items-center rounded border border-kit bg-kit-page px-3 text-sm font-medium text-kit-heading">
-                                {formatCurrency(productCost)}
-                              </div>
-                            </FormField>
-
-                            <FormField
-                              label="Tổng giá vốn"
-                              tooltip="Giá vốn + chi phí tiêu hao"
-                            >
-                              <div className="flex h-9 items-center rounded border border-kit bg-kit-page px-3 text-sm font-semibold text-kit-heading">
-                                {formatCurrency(totalCost)}
-                              </div>
-                            </FormField>
-                          </div>
-                        </div>
-
-                        <div>
-                          <p className="mb-2 text-xs font-semibold text-kit-muted">
-                            Định giá
-                          </p>
-                          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-                            <FormField
-                              label="Tỷ lệ hoa hồng (%)"
-                              error={errors.commissionRate?.message}
-                            >
-                              <Input
-                                {...register("commissionRate", {
-                                  valueAsNumber: true,
-                                })}
-                                type="number"
-                                placeholder="0"
-                                invalid={!!errors.commissionRate}
-                              />
-                            </FormField>
-
-                            <FormField
-                              label="% lãi mong muốn"
-                              tooltip="% lãi trên giá vốn (sau hoa hồng). VD: 100% = lãi bằng giá vốn."
-                              error={errors.desiredProfitPercent?.message}
-                            >
-                              <Input
-                                {...register("desiredProfitPercent", {
-                                  valueAsNumber: true,
-                                })}
-                                type="number"
-                                placeholder="20"
-                                invalid={!!errors.desiredProfitPercent}
-                              />
-                            </FormField>
-
-                            <FormField
-                              label="Giá bán tối thiểu"
-                              tooltip="Mức hòa vốn sau hoa hồng. Bạn có thể nhập tay hoặc áp dụng gợi ý."
-                              error={errors.minSellingPrice?.message}
-                            >
-                              <Controller
-                                name="minSellingPrice"
-                                control={control}
-                                render={({ field }) => (
-                                  <CurrencyInput
-                                    value={field.value}
-                                    onChange={(v) => field.onChange(v ?? 0)}
-                                    onBlur={field.onBlur}
-                                    placeholder="0"
-                                  />
-                                )}
-                              />
-                              <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-kit-muted">
-                                <span>
-                                  Gợi ý hòa vốn:{" "}
-                                  <span className="font-semibold text-kit-heading">
-                                    {formatCurrency(suggestedMinPrice)}
-                                  </span>
-                                </span>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  className="mb-0 h-7 px-2 text-xs"
-                                  onClick={() =>
-                                    setValue(
-                                      "minSellingPrice",
-                                      suggestedMinPrice,
-                                      {
-                                        shouldDirty: true,
-                                        shouldValidate: true,
-                                      },
-                                    )
-                                  }
-                                >
-                                  Áp dụng gợi ý
-                                </Button>
-                              </div>
-                            </FormField>
-
-                            <FormField
-                              label="Giá bán *"
-                              tooltip="Gợi ý = giá vốn × (1 + % lãi) ÷ (1 − % hoa hồng)."
-                              error={errors.sellingPrice?.message}
-                            >
-                              <Controller
-                                name="sellingPrice"
-                                control={control}
-                                render={({ field }) => (
-                                  <CurrencyInput
-                                    value={field.value}
-                                    onChange={(v) => field.onChange(v ?? 0)}
-                                    onBlur={field.onBlur}
-                                    placeholder="0"
-                                  />
-                                )}
-                              />
-                              <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-kit-muted">
-                                <span>
-                                  Gợi ý lãi {watchDesiredProfit}% trên giá vốn:{" "}
-                                  <span className="font-semibold text-kit-heading">
-                                    {formatCurrency(suggestedSellPrice)}
-                                  </span>
-                                </span>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  className="mb-0 h-7 px-2 text-xs"
-                                  onClick={() =>
-                                    setValue(
-                                      "sellingPrice",
-                                      suggestedSellPrice,
-                                      {
-                                        shouldDirty: true,
-                                        shouldValidate: true,
-                                      },
-                                    )
-                                  }
-                                >
-                                  Áp dụng gợi ý
-                                </Button>
-                              </div>
-                              {belowMin && (
-                                <p className="mt-1.5 text-xs text-kit-danger">
-                                  Giá bán đang thấp hơn giá tối thiểu gợi ý (
-                                  {formatCurrency(suggestedMinPrice)}).
-                                </p>
+                      <div>
+                        <p className="mb-2 text-xs font-semibold text-kit-muted">
+                          Chi phí
+                        </p>
+                        <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+                          <FormField
+                            label="Giá vốn *"
+                            tooltip="Chi phí gốc của dịch vụ"
+                            error={errors.costPrice?.message}
+                          >
+                            <Controller
+                              name="costPrice"
+                              control={control}
+                              render={({ field }) => (
+                                <CurrencyInput
+                                  value={field.value}
+                                  onChange={(v) => field.onChange(v ?? 0)}
+                                  onBlur={field.onBlur}
+                                  placeholder="0"
+                                  invalid={!!errors.costPrice}
+                                />
                               )}
-                            </FormField>
-                          </div>
-                        </div>
+                            />
+                          </FormField>
 
-                        <div className="border border-kit bg-kit-page/60 p-3">
-                          <p className="mb-2 text-xs font-semibold text-kit-muted">
-                            Lãi dự kiến
-                          </p>
-                          <div className="flex flex-wrap items-center gap-4 text-sm">
-                            <span>
-                              Hoa hồng:{" "}
-                              <span className="font-medium text-kit-heading">
-                                {formatCurrency(commissionAmount)}
-                              </span>
-                            </span>
-                            <span>
-                              Lãi gộp:{" "}
-                              <span
-                                className={`font-semibold ${profitTextClass(profitTone)}`}
-                              >
-                                {formatCurrency(grossProfit)}
-                              </span>
-                            </span>
-                            <span>
-                              % lãi / giá vốn:{" "}
-                              <span
-                                className={`font-semibold ${profitTextClass(profitTone)}`}
-                              >
-                                {markupOnCostPercent != null
-                                  ? `${markupOnCostPercent}%`
-                                  : "—"}
-                              </span>
-                            </span>
-                            <span>
-                              Biên lãi / giá bán:{" "}
-                              <span
-                                className={`font-semibold ${profitTextClass(profitTone)}`}
-                              >
-                                {grossMarginPercent != null
-                                  ? `${grossMarginPercent}%`
-                                  : "—"}
-                              </span>
-                            </span>
-                            <Badge
-                              variant={profitBadgeVariant(profitTone)}
-                              soft
-                            >
-                              {getProfitLabel(profitTone)}
-                            </Badge>
-                          </div>
+                          <FormField
+                            label="Chi phí tiêu hao"
+                            tooltip="Tự tính từ sản phẩm tiêu hao ở tab Sản phẩm"
+                          >
+                            <div className="flex h-9 items-center rounded border border-kit bg-kit-page px-3 text-sm font-medium text-kit-heading">
+                              {formatCurrency(productCost)}
+                            </div>
+                          </FormField>
+
+                          <FormField
+                            label="Tổng giá vốn"
+                            tooltip="Giá vốn + chi phí tiêu hao"
+                          >
+                            <div className="flex h-9 items-center rounded border border-kit bg-kit-page px-3 text-sm font-semibold text-kit-heading">
+                              {formatCurrency(totalCost)}
+                            </div>
+                          </FormField>
                         </div>
+                      </div>
+
+                      <div>
+                        <p className="mb-2 text-xs font-semibold text-kit-muted">
+                          Định giá
+                        </p>
+                        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+                          <FormField
+                            label="Tỷ lệ hoa hồng (%)"
+                            error={errors.commissionRate?.message}
+                          >
+                            <Input
+                              {...register("commissionRate", {
+                                valueAsNumber: true,
+                              })}
+                              type="number"
+                              placeholder="0"
+                              invalid={!!errors.commissionRate}
+                            />
+                          </FormField>
+
+                          <FormField
+                            label="% lãi mong muốn"
+                            tooltip="% lãi trên giá vốn (sau hoa hồng). VD: 100% = lãi bằng giá vốn."
+                            error={errors.desiredProfitPercent?.message}
+                          >
+                            <Input
+                              {...register("desiredProfitPercent", {
+                                valueAsNumber: true,
+                              })}
+                              type="number"
+                              placeholder="20"
+                              invalid={!!errors.desiredProfitPercent}
+                            />
+                          </FormField>
+
+                          <FormField
+                            label="Giá bán tối thiểu"
+                            tooltip="Mức hòa vốn sau hoa hồng. Bạn có thể nhập tay hoặc áp dụng gợi ý."
+                            error={errors.minSellingPrice?.message}
+                          >
+                            <Controller
+                              name="minSellingPrice"
+                              control={control}
+                              render={({ field }) => (
+                                <CurrencyInput
+                                  value={field.value}
+                                  onChange={(v) => field.onChange(v ?? 0)}
+                                  onBlur={field.onBlur}
+                                  placeholder="0"
+                                />
+                              )}
+                            />
+                            <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-kit-muted">
+                              <span>
+                                Gợi ý hòa vốn:{" "}
+                                <span className="font-semibold text-kit-heading">
+                                  {formatCurrency(suggestedMinPrice)}
+                                </span>
+                              </span>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="mb-0 h-7 px-2 text-xs"
+                                onClick={() =>
+                                  setValue(
+                                    "minSellingPrice",
+                                    suggestedMinPrice,
+                                    {
+                                      shouldDirty: true,
+                                      shouldValidate: true,
+                                    },
+                                  )
+                                }
+                              >
+                                Áp dụng gợi ý
+                              </Button>
+                            </div>
+                          </FormField>
+
+                          <FormField
+                            label="Giá bán *"
+                            tooltip="Gợi ý = giá vốn × (1 + % lãi) ÷ (1 − % hoa hồng)."
+                            error={errors.sellingPrice?.message}
+                          >
+                            <Controller
+                              name="sellingPrice"
+                              control={control}
+                              render={({ field }) => (
+                                <CurrencyInput
+                                  value={field.value}
+                                  onChange={(v) => field.onChange(v ?? 0)}
+                                  onBlur={field.onBlur}
+                                  placeholder="0"
+                                />
+                              )}
+                            />
+                            <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-kit-muted">
+                              <span>
+                                Gợi ý lãi {watchDesiredProfit}% trên giá vốn:{" "}
+                                <span className="font-semibold text-kit-heading">
+                                  {formatCurrency(suggestedSellPrice)}
+                                </span>
+                              </span>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="mb-0 h-7 px-2 text-xs"
+                                onClick={() =>
+                                  setValue("sellingPrice", suggestedSellPrice, {
+                                    shouldDirty: true,
+                                    shouldValidate: true,
+                                  })
+                                }
+                              >
+                                Áp dụng gợi ý
+                              </Button>
+                            </div>
+                            {belowMin && (
+                              <p className="mt-1.5 text-xs text-kit-danger">
+                                Giá bán đang thấp hơn giá tối thiểu gợi ý (
+                                {formatCurrency(suggestedMinPrice)}).
+                              </p>
+                            )}
+                          </FormField>
+                        </div>
+                      </div>
+
+                      <div className="border border-kit bg-kit-page/60 p-3">
+                        <p className="mb-2 text-xs font-semibold text-kit-muted">
+                          Lãi dự kiến
+                        </p>
+                        <div className="flex flex-wrap items-center gap-4 text-sm">
+                          <span>
+                            Hoa hồng:{" "}
+                            <span className="font-medium text-kit-heading">
+                              {formatCurrency(commissionAmount)}
+                            </span>
+                          </span>
+                          <span>
+                            Lãi gộp:{" "}
+                            <span
+                              className={`font-semibold ${profitTextClass(profitTone)}`}
+                            >
+                              {formatCurrency(grossProfit)}
+                            </span>
+                          </span>
+                          <span>
+                            % lãi / giá vốn:{" "}
+                            <span
+                              className={`font-semibold ${profitTextClass(profitTone)}`}
+                            >
+                              {markupOnCostPercent != null
+                                ? `${markupOnCostPercent}%`
+                                : "—"}
+                            </span>
+                          </span>
+                          <span>
+                            Biên lãi / giá bán:{" "}
+                            <span
+                              className={`font-semibold ${profitTextClass(profitTone)}`}
+                            >
+                              {grossMarginPercent != null
+                                ? `${grossMarginPercent}%`
+                                : "—"}
+                            </span>
+                          </span>
+                          <Badge variant={profitBadgeVariant(profitTone)} soft>
+                            {getProfitLabel(profitTone)}
+                          </Badge>
+                        </div>
+                      </div>
                     </div>
                   ),
                 },

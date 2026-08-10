@@ -1,5 +1,5 @@
 ﻿import { Calculator, CheckCircle2, Pencil, Wallet } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   getCoreRowModel,
   useReactTable,
@@ -43,9 +43,16 @@ const now = new Date();
 
 export function PayrollListPage() {
   "use no memo";
+  const hasRole = useAuthStore((s) => s.hasRole);
+  const user = useAuthStore((s) => s.user);
+  const canManagePayroll = hasRole("Admin") || hasRole("Manager");
+  const myStaffId = user?.staffInfo?.id ?? null;
+
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [staffId, setStaffId] = useState<number | null>(null);
+  const [staffId, setStaffId] = useState<number | null>(
+    canManagePayroll ? null : myStaffId,
+  );
   const [localSalonId, setLocalSalonId] = useState<number | null>(null);
   const [month, setMonth] = useState<number | null>(null);
   const [year, setYear] = useState<number | null>(now.getFullYear());
@@ -55,11 +62,20 @@ export function PayrollListPage() {
   const headerSalonId = useAuthStore((s) => s.getEffectiveSalonId());
   const effectiveSalonId = headerSalonId ?? localSalonId;
 
-  const { data: staffsResult } = useAdminStaffs({
-    pageIndex: 1,
-    pageSize: 200,
-    salonId: effectiveSalonId ?? undefined,
-  });
+  useEffect(() => {
+    if (canManagePayroll) return;
+    if (!myStaffId) return;
+    setStaffId(myStaffId);
+  }, [canManagePayroll, myStaffId]);
+
+  const { data: staffsResult } = useAdminStaffs(
+    {
+      pageIndex: 1,
+      pageSize: 200,
+      salonId: effectiveSalonId ?? undefined,
+    },
+    canManagePayroll,
+  );
   const staffs = useMemo(
     () => staffsResult?.data?.items ?? [],
     [staffsResult?.data?.items],
@@ -67,15 +83,17 @@ export function PayrollListPage() {
 
   const { data: salonsResult } = useSalons(
     { pageIndex: 1, pageSize: 100 },
-    !headerSalonId,
+    canManagePayroll && !headerSalonId,
   );
   const salons = useMemo(() => salonsResult?.data?.items ?? [], [salonsResult]);
+
+  const effectiveStaffId = canManagePayroll ? staffId : myStaffId;
 
   const { data: result, isLoading, isFetching } = usePayrolls({
     pageIndex,
     pageSize,
-    staffId: staffId ?? undefined,
-    salonId: effectiveSalonId ?? undefined,
+    staffId: effectiveStaffId ?? undefined,
+    salonId: canManagePayroll ? (effectiveSalonId ?? undefined) : undefined,
     month: month ?? undefined,
     year: year ?? undefined,
   });
@@ -96,16 +114,22 @@ export function PayrollListPage() {
     (_: unknown, index: number) => now.getFullYear() - index,
   );
 
-  const staffOptions = useMemo(
-    () =>
-      staffs
-        .filter((staff: StaffDto) => staff.id != null)
-        .map((staff: StaffDto) => ({
-          value: String(staff.id),
-          label: staff.fullName ?? `Nhân viên #${staff.id}`,
-        })),
-    [staffs],
-  );
+  const staffOptions: { value: string; label: string }[] = [];
+  if (canManagePayroll) {
+    for (let index = 0; index < staffs.length; index++) {
+      const staff: StaffDto = staffs[index];
+      if (!staff.id) continue;
+      staffOptions.push({
+        value: String(staff.id),
+        label: staff.fullName ?? `Nhân viên #${staff.id}`,
+      });
+    }
+  } else if (myStaffId) {
+    staffOptions.push({
+      value: String(myStaffId),
+      label: user?.fullName ?? `Nhân viên #${myStaffId}`,
+    });
+  }
 
   const salonOptions = useMemo(
     () => [
@@ -143,144 +167,153 @@ export function PayrollListPage() {
   );
 
   const columns = useMemo<ColumnDef<PayrollDto>[]>(
-    () => [
-      {
-        id: "index",
-        header: "#",
-        cell: ({ row }) => (
-          <IndexCell
-            pageIndex={pageIndex}
-            pageSize={pageSize}
-            rowIndex={row.index}
-          />
-        ),
-        size: 50,
-      },
-      {
-        accessorKey: "staffName",
-        header: "Nhân viên",
-        cell: ({ row }) => <NameCell value={row.original.staffName} />,
-      },
-      {
-        id: "period",
-        header: "Kỳ lương",
-        cell: ({ row }) => (
-          <MutedCell
-            value={`${row.original.periodMonth}/${row.original.periodYear}`}
-          />
-        ),
-      },
-      {
-        accessorKey: "salaryType",
-        header: "Loại lương",
-        cell: ({ row }) => (
-          <MutedCell
-            value={
-              SALARY_TYPE_LABEL[String(row.original.salaryType ?? "")] ?? "—"
+    () => {
+      const cols: ColumnDef<PayrollDto>[] = [
+        {
+          id: "index",
+          header: "#",
+          cell: ({ row }) => (
+            <IndexCell
+              pageIndex={pageIndex}
+              pageSize={pageSize}
+              rowIndex={row.index}
+            />
+          ),
+          size: 50,
+        },
+        {
+          accessorKey: "staffName",
+          header: "Nhân viên",
+          cell: ({ row }) => <NameCell value={row.original.staffName} />,
+        },
+        {
+          id: "period",
+          header: "Kỳ lương",
+          cell: ({ row }) => (
+            <MutedCell
+              value={`${row.original.periodMonth}/${row.original.periodYear}`}
+            />
+          ),
+        },
+        {
+          accessorKey: "salaryType",
+          header: "Loại lương",
+          cell: ({ row }) => (
+            <MutedCell
+              value={
+                SALARY_TYPE_LABEL[String(row.original.salaryType ?? "")] ?? "—"
+              }
+            />
+          ),
+        },
+        {
+          accessorKey: "rate",
+          header: "Lương tháng",
+          cell: ({ row }) => <PriceCell value={row.original.rate} />,
+        },
+        {
+          accessorKey: "standardWorkDays",
+          header: "Công chuẩn",
+          cell: ({ row }) => (
+            <MutedCell value={row.original.standardWorkDays ?? "—"} />
+          ),
+        },
+        {
+          accessorKey: "totalHours",
+          header: "Tổng giờ",
+          cell: ({ row }) => <MutedCell value={row.original.totalHours ?? 0} />,
+        },
+        {
+          accessorKey: "totalWorkDays",
+          header: "Tổng công",
+          cell: ({ row }) => (
+            <MutedCell value={row.original.totalWorkDays ?? 0} />
+          ),
+        },
+        {
+          accessorKey: "baseAmount",
+          header: "Lương CB",
+          cell: ({ row }) => <PriceCell value={row.original.baseAmount} />,
+        },
+        {
+          accessorKey: "commissionAmount",
+          header: "Hoa hồng dịch vụ",
+          cell: ({ row }) => (
+            <span className="font-semibold text-kit-warning">
+              {formatCurrency(row.original.commissionAmount)}
+            </span>
+          ),
+        },
+        {
+          accessorKey: "totalAmount",
+          header: "Tổng",
+          cell: ({ row }) => (
+            <span className="font-semibold text-kit-heading">
+              {formatCurrency(row.original.totalAmount)}
+            </span>
+          ),
+        },
+        {
+          accessorKey: "status",
+          header: "Trạng thái",
+          cell: ({ row }) => {
+            const status = row.original.status;
+            if (status === 2) {
+              return (
+                <Badge variant="success" soft>
+                  Đã chốt
+                </Badge>
+              );
             }
-          />
-        ),
-      },
-      {
-        accessorKey: "rate",
-        header: "Lương tháng",
-        cell: ({ row }) => <PriceCell value={row.original.rate} />,
-      },
-      {
-        accessorKey: "standardWorkDays",
-        header: "Công chuẩn",
-        cell: ({ row }) => (
-          <MutedCell value={row.original.standardWorkDays ?? "—"} />
-        ),
-      },
-      {
-        accessorKey: "totalHours",
-        header: "Tổng giờ",
-        cell: ({ row }) => <MutedCell value={row.original.totalHours ?? 0} />,
-      },
-      {
-        accessorKey: "totalWorkDays",
-        header: "Tổng công",
-        cell: ({ row }) => <MutedCell value={row.original.totalWorkDays ?? 0} />,
-      },
-      {
-        accessorKey: "baseAmount",
-        header: "Lương CB",
-        cell: ({ row }) => <PriceCell value={row.original.baseAmount} />,
-      },
-      {
-        accessorKey: "commissionAmount",
-        header: "Hoa hồng dịch vụ",
-        cell: ({ row }) => (
-          <span className="font-semibold text-kit-warning">
-            {formatCurrency(row.original.commissionAmount)}
-          </span>
-        ),
-      },
-      {
-        accessorKey: "totalAmount",
-        header: "Tổng",
-        cell: ({ row }) => (
-          <span className="font-semibold text-kit-heading">
-            {formatCurrency(row.original.totalAmount)}
-          </span>
-        ),
-      },
-      {
-        accessorKey: "status",
-        header: "Trạng thái",
-        cell: ({ row }) => {
-          const status = row.original.status;
-          if (status === 2) {
             return (
-              <Badge variant="success" soft>
-                Đã chốt
+              <Badge variant="warning" soft>
+                Nháp
               </Badge>
             );
-          }
-          return (
-            <Badge variant="warning" soft>
-              Nháp
-            </Badge>
-          );
+          },
         },
-      },
-      {
-        id: "actions",
-        header: "",
-        cell: ({ row }) => {
-          const payroll = row.original;
-          if (!payroll.id) return null;
-          return (
-            <div className="flex items-center gap-1.5">
-              <Button
-                type="button"
-                variant="outline-secondary"
-                size="sm"
-                className="mb-0"
-                onClick={() => setEditingPayroll(payroll)}
-              >
-                <Pencil className="h-3.5 w-3.5" />
-                Sửa
-              </Button>
-              <Button
-                type="button"
-                variant="primary"
-                size="sm"
-                className="mb-0"
-                loading={confirmMutation.isPending}
-                onClick={() => confirmMutation.mutate(payroll.id!)}
-              >
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                Chốt
-              </Button>
-            </div>
-          );
-        },
-        size: 180,
-      },
-    ],
-    [pageIndex, pageSize, confirmMutation],
+      ];
+
+      if (canManagePayroll) {
+        cols.push({
+          id: "actions",
+          header: "",
+          cell: ({ row }) => {
+            const payroll = row.original;
+            if (!payroll.id) return null;
+            return (
+              <div className="flex items-center gap-1.5">
+                <Button
+                  type="button"
+                  variant="outline-secondary"
+                  size="sm"
+                  className="mb-0"
+                  onClick={() => setEditingPayroll(payroll)}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  Sửa
+                </Button>
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="sm"
+                  className="mb-0"
+                  loading={confirmMutation.isPending}
+                  onClick={() => confirmMutation.mutate(payroll.id!)}
+                >
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  Chốt
+                </Button>
+              </div>
+            );
+          },
+          size: 180,
+        });
+      }
+
+      return cols;
+    },
+    [pageIndex, pageSize, confirmMutation, canManagePayroll],
   );
 
   const table = useReactTable({
@@ -295,18 +328,20 @@ export function PayrollListPage() {
       <TablePageShell isFetching={isFetching} isLoading={isLoading}>
         <div className="border-b border-kit px-4 pt-4">
           <div className="mb-4 flex flex-wrap items-end gap-3">
-            <Button
-              variant="primary"
-              size="sm"
-              className="mb-0"
-              onClick={() => setGenerateOpen(true)}
-            >
-              <Calculator className="h-3.5 w-3.5" />
-              Tính lương
-            </Button>
+            {canManagePayroll ? (
+              <Button
+                variant="primary"
+                size="sm"
+                className="mb-0"
+                onClick={() => setGenerateOpen(true)}
+              >
+                <Calculator className="h-3.5 w-3.5" />
+                Tính lương
+              </Button>
+            ) : null}
 
             <div className="ml-auto flex flex-wrap items-end gap-3">
-              {!headerSalonId ? (
+              {canManagePayroll && !headerSalonId ? (
                 <FormField label="Chi nhánh" className="mb-0 min-w-44">
                   <Select
                     inputSize="sm"
@@ -326,13 +361,17 @@ export function PayrollListPage() {
                 <SearchableSelect
                   inputSize="sm"
                   className="w-55"
-                  value={staffId ? String(staffId) : ""}
+                  value={effectiveStaffId ? String(effectiveStaffId) : ""}
                   options={staffOptions}
-                  placeholder="Tất cả nhân viên"
+                  placeholder={
+                    canManagePayroll ? "Tất cả nhân viên" : "Nhân viên của bạn"
+                  }
                   searchPlaceholder="Tìm nhân viên..."
                   emptyText="Không tìm thấy"
-                  clearable
+                  clearable={canManagePayroll}
+                  disabled={!canManagePayroll}
                   onChange={(value: string) => {
+                    if (!canManagePayroll) return;
                     setStaffId(value ? Number(value) : null);
                     setPageIndex(1);
                   }}
@@ -379,15 +418,17 @@ export function PayrollListPage() {
               icon={Wallet}
               title="Chưa có bảng lương"
               action={
-                <Button
-                  variant="primary"
-                  size="sm"
-                  className="mb-0"
-                  onClick={() => setGenerateOpen(true)}
-                >
-                  <Calculator className="h-3.5 w-3.5" />
-                  Tính lương
-                </Button>
+                canManagePayroll ? (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="mb-0"
+                    onClick={() => setGenerateOpen(true)}
+                  >
+                    <Calculator className="h-3.5 w-3.5" />
+                    Tính lương
+                  </Button>
+                ) : null
               }
             />
           }
@@ -425,17 +466,21 @@ export function PayrollListPage() {
         />
       </TablePageShell>
 
-      <GeneratePayrollDialog
-        open={generateOpen}
-        onOpenChange={setGenerateOpen}
-      />
-      <EditPayrollDialog
-        open={editingPayroll !== null}
-        onOpenChange={(open) => {
-          if (!open) setEditingPayroll(null);
-        }}
-        payroll={editingPayroll}
-      />
+      {canManagePayroll ? (
+        <>
+          <GeneratePayrollDialog
+            open={generateOpen}
+            onOpenChange={setGenerateOpen}
+          />
+          <EditPayrollDialog
+            open={editingPayroll !== null}
+            onOpenChange={(open) => {
+              if (!open) setEditingPayroll(null);
+            }}
+            payroll={editingPayroll}
+          />
+        </>
+      ) : null}
     </div>
   );
 }

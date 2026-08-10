@@ -25,6 +25,13 @@ public class GetAllStaffServiceHandler : IRequestHandler<GetAllStaffServiceQuery
         {
             query = query.Where(x => x.ServiceId == request.ServiceId);
         }
+        if (!string.IsNullOrWhiteSpace(request.Filter))
+        {
+            var keyword = request.Filter.Trim();
+            query = query.Where(x =>
+                (x.Service != null && x.Service.Code != null && x.Service.Code.Contains(keyword))
+                || (x.Service != null && x.Service.Name != null && x.Service.Name.Contains(keyword)));
+        }
 
         query = request.IsDescending ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt);
 

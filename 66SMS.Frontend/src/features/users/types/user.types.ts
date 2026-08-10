@@ -41,6 +41,7 @@ export interface CustomerProfileDto {
 }
 
 export interface UserAccountDto {
+  id: number;
   username: string;
   email: string;
   role?: string;

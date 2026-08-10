@@ -81,10 +81,10 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                     if (!topUp.IsSuccess && topUp.Code == 404)
                         return VnPayIpnResponse.OrderNotFound();
 
-                    if (topUp.IsSuccess && topUp.Data is bool isNewlyCredited && !isNewlyCredited)
+                    if (topUp.IsSuccess && Equals(topUp.Data, false))
                         return VnPayIpnResponse.OrderAlreadyConfirmed();
 
-                    if (topUp.IsSuccess && topUp.Data is bool newly && newly)
+                    if (topUp.IsSuccess && Equals(topUp.Data, true))
                         await unitOfWork.SaveChangeAsync(cancellationToken);
                 }
 
@@ -128,8 +128,10 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                 if (!apply.IsSuccess)
                     return VnPayIpnResponse.OrderAlreadyConfirmed();
 
+                if (apply.Data != true)
+                    return VnPayIpnResponse.OrderAlreadyConfirmed();
+
                 if (result.Phase == AppointmentPaymentConst.PHASE_FINAL_PAYMENT
-                    && apply.Data is bool isNewlyPaid && isNewlyPaid
                     && appointment.TotalAmount > 0)
                 {
                     await loyaltyPointService.AddPointsAndCheckUpgradeAsync(
@@ -139,7 +141,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                         cancellationToken);
                 }
 
-                if (result.Phase == AppointmentPaymentConst.PHASE_FINAL_PAYMENT && apply.IsSuccess)
+                if (result.Phase == AppointmentPaymentConst.PHASE_FINAL_PAYMENT)
                 {
                     var invoice = await invoiceRepository.AsQueryable(asNoTracking: false)
                         .Where(i => i.AppointmentId == appointment.Id

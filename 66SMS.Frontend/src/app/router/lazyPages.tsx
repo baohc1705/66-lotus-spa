@@ -48,6 +48,11 @@ export const StaffListPage = lazy(() =>
     default: m.StaffListPage,
   })),
 );
+export const MyStaffServicesPage = lazy(() =>
+  import("@/features/staffs/pages/MyStaffServicesPage").then((m) => ({
+    default: m.MyStaffServicesPage,
+  })),
+);
 export const StaffAppointmentsPage = lazy(() =>
   import("@/features/staff_appointments/pages/StaffAppointmentsPage").then(
     (m) => ({ default: m.StaffAppointmentsPage }),

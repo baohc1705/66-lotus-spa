@@ -246,6 +246,12 @@ export function AttendanceDailyDialog(props: AttendanceDailyDialogProps) {
 
   function submitStaffForm(values: AttendanceFormValues) {
     if (!isToday) {
+      const todayText = getTodayDateText();
+      if (scheduleDateText && scheduleDateText < todayText) {
+        toast.error("Bạn không thể chấm công ngày đã qua.");
+      } else {
+        toast.error("Bạn không thể chấm công ngày trong tương lai.");
+      }
       return;
     }
 
@@ -297,7 +303,7 @@ export function AttendanceDailyDialog(props: AttendanceDailyDialogProps) {
   ) {
     if (!isToday) {
       toast.error(
-        "Hệ thống chỉ hỗ trợ ghi nhận đi làm (Check-in) cho ngày hôm nay. Đối với ngày trong quá khứ/tương lai, vui lòng chọn hình thức Nghỉ.",
+        "Hệ thống chỉ hỗ trợ ghi nhận đi làm cho ngày hôm nay.",
       );
       return;
     }
@@ -445,37 +451,37 @@ export function AttendanceDailyDialog(props: AttendanceDailyDialogProps) {
             <AlertCircle className="mt-0.5 size-4 shrink-0" />
             <span>
               Lịch làm việc này thuộc ngày khác. Bạn không thể tự chấm công hoặc
-              thay đổi giờ của ngày đã qua / ngày sắp tới.
+              thay đổi thời gian.
             </span>
           </div>
         </Alert>
       );
     }
 
-    let statusAlert = null;
+    function renderStatusAlert() {
+      if (!attendance) {
+        return (
+          <Alert variant="warning">
+            <p className="font-semibold">Bạn chưa chấm công.</p>
+          </Alert>
+        );
+      }
 
-    if (!attendance) {
-      statusAlert = (
-        <Alert variant="warning">
-          <p className="font-semibold">
-            Bạn chưa ghi nhận bắt đầu ca làm việc (Check-in).
-          </p>
-        </Alert>
-      );
-    } else if (!attendance.checkOutAt) {
-      statusAlert = (
-        <Alert variant="success">
-          <p className="font-semibold">Bạn đã Check-in thành công!</p>
-          <p className="mt-1 text-xs opacity-80">
-            Thời gian vào:{" "}
-            <span className="font-bold">
-              {toLocalTimeOnly(attendance.checkInAt)}
-            </span>
-          </p>
-        </Alert>
-      );
-    } else {
-      statusAlert = (
+      if (!attendance.checkOutAt) {
+        return (
+          <Alert variant="success">
+            <p className="font-semibold">Bạn đã chấm công thành công!</p>
+            <p className="mt-1 text-xs opacity-80">
+              Thời gian vào:{" "}
+              <span className="font-bold">
+                {toLocalTimeOnly(attendance.checkInAt)}
+              </span>
+            </p>
+          </Alert>
+        );
+      }
+
+      return (
         <Alert variant="secondary">
           <p className="font-semibold text-kit-heading">
             Bạn đã hoàn thành chấm công ngày hôm nay!
@@ -500,7 +506,7 @@ export function AttendanceDailyDialog(props: AttendanceDailyDialogProps) {
 
     return (
       <div className="space-y-3">
-        {statusAlert}
+        {renderStatusAlert()}
         {canEditNote ? (
           <FormField label="Ghi chú (không bắt buộc)">
             <Textarea

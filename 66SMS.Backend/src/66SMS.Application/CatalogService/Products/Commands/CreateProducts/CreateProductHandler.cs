@@ -1,3 +1,4 @@
+using System.Data;
 using _66SMS.Contract.Abstractions;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
@@ -6,7 +7,6 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 using MediatR;
-using System.Data;
 
 namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
 {
@@ -35,6 +35,7 @@ namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
             try
             {
                 Product product = mapper.Map<Product>(request);
+                product.Code = string.Empty;
 
                 var pendingUploads = new List<(ProductImage Image, string Base64)>();
 
@@ -49,8 +50,7 @@ namespace _66SMS.Application.CatalogService.Products.Commands.CreateProducts
                         };
                         if (dto.IsPrimary == true)
                             image.IsPrimary = true;
-                        if (dto.SortOrder is int sortOrder)
-                            image.SortOrder = sortOrder;
+                            image.SortOrder = dto.SortOrder ?? 0;
 
                         product.Images.Add(image);
                         if (!string.IsNullOrWhiteSpace(dto.ImageBase64))

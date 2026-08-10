@@ -96,7 +96,11 @@ export function StaffDetailExpanded({
             </TableDetailGrid>
 
             <TableDetailActions>
-              <PermissionGate resource={perm.resource} action={perm.update}>
+              <PermissionGate
+                resource={perm.resource}
+                action={perm.update}
+                role={perm.role}
+              >
                 <Button
                   variant="admin"
                   size="sm"

@@ -12,7 +12,7 @@ namespace _66SMS.Application.CatalogService.Services.Commands.CreateServices
     public class CreateServiceCommand : IRequest<Result<object>>
     {
         public int? CategoryId { get; set; }
-        public string? Code { get; set; }
+        //public string? Code { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
         public string? Content { get; set; }

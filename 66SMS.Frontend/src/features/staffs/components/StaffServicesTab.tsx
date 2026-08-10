@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Plus, Scissors, Trash2 } from "lucide-react";
 
+import { useAuthStore } from "@/features/auth/stores/authStore";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Tooltip } from "@/shared/components/Tooltip";
 import { Button } from "@/shared/elements/Button";
 import { Switch } from "@/shared/forms/Switch";
@@ -17,7 +17,6 @@ import {
 import { StatusActive } from "@/shared/constants/status.enum";
 import { formatCurrency } from "@/shared/utils/currency";
 
-import { STAFF_PERM } from "../constants/staff.permissions";
 import {
   useDeleteStaffServicesMutation,
   useStaffServices,
@@ -29,14 +28,18 @@ interface StaffServicesTabProps {
   staffId: number;
   staffName?: string | null;
   onAssign?: () => void;
+  readOnly?: boolean;
 }
 
 export function StaffServicesTab({
   staffId,
   staffName,
   onAssign,
+  readOnly = false,
 }: StaffServicesTabProps) {
-  const perm = STAFF_PERM;
+  const hasRole = useAuthStore((s) => s.hasRole);
+  const canManage =
+    !readOnly && (hasRole("Admin") || hasRole("Manager"));
   const [removeTarget, setRemoveTarget] = useState<StaffServiceDto | null>(
     null,
   );
@@ -60,6 +63,83 @@ export function StaffServicesTab({
     });
   }
 
+  function renderStatusCell(item: StaffServiceDto) {
+    if (!canManage) {
+      if (item.status === StatusActive.Active) {
+        return (
+          <span className="text-sm text-kit-success">Đang làm</span>
+        );
+      }
+      return <span className="text-sm text-kit-muted">Tạm dừng</span>;
+    }
+
+    return (
+      <Switch
+        className="mb-0"
+        checked={item.status === StatusActive.Active}
+        onChange={(checked: boolean) => {
+          if (!item.id) return;
+          updateMutation.mutate({
+            id: item.id,
+            payload: {
+              status: checked
+                ? StatusActive.Active
+                : StatusActive.Inactive,
+            },
+          });
+        }}
+        disabled={updateMutation.isPending}
+      />
+    );
+  }
+
+  function renderRows() {
+    const rows: ReactNode[] = [];
+    for (let index = 0; index < items.length; index++) {
+      const item = items[index];
+      rows.push(
+        <TableRow key={item.id ?? item.serviceId}>
+          <TableCell className="text-kit-muted">{index + 1}</TableCell>
+          <TableCell className="text-kit-muted">
+            {item.serCode ?? "—"}
+          </TableCell>
+          <TableCell className="font-medium text-kit-heading">
+            {item.serName ?? "—"}
+          </TableCell>
+          <TableCell className="text-kit-muted">
+            {item.serDurationMins != null
+              ? `${item.serDurationMins} phút`
+              : "—"}
+          </TableCell>
+          <TableCell className="text-kit-muted">
+            {formatCurrency(item.serCostPrice)}
+          </TableCell>
+          <TableCell className="text-kit-muted">
+            {item.serCommissionRate != null
+              ? `${item.serCommissionRate}%`
+              : "—"}
+          </TableCell>
+          <TableCell>{renderStatusCell(item)}</TableCell>
+          {canManage ? (
+            <TableCell className="text-center">
+              <Tooltip text="Gỡ dịch vụ">
+                <Button
+                  size="icon-sm"
+                  variant="outline-danger"
+                  className="mb-0 mr-0"
+                  onClick={() => setRemoveTarget(item)}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </Tooltip>
+            </TableCell>
+          ) : null}
+        </TableRow>,
+      );
+    }
+    return rows;
+  }
+
   if (isLoading) {
     return <p className="py-6 text-center text-sm text-kit-muted">Đang tải...</p>;
   }
@@ -72,7 +152,7 @@ export function StaffServicesTab({
             ? `${items.length} dịch vụ đang phân công`
             : "Chưa phân công dịch vụ nào"}
         </p>
-        <PermissionGate resource={perm.resource} action={perm.create}>
+        {canManage ? (
           <Button
             variant="admin"
             size="sm"
@@ -82,7 +162,7 @@ export function StaffServicesTab({
             <Plus className="h-3.5 w-3.5" />
             Phân công
           </Button>
-        </PermissionGate>
+        ) : null}
       </div>
 
       {items.length === 0 ? (
@@ -104,97 +184,36 @@ export function StaffServicesTab({
                 <TableHeaderCell>Giá vốn</TableHeaderCell>
                 <TableHeaderCell>Hoa hồng</TableHeaderCell>
                 <TableHeaderCell>Trạng thái</TableHeaderCell>
-                <TableHeaderCell className="w-16 text-center">
-                  Xóa
-                </TableHeaderCell>
+                {canManage ? (
+                  <TableHeaderCell className="w-16 text-center">
+                    Xóa
+                  </TableHeaderCell>
+                ) : null}
               </TableRow>
             </TableHead>
-            <TableBody>
-              {items.map((item: StaffServiceDto, index: number) => (
-                <TableRow key={item.id ?? item.serviceId}>
-                  <TableCell className="text-kit-muted">{index + 1}</TableCell>
-                  <TableCell className="text-kit-muted">
-                    {item.serCode ?? "—"}
-                  </TableCell>
-                  <TableCell className="font-medium text-kit-heading">
-                    {item.serName ?? "—"}
-                  </TableCell>
-                  <TableCell className="text-kit-muted">
-                    {item.serDurationMins != null
-                      ? `${item.serDurationMins} phút`
-                      : "—"}
-                  </TableCell>
-                  <TableCell className="text-kit-muted">
-                    {formatCurrency(item.serCostPrice)}
-                  </TableCell>
-                  <TableCell className="text-kit-muted">
-                    {item.serCommissionRate != null
-                      ? `${item.serCommissionRate}%`
-                      : "—"}
-                  </TableCell>
-                  <TableCell>
-                    <PermissionGate
-                      resource={perm.resource}
-                      action={perm.update}
-                    >
-                      <Switch
-                        className="mb-0"
-                        checked={item.status === StatusActive.Active}
-                        onChange={(checked: boolean) => {
-                          if (!item.id) return;
-                          updateMutation.mutate({
-                            id: item.id,
-                            payload: {
-                              status: checked
-                                ? StatusActive.Active
-                                : StatusActive.Inactive,
-                            },
-                          });
-                        }}
-                        disabled={updateMutation.isPending}
-                      />
-                    </PermissionGate>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <PermissionGate
-                      resource={perm.resource}
-                      action={perm.delete}
-                    >
-                      <Tooltip text="Gỡ dịch vụ">
-                        <Button
-                          size="icon-sm"
-                          variant="outline-danger"
-                          className="mb-0 mr-0"
-                          onClick={() => setRemoveTarget(item)}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </Tooltip>
-                    </PermissionGate>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+            <TableBody>{renderRows()}</TableBody>
           </Table>
         </div>
       )}
 
-      <ConfirmDialog
-        open={!!removeTarget}
-        onOpenChange={(open) => {
-          if (!open) setRemoveTarget(null);
-        }}
-        onConfirm={handleRemove}
-        title="Xóa phân công dịch vụ"
-        description={
-          staffName
-            ? `Gỡ dịch vụ "${removeTarget?.serName ?? ""}" khỏi nhân viên ${staffName}?`
-            : `Bạn có chắc muốn xóa phân công dịch vụ "${removeTarget?.serName ?? ""}"? Hành động này không thể hoàn tác.`
-        }
-        confirmLabel="Xóa"
-        loading={deleteMutation.isPending}
-        variant="danger"
-      />
+      {canManage ? (
+        <ConfirmDialog
+          open={!!removeTarget}
+          onOpenChange={(open) => {
+            if (!open) setRemoveTarget(null);
+          }}
+          onConfirm={handleRemove}
+          title="Xóa phân công dịch vụ"
+          description={
+            staffName
+              ? `Gỡ dịch vụ "${removeTarget?.serName ?? ""}" khỏi nhân viên ${staffName}?`
+              : `Bạn có chắc muốn xóa phân công dịch vụ "${removeTarget?.serName ?? ""}"? Hành động này không thể hoàn tác.`
+          }
+          confirmLabel="Xóa"
+          loading={deleteMutation.isPending}
+          variant="danger"
+        />
+      ) : null}
     </div>
   );
 }
