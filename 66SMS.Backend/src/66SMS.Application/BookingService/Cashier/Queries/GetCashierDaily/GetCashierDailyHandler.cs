@@ -54,7 +54,6 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
                         ServiceId = b.ServiceId,
                         StaffId = b.StaffId,
                         StaffName = b.StaffName,
-                        SlotId = b.SlotId,
                         StartTime = b.StartTime,
                         EndTime = b.EndTime,
                         Status = b.Status,

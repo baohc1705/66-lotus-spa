@@ -12,9 +12,8 @@ namespace _66SMS.Domain.Models
         public int? ServiceId { get; set; }
         public int StaffId { get; set; }
         public string StaffName { get; set; } = null!;
-        public int SlotId { get; set; }
-        public string StartTime { get; set; } = null!;
-        public string EndTime { get; set; } = null!;
+        public string? StartTime { get; set; }
+        public string? EndTime { get; set; }
         public string Status { get; set; } = null!;
         public decimal TotalAmount { get; set; }
         public decimal PaidAmount { get; set; }

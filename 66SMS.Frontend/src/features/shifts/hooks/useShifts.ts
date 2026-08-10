@@ -1,5 +1,5 @@
 import { shiftApi } from "@/features/shifts/api/shift.api";
-import type { PageRequest, Result } from "@/shared/types/common.types";
+import type { Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/shared/components/kitToast";
 import type { AxiosError } from "axios";
@@ -8,20 +8,22 @@ import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type {
   CreateShiftPayload,
   UpdateShiftPayload,
+  GetShiftsParams,
 } from "../types/shift.types";
 
 const ENTITY = "ca làm việc";
 
-export const SHIFT_KEYS = createEntityQueryKeys<PageRequest>("shifts");
+export const SHIFT_KEYS = createEntityQueryKeys<GetShiftsParams>("shifts");
 
-export function useShifts(params: PageRequest) {
+export function useShifts(params: GetShiftsParams, enabled = true) {
   return useQuery({
     queryKey: SHIFT_KEYS.list(params),
     queryFn: () => shiftApi.getAll(params),
+    enabled,
   });
 }
 
-export function useAdminShifts(params: PageRequest, enabled = true) {
+export function useAdminShifts(params: GetShiftsParams, enabled = true) {
   return useQuery({
     queryKey: SHIFT_KEYS.adminList(params),
     queryFn: () => shiftApi.getAll(params),
@@ -38,12 +40,12 @@ export function useShiftDetail(id: number | null) {
 }
 
 export function useCreateShift() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: CreateShiftPayload) => shiftApi.create(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: SHIFT_KEYS.all });
+        queryClient.invalidateQueries({ queryKey: SHIFT_KEYS.all });
         toast.success(`Tạo ${ENTITY} thành công`);
       } else {
         toast.error(result.message || "Có lỗi xảy ra");
@@ -56,7 +58,7 @@ export function useCreateShift() {
 }
 
 export function useUpdateShift() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
       id,
@@ -67,7 +69,7 @@ export function useUpdateShift() {
     }) => shiftApi.update(id, payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: SHIFT_KEYS.all });
+        queryClient.invalidateQueries({ queryKey: SHIFT_KEYS.all });
         toast.success(`Cập nhật ${ENTITY} thành công`);
       } else {
         toast.error(result.message || "Có lỗi xảy ra");
@@ -82,12 +84,12 @@ export function useUpdateShift() {
 }
 
 export function useDeleteShift() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => shiftApi.delete(id),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: SHIFT_KEYS.all });
+        queryClient.invalidateQueries({ queryKey: SHIFT_KEYS.all });
         toast.success(`Xóa ${ENTITY} thành công`);
       } else {
         toast.error(result.message || "Có lỗi xảy ra");

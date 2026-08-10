@@ -86,10 +86,10 @@ BEGIN
         ON ws.staff_id = r.staff_id
        AND ws.work_date = @WorkDate
        AND ws.status = 1
-    INNER JOIN dbo.shift_periods sp
-        ON sp.id = ws.shift_period_id
-    WHERE sp.shift_start <= @window_start
-      AND sp.shift_end >= @window_end
+    WHERE ws.shift_start IS NOT NULL
+      AND ws.shift_end IS NOT NULL
+      AND ws.shift_start <= @window_start
+      AND ws.shift_end >= @window_end
       AND (
             @SalonId IS NULL
             OR ws.salon_id = @SalonId

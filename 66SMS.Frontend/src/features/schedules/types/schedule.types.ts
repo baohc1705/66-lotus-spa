@@ -1,17 +1,20 @@
 import type { ShiftDTO } from "@/features/shifts/types/shift.types";
+import type { PageRequest } from "@/shared/types/common.types";
 
 export interface WorkScheduleDTO {
   id?: number;
-  shiftPeriodId?: number;
+  shiftId?: number;
+  shiftStart?: string;
+  shiftEnd?: string;
   staffId?: number;
   salonId?: number;
-  workDate?: string;  
+  workDate?: string;
   shift?: ShiftDTO;
   staffName?: string;
 }
 
 export interface CreateWorkSchedulePayload {
-  shiftPeriodId?: number;
+  shiftId?: number;
   staffId?: number;
   salonId?: number;
   workDate?: string;
@@ -23,13 +26,11 @@ export interface BulkCreateWorkSchedulePayload {
 
 export interface UpdateWorkSchedulePayload {
   id?: number;
-  shiftPeriodId?: number;
+  shiftId?: number;
   staffId?: number;
   salonId?: number;
   workDate?: string;
 }
-
-import type { PageRequest } from "@/shared/types/common.types";
 
 export interface GetWorkSchedulesParams extends PageRequest {
   startDate?: string;

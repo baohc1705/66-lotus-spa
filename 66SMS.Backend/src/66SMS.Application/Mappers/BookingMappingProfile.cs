@@ -5,14 +5,12 @@ using _66SMS.Application.BookingService.BookingRooms.Commands.UpdateBookingRooms
 using _66SMS.Application.BookingService.ConfigAppointments.Commands.CreateConfigAppointment;
 using _66SMS.Application.BookingService.ConfigAppointments.Commands.UpdateConfigAppointment;
 using _66SMS.Application.BookingService.Shifts.Commands.CreateShift;
-using _66SMS.Application.BookingService.Shifts.Commands.CreateShiftPeriod;
 using _66SMS.Application.BookingService.Shifts.Commands.UpdateShift;
 using _66SMS.Application.BookingService.TimeSlots.Commands.CreateTimeSlot;
 using _66SMS.Application.BookingService.TimeSlots.Commands.UpdateTimeSlot;
 using _66SMS.Application.BookingService.WorkSchedules.Commands.CreateWorkSchedule;
 using _66SMS.Application.BookingService.WorkSchedules.Commands.UpdateWorkSchedule;
 using _66SMS.Application.DTOs;
-using _66SMS.Contract.Helpers;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 
@@ -22,51 +20,21 @@ namespace _66SMS.Application.Mappers
     {
         public BookingMappingProfile()
         {
-            // Create shift command to entity
-            CreateMap<CreateShiftCommand, Shift>()
-                .ForMember(dest => dest.ShiftPeriods, opt => opt.Ignore());
-            CreateMap<CreateShiftPeriodDto, ShiftPeriod>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.ShiftId, opt => opt.Ignore())
-                .ForMember(dest => dest.Shift, opt => opt.Ignore())
-                .ForMember(dest => dest.WorkSchedules, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.EffectiveFrom, opt => opt.MapFrom(src => src.EffectiveFrom ?? DateTimeHelper.UtcNow().ToDateOnly()));
-            CreateMap<CreateShiftPeriodCommand, ShiftPeriod>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.Shift, opt => opt.Ignore())
-                .ForMember(dest => dest.WorkSchedules, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.EffectiveFrom, opt => opt.MapFrom(src => src.EffectiveFrom ?? DateTimeHelper.UtcNow().ToDateOnly()));
-
-            // Update shift command to entity
+            CreateMap<CreateShiftCommand, Shift>();
             CreateMap<UpdateShiftCommand, Shift>()
-                .ForMember(dest => dest.ShiftPeriods, opt => opt.Ignore())
                 .IgnoreNullValueTypes();
-            CreateMap<UpdateShiftPeriodDto, ShiftPeriod>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.ShiftId, opt => opt.Ignore())
-                .ForMember(dest => dest.Shift, opt => opt.Ignore())
-                .ForMember(dest => dest.WorkSchedules, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-                .IgnoreNullValueTypes();
-            CreateMap<ShiftPeriodDTO, ShiftPeriod>()
-                .IgnoreNullValueTypes();
+            CreateMap<Shift, ShiftDTO>();
 
-            // Projection mapping rules
-            CreateMap<Shift, ShiftDTO>()
-                .ForMember(dest => dest.ShiftPeriodDTOs, opt => opt.MapFrom(src => src.ShiftPeriods));
-            CreateMap<ShiftPeriod, ShiftPeriodDTO>();
-
-            // Create WorkSchedule
             CreateMap<CreateWorkScheduleCommand, WorkSchedule>()
+                .ForMember(dest => dest.ShiftStart, opt => opt.Ignore())
+                .ForMember(dest => dest.ShiftEnd, opt => opt.Ignore())
                 .IgnoreNullValueTypes();
 
-            // Update WorkSchedule
             CreateMap<UpdateWorkScheduleCommand, WorkSchedule>()
+                .ForMember(dest => dest.ShiftStart, opt => opt.Ignore())
+                .ForMember(dest => dest.ShiftEnd, opt => opt.Ignore())
                 .IgnoreNullValueTypes();
 
-            // BookingRoom
             CreateMap<CreateBookingRoomCommand, BookingRoom>()
                 .IgnoreNullValueTypes();
             CreateMap<UpdateBookingRoomCommand, BookingRoom>()
@@ -75,7 +43,6 @@ namespace _66SMS.Application.Mappers
             CreateMap<BookingRoom, BookingRoomDto>()
                 .IgnoreNullValueTypes();
 
-            // BookingPosition
             CreateMap<CreateBookingPositionCommand, BookingPosition>()
                 .IgnoreNullValueTypes();
             CreateMap<UpdateBookingPositionCommand, BookingPosition>()
@@ -85,7 +52,6 @@ namespace _66SMS.Application.Mappers
                 .ForMember(dest => dest.RoomName, opt => opt.MapFrom(src => src.Room != null ? src.Room.Name : null))
                 .IgnoreNullValueTypes();
 
-            // TimeSlot
             CreateMap<CreateTimeSlotCommand, TimeSlot>()
                 .IgnoreNullValueTypes();
             CreateMap<UpdateTimeSlotCommand, TimeSlot>()
@@ -94,7 +60,6 @@ namespace _66SMS.Application.Mappers
             CreateMap<TimeSlot, TimeSlotDto>()
                 .IgnoreNullValueTypes();
 
-            // ConfigAppointment
             CreateMap<CreateConfigAppointmentCommand, ConfigAppointment>()
                 .IgnoreNullValueTypes();
             CreateMap<UpdateConfigAppointmentCommand, ConfigAppointment>()
@@ -104,7 +69,6 @@ namespace _66SMS.Application.Mappers
                 .ForMember(dest => dest.SalonName, opt => opt.MapFrom(src => src.Salon != null ? src.Salon.Name : null))
                 .IgnoreNullValueTypes();
 
-            // AppointmentDto
             CreateMap<Appointment, AppointmentDto>()
                 .IgnoreNullValueTypes();
         }

@@ -1,11 +1,9 @@
 using _66SMS.API.Abstractions;
 using _66SMS.Application.BookingService.Shifts.Commands.CreateShift;
-using _66SMS.Application.BookingService.Shifts.Commands.CreateShiftPeriod;
 using _66SMS.Application.BookingService.Shifts.Commands.DeleteShift;
 using _66SMS.Application.BookingService.Shifts.Commands.UpdateShift;
 using _66SMS.Application.BookingService.Shifts.Queries.GetAllShift;
 using _66SMS.Application.DTOs;
-using _66SMS.Contract.Abstractions;
 using _66SMS.Contract.Shared;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
@@ -18,28 +16,16 @@ namespace _66SMS.API.Controllers
     public class ShiftController : ApiController<ShiftController>
     {
         private readonly IMediator mediator;
-        private readonly IJwtService jwtService;
 
-        public ShiftController(IMediator mediator, IJwtService jwtService)
+        public ShiftController(IMediator mediator)
         {
             this.mediator = mediator;
-            this.jwtService = jwtService;
         }
 
         [HttpPost]
         [PermissionAuthorize("shifts", "create")]
-        public async Task<IActionResult> CreateShift([FromBody]CreateShiftCommand command)
+        public async Task<IActionResult> CreateShift([FromBody] CreateShiftCommand command)
         {
-            Result<object> result = await mediator.Send(command);
-            return HandleResult(result);
-        }
-
-        [HttpPost("{shiftId:int}/periods")]
-        [PermissionAuthorize("shifts", "create")]
-        public async Task<IActionResult> CreateShiftPeriod([FromRoute] int shiftId, [FromBody] CreateShiftPeriodCommand command)
-        {
-            command.ShiftId = shiftId;
-            command.CreatedBy = jwtService.GetUserId();
             Result<object> result = await mediator.Send(command);
             return HandleResult(result);
         }

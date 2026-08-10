@@ -1,19 +1,19 @@
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Clock, Eye, Pencil, Trash2 } from "lucide-react";
+import { Clock, Pencil, Trash2 } from "lucide-react";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Tooltip } from "@/shared/components/Tooltip";
 import { Button } from "@/shared/elements/Button";
 import { SortableColumnHeader } from "@/shared/tables/SortableColumnHeader";
 import { IndexCell, NameCell } from "@/shared/tables/TableCells";
-import { formatDisplayDate, toLocalTimeOnly } from "@/shared/utils/date.utils";
+import { toLocalTimeOnly } from "@/shared/utils/date.utils";
 import { SHIFT_PERM } from "../constants/shift.permissions";
 import type { ShiftDTO } from "../types/shift.types";
 
 export const SHIFT_COLUMN_LABELS = {
   name: "Tên ca",
+  salonName: "Chi nhánh",
   time: "Giờ làm việc",
-  effective: "Hiệu lực",
 } as const;
 
 interface UseActiveShiftColumnsParams {
@@ -69,37 +69,33 @@ export function useActiveShiftColumns({
         size: 150,
       },
       {
+        accessorKey: "salonName",
+        header: () => (
+          <SortableColumnHeader
+            label={cols.salonName}
+            column="salonName"
+            orderBy={orderBy}
+            isDescending={isDescending}
+            onSort={onSort}
+          />
+        ),
+        cell: ({ row }) => <NameCell value={row.original.salonName} />,
+        size: 180,
+      },
+      {
         id: "time",
         header: cols.time,
         cell: ({ row }) => {
-          const currentPeriod = row.original.shiftPeriodDTOs?.[0];
-          if (!currentPeriod) return "—";
+          const shift = row.original;
+          if (!shift.shiftStart || !shift.shiftEnd) return "—";
           return (
             <div className="flex items-center gap-1.5 text-kit-heading">
               <Clock className="h-4 w-4 text-kit-muted" />
               <span>
-                {toLocalTimeOnly(currentPeriod.shiftStart)} -{" "}
-                {toLocalTimeOnly(currentPeriod.shiftEnd)}
+                {toLocalTimeOnly(shift.shiftStart)} -{" "}
+                {toLocalTimeOnly(shift.shiftEnd)}
               </span>
             </div>
-          );
-        },
-        size: 200,
-      },
-      {
-        id: "effective",
-        header: cols.effective,
-        cell: ({ row }) => {
-          const currentPeriod = row.original.shiftPeriodDTOs?.[0];
-          if (!currentPeriod) return "—";
-          const from = formatDisplayDate(currentPeriod.effectiveFrom) || "—";
-          const to = currentPeriod.effectiveTo
-            ? formatDisplayDate(currentPeriod.effectiveTo)
-            : "Vô thời hạn";
-          return (
-            <span className="text-sm text-kit-muted">
-              {from} - {to}
-            </span>
           );
         },
         size: 200,
@@ -109,22 +105,11 @@ export function useActiveShiftColumns({
         header: "Thao tác",
         cell: ({ row }) => {
           const item = row.original;
-          const expanded = row.getIsExpanded();
           return (
             <div
               className="flex items-center gap-1"
               onClick={(e) => e.stopPropagation()}
             >
-              <Tooltip text={expanded ? "Đóng chi tiết" : "Xem chi tiết"}>
-                <Button
-                  size="icon-sm"
-                  variant="outline-info"
-                  className="mb-0 mr-0"
-                  onClick={() => row.toggleExpanded()}
-                >
-                  <Eye className="h-3.5 w-3.5" />
-                </Button>
-              </Tooltip>
               <PermissionGate resource={perm.resource} action={perm.update}>
                 <Tooltip text="Sửa">
                   <Button

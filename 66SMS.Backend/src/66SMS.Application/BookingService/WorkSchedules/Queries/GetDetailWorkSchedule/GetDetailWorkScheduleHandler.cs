@@ -22,15 +22,20 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Queries.GetDetailWorkS
                 .Select(x => new WorkScheduleDTO
                 {
                     Id = x.Id,
-                    ShiftPeriodId = x.ShiftPeriodId,
+                    ShiftId = x.ShiftId,
+                    ShiftStart = x.ShiftStart,
+                    ShiftEnd = x.ShiftEnd,
                     StaffId = x.StaffId,
                     WorkDate = x.WorkDate,
                     StaffName = x.Staff != null ? x.Staff.FullName : null,
-                    Shift = x.ShiftPeriod != null && x.ShiftPeriod.Shift != null ? new ShiftDTO
+                    Shift = x.Shift != null ? new ShiftDTO
                     {
-                        Id = x.ShiftPeriod.Shift.Id,
-                        Name = x.ShiftPeriod.Shift.Name,
-                        Description = x.ShiftPeriod.Shift.Description
+                        Id = x.Shift.Id,
+                        SalonId = x.Shift.SalonId,
+                        Name = x.Shift.Name,
+                        Description = x.Shift.Description,
+                        ShiftStart = x.Shift.ShiftStart,
+                        ShiftEnd = x.Shift.ShiftEnd,
                     } : null
                 })
                 .FirstOrDefaultAsync(cancellationToken);

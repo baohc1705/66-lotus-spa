@@ -2,17 +2,16 @@ import axiosInstance from "@/shared/api/axiosInstance";
 import type {
   Result,
   PagedResult,
-  PageRequest,
 } from "@/shared/types/common.types";
 import type {
   ShiftDTO,
   CreateShiftPayload,
   UpdateShiftPayload,
+  GetShiftsParams,
 } from "../types/shift.types";
 
-
 export const shiftApi = {
-  getAll: (params: PageRequest) =>
+  getAll: (params: GetShiftsParams) =>
     axiosInstance
       .get<Result<PagedResult<ShiftDTO>>>("/shift", { params })
       .then((r) => r.data),

@@ -5,10 +5,7 @@ import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useWorkSchedules } from "@/features/schedules/hooks/useSchedules";
 import type { WorkScheduleDTO } from "@/features/schedules/types/schedule.types";
 import { useShifts } from "@/features/shifts/hooks/useShifts";
-import type {
-  ShiftDTO,
-  ShiftPeriodDTO,
-} from "@/features/shifts/types/shift.types";
+import type { ShiftDTO } from "@/features/shifts/types/shift.types";
 import { Button } from "@/shared/elements/Button";
 import { Card, CardBody } from "@/shared/elements/Card";
 import { Checkbox } from "@/shared/forms/Checkbox";
@@ -33,11 +30,6 @@ import {
 import { AttendanceDailyDialog } from "../components/AttendanceDailyDialog";
 import { useAttendances } from "../hooks/useAttendances";
 import type { AttendanceDto } from "../types/attendance.types";
-
-type ShiftPeriodItem = {
-  shift: ShiftDTO;
-  period: ShiftPeriodDTO;
-};
 
 type CardStyle = {
   className: string;
@@ -121,22 +113,6 @@ function isWorkingStatus(status: number | null): boolean {
   return status === 1 || status === 2;
 }
 
-function isPeriodActiveOnDate(
-  period: ShiftPeriodDTO,
-  dateText: string,
-): boolean {
-  if (!period.effectiveFrom) {
-    return false;
-  }
-  if (period.effectiveFrom > dateText) {
-    return false;
-  }
-  if (period.effectiveTo && period.effectiveTo < dateText) {
-    return false;
-  }
-  return true;
-}
-
 export function AttendanceListPage() {
   const salonId = useAuthStore((state) => state.getEffectiveSalonId());
   const { user, hasRole } = useAuthStore();
@@ -174,10 +150,14 @@ export function AttendanceListPage() {
 
   const staffFilter = isAdminOrManager ? undefined : (currentStaffId ?? -1);
 
-  const shiftsQuery = useShifts({
-    pageIndex: 1,
-    pageSize: 100,
-  });
+  const shiftsQuery = useShifts(
+    {
+      pageIndex: 1,
+      pageSize: 100,
+      salonId: salonId ?? undefined,
+    },
+    !!salonId,
+  );
 
   const schedulesQuery = useWorkSchedules({
     startDate: startDate,
@@ -276,40 +256,19 @@ export function AttendanceListPage() {
     showLeaveOnly,
   ]);
 
-  const activeShiftPeriods = useMemo(() => {
-    const result: ShiftPeriodItem[] = [];
-    const shifts = shiftsQuery.data?.data?.items ?? [];
+  const shifts = shiftsQuery.data?.data?.items ?? [];
 
-    for (const shift of shifts) {
-      const periods = shift.shiftPeriodDTOs ?? [];
-      for (const period of periods) {
-        const fromDate = period.effectiveFrom;
-        const toDate = period.effectiveTo;
-
-        if (!fromDate || fromDate > endDate) {
-          continue;
-        }
-        if (toDate && toDate < startDate) {
-          continue;
-        }
-
-        result.push({ shift: shift, period: period });
-      }
-    }
-
-    return result;
-  }, [shiftsQuery.data?.data?.items, startDate, endDate]);
-
-  const schedulesByPeriodAndDay = useMemo(() => {
+  const schedulesByShiftAndDay = useMemo(() => {
     const map = new Map<string, WorkScheduleDTO[]>();
 
-    for (const schedule of filteredSchedules) {
-      if (!schedule.shiftPeriodId || !schedule.workDate) {
+    for (let index = 0; index < filteredSchedules.length; index++) {
+      const schedule = filteredSchedules[index];
+      if (!schedule.shiftId || !schedule.workDate) {
         continue;
       }
 
       const dateText = formatDate(schedule.workDate).format("YYYY-MM-DD");
-      const key = schedule.shiftPeriodId + "_" + dateText;
+      const key = schedule.shiftId + "_" + dateText;
       const currentList = map.get(key) ?? [];
       currentList.push(schedule);
       map.set(key, currentList);
@@ -321,18 +280,21 @@ export function AttendanceListPage() {
   function openAttendanceDialog(schedule: WorkScheduleDTO) {
     let scheduleWithShift = schedule;
 
-    if (schedule.shiftPeriodId) {
-      const matched = activeShiftPeriods.find((item: ShiftPeriodItem) => {
-        return item.period.id === schedule.shiftPeriodId;
-      });
+    if (schedule.shiftId) {
+      let matched: ShiftDTO | null = null;
+      for (let index = 0; index < shifts.length; index++) {
+        if (shifts[index].id === schedule.shiftId) {
+          matched = shifts[index];
+          break;
+        }
+      }
 
       if (matched) {
         scheduleWithShift = {
           ...schedule,
-          shift: {
-            ...matched.shift,
-            shiftPeriodDTOs: [matched.period],
-          },
+          shift: matched,
+          shiftStart: schedule.shiftStart ?? matched.shiftStart,
+          shiftEnd: schedule.shiftEnd ?? matched.shiftEnd,
         };
       }
     }
@@ -492,7 +454,7 @@ export function AttendanceListPage() {
               </TableHead>
 
               <TableBody>
-                {activeShiftPeriods.length === 0 ? (
+                {shifts.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8}>
                       <TableEmptyState
@@ -502,113 +464,90 @@ export function AttendanceListPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  activeShiftPeriods.map(
-                    (item: ShiftPeriodItem, rowIndex: number) => {
-                      const shift = item.shift;
-                      const period = item.period;
-                      const rowKey =
-                        String(shift.id) +
-                        "_" +
-                        String(period.id) +
-                        "_" +
-                        String(rowIndex);
+                  shifts.map((shift: ShiftDTO, rowIndex: number) => {
+                    if (!shift.id) return null;
 
-                      return (
-                        <TableRow key={rowKey}>
-                          <TableCell className="bg-kit-page/40">
-                            <div className="font-semibold text-kit-heading">
-                              {shift.name}
-                            </div>
-                            <div className="mt-1.5 flex items-center gap-1.5 text-xs text-kit-muted">
-                              <Clock className="size-3 text-kit-muted" />
-                              <span className="rounded bg-kit-page px-1.5 py-0.5 font-semibold text-kit-heading">
-                                {period.shiftStart?.substring(0, 5)}
-                              </span>
-                              <span>-</span>
-                              <span className="rounded bg-kit-page px-1.5 py-0.5 font-semibold text-kit-heading">
-                                {period.shiftEnd?.substring(0, 5)}
-                              </span>
-                            </div>
-                          </TableCell>
+                    const rowKey = String(shift.id) + "_" + String(rowIndex);
 
-                          {weekDays.map((day: DateUtil, dayIndex: number) => {
-                            const dateText = day.format("YYYY-MM-DD");
-                            const periodIsActive = isPeriodActiveOnDate(
-                              period,
-                              dateText,
-                            );
+                    return (
+                      <TableRow key={rowKey}>
+                        <TableCell className="bg-kit-page/40">
+                          <div className="font-semibold text-kit-heading">
+                            {shift.name}
+                          </div>
+                          <div className="mt-1.5 flex items-center gap-1.5 text-xs text-kit-muted">
+                            <Clock className="size-3 text-kit-muted" />
+                            <span className="rounded bg-kit-page px-1.5 py-0.5 font-semibold text-kit-heading">
+                              {shift.shiftStart?.substring(0, 5)}
+                            </span>
+                            <span>-</span>
+                            <span className="rounded bg-kit-page px-1.5 py-0.5 font-semibold text-kit-heading">
+                              {shift.shiftEnd?.substring(0, 5)}
+                            </span>
+                          </div>
+                        </TableCell>
 
-                            if (!periodIsActive) {
-                              return (
-                                <TableCell
-                                  key={dayIndex}
-                                  className="bg-kit-page/30 text-center text-xs italic text-kit-muted"
-                                >
-                                  Không áp dụng
-                                </TableCell>
-                              );
-                            }
+                        {weekDays.map((day: DateUtil, dayIndex: number) => {
+                          const dateText = day.format("YYYY-MM-DD");
+                          const cellKey = shift.id + "_" + dateText;
+                          const cellSchedules =
+                            schedulesByShiftAndDay.get(cellKey) ?? [];
 
-                            const cellKey = period.id + "_" + dateText;
-                            const cellSchedules =
-                              schedulesByPeriodAndDay.get(cellKey) ?? [];
+                          return (
+                            <TableCell key={dayIndex}>
+                              <div className="flex min-h-27.5 flex-col gap-2 p-0.5">
+                                {cellSchedules.length === 0 ? (
+                                  <div className="py-10 text-center text-xs italic text-kit-muted">
+                                    Không có lịch
+                                  </div>
+                                ) : (
+                                  cellSchedules.map(
+                                    (schedule: WorkScheduleDTO) => {
+                                      let attendance: AttendanceDto | null =
+                                        null;
+                                      if (schedule.id) {
+                                        attendance =
+                                          attendanceByScheduleId.get(
+                                            schedule.id,
+                                          ) ?? null;
+                                      }
 
-                            return (
-                              <TableCell key={dayIndex}>
-                                <div className="flex min-h-27.5 flex-col gap-2 p-0.5">
-                                  {cellSchedules.length === 0 ? (
-                                    <div className="py-10 text-center text-xs italic text-kit-muted">
-                                      Không có lịch
-                                    </div>
-                                  ) : (
-                                    cellSchedules.map(
-                                      (schedule: WorkScheduleDTO) => {
-                                        let attendance: AttendanceDto | null =
-                                          null;
-                                        if (schedule.id) {
-                                          attendance =
-                                            attendanceByScheduleId.get(
-                                              schedule.id,
-                                            ) ?? null;
-                                        }
+                                      const card = getCardStyle(attendance);
 
-                                        const card = getCardStyle(attendance);
-
-                                        return (
-                                          <button
-                                            type="button"
-                                            key={schedule.id}
-                                            onClick={() =>
-                                              openAttendanceDialog(schedule)
+                                      return (
+                                        <button
+                                          type="button"
+                                          key={schedule.id}
+                                          onClick={() =>
+                                            openAttendanceDialog(schedule)
+                                          }
+                                          className={card.className}
+                                        >
+                                          <div className="truncate font-semibold text-kit-heading">
+                                            {schedule.staffName}
+                                          </div>
+                                          <div className="mt-1 text-kit-muted">
+                                            {card.timeText}
+                                          </div>
+                                          <div
+                                            className={
+                                              "mt-1 " + card.statusClass
                                             }
-                                            className={card.className}
                                           >
-                                            <div className="truncate font-semibold text-kit-heading">
-                                              {schedule.staffName}
-                                            </div>
-                                            <div className="mt-1 text-kit-muted">
-                                              {card.timeText}
-                                            </div>
-                                            <div
-                                              className={
-                                                "mt-1 " + card.statusClass
-                                              }
-                                            >
-                                              {card.statusText}
-                                            </div>
-                                          </button>
-                                        );
-                                      },
-                                    )
-                                  )}
-                                </div>
-                              </TableCell>
-                            );
-                          })}
-                        </TableRow>
-                      );
-                    },
-                  )
+                                            {card.statusText}
+                                          </div>
+                                        </button>
+                                      );
+                                    },
+                                  )
+                                )}
+                              </div>
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    );
+                  })
                 )}
               </TableBody>
             </Table>

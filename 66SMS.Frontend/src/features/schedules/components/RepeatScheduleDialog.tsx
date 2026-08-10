@@ -59,7 +59,7 @@ export function RepeatScheduleDialog({
     let scheduleCount = 0;
     for (const week of weeks) {
       for (const schedule of currentWeekSchedules) {
-        if (!schedule.workDate || !schedule.staffId || !schedule.shiftPeriodId) {
+        if (!schedule.workDate || !schedule.staffId || !schedule.shiftId) {
           continue;
         }
         const original = formatDate(schedule.workDate);
@@ -90,7 +90,7 @@ export function RepeatScheduleDialog({
 
     const schedules: {
       staffId: number;
-      shiftPeriodId: number;
+      shiftId: number;
       workDate: string;
       salonId?: number;
     }[] = [];
@@ -98,7 +98,7 @@ export function RepeatScheduleDialog({
     let weekCursor = currentWeekStart.add(1, "week");
     while (weekCursor.toDate() <= endWeekStart.toDate()) {
       for (const schedule of currentWeekSchedules) {
-        if (!schedule.workDate || !schedule.staffId || !schedule.shiftPeriodId) {
+        if (!schedule.workDate || !schedule.staffId || !schedule.shiftId) {
           continue;
         }
         const original = formatDate(schedule.workDate);
@@ -109,7 +109,7 @@ export function RepeatScheduleDialog({
         if (skipHolidays && isHoliday(newDate)) continue;
         schedules.push({
           staffId: schedule.staffId,
-          shiftPeriodId: schedule.shiftPeriodId,
+          shiftId: schedule.shiftId,
           workDate: newDate.format("YYYY-MM-DD"),
           salonId: salonId || schedule.salonId || undefined,
         });

@@ -9,10 +9,7 @@ import { formatDate } from "@/shared/utils/date.utils";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useStaffs } from "@/features/staffs/hooks/useStaffs";
 import type { StaffDto } from "@/features/staffs/types/staff.types";
-import type {
-  ShiftDTO,
-  ShiftPeriodDTO,
-} from "@/features/shifts/types/shift.types";
+import type { ShiftDTO } from "@/features/shifts/types/shift.types";
 import { useBulkCreateWorkSchedule } from "../hooks/useSchedules";
 
 const WEEKDAYS = [
@@ -27,7 +24,6 @@ const WEEKDAYS = [
 
 interface AddStaffDialogProps {
   shift?: ShiftDTO | null;
-  shiftPeriod?: ShiftPeriodDTO | null;
   date: string | null;
   defaultStaffId?: number | null;
   existingStaffIds?: number[];
@@ -36,7 +32,6 @@ interface AddStaffDialogProps {
 
 export function AddStaffDialog({
   shift,
-  shiftPeriod,
   date,
   defaultStaffId,
   existingStaffIds = [],
@@ -58,25 +53,32 @@ export function AddStaffDialog({
 
   const { mutate: bulkCreate, isPending } = useBulkCreateWorkSchedule();
 
-  const availableStaffs = useMemo(
-    () =>
-      (staffsData?.data?.items || []).filter(
-        (staff: StaffDto) => !existingStaffIds.includes(staff.id!),
-      ),
-    [staffsData, existingStaffIds],
-  );
+  const availableStaffs = useMemo(() => {
+    const items = staffsData?.data?.items || [];
+    const result: StaffDto[] = [];
+    for (let index = 0; index < items.length; index++) {
+      const staff = items[index];
+      if (!staff.id) continue;
+      if (existingStaffIds.includes(staff.id)) continue;
+      result.push(staff);
+    }
+    return result;
+  }, [staffsData, existingStaffIds]);
 
   const filteredStaffs = useMemo(() => {
     const query = searchText.toLowerCase().trim();
     if (!query) return availableStaffs;
-    return availableStaffs.filter(
-      (staff: StaffDto) =>
-        staff.fullName?.toLowerCase().includes(query) ||
-        staff.code?.toLowerCase().includes(query),
-    );
+    const result: StaffDto[] = [];
+    for (let index = 0; index < availableStaffs.length; index++) {
+      const staff = availableStaffs[index];
+      const nameMatch = staff.fullName?.toLowerCase().includes(query);
+      const codeMatch = staff.code?.toLowerCase().includes(query);
+      if (nameMatch || codeMatch) result.push(staff);
+    }
+    return result;
   }, [availableStaffs, searchText]);
 
-  if (!date || !shift || !shiftPeriod) return null;
+  if (!date || !shift || !shift.id) return null;
 
   function toggleStaff(id: number) {
     setValidationError("");
@@ -87,7 +89,11 @@ export function AddStaffDialog({
 
   function toggleAll() {
     setValidationError("");
-    const allFilteredIds = filteredStaffs.map((staff: StaffDto) => staff.id!);
+    const allFilteredIds: number[] = [];
+    for (let index = 0; index < filteredStaffs.length; index++) {
+      const id = filteredStaffs[index].id;
+      if (id) allFilteredIds.push(id);
+    }
     const allSelected = allFilteredIds.every((id: number) =>
       selectedIds.includes(id),
     );
@@ -121,7 +127,7 @@ export function AddStaffDialog({
       );
       return {
         staffId,
-        shiftPeriodId: shiftPeriod!.id,
+        shiftId: shift!.id,
         workDate: date!,
         salonId: salonId || staff?.salonId || undefined,
       };
@@ -145,7 +151,7 @@ export function AddStaffDialog({
   const utilDate = formatDate(date);
   const dayName =
     WEEKDAYS.find((day) => day.value === utilDate.day())?.label || "";
-  const subTitle = `Ca: ${shift.name} (${shiftPeriod.shiftStart?.substring(0, 5)} - ${shiftPeriod.shiftEnd?.substring(0, 5)}) | ${dayName}, ${utilDate.format("DD/MM/YYYY")}`;
+  const subTitle = `Ca: ${shift.name} (${shift.shiftStart?.substring(0, 5)} - ${shift.shiftEnd?.substring(0, 5)}) | ${dayName}, ${utilDate.format("DD/MM/YYYY")}`;
 
   return (
     <Modal

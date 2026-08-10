@@ -19,6 +19,11 @@ namespace _66SMS.Application.BookingService.Shifts.Queries.GetAllShift
         {
             var query = shiftSqlRepository.AsQueryable();
 
+            if (request.SalonId.HasValue)
+            {
+                query = query.Where(x => x.SalonId == request.SalonId.Value);
+            }
+
             if (!string.IsNullOrEmpty(request.Filter))
             {
                 query = query.Where(x => x.Name.Contains(request.Filter) || (x.Description != null && x.Description.Contains(request.Filter)));
@@ -27,6 +32,9 @@ namespace _66SMS.Application.BookingService.Shifts.Queries.GetAllShift
             query = request.OrderBy?.ToLower() switch
             {
                 "name" => request.IsDescending ? query.OrderByDescending(x => x.Name) : query.OrderBy(x => x.Name),
+                "salonname" => request.IsDescending
+                    ? query.OrderByDescending(x => x.Salon != null ? x.Salon.Name : null)
+                    : query.OrderBy(x => x.Salon != null ? x.Salon.Name : null),
                 _ => request.IsDescending ? query.OrderByDescending(x => x.Id) : query.OrderBy(x => x.Id)
             };
 
@@ -34,19 +42,12 @@ namespace _66SMS.Application.BookingService.Shifts.Queries.GetAllShift
                 .Select(x => new ShiftDTO
                 {
                     Id = x.Id,
+                    SalonId = x.SalonId,
+                    SalonName = x.Salon != null ? x.Salon.Name : null,
                     Name = x.Name,
                     Description = x.Description,
-                    ShiftPeriodDTOs = x.ShiftPeriods!
-                        .Select(sp => new ShiftPeriodDTO
-                        {
-                            Id = sp.Id,
-                            ShiftStart = sp.ShiftStart,
-                            ShiftEnd = sp.ShiftEnd,
-                            EffectiveFrom = sp.EffectiveFrom,
-                            EffectiveTo = sp.EffectiveTo,
-                            CreatedAt = sp.CreatedAt,
-                        })
-                        .ToList(),
+                    ShiftStart = x.ShiftStart,
+                    ShiftEnd = x.ShiftEnd,
                 })
                 .ToPagedAsync(request, cancellationToken);
 

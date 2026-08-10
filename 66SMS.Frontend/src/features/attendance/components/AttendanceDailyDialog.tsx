@@ -62,8 +62,7 @@ function getDefaultShiftTime(
   field: "shiftStart" | "shiftEnd",
   fallback: string,
 ): string {
-  const firstPeriod = schedule.shift?.shiftPeriodDTOs?.[0];
-  const rawTime = firstPeriod?.[field];
+  const rawTime = schedule[field] ?? schedule.shift?.[field];
   if (!rawTime) {
     return fallback;
   }
@@ -429,10 +428,10 @@ export function AttendanceDailyDialog(props: AttendanceDailyDialogProps) {
 
   const shiftName = schedule.shift?.name ?? "Ca";
   const shiftStart =
-    schedule.shift?.shiftPeriodDTOs?.[0]?.shiftStart?.substring(0, 5) ??
+    (schedule.shiftStart ?? schedule.shift?.shiftStart)?.substring(0, 5) ??
     "--:--";
   const shiftEnd =
-    schedule.shift?.shiftPeriodDTOs?.[0]?.shiftEnd?.substring(0, 5) ?? "--:--";
+    (schedule.shiftEnd ?? schedule.shift?.shiftEnd)?.substring(0, 5) ?? "--:--";
   const shiftLabel =
     shiftName + " (" + shiftStart + " - " + shiftEnd + ")";
 

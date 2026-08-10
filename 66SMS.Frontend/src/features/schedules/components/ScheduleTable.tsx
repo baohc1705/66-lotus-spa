@@ -15,10 +15,7 @@ import {
 import { TableEmptyState } from "@/shared/tables/TableEmptyState";
 import { formatDate, DateUtil } from "@/shared/utils/date.utils";
 import { useAuthStore } from "@/features/auth/stores/authStore";
-import type {
-  ShiftDTO,
-  ShiftPeriodDTO,
-} from "@/features/shifts/types/shift.types";
+import type { ShiftDTO } from "@/features/shifts/types/shift.types";
 import type { StaffDto } from "@/features/staffs/types/staff.types";
 
 import { AddStaffDialog } from "./AddStaffDialog";
@@ -61,7 +58,6 @@ export function ScheduleTable({
 
   const [addingShift, setAddingShift] = useState<{
     shift: ShiftDTO;
-    shiftPeriod: ShiftPeriodDTO;
     date: string;
     defaultStaffId?: number | null;
     existingStaffIds: number[];
@@ -77,48 +73,35 @@ export function ScheduleTable({
     setDeleteScheduleId(id);
   }
 
-  const days = Array.from({ length: 7 }).map((_, index: number) =>
-    weekStart.add(index, "day"),
-  );
+  const days: DateUtil[] = [];
+  for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+    days.push(weekStart.add(dayIndex, "day"));
+  }
   const today = formatDate().startOf("day");
 
   const fullMap = new Map<string, WorkScheduleDTO>();
   const shiftDayMap = new Map<string, WorkScheduleDTO[]>();
   const staffDayMap = new Map<string, WorkScheduleDTO[]>();
 
-  workSchedules.forEach((schedule: WorkScheduleDTO) => {
+  for (let index = 0; index < workSchedules.length; index++) {
+    const schedule = workSchedules[index];
     const dateStr = formatDate(schedule.workDate).format("YYYY-MM-DD");
 
-    if (schedule.shiftPeriodId && schedule.staffId) {
-      const keyFull = `${schedule.shiftPeriodId}_${schedule.staffId}_${dateStr}`;
-      fullMap.set(keyFull, schedule);
+    if (!schedule.shiftId || !schedule.staffId) continue;
 
-      const keyShift = `${schedule.shiftPeriodId}_${dateStr}`;
-      const existingShifts = shiftDayMap.get(keyShift) || [];
-      shiftDayMap.set(keyShift, [...existingShifts, schedule]);
+    const keyFull = `${schedule.shiftId}_${schedule.staffId}_${dateStr}`;
+    fullMap.set(keyFull, schedule);
 
-      const keyStaff = `${schedule.staffId}_${dateStr}`;
-      const existingStaff = staffDayMap.get(keyStaff) || [];
-      staffDayMap.set(keyStaff, [...existingStaff, schedule]);
-    }
-  });
+    const keyShift = `${schedule.shiftId}_${dateStr}`;
+    const existingShifts = shiftDayMap.get(keyShift) || [];
+    existingShifts.push(schedule);
+    shiftDayMap.set(keyShift, existingShifts);
 
-  const activeShiftPeriods: { shift: ShiftDTO; period: ShiftPeriodDTO }[] = [];
-  const weekStartStr = weekStart.format("YYYY-MM-DD");
-  const weekEndStr = weekStart.add(6, "day").format("YYYY-MM-DD");
-
-  shifts.forEach((shift: ShiftDTO) => {
-    if (!shift.shiftPeriodDTOs) return;
-    shift.shiftPeriodDTOs.forEach((period: ShiftPeriodDTO) => {
-      const from = period.effectiveFrom;
-      const to = period.effectiveTo;
-      if (from && from <= weekEndStr) {
-        if (!to || to >= weekStartStr) {
-          activeShiftPeriods.push({ shift, period });
-        }
-      }
-    });
-  });
+    const keyStaff = `${schedule.staffId}_${dateStr}`;
+    const existingStaff = staffDayMap.get(keyStaff) || [];
+    existingStaff.push(schedule);
+    staffDayMap.set(keyStaff, existingStaff);
+  }
 
   function handleDragStart(
     event: { dataTransfer: DataTransfer },
@@ -142,7 +125,7 @@ export function ScheduleTable({
 
   function handleDrop(
     event: { preventDefault(): void; dataTransfer: DataTransfer },
-    targetPeriodId: number,
+    targetShiftId: number,
     targetDateStr: string,
   ) {
     event.preventDefault();
@@ -153,15 +136,13 @@ export function ScheduleTable({
     const scheduleId = parseInt(scheduleIdText, 10);
     const staffId = parseInt(staffIdText, 10);
 
-    const key = `${targetPeriodId}_${targetDateStr}`;
+    const key = `${targetShiftId}_${targetDateStr}`;
     const cellSchedules = shiftDayMap.get(key) || [];
-    if (
-      cellSchedules.some(
-        (schedule: WorkScheduleDTO) => schedule.staffId === staffId,
-      )
-    ) {
-      toast.error("Nhân viên này đã được xếp vào ca này trong cùng ngày.");
-      return;
+    for (let index = 0; index < cellSchedules.length; index++) {
+      if (cellSchedules[index].staffId === staffId) {
+        toast.error("Nhân viên này đã được xếp vào ca này trong cùng ngày.");
+        return;
+      }
     }
 
     const originalSchedule = workSchedules.find(
@@ -173,7 +154,7 @@ export function ScheduleTable({
       {
         id: scheduleId,
         payload: {
-          shiftPeriodId: targetPeriodId,
+          shiftId: targetShiftId,
           staffId,
           workDate: targetDateStr,
           salonId:
@@ -191,18 +172,18 @@ export function ScheduleTable({
     );
   }
 
-  function renderShiftNameCell(shift: ShiftDTO, period: ShiftPeriodDTO) {
+  function renderShiftNameCell(shift: ShiftDTO) {
     return (
       <TableCell className="bg-kit-page/40">
         <div className="font-semibold text-kit-heading">{shift.name}</div>
         <div className="mt-1.5 flex items-center gap-1.5 text-xs text-kit-muted">
           <Clock className="size-3 text-kit-muted" />
           <span className="rounded bg-kit-page px-1.5 py-0.5 font-semibold text-kit-heading">
-            {period.shiftStart?.substring(0, 5)}
+            {shift.shiftStart?.substring(0, 5)}
           </span>
           <span>-</span>
           <span className="rounded bg-kit-page px-1.5 py-0.5 font-semibold text-kit-heading">
-            {period.shiftEnd?.substring(0, 5)}
+            {shift.shiftEnd?.substring(0, 5)}
           </span>
         </div>
       </TableCell>
@@ -210,111 +191,98 @@ export function ScheduleTable({
   }
 
   function renderByShift(): ReactNode {
-    if (activeShiftPeriods.length === 0) {
+    if (shifts.length === 0) {
       return (
         <TableRow>
           <TableCell colSpan={8}>
-            <TableEmptyState
-              icon={Clock}
-              title="Không có ca làm việc"
-            />
+            <TableEmptyState icon={Clock} title="Không có ca làm việc" />
           </TableCell>
         </TableRow>
       );
     }
 
-    return activeShiftPeriods.map(({ shift, period }, index: number) => (
-      <TableRow key={`${shift.id}_${period.id}_${index}`}>
-        {renderShiftNameCell(shift, period)}
-        {days.map((day: DateUtil, dayIndex: number) => {
-          const dateStr = day.format("YYYY-MM-DD");
-          const isPeriodActiveThisDay =
-            period.effectiveFrom &&
-            period.effectiveFrom <= dateStr &&
-            (!period.effectiveTo || period.effectiveTo >= dateStr);
+    const rows: ReactNode[] = [];
+    for (let index = 0; index < shifts.length; index++) {
+      const shift = shifts[index];
+      if (!shift.id) continue;
 
-          if (!isPeriodActiveThisDay) {
+      rows.push(
+        <TableRow key={`${shift.id}_${index}`}>
+          {renderShiftNameCell(shift)}
+          {days.map((day: DateUtil, dayIndex: number) => {
+            const dateStr = day.format("YYYY-MM-DD");
+            const key = `${shift.id}_${dateStr}`;
+            const cellSchedules = shiftDayMap.get(key) || [];
+
             return (
-              <TableCell
-                key={dayIndex}
-                className="bg-kit-page/30 text-center text-xs italic text-kit-muted"
-              >
-                Không áp dụng
+              <TableCell key={dayIndex} className="relative min-h-35 align-top">
+                <div
+                  className="flex min-h-27.5 flex-col gap-1.5"
+                  onDragOver={handleDragOver}
+                  onDrop={(event) => handleDrop(event, shift.id!, dateStr)}
+                >
+                  <div className="flex-1 space-y-1.5 overflow-y-auto p-0.5">
+                    {cellSchedules.map((schedule: WorkScheduleDTO) => (
+                      <div
+                        key={schedule.id}
+                        draggable={canEdit}
+                        onDragStart={(event) => {
+                          if (!canEdit) {
+                            event.preventDefault();
+                            return;
+                          }
+                          handleDragStart(event, schedule);
+                        }}
+                        className={
+                          "group/item flex items-center justify-between truncate rounded border border-kit bg-kit-white px-2.5 py-1.5 text-xs font-medium text-kit-heading shadow-xs transition-colors " +
+                          (canEdit
+                            ? "cursor-grab hover:border-kit-primary active:cursor-grabbing"
+                            : "")
+                        }
+                      >
+                        <span className="truncate">{schedule.staffName}</span>
+                        {canEdit ? (
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleDelete(schedule.id!);
+                            }}
+                            className="flex shrink-0 items-center justify-center rounded p-0.5 text-kit-muted opacity-0 transition-opacity group-hover/item:opacity-100 hover:text-kit-danger"
+                            title="Xóa lịch làm việc"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+
+                  {canEdit && !day.isBefore(today) ? (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setAddingShift({
+                          shift,
+                          date: dateStr,
+                          existingStaffIds: cellSchedules
+                            .map((schedule: WorkScheduleDTO) => schedule.staffId)
+                            .filter((id): id is number => id != null),
+                        })
+                      }
+                      className="flex w-full items-center justify-center gap-1 rounded border border-kit-primary/20 bg-kit-page px-2 py-1.5 text-xs font-semibold text-kit-primary transition-colors hover:text-kit-heading"
+                    >
+                      <Plus size={12} /> Thêm nhân viên
+                    </button>
+                  ) : null}
+                </div>
               </TableCell>
             );
-          }
-
-          const key = `${period.id}_${dateStr}`;
-          const cellSchedules = shiftDayMap.get(key) || [];
-
-          return (
-            <TableCell key={dayIndex} className="relative min-h-35 align-top">
-              <div
-                className="flex min-h-27.5 flex-col gap-1.5"
-                onDragOver={handleDragOver}
-                onDrop={(event) => handleDrop(event, period.id!, dateStr)}
-              >
-                <div className="flex-1 space-y-1.5 overflow-y-auto p-0.5">
-                  {cellSchedules.map((schedule: WorkScheduleDTO) => (
-                    <div
-                      key={schedule.id}
-                      draggable={canEdit}
-                      onDragStart={(event) => {
-                        if (!canEdit) {
-                          event.preventDefault();
-                          return;
-                        }
-                        handleDragStart(event, schedule);
-                      }}
-                      className={
-                        "group/item flex items-center justify-between truncate rounded border border-kit bg-kit-white px-2.5 py-1.5 text-xs font-medium text-kit-heading shadow-xs transition-colors " +
-                        (canEdit
-                          ? "cursor-grab hover:border-kit-primary active:cursor-grabbing"
-                          : "")
-                      }
-                    >
-                      <span className="truncate">{schedule.staffName}</span>
-                      {canEdit ? (
-                        <button
-                          type="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleDelete(schedule.id!);
-                          }}
-                          className="flex shrink-0 items-center justify-center rounded p-0.5 text-kit-muted opacity-0 transition-opacity group-hover/item:opacity-100 hover:text-kit-danger"
-                          title="Xóa lịch làm việc"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-
-                {canEdit && !day.isBefore(today) ? (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setAddingShift({
-                        shift,
-                        shiftPeriod: period,
-                        date: dateStr,
-                        existingStaffIds: cellSchedules
-                          .map((schedule: WorkScheduleDTO) => schedule.staffId)
-                          .filter((id): id is number => id != null),
-                      })
-                    }
-                    className="flex w-full items-center justify-center gap-1 rounded border border-kit-primary/20 bg-kit-page px-2 py-1.5 text-xs font-semibold text-kit-primary transition-colors hover:text-kit-heading"
-                  >
-                    <Plus size={12} /> Thêm nhân viên
-                  </button>
-                ) : null}
-              </div>
-            </TableCell>
-          );
-        })}
-      </TableRow>
-    ));
+          })}
+        </TableRow>,
+      );
+    }
+    return rows;
   }
 
   function renderByStaff(): ReactNode {
@@ -322,10 +290,7 @@ export function ScheduleTable({
       return (
         <TableRow>
           <TableCell colSpan={8}>
-            <TableEmptyState
-              icon={Clock}
-              title="Không có nhân viên"
-            />
+            <TableEmptyState icon={Clock} title="Không có nhân viên" />
           </TableCell>
         </TableRow>
       );
@@ -369,103 +334,100 @@ export function ScheduleTable({
       return (
         <TableRow>
           <TableCell colSpan={8}>
-            <TableEmptyState
-              icon={Clock}
-              title="Chưa chọn nhân viên"
-            />
+            <TableEmptyState icon={Clock} title="Chưa chọn nhân viên" />
           </TableCell>
         </TableRow>
       );
     }
 
-    return activeShiftPeriods.map(({ shift, period }, index: number) => (
-      <TableRow key={`${shift.id}_${period.id}_${index}`}>
-        {renderShiftNameCell(shift, period)}
-        {days.map((day: DateUtil, dayIndex: number) => {
-          const dateStr = day.format("YYYY-MM-DD");
-          const isPeriodActiveThisDay =
-            period.effectiveFrom &&
-            period.effectiveFrom <= dateStr &&
-            (!period.effectiveTo || period.effectiveTo >= dateStr);
+    if (shifts.length === 0) {
+      return (
+        <TableRow>
+          <TableCell colSpan={8}>
+            <TableEmptyState icon={Clock} title="Không có ca làm việc" />
+          </TableCell>
+        </TableRow>
+      );
+    }
 
-          if (!isPeriodActiveThisDay) {
+    const rows: ReactNode[] = [];
+    for (let index = 0; index < shifts.length; index++) {
+      const shift = shifts[index];
+      if (!shift.id) continue;
+
+      rows.push(
+        <TableRow key={`${shift.id}_${index}`}>
+          {renderShiftNameCell(shift)}
+          {days.map((day: DateUtil, dayIndex: number) => {
+            const dateStr = day.format("YYYY-MM-DD");
+            const keyFull = `${shift.id}_${selectedStaffId}_${dateStr}`;
+            const isWorking = fullMap.has(keyFull);
+
             return (
               <TableCell
                 key={dayIndex}
-                className="bg-kit-page/30 text-center text-xs italic text-kit-muted"
+                className={
+                  "relative min-h-25 text-center align-middle " +
+                  (isWorking ? "bg-kit-page/40" : "")
+                }
               >
-                Không áp dụng
+                {isWorking ? (
+                  <div className="group relative flex h-full min-h-22 flex-col items-center justify-center">
+                    <div className="inline-flex flex-col items-center gap-1 text-kit-primary">
+                      <div className="rounded-full bg-kit-page p-1.5 text-kit-primary">
+                        <Check size={18} className="stroke-[3px]" />
+                      </div>
+                      <span className="text-xs font-semibold">Ca làm việc</span>
+                    </div>
+
+                    {canEdit && !day.isBefore(today) ? (
+                      <div className="absolute inset-0 flex items-center justify-center bg-kit-white/90 opacity-0 transition-opacity group-hover:opacity-100">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const schedule = fullMap.get(keyFull);
+                            if (schedule?.id) handleDelete(schedule.id);
+                          }}
+                          className="flex items-center gap-1 rounded-full border border-kit-danger/40 bg-kit-page px-3 py-1.5 text-xs font-semibold text-kit-danger"
+                        >
+                          <Trash2 size={12} /> Hủy ca
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : (
+                  <div className="group relative flex h-full min-h-22 flex-col items-center justify-center gap-1.5">
+                    <span className="text-xs font-medium text-kit-muted">
+                      Nghỉ
+                    </span>
+
+                    {canEdit && !day.isBefore(today) ? (
+                      <div className="absolute inset-0 flex items-center justify-center bg-kit-white/90 opacity-0 transition-opacity group-hover:opacity-100">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setAddingShift({
+                              shift,
+                              date: dateStr,
+                              defaultStaffId: selectedStaffId,
+                              existingStaffIds: [],
+                            })
+                          }
+                          className="flex items-center gap-1 rounded-full bg-kit-page px-3 py-1.5 text-xs font-semibold text-kit-primary hover:text-kit-heading"
+                        >
+                          <Plus size={12} /> Đăng ký ca
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
+                )}
               </TableCell>
             );
-          }
-
-          const keyFull = `${period.id}_${selectedStaffId}_${dateStr}`;
-          const isWorking = fullMap.has(keyFull);
-
-          return (
-            <TableCell
-              key={dayIndex}
-              className={
-                "relative min-h-25 text-center align-middle " +
-                (isWorking ? "bg-kit-page/40" : "")
-              }
-            >
-              {isWorking ? (
-                <div className="group relative flex h-full min-h-22 flex-col items-center justify-center">
-                  <div className="inline-flex flex-col items-center gap-1 text-kit-primary">
-                    <div className="rounded-full bg-kit-page p-1.5 text-kit-primary">
-                      <Check size={18} className="stroke-[3px]" />
-                    </div>
-                    <span className="text-xs font-semibold">Ca làm việc</span>
-                  </div>
-
-                  {canEdit && !day.isBefore(today) ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-kit-white/90 opacity-0 transition-opacity group-hover:opacity-100">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const schedule = fullMap.get(keyFull);
-                          if (schedule?.id) handleDelete(schedule.id);
-                        }}
-                        className="flex items-center gap-1 rounded-full border border-kit-danger/40 bg-kit-page px-3 py-1.5 text-xs font-semibold text-kit-danger"
-                      >
-                        <Trash2 size={12} /> Hủy ca
-                      </button>
-                    </div>
-                  ) : null}
-                </div>
-              ) : (
-                <div className="group relative flex h-full min-h-22 flex-col items-center justify-center gap-1.5">
-                  <span className="text-xs font-medium text-kit-muted">
-                    Nghỉ
-                  </span>
-
-                  {canEdit && !day.isBefore(today) ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-kit-white/90 opacity-0 transition-opacity group-hover:opacity-100">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setAddingShift({
-                            shift,
-                            shiftPeriod: period,
-                            date: dateStr,
-                            defaultStaffId: selectedStaffId,
-                            existingStaffIds: [],
-                          })
-                        }
-                        className="flex items-center gap-1 rounded-full bg-kit-page px-3 py-1.5 text-xs font-semibold text-kit-primary hover:text-kit-heading"
-                      >
-                        <Plus size={12} /> Đăng ký ca
-                      </button>
-                    </div>
-                  ) : null}
-                </div>
-              )}
-            </TableCell>
-          );
-        })}
-      </TableRow>
-    ));
+          })}
+        </TableRow>,
+      );
+    }
+    return rows;
   }
 
   const rowHeaderTitle = viewMode === "staff" ? "Nhân viên" : "Ca làm việc";
@@ -520,7 +482,6 @@ export function ScheduleTable({
       {addingShift ? (
         <AddStaffDialog
           shift={addingShift.shift}
-          shiftPeriod={addingShift.shiftPeriod}
           date={addingShift.date}
           defaultStaffId={addingShift.defaultStaffId}
           existingStaffIds={addingShift.existingStaffIds}

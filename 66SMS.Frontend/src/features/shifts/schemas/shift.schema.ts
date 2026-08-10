@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const createShiftSchema = z
   .object({
+    salonId: z.coerce.number().min(1, "Vui lòng chọn chi nhánh"),
     name: z.string().min(1, "Tên ca làm việc không được để trống"),
     description: z.string().optional().or(z.literal("")),
     shiftStart: z
@@ -16,10 +17,6 @@ export const createShiftSchema = z
         /^([01]\d|2[0-3]):?([0-5]\d)$/,
         "Định dạng giờ không hợp lệ (HH:mm)",
       ),
-    effectiveFrom: z
-      .string()
-      .min(1, "Vui lòng chọn ngày áp dụng"),
-    effectiveTo: z.string().optional().or(z.literal("")),
   })
   .refine(
     (data) => {
@@ -28,18 +25,6 @@ export const createShiftSchema = z
     {
       message: "Giờ kết thúc phải lớn hơn giờ bắt đầu",
       path: ["shiftEnd"],
-    },
-  )
-  .refine(
-    (data) => {
-      if (data.effectiveTo && data.effectiveTo !== "") {
-        return new Date(data.effectiveFrom) <= new Date(data.effectiveTo);
-      }
-      return true;
-    },
-    {
-      message: "Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu",
-      path: ["effectiveTo"],
     },
   );
 

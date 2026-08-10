@@ -8,6 +8,7 @@ import {
   Plus,
 } from "lucide-react";
 import { FallbackImage } from "@/shared/components/FallbackImage";
+import { Popover } from "@/shared/components/Popover";
 import { Button } from "@/shared/elements/Button";
 import { Dropdown, type DropdownItem } from "@/shared/elements/Dropdown";
 import { Checkbox } from "@/shared/forms/Checkbox";
@@ -345,7 +346,7 @@ export function CashierCalendar(props: CashierCalendarProps) {
     getStatusFilterItems(),
   );
 
-  const [weekMoreCellKey, setWeekMoreCellKey] = useState<string | null>(null);
+  const [hiddenMenuNonce, setHiddenMenuNonce] = useState(0);
   const [weekLayout, setWeekLayout] = useState<"day" | "staff">("day");
 
   const activeStatusIds = getActiveStatusIds(statusFilters);
@@ -568,7 +569,6 @@ export function CashierCalendar(props: CashierCalendarProps) {
 
         let moreButton = null;
         if (hiddenBookings.length > 0) {
-          const isOpen = weekMoreCellKey === cellKey;
           const hiddenList = [];
           for (let h = 0; h < hiddenBookings.length; h++) {
             const hidden = hiddenBookings[h];
@@ -593,7 +593,7 @@ export function CashierCalendar(props: CashierCalendarProps) {
                 title={hiddenName + " · " + statusLabel}
                 onClick={(event: { stopPropagation(): void }) => {
                   event.stopPropagation();
-                  setWeekMoreCellKey(null);
+                  setHiddenMenuNonce(hiddenMenuNonce + 1);
                   onBookingClick(hidden);
                 }}
               >
@@ -606,34 +606,25 @@ export function CashierCalendar(props: CashierCalendarProps) {
           }
 
           moreButton = (
-            <div className="absolute bottom-1 right-1 z-10">
-              <button
-                type="button"
-                className="rounded bg-kit-primary px-1.5 py-0.5 text-2xs font-bold text-kit-white shadow hover:bg-blue-700"
-                onClick={(event: { stopPropagation(): void }) => {
-                  event.stopPropagation();
-                  if (isOpen) {
-                    setWeekMoreCellKey(null);
-                  } else {
-                    setWeekMoreCellKey(cellKey);
-                  }
-                }}
-              >
-                +{hiddenBookings.length}
-              </button>
-              {isOpen ? (
-                <div
-                  className="absolute right-0 bottom-full z-20 mb-1 max-h-64 w-56 overflow-y-auto rounded border border-kit bg-kit-white p-1.5 shadow-lg"
-                  onClick={(event: { stopPropagation(): void }) => {
-                    event.stopPropagation();
-                  }}
-                >
-                  <p className="mb-1 px-1 text-2xs font-bold text-kit-muted">
-                    Lịch ẩn
-                  </p>
-                  {hiddenList}
-                </div>
-              ) : null}
+            <div
+              className="absolute bottom-1 right-1 z-10"
+              onClick={(event: { stopPropagation(): void }) => {
+                event.stopPropagation();
+              }}
+            >
+              <Popover
+                key={"week-slot-more-" + cellKey + "-" + hiddenMenuNonce}
+                placement="top"
+                align="end"
+                title="Lịch ẩn"
+                contentClassName="max-h-64 overflow-y-auto p-1.5"
+                trigger={
+                  <span className="rounded bg-kit-primary px-1.5 py-0.5 text-2xs font-bold text-kit-white shadow hover:bg-blue-700">
+                    +{hiddenBookings.length}
+                  </span>
+                }
+                content={hiddenList}
+              />
             </div>
           );
         }
@@ -647,7 +638,6 @@ export function CashierCalendar(props: CashierCalendarProps) {
             <div
               className="relative h-full w-full cursor-pointer hover:bg-kit-primary/5"
               onClick={() => {
-                setWeekMoreCellKey(null);
                 openDayView(day);
               }}
             >
@@ -772,7 +762,6 @@ export function CashierCalendar(props: CashierCalendarProps) {
               title={customerName + " · " + statusLabel}
               onClick={(event: { stopPropagation(): void }) => {
                 event.stopPropagation();
-                setWeekMoreCellKey(null);
                 onBookingClick(booking);
               }}
             >
@@ -786,7 +775,6 @@ export function CashierCalendar(props: CashierCalendarProps) {
 
         let moreButton = null;
         if (hiddenBookings.length > 0) {
-          const isOpen = weekMoreCellKey === cellKey;
           const hiddenList = [];
           for (let h = 0; h < hiddenBookings.length; h++) {
             const hidden = hiddenBookings[h];
@@ -811,7 +799,7 @@ export function CashierCalendar(props: CashierCalendarProps) {
                 title={hiddenName + " · " + statusLabel}
                 onClick={(event: { stopPropagation(): void }) => {
                   event.stopPropagation();
-                  setWeekMoreCellKey(null);
+                  setHiddenMenuNonce(hiddenMenuNonce + 1);
                   onBookingClick(hidden);
                 }}
               >
@@ -824,34 +812,25 @@ export function CashierCalendar(props: CashierCalendarProps) {
           }
 
           moreButton = (
-            <div className="relative mt-1">
-              <button
-                type="button"
-                className="rounded bg-kit-primary px-1.5 py-0.5 text-2xs font-bold text-kit-white shadow hover:bg-blue-700"
-                onClick={(event: { stopPropagation(): void }) => {
-                  event.stopPropagation();
-                  if (isOpen) {
-                    setWeekMoreCellKey(null);
-                  } else {
-                    setWeekMoreCellKey(cellKey);
-                  }
-                }}
-              >
-                +{hiddenBookings.length}
-              </button>
-              {isOpen ? (
-                <div
-                  className="absolute left-0 top-full z-20 mt-1 max-h-64 w-56 overflow-y-auto rounded border border-kit bg-kit-white p-1.5 shadow-lg"
-                  onClick={(event: { stopPropagation(): void }) => {
-                    event.stopPropagation();
-                  }}
-                >
-                  <p className="mb-1 px-1 text-2xs font-bold text-kit-muted">
-                    Lịch ẩn
-                  </p>
-                  {hiddenList}
-                </div>
-              ) : null}
+            <div
+              className="relative mt-1"
+              onClick={(event: { stopPropagation(): void }) => {
+                event.stopPropagation();
+              }}
+            >
+              <Popover
+                key={"week-staff-more-" + cellKey + "-" + hiddenMenuNonce}
+                placement="bottom"
+                align="start"
+                title="Lịch ẩn"
+                contentClassName="max-h-64 overflow-y-auto p-1.5"
+                trigger={
+                  <span className="rounded bg-kit-primary px-1.5 py-0.5 text-2xs font-bold text-kit-white shadow hover:bg-blue-700">
+                    +{hiddenBookings.length}
+                  </span>
+                }
+                content={hiddenList}
+              />
             </div>
           );
         }
@@ -864,7 +843,6 @@ export function CashierCalendar(props: CashierCalendarProps) {
             <div
               className="min-h-20 w-full cursor-pointer rounded-sm p-0.5 hover:bg-kit-primary/5"
               onClick={() => {
-                setWeekMoreCellKey(null);
                 openDayView(day);
               }}
             >
@@ -1001,7 +979,6 @@ export function CashierCalendar(props: CashierCalendarProps) {
             title={customerName + " · " + statusLabel}
             onClick={(event: { stopPropagation(): void }) => {
               event.stopPropagation();
-              setWeekMoreCellKey(null);
               onBookingClick(booking);
             }}
           >
@@ -1015,7 +992,6 @@ export function CashierCalendar(props: CashierCalendarProps) {
 
       let moreButton = null;
       if (hiddenBookings.length > 0) {
-        const isOpen = weekMoreCellKey === cellKey;
         const hiddenList = [];
         for (let h = 0; h < hiddenBookings.length; h++) {
           const hidden = hiddenBookings[h];
@@ -1040,7 +1016,7 @@ export function CashierCalendar(props: CashierCalendarProps) {
               title={hiddenName + " · " + statusLabel}
               onClick={(event: { stopPropagation(): void }) => {
                 event.stopPropagation();
-                setWeekMoreCellKey(null);
+                setHiddenMenuNonce(hiddenMenuNonce + 1);
                 onBookingClick(hidden);
               }}
             >
@@ -1053,34 +1029,25 @@ export function CashierCalendar(props: CashierCalendarProps) {
         }
 
         moreButton = (
-          <div className="relative mt-0.5">
-            <button
-              type="button"
-              className="rounded bg-kit-primary px-1.5 py-0.5 text-2xs font-bold text-kit-white shadow hover:bg-blue-700"
-              onClick={(event: { stopPropagation(): void }) => {
-                event.stopPropagation();
-                if (isOpen) {
-                  setWeekMoreCellKey(null);
-                } else {
-                  setWeekMoreCellKey(cellKey);
-                }
-              }}
-            >
-              +{hiddenBookings.length}
-            </button>
-            {isOpen ? (
-              <div
-                className="absolute left-0 top-full z-20 mt-1 max-h-64 w-56 overflow-y-auto rounded border border-kit bg-kit-white p-1.5 shadow-lg"
-                onClick={(event: { stopPropagation(): void }) => {
-                  event.stopPropagation();
-                }}
-              >
-                <p className="mb-1 px-1 text-2xs font-bold text-kit-muted">
-                  Lịch ẩn
-                </p>
-                {hiddenList}
-              </div>
-            ) : null}
+          <div
+            className="relative mt-0.5"
+            onClick={(event: { stopPropagation(): void }) => {
+              event.stopPropagation();
+            }}
+          >
+            <Popover
+              key={"month-more-" + cellKey + "-" + hiddenMenuNonce}
+              placement="bottom"
+              align="start"
+              title="Lịch ẩn"
+              contentClassName="max-h-64 overflow-y-auto p-1.5"
+              trigger={
+                <span className="rounded bg-kit-primary px-1.5 py-0.5 text-2xs font-bold text-kit-white shadow hover:bg-blue-700">
+                  +{hiddenBookings.length}
+                </span>
+              }
+              content={hiddenList}
+            />
           </div>
         );
       }
@@ -1090,7 +1057,6 @@ export function CashierCalendar(props: CashierCalendarProps) {
           key={cellKey}
           className={cellClass}
           onClick={() => {
-            setWeekMoreCellKey(null);
             openDayView(day);
           }}
         >

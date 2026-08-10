@@ -39,7 +39,6 @@ namespace _66SMS.Persistence.DependencyInjection
             services.AddScoped<ICustomerSqlRepository, CustomerSqlRepository>();
             services.AddScoped<IStaffSqlRepository, StaffSqlRepository>();
             services.AddScoped<IShiftSqlRepository, ShiftSqlRepository>();
-            services.AddScoped<IShiftPeriodSqlRepository, ShiftPeriodSqlRepository>();
             services.AddScoped<IWorkScheduleSqlRepository, WorkScheduleSqlRepository>();
             
             services.AddScoped<IProductCategorySqlRepository, ProductCategorySqlRepository>();
