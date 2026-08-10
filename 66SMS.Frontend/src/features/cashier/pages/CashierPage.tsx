@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/features/auth/stores/authStore";
+import { useConfigAppointmentBySalon } from "@/features/config_appointments/hooks/useConfigAppointments";
 import { invoiceApi } from "@/features/invoices/api/invoice.api";
 import type { InvoiceDto } from "@/features/invoices/types/invoice.types";
 import { toast } from "@/shared/components/kitToast";
@@ -16,6 +17,7 @@ import type { CashierBooking } from "../types";
 import {
   getIsoWeekStart,
   getMonthRange,
+  resolveCashierSlotConfig,
   type CashierCalendarView,
 } from "../utils/cashierCalendar.utils";
 
@@ -60,8 +62,15 @@ export function CashierPage() {
     salonId,
     viewMode !== "day",
   );
+  const configQuery = useConfigAppointmentBySalon(salonId);
 
   const calendarQuery = viewMode === "day" ? dailyQuery : rangeQuery;
+
+  let configDto = undefined;
+  if (configQuery.data?.isSuccess === true) {
+    configDto = configQuery.data.data ?? undefined;
+  }
+  const slotConfig = resolveCashierSlotConfig(configDto);
 
   useEffect(() => {
     if (!isAdmin && !isReceptionist) {
@@ -115,6 +124,9 @@ export function CashierPage() {
     }
   };
 
+  const calendarLoading =
+    calendarQuery.isLoading || (!!salonId && configQuery.isLoading);
+
   return (
     <div className="relative flex h-screen w-full flex-col bg-kit-page font-sans text-sm text-kit-body">
       <CashierHeader activeTab={activeTab} onTabChange={setActiveTab} />
@@ -133,7 +145,8 @@ export function CashierPage() {
                 viewMode={viewMode}
                 columns={calendarQuery.data?.columns ?? []}
                 bookings={calendarQuery.data?.bookings ?? []}
-                isLoading={calendarQuery.isLoading}
+                slotConfig={slotConfig}
+                isLoading={calendarLoading}
                 isError={calendarQuery.isError}
                 errorMessage={calendarQuery.error}
                 onDateChange={setCurrentDate}

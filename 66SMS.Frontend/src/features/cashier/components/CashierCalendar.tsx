@@ -23,6 +23,9 @@ import type { CashierBooking, StaffColumn } from "../types";
 import {
   CASHIER_STATUS_CARD_CLASS,
   CASHIER_STATUS_LABELS,
+  DEFAULT_SLOT_END_MINS,
+  DEFAULT_SLOT_START_MINS,
+  DEFAULT_SLOT_STEP_MINS,
   SLOT_ROW_HEIGHT_PX,
   buildDayTimeSlots,
   formatCalendarTitle,
@@ -45,11 +48,10 @@ import {
   toCalendarStatus,
   toDateKey,
   type CashierCalendarView,
+  type CashierSlotConfig,
 } from "../utils/cashierCalendar.utils";
 
 const WEEKDAY_LABELS = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
-
-const SLOT_ROWS = buildDayTimeSlots();
 
 type StatusFilterItem = {
   id: string;
@@ -63,6 +65,7 @@ type CashierCalendarProps = {
   viewMode: CashierCalendarView;
   columns: StaffColumn[];
   bookings: CashierBooking[];
+  slotConfig?: CashierSlotConfig | null;
   isLoading?: boolean;
   isError?: boolean;
   errorMessage?: string | null;
@@ -185,6 +188,7 @@ function BookingCard(props: {
   sideIndex?: number;
   sideCount?: number;
   compact?: boolean;
+  stepMins?: number;
 }) {
   const booking = props.booking;
   const onClick = props.onClick;
@@ -194,18 +198,19 @@ function BookingCard(props: {
     sideCount = 1;
   }
   const compact = props.compact || false;
+  const stepMins = props.stepMins || DEFAULT_SLOT_STEP_MINS;
 
   const calendarStatus = toCalendarStatus(booking.status);
   const cardClass = CASHIER_STATUS_CARD_CLASS[calendarStatus];
   const customerName = booking.customerName || "Khách";
   const serviceName = booking.serviceName || "Dịch vụ";
   const statusLabel = CASHIER_STATUS_LABELS[calendarStatus] || "";
-  const durationMins = getBookingDurationMins(booking);
+  const durationMins = getBookingDurationMins(booking, stepMins);
   let lines = getBookingContentLines(durationMins);
   if (compact) {
     lines = 1;
   }
-  const slotCount = getBookingSlotCount(booking);
+  const slotCount = getBookingSlotCount(booking, stepMins);
 
   let leftCss = "1px";
   let rightCss = "1px";
@@ -313,6 +318,16 @@ export function CashierCalendar(props: CashierCalendarProps) {
   const viewMode = props.viewMode;
   const columns = props.columns;
   const bookings = props.bookings;
+  let slotConfig = props.slotConfig;
+  if (!slotConfig) {
+    slotConfig = {
+      startMins: DEFAULT_SLOT_START_MINS,
+      endMins: DEFAULT_SLOT_END_MINS,
+      stepMins: DEFAULT_SLOT_STEP_MINS,
+    };
+  }
+  const slotRows = buildDayTimeSlots(slotConfig);
+  const stepMins = slotConfig.stepMins;
   const isLoading = props.isLoading || false;
   const isError = props.isError || false;
   const errorMessage = props.errorMessage;
@@ -439,8 +454,8 @@ export function CashierCalendar(props: CashierCalendarProps) {
   function renderSlotRows() {
     const rows = [];
 
-    for (let slotIndex = 0; slotIndex < SLOT_ROWS.length; slotIndex++) {
-      const slotTime = SLOT_ROWS[slotIndex];
+    for (let slotIndex = 0; slotIndex < slotRows.length; slotIndex++) {
+      const slotTime = slotRows[slotIndex];
       const cells = [];
 
       for (let colIndex = 0; colIndex < columns.length; colIndex++) {
@@ -450,6 +465,7 @@ export function CashierCalendar(props: CashierCalendarProps) {
           String(column.id),
           slotTime,
           activeStatusIds,
+          stepMins,
         );
 
         const cards = [];
@@ -459,6 +475,7 @@ export function CashierCalendar(props: CashierCalendarProps) {
             <BookingCard
               key={booking.id}
               booking={booking}
+              stepMins={stepMins}
               onClick={() => onBookingClick(booking)}
             />,
           );
@@ -508,8 +525,8 @@ export function CashierCalendar(props: CashierCalendarProps) {
   function renderWeekSlotRows() {
     const rows = [];
 
-    for (let slotIndex = 0; slotIndex < SLOT_ROWS.length; slotIndex++) {
-      const slotTime = SLOT_ROWS[slotIndex];
+    for (let slotIndex = 0; slotIndex < slotRows.length; slotIndex++) {
+      const slotTime = slotRows[slotIndex];
       const cells = [];
 
       for (let dayIndex = 0; dayIndex < weekDays.length; dayIndex++) {
@@ -519,6 +536,7 @@ export function CashierCalendar(props: CashierCalendarProps) {
           day,
           slotTime,
           activeStatusIds,
+          stepMins,
         );
         const cellKey = toDateKey(day) + "-" + slotTime;
 
@@ -542,6 +560,7 @@ export function CashierCalendar(props: CashierCalendarProps) {
               sideIndex={b}
               sideCount={visibleBookings.length}
               compact={visibleBookings.length > 1}
+              stepMins={stepMins}
               onClick={() => onBookingClick(booking)}
             />,
           );

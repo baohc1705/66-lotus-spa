@@ -156,45 +156,105 @@ export function minsToTime(totalMins: number): string {
   return hourText + ":" + minuteText;
 }
 
-/**
- * Truc gio lich thu ngan: HARDCODE tren client (khong load API TimeSlot).
- * Moi o = 30 phut (SLOT_STEP_MINS). Cot gio hien tung moc 08:00, 08:30, ...
- * VD: 08:00-09:30 = 3 o cao.
- */
-export const SLOT_START_HOUR = 8;
-export const SLOT_END_HOUR = 22;
-export const SLOT_STEP_MINS = 30;
+export const DEFAULT_SLOT_START_MINS = 8 * 60;
+export const DEFAULT_SLOT_END_MINS = 22 * 60;
+export const DEFAULT_SLOT_STEP_MINS = 30;
 export const SLOT_ROW_HEIGHT_PX = 56;
 
-export function buildDayTimeSlots(): string[] {
+export const SLOT_START_HOUR = 8;
+export const SLOT_END_HOUR = 22;
+export const SLOT_STEP_MINS = DEFAULT_SLOT_STEP_MINS;
+
+export type CashierSlotConfig = {
+  startMins: number;
+  endMins: number;
+  stepMins: number;
+};
+
+export function resolveCashierSlotConfig(input?: {
+  startTime?: string | null;
+  endTime?: string | null;
+  slotMinutes?: number | null;
+} | null): CashierSlotConfig {
+  let startMins = DEFAULT_SLOT_START_MINS;
+  let endMins = DEFAULT_SLOT_END_MINS;
+  let stepMins = DEFAULT_SLOT_STEP_MINS;
+
+  if (input?.startTime) {
+    const parsedStart = timeToMins(input.startTime);
+    if (!Number.isNaN(parsedStart)) {
+      startMins = parsedStart;
+    }
+  }
+
+  if (input?.endTime) {
+    const parsedEnd = timeToMins(input.endTime);
+    if (!Number.isNaN(parsedEnd)) {
+      endMins = parsedEnd;
+    }
+  }
+
+  if (typeof input?.slotMinutes === "number" && input.slotMinutes > 0) {
+    stepMins = input.slotMinutes;
+  }
+
+  if (endMins <= startMins) {
+    startMins = DEFAULT_SLOT_START_MINS;
+    endMins = DEFAULT_SLOT_END_MINS;
+  }
+
+  return {
+    startMins: startMins,
+    endMins: endMins,
+    stepMins: stepMins,
+  };
+}
+
+export function buildDayTimeSlots(config?: CashierSlotConfig | null): string[] {
+  const resolved = config ?? {
+    startMins: DEFAULT_SLOT_START_MINS,
+    endMins: DEFAULT_SLOT_END_MINS,
+    stepMins: DEFAULT_SLOT_STEP_MINS,
+  };
   const slots: string[] = [];
-  const startMins = SLOT_START_HOUR * 60;
-  const endMins = SLOT_END_HOUR * 60;
-  for (let mins = startMins; mins < endMins; mins = mins + SLOT_STEP_MINS) {
+  for (
+    let mins = resolved.startMins;
+    mins < resolved.endMins;
+    mins = mins + resolved.stepMins
+  ) {
     slots.push(minsToTime(mins));
   }
   return slots;
 }
 
-export function floorToSlot(timeValue: string): string {
+export function floorToSlot(
+  timeValue: string,
+  stepMins: number = DEFAULT_SLOT_STEP_MINS,
+): string {
   const mins = timeToMins(timeValue);
-  const floored = Math.floor(mins / SLOT_STEP_MINS) * SLOT_STEP_MINS;
+  const floored = Math.floor(mins / stepMins) * stepMins;
   return minsToTime(floored);
 }
 
-export function getBookingDurationMins(booking: CashierBooking): number {
+export function getBookingDurationMins(
+  booking: CashierBooking,
+  stepMins: number = DEFAULT_SLOT_STEP_MINS,
+): number {
   const startMins = timeToMins(booking.startTime);
   const endMins = timeToMins(booking.endTime);
   const duration = endMins - startMins;
   if (duration <= 0) {
-    return SLOT_STEP_MINS;
+    return stepMins;
   }
   return duration;
 }
 
-export function getBookingSlotCount(booking: CashierBooking): number {
-  const duration = getBookingDurationMins(booking);
-  const slotCount = duration / SLOT_STEP_MINS;
+export function getBookingSlotCount(
+  booking: CashierBooking,
+  stepMins: number = DEFAULT_SLOT_STEP_MINS,
+): number {
+  const duration = getBookingDurationMins(booking, stepMins);
+  const slotCount = duration / stepMins;
   if (slotCount < 1) {
     return 1;
   }
@@ -216,6 +276,7 @@ export function getBookingsForSlot(
   staffId: string,
   slotTime: string,
   activeStatusIds: string[],
+  stepMins: number = DEFAULT_SLOT_STEP_MINS,
 ): CashierBooking[] {
   const result: CashierBooking[] = [];
   for (let index = 0; index < bookings.length; index++) {
@@ -227,7 +288,7 @@ export function getBookingsForSlot(
     if (activeStatusIds.indexOf(calendarStatus) < 0) {
       continue;
     }
-    if (floorToSlot(booking.startTime) !== slotTime) {
+    if (floorToSlot(booking.startTime, stepMins) !== slotTime) {
       continue;
     }
     result.push(booking);
@@ -240,6 +301,7 @@ export function getBookingsForDaySlot(
   date: Date,
   slotTime: string,
   activeStatusIds: string[],
+  stepMins: number = DEFAULT_SLOT_STEP_MINS,
 ): CashierBooking[] {
   const result: CashierBooking[] = [];
   const dateKey = toDateKey(date);
@@ -252,7 +314,7 @@ export function getBookingsForDaySlot(
     if (activeStatusIds.indexOf(calendarStatus) < 0) {
       continue;
     }
-    if (floorToSlot(booking.startTime) !== slotTime) {
+    if (floorToSlot(booking.startTime, stepMins) !== slotTime) {
       continue;
     }
     result.push(booking);
