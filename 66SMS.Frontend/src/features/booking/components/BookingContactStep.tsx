@@ -104,9 +104,11 @@ export function BookingContactStep() {
       const lockRes = await createSlotLockMutation({
         locks: guests.map((g) => ({
           slotId: g.selectedTimeSlot!.slotId,
+          startTime: g.selectedTimeSlot!.startTime || g.selectedTimeSlot!.time,
           staffId: g.selectedTechnician?.id ?? null,
           appointmentDate: formatDate(g.selectedDate!).format("YYYY-MM-DD"),
           serviceId: g.selectedService!.id ?? 0,
+          salonId: selectedSalon?.id ?? null,
         })),
       });
 
@@ -133,6 +135,8 @@ export function BookingContactStep() {
           lockId: lockedIds[index],
           staffId: guest.selectedTechnician?.id ?? null,
           slotId: guest.selectedTimeSlot!.slotId || 0,
+          startTime:
+            guest.selectedTimeSlot!.startTime || guest.selectedTimeSlot!.time,
           appointmentDate: formatDate(guest.selectedDate!).format("YYYY-MM-DD"),
           salonId: selectedSalon?.id ?? null,
           note: isFirstGuest && customerNote ? customerNote : undefined,

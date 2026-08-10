@@ -8,6 +8,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.RescheduleAppointme
         public int AppointmentId { get; set; }
         public DateOnly AppointmentDate { get; set; }
         public int SlotId { get; set; }
+        public string? StartTime { get; set; }
         public int? UserId { get; set; }
     }
 }

@@ -7,7 +7,6 @@ namespace _66SMS.Domain.Entities
         public string AppointmentCode { get; set; } = null!;
         public int CreatedByUserId { get; set; }
         public int StaffId { get; set; }
-        public int SlotId { get; set; }
         public int? PositionId { get; set; }
         public int? LockId { get; set; }
         public int? SalonId { get; set; }
@@ -35,7 +34,6 @@ namespace _66SMS.Domain.Entities
         // Navigation properties
         public User? CreatedByUser { get; set; }
         public Staff? Staff { get; set; }
-        public TimeSlot? TimeSlot { get; set; }
         public BookingPosition? Position { get; set; }
         public WorkSchedule? Schedule { get; set; }
         public AppointmentSlotLock? Lock { get; set; }

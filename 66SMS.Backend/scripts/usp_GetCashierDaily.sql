@@ -54,7 +54,7 @@ BEGIN
         AppointmentDate  DATE           NOT NULL,
         StaffId          INT            NOT NULL,
         StaffName        NVARCHAR(100)  NOT NULL,
-        SlotId           INT            NOT NULL,
+        SlotId           INT            NULL,
         StartTime        TIME(7)        NULL,
         EndTime          TIME(7)        NULL,
         PositionId       INT            NULL,
@@ -84,8 +84,8 @@ BEGIN
         a.appointment_date,
         a.staff_id,
         ISNULL(st.full_name, N'N/A'),
-        a.slot_id,
-        COALESCE(a.time_appt_start, ts.start_time),
+        CAST(NULL AS INT),
+        a.time_appt_start,
         a.time_appt_end,
         a.position_id,
         CASE
@@ -106,8 +106,6 @@ BEGIN
     FROM dbo.appointments a
     INNER JOIN dbo.staffs st
         ON st.id = a.staff_id
-    LEFT JOIN dbo.time_slots ts
-        ON ts.id = a.slot_id
     LEFT JOIN dbo.booking_positions bp
         ON bp.id = a.position_id
     LEFT JOIN dbo.booking_rooms br

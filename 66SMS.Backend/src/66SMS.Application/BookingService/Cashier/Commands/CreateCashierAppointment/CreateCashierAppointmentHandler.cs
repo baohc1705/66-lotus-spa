@@ -24,7 +24,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
         private readonly IUserSqlRepository userSqlRepository;
         private readonly IRoleSqlRepository roleSqlRepository;
         private readonly IPromotionSqlRepository promotionSqlRepository;
-        private readonly ITimeSlotSqlRepository timeSlotSqlRepository;
         private readonly IPasswordHash passwordHash;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
 
@@ -37,7 +36,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
             IUserSqlRepository userSqlRepository,
             IRoleSqlRepository roleSqlRepository,
             IPromotionSqlRepository promotionSqlRepository,
-            ITimeSlotSqlRepository timeSlotSqlRepository,
             IPasswordHash passwordHash,
             ISqlUnitOfWork sqlUnitOfWork)
         {
@@ -49,7 +47,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
             this.userSqlRepository = userSqlRepository;
             this.roleSqlRepository = roleSqlRepository;
             this.promotionSqlRepository = promotionSqlRepository;
-            this.timeSlotSqlRepository = timeSlotSqlRepository;
             this.passwordHash = passwordHash;
             this.sqlUnitOfWork = sqlUnitOfWork;
         }
@@ -137,18 +134,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                     .Where(x => lockIds.Contains(x.Id))
                     .ToDictionaryAsync(x => x.Id, cancellationToken);
 
-                var slotIds = guests
-                    .Select(g => g.LockId.HasValue && locks.TryGetValue(g.LockId.Value, out var locked) ? locked.SlotId : g.SlotId)
-                    .Where(id => id.HasValue)
-                    .Select(id => id!.Value)
-                    .Distinct()
-                    .ToList();
-
-                var slotStarts = await timeSlotSqlRepository.AsQueryable(asNoTracking: true)
-                    .Where(x => slotIds.Contains(x.Id))
-                    .Select(x => new { x.Id, x.StartTime })
-                    .ToDictionaryAsync(x => x.Id, x => x.StartTime, cancellationToken);
-
                 var salonIds = guests.Where(g => g.SalonId.HasValue).Select(g => g.SalonId!.Value).Distinct().ToList();
                 var staffInSalons = await staffSqlRepository.AsQueryable(asNoTracking: true)
                     .SelectMany(s => s.StaffSalons!
@@ -172,7 +157,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                     int staffId;
                     int? scheduleId;
                     AppointmentSlotLock? activeLock = null;
-                    int slotId;
 
                     if (guest.LockId.HasValue)
                     {
@@ -187,8 +171,15 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                         }
 
                         var staffInfo = await appointmentSqlRepository.ResolveBookingStaffAsync(
-                            slotLock.AppointmentDate, mainServiceId, slotLock.SlotId,
-                            slotLock.StaffId, guest.SalonId, slotLock.Id, null, cancellationToken);
+                            slotLock.AppointmentDate,
+                            mainServiceId,
+                            slotId: null,
+                            slotLock.StaffId,
+                            guest.SalonId,
+                            slotLock.Id,
+                            null,
+                            startTime: slotLock.StartTime,
+                            cancellationToken: cancellationToken);
 
                         if (staffInfo == null)
                         {
@@ -201,14 +192,19 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                         activeLock = slotLock;
                         staffId = slotLock.StaffId;
                         scheduleId = staffInfo.ScheduleId;
-                        slotId = slotLock.SlotId;
                     }
                     else
                     {
-                        slotId = (int)guest.SlotId!;
                         var staffInfo = await appointmentSqlRepository.ResolveBookingStaffAsync(
-                            (DateOnly)guest.AppointmentDate!, mainServiceId, slotId,
-                            guest.StaffId, guest.SalonId, null, null, cancellationToken);
+                            (DateOnly)guest.AppointmentDate!,
+                            mainServiceId,
+                            slotId: null,
+                            guest.StaffId,
+                            guest.SalonId,
+                            null,
+                            null,
+                            startTime: DateTimeHelper.ParseTimeOnly(guest.StartTime),
+                            cancellationToken: cancellationToken);
 
                         if (staffInfo == null)
                         {
@@ -254,7 +250,15 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                     if (discountPercent > 0 && totalAmount > 0)
                         totalAmount -= totalAmount * discountPercent / 100m;
 
-                    TimeOnly? slotStart = slotStarts.TryGetValue(slotId, out var startTime) ? startTime : null;
+                    TimeOnly? slotStart = null;
+                    if (activeLock?.StartTime != null)
+                    {
+                        slotStart = activeLock.StartTime;
+                    }
+                    else
+                    {
+                        slotStart = DateTimeHelper.ParseTimeOnly(guest.StartTime);
+                    }
                     var durationMinutes = appointmentServices.Sum(s => s.DurationSnapshot * s.Quantity);
 
                     var appointment = new Appointment
@@ -264,7 +268,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                         StaffId = staffId,
                         SalonId = guest.SalonId,
                         ScheduleId = scheduleId,
-                        SlotId = slotId,
                         PositionId = activeLock != null ? activeLock.PositionId : guest.PositionId,
                         LockId = activeLock?.Id,
                         AppointmentDate = (DateOnly)guest.AppointmentDate!,

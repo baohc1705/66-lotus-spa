@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useTimeSlots } from "@/features/booking/hooks/useBookingData";
-import type { TimeSlotDTO } from "@/features/booking/types/booking.types";
 import { useServices } from "@/features/services/hooks/useServices";
 import type { ServiceDto } from "@/features/services/types/service.types";
 import { Modal } from "@/shared/components/Modal";
@@ -57,7 +56,7 @@ export function StaffAvailabilityDialog({
   salonId,
 }: StaffAvailabilityDialogProps) {
   const [serviceId, setServiceId] = useState<number | null>(null);
-  const [slotId, setSlotId] = useState<number | null>(null);
+  const [startTime, setStartTime] = useState<string | null>(null);
 
   const dateStr = formatDate(currentDate).format("YYYY-MM-DD");
 
@@ -72,7 +71,7 @@ export function StaffAvailabilityDialog({
   const availabilityQuery = useStaffAvailability(
     open,
     currentDate,
-    slotId,
+    startTime,
     serviceId,
     salonId,
   );
@@ -91,25 +90,31 @@ export function StaffAvailabilityDialog({
 
   const slotOptions = useMemo(() => {
     const slots = timeSlotsQuery.data ?? [];
-    return slots.map((s: TimeSlotDTO) => ({
-      value: String(s.slotId),
-      label: s.time,
-    }));
+    const options: { value: string; label: string }[] = [];
+    for (let index = 0; index < slots.length; index++) {
+      const slot = slots[index];
+      if (!slot.time) continue;
+      options.push({
+        value: slot.time,
+        label: slot.time,
+      });
+    }
+    return options;
   }, [timeSlotsQuery.data]);
 
   const handleServiceChange = (value: string) => {
     const id = value ? Number(value) : null;
     setServiceId(id);
-    setSlotId(null);
+    setStartTime(null);
   };
 
   const handleSlotChange = (value: string) => {
-    setSlotId(value ? Number(value) : null);
+    setStartTime(value ? value : null);
   };
 
   const handleClose = () => {
     setServiceId(null);
-    setSlotId(null);
+    setStartTime(null);
     onOpenChange(false);
   };
 
@@ -143,7 +148,7 @@ export function StaffAvailabilityDialog({
         <FormField label="Giờ">
           <SearchableSelect
             options={slotOptions}
-            value={slotId ? String(slotId) : ""}
+            value={startTime ?? ""}
             onChange={handleSlotChange}
             placeholder={
               serviceId ? "Chọn khung giờ..." : "Chọn dịch vụ trước"
@@ -154,7 +159,7 @@ export function StaffAvailabilityDialog({
         </FormField>
       </div>
 
-      {!serviceId || !slotId ? (
+      {!serviceId || !startTime ? (
         <p className="text-xs text-kit-muted py-6 text-center">
           Chọn dịch vụ và giờ để xem danh sách nhân viên.
         </p>

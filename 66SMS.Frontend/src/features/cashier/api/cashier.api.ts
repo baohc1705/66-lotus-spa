@@ -25,7 +25,7 @@ export type GetCashierPositionsParams = {
 
 export type GetStaffAvailabilityParams = {
   date?: string;
-  slotId?: number;
+  startTime?: string;
   serviceId?: number;
   salonId?: number | null;
 };
@@ -99,7 +99,7 @@ export const cashierApi = {
 
   rescheduleAppointment: (
     appointmentId: string | number,
-    payload: { appointmentDate: string; slotId: number },
+    payload: { appointmentDate: string; slotId: number; startTime?: string },
   ) =>
     axiosInstance
       .put<Result<void>>(
@@ -130,7 +130,7 @@ export const cashierApi = {
 
   getStaffAvailability: (
     date: Date,
-    slotId: number,
+    startTime: string,
     serviceId: number,
     salonId?: number | null,
   ) =>
@@ -138,7 +138,7 @@ export const cashierApi = {
       .get<Result<StaffAvailabilityDto[]>>("/cashier/staff-availability", {
         params: {
           date: toDateOnly(date),
-          slotId,
+          startTime,
           serviceId,
           ...withSalonId(salonId),
         } satisfies GetStaffAvailabilityParams,

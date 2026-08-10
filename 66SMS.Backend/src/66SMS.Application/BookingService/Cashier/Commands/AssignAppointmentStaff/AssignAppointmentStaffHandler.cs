@@ -46,12 +46,13 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentSt
             var resolved = await appointmentSqlRepository.ResolveBookingStaffAsync(
                 appointment.AppointmentDate,
                 mainServiceId,
-                appointment.SlotId,
+                slotId: null,
                 request.StaffId,
                 appointment.SalonId,
                 appointment.LockId,
                 appointment.Id,
-                cancellationToken);
+                startTime: appointment.TimeApptStart,
+                cancellationToken: cancellationToken);
 
             if (resolved == null)
                 return Result<object>.Conflict(AppointmentConst.MSG_ASSIGN_STAFF_UNAVAILABLE, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);

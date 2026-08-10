@@ -36,11 +36,50 @@ BEGIN
         end_time   TIME(7) NOT NULL
     );
 
-    INSERT INTO @slots (slot_index, slot_id, start_time, end_time)
-    SELECT ROW_NUMBER() OVER (ORDER BY start_time) - 1, id, start_time, end_time
-    FROM dbo.time_slots;
+    DECLARE @cfg_start     TIME(7);
+    DECLARE @cfg_end       TIME(7);
+    DECLARE @cfg_slot_mins INT;
+    DECLARE @slot_cursor   TIME(7);
+    DECLARE @slot_index    INT;
+    DECLARE @slot_end      TIME(7);
 
-    SET @slot_count = @@ROWCOUNT;
+    SELECT TOP (1)
+        @cfg_start = start_time,
+        @cfg_end = end_time,
+        @cfg_slot_mins = slot_minutes
+    FROM dbo.config_appointments
+    WHERE (@salon_id IS NULL OR salon_id = @salon_id OR salon_id IS NULL)
+      AND start_time IS NOT NULL
+      AND end_time IS NOT NULL
+      AND slot_minutes IS NOT NULL
+      AND slot_minutes > 0
+    ORDER BY
+        CASE WHEN salon_id = @salon_id THEN 0 ELSE 1 END,
+        id;
+
+    IF @cfg_start IS NULL OR @cfg_end IS NULL OR @cfg_slot_mins IS NULL OR @cfg_start >= @cfg_end
+    BEGIN
+        SELECT CAST(NULL AS INT) AS StaffId, CAST(NULL AS NVARCHAR(100)) AS StaffName,
+               CAST(NULL AS NVARCHAR(500)) AS Avatar, CAST(NULL AS INT) AS SlotsLeft
+        WHERE 1 = 0;
+        RETURN;
+    END;
+
+    SET @slot_index = 0;
+    SET @slot_cursor = @cfg_start;
+
+    WHILE DATEADD(MINUTE, @cfg_slot_mins, CAST(@slot_cursor AS DATETIME)) <= CAST(@cfg_end AS DATETIME)
+    BEGIN
+        SET @slot_end = CAST(DATEADD(MINUTE, @cfg_slot_mins, CAST(@slot_cursor AS DATETIME)) AS TIME(7));
+
+        INSERT INTO @slots (slot_index, slot_id, start_time, end_time)
+        VALUES (@slot_index, @slot_index + 1, @slot_cursor, @slot_end);
+
+        SET @slot_index = @slot_index + 1;
+        SET @slot_cursor = @slot_end;
+    END;
+
+    SET @slot_count = (SELECT COUNT(*) FROM @slots);
     IF @slot_count = 0
     BEGIN
         SELECT CAST(NULL AS INT) AS StaffId, CAST(NULL AS NVARCHAR(100)) AS StaffName,
@@ -155,20 +194,31 @@ BEGIN
             END AS needed
         FROM dbo.appointments a
         INNER JOIN @staff s ON s.staff_id = a.staff_id
-        INNER JOIN @slots fs ON fs.slot_id = a.slot_id
+        INNER JOIN @slots fs ON fs.start_time = a.time_appt_start
         LEFT JOIN appt_dur d ON d.appointment_id = a.id
         WHERE a.appointment_date = @date AND a.status NOT IN (5, 6, 9)
+          AND a.time_appt_start IS NOT NULL
 
         UNION ALL
 
         SELECT
             l.staff_id,
             fs.slot_index,
-            CASE WHEN l.slots_needed > 0 THEN l.slots_needed ELSE @slots_needed END
+            CASE
+                WHEN CEILING(
+                    ISNULL(l.duration_mins, ISNULL(l.slots_needed, 1) * ISNULL(l.slot_minutes, @slot_minutes))
+                    * 1.0 / @slot_minutes
+                ) < 1 THEN 1
+                ELSE CAST(CEILING(
+                    ISNULL(l.duration_mins, ISNULL(l.slots_needed, 1) * ISNULL(l.slot_minutes, @slot_minutes))
+                    * 1.0 / @slot_minutes
+                ) AS INT)
+            END
         FROM dbo.appointment_slot_locks l
         INNER JOIN @staff s ON s.staff_id = l.staff_id
-        INNER JOIN @slots fs ON fs.slot_id = l.slot_id
+        INNER JOIN @slots fs ON fs.start_time = l.start_time
         WHERE l.appointment_date = @date AND l.status = 1 AND l.expires_at > @now
+          AND l.start_time IS NOT NULL
     )
     INSERT INTO @booked (staff_id, slot_index)
     SELECT DISTINCT o.staff_id, o.start_index + n.slot_index

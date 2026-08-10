@@ -12,7 +12,9 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
             RuleForEach(x => x.Guests).ChildRules(guest =>
             {
                 guest.RuleFor(g => g.AppointmentDate).NotNull();
-                guest.RuleFor(g => g.SlotId).NotNull().GreaterThan(0);
+                guest.RuleFor(g => g)
+                    .Must(g => g.LockId.HasValue || !string.IsNullOrWhiteSpace(g.StartTime))
+                    .WithMessage("LockId hoặc StartTime là bắt buộc.");
                 guest.RuleFor(g => g.Services).NotEmpty();
                 guest.RuleFor(g => g.Note)
                     .MaximumLength(AppointmentConst.NOTE_MAX_LENGTH)

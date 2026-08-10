@@ -218,7 +218,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
                 .Include(a => a.Payments)
                 .Include(a => a.Services!)
                     .ThenInclude(s => s.Service)
-                .Include(a => a.TimeSlot)
                 .Include(a => a.CreatedByUser!)
                     .ThenInclude(u => u!.Customer!)
                         .ThenInclude(c => c!.MembershipCard!)
@@ -302,7 +301,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
             if (string.IsNullOrWhiteSpace(customerEmail))
                 return;
 
-            var startTime = appointment.TimeApptStart ?? appointment.TimeSlot?.StartTime;
+            var startTime = appointment.TimeApptStart;
             if (startTime is null)
                 return;
 

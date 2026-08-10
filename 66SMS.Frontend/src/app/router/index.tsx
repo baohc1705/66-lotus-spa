@@ -33,7 +33,6 @@ import {
   WorkSchedulePage,
   BookingRoomListPage,
   BookingPositionListPage,
-  TimeSlotListPage,
   ConfigAppointmentListPage,
   WalletManagementPage,
   SalonListPage,
@@ -232,11 +231,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "timeslots",
-            element: (
-              <WithPageSuspense>
-                <TimeSlotListPage />
-              </WithPageSuspense>
-            ),
+            element: <Navigate to="/admin/config-appointments" replace />,
           },
           {
             path: "config-appointments",

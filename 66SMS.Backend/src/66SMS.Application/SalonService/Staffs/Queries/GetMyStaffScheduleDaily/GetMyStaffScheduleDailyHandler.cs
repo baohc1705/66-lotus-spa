@@ -36,7 +36,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleDaily
 
             var bookings = await appointmentSqlRepository.AsQueryable(true)
                 .Where(a => a.StaffId == staff.Id && a.AppointmentDate == date)
-                .OrderBy(a => a.TimeApptStart ?? a.TimeSlot!.StartTime)
+                .OrderBy(a => a.TimeApptStart)
                 .Select(a => new StaffScheduleBookingDto
                 {
                     Id = a.Id.ToString(),
@@ -46,8 +46,8 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetMyStaffScheduleDaily
                     ServiceName = string.Join(", ", a.Services!
                         .Where(s => s.Service != null)
                         .Select(s => s.Service!.Name)),
-                    StartTime = a.TimeApptStart ?? a.TimeSlot!.StartTime,
-                    EndTime = a.TimeApptEnd ?? a.TimeSlot!.EndTime,
+                    StartTime = a.TimeApptStart,
+                    EndTime = a.TimeApptEnd,
                     Status = a.Status,
                     PaidAmount = a.PaidAmount,
                     TotalAmount = a.TotalAmount,
