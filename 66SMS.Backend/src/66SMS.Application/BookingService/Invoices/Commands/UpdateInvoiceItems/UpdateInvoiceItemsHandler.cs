@@ -1,7 +1,7 @@
 using System.Data;
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Helpers;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Helpers;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
@@ -104,7 +104,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.UpdateInvoiceItems
                 decimal subTotal = 0;
                 foreach (var i in request.Items)
                 {
-                    var quantity = i.Quantity ?? 1;
+                    var quantity = i.Quantity!.Value;
                     var lineDiscount = i.DiscountAmount ?? 0;
                     string itemName;
                     decimal unitPrice;
@@ -144,7 +144,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.UpdateInvoiceItems
                     if (lineTotal < 0) lineTotal = 0;
                     subTotal += lineTotal;
 
-                    invoice.Items.Add(new InvoiceItem
+                    var item = new InvoiceItem
                     {
                         InvoiceId = invoice.Id,
                         ItemType = i.ItemType!.Value,
@@ -152,16 +152,22 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.UpdateInvoiceItems
                         ItemName = itemName,
                         UnitPrice = unitPrice,
                         Quantity = quantity,
-                        DiscountAmount = lineDiscount,
                         LineTotal = lineTotal,
                         StaffId = i.StaffId,
                         Note = i.Note,
                         Status = (int)StatusActiveEnum.ACTIVED,
-                        CommissionRate = commissionRate,
-                        CommissionAmount = commissionRate.HasValue
-                            ? Math.Round(lineTotal * (commissionRate.Value / 100m), 0)
-                            : 0,
-                    });
+                    };
+
+                    if (lineDiscount != 0)
+                        item.DiscountAmount = lineDiscount;
+
+                    if (commissionRate is decimal rate)
+                    {
+                        item.CommissionRate = rate;
+                        item.CommissionAmount = Math.Round(lineTotal * (rate / 100m), 0);
+                    }
+
+                    invoice.Items.Add(item);
                 }
 
                 int? tierId = invoice.MembershipTierId;

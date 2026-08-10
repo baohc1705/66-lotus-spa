@@ -1,6 +1,6 @@
-using _66SMS.Application.DTOs.Certificates;
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Shared;
+using _66SMS.Application.DTOs;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using MediatR;
@@ -21,8 +21,6 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Queries.GetDetailS
         {
             var item = await staffCertificateRepository
                 .AsQueryable()
-                .Include(x => x.Staff)
-                .Include(x => x.CertificateType)
                 .Where(x => x.Id == request.Id && x.Status != StaffCertificateConst.STATUS_DELETED)
                 .Select(x => new StaffCertificateDTO
                 {

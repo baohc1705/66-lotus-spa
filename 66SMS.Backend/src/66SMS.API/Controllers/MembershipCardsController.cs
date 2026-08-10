@@ -4,7 +4,7 @@ using _66SMS.Application.CustomerService.MembershipCards.Commands.DeleteMembersh
 using _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMembershipCards;
 using _66SMS.Application.CustomerService.MembershipCards.Queries.GetAllMembershipCards;
 using _66SMS.Application.CustomerService.MembershipCards.Queries.GetDetailMembershipCard;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

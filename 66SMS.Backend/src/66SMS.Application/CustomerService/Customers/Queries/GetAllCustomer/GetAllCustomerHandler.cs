@@ -1,51 +1,37 @@
-using _66SMS.Application.DTOs.Customers;
-using _66SMS.Contracts.Extensions;
-using _66SMS.Contracts.Shared;
+using _66SMS.Application.DTOs;
+using _66SMS.Contract.Extensions;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
-using AutoMapper;
 using MediatR;
 
 namespace _66SMS.Application.CustomerService.Customers.Queries.GetAllCustomer
 {
-    /// <summary>
-    /// Handler for <see cref="GetAllCustomerQuery"/>
-    /// </summary>
     public class GetAllCustomerHandler : IRequestHandler<GetAllCustomerQuery, Result<PagedResult<CustomerDTO>>>
     {
         private readonly ICustomerSqlRepository customerSqlRepository;
-        private readonly IMapper mapper;
 
-        public GetAllCustomerHandler(ICustomerSqlRepository customerSqlRepository, IMapper mapper)
+        public GetAllCustomerHandler(ICustomerSqlRepository customerSqlRepository)
         {
             this.customerSqlRepository = customerSqlRepository;
-            this.mapper = mapper;
         }
 
         public async Task<Result<PagedResult<CustomerDTO>>> Handle(GetAllCustomerQuery request, CancellationToken cancellationToken)
         {
             var query = customerSqlRepository.AsQueryable();
-            // filter
             if (!string.IsNullOrEmpty(request.Filter))
             {
                 query = query.Where(x => x.FullName.StartsWith(request.Filter) || x.Phone == request.Filter || x.User!.Email == request.Filter);
             }
 
             if (request.Status != null)
-            {
                 query = query.Where(x => x.Status == request.Status);
-            }
 
             if (request.Gender != null)
-            {
                 query = query.Where(x => x.Gender == request.Gender);
-            }
 
             if (!string.IsNullOrEmpty(request.Source))
-            {
                 query = query.Where(x => x.Source == request.Source);
-            }
 
-            // order
             query = request.OrderBy?.ToLower() switch
             {
                 "email" => request.IsDescending ? query.OrderByDescending(x => x.User!.Email) : query.OrderBy(x => x.User!.Email),

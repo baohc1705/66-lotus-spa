@@ -1,7 +1,7 @@
 using _66SMS.Application.BookingService.Helpers;
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
@@ -55,11 +55,7 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetWalletTopUpVnPayUr
             }
 
             var ip = string.IsNullOrWhiteSpace(request.IpAddress) ? "127.0.0.1" : request.IpAddress;
-            var url = vnPayService.CreateWalletTopUpUrl(
-                wallet.Id,
-                request.Amount,
-                $"Nap tien vi {wallet.Id}",
-                ip);
+            var url = vnPayService.CreateWalletTopUpUrl(wallet.Id, request.Amount, ip);
 
             return Result<string>.Success(url);
         }

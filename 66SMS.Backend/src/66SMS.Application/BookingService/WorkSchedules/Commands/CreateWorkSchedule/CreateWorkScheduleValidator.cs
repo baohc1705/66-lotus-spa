@@ -1,4 +1,4 @@
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 using FluentValidation;
 
 namespace _66SMS.Application.BookingService.WorkSchedules.Commands.CreateWorkSchedule

@@ -10,15 +10,17 @@ import {
 } from "@/features/profile/hooks/useMembershipInfo";
 import { useConfigAppointmentBySalon } from "@/features/config_appointments/hooks/useConfigAppointments";
 import { useBookingStore } from "../stores/bookingStore";
-import { useCreateBooking } from "../hooks/useBookingData";
+import {
+  useCreateBooking,
+  useCreateSlotLock,
+  useReleaseSlotLock,
+} from "../hooks/useBookingData";
 import {
   bookingContactSchema,
   type BookingContactFormValues,
 } from "../schemas/booking.schema";
 import type { GuestAppointmentDto } from "../types/booking.types";
 import { formatDate } from "@/shared/utils/date.utils";
-
-const DEFAULT_DEPOSIT_PERCENT = 20;
 
 export function BookingContactStep() {
   const {
@@ -31,18 +33,30 @@ export function BookingContactStep() {
     promotionCode,
     appliedPromotion,
     setCreatedBookingIds,
+    setGuestLockId,
   } = useBookingStore();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { mutateAsync: createBooking } = useCreateBooking();
+  const { mutateAsync: createSlotLockMutation } = useCreateSlotLock();
+  const { mutateAsync: releaseSlotLockMutation } = useReleaseSlotLock();
+  const { mutateAsync: createBookingMutation } = useCreateBooking();
 
   const accessToken = useAuthStore((s) => s.accessToken);
   const membershipCardQuery = useMyMembershipCard(!!accessToken);
   const tiersQuery = useMembershipTiers();
   const configQuery = useConfigAppointmentBySalon(selectedSalon?.id);
-
   const depositPercent =
-    configQuery.data?.data?.depositPercent ?? DEFAULT_DEPOSIT_PERCENT;
+    configQuery.data?.isSuccess === true
+      ? (configQuery.data.data?.depositPercent ?? undefined)
+      : undefined;
+  const hasDepositConfig = typeof depositPercent === "number";
+  const configError =
+    !!selectedSalon?.id &&
+    (configQuery.isError ||
+      (configQuery.isSuccess && configQuery.data?.isSuccess === false) ||
+      (configQuery.isSuccess &&
+        configQuery.data?.isSuccess === true &&
+        !hasDepositConfig));
 
   const membershipTier = tiersQuery.data?.find(
     (t) => t.id === membershipCardQuery.data?.membershipTierId,
@@ -66,42 +80,69 @@ export function BookingContactStep() {
 
   const onSubmit = async (data: BookingContactFormValues) => {
     const invalidGuests = guests.filter(
-      (g) => !g.selectedService || !g.selectedDate || !g.selectedTimeSlot
+      (g) => !g.selectedService || !g.selectedDate || !g.selectedTimeSlot,
     );
 
     if (invalidGuests.length > 0) {
       toast.error(
-        "Vui lòng chọn đầy đủ Dịch vụ và Thời gian cho tất cả khách hàng."
+        "Vui lòng chọn đầy đủ Dịch vụ và Thời gian cho tất cả khách hàng.",
       );
       return;
     }
+
+    if (!hasDepositConfig) {
+      toast.error("Chưa cấu hình phần trăm cọc cho chi nhánh.");
+      return;
+    }
+
+    let lockedIds: number[] = [];
 
     try {
       setIsSubmitting(true);
       setContactInfo(data);
 
-      const payload: GuestAppointmentDto[] = guests.map((guest, index) => {
+      const lockRes = await createSlotLockMutation({
+        locks: guests.map((g) => ({
+          slotId: g.selectedTimeSlot!.slotId,
+          staffId: g.selectedTechnician?.id ?? null,
+          appointmentDate: formatDate(g.selectedDate!).format("YYYY-MM-DD"),
+          serviceId: g.selectedService!.id ?? 0,
+        })),
+      });
+
+      if (!lockRes.success || !lockRes.lockIds?.length) {
+        toast.error(
+          lockRes.message ||
+            "Không thể giữ khung giờ này, vui lòng chọn giờ khác.",
+        );
+        return;
+      }
+
+      lockedIds = lockRes.lockIds;
+      guests.forEach((_g, idx: number) => {
+        if (lockedIds[idx]) {
+          setGuestLockId(idx, lockedIds[idx]);
+        }
+      });
+
+      const payload: GuestAppointmentDto[] = guests.map((guest, index: number) => {
         const isFirstGuest = index === 0;
-        const notePrefix = `[Đại diện: ${data.fullName} - SĐT: ${data.phoneNumber}]`;
-        const finalNote =
-          isFirstGuest && data.note
-            ? `${notePrefix} - Ghi chú: ${data.note}`
-            : notePrefix;
+        const customerNote = data.note?.trim();
 
         return {
-          lockId: guest.lockId,
+          lockId: lockedIds[index],
           staffId: guest.selectedTechnician?.id ?? null,
           slotId: guest.selectedTimeSlot!.slotId || 0,
           appointmentDate: formatDate(guest.selectedDate!).format("YYYY-MM-DD"),
           salonId: selectedSalon?.id ?? null,
-          note: finalNote,
+          note: isFirstGuest && customerNote ? customerNote : undefined,
           services: [
             { serviceId: guest.selectedService!.id ?? 0, quantity: 1 },
           ],
         };
       });
 
-      const result = await createBooking({
+      const result = await createBookingMutation({
         promotionCode: appliedPromotion ? promotionCode : undefined,
         guests: payload,
       });
@@ -110,10 +151,13 @@ export function BookingContactStep() {
         setCreatedBookingIds(result.bookingIds || []);
         toast.success("Đặt lịch thành công! Cảm ơn bạn đã tin tưởng.");
         nextStep();
+      } else if (lockedIds.length > 0) {
+        await releaseSlotLockMutation(lockedIds).catch(() => undefined);
       }
-    } catch (error) {
-      toast.error("Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.");
-      console.error(error);
+    } catch {
+      if (lockedIds.length > 0) {
+        await releaseSlotLockMutation(lockedIds).catch(() => undefined);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -129,10 +173,12 @@ export function BookingContactStep() {
       : 0;
   const promoDiscount = appliedPromotion ? appliedPromotion.discountAmount : 0;
   const finalTotal = Math.max(0, servicesSubTotal - membershipDiscount - promoDiscount);
-  const depositPreview = Math.round((finalTotal * depositPercent) / 100);
+  const depositPreview = hasDepositConfig
+    ? Math.round((finalTotal * depositPercent) / 100)
+    : 0;
 
   const inputClass = (hasError: boolean) =>
-    `w-full rounded-sm border bg-surface px-4 py-3 text-sm text-ink transition-colors placeholder:text-warm-600 hover:border-warm-300 focus:outline-none focus:border-rose-600 ${
+    `w-full rounded-sm border bg-surface px-4 py-3 text-sm text-ink transition-colors placeholder:text-warm-600 hover:border-warm-300 focus:outline-hidden focus:border-rose-600 ${
       hasError ? "border-error-text" : "border-warm-100"
     }`;
 
@@ -143,20 +189,36 @@ export function BookingContactStep() {
         <span>Thông tin liên hệ</span>
       </h3>
 
-      <div className="p-4 rounded-sm border border-warning-bg bg-warning-bg flex gap-3">
-        <Wallet className="w-5 h-5 text-warning-text shrink-0 mt-0.5" />
-        <div className="text-sm text-ink">
-          <p className="font-semibold text-ink">
-            Đặt cọc {depositPercent}% để giữ lịch
-          </p>
-          <p className="mt-1 text-warm-600">
-            Sau khi xác nhận, bạn sẽ cần thanh toán cọc{" "}
-            <strong className="text-rose-600">{depositPreview.toLocaleString("vi-VN")}đ</strong> cho tổng
-            cộng {guests.length} khách. Phần còn lại thu sau khi sử dụng dịch vụ
-            tại spa.
-          </p>
+      {configError ? (
+        <div className="p-4 rounded-sm border border-error-text/30 bg-error-bg flex gap-3">
+          <Info className="w-5 h-5 text-error-text shrink-0 mt-0.5" />
+          <div className="text-sm text-ink">
+            <p className="font-semibold text-error-text">
+              Chưa cấu hình phần trăm cọc cho chi nhánh
+            </p>
+            <p className="mt-1 text-warm-600">
+              Vui lòng liên hệ spa để cấu hình trước khi đặt lịch.
+            </p>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="p-4 rounded-sm border border-warning-bg bg-warning-bg flex gap-3">
+          <Wallet className="w-5 h-5 text-warning-text shrink-0 mt-0.5" />
+          <div className="text-sm text-ink">
+            <p className="font-semibold text-ink">
+              Đặt cọc {depositPercent}% để giữ lịch
+            </p>
+            <p className="mt-1 text-warm-600">
+              Sau khi xác nhận, bạn sẽ cần thanh toán cọc{" "}
+              <strong className="text-rose-600">
+                {depositPreview.toLocaleString("vi-VN")}đ
+              </strong>{" "}
+              cho tổng cộng {guests.length} khách. Phần còn lại thu sau khi sử
+              dụng dịch vụ tại spa.
+            </p>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -232,7 +294,7 @@ export function BookingContactStep() {
             {...register("note")}
             rows={3}
             placeholder="Yêu cầu chung cho đoàn khách..."
-            className="w-full resize-none rounded-sm border border-warm-100 bg-surface px-4 py-3 text-sm text-ink placeholder:text-warm-600 hover:border-warm-300 focus:outline-none focus:border-rose-600"
+            className="w-full resize-none rounded-sm border border-warm-100 bg-surface px-4 py-3 text-sm text-ink placeholder:text-warm-600 hover:border-warm-300 focus:outline-hidden focus:border-rose-600"
           />
         </div>
 
@@ -248,7 +310,7 @@ export function BookingContactStep() {
           </button>
           <button
             type="submit"
-            disabled={!isValid || isSubmitting}
+            disabled={!isValid || isSubmitting || !hasDepositConfig}
             className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3 rounded-full font-bold transition-all bg-rose-600 text-white hover:bg-rose-500 disabled:bg-warm-50 disabled:text-warm-300 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (

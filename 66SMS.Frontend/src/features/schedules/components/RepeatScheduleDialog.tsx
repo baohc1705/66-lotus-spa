@@ -167,7 +167,7 @@ export function RepeatScheduleDialog({
           <div className="bg-adminGray-50/40 border border-adminGreen-600/20 rounded-lg px-4 py-3 flex items-start gap-3">
             <CalendarDays
               size={16}
-              className="text-adminGreen-600 mt-0.5 flex-shrink-0"
+              className="text-adminGreen-600 mt-0.5 shrink-0"
             />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-adminInk">{weekLabel}</p>
@@ -224,7 +224,7 @@ export function RepeatScheduleDialog({
               <div className="flex items-start gap-2 bg-state-warning-bg border border-state-warning-border rounded-lg px-4 py-3">
                 <AlertCircle
                   size={15}
-                  className="text-adminGold-600 flex-shrink-0 mt-0.5"
+                  className="text-adminGold-600 shrink-0 mt-0.5"
                 />
                 <p className="text-sm text-state-warning-text">
                   Tuần kết thúc phải sau tuần hiện tại.

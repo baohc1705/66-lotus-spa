@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Application.DTOs
+namespace _66SMS.Application.DTOs
 {
     public class StaffAvailabilityDto
     {

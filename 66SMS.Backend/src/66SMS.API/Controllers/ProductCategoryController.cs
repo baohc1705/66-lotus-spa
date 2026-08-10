@@ -51,8 +51,7 @@ namespace _66SMS.API.Controllers
 
         [HttpDelete("bulk")]
         [PermissionAuthorize("products", "delete")]
-        public async Task<IActionResult> DeleteMultiples(
-            [FromBody] DeleteProductCategoryMultiplesCommand command)
+        public async Task<IActionResult> DeleteMultiples([FromBody] DeleteProductCategoryMultiplesCommand command)
         {
             var result = await mediator.Send(command);
             return HandleResult(result);

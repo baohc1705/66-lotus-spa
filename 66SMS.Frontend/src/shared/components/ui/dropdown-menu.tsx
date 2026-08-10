@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import * as React from "react"
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
@@ -64,7 +64,7 @@ function DropdownMenuContent({
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
         align={align}
-        className={cn("z-50 min-w-[160px] overflow-hidden bg-white rounded-md shadow-md py-2 text-sm duration-150 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2", className)}
+        className={cn("z-50 min-w-40 overflow-hidden bg-white rounded-md shadow-md py-2 text-sm duration-150 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2", className)}
         {...props}
       />
     </DropdownMenuPrimitive.Portal>
@@ -85,7 +85,7 @@ function DropdownMenuItem({
       data-slot="dropdown-menu-item"
       data-inset={inset}
       data-variant={variant}
-      className={cn("relative flex cursor-default select-none items-center gap-3 px-4 py-2 text-sm outline-none transition-colors data-inset:pl-8 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", variant === "default" && "text-lotus-deep focus:bg-adminGray-50/50", variant === "destructive" && "text-state-danger-text focus:bg-state-danger-bg focus:text-state-danger-text", className)}
+      className={cn("relative flex cursor-default select-none items-center gap-3 px-4 py-2 text-sm outline-hidden transition-colors data-inset:pl-8 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", variant === "default" && "text-lotus-deep focus:bg-adminGray-50/50", variant === "destructive" && "text-state-danger-text focus:bg-state-danger-bg focus:text-state-danger-text", className)}
       {...props}
     />
   )
@@ -100,7 +100,7 @@ function DropdownMenuCheckboxItem({
   return (
     <DropdownMenuPrimitive.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
-      className={cn("relative flex cursor-default select-none items-center gap-2 py-2 pl-8 pr-4 text-sm outline-none transition-colors text-lotus-deep focus:bg-adminGray-50/50 data-disabled:pointer-events-none data-disabled:opacity-50", className)}
+      className={cn("relative flex cursor-default select-none items-center gap-2 py-2 pl-8 pr-4 text-sm outline-hidden transition-colors text-lotus-deep focus:bg-adminGray-50/50 data-disabled:pointer-events-none data-disabled:opacity-50", className)}
       checked={checked}
       {...props}
     >
@@ -122,7 +122,7 @@ function DropdownMenuRadioItem({
   return (
     <DropdownMenuPrimitive.RadioItem
       data-slot="dropdown-menu-radio-item"
-      className={cn("relative flex cursor-default select-none items-center gap-2 py-2 pl-8 pr-4 text-sm outline-none transition-colors text-lotus-deep focus:bg-adminGray-50/50 data-disabled:pointer-events-none data-disabled:opacity-50", className)}
+      className={cn("relative flex cursor-default select-none items-center gap-2 py-2 pl-8 pr-4 text-sm outline-hidden transition-colors text-lotus-deep focus:bg-adminGray-50/50 data-disabled:pointer-events-none data-disabled:opacity-50", className)}
       {...props}
     >
       <span className="absolute left-2 flex size-4 items-center justify-center text-adminGreen-600">
@@ -174,7 +174,7 @@ function DropdownMenuSubTrigger({
 }) {
   return (
     <DropdownMenuPrimitive.SubTrigger
-      className={cn("flex cursor-default select-none items-center gap-2 px-4 py-2 text-sm outline-none text-lotus-deep focus:bg-adminGray-50/50 data-inset:pl-8", inset && "pl-8", className)}
+      className={cn("flex cursor-default select-none items-center gap-2 px-4 py-2 text-sm outline-hidden text-lotus-deep focus:bg-adminGray-50/50 data-inset:pl-8", inset && "pl-8", className)}
       {...props}
     >
       {children}

@@ -6,8 +6,8 @@ namespace _66SMS.Domain.Entities
     {
         public int WalletId { get; set; }
         public int? AppointmentPaymentId { get; set; }
-        public decimal Amount { get; set; }
-        public decimal BalanceAfter { get; set; }
+        public decimal Amount { get; set; } = 0;
+        public decimal BalanceAfter { get; set; } = 0;
         public int Type { get; set; }
         public string? Note { get; set; }
         public int Status { get; set; }

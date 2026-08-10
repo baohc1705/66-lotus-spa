@@ -1,4 +1,4 @@
-import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+﻿import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ScheduleViewMode } from "../types";
 
@@ -55,7 +55,7 @@ export function StaffScheduleToolbar({
       : (weekLabel ?? "");
 
   return (
-    <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-4 rounded-admin border border-adminGray-100/30 shadow-sm">
+    <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-4 rounded-admin border border-adminGray-100/30 shadow-xs">
       <div className="flex items-center gap-2">
         <div className="flex bg-adminGray-100 p-0.5 rounded-lg border border-adminGray-100/50 h-9">
           <button
@@ -64,7 +64,7 @@ export function StaffScheduleToolbar({
             className={cn(
               "px-3 py-1.5 text-sm font-semibold rounded-md transition-colors",
               viewMode === "day"
-                ? "bg-white text-primary shadow-sm"
+                ? "bg-white text-primary shadow-xs"
                 : "text-adminGray-600 hover:text-adminInk",
             )}
           >
@@ -76,7 +76,7 @@ export function StaffScheduleToolbar({
             className={cn(
               "px-3 py-1.5 text-sm font-semibold rounded-md transition-colors",
               viewMode === "week"
-                ? "bg-white text-primary shadow-sm"
+                ? "bg-white text-primary shadow-xs"
                 : "text-adminGray-600 hover:text-adminInk",
             )}
           >
@@ -130,7 +130,7 @@ export function StaffScheduleToolbar({
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <div className="flex items-center gap-2 px-3 text-sm font-semibold text-adminInk min-w-[200px] justify-center select-none">
+          <div className="flex items-center gap-2 px-3 text-sm font-semibold text-adminInk min-w-48 justify-center select-none">
             <Calendar className="w-4 h-4 text-adminGray-600 shrink-0" />
             <span className="truncate">{dateLabel}</span>
           </div>

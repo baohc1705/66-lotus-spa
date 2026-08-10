@@ -1,4 +1,4 @@
-import * as React from "react"
+﻿import * as React from "react"
 import { Select as SelectPrimitive } from "radix-ui"
 import { ChevronDownIcon, ChevronUpIcon, CheckIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -35,12 +35,12 @@ function SelectTrigger({
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
-      className={cn("flex w-full items-center justify-between gap-2 rounded-none border border-adminGray-300 bg-white px-3 py-2 text-sm whitespace-nowrap select-none text-lotus-deep data-placeholder:text-lotus-stone outline-none transition-colors duration-150 hover:border-adminGray-400 focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-adminGray-50 [&_svg]:pointer-events-none [&_svg]:shrink-0", className)}
+      className={cn("flex w-full items-center justify-between gap-2 rounded-none border border-adminGray-300 bg-white px-3 py-2 text-sm whitespace-nowrap select-none text-lotus-deep data-placeholder:text-lotus-stone outline-hidden transition-colors duration-150 hover:border-adminGray-400 focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-adminGray-50 [&_svg]:pointer-events-none [&_svg]:shrink-0", className)}
       {...props}
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="size-4 text-lotus-stone shrink-0" />
+        <ChevronDownIcon className="size-4 shrink-0 opacity-80" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   )
@@ -57,7 +57,7 @@ function SelectContent({
       <SelectPrimitive.Content
         data-slot="select-content"
         position={position}
-        className={cn("relative z-[90] min-w-[8rem] max-h-[--radix-select-content-available-height] origin-[--radix-select-content-transform-origin] overflow-x-hidden overflow-y-auto bg-white rounded-md shadow-md text-lotus-deep duration-150 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2", position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1 *:data-[slot=select-viewport]:h-[--radix-select-trigger-height] *:data-[slot=select-viewport]:w-full *:data-[slot=select-viewport]:min-w-[--radix-select-trigger-width]", className)}
+        className={cn("relative z-50 min-w-[8rem] max-h-[--radix-select-content-available-height] origin-[--radix-select-content-transform-origin] overflow-x-hidden overflow-y-auto bg-white rounded-md shadow-md text-lotus-deep duration-150 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2", position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1 *:data-[slot=select-viewport]:h-[--radix-select-trigger-height] *:data-[slot=select-viewport]:w-full *:data-[slot=select-viewport]:min-w-[--radix-select-trigger-width]", className)}
         {...props}
       >
         <SelectScrollUpButton />
@@ -91,7 +91,7 @@ function SelectItem({
   return (
     <SelectPrimitive.Item
       data-slot="select-item"
-      className={cn("relative flex w-full cursor-default select-none items-center gap-2 rounded-sm py-2 pl-3 pr-8 text-sm outline-none text-lotus-deep focus:bg-adminGray-50/50 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", className)}
+      className={cn("relative flex w-full cursor-default select-none items-center gap-2 rounded-sm py-2 pl-3 pr-8 text-sm outline-hidden text-lotus-deep focus:bg-adminGray-50/50 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", className)}
       {...props}
     >
       <span className="pointer-events-none absolute right-2 flex size-4 items-center justify-center text-adminGreen-600">

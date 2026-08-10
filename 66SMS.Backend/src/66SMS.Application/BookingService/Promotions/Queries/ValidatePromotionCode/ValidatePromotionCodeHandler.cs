@@ -1,7 +1,7 @@
-using _66SMS.Application.DTOs.Promotions;
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Helpers;
-using _66SMS.Contracts.Shared;
+using _66SMS.Application.DTOs;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Helpers;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using MediatR;
@@ -55,7 +55,7 @@ namespace _66SMS.Application.BookingService.Promotions.Queries.ValidatePromotion
             {
                 var percent = promo.DiscountValue ?? 0m;
                 discountAmount = Math.Round(request.OrderTotal * percent / 100m, 0, MidpointRounding.AwayFromZero);
-                
+
                 if (promo.MaxDiscountAmount > 0 && discountAmount > promo.MaxDiscountAmount.Value)
                 {
                     discountAmount = promo.MaxDiscountAmount.Value;

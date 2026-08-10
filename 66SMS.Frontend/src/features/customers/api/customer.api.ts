@@ -1,5 +1,4 @@
 import axiosInstance from "@/shared/api/axiosInstance";
-import { API } from "@/shared/api/endpoints";
 import type {
   Result,
   PagedResult,
@@ -11,25 +10,23 @@ import type {
   UpdateCustomerPayload,
 } from "../types/customer.types";
 
-const BASE = API.customers;
-
 export const customerApi = {
   getAll: (params: PageRequest) =>
     axiosInstance
-      .get<Result<PagedResult<CustomerDto>>>(BASE, { params })
+      .get<Result<PagedResult<CustomerDto>>>("/customer", { params })
       .then((r) => r.data),
 
   getDetail: (id: number) =>
-    axiosInstance.get<Result<CustomerDto>>(`${BASE}/${id}`).then((r) => r.data),
+    axiosInstance.get<Result<CustomerDto>>(`/customer/${id}`).then((r) => r.data),
 
   create: (payload: CreateCustomerPayload) =>
-    axiosInstance.post<Result<object>>(BASE, payload).then((r) => r.data),
+    axiosInstance.post<Result<object>>("/customer", payload).then((r) => r.data),
 
   update: (id: number, payload: UpdateCustomerPayload) =>
     axiosInstance
-      .patch<Result<object>>(`${BASE}/${id}`, payload)
+      .patch<Result<object>>(`/customer/${id}`, payload)
       .then((r) => r.data),
 
   delete: (id: number) =>
-    axiosInstance.delete<Result<object>>(`${BASE}/${id}`).then((r) => r.data),
+    axiosInstance.delete<Result<object>>(`/customer/${id}`).then((r) => r.data),
 };

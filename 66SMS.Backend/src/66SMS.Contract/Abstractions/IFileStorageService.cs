@@ -1,4 +1,4 @@
-namespace _66SMS.Contracts.Abstractions
+namespace _66SMS.Contract.Abstractions
 {
     /// <summary>
     /// Service lưu trữ file dùng chung. Đặt tên tổng quát (không gắn Cloudinary) để dễ

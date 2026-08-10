@@ -18,7 +18,7 @@ const badgeVariants = cva(
         gold: "bg-[var(--spa-gold-light)] text-[var(--spa-gold)]",
         blush: "bg-[var(--spa-blush)] text-[var(--spa-rose)]",
         white:
-          "bg-white/20 text-white border border-white/30 backdrop-blur-sm",
+          "bg-white/20 text-white border border-white/30 backdrop-blur-xs",
         admin:
           "bg-adminGreen-100 text-adminGreen-900",
         success: "bg-state-success-bg text-state-success-text",

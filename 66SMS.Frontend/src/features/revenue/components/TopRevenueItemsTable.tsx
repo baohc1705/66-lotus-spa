@@ -48,7 +48,7 @@ export const TopRevenueItemsTable = memo(function TopRevenueItemsTable({
               onClick={() => setActiveTab(t.key)}
               className={`px-2.5 py-0.5 text-2xs font-semibold rounded-[4px] transition-all ${
                 activeTab === t.key
-                  ? "bg-white text-adminInk shadow-sm"
+                  ? "bg-white text-adminInk shadow-xs"
                   : "text-adminGray-400 hover:text-adminGray-600"
               }`}
             >

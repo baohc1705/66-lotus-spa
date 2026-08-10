@@ -1,16 +1,13 @@
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.Logout
 {
-    /// <summary>
-    /// Handler for <see cref="LogoutCommand"/>
-    /// </summary>
     public class LogoutHandler : IRequestHandler<LogoutCommand, Result<object>>
     {
         private readonly IRefreshTokenSqlRepository refreshTokenSqlRepository;

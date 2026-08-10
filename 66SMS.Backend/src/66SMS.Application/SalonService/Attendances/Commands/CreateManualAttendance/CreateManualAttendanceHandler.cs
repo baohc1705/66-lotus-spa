@@ -1,12 +1,12 @@
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using System.Data;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.SalonService.Attendances.Commands.CreateManualAttendance
 {
@@ -25,7 +25,6 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CreateManualAtten
         {
             var workDate = request.WorkDate ?? DateTimeHelper.UtcNow().ToDateOnly();
 
-            // Mỗi ca (workSchedule) một bản ghi — tránh đụng các ca khác cùng ngày
             bool exists;
             if (request.WorkScheduleId.HasValue && request.WorkScheduleId > 0)
             {
@@ -52,7 +51,6 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CreateManualAtten
                 WorkScheduleId = request.WorkScheduleId,
                 WorkDate = workDate,
                 Status = request.Status,
-                WorkedHours = 0,
                 Note = request.Note,
                 CreatedAt = DateTimeHelper.UtcNow(),
             };

@@ -1,12 +1,8 @@
-using _66SMS.Application.Abstractions;
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Constants;
-using _66SMS.Contracts.Settings;
+using _66SMS.Contract.Constants;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Persistence.Repositories.Sql;
 using _66SMS.Persistence.Repositories.Sql.Base;
-using _66SMS.Persistence.StoredProcedures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,10 +20,6 @@ namespace _66SMS.Persistence.DependencyInjection
                options.UseSqlServer(connectionString)
                ;
             });
-
-            services.AddOptions<StoredProcedureSettings>()
-                .Bind(configuration.GetSection(StoredProcedureSettings.SectionName));
-            services.AddScoped<IStoredProcedureExecutor, SqlStoredProcedureExecutor>();
 
             services.RegisterRepositories();
             return services;
@@ -75,7 +67,6 @@ namespace _66SMS.Persistence.DependencyInjection
 
             services.AddScoped<ITimeSlotSqlRepository, TimeSlotSqlRepository>();
             services.AddScoped<IConfigAppointmentSqlRepository, ConfigAppointmentSqlRepository>();
-            services.AddScoped<IBookingContextProvider, BookingContextProvider>();
 
             services.AddScoped<ISalonSqlRepository, SalonSqlRepository>();
             services.AddScoped<ILandingBannerSqlRepository, LandingBannerSqlRepository>();

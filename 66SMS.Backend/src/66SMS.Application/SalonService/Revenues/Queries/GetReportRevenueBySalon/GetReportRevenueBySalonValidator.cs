@@ -1,4 +1,4 @@
-﻿using _66SMS.Domain.Constants;
+using _66SMS.Domain.Constants;
 using FluentValidation;
 
 namespace _66SMS.Application.SalonService.Revenues.Queries.GetReportRevenueBySalon

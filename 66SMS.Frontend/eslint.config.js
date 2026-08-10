@@ -18,5 +18,17 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+  //   rules: {
+  //     'react-refresh/only-export-components': [
+  //       'error',
+  //       { allowConstantExport: true, extraHOCs: ['lazy'] },
+  //     ],
+  //   },
+  // },
+  // {
+  //   files: ['src/app/router/lazyPages.tsx', 'src/app/router/index.tsx'],
+  //   rules: {
+  //     'react-refresh/only-export-components': 'off',
+  //   },
   },
 ])

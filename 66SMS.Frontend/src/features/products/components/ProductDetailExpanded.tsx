@@ -51,10 +51,10 @@ export function ProductDetailExpanded({
     product.images?.[0]?.url;
 
   return (
-    <div className="bg-adminGray-50/30 w-full overflow-hidden max-h-[400px] overflow-y-auto custom-scrollbar p-4 m-0">
+    <div className="bg-adminGray-50/30 w-full overflow-hidden max-h-100 overflow-y-auto custom-scrollbar p-4 m-0">
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4 pb-4 border-b border-adminGray-100/50">
-          <div className="w-16 h-16 rounded-xl bg-adminGray-50/50 flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-adminGray-100/50 p-1">
+          <div className="w-16 h-16 rounded-xl bg-adminGray-50/50 flex items-center justify-center shrink-0 overflow-hidden shadow-xs border border-adminGray-100/50 p-1">
             {primaryImage ? (
               <img
                 src={primaryImage}
@@ -108,7 +108,7 @@ export function ProductDetailExpanded({
               variant="admin"
               size="sm"
               onClick={() => onEdit?.(product)}
-              className="bg-adminGreen-600 hover:opacity-90 text-white shadow-sm h-8 px-4 text-sm gap-1.5 rounded-md transition-opacity"
+              className="bg-adminGreen-600 hover:opacity-90 text-white shadow-xs h-8 px-4 text-sm gap-1.5 rounded-md transition-opacity"
             >
               <Pencil className="w-3.5 h-3.5" />
               Cập nhật

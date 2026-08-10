@@ -17,6 +17,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
         public static VnPayIpnResponse OrderNotFound() => new VnPayIpnResponse { RspCode = "01", Message = "Order not found" };
         public static VnPayIpnResponse OrderAlreadyConfirmed() => new VnPayIpnResponse { RspCode = "02", Message = "Order already confirmed" };
         public static VnPayIpnResponse InvalidAmount() => new VnPayIpnResponse { RspCode = "04", Message = "Invalid amount" };
+        public static VnPayIpnResponse InvalidOrder() => new VnPayIpnResponse { RspCode = "04", Message = "Invalid order" };
         public static VnPayIpnResponse InvalidSignature() => new VnPayIpnResponse { RspCode = "97", Message = "Invalid signature" };
         public static VnPayIpnResponse UnknownError() => new VnPayIpnResponse { RspCode = "99", Message = "Unknown error" };
     }

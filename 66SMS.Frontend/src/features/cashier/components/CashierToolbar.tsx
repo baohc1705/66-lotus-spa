@@ -80,7 +80,7 @@ export function CashierToolbar({
           <input
             type="text"
             placeholder="Tìm khách hàng (F4)..."
-            className="pl-8 pr-3 py-1 bg-white border border-adminGray-100 rounded-[3px] text-xs w-48 focus:outline-none focus:ring-1 focus:ring-adminGreen-600 focus:border-adminGreen-600 transition-all text-adminInk placeholder:text-adminGray-600"
+            className="pl-8 pr-3 py-1 bg-white border border-adminGray-100 rounded-[3px] text-xs w-48 focus:outline-hidden focus:ring-1 focus:ring-adminGreen-600 focus:border-adminGreen-600 transition-all text-adminInk placeholder:text-adminGray-600"
           />
         </div>
         <button className="w-7 h-7 flex items-center justify-center rounded-[3px] border border-adminGray-100 bg-white hover:bg-adminGray-50 text-adminInk transition-colors">
@@ -185,7 +185,7 @@ export function CashierToolbar({
 
         <button
           onClick={onAddBooking}
-          className="flex items-center gap-1 px-2.5 py-1 bg-adminGreen-600 text-white text-xs font-bold rounded-[3px] hover:bg-adminGreen-600/90 transition-all shadow-sm"
+          className="flex items-center gap-1 px-2.5 py-1 bg-adminGreen-600 text-white text-xs font-bold rounded-[3px] hover:bg-adminGreen-600/90 transition-all shadow-xs"
         >
           <Plus className="w-3.5 h-3.5" />
           Thêm lịch

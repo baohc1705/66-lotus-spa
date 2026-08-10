@@ -31,7 +31,7 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     const data = payload[0].payload;
     const color = payload[0].color ?? "var(--admin-green-600)";
     return (
-      <div className="bg-white/95 backdrop-blur-sm border border-adminGray-100/50 p-2.5 rounded-admin shadow-lg text-xs font-sans">
+      <div className="bg-white/95 backdrop-blur-xs border border-adminGray-100/50 p-2.5 rounded-admin shadow-lg text-xs font-sans">
         <p className="font-semibold text-adminInk flex items-center gap-1.5">
           <span
             className="w-2 h-2 rounded-full"

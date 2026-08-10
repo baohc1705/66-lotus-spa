@@ -83,7 +83,7 @@ export function CashierHeader({
           >
             <ReceiptText className="w-3.5 h-3.5" />
             Hóa đơn
-            <div className="ml-0.5 w-4 h-4 rounded-[3px] bg-adminGold-600 text-adminGreen-950 flex items-center justify-center shadow-sm">
+            <div className="ml-0.5 w-4 h-4 rounded-[3px] bg-adminGold-600 text-adminGreen-950 flex items-center justify-center shadow-xs">
               <Plus className="w-2.5 h-2.5 font-bold" />
             </div>
           </button>
@@ -109,7 +109,7 @@ export function CashierHeader({
         <div className="border-l border-white/20 pl-2.5 flex items-center gap-2 relative">
           <button
             onClick={() => setIsProfileOpen(!isProfileOpen)}
-            className="flex items-center gap-2 text-left hover:opacity-90 transition-opacity focus:outline-none"
+            className="flex items-center gap-2 text-left hover:opacity-90 transition-opacity focus:outline-hidden"
           >
             <div className="text-right hidden sm:block">
               <div className="text-2xs text-adminGold-100 font-bold uppercase tracking-wider">
@@ -119,7 +119,7 @@ export function CashierHeader({
                 {cashierName}
               </div>
             </div>
-            <div className="w-7 h-7 flex items-center justify-center rounded-[3px] bg-white/10 text-white border border-white/20 hover:bg-white/20 hover:shadow-sm transition-all duration-300">
+            <div className="w-7 h-7 flex items-center justify-center rounded-[3px] bg-white/10 text-white border border-white/20 hover:bg-white/20 hover:shadow-xs transition-all duration-300">
               <Menu className="w-4 h-4" />
             </div>
           </button>

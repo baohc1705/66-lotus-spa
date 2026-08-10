@@ -1,5 +1,5 @@
-using _66SMS.Application.DTOs.Revenues;
-using _66SMS.Contracts.Shared;
+using _66SMS.Application.DTOs;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
 
@@ -19,7 +19,6 @@ namespace _66SMS.Application.SalonService.Revenues.Queries.GetTodaySummary
             GetTodaySummaryQuery request,
             CancellationToken cancellationToken)
         {
-            // Ngày local VN (+07)
             var todayVn = DateOnly.FromDateTime(
                 DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(7)).DateTime);
 

@@ -115,7 +115,7 @@ export function RevenueDashboard() {
   };
 
   const inputClass =
-    "text-xs text-adminInk font-semibold bg-transparent border-none outline-none cursor-pointer";
+    "text-xs text-adminInk font-semibold bg-transparent border-none outline-hidden cursor-pointer";
 
   return (
     <div className="space-y-2 pb-10">

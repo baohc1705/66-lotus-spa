@@ -1,4 +1,4 @@
-﻿using _66SMS.Domain.Entities;
+using _66SMS.Domain.Entities;
 using FluentValidation;
 
 namespace _66SMS.Application.BookingService.WorkSchedules.Commands.DeleteWorkSchedule

@@ -6,7 +6,7 @@ namespace _66SMS.Domain.Entities
     {
         public int StaffId { get; set; }
         public int SalonId { get; set; }
-        public bool IsManager { get; set; }
+        public bool IsManager { get; set; } = false;
         public DateOnly StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
         public int Status { get; set; }

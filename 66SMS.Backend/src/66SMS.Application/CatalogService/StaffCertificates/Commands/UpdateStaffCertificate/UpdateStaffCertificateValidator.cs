@@ -7,6 +7,7 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.UpdateSta
     {
         public UpdateStaffCertificateValidator()
         {
+            RuleFor(x => x.Id).NotNull().GreaterThan(0);
             RuleFor(x => x.CertificateTypeId).NotNull().GreaterThan(0);
             RuleFor(x => x.CertificateName).NotNull().NotEmpty().MaximumLength(StaffCertificateConst.CERTIFICATE_NAME_MAX_LENGTH);
             RuleFor(x => x.IssuingOrganization).NotNull().NotEmpty().MaximumLength(StaffCertificateConst.ISSUING_ORGANIZATION_MAX_LENGTH);

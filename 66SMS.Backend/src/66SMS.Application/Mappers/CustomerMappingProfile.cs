@@ -4,8 +4,7 @@ using _66SMS.Application.CustomerService.MembershipCards.Commands.CreateMembersh
 using _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMembershipCards;
 using _66SMS.Application.CustomerService.MembershipTiers.Commands.CreateMembershipTiers;
 using _66SMS.Application.CustomerService.MembershipTiers.Commands.UpdateMembershipTiers;
-using _66SMS.Application.DTOs.MembershipCards;
-using _66SMS.Application.DTOs.MembershipTiers;
+using _66SMS.Application.DTOs;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 

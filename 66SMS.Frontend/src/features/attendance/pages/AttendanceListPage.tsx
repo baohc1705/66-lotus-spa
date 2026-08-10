@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/features/auth/stores/authStore";
+﻿import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useWorkSchedules } from "@/features/schedules/hooks/useSchedules";
 import type { WorkScheduleDTO } from "@/features/schedules/types/schedule.types";
 import { useShifts } from "@/features/shifts/hooks/useShifts";
@@ -199,7 +199,7 @@ export function AttendanceListPage() {
     const att = ws.id ? scheduleAttendanceMap.get(ws.id) : null;
 
     const defaultClass =
-      "w-full text-left p-2.5 border rounded-xl transition-all focus:outline-none focus:ring-1 shadow-sm";
+      "w-full text-left p-2.5 border rounded-xl transition-all focus:outline-hidden focus:ring-1 shadow-xs";
 
     if (!att) {
       return {
@@ -261,7 +261,7 @@ export function AttendanceListPage() {
 
   return (
     <div className="space-y-2">
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-2 rounded border border-adminGray-100/30 shadow-sm">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-2 rounded border border-adminGray-100/30 shadow-xs">
         <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto">
           {isAdminOrManager && (
             <div className="relative w-full sm:w-64">
@@ -274,7 +274,7 @@ export function AttendanceListPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm kiếm nhân viên..."
-                className="pl-9 pr-4 py-2 bg-white border border-adminGray-100/50 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-adminGreen-600 w-full transition-all placeholder:text-adminGray-400"
+                className="pl-9 pr-4 py-2 bg-white border border-adminGray-100/50 rounded-xl text-sm focus:outline-hidden focus:ring-1 focus:ring-adminGreen-600 w-full transition-all placeholder:text-adminGray-400"
               />
             </div>
           )}
@@ -311,7 +311,7 @@ export function AttendanceListPage() {
         </div>
         <div className="flex items-center gap-3 w-full xl:w-auto justify-end">
           <div className=""></div>
-          <div className="flex items-center bg-white border border-adminGray-100/50 rounded-xl overflow-hidden shadow-sm h-9">
+          <div className="flex items-center bg-white border border-adminGray-100/50 rounded-xl overflow-hidden shadow-xs h-9">
             <button
               type="button"
               onClick={handlePrevWeek}
@@ -319,7 +319,7 @@ export function AttendanceListPage() {
             >
               <ChevronLeft size={16} />
             </button>
-            <div className="px-4 text-sm font-bold text-adminInk select-none min-w-[200px] text-center border-x border-adminGray-100">
+            <div className="px-4 text-sm font-bold text-adminInk select-none min-w-48 text-center border-x border-adminGray-100">
               {weekLabel}
             </div>
             <button
@@ -334,7 +334,7 @@ export function AttendanceListPage() {
           <button
             type="button"
             onClick={handleThisWeek}
-            className="text-sm font-bold text-adminGray-600 hover:text-adminInk border border-adminGray-100/60 hover:bg-adminGray-50 px-4 h-9 rounded-xl transition-all shadow-sm"
+            className="text-sm font-bold text-adminGray-600 hover:text-adminInk border border-adminGray-100/60 hover:bg-adminGray-50 px-4 h-9 rounded-xl transition-all shadow-xs"
           >
             Tuần này
           </button>
@@ -342,7 +342,7 @@ export function AttendanceListPage() {
       </div>
 
       {isPageLoading ? (
-        <div className="flex items-center justify-center py-24 bg-white rounded border border-adminGray-100/30 shadow-sm min-h-[400px]">
+        <div className="flex items-center justify-center py-24 bg-white rounded border border-adminGray-100/30 shadow-xs min-h-[400px]">
           <div className="flex flex-col items-center gap-3">
             <div className="w-8 h-8 animate-spin rounded-full border-4 border-adminGray-100 border-t-lotus-leaf" />
             <p className="text-sm font-semibold text-adminGray-600">
@@ -351,7 +351,7 @@ export function AttendanceListPage() {
           </div>
         </div>
       ) : (
-        <div className="overflow-x-auto border border-adminGray-100/50 bg-white rounded shadow-sm">
+        <div className="overflow-x-auto border border-adminGray-100/50 bg-white rounded shadow-xs">
           <table className="w-full text-sm text-left table-fixed min-w-[1000px]">
             <thead className="bg-adminGray-50 border-b border-adminGray-100/60">
               <tr>

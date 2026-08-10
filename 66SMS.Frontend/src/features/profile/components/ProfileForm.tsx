@@ -181,7 +181,7 @@ export function ProfileForm({ initialData, customerDetail }: ProfileFormProps) {
   const avatarUrl = localAvatarPreview ?? watch("profilePhotoUrl");
 
   const inputClass =
-    "w-full px-4 py-3 rounded-none border border-lotus-stone/30 bg-white focus:outline-none focus:border-lotus-rose focus:ring-1 focus:ring-lotus-rose transition-colors text-lotus-deep";
+    "w-full px-4 py-3 rounded-none border border-lotus-stone/30 bg-white focus:outline-hidden focus:border-lotus-rose focus:ring-1 focus:ring-lotus-rose transition-colors text-lotus-deep";
 
   return (
     <div className="max-w-5xl mx-auto space-y-4">
@@ -197,7 +197,7 @@ export function ProfileForm({ initialData, customerDetail }: ProfileFormProps) {
             />
             <div
               onClick={handleAvatarClick}
-              className="relative z-10 w-60 h-60 rounded-full p-0.5 shadow-sm mb-3 cursor-pointer group"
+              className="relative z-10 w-60 h-60 rounded-full p-0.5 shadow-xs mb-3 cursor-pointer group"
             >
               <div className="w-full h-full rounded-full overflow-hidden relative">
                 {avatarUrl ? (
@@ -403,7 +403,7 @@ export function ProfileForm({ initialData, customerDetail }: ProfileFormProps) {
               <Button
                 type="submit"
                 disabled={isPending}
-                className="w-full sm:w-auto px-8 py-3 rounded-md shadow-sm bg-lotus-rose hover:bg-lotus-rose/90 text-white"
+                className="w-full sm:w-auto px-8 py-3 rounded-md shadow-xs bg-lotus-rose hover:bg-lotus-rose/90 text-white"
               >
                 {isPending ? (
                   <span className="flex items-center gap-2">

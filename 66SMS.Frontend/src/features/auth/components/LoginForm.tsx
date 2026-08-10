@@ -38,7 +38,7 @@ export const LoginForm = () => {
             type="text"
             placeholder="Email hoặc tên đăng nhập"
             autoComplete="username"
-            className="w-full h-11 pl-11 pr-4 rounded-xl border border-warm-100 bg-white text-ink text-sm outline-none transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
+            className="w-full h-11 pl-11 pr-4 rounded-xl border border-warm-100 bg-white text-ink text-sm outline-hidden transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
             aria-invalid={!!errors.usernameOrEmail}
             {...register("usernameOrEmail")}
           />
@@ -60,7 +60,7 @@ export const LoginForm = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Mật khẩu"
             autoComplete="current-password"
-            className="w-full h-11 pl-11 pr-12 rounded-xl border border-warm-100 bg-white text-ink text-sm outline-none transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
+            className="w-full h-11 pl-11 pr-12 rounded-xl border border-warm-100 bg-white text-ink text-sm outline-hidden transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
             aria-invalid={!!errors.password}
             {...register("password")}
           />
@@ -89,7 +89,7 @@ export const LoginForm = () => {
       <button
         type="submit"
         disabled={login.isPending}
-        className="w-full h-11 flex items-center justify-center gap-2 rounded-xl text-white bg-rose-600 font-semibold text-sm transition-all duration-200 outline-none hover:bg-rose-500 hover:shadow-lg active:bg-rose-800 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-warm-400"
+        className="w-full h-11 flex items-center justify-center gap-2 rounded-xl text-white bg-rose-600 font-semibold text-sm transition-all duration-200 outline-hidden hover:bg-rose-500 hover:shadow-lg active:bg-rose-800 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-warm-400"
       >
         {login.isPending ? (
           <>

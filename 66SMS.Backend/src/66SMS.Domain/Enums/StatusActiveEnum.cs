@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Domain.Enums
+namespace _66SMS.Domain.Enums
 {
     public enum StatusActiveEnum
     {

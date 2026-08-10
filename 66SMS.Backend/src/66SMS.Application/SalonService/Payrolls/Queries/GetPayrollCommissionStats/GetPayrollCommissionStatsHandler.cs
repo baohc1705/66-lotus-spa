@@ -1,7 +1,8 @@
-using _66SMS.Application.DTOs.Payrolls;
-using _66SMS.Contracts.Shared;
+using _66SMS.Application.DTOs;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
+using _66SMS.Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -116,9 +117,9 @@ namespace _66SMS.Application.SalonService.Payrolls.Queries.GetPayrollCommissionS
                         .Where(n => !string.IsNullOrWhiteSpace(n))
                         .Distinct());
 
-                    var durationMins = first.DurationMins is > 0 ? first.DurationMins.Value : 15;
+                    var durationMins = first.DurationMins is > 0 ? first.DurationMins.Value : 0;
                     var startTime = first.SlotStartTime;
-                    var endTime = startTime.HasValue
+                    var endTime = startTime.HasValue && durationMins > 0
                         ? startTime.Value.AddMinutes(durationMins)
                         : first.SlotEndTime;
 

@@ -1,8 +1,8 @@
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Helpers;
-using _66SMS.Contracts.Messages;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Helpers;
+using _66SMS.Contract.Messages;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
@@ -12,9 +12,6 @@ using System.Data;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.SendEmailOtp
 {
-    /// <summary>
-    /// Handler for <see cref="SendEmailOtpCommand"/>
-    /// </summary>
     public class SendEmailOtpHandler : IRequestHandler<SendEmailOtpCommand, Result<object>>
     {
         private readonly IUserSqlRepository userSqlRepository;

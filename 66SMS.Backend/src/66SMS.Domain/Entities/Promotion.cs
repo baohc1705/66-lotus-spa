@@ -14,7 +14,7 @@ namespace _66SMS.Domain.Entities
         public int? BuyQuantity { get; set; }
         public int? GetQuantity { get; set; }
         public int? UsageLimit { get; set; }
-        public int UsedCount { get; set; }
+        public int UsedCount { get; set; } = 0;
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
         public int Status { get; set; }

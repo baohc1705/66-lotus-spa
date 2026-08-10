@@ -1,5 +1,5 @@
-using _66SMS.Contracts.Extensions;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Extensions;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Enums;
 using MediatR;
@@ -7,9 +7,6 @@ using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.ProductCategories.Queries.GetAllProductCategories
 {
-    /// <summary>
-    /// Handler for <see cref="GetAllProductCategoryQuery"/>
-    /// </summary>
     public class GetAllProductCategoryHandler : IRequestHandler<GetAllProductCategoryQuery, Result<PagedResult<ProductCategoryDto>>>
     {
         private readonly IProductCategorySqlRepository productCategorySqlRepository;
@@ -46,7 +43,7 @@ namespace _66SMS.Application.CatalogService.ProductCategories.Queries.GetAllProd
                 var keyword = request.Filter.ToLower();
                 query = query.Where(x => x.Name.ToLower().Contains(keyword));
             }
-            
+
             PagedResult<ProductCategoryDto> result = await query
                 .Select(x => new ProductCategoryDto
                 {

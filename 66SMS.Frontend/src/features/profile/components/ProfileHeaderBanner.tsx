@@ -61,7 +61,7 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
   }
 
   return (
-    <div className="w-full bg-white rounded-xl shadow-sm p-3 md:p-4">
+    <div className="w-full bg-white rounded-xl shadow-xs p-3 md:p-4">
       <div className="flex flex-col lg:flex-row items-center justify-between gap-3 md:gap-4">
         <div className="flex items-center gap-3 w-full lg:w-auto">
           <div className="w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center bg-rose-50">

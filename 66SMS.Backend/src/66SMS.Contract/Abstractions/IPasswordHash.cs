@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Contracts.Abstractions
+namespace _66SMS.Contract.Abstractions
 {
     public interface IPasswordHash
     {

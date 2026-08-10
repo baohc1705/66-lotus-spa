@@ -1,5 +1,5 @@
 using MediatR;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 
 namespace _66SMS.Application.SalonService.Staffs.Commands.DeleteStaffServices;
 

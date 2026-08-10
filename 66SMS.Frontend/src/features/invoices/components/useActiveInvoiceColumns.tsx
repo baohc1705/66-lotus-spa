@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Ban, Eye } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
@@ -106,7 +106,7 @@ export function useActiveInvoiceColumns({
         header: cols.customerName,
         cell: ({ row }) => (
           <div>
-            <p className="text-sm font-semibold text-adminInk truncate max-w-[180px]">
+            <p className="text-sm font-semibold text-adminInk truncate max-w-44">
               {row.original.customerName ?? "Khách vãng lai"}
             </p>
             {row.original.customerPhone && (

@@ -1,5 +1,5 @@
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
@@ -10,9 +10,6 @@ using System.Data;
 
 namespace _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMembershipCards
 {
-    /// <summary>
-    /// handler for <see cref="UpdateMembershipCardCommand"/>
-    /// </summary>
     public class UpdateMembershipCardHandler : IRequestHandler<UpdateMembershipCardCommand, Result<object>>
     {
         private readonly IMembershipCardSqlRepository membershipCardSqlRepository;
@@ -37,16 +34,13 @@ namespace _66SMS.Application.CustomerService.MembershipCards.Commands.UpdateMemb
 
         public async Task<Result<object>> Handle(UpdateMembershipCardCommand request, CancellationToken cancellationToken)
         {
-            // find membership card by id and tracking to update
             MembershipCard? membershipCard = await membershipCardSqlRepository.FindByIdAsync(request.Id, false, cancellationToken);
 
-            // return not found if membership card is null
             if (membershipCard == null)
             {
                 return Result<object>.NotFound(MembershipCardConst.MSG_MEMBERSHIP_CARD_NOT_FOUND, ErrorCodes.ERR_MEMBERSHIP_CARD_NOT_FOUND);
             }
 
-            // find customer if request provived
             if (request.CustomerId.HasValue)
             {
                 Customer? customer = await customerSqlRepository.FindByIdAsync(request.CustomerId.Value);

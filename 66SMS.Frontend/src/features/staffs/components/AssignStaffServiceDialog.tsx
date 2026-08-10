@@ -170,7 +170,7 @@ export function AssignStaffServiceDialog({
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
                 placeholder="Tìm theo tên, mã hoặc danh mục..."
-                className="w-full pl-8 pr-3 py-1.5 border border-adminGray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adminGreen-600 bg-white"
+                className="w-full pl-8 pr-3 py-1.5 border border-adminGray-100 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-adminGreen-600 bg-white"
               />
             </div>
             <button
@@ -214,7 +214,7 @@ export function AssignStaffServiceDialog({
                         }`}
                       >
                         <div
-                          className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${
+                          className={`w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors ${
                             isSelected
                               ? "bg-adminGreen-600 border-adminGreen-600"
                               : "border-adminGray-300"

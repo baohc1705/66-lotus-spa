@@ -1,7 +1,7 @@
 using _66SMS.Application.BookingService.Helpers;
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Helpers;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Helpers;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
@@ -30,7 +30,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
 
         public async Task<Result<int>> Handle(CreateInvoiceFromAppointmentCommand request, CancellationToken cancellationToken)
         {
-            
+
             var appointment = await appointmentRepository.AsQueryable(asNoTracking: false)
                 .Include(a => a.Payments)
                 .Include(a => a.Services!)
@@ -46,7 +46,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
                 return Result<int>.NotFound(AppointmentConst.MSG_APPOINTMENT_NOT_FOUND, ErrorCodes.ERR_APPOINTMENT_NOT_FOUND);
             }
 
-            
+
             if (appointment.Status != AppointmentConst.STATUS_COMPLETED)
             {
                 return Result<int>.BadRequest("Lịch hẹn chưa hoàn thành phục vụ để tạo hóa đơn.", ErrorCodes.ERR_APPOINTMENT_ALREADY_THIS_STATUS);
@@ -75,29 +75,26 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
                         var lineTotal = unitPrice * quantity;
                         subTotal += lineTotal;
 
-                        decimal? commissionRate = null;
-                        decimal commissionAmount = 0;
-
-                        if (appService.Service != null && appService.Service.CommissionRate.HasValue)
-                        {
-                            commissionRate = appService.Service.CommissionRate.Value;
-                            commissionAmount = Math.Round(lineTotal * (commissionRate.Value / 100m), 0);
-                        }
-
-                        items.Add(new InvoiceItem
+                        var item = new InvoiceItem
                         {
                             ItemType = InvoiceItemConst.TYPE_SERVICE,
                             RefId = appService.ServiceId,
-                            ItemName = appService.Service?.Name ?? "Dịch vụ",
                             UnitPrice = unitPrice,
                             Quantity = quantity,
-                            DiscountAmount = 0,
                             LineTotal = lineTotal,
                             StaffId = appointment.StaffId,
                             Status = InvoiceItemConst.STATUS_ACTIVE,
-                            CommissionRate = commissionRate,
-                            CommissionAmount = commissionAmount,
-                        });
+                        };
+                        if (appService.Service != null)
+                            item.ItemName = appService.Service.Name;
+
+                        if (appService.Service?.CommissionRate is decimal rate)
+                        {
+                            item.CommissionRate = rate;
+                            item.CommissionAmount = Math.Round(lineTotal * (rate / 100m), 0);
+                        }
+
+                        items.Add(item);
                     }
                 }
 
@@ -124,7 +121,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
                 var customer = appointment.CreatedByUser?.Customer;
 
                 var (membershipDiscount, promoDiscount, membershipTierId) =
-                    AppointmentInvoiceDiscountHelper.Split(subTotal, appointment.TotalAmount, appointment.Note, customer);
+                    AppointmentInvoiceDiscountHelper.Split(subTotal, appointment.TotalAmount, customer);
 
                 var invoice = new Invoice
                 {
@@ -139,13 +136,8 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
                     DiscountAmount = promoDiscount,
                     MembershipTierId = membershipTierId,
                     MembershipDiscountAmount = membershipDiscount,
-                    LoyaltyPointsUsed = 0,
-                    LoyaltyPointsValue = 0,
-                    LoyaltyPointsEarned = 0,
-                    TaxAmount = 0,
                     TotalAmount = appointment.TotalAmount,
-                    PaidAmount = appointment.PaidAmount, 
-                    ChangeAmount = 0,
+                    PaidAmount = appointment.PaidAmount,
                     PaymentMethod = paymentMethod,
                     Status = status,
                     Note = appointment.Note,

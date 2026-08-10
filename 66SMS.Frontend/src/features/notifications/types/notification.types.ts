@@ -1,4 +1,8 @@
 export type BookingNotificationPayload = {
+  customerMessage?: string | null;
+  salonId?: number | null;
+  customerUserId?: number | null;
+  staffUserId?: number | null;
   appointmentId: number;
   staffId?: number | null;
   status: number;
@@ -11,9 +15,6 @@ export type NotificationMessage<TPayload = unknown> = {
   eventType: string;
   title: string;
   message: string;
-  salonId?: number | null;
-  customerUserId?: number | null;
-  staffUserId?: number | null;
   payload?: TPayload | null;
 };
 

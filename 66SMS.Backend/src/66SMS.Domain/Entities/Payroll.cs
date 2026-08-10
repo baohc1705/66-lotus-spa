@@ -9,12 +9,12 @@ namespace _66SMS.Domain.Entities
         public int PeriodMonth { get; set; }
         public int PeriodYear { get; set; }
         public int SalaryType { get; set; }
-        public decimal Rate { get; set; }
-        public decimal TotalHours { get; set; }
-        public decimal TotalWorkDays { get; set; }
-        public decimal BaseAmount { get; set; }
-        public decimal CommissionAmount { get; set; }
-        public decimal TotalAmount { get; set; }
+        public decimal Rate { get; set; } = 0;
+        public decimal TotalHours { get; set; } = 0;
+        public decimal TotalWorkDays { get; set; } = 0;
+        public decimal BaseAmount { get; set; } = 0;
+        public decimal CommissionAmount { get; set; } = 0;
+        public decimal TotalAmount { get; set; } = 0;
         public int Status { get; set; }
         public string? Note { get; set; }
 

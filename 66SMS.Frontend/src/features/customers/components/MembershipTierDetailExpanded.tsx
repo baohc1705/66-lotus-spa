@@ -50,7 +50,7 @@ export function MembershipTierDetailExpanded({
     <div className="bg-adminGray-50/30 w-full overflow-hidden p-6 border-t border-adminGray-100/50">
       <div className="flex flex-col gap-5">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-state-warning-bg flex items-center justify-center shrink-0 shadow-sm border border-state-warning-border/50">
+          <div className="w-12 h-12 rounded-xl bg-state-warning-bg flex items-center justify-center shrink-0 shadow-xs border border-state-warning-border/50">
             <Crown className="w-6 h-6 text-adminGold-600" />
           </div>
           <div className="flex-1 min-w-0">
@@ -112,7 +112,7 @@ export function MembershipTierDetailExpanded({
               variant="admin"
               size="sm"
               onClick={() => onEdit?.(tier)}
-              className="bg-adminGreen-600 hover:opacity-90 text-white shadow-sm h-8 px-4 text-sm gap-1.5 rounded-md transition-opacity shrink-0"
+              className="bg-adminGreen-600 hover:opacity-90 text-white shadow-xs h-8 px-4 text-sm gap-1.5 rounded-md transition-opacity shrink-0"
             >
               <Pencil className="w-3.5 h-3.5" />
               Chỉnh sửa
@@ -134,7 +134,7 @@ function DetailCard({
   value: string;
 }) {
   return (
-    <div className="bg-white rounded-lg p-3 border border-adminGray-100 shadow-sm flex items-start gap-3">
+    <div className="bg-white rounded-lg p-3 border border-adminGray-100 shadow-xs flex items-start gap-3">
       <div className="w-8 h-8 rounded-md bg-adminGray-50 flex items-center justify-center shrink-0 text-adminGray-600">
         <Icon className="w-4 h-4" />
       </div>

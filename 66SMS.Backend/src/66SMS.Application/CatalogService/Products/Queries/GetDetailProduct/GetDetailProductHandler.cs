@@ -1,18 +1,14 @@
-using _66SMS.Application.DTOs.ProductImages;
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Shared;
+using _66SMS.Application.DTOs;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.Products.Queries.GetDetailProduct
 {
-    /// <summary>
-    /// Handler for <see cref="GetDetailProductQuery"/>
-    /// </summary>
     public class GetDetailProductHandler : IRequestHandler<GetDetailProductQuery, Result<ProductFullDto>>
     {
         private readonly IProductSqlRepository productSqlRepository;

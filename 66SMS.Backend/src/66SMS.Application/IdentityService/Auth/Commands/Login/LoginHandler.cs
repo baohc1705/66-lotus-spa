@@ -1,9 +1,8 @@
-using _66SMS.Application.DTOs.Auth;
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Constants;
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Settings;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Constants;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Settings;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
@@ -12,7 +11,8 @@ using _66SMS.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.Login
 {
@@ -115,7 +115,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Login
                 UserId = userExisted.Id,
                 Token = rawRefreshToken,
                 ExpiresAt = DateTimeHelper.UtcNow().AddDays(jwtOptions.Value.RefreshTokenExpiryDays),
-                CreatedByIp = request.IpAddress ?? "",
+                CreatedByIp = request.IpAddress,
                 CreatedAt = DateTimeHelper.UtcNow(),
             });
 
@@ -176,7 +176,6 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.Login
             }
             else
             {
-                // staff / manager / admin (nếu có bản ghi staff) — lấy SalonId cho token
                 var staff = await staffSqlRepository
                     .AsQueryable(true)
                     .Where(x => x.UserId == user.Id)

@@ -1,5 +1,5 @@
 using _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 using MediatR;
 using System.Text.Json.Serialization;
 

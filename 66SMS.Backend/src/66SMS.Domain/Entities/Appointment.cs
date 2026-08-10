@@ -18,8 +18,8 @@ namespace _66SMS.Domain.Entities
         public int? Source { get; set; }
         public int Status { get; set; }
         public string? Note { get; set; }
-        public decimal TotalAmount { get; set; }
-        public decimal PaidAmount { get; set; }
+        public decimal TotalAmount { get; set; } = 0;
+        public decimal PaidAmount { get; set; } = 0;
         public int? DepositPercent { get; set; }
         public DateTimeOffset? DepositDeadlineAt { get; set; }
         public DateTimeOffset? DepositRequestedAt { get; set; }

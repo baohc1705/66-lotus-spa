@@ -238,7 +238,7 @@ export function WalletTransactionModal({
                 return (
                   <div
                     key={tx.id}
-                    className="flex flex-col p-4 rounded-xl border border-adminGray-100 bg-white shadow-sm gap-3"
+                    className="flex flex-col p-4 rounded-xl border border-adminGray-100 bg-white shadow-xs gap-3"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-4">
@@ -277,7 +277,9 @@ export function WalletTransactionModal({
                             )}
                           </div>
                           <p className="font-semibold text-adminInk text-xs mt-1">
-                            {tx.note}
+                            {tx.note && !tx.note.startsWith("TxnRef:")
+                              ? tx.note
+                              : typeInfo.label}
                           </p>
                           <div className="flex items-center gap-2 mt-1 text-2xs text-adminGray-600">
                             <span>{formatDateTimeDisplay(tx.createdAt)}</span>

@@ -1,5 +1,4 @@
 import axiosInstance from "@/shared/api/axiosInstance";
-import { API } from "@/shared/api/endpoints";
 import type { Result, PagedResult } from "@/shared/types/common.types";
 import type {
   MembershipCardDto,
@@ -7,21 +6,20 @@ import type {
   MembershipCardQueryParams,
 } from "../types/membershipCard.types";
 
-const BASE = API.membershipCards;
 
 export const membershipCardApi = {
   getAll: (params: MembershipCardQueryParams) =>
     axiosInstance
-      .get<Result<PagedResult<MembershipCardDto>>>(BASE, { params })
+      .get<Result<PagedResult<MembershipCardDto>>>("/membership-cards", { params })
       .then((r) => r.data),
 
   getDetail: (id: number) =>
     axiosInstance
-      .get<Result<MembershipCardDto>>(`${BASE}/${id}`)
+      .get<Result<MembershipCardDto>>(`/membership-cards/${id}`)
       .then((r) => r.data),
 
   update: (id: number, payload: UpdateMembershipCardPayload) =>
     axiosInstance
-      .patch<Result<object>>(`${BASE}/${id}`, payload)
+      .patch<Result<object>>(`/membership-cards/${id}`, payload)
       .then((r) => r.data),
 };

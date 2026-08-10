@@ -1,15 +1,12 @@
-using _66SMS.Contracts.Helpers;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Helpers;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.BookingService.Helpers
-{
-    /// <summary>
-    /// Cộng tiền vào ví khi VNPay nạp thành công 
-    /// </summary>
+{   
     public static class WalletTopUpApplyService
     {
         public static async Task<Result<object>> ApplyAsync(
@@ -63,7 +60,7 @@ namespace _66SMS.Application.BookingService.Helpers
                 Amount = amount,
                 BalanceAfter = wallet.Balance,
                 Type = WalletTransactionConst.TYPE_TOP_UP,
-                Note = $"Nạp tiền VNPay | {noteMarker}",
+                Note = noteMarker,
                 Status = WalletTransactionConst.STATUS_SUCCESS,
                 CreatedAt = DateTimeHelper.UtcNow(),
                 CreatedBy = wallet.Customer?.UserId

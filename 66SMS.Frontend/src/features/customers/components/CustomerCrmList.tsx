@@ -62,7 +62,7 @@ export function CustomerCrmList({
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
 
   return (
-    <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-sm">
+    <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-xs">
       <div className="p-3 border-b border-adminGray-100 space-y-2">
         <div className="flex items-center gap-1.5">
           <div className="relative flex-1">
@@ -162,7 +162,7 @@ export function CustomerCrmList({
               variant="admin"
               size="sm"
               onClick={onAdd}
-              className="h-8 px-2.5 text-xs bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white flex items-center gap-1 shadow-sm font-semibold"
+              className="h-8 px-2.5 text-xs bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white flex items-center gap-1 shadow-xs font-semibold"
             >
               <Plus className="h-3.5 w-3.5" />
               Thêm

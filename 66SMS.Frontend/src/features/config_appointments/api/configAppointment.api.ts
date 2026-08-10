@@ -1,5 +1,4 @@
 import axiosInstance from "@/shared/api/axiosInstance";
-import { API } from "@/shared/api/endpoints";
 import type {
   Result,
   PagedResult,
@@ -11,7 +10,6 @@ import type {
   UpdateConfigAppointmentPayload,
 } from "../types/config_appointment.types";
 
-const BASE = API.configAppointments;
 
 export type ConfigAppointmentListParams = PageRequest & {
   salonId?: number;
@@ -20,27 +18,27 @@ export type ConfigAppointmentListParams = PageRequest & {
 export const configAppointmentApi = {
   getAll: (params: ConfigAppointmentListParams) =>
     axiosInstance
-      .get<Result<PagedResult<ConfigAppointmentDTO>>>(BASE, { params })
+      .get<Result<PagedResult<ConfigAppointmentDTO>>>("/config-appointments", { params })
       .then((r) => r.data),
 
   getDetail: (id: number) =>
     axiosInstance
-      .get<Result<ConfigAppointmentDTO>>(`${BASE}/${id}`)
+      .get<Result<ConfigAppointmentDTO>>(`/config-appointments/${id}`)
       .then((r) => r.data),
 
   getBySalon: (salonId: number) =>
     axiosInstance
-      .get<Result<ConfigAppointmentDTO>>(`${BASE}/by-salon/${salonId}`)
+      .get<Result<ConfigAppointmentDTO>>(`/config-appointments/by-salon/${salonId}`)
       .then((r) => r.data),
 
   create: (payload: CreateConfigAppointmentPayload) =>
-    axiosInstance.post<Result<object>>(BASE, payload).then((r) => r.data),
+    axiosInstance.post<Result<object>>("/config-appointments", payload).then((r) => r.data),
 
   update: (id: number, payload: UpdateConfigAppointmentPayload) =>
     axiosInstance
-      .patch<Result<object>>(`${BASE}/${id}`, payload)
+      .patch<Result<object>>(`/config-appointments/${id}`, payload)
       .then((r) => r.data),
 
   delete: (id: number) =>
-    axiosInstance.delete<Result<object>>(`${BASE}/${id}`).then((r) => r.data),
+    axiosInstance.delete<Result<object>>(`/config-appointments/${id}`).then((r) => r.data),
 };

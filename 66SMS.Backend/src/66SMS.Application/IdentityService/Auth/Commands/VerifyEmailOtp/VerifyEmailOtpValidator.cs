@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 using FluentValidation;
-using _66SMS.Contracts.Constants;
+using _66SMS.Contract.Constants;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.VerifyEmailOtp
 {

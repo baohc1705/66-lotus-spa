@@ -1,5 +1,5 @@
-﻿using _66SMS.Application.DTOs;
-using _66SMS.Contracts.Shared;
+using _66SMS.Application.DTOs;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
 
@@ -16,7 +16,12 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetStaffAvailability
 
         public async Task<Result<IReadOnlyList<StaffAvailabilityDto>>> Handle(GetStaffAvailabilityQuery request, CancellationToken cancellationToken)
         {
-            var rows = await appointmentSqlRepository.GetStaffAvailabilityAsync(request.Date, request.SlotId, request.ServiceId, request.SalonId, cancellationToken);
+            var rows = await appointmentSqlRepository.GetStaffAvailabilityAsync(
+                request.Date!.Value,
+                request.SlotId!.Value,
+                request.ServiceId!.Value,
+                request.SalonId,
+                cancellationToken);
             var data = rows.Select(r => new StaffAvailabilityDto
             {
                 StaffId = r.StaffId,

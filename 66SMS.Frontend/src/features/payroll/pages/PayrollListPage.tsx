@@ -1,4 +1,4 @@
-import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
+﻿import { AdminSelectTrigger } from "@/shared/components/forms/AdminSelectTrigger";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useSalons } from "@/features/salons/hooks/useSalons";
 import { useAdminStaffs } from "@/features/staffs/hooks/useStaffs";
@@ -255,7 +255,7 @@ export function PayrollListPage() {
                     setPageIndex(1);
                   }}
                 >
-                  <AdminSelectTrigger className="w-[180px]">
+                  <AdminSelectTrigger className="w-44">
                     <SelectValue placeholder="Tất cả" />
                   </AdminSelectTrigger>
                   <SelectContent>
@@ -280,7 +280,7 @@ export function PayrollListPage() {
                   setPageIndex(1);
                 }}
               >
-                <AdminSelectTrigger className="w-[180px]">
+                <AdminSelectTrigger className="w-44">
                   <SelectValue placeholder="Tất cả" />
                 </AdminSelectTrigger>
                 <SelectContent>

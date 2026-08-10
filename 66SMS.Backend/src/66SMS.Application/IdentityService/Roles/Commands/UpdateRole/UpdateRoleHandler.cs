@@ -1,14 +1,11 @@
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using MediatR;
 
 namespace _66SMS.Application.IdentityService.Roles.Commands.UpdateRole
 {
-    /// <summary>
-    /// Handler for <see cref="UpdateRoleCommand"/>
-    /// </summary>
     public class UpdateRoleHandler : IRequestHandler<UpdateRoleCommand, Result<object>>
     {
         private readonly IRoleSqlRepository roleSqlRepository;

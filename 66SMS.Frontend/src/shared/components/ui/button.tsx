@@ -9,7 +9,7 @@ const buttonVariants = cva(
     "inline-flex shrink-0 items-center justify-center gap-2",
     "font-semibold whitespace-nowrap select-none",
     "transition-all duration-200 ease-out",
-    "outline-none",
+    "outline-hidden",
     "focus-visible:ring-2 focus-visible:ring-adminGreen-600 focus-visible:ring-offset-2",
     "disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none",
     "hover:-translate-y-0.5 active:translate-y-0",
@@ -21,7 +21,7 @@ const buttonVariants = cva(
         default: [
           "bg-adminGreen-600 text-white",
           "hover:bg-adminGreen-600/90",
-          "shadow-sm",
+          "shadow-xs",
         ].join(" "),
 
         secondary: [
@@ -37,7 +37,7 @@ const buttonVariants = cva(
         gold: [
           "bg-adminGold-600 text-white",
           "hover:opacity-90",
-          "shadow-sm",
+          "shadow-xs",
         ].join(" "),
 
         ghost: [
@@ -56,7 +56,7 @@ const buttonVariants = cva(
           "bg-adminGreen-600 text-white",
           "hover:bg-adminGreen-500",
           "disabled:bg-adminGray-100 disabled:text-adminGray-300",
-          "shadow-sm",
+          "shadow-xs",
           "focus-visible:ring-adminGreen-600",
         ].join(" "),
 

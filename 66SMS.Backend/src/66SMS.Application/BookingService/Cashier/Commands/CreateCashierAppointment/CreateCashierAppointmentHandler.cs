@@ -1,10 +1,8 @@
-using _66SMS.Application.Abstractions;
-using _66SMS.Application.BookingService.Appointments.Commands.CreateAppointment;
 using _66SMS.Application.BookingService.Helpers;
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Helpers;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Helpers;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
@@ -15,21 +13,16 @@ using System.Data;
 
 namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppointment
 {
-    /// <summary>
-    /// Handler đặt lịch hộ của lễ tân/cashier.
-    /// </summary>
     public class CreateCashierAppointmentHandler
         : IRequestHandler<CreateCashierAppointmentCommand, Result<List<int>>>
     {
         private readonly IAppointmentSqlRepository appointmentSqlRepository;
         private readonly IServiceSqlRepository serviceSqlRepository;
-        private readonly IBookingAvailabilityService bookingAvailabilityService;
         private readonly IAppointmentSlotLockSqlRepository appointmentSlotLockSqlRepository;
         private readonly IStaffSqlRepository staffSqlRepository;
         private readonly ICustomerSqlRepository customerSqlRepository;
         private readonly IUserSqlRepository userSqlRepository;
         private readonly IRoleSqlRepository roleSqlRepository;
-        private readonly IWorkScheduleSqlRepository workScheduleSqlRepository;
         private readonly IPromotionSqlRepository promotionSqlRepository;
         private readonly ITimeSlotSqlRepository timeSlotSqlRepository;
         private readonly IPasswordHash passwordHash;
@@ -38,13 +31,11 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
         public CreateCashierAppointmentHandler(
             IAppointmentSqlRepository appointmentSqlRepository,
             IServiceSqlRepository serviceSqlRepository,
-            IBookingAvailabilityService bookingAvailabilityService,
             IAppointmentSlotLockSqlRepository appointmentSlotLockSqlRepository,
             IStaffSqlRepository staffSqlRepository,
             ICustomerSqlRepository customerSqlRepository,
             IUserSqlRepository userSqlRepository,
             IRoleSqlRepository roleSqlRepository,
-            IWorkScheduleSqlRepository workScheduleSqlRepository,
             IPromotionSqlRepository promotionSqlRepository,
             ITimeSlotSqlRepository timeSlotSqlRepository,
             IPasswordHash passwordHash,
@@ -52,13 +43,11 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
         {
             this.appointmentSqlRepository = appointmentSqlRepository;
             this.serviceSqlRepository = serviceSqlRepository;
-            this.bookingAvailabilityService = bookingAvailabilityService;
             this.appointmentSlotLockSqlRepository = appointmentSlotLockSqlRepository;
             this.staffSqlRepository = staffSqlRepository;
             this.customerSqlRepository = customerSqlRepository;
             this.userSqlRepository = userSqlRepository;
             this.roleSqlRepository = roleSqlRepository;
-            this.workScheduleSqlRepository = workScheduleSqlRepository;
             this.promotionSqlRepository = promotionSqlRepository;
             this.timeSlotSqlRepository = timeSlotSqlRepository;
             this.passwordHash = passwordHash;
@@ -66,28 +55,6 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
         }
 
         public async Task<Result<List<int>>> Handle(
-            CreateCashierAppointmentCommand request,
-            CancellationToken cancellationToken)
-        {
-            for (var attempt = 0; attempt <= BookingDbConcurrency.MaxDeadlockRetries; attempt++)
-            {
-                try
-                {
-                    return await TryCreateAsync(request, cancellationToken);
-                }
-                catch (Exception ex) when (BookingDbConcurrency.IsDeadlock(ex)
-                    && attempt < BookingDbConcurrency.MaxDeadlockRetries)
-                {
-                    await Task.Delay(40 * (attempt + 1), cancellationToken);
-                }
-            }
-
-            return Result<List<int>>.Conflict(
-                AppointmentConst.MSG_APPOINTMENT_SLOT_FULL,
-                ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
-        }
-
-        private async Task<Result<List<int>>> TryCreateAsync(
             CreateCashierAppointmentCommand request,
             CancellationToken cancellationToken)
         {
@@ -150,13 +117,49 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                 var customerUserId = ensureResult.Data!;
                 var discountPercent = customer.MembershipCard?.Tier?.DiscountPercent ?? 0;
                 var now = DateTimeHelper.UtcNow();
-                var appointmentIds = new List<int>();
+                var guests = request.Guests;
                 var createdAppointments = new List<Appointment>();
 
-                foreach (var guest in request.Guests)
+                var serviceIds = guests
+                    .SelectMany(g => g.Services ?? [])
+                    .Where(s => s.ServiceId.HasValue)
+                    .Select(s => s.ServiceId!.Value)
+                    .Distinct()
+                    .ToList();
+
+                var servicesMap = await serviceSqlRepository.AsQueryable(asNoTracking: true)
+                    .Where(x => serviceIds.Contains(x.Id))
+                    .Select(x => new { x.Id, x.SellingPrice, x.DurationMins })
+                    .ToDictionaryAsync(x => x.Id, cancellationToken);
+
+                var lockIds = guests.Where(g => g.LockId.HasValue).Select(g => g.LockId!.Value).Distinct().ToList();
+                var locks = await appointmentSlotLockSqlRepository.AsQueryable(asNoTracking: false)
+                    .Where(x => lockIds.Contains(x.Id))
+                    .ToDictionaryAsync(x => x.Id, cancellationToken);
+
+                var slotIds = guests
+                    .Select(g => g.LockId.HasValue && locks.TryGetValue(g.LockId.Value, out var locked) ? locked.SlotId : g.SlotId)
+                    .Where(id => id.HasValue)
+                    .Select(id => id!.Value)
+                    .Distinct()
+                    .ToList();
+
+                var slotStarts = await timeSlotSqlRepository.AsQueryable(asNoTracking: true)
+                    .Where(x => slotIds.Contains(x.Id))
+                    .Select(x => new { x.Id, x.StartTime })
+                    .ToDictionaryAsync(x => x.Id, x => x.StartTime, cancellationToken);
+
+                var salonIds = guests.Where(g => g.SalonId.HasValue).Select(g => g.SalonId!.Value).Distinct().ToList();
+                var staffInSalons = await staffSqlRepository.AsQueryable(asNoTracking: true)
+                    .SelectMany(s => s.StaffSalons!
+                        .Where(ss => ss.Status == StaffSalonConst.STATUS_ACTIVE && salonIds.Contains(ss.SalonId))
+                        .Select(ss => new { StaffId = s.Id, ss.SalonId }))
+                    .ToDictionaryAsync(x => (x.StaffId, x.SalonId), cancellationToken);
+
+                foreach (var guest in guests)
                 {
-                    var mainServiceId = guest.Services?.FirstOrDefault()?.ServiceId ?? 0;
-                    if (mainServiceId == 0)
+                    var services = guest.Services;
+                    if (services == null || services.Count == 0 || services.All(s => (s.ServiceId ?? 0) <= 0))
                     {
                         transaction.Rollback();
                         return Result<List<int>>.BadRequest(
@@ -164,19 +167,18 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                             ErrorCodes.ERR_APPOINTMENT_MIN_ONE_SERVICE);
                     }
 
+                    var mainServiceId = services.First(s => (s.ServiceId ?? 0) > 0).ServiceId!.Value;
+
                     int staffId;
                     int? scheduleId;
-                    AppointmentSlotLock? validLock = null;
+                    AppointmentSlotLock? activeLock = null;
+                    int slotId;
 
                     if (guest.LockId.HasValue)
                     {
-                        validLock = await appointmentSlotLockSqlRepository.FindByIdAsync(
-                            guest.LockId.Value,
-                            asNoTracking: false);
-
-                        if (validLock == null
-                            || validLock.Status != AppointmentSlotLockConst.STATUS_ACTIVE
-                            || validLock.ExpiresAt <= DateTimeHelper.UtcNow())
+                        if (!locks.TryGetValue(guest.LockId.Value, out var slotLock)
+                            || slotLock.Status != AppointmentSlotLockConst.STATUS_ACTIVE
+                            || slotLock.ExpiresAt <= DateTimeHelper.UtcNow())
                         {
                             transaction.Rollback();
                             return Result<List<int>>.BadRequest(
@@ -184,18 +186,11 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                                 ErrorCodes.ERR_APPOINTMENT_SLOT_LOCK_INVALID);
                         }
 
-                        staffId = validLock.StaffId;
+                        var staffInfo = await appointmentSqlRepository.ResolveBookingStaffAsync(
+                            slotLock.AppointmentDate, mainServiceId, slotLock.SlotId,
+                            slotLock.StaffId, guest.SalonId, slotLock.Id, cancellationToken);
 
-                        var resolvedStaff = await bookingAvailabilityService.ResolveStaffAsync(
-                            validLock.AppointmentDate,
-                            mainServiceId,
-                            validLock.StaffId,
-                            validLock.SlotId,
-                            salonId: guest.SalonId,
-                            excludeLockId: validLock.Id,
-                            cancellationToken);
-
-                        if (resolvedStaff == null)
+                        if (staffInfo == null)
                         {
                             transaction.Rollback();
                             return Result<List<int>>.Conflict(
@@ -203,30 +198,19 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                                 ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
                         }
 
-                        scheduleId = resolvedStaff.Value.ScheduleId;
-                        if (!scheduleId.HasValue)
-                        {
-                            var schedule = await workScheduleSqlRepository.AsQueryable()
-                                .FirstOrDefaultAsync(
-                                    x => x.StaffId == staffId
-                                        && x.WorkDate == validLock.AppointmentDate
-                                        && x.Status == WorkScheduleConst.STATUS_ACTIVED,
-                                    cancellationToken);
-                            scheduleId = schedule?.Id;
-                        }
+                        activeLock = slotLock;
+                        staffId = slotLock.StaffId;
+                        scheduleId = staffInfo.ScheduleId;
+                        slotId = slotLock.SlotId;
                     }
                     else
                     {
-                        var resolvedStaff = await bookingAvailabilityService.ResolveStaffAsync(
-                            (DateOnly)guest.AppointmentDate!,
-                            mainServiceId,
-                            guest.StaffId,
-                            (int)guest.SlotId!,
-                            salonId: guest.SalonId,
-                            excludeLockId: null,
-                            cancellationToken);
+                        slotId = (int)guest.SlotId!;
+                        var staffInfo = await appointmentSqlRepository.ResolveBookingStaffAsync(
+                            (DateOnly)guest.AppointmentDate!, mainServiceId, slotId,
+                            guest.StaffId, guest.SalonId, null, cancellationToken);
 
-                        if (resolvedStaff == null)
+                        if (staffInfo == null)
                         {
                             transaction.Rollback();
                             return Result<List<int>>.Conflict(
@@ -234,61 +218,45 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                                 ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
                         }
 
-                        staffId = resolvedStaff.Value.StaffId;
-                        scheduleId = resolvedStaff.Value.ScheduleId;
+                        staffId = staffInfo.StaffId;
+                        scheduleId = staffInfo.ScheduleId;
                     }
 
-                    if (guest.SalonId.HasValue)
+                    if (guest.SalonId.HasValue && !staffInSalons.ContainsKey((staffId, guest.SalonId.Value)))
                     {
-                        var belongsToSalon = await staffSqlRepository.AsQueryable()
-                            .AnyAsync(
-                                s => s.Id == staffId
-                                    && s.StaffSalons != null
-                                    && s.StaffSalons.Any(ss =>
-                                        ss.SalonId == guest.SalonId.Value
-                                        && ss.Status == StaffSalonConst.STATUS_ACTIVE),
-                                cancellationToken);
-
-                        if (!belongsToSalon)
-                        {
-                            transaction.Rollback();
-                            return Result<List<int>>.BadRequest(
-                                AppointmentConst.MSG_APPOINTMENT_STAFF_NOT_IN_SALON,
-                                ErrorCodes.ERR_APPOINTMENT_STAFF_NOT_IN_SALON);
-                        }
+                        transaction.Rollback();
+                        return Result<List<int>>.BadRequest(
+                            AppointmentConst.MSG_APPOINTMENT_STAFF_NOT_IN_SALON,
+                            ErrorCodes.ERR_APPOINTMENT_STAFF_NOT_IN_SALON);
                     }
 
                     var appointmentServices = new List<AppointmentService>();
                     decimal totalAmount = 0;
 
-                    foreach (var reqService in guest.Services!)
+                    foreach (var item in services)
                     {
-                        var serviceEntity = await serviceSqlRepository.AsQueryable()
-                            .Where(x => x.Id == reqService.ServiceId)
-                            .FirstOrDefaultAsync(cancellationToken);
-                        if (serviceEntity == null) continue;
+                        if (!item.ServiceId.HasValue || !servicesMap.TryGetValue(item.ServiceId.Value, out var serviceData))
+                            continue;
 
+                        var quantity = (int)item.Quantity!;
                         appointmentServices.Add(new AppointmentService
                         {
-                            ServiceId = serviceEntity.Id,
-                            PriceSnapshot = serviceEntity.SellingPrice,
-                            DurationSnapshot = serviceEntity.DurationMins,
-                            Quantity = (int)reqService.Quantity!,
+                            ServiceId = serviceData.Id,
+                            PriceSnapshot = serviceData.SellingPrice,
+                            DurationSnapshot = serviceData.DurationMins,
+                            Quantity = quantity,
                             Status = AppointmentServiceConst.STATUS_ACTIVE,
                             CreatedAt = now,
                         });
-                        totalAmount += serviceEntity.SellingPrice * (int)reqService.Quantity;
+                        totalAmount += serviceData.SellingPrice * quantity;
                     }
 
                     if (discountPercent > 0 && totalAmount > 0)
                         totalAmount -= totalAmount * discountPercent / 100m;
 
-                    var slotId = (int)(validLock != null ? validLock.SlotId : guest.SlotId)!;
-                    var timeSlot = await timeSlotSqlRepository.FindByIdAsync(slotId, true, cancellationToken);
-                    var durationMins = appointmentServices.Sum(s => s.DurationSnapshot * s.Quantity);
-                    if (durationMins <= 0) durationMins = 15;
+                    TimeOnly? slotStart = slotStarts.TryGetValue(slotId, out var startTime) ? startTime : null;
+                    var durationMinutes = appointmentServices.Sum(s => s.DurationSnapshot * s.Quantity);
 
-                    // Lễ tân đặt: chờ phục vụ ngay, không yêu cầu cọc
                     var appointment = new Appointment
                     {
                         AppointmentCode = $"LH-{now:yyyyMMddHHmmss}{Random.Shared.Next(100, 999)}",
@@ -297,58 +265,53 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                         SalonId = guest.SalonId,
                         ScheduleId = scheduleId,
                         SlotId = slotId,
-                        PositionId = validLock != null ? validLock.PositionId : guest.PositionId,
-                        LockId = validLock?.Id,
+                        PositionId = activeLock != null ? activeLock.PositionId : guest.PositionId,
+                        LockId = activeLock?.Id,
                         AppointmentDate = (DateOnly)guest.AppointmentDate!,
-                        TimeApptStart = timeSlot?.StartTime,
-                        TimeApptEnd = timeSlot != null
-                            ? timeSlot.StartTime.AddMinutes(durationMins)
+                        TimeApptStart = slotStart,
+                        TimeApptEnd = slotStart.HasValue && durationMinutes > 0
+                            ? slotStart.Value.AddMinutes(durationMinutes)
                             : null,
                         Status = AppointmentConst.STATUS_WAITING,
                         Note = guest.Note,
                         TotalAmount = totalAmount,
-                        PaidAmount = 0,
                         Services = appointmentServices,
                         CreatedAt = now,
                         CreatedBy = request.ActorUserId,
                         ConfirmedAt = now,
-                        DepositPercent = 0,
-                        DepositDeadlineAt = null,
-                        DepositRequestedAt = null,
                     };
 
                     appointmentSqlRepository.Add(appointment);
-                    await appointmentSqlRepository.SaveChangeAsync(cancellationToken);
-                    appointmentIds.Add(appointment.Id);
                     createdAppointments.Add(appointment);
 
-                    if (validLock != null)
+                    if (activeLock != null)
                     {
-                        validLock.Status = AppointmentSlotLockConst.STATUS_RELEASED;
-                        validLock.ReleasedAt = DateTimeHelper.UtcNow();
-                        validLock.Appointment = appointment;
-                        appointmentSlotLockSqlRepository.Update(validLock);
-                        await appointmentSlotLockSqlRepository.SaveChangeAsync(cancellationToken);
+                        activeLock.Status = AppointmentSlotLockConst.STATUS_RELEASED;
+                        activeLock.ReleasedAt = DateTimeHelper.UtcNow();
+                        activeLock.Appointment = appointment;
+                        appointmentSlotLockSqlRepository.Update(activeLock);
                     }
                 }
 
+                await appointmentSqlRepository.SaveChangeAsync(cancellationToken);
+
                 if (!string.IsNullOrWhiteSpace(request.PromotionCode) && createdAppointments.Count > 0)
                 {
-                    var promoResult = await ApplyPromotionAsync(
+                    var promotionResult = await ApplyPromotionAsync(
                         request.PromotionCode,
                         createdAppointments,
                         now,
                         cancellationToken);
 
-                    if (!promoResult.IsSuccess)
+                    if (!promotionResult.IsSuccess)
                     {
                         transaction.Rollback();
-                        return promoResult;
+                        return promotionResult;
                     }
                 }
 
                 transaction.Commit();
-                return Result<List<int>>.Created(appointmentIds);
+                return Result<List<int>>.Created(createdAppointments.Select(a => a.Id).ToList());
             }
             catch
             {
@@ -364,56 +327,55 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
             CancellationToken cancellationToken)
         {
             var code = promotionCode.Trim().ToUpper();
-            var promo = await promotionSqlRepository.AsQueryable()
+            var promotion = await promotionSqlRepository.AsQueryable()
                 .Where(p => p.Code == code && p.Status != PromotionConst.STATUS_DELETED)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (promo == null)
+            if (promotion == null)
                 return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_NOT_FOUND, ErrorCodes.ERR_PROMOTION_NOT_FOUND);
 
-            if (promo.Status != PromotionConst.STATUS_ACTIVE)
+            if (promotion.Status != PromotionConst.STATUS_ACTIVE)
                 return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_INACTIVE, ErrorCodes.ERR_PROMOTION_INACTIVE);
 
-            if (promo.StartDate > now || promo.EndDate < now)
+            if (promotion.StartDate > now || promotion.EndDate < now)
                 return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_EXPIRED, ErrorCodes.ERR_PROMOTION_EXPIRED);
 
-            if (promo.UsageLimit > 0 && promo.UsedCount >= promo.UsageLimit.Value)
+            var usageLimit = promotion.UsageLimit ?? 0;
+            if (usageLimit > 0 && promotion.UsedCount >= usageLimit)
                 return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_USAGE_LIMIT, ErrorCodes.ERR_PROMOTION_USAGE_LIMIT);
 
-            decimal grandTotal = createdAppointments.Sum(a => a.TotalAmount);
+            decimal orderTotal = createdAppointments.Sum(a => a.TotalAmount);
 
-            if (promo.MinOrderValue.HasValue && grandTotal < promo.MinOrderValue.Value)
+            var minOrder = promotion.MinOrderValue ?? 0m;
+            if (minOrder > 0 && orderTotal < minOrder)
                 return Result<List<int>>.BadRequest(PromotionConst.MSG_PROMOTION_MIN_ORDER, ErrorCodes.ERR_PROMOTION_MIN_ORDER);
 
+            var discountValue = promotion.DiscountValue ?? 0m;
+            var maxDiscount = promotion.MaxDiscountAmount ?? 0m;
             decimal discount = 0m;
-            if (promo.DiscountType == PromotionConst.DISCOUNT_TYPE_PERCENT)
+
+            if (promotion.DiscountType == PromotionConst.DISCOUNT_TYPE_PERCENT)
             {
-                var percent = promo.DiscountValue ?? 0m;
-                discount = Math.Round(grandTotal * percent / 100m, 0, MidpointRounding.AwayFromZero);
-                if (promo.MaxDiscountAmount > 0 && discount > promo.MaxDiscountAmount.Value)
-                    discount = promo.MaxDiscountAmount.Value;
+                discount = Math.Round(orderTotal * discountValue / 100m, 0, MidpointRounding.AwayFromZero);
+                if (maxDiscount > 0 && discount > maxDiscount)
+                    discount = maxDiscount;
             }
-            else if (promo.DiscountType == PromotionConst.DISCOUNT_TYPE_FIXED)
+            else if (promotion.DiscountType == PromotionConst.DISCOUNT_TYPE_FIXED)
             {
-                discount = promo.DiscountValue ?? 0m;
-                if (discount > grandTotal)
-                    discount = grandTotal;
+                discount = discountValue;
+                if (discount > orderTotal)
+                    discount = orderTotal;
             }
 
             if (discount > 0)
             {
-                var firstApp = createdAppointments.First();
-                firstApp.TotalAmount = Math.Max(0m, firstApp.TotalAmount - discount);
-                firstApp.Note = string.IsNullOrWhiteSpace(firstApp.Note)
-                    ? $"[Đã áp dụng mã: {promo.Code} giảm {discount:N0}đ]"
-                    : $"{firstApp.Note} [Đã áp dụng mã: {promo.Code} giảm {discount:N0}đ]";
-
-                appointmentSqlRepository.Update(firstApp);
-                await appointmentSqlRepository.SaveChangeAsync(cancellationToken);
+                var firstAppointment = createdAppointments.First();
+                firstAppointment.TotalAmount = Math.Max(0m, firstAppointment.TotalAmount - discount);
+                appointmentSqlRepository.Update(firstAppointment);
             }
 
-            promo.UsedCount++;
-            promotionSqlRepository.Update(promo);
+            promotion.UsedCount++;
+            promotionSqlRepository.Update(promotion);
             await promotionSqlRepository.SaveChangeAsync(cancellationToken);
 
             return Result<List<int>>.Success(createdAppointments.Select(a => a.Id).ToList());

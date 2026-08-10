@@ -154,7 +154,7 @@ export function CashierWeeklyView({
   return (
     <div className="flex-1 min-h-0 min-w-0 w-full overflow-auto scrollbar-thin bg-white relative font-sans">
       <div className="flex min-w-max">
-        <div className="w-16 flex-shrink-0 border-r border-adminGray-300/80 bg-adminGreen-50/20 sticky left-0 z-30">
+        <div className="w-16 shrink-0 border-r border-adminGray-300/80 bg-adminGreen-50/20 sticky left-0 z-30">
           <div className="h-16 border-b border-adminGray-300/80 sticky top-0 left-0 bg-adminGreen-50/50 z-50"></div>
           <div className="relative">
             {HOURS.map((hour) => (
@@ -179,7 +179,7 @@ export function CashierWeeklyView({
               key={colIdx}
               className="flex-1 min-w-[150px] border-r border-adminGray-100 relative"
             >
-              <div className="h-16 border-b border-adminGray-300/80 sticky top-0 bg-white/95 backdrop-blur-sm z-20 flex flex-col items-center justify-center gap-0.5">
+              <div className="h-16 border-b border-adminGray-300/80 sticky top-0 bg-white/95 backdrop-blur-xs z-20 flex flex-col items-center justify-center gap-0.5">
                 <div
                   className={`text-xs font-medium uppercase ${
                     isToday
@@ -225,8 +225,8 @@ export function CashierWeeklyView({
                     className="absolute left-0 right-0 z-10 pointer-events-none"
                     style={{ top: currentTimeY }}
                   >
-                    <div className="absolute -left-1.5 -top-1.5 w-3 h-3 rounded-full bg-adminGreen-600 border-2 border-white shadow-sm z-10" />
-                    <div className="w-full border-t-2 border-adminGreen-600/80 shadow-sm" />
+                    <div className="absolute -left-1.5 -top-1.5 w-3 h-3 rounded-full bg-adminGreen-600 border-2 border-white shadow-xs z-10" />
+                    <div className="w-full border-t-2 border-adminGreen-600/80 shadow-xs" />
                   </div>
                 )}
 
@@ -241,7 +241,7 @@ export function CashierWeeklyView({
                     return (
                       <div
                         key={booking.id}
-                        className={`absolute rounded-[4px] p-1.5 shadow-sm overflow-hidden text-left transition-all hover:scale-[1.02] hover:z-20 hover:shadow-md cursor-pointer font-sans border-l-2 ${getBookingColor(
+                        className={`absolute rounded-[4px] p-1.5 shadow-xs overflow-hidden text-left transition-all hover:scale-[1.02] hover:z-20 hover:shadow-md cursor-pointer font-sans border-l-2 ${getBookingColor(
                           booking.status,
                         )}`}
                         style={{

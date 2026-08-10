@@ -200,7 +200,7 @@ export function WalletManagementPage() {
 
   return (
     <div className="flex flex-col gap-2 h-full overflow-hidden w-full">
-      <div className="shrink-0 bg-white p-4 rounded border border-adminGray-100/30 shadow-sm flex items-center justify-between">
+      <div className="shrink-0 bg-white p-4 rounded border border-adminGray-100/30 shadow-xs flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-adminGreen-50/20 text-adminGreen-600 rounded-xl">
             <Wallet className="w-5 h-5" />

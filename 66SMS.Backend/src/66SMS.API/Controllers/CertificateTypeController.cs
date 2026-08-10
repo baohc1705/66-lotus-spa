@@ -5,7 +5,7 @@ using _66SMS.Application.CatalogService.CertificateTypes.Commands.DeleteCertific
 using _66SMS.Application.CatalogService.CertificateTypes.Commands.UpdateCertificateType;
 using _66SMS.Application.CatalogService.CertificateTypes.Queries.GetAllCertificateTypes;
 using _66SMS.Application.CatalogService.CertificateTypes.Queries.GetDetailCertificateType;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
@@ -84,18 +84,9 @@ namespace _66SMS.API.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetAll(int? status, string? filter, string? orderBy, bool? isDescending, int? pageIndex, int? pageSize)
+        public async Task<IActionResult> GetAll([FromQuery] GetAllCertificateTypesQuery query)
         {
-            var query = new GetAllCertificateTypesQuery
-            {
-                Status = status,
-                Filter = filter,
-                OrderBy = orderBy,
-                IsDescending = isDescending ?? false,
-                PageIndex = pageIndex ?? 1,
-                PageSize = pageSize ?? 100,
-                IsDeleted = false,
-            };
+            query.IsDeleted = false;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

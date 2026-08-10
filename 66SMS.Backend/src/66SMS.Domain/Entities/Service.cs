@@ -9,9 +9,9 @@ namespace _66SMS.Domain.Entities
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public string? Content { get; set; }
-        public int DurationMins { get; set; }
-        public decimal CostPrice { get; set; }
-        public decimal SellingPrice { get; set; }
+        public int DurationMins { get; set; } = 0;
+        public decimal CostPrice { get; set; } = 0;
+        public decimal SellingPrice { get; set; } = 0;
         public decimal? MinSellingPrice { get; set; }
         public decimal? CommissionRate { get; set; }
         public int? SortOrder { get; set; }

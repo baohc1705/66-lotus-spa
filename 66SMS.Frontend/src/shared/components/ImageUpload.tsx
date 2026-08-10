@@ -29,7 +29,7 @@ export function ImageUpload({ value, onFileChange, shape = 'circle', label = 'Ch
         onClick={() => inputRef.current?.click()}
         className={[
           'group relative h-24 w-24 shrink-0 overflow-hidden transition-all',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-adminGreen-600 focus-visible:ring-offset-2',
+          'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-adminGreen-600 focus-visible:ring-offset-2',
           shapeClass,
           displaySrc
             ? 'border border-adminGray-100 hover:border-adminGreen-600/60'

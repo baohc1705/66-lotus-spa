@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { RolePermissionModal } from './RolePermissionModal';
 
 export function PermissionFormModal({ initial, onClose, onSave, saving }: {
@@ -19,7 +19,7 @@ export function PermissionFormModal({ initial, onClose, onSave, saving }: {
         <div>
           <label className="block text-xs font-semibold text-adminGray-600 mb-1">Tên quyền *</label>
           <input
-            className="w-full px-3 py-2 rounded-lg border border-border bg-white text-adminInk text-sm outline-none focus:border-adminGreen-600 transition-colors"
+            className="w-full px-3 py-2 rounded-lg border border-border bg-white text-adminInk text-sm outline-hidden focus:border-adminGreen-600 transition-colors"
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="Ví dụ: Xem danh sách người dùng"
@@ -29,7 +29,7 @@ export function PermissionFormModal({ initial, onClose, onSave, saving }: {
           <div>
             <label className="block text-xs font-semibold text-adminGray-600 mb-1">Resource *</label>
             <input
-              className="w-full px-3 py-2 rounded-lg border border-border bg-white text-adminInk text-sm outline-none focus:border-adminGreen-600 transition-colors"
+              className="w-full px-3 py-2 rounded-lg border border-border bg-white text-adminInk text-sm outline-hidden focus:border-adminGreen-600 transition-colors"
               value={resource}
               onChange={e => setResource(e.target.value)}
               placeholder="users"
@@ -38,7 +38,7 @@ export function PermissionFormModal({ initial, onClose, onSave, saving }: {
           <div>
             <label className="block text-xs font-semibold text-adminGray-600 mb-1">Action *</label>
             <input
-              className="w-full px-3 py-2 rounded-lg border border-border bg-white text-adminInk text-sm outline-none focus:border-adminGreen-600 transition-colors"
+              className="w-full px-3 py-2 rounded-lg border border-border bg-white text-adminInk text-sm outline-hidden focus:border-adminGreen-600 transition-colors"
               value={action}
               onChange={e => setAction(e.target.value)}
               placeholder="read"
@@ -48,7 +48,7 @@ export function PermissionFormModal({ initial, onClose, onSave, saving }: {
         <div>
           <label className="block text-xs font-semibold text-adminGray-600 mb-1">Mô tả</label>
           <textarea
-            className="w-full px-3 py-2 rounded-lg border border-border bg-white text-adminInk text-sm outline-none focus:border-adminGreen-600 transition-colors resize-y min-h-[60px]"
+            className="w-full px-3 py-2 rounded-lg border border-border bg-white text-adminInk text-sm outline-hidden focus:border-adminGreen-600 transition-colors resize-y min-h-15"
             value={desc}
             onChange={e => setDesc(e.target.value)}
             placeholder="Mô tả quyền..."

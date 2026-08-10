@@ -40,7 +40,7 @@ export function Logo({
       <img
         src={logoHomeUrl}
         alt="Hoa Sen Spa Logo"
-        className={`object-contain shrink-0 drop-shadow-sm transition-transform duration-500 ease-out group-hover:scale-105 ${
+        className={`object-contain shrink-0 drop-shadow-xs transition-transform duration-500 ease-out group-hover:scale-105 ${
           isOnDark
             ? "logo-icon-gold h-8 w-auto opacity-95"
             : s.img

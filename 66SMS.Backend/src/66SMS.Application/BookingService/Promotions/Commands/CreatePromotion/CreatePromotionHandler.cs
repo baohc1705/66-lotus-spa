@@ -1,6 +1,6 @@
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Helpers;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Helpers;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
@@ -33,9 +33,8 @@ namespace _66SMS.Application.BookingService.Promotions.Commands.CreatePromotion
                 return Result<object>.Conflict(PromotionConst.MSG_CODE_EXISTED, ErrorCodes.ERR_PROMOTION_CODE_EXISTED);
 
             Promotion promotion = mapper.Map<Promotion>(request);
-            promotion.UsedCount = 0;
             promotion.CreatedAt = DateTimeHelper.UtcNow();
-            
+
             if (promotion.UsageLimit <= 0)
                 promotion.UsageLimit = null;
             if (promotion.MaxDiscountAmount <= 0)

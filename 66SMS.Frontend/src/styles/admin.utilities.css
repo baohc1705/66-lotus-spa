@@ -1,0 +1,578 @@
+@utility rounded-lotus-admin-sm {
+  border-radius: var(--lotus-admin-radius-sm);
+}
+
+@utility max-w-lotus-admin-cell {
+  max-width: var(--lotus-admin-cell-max);
+}
+
+@utility min-h-lotus-admin-textarea {
+  min-height: var(--lotus-admin-textarea-min-h);
+}
+
+@utility lotus-admin-input {
+  @apply h-9 w-full text-sm rounded-none border bg-white;
+  border-color: var(--admin-gray-300);
+  color: var(--admin-ink);
+  &:hover {
+    border-color: var(--admin-gray-400);
+  }
+  &:focus {
+    border-color: var(--admin-green-600);
+    box-shadow: 0 0 0 1px var(--admin-green-600);
+    background: #fff;
+  }
+  &:disabled {
+    background: var(--admin-gray-50);
+    color: var(--admin-gray-400);
+    border-color: var(--admin-gray-200);
+  }
+}
+
+@utility lotus-admin-textarea {
+  @apply w-full text-sm min-h-lotus-admin-textarea resize-none rounded-none border bg-white;
+  border-color: var(--admin-gray-300);
+  color: var(--admin-ink);
+  &:hover {
+    border-color: var(--admin-gray-400);
+  }
+  &:focus {
+    border-color: var(--admin-green-600);
+    box-shadow: 0 0 0 1px var(--admin-green-600);
+    background: #fff;
+  }
+}
+
+@utility lotus-admin-select-trigger {
+  @apply h-9 w-full text-sm rounded-none border bg-white;
+  border-color: var(--admin-gray-300);
+  color: var(--admin-ink);
+  &:hover {
+    border-color: var(--admin-gray-400);
+  }
+  &:focus {
+    border-color: var(--admin-green-600);
+    box-shadow: 0 0 0 1px var(--admin-green-600);
+    background: #fff;
+  }
+  &:focus-visible {
+    border-color: var(--admin-green-600);
+    box-shadow: 0 0 0 1px var(--admin-green-600);
+    background: #fff;
+  }
+}
+
+@utility lotus-admin-form-label {
+  @apply flex items-center gap-1 text-xs font-semibold;
+  color: var(--admin-gray-600);
+}
+
+@utility lotus-admin-form-error {
+  @apply text-2xs font-medium;
+  color: var(--state-danger-text);
+}
+
+@utility lotus-admin-form-section-title {
+  @apply text-sm font-semibold;
+  color: var(--admin-ink);
+}
+
+@utility lotus-admin-btn-toolbar {
+  @apply text-xs h-7 px-2;
+}
+
+@utility lotus-admin-table-page-card {
+  @apply relative overflow-hidden rounded-admin;
+  background: var(--admin-bg-surface);
+  border: 1px solid var(--admin-border);
+}
+
+@utility lotus-admin-table-fetch-bar {
+  @apply absolute top-0 left-0 right-0 h-0.5 overflow-hidden;
+  background: var(--admin-green-100);
+}
+
+@utility lotus-admin-table-fetch-bar-inner {
+  @apply h-full w-1/3 animate-[slide_1s_ease-in-out_infinite];
+  background: var(--admin-green-600);
+}
+
+@utility lotus-admin-table-cell-index {
+  color: var(--admin-gray-600);
+}
+
+@utility lotus-admin-table-cell-name {
+  @apply font-semibold;
+  color: var(--admin-ink);
+}
+
+@utility lotus-admin-table-cell-muted {
+  color: var(--admin-ink);
+}
+
+@utility lotus-admin-table-cell-muted-sm {
+  @apply text-xs;
+  color: var(--admin-ink);
+}
+
+@utility lotus-admin-table-cell-truncate {
+  @apply truncate max-w-lotus-admin-cell inline-block;
+  color: var(--admin-ink);
+}
+
+@utility lotus-admin-table-toolbar-btn {
+  @apply text-xs gap-1.5;
+}
+
+@utility lotus-admin-table-selection-bar {
+  @apply flex items-center gap-2 mr-auto text-sm font-medium px-3 py-1.5 rounded-lg;
+  color: var(--admin-ink);
+  background: var(--admin-green-50);
+  border: 1px solid var(--admin-green-200);
+}
+
+@utility lotus-admin-table-sort-btn {
+  @apply flex items-center gap-1.5 transition-colors;
+  &:hover {
+    color: var(--admin-green-600);
+  }
+}
+
+@utility lotus-admin-sidebar-search {
+  @apply w-full text-xs h-8 pl-8 pr-3 rounded focus:outline-hidden;
+  background: var(--admin-gray-50);
+  border: 1px solid var(--admin-gray-100);
+  color: var(--admin-ink);
+  &::placeholder {
+    color: var(--admin-gray-400);
+  }
+  &:hover {
+    border-color: var(--admin-gray-300);
+  }
+  &:focus {
+    border-color: var(--admin-green-600);
+    box-shadow: 0 0 0 1px var(--admin-green-600);
+  }
+}
+
+@utility lotus-admin-sidebar-item {
+  @apply w-full flex items-center justify-between gap-2 px-3 py-1.5 text-sm transition-all duration-150 rounded;
+  color: var(--admin-gray-600);
+  &:hover {
+    background: var(--admin-gray-50);
+  }
+  &.is-active {
+    background: var(--admin-green-100);
+    color: var(--admin-green-900);
+  }
+}
+
+@utility lotus-admin-sidebar-badge {
+  @apply text-2xs shrink-0 font-medium px-1.5 py-0.5 rounded-full;
+}
+
+@utility lotus-admin-sidebar-add-btn {
+  @apply w-full text-xs h-8 gap-1.5 justify-center font-bold;
+}
+
+@utility admin-header {
+  background: var(--admin-bg-header);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@utility admin-nav-tab {
+  color: var(--admin-green-100);
+  &:hover {
+    color: #ffffff;
+  }
+  &.is-active {
+    color: #ffffff;
+  }
+  & svg {
+    color: var(--admin-gold-600);
+  }
+}
+
+@utility admin-nav-tab-underline {
+  background: var(--admin-gold-600);
+}
+
+@utility logo-icon-gold {
+  filter: brightness(0) saturate(100%) invert(52%) sepia(72%) saturate(650%)
+    hue-rotate(8deg) brightness(95%) contrast(92%);
+}
+
+@utility admin-sidebar-section-title {
+  color: var(--admin-gold-600);
+  opacity: 0.7;
+}
+
+@utility admin-sidebar-nav-item {
+  color: var(--admin-gold-600);
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+  }
+  &.is-active {
+    background: var(--admin-green-600);
+    color: #ffffff;
+  }
+  & svg {
+    color: var(--admin-gold-600);
+  }
+  &.is-active svg {
+    color: #ffffff;
+  }
+}
+
+@utility admin-sidebar-nav-child {
+  color: var(--admin-gold-600);
+  opacity: 0.85;
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    opacity: 1;
+  }
+  &.is-active {
+    background: var(--admin-green-600);
+    color: #ffffff;
+    opacity: 1;
+  }
+  & svg {
+    color: var(--admin-gold-600);
+  }
+  &.is-active svg {
+    color: #ffffff;
+  }
+}
+
+@utility admin-stat-icon--green {
+  background: var(--admin-green-100);
+  color: var(--admin-green-600);
+}
+
+@utility admin-stat-icon--gold {
+  background: var(--admin-gold-100);
+  color: var(--admin-gold-600);
+}
+
+@utility lotus-cashier-header {
+  background-image: linear-gradient(
+    to right,
+    var(--admin-green-900),
+    var(--admin-green-800),
+    var(--admin-green-600)
+  );
+}
+
+/* ---------- UI kit (shared demo components) ---------- */
+
+@utility bg-kit-primary {
+  background-color: var(--kit-primary);
+}
+@utility bg-kit-secondary {
+  background-color: var(--kit-secondary);
+}
+@utility bg-kit-success {
+  background-color: var(--kit-success);
+}
+@utility bg-kit-info {
+  background-color: var(--kit-info);
+}
+@utility bg-kit-warning {
+  background-color: var(--kit-warning);
+}
+@utility bg-kit-danger {
+  background-color: var(--kit-danger);
+}
+@utility bg-kit-focus {
+  background-color: var(--kit-focus);
+}
+@utility bg-kit-alt {
+  background-color: var(--kit-alt);
+}
+@utility bg-kit-light {
+  background-color: var(--kit-light);
+}
+@utility bg-kit-dark {
+  background-color: var(--kit-dark);
+}
+@utility bg-kit-page {
+  background-color: var(--kit-page);
+}
+@utility bg-kit-track {
+  background-color: var(--kit-track);
+}
+@utility bg-kit-white {
+  background-color: var(--kit-white);
+}
+
+@utility text-kit-primary {
+  color: var(--kit-primary);
+}
+@utility text-kit-secondary {
+  color: var(--kit-secondary);
+}
+@utility text-kit-success {
+  color: var(--kit-success);
+}
+@utility text-kit-info {
+  color: var(--kit-info);
+}
+@utility text-kit-warning {
+  color: var(--kit-warning-text);
+}
+@utility text-kit-danger {
+  color: var(--kit-danger);
+}
+@utility text-kit-focus {
+  color: var(--kit-focus);
+}
+@utility text-kit-alt {
+  color: var(--kit-alt);
+}
+@utility text-kit-dark {
+  color: var(--kit-dark);
+}
+@utility text-kit-body {
+  color: var(--kit-body);
+}
+@utility text-kit-muted {
+  color: var(--kit-muted);
+}
+@utility text-kit-heading {
+  color: var(--kit-heading);
+}
+@utility text-kit-on-warning {
+  color: var(--kit-on-warning);
+}
+@utility text-kit-white {
+  color: var(--kit-white);
+}
+
+@utility border-kit {
+  border-color: var(--kit-border);
+}
+@utility border-kit-primary {
+  border-color: var(--kit-primary);
+}
+@utility border-kit-secondary {
+  border-color: var(--kit-secondary);
+}
+@utility border-kit-success {
+  border-color: var(--kit-success);
+}
+@utility border-kit-danger {
+  border-color: var(--kit-danger);
+}
+@utility border-kit-warning {
+  border-color: var(--kit-warning);
+}
+@utility border-kit-info {
+  border-color: var(--kit-info);
+}
+
+@utility soft-kit-primary {
+  background-color: var(--kit-soft-primary-bg);
+  color: var(--kit-soft-primary-text);
+  border-color: var(--kit-soft-primary-border);
+}
+@utility soft-kit-secondary {
+  background-color: var(--kit-soft-secondary-bg);
+  color: var(--kit-soft-secondary-text);
+  border-color: var(--kit-soft-secondary-border);
+}
+@utility soft-kit-success {
+  background-color: var(--kit-soft-success-bg);
+  color: var(--kit-soft-success-text);
+  border-color: var(--kit-soft-success-border);
+}
+@utility soft-kit-danger {
+  background-color: var(--kit-soft-danger-bg);
+  color: var(--kit-soft-danger-text);
+  border-color: var(--kit-soft-danger-border);
+}
+@utility soft-kit-warning {
+  background-color: var(--kit-soft-warning-bg);
+  color: var(--kit-soft-warning-text);
+  border-color: var(--kit-soft-warning-border);
+}
+@utility soft-kit-info {
+  background-color: var(--kit-soft-info-bg);
+  color: var(--kit-soft-info-text);
+  border-color: var(--kit-soft-info-border);
+}
+@utility soft-kit-light {
+  background-color: var(--kit-page);
+  color: var(--kit-muted);
+  border-color: var(--kit-border);
+}
+@utility soft-kit-dark {
+  background-color: var(--kit-light);
+  color: var(--kit-dark);
+  border-color: var(--color-gray-300);
+}
+
+@utility btn-group {
+  @apply mb-2 mr-2 inline-flex;
+  & > button {
+    margin-bottom: 0;
+    margin-right: 0;
+    border-radius: 0;
+  }
+  & > button:first-child {
+    border-top-left-radius: var(--radius-sm, 0.25rem);
+    border-bottom-left-radius: var(--radius-sm, 0.25rem);
+  }
+  & > button:last-child {
+    border-top-right-radius: var(--radius-sm, 0.25rem);
+    border-bottom-right-radius: var(--radius-sm, 0.25rem);
+  }
+  & > button:not(:last-child) {
+    border-right-width: 0;
+  }
+}
+
+@utility nav-justified {
+  @apply w-full;
+  & > * {
+    flex: 1 1 0%;
+  }
+}
+
+@utility nav-pills {
+  @apply gap-1;
+}
+
+@utility input-group {
+  @apply flex w-full flex-wrap items-stretch;
+  & > *:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left-width: 0;
+  }
+  & > *:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+@utility input-group-sm {
+  font-size: var(--text-sm);
+  & input {
+    font-size: var(--text-sm);
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+@utility input-group-lg {
+  font-size: var(--text-lg);
+  & input {
+    font-size: var(--text-lg);
+    padding: 0.5rem 1rem;
+  }
+}
+
+@utility shadow-kit-card {
+  @apply shadow-sm;
+}
+@utility shadow-kit-pop {
+  @apply shadow-md;
+}
+@utility shadow-kit-modal {
+  @apply shadow-lg;
+}
+@utility shadow-kit-toast {
+  @apply shadow-md;
+}
+@utility shadow-kit-primary {
+  @apply shadow-md shadow-blue-600/40;
+}
+@utility shadow-kit-danger {
+  @apply shadow-md shadow-red-600/25;
+}
+@utility shadow-kit-success {
+  @apply shadow-md shadow-green-500/25;
+}
+@utility shadow-kit-warning {
+  @apply shadow-md shadow-yellow-400/30;
+}
+@utility shadow-kit-info {
+  @apply shadow-md shadow-sky-500/25;
+}
+
+@utility gradient-happy-green {
+  @apply bg-gradient-to-r from-teal-500 to-lime-500;
+}
+@utility gradient-premium-dark {
+  @apply bg-gradient-to-r from-neutral-700 to-black;
+}
+@utility gradient-love-kiss {
+  @apply bg-gradient-to-t from-rose-600 to-orange-200;
+}
+@utility gradient-grow-early {
+  @apply bg-gradient-to-t from-emerald-600 to-teal-400;
+}
+@utility gradient-strong-bliss {
+  @apply bg-gradient-to-r from-pink-300 via-rose-300 to-orange-200;
+}
+@utility gradient-warm-flame {
+  @apply bg-gradient-to-br from-rose-300 to-orange-200;
+}
+@utility gradient-tempting-azure {
+  @apply bg-gradient-to-br from-emerald-200 to-sky-300;
+}
+@utility gradient-sunny-morning {
+  @apply bg-gradient-to-br from-amber-300 to-orange-300;
+}
+@utility gradient-mean-fruit {
+  @apply bg-gradient-to-br from-orange-300 to-fuchsia-400;
+}
+@utility gradient-night-fade {
+  @apply bg-gradient-to-t from-violet-300 to-pink-200;
+}
+@utility gradient-heavy-rain {
+  @apply bg-gradient-to-t from-slate-300 to-slate-200;
+}
+@utility gradient-amy-crisp {
+  @apply bg-gradient-to-br from-indigo-200 to-rose-300;
+}
+@utility gradient-malibu-beach {
+  @apply bg-gradient-to-r from-blue-400 to-cyan-400;
+}
+@utility gradient-deep-blue {
+  @apply bg-gradient-to-br from-purple-200 to-sky-300;
+}
+@utility gradient-mixed-hopes {
+  @apply bg-gradient-to-r from-fuchsia-400 to-pink-400;
+}
+@utility gradient-happy-itmeo {
+  @apply bg-gradient-to-t from-teal-200 to-teal-400;
+}
+@utility gradient-happy-fisher {
+  @apply bg-gradient-to-br from-cyan-300 to-blue-400;
+}
+@utility gradient-arielle-smile {
+  @apply bg-gradient-to-br from-cyan-400 via-sky-400 to-blue-400;
+}
+@utility gradient-ripe-malin {
+  @apply bg-gradient-to-br from-fuchsia-400 to-rose-400;
+}
+@utility gradient-vicious-stance {
+  @apply bg-gradient-to-br from-slate-800 to-slate-600;
+}
+@utility gradient-midnight-bloom {
+  @apply bg-gradient-to-br from-slate-700 to-violet-800;
+}
+@utility gradient-night-sky {
+  @apply bg-gradient-to-t from-blue-500 to-sky-400;
+}
+@utility gradient-slick-carbon {
+  @apply bg-gradient-to-b from-neutral-700 via-neutral-800 to-black;
+}
+@utility gradient-royal {
+  @apply bg-gradient-to-r from-slate-900 to-slate-700;
+}
+@utility gradient-asteroid {
+  @apply bg-gradient-to-t from-slate-950 via-slate-800 to-slate-700;
+}

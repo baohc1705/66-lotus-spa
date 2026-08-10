@@ -1,8 +1,8 @@
-using _66SMS.Contracts.Constants;
+using _66SMS.Contract.Constants;
 using _66SMS.Domain.Constants;
 using FluentValidation;
 using System;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
 {

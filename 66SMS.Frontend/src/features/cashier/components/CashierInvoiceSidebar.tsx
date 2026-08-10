@@ -162,12 +162,14 @@ function CashierInvoiceSidebarForm({
     return new Date(y, m - 1, d);
   }, [booking.bookingDate]);
 
-  const timeSlotsQuery = useTimeSlots(
-    canEditAssignment && !booking.slotId ? (booking.bookingDate ?? null) : null,
-    booking.serviceId ?? undefined,
-    undefined,
-    salonId ?? undefined,
-  );
+  const timeSlotsQuery = useTimeSlots({
+    date:
+      canEditAssignment && !booking.slotId
+        ? (booking.bookingDate ?? undefined)
+        : undefined,
+    serviceId: booking.serviceId ?? undefined,
+    salonId: salonId ?? undefined,
+  });
 
   const resolvedSlotId = useMemo(() => {
     if (booking.slotId) return booking.slotId;
@@ -327,7 +329,7 @@ function CashierInvoiceSidebarForm({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs"
       onClick={onClose}
     >
       <div
@@ -358,7 +360,7 @@ function CashierInvoiceSidebarForm({
                   <FallbackImage
                     kind="customer"
                     src={booking.customerAvatar}
-                    alt={booking.customerName}
+                    alt={booking.customerName ?? undefined}
                     className="w-14 h-14 object-cover"
                   />
                 </div>

@@ -1,6 +1,6 @@
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Messages;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Messages;
+using _66SMS.Contract.Shared;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 

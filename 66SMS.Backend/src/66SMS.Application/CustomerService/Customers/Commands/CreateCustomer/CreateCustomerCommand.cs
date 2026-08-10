@@ -1,8 +1,8 @@
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Constants;
 using MediatR;
 using System.Text.Json.Serialization;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
 {
@@ -13,12 +13,10 @@ namespace _66SMS.Application.CustomerService.Customers.Commands.CreateCustomer
     {
         public string? FullName { get; set; }
         public string? AvatarUrl { get; set; }
-        /// <summary>Base64 ảnh mới — upload qua IImageUploadService.</summary>
         public string? ImageBase64 { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public int? Gender { get; set; }
         public string? Phone { get; set; }
-        /// <summary>Email tài khoản User (username/password = SĐT).</summary>
         public string? Email { get; set; }
         public int? LoyaltyPoint { get; set; }
         public DateTimeOffset? FirstPurchaseAt { get; set; }

@@ -1,14 +1,11 @@
-using _66SMS.Application.DTOs.Auth;
-using _66SMS.Contracts.Shared;
+using _66SMS.Application.DTOs;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.IdentityService.Permissions.Queries.GetAllPermissions
 {
-    /// <summary>
-    /// Handler for <see cref="GetAllPermissionsQuery"/>
-    /// </summary>
     public class GetAllPermissionsHandler : IRequestHandler<GetAllPermissionsQuery, Result<List<PermissionDTO>>>
     {
         private readonly IPermissionSqlRepository permissionSqlRepository;

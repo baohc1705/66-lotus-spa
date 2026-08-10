@@ -1,7 +1,7 @@
 using _66SMS.Application.BookingService.Helpers;
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Helpers;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Helpers;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using MediatR;
@@ -51,7 +51,7 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateMyBookingStatus
             if (request.Status == AppointmentConst.STATUS_COMPLETED)
             {
                 // Uncomment block ben duoi khi can bat check duration (demo thi de comment).
-                
+
                 //if (info.TimeStartService.HasValue)
                 //{
                 //    var durationMins = await appointmentSqlRepository.AsQueryable(true)
@@ -70,7 +70,6 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateMyBookingStatus
                 //            ErrorCodes.ERR_STAFF_COMPLETE_BEFORE_APPT_END);
                 //    }
                 //}
-                
             }
 
             var appointment = await appointmentSqlRepository.FindByIdAsync(info.Id, false, cancellationToken);

@@ -1,5 +1,5 @@
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
@@ -11,9 +11,6 @@ using System.Data;
 
 namespace _66SMS.Application.SalonService.Salons.Commands.CreateSalon
 {
-    /// <summary>
-    /// Handler for <see cref="CreateSalonCommand"/>
-    /// </summary>
     public class CreateSalonHandler : IRequestHandler<CreateSalonCommand, Result<object>>
     {
         private readonly ISalonSqlRepository salonSqlRepository;
@@ -42,7 +39,6 @@ namespace _66SMS.Application.SalonService.Salons.Commands.CreateSalon
                 request.ImageUrl = null;
 
             Salon salon = mapper.Map<Salon>(request);
-            salon.Code = string.Empty;
 
             if (request.IsPrimary != true)
                 salon.IsPrimary = null;

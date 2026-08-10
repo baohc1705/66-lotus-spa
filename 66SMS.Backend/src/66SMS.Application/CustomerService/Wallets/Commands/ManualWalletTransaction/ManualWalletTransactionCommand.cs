@@ -1,4 +1,4 @@
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 using MediatR;
 
 namespace _66SMS.Application.CustomerService.Wallets.Commands.ManualWalletTransaction
@@ -6,8 +6,8 @@ namespace _66SMS.Application.CustomerService.Wallets.Commands.ManualWalletTransa
     public class ManualWalletTransactionCommand : IRequest<Result<object>>
     {
         public int WalletId { get; set; }
-        public decimal Amount { get; set; } // Can be positive (deposit) or negative (deduct)
+        public decimal Amount { get; set; } 
         public string Note { get; set; } = null!;
-        public int UserId { get; set; } // Admin/Staff user performing this
+        public int UserId { get; set; }
     }
 }

@@ -88,7 +88,7 @@ export function AdminTopNavbar() {
               </Link>
             ) : (
               <button
-                className={`admin-nav-tab flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] font-sans text-sm font-normal whitespace-nowrap transition-all duration-300 outline-none ${
+                className={`admin-nav-tab flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] font-sans text-sm font-normal whitespace-nowrap transition-all duration-300 outline-hidden ${
                   isActive
                     ? "is-active"
                     : isTabOpen

@@ -1,5 +1,5 @@
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Shared;
+using _66SMS.Domain.Abstractions.Services;
+using _66SMS.Domain.Models;
 using ClosedXML.Excel;
 
 namespace _66SMS.Infrastructure.Excels
@@ -325,8 +325,6 @@ namespace _66SMS.Infrastructure.Excels
             sheet.Columns().AdjustToContents();
         }
 
-
-
         public byte[] BuildReportByPeriodWorkbook(DateOnly from, DateOnly to, string grain, IReadOnlyList<ReportRevenueByPeriodRowDto> rows)
         {
             using var workbook = new XLWorkbook();
@@ -414,20 +412,26 @@ namespace _66SMS.Infrastructure.Excels
 
             foreach (var item in rows)
             {
+                var staffCount = item.StaffCount ?? 0;
+                var orderCount = item.OrderCount ?? 0;
+                var cashIn = item.CashIn ?? 0;
+                var commissionOut = item.CommissionOut ?? 0;
+                var totalRevenue = item.TotalRevenue ?? 0;
+
                 sheet.Cell(row, 1).Value = stt++;
-                sheet.Cell(row, 2).Value = item.SalonName;
-                sheet.Cell(row, 3).Value = item.StaffCount;
-                sheet.Cell(row, 4).Value = item.OrderCount;
-                sheet.Cell(row, 5).Value = item.CashIn;
-                sheet.Cell(row, 6).Value = item.CommissionOut;
-                sheet.Cell(row, 7).Value = item.TotalRevenue;
+                sheet.Cell(row, 2).Value = item.SalonName ?? string.Empty;
+                sheet.Cell(row, 3).Value = staffCount;
+                sheet.Cell(row, 4).Value = orderCount;
+                sheet.Cell(row, 5).Value = cashIn;
+                sheet.Cell(row, 6).Value = commissionOut;
+                sheet.Cell(row, 7).Value = totalRevenue;
                 FormatMoney(sheet.Range(row, 5, row, 7));
 
-                sumStaff += item.StaffCount;
-                sumOrder += item.OrderCount;
-                sumCashIn += item.CashIn;
-                sumComm += item.CommissionOut;
-                sumGross += item.TotalRevenue;
+                sumStaff += staffCount;
+                sumOrder += orderCount;
+                sumCashIn += cashIn;
+                sumComm += commissionOut;
+                sumGross += totalRevenue;
                 row++;
             }
 

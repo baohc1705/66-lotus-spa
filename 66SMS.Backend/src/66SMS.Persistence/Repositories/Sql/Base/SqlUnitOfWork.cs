@@ -1,4 +1,4 @@
-﻿using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
+using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Data;

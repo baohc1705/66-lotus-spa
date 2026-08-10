@@ -45,7 +45,7 @@ export function BookingSalonStep() {
                   />
 
                   {isSelected && (
-                    <div className="absolute top-2 right-2 w-7 h-7 bg-rose-600 rounded-full flex items-center justify-center shadow-sm">
+                    <div className="absolute top-2 right-2 w-7 h-7 bg-rose-600 rounded-full flex items-center justify-center shadow-xs">
                       <Check className="w-4 h-4 text-white" />
                     </div>
                   )}

@@ -1,4 +1,4 @@
-﻿namespace _66SMS.Infrastructure.Payments.VnPay
+namespace _66SMS.Infrastructure.Payments.VnPay
 {
     public class VnPayCompare : IComparer<string>
     {

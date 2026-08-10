@@ -1,0 +1,12 @@
+namespace _66SMS.Domain.Models
+{
+    public class ReportRevenueByPeriodRowDto
+    {
+        public string PeriodKey { get; set; } = null!;
+        public int OrderCount { get; set; }
+        public decimal InvoiceTotal { get; set; }
+        public decimal CommissionTotal { get; set; }
+        public decimal CashOut { get; set; }
+        public decimal TotalRevenue { get; set; }
+    }
+}

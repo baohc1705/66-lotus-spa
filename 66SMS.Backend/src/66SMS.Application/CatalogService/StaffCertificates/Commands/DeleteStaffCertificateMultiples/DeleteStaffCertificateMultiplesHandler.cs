@@ -1,12 +1,12 @@
 using MediatR;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
-using _66SMS.Contracts.Enumerations;
+using _66SMS.Contract.Enumerations;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.CatalogService.StaffCertificates.Commands.DeleteStaffCertificateMultiples
 {

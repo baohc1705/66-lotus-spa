@@ -1,104 +1,134 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { HomePage } from "@/features/landing/pages/HomePage";
-import { ProfilePage } from "@/features/profile";
-import { ProtectedRoute } from "./ProtectedRoute";
-import {
-  AdminLayout,
-  AdminDashboard,
-  AdminProfilePage,
-} from "@/features/admin";
 import {
   LoginPage,
   RegisterPage,
   ForgotPasswordPage,
   ResetPasswordPage,
 } from "@/features/auth";
-import RolePermissionPage from "@/features/auth/pages/RolePermissionPage";
-import { BookingPage } from "@/features/booking";
-import { CashierPage, VnPayReturnPage } from "@/features/cashier";
-import { AccountListPage, UsersPage } from "@/features/users";
-import { StaffListPage } from "@/features/staffs";
-import { StaffAppointmentsPage } from "@/features/staff_appointments";
+import { AdminLayout } from "@/features/admin/AdminLayout";
+import { SettingsLayout } from "@/features/setttings/components/SettingsLayout";
+import { ProtectedRoute } from "./ProtectedRoute";
+import { WithPageSuspense } from "./WithPageSuspense";
 import {
+  ProfilePage,
+  AdminDashboard,
+  AdminProfilePage,
+  RolePermissionPage,
+  BookingPage,
+  CashierPage,
+  VnPayReturnPage,
+  AccountListPage,
+  UsersPage,
+  StaffListPage,
+  StaffAppointmentsPage,
   CustomerListPage,
   MembershipCardListPage,
   MembershipTierListPage,
-} from "@/features/customers";
-import { ProductListPage } from "@/features/products";
-import { ProductCategoryListPage } from "@/features/product_categories";
-import { ServiceListPage } from "@/features/services";
-import { ServiceCategoryListPage } from "@/features/service_categories";
-import { ShiftListPage } from "@/features/shifts";
-import { WorkSchedulePage } from "@/features/schedules";
-import { BookingRoomListPage } from "@/features/booking_rooms";
-import { BookingPositionListPage } from "@/features/booking_positions";
-import { TimeSlotListPage } from "@/features/time_slots";
-import { ConfigAppointmentListPage } from "@/features/config_appointments";
-import { WalletManagementPage } from "@/features/wallet";
-import { SalonListPage } from "@/features/salons";
-import { LandingBannerListPage } from "@/features/landing-banners";
-import { TreatmentCourseListPage } from "@/features/treatment_courses";
-import { InvoiceListPage } from "@/features/invoices";
-import { AttendanceListPage } from "@/features/attendance";
-import { PayrollListPage, PayrollStatsPage } from "@/features/payroll";
-import {
+  ProductListPage,
+  ProductCategoryListPage,
+  ServiceListPage,
+  ServiceCategoryListPage,
+  ShiftListPage,
+  WorkSchedulePage,
+  BookingRoomListPage,
+  BookingPositionListPage,
+  TimeSlotListPage,
+  ConfigAppointmentListPage,
+  WalletManagementPage,
+  SalonListPage,
+  LandingBannerListPage,
+  TreatmentCourseListPage,
+  InvoiceListPage,
+  AttendanceListPage,
+  PayrollListPage,
+  PayrollStatsPage,
   CertificateTypesPage,
   StaffCertificatesPage,
-} from "@/features/certificates";
-import { PromotionListPage } from "@/features/promotions";
-import { RevenueByDayPage, RevenueBySalonPage, RevenueByServicePage, RevenueByStaffPage } from "@/features/revenue";
+  PromotionListPage,
+  RevenueByDayPage,
+  RevenueBySalonPage,
+  RevenueByServicePage,
+  RevenueByStaffPage,
+  SettingsHomePage,
+  ButtonsPage,
+  DropdownsPage,
+  IconsPage,
+  BadgesPage,
+  CardsPage,
+  ListGroupsPage,
+  NavigationPage,
+  UtilitiesPage,
+  TabsPage,
+  AccordionsPage,
+  NotificationsPage,
+  ModalsPage,
+  ProgressPage,
+  TooltipsPage,
+  CarouselPage,
+  CalendarPage,
+  PaginationPage,
+  ScrollablePage,
+  MapsPage,
+  ControlsPage,
+  LayoutsPage,
+  ValidationPage,
+  RegularPage,
+  DataTablePage,
+  BoxesPage,
+  RechartsPage,
+  DashboardExample1Page,
+} from "./lazyPages";
 
 export const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <HomePage />,
-  },
-  {
-    path: "/login",
-    element: <LoginPage />,
-  },
-  {
-    path: "/register",
-    element: <RegisterPage />,
-  },
-  {
-    path: "/forgot-password",
-    element: <ForgotPasswordPage />,
-  },
-  {
-    path: "/reset-password",
-    element: <ResetPasswordPage />,
-  },
+  { path: "/", element: <HomePage /> },
+  { path: "/login", element: <LoginPage /> },
+  { path: "/register", element: <RegisterPage /> },
+  { path: "/forgot-password", element: <ForgotPasswordPage /> },
+  { path: "/reset-password", element: <ResetPasswordPage /> },
   {
     path: "/thanh-toan/vnpay-return",
-    element: <VnPayReturnPage />,
+    element: (
+      <WithPageSuspense>
+        <VnPayReturnPage />
+      </WithPageSuspense>
+    ),
   },
   {
     path: "/dat-lich",
-    element: <BookingPage />,
+    element: (
+      <WithPageSuspense>
+        <BookingPage />
+      </WithPageSuspense>
+    ),
   },
   {
     element: <ProtectedRoute />,
     children: [
-      // {
-      //   path: "/dat-lich",
-      //   element: <BookingPage />,
-      // },
-      {
-        path: "/dashboard",
-        element: <div className="p-6">Dashboard</div>,
-      },
+      { path: "/dashboard", element: <div className="p-6">Dashboard</div> },
       {
         path: "/users",
-        element: <UsersPage />,
+        element: (
+          <WithPageSuspense>
+            <UsersPage />
+          </WithPageSuspense>
+        ),
       },
       {
         path: "/profile",
-        element: <ProfilePage />,
+        element: (
+          <WithPageSuspense>
+            <ProfilePage />
+          </WithPageSuspense>
+        ),
       },
       {
         path: "/thu-ngan",
-        element: <CashierPage />,
+        element: (
+          <WithPageSuspense>
+            <CashierPage />
+          </WithPageSuspense>
+        ),
       },
       {
         path: "/admin",
@@ -106,146 +136,513 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AdminDashboard />,
+            element: (
+              <WithPageSuspense>
+                <AdminDashboard />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "profile",
-            element: <AdminProfilePage />,
+            element: (
+              <WithPageSuspense>
+                <AdminProfilePage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "staff/list",
-            element: <StaffListPage />,
+            element: (
+              <WithPageSuspense>
+                <StaffListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "staff/appointments",
-            element: <StaffAppointmentsPage />,
+            element: (
+              <WithPageSuspense>
+                <StaffAppointmentsPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "customers/list",
-            element: <CustomerListPage />,
+            element: (
+              <WithPageSuspense>
+                <CustomerListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "customers/membership-cards",
-            element: <MembershipCardListPage />,
+            element: (
+              <WithPageSuspense>
+                <MembershipCardListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "customers/membership-tiers",
-            element: <MembershipTierListPage />,
+            element: (
+              <WithPageSuspense>
+                <MembershipTierListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "products/list",
-            element: <ProductListPage />,
+            element: (
+              <WithPageSuspense>
+                <ProductListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "products/categories",
-            element: <ProductCategoryListPage />,
+            element: (
+              <WithPageSuspense>
+                <ProductCategoryListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "services",
-            element: <ServiceListPage />,
+            element: (
+              <WithPageSuspense>
+                <ServiceListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "rooms/list",
-            element: <BookingRoomListPage />,
+            element: (
+              <WithPageSuspense>
+                <BookingRoomListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "rooms/positions",
-            element: <BookingPositionListPage />,
+            element: (
+              <WithPageSuspense>
+                <BookingPositionListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "timeslots",
-            element: <TimeSlotListPage />,
+            element: (
+              <WithPageSuspense>
+                <TimeSlotListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "config-appointments",
-            element: <ConfigAppointmentListPage />,
+            element: (
+              <WithPageSuspense>
+                <ConfigAppointmentListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "services/categories",
-            element: <ServiceCategoryListPage />,
+            element: (
+              <WithPageSuspense>
+                <ServiceCategoryListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "shifts",
-            element: <ShiftListPage />,
+            element: (
+              <WithPageSuspense>
+                <ShiftListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "staff/schedule",
-            element: <WorkSchedulePage />,
+            element: (
+              <WithPageSuspense>
+                <WorkSchedulePage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "customers/wallets",
-            element: <WalletManagementPage />,
+            element: (
+              <WithPageSuspense>
+                <WalletManagementPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "salons",
-            element: <SalonListPage />,
+            element: (
+              <WithPageSuspense>
+                <SalonListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "landing-banners",
-            element: <LandingBannerListPage />,
+            element: (
+              <WithPageSuspense>
+                <LandingBannerListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "roles",
-            element: <RolePermissionPage />,
+            element: (
+              <WithPageSuspense>
+                <RolePermissionPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "treatments",
-            element: <TreatmentCourseListPage />,
+            element: (
+              <WithPageSuspense>
+                <TreatmentCourseListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "invoices",
-            element: <InvoiceListPage />,
+            element: (
+              <WithPageSuspense>
+                <InvoiceListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "certificate-types",
-            element: <CertificateTypesPage />,
+            element: (
+              <WithPageSuspense>
+                <CertificateTypesPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "staff-certificates",
-            element: <StaffCertificatesPage />,
+            element: (
+              <WithPageSuspense>
+                <StaffCertificatesPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "attendance",
-            element: <AttendanceListPage />,
+            element: (
+              <WithPageSuspense>
+                <AttendanceListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "payroll",
-            element: <PayrollListPage />,
+            element: (
+              <WithPageSuspense>
+                <PayrollListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "payroll/stats",
-            element: <PayrollStatsPage />,
+            element: (
+              <WithPageSuspense>
+                <PayrollStatsPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "marketing/promotions",
-            element: <PromotionListPage />,
+            element: (
+              <WithPageSuspense>
+                <PromotionListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "accounts",
-            element: <AccountListPage />,
+            element: (
+              <WithPageSuspense>
+                <AccountListPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "reports/revenue/by-day",
-            element: <RevenueByDayPage />,
+            element: (
+              <WithPageSuspense>
+                <RevenueByDayPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "reports/revenue/by-salon",
-            element: <RevenueBySalonPage />,
+            element: (
+              <WithPageSuspense>
+                <RevenueBySalonPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "reports/revenue/by-staff",
-            element: <RevenueByStaffPage />,
+            element: (
+              <WithPageSuspense>
+                <RevenueByStaffPage />
+              </WithPageSuspense>
+            ),
           },
           {
             path: "reports/revenue/by-service",
-            element: <RevenueByServicePage />,
+            element: (
+              <WithPageSuspense>
+                <RevenueByServicePage />
+              </WithPageSuspense>
+            ),
           },
         ],
       },
     ],
   },
   {
-    path: "*",
-    element: <Navigate to="/" replace />,
+    path: "/demo",
+    element: <SettingsLayout />,
+    children: [
+      {
+        index: true,
+        element: (
+          <WithPageSuspense>
+            <SettingsHomePage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "dashboards/example-1",
+        element: (
+          <WithPageSuspense>
+            <DashboardExample1Page />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "elements/buttons",
+        element: (
+          <WithPageSuspense>
+            <ButtonsPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "elements/dropdowns",
+        element: (
+          <WithPageSuspense>
+            <DropdownsPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "elements/icons",
+        element: (
+          <WithPageSuspense>
+            <IconsPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "elements/badges",
+        element: (
+          <WithPageSuspense>
+            <BadgesPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "elements/cards",
+        element: (
+          <WithPageSuspense>
+            <CardsPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "elements/list-groups",
+        element: (
+          <WithPageSuspense>
+            <ListGroupsPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "elements/navigation",
+        element: (
+          <WithPageSuspense>
+            <NavigationPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "elements/utilities",
+        element: (
+          <WithPageSuspense>
+            <UtilitiesPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "components/tabs",
+        element: (
+          <WithPageSuspense>
+            <TabsPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "components/accordions",
+        element: (
+          <WithPageSuspense>
+            <AccordionsPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "components/notifications",
+        element: (
+          <WithPageSuspense>
+            <NotificationsPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "components/modals",
+        element: (
+          <WithPageSuspense>
+            <ModalsPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "components/progress",
+        element: (
+          <WithPageSuspense>
+            <ProgressPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "components/tooltips",
+        element: (
+          <WithPageSuspense>
+            <TooltipsPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "components/carousel",
+        element: (
+          <WithPageSuspense>
+            <CarouselPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "components/calendar",
+        element: (
+          <WithPageSuspense>
+            <CalendarPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "components/pagination",
+        element: (
+          <WithPageSuspense>
+            <PaginationPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "components/scrollable",
+        element: (
+          <WithPageSuspense>
+            <ScrollablePage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "components/maps",
+        element: (
+          <WithPageSuspense>
+            <MapsPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "forms/controls",
+        element: (
+          <WithPageSuspense>
+            <ControlsPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "forms/layouts",
+        element: (
+          <WithPageSuspense>
+            <LayoutsPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "forms/validation",
+        element: (
+          <WithPageSuspense>
+            <ValidationPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "tables/regular",
+        element: (
+          <WithPageSuspense>
+            <RegularPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "tables/datatable",
+        element: (
+          <WithPageSuspense>
+            <DataTablePage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "widgets/boxes",
+        element: (
+          <WithPageSuspense>
+            <BoxesPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "charts/recharts",
+        element: (
+          <WithPageSuspense>
+            <RechartsPage />
+          </WithPageSuspense>
+        ),
+      },
+      {
+        path: "charts/chartjs",
+        element: <Navigate to="/demo/charts/recharts" replace />,
+      },
+    ],
   },
+  { path: "*", element: <Navigate to="/" replace /> },
 ]);

@@ -5,7 +5,7 @@ namespace _66SMS.Domain.Entities
     public class Wallet : EntityBase<int>
     {
         public int CustomerId { get; set; }
-        public decimal Balance { get; set; }
+        public decimal Balance { get; set; } = 0;
         public int Status { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }

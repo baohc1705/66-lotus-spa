@@ -26,7 +26,7 @@ namespace _66SMS.Domain.Constants
         public const string MSG_WALLET_ID_NOT_FOUND = $"{nameof(Entities.Wallet)} with id not found";
         public const string MSG_WALLET_NOT_FOUND = "Ví không tồn tại.";
         public const string MSG_WALLET_INVALID_AMOUNT = "Số tiền phải khác 0.";
-        public const string MSG_WALLET_INSUFFICIENT_BALANCE = "Số dư ví không đủ để thanh toán tiền cọc.";
+        public const string MSG_WALLET_INSUFFICIENT_BALANCE = "Số dư ví không đủ để thanh toán.";
         public const string MSG_WALLET_TRANSACTION_SUCCESS = "Giao dịch thành công.";
         public const string MSG_WALLET_NOT_ACTIVE = "Ví không ở trạng thái hoạt động.";
         public const string MSG_WALLET_TOP_UP_AMOUNT_RANGE = "Số tiền nạp phải từ 10.000đ đến 50.000.000đ.";

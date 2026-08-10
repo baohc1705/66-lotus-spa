@@ -6,7 +6,7 @@ namespace _66SMS.Domain.Entities
     {
         public int ServiceId { get; set; }
         public int ProductId { get; set; }
-        public int QuantityUsed { get; set; }
+        public int QuantityUsed { get; set; } = 0;
         public string? Note { get; set; }
         public decimal? UnitCost { get; set; }
         public int Status { get; set; }

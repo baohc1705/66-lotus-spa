@@ -1,4 +1,4 @@
-﻿using _66SMS.Contracts.Settings;
+using _66SMS.Contract.Settings;
 using _66SMS.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

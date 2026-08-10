@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 
-namespace _66SMS.Contracts.Abstractions
+namespace _66SMS.Contract.Abstractions
 {
     public interface IJwtService
     {

@@ -1,5 +1,5 @@
-using _66SMS.Contracts.Extensions;  
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Extensions;  
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Enums;
 using MediatR;
@@ -7,9 +7,6 @@ using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.CatalogService.Products.Queries.GetAllProducts
 {
-    /// <summary>
-    /// Handler for <see cref="GetAllProductQuery"/>
-    /// </summary>
     public class GetAllProductHandler : IRequestHandler<GetAllProductQuery, Result<PagedResult<ProductDto>>>
     {
         private readonly IProductSqlRepository productSqlRepository;

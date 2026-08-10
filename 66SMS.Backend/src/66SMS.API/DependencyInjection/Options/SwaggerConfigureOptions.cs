@@ -23,7 +23,7 @@ namespace _66SMS.API.DependencyInjection.Options
                 {
                     Title = apiConfig.Name,
                     Version = description.ApiVersion.ToString(),
-                    Description = description.IsDeprecated ? "Phien ban ngay ngung ho tro" : null
+                    Description = description.IsDeprecated ? "This version is no longer supported" : null
                 });
             }
 
@@ -35,7 +35,7 @@ namespace _66SMS.API.DependencyInjection.Options
                 Scheme = "Bearer",
                 BearerFormat = "JWT",
                 In = ParameterLocation.Header,
-                Description = "Nhap token cua ban o day."
+                Description = "Enter your token here."
             });
 
             options.OperationFilter<AuthorizeCheckOperationFilter>();

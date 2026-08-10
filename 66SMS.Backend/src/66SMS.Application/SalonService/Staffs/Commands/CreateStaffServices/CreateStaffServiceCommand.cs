@@ -1,7 +1,7 @@
 using MediatR;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 using System.Text.Json.Serialization;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 using _66SMS.Domain.Enums;
 
 namespace _66SMS.Application.SalonService.Staffs.Commands.CreateStaffServices;

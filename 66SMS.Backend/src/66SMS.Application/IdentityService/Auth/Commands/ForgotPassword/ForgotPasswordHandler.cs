@@ -1,9 +1,9 @@
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Constants;
-using _66SMS.Contracts.Helpers;
-using _66SMS.Contracts.Messages;
-using _66SMS.Contracts.Settings;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Constants;
+using _66SMS.Contract.Helpers;
+using _66SMS.Contract.Messages;
+using _66SMS.Contract.Settings;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Entities;
@@ -14,9 +14,6 @@ using Microsoft.Extensions.Options;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.ForgotPassword
 {
-    /// <summary>
-    /// Handler for <see cref="ForgotPasswordCommand"/>
-    /// </summary>
     public class ForgotPasswordHandler : IRequestHandler<ForgotPasswordCommand, Result<object>>
     {
         private readonly IUserSqlRepository userSqlRepository;
@@ -51,7 +48,6 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.ForgotPassword
                 .Where(x => x.Email.ToLower() == email)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            // Luôn trả về Ok dù không tìm thấy user (chống user enumeration)
             if (user == null)
                 return Result<object>.Ok();
 

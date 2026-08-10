@@ -31,7 +31,7 @@ function TicketPunchRow({ edge }: { edge: "top" | "bottom" }) {
       {Array.from({ length: holeCount }).map((_, i) => (
         <div
           key={`${edge}-${i}`}
-          className="w-4 h-4 rounded-full bg-page shadow-sm shrink-0"
+          className="w-4 h-4 rounded-full bg-page shadow-xs shrink-0"
         />
       ))}
     </div>
@@ -41,8 +41,6 @@ function TicketPunchRow({ edge }: { edge: "top" | "bottom" }) {
 function TicketDivider() {
   return <div className="h-px bg-warm-100" />;
 }
-
-const DEFAULT_DEPOSIT_PERCENT = 20;
 
 export function BookingSummarySidebar() {
   const {
@@ -59,9 +57,18 @@ export function BookingSummarySidebar() {
   const membershipCardQuery = useMyMembershipCard(!!accessToken);
   const tiersQuery = useMembershipTiers();
   const configQuery = useConfigAppointmentBySalon(selectedSalon?.id);
-
   const depositPercent =
-    configQuery.data?.data?.depositPercent ?? DEFAULT_DEPOSIT_PERCENT;
+    configQuery.data?.isSuccess === true
+      ? (configQuery.data.data?.depositPercent ?? undefined)
+      : undefined;
+  const hasDepositConfig = typeof depositPercent === "number";
+  const configError =
+    !!selectedSalon?.id &&
+    (configQuery.isError ||
+      (configQuery.isSuccess && configQuery.data?.isSuccess === false) ||
+      (configQuery.isSuccess &&
+        configQuery.data?.isSuccess === true &&
+        !hasDepositConfig));
 
   const membershipTier = tiersQuery.data?.find(
     (t) => t.id === membershipCardQuery.data?.membershipTierId,
@@ -83,7 +90,9 @@ export function BookingSummarySidebar() {
     0,
     servicesSubTotal - membershipDiscount - promoDiscount,
   );
-  const deposit = Math.round((finalTotal * depositPercent) / 100);
+  const deposit = hasDepositConfig
+    ? Math.round((finalTotal * depositPercent) / 100)
+    : 0;
 
   return (
     <div className="relative">
@@ -296,10 +305,18 @@ export function BookingSummarySidebar() {
             </div>
 
             <div className="flex justify-between items-center text-xs text-warm-600">
-              <span>Thanh toán cọc ({depositPercent}%):</span>
-              <span className="font-bold text-ink">
-                {deposit.toLocaleString("vi-VN")}đ
-              </span>
+              {configError ? (
+                <span className="text-error-text">
+                  Chưa cấu hình phần trăm cọc cho chi nhánh
+                </span>
+              ) : (
+                <>
+                  <span>Thanh toán cọc ({depositPercent}%):</span>
+                  <span className="font-bold text-ink">
+                    {deposit.toLocaleString("vi-VN")}đ
+                  </span>
+                </>
+              )}
             </div>
           </div>
 

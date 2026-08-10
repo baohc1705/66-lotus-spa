@@ -26,7 +26,7 @@ function ChartTooltip({ active, payload, label }: TooltipProps) {
   if (!active || !payload?.length) return null;
 
   return (
-    <div className="rounded-md border bg-white px-3 py-2 text-xs shadow-sm">
+    <div className="rounded-md border bg-white px-3 py-2 text-xs shadow-xs">
       <div className="mb-1 font-semibold text-slate-800">{label}</div>
       <div className="text-lotus-primary">
         Doanh thu: {formatCurrency(Number(payload[0].value))}

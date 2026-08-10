@@ -5,21 +5,17 @@ import {
   ChevronRight,
   MapPin,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import {
   useAvailableBookingDays,
-  useCreateSlotLock,
   useTechnicians,
   useTimeSlots,
 } from "../hooks/useBookingData";
 import { useBookingStore } from "../stores/bookingStore";
 import { filterSlotsAfterNow } from "../utils/timeSlot.utils";
 import { formatDate } from "@/shared/utils/date.utils";
-import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { FallbackImage } from "@/shared/components/FallbackImage";
-import type { AxiosError } from "axios";
-import type { Result } from "@/shared/types/common.types";
 import type { BookingDayDto, TimeSlotDTO } from "../types/booking.types";
 
 export function BookingTimeStep() {
@@ -49,17 +45,17 @@ export function BookingTimeStep() {
     ? formatDate(selectedDate).format("YYYY-MM-DD")
     : null;
 
-  const { data: technicians = [], isLoading: loadingTechs } = useTechnicians(
-    dateInput,
+  const { data: technicians = [], isLoading: loadingTechs } = useTechnicians({
+    date: dateInput ?? undefined,
     serviceId,
-    selectedSalon?.id,
-  );
-  const { data: timeSlots = [], isLoading: loadingSlots } = useTimeSlots(
-    dateInput,
+    salonId: selectedSalon?.id,
+  });
+  const { data: timeSlots = [], isLoading: loadingSlots } = useTimeSlots({
+    date: dateInput ?? undefined,
     serviceId,
-    selectedTechnician?.id,
-    selectedSalon?.id,
-  );
+    staffId: selectedTechnician?.id,
+    salonId: selectedSalon?.id,
+  });
 
   const visibleTimeSlots = useMemo(
     () => filterSlotsAfterNow(timeSlots, dateInput),
@@ -70,7 +66,10 @@ export function BookingTimeStep() {
     if (
       selectedTimeSlot &&
       !visibleTimeSlots.some(
-        (s: TimeSlotDTO) => s.slotId === selectedTimeSlot.slotId,
+        (s: TimeSlotDTO) =>
+          s.slotId === selectedTimeSlot.slotId &&
+          (s.status?.toLowerCase() === "available" ||
+            s.status?.toLowerCase() === "trống"),
       )
     ) {
       selectTimeSlot(null);
@@ -80,10 +79,7 @@ export function BookingTimeStep() {
   const hasWorkingTechnicians = technicians.length > 0;
   const isStep2Valid = !!selectedDate && !!selectedTimeSlot;
 
-  const { mutateAsync: createSlotLock } = useCreateSlotLock();
-  const [isLocking, setIsLocking] = useState(false);
-
-  const handleNextStep = async () => {
+  const handleNextStep = () => {
     const validGuests = store.guests.filter(
       (g) => g.selectedService && g.selectedDate && g.selectedTimeSlot,
     );
@@ -93,46 +89,7 @@ export function BookingTimeStep() {
       return;
     }
 
-    const guestsToLock = validGuests.filter((g) => !g.lockId);
-
-    if (guestsToLock.length === 0) {
-      nextStep();
-      return;
-    }
-
-    try {
-      setIsLocking(true);
-      const payload = guestsToLock.map((g) => ({
-        slotId: g.selectedTimeSlot!.slotId,
-        staffId: g.selectedTechnician?.id ?? null,
-        appointmentDate: formatDate(g.selectedDate!).format("YYYY-MM-DD"),
-        serviceId: g.selectedService!.id ?? 0,
-      }));
-
-      const res = await createSlotLock(payload);
-      if (res.success && res.lockIds) {
-        guestsToLock.forEach((g, idx) => {
-          const originalIndex = store.guests.findIndex(
-            (storeG) => storeG.id === g.id,
-          );
-          if (originalIndex !== -1 && res.lockIds[idx]) {
-            store.setGuestLockId(originalIndex, res.lockIds[idx]);
-          }
-        });
-        nextStep();
-      } else {
-        toast.error("Không thể giữ khung giờ này, vui lòng chọn giờ khác.");
-      }
-    } catch (error) {
-      toast.error(
-        getErrorMessage(
-          error as AxiosError<Result<unknown>>,
-          "Khung giờ vừa có người đặt, vui lòng chọn lại.",
-        ),
-      );
-    } finally {
-      setIsLocking(false);
-    }
+    nextStep();
   };
 
   return (
@@ -282,6 +239,10 @@ export function BookingTimeStep() {
               Đã đặt
             </div>
             <div className="flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-warm-200 inline-block" />
+              Không đủ giờ
+            </div>
+            <div className="flex items-center gap-1">
               <span className="w-2.5 h-2.5 rounded-full bg-warm-100 inline-block" />
               Ngoài giờ
             </div>
@@ -321,6 +282,10 @@ export function BookingTimeStep() {
                 label = "Đã đặt";
                 classes =
                   "border-error-bg bg-error-bg text-error-text cursor-not-allowed line-through opacity-60";
+              } else if (s === "short") {
+                label = "Không đủ giờ";
+                classes =
+                  "border-warm-100 bg-warm-50 text-warm-400 cursor-not-allowed opacity-60";
               } else if (s === "outside") {
                 label = "Ngoài giờ";
                 classes =
@@ -360,7 +325,7 @@ export function BookingTimeStep() {
         </button>
         <button
           onClick={handleNextStep}
-          disabled={!isStep2Valid || isLocking}
+          disabled={!isStep2Valid}
           className={`flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-full font-bold transition-all ${
             isStep2Valid
               ? "bg-rose-600 text-white hover:bg-rose-500"

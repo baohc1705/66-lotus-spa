@@ -1,4 +1,4 @@
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -18,22 +18,22 @@ namespace _66SMS.Application.IdentityService.Users.Queries.GetMyWallet
 
         public async Task<Result<MyWalletDto>> Handle(GetMyWalletQuery request, CancellationToken cancellationToken)
         {
-            var user = await userSqlRepository.AsQueryable(asNoTracking: true)
-                .Include(u => u.Customer)
-                .FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
+            var customerId = await userSqlRepository.AsQueryable(asNoTracking: true)
+                .Where(u => u.Id == request.UserId)
+                .Select(u => u.Customer != null ? (int?)u.Customer.Id : null)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            if (user == null || user.Customer == null)
-            {
-                // Nếu User chưa có Customer profile, mặc định số dư là 0 (chưa có Ví)
+            if (customerId == null)
                 return Result<MyWalletDto>.Success(new MyWalletDto { Balance = 0 });
-            }
 
-            var wallet = await walletSqlRepository.AsQueryable(asNoTracking: true)
-                .FirstOrDefaultAsync(w => w.CustomerId == user.Customer.Id, cancellationToken);
+            var balance = await walletSqlRepository.AsQueryable(asNoTracking: true)
+                .Where(w => w.CustomerId == customerId.Value)
+                .Select(w => (decimal?)w.Balance)
+                .FirstOrDefaultAsync(cancellationToken);
 
             return Result<MyWalletDto>.Success(new MyWalletDto
             {
-                Balance = wallet?.Balance ?? 0
+                Balance = balance ?? 0
             });
         }
     }

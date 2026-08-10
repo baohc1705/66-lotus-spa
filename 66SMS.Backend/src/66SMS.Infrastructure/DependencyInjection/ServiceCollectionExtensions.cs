@@ -1,5 +1,6 @@
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Settings;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Settings;
+using _66SMS.Domain.Abstractions.Services;
 using _66SMS.Infrastructure.DependencyInjection.Extensions;
 using _66SMS.Infrastructure.Excels;
 using _66SMS.Infrastructure.Mails;
@@ -16,6 +17,12 @@ namespace _66SMS.Infrastructure.DependencyInjection
             // Jwt service
             services.AddScoped<IJwtService, JwtService>();
             services.AddJwtService(configuration);
+
+            // Cookie
+            services.AddScoped<ICookieService, CookieService>();
+
+            // Client IP
+            services.AddScoped<IClientIpService, ClientIpService>();
 
             // Hash pass
             services.AddScoped<IPasswordHash, PasswordHash>();

@@ -161,11 +161,11 @@ export function CashierPage() {
 
           <div className="flex-1 flex min-h-0 min-w-0 w-full overflow-hidden relative z-10 border-t border-adminGray-100">
             {isLoading ? (
-              <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-sm">
+              <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-xs">
                 <Loader2 className="w-8 h-8 text-adminGreen-600 animate-spin" />
               </div>
             ) : isError ? (
-              <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-sm text-adminGreen-600 text-sm gap-2">
+              <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-xs text-adminGreen-600 text-sm gap-2">
                 <span>{error ?? "Không tải được lịch hẹn"}</span>
                 <button
                   type="button"
@@ -176,7 +176,7 @@ export function CashierPage() {
                 </button>
               </div>
             ) : !data ? (
-              <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-sm text-adminGray-600">
+              <div className="flex-1 flex items-center justify-center bg-white/50 backdrop-blur-xs text-adminGray-600">
                 Không thể tải dữ liệu lưới lịch
               </div>
             ) : timeRange === "weekly" ? (

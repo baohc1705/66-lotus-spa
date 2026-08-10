@@ -1,4 +1,3 @@
-using _66SMS.Application.DTOs.Staffs;
 using _66SMS.Application.SalonService.Salons.Commands.CreateSalon;
 using _66SMS.Application.SalonService.Salons.Commands.UpdateSalon;
 using _66SMS.Application.SalonService.Staffs.Commands.CreateStaff;

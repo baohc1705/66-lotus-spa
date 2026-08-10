@@ -1,5 +1,4 @@
-using _66SMS.Application.DTOs.Provinces;
-using _66SMS.Application.DTOs.Wards;
+using _66SMS.Application.DTOs;
 using _66SMS.Domain.Entities;
 using AutoMapper;
 

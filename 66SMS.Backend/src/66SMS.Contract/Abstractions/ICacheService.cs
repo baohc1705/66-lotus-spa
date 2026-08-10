@@ -1,4 +1,4 @@
-namespace _66SMS.Contracts.Abstractions
+namespace _66SMS.Contract.Abstractions
 {
     /// <summary>
     /// Cache phân tán (Redis). Chỉ cache Data DTO, không cache Result

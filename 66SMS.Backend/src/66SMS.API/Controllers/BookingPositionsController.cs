@@ -7,7 +7,6 @@ using _66SMS.Application.BookingService.BookingPositions.Queries.GetDetailBookin
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace _66SMS.API.Controllers

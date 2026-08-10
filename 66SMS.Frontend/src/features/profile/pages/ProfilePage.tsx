@@ -122,7 +122,7 @@ export function ProfilePage() {
       <div className="relative z-10 flex flex-col min-h-screen">
         <Navbar alwaysDark />
 
-        <div className="flex-grow pt-20 pb-10">
+        <div className="grow pt-20 pb-10">
           <div className="landing-container space-y-2">
             <ProfileHeaderBanner profile={profile} />
 
@@ -132,7 +132,7 @@ export function ProfilePage() {
                 onTabChange={handleTabChange}
               />
 
-              <div className="flex-1 w-full min-w-0 bg-white rounded-xl shadow-sm overflow-hidden">
+              <div className="flex-1 w-full min-w-0 bg-white rounded-xl shadow-xs overflow-hidden">
                 <div className="p-4 md:p-5">{renderContent()}</div>
               </div>
             </div>

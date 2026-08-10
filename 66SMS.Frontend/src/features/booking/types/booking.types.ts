@@ -33,21 +33,26 @@ export interface BookingPositionDTO {
   status?: number;
 }
 export interface SlotLockDto {
-  slotId: number;
-  staffId: number | null;
+  slotId?: number;
+  staffId?: number | null;
   positionId?: number | null;
-  appointmentDate: string;
-  serviceId: number;
+  appointmentDate?: string;
+  serviceId?: number;
 }
+
+export interface CreateSlotLockPayload {
+  locks: SlotLockDto[];
+}
+
 export interface GuestAppointmentDto {
   lockId?: number;
-  staffId: number | null;
-  slotId: number;
-  appointmentDate: string;
+  staffId?: number | null;
+  slotId?: number;
+  appointmentDate?: string;
   positionId?: number | null;
   salonId?: number | null;
   note?: string;
-  services: { serviceId: number; quantity: number }[];
+  services?: { serviceId?: number; quantity?: number }[];
 }
 
 export interface PromotionValidationDto {
@@ -72,9 +77,38 @@ export interface ActivePromotionDto {
   endDate?: string | null;
 }
 
-export interface CreateBookingPayload {
+export interface CreateAppointmentPayload {
   promotionCode?: string;
   guests: GuestAppointmentDto[];
+}
+
+export type CreateBookingPayload = CreateAppointmentPayload;
+
+export interface GetAvailableBookingDaysParams {
+  days?: number;
+}
+
+export interface GetTechniciansParams {
+  date?: string;
+  serviceId?: number;
+  salonId?: number;
+}
+
+export interface GetTimeSlotsParams {
+  date?: string;
+  serviceId?: number;
+  staffId?: number;
+  salonId?: number;
+}
+
+export interface GetAllAppointmentParams {
+  userId?: number;
+  salonId?: number;
+  pageIndex?: number;
+  pageSize?: number;
+  filter?: string;
+  orderBy?: string;
+  isDescending?: boolean;
 }
 
 export type CreateSlotLockResponseDto = number[];

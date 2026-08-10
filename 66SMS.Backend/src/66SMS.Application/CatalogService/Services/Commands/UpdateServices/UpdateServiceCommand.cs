@@ -1,8 +1,8 @@
 using _66SMS.Application.CatalogService.Services.Commands.CreateServices;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Shared;
 using MediatR;
 using System.Text.Json.Serialization;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.CatalogService.Services.Commands.UpdateServices
 {

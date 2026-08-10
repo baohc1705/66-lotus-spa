@@ -181,7 +181,7 @@ export function CashierGrid({
   return (
     <div className="flex-1 min-h-0 min-w-0 w-full overflow-auto scrollbar-thin bg-white relative font-sans">
       <div className="flex min-w-max">
-        <div className="w-16 flex-shrink-0 border-r border-adminGray-300/80 bg-adminGreen-50/20 sticky left-0 z-30">
+        <div className="w-16 shrink-0 border-r border-adminGray-300/80 bg-adminGreen-50/20 sticky left-0 z-30">
           <div className="h-11 border-b border-adminGray-300/80 sticky top-0 left-0 bg-adminGreen-50/50 z-50"></div>
           <div className="relative">
             {HOURS.map((hour) => (
@@ -197,7 +197,7 @@ export function CashierGrid({
                 className="absolute left-0.5 right-0.5 z-30 flex items-center justify-center pointer-events-none"
                 style={{ top: `${currentTimeY}px` }}
               >
-                <div className="bg-state-danger-solid text-white text-2xs px-1 rounded-[2px] shadow-sm font-bold -translate-y-1/2 border border-state-danger-solid">
+                <div className="bg-state-danger-solid text-white text-2xs px-1 rounded-[2px] shadow-xs font-bold -translate-y-1/2 border border-state-danger-solid">
                   {currentH.toString().padStart(2, "0")}:
                   {currentM.toString().padStart(2, "0")}
                 </div>
@@ -261,7 +261,7 @@ export function CashierGrid({
                               )
                             }
                           >
-                            <div className="absolute left-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 bg-adminInk text-white text-2xs px-1 rounded-[2px] z-20 font-medium shadow-sm transition-opacity">
+                            <div className="absolute left-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 bg-adminInk text-white text-2xs px-1 rounded-[2px] z-20 font-medium shadow-xs transition-opacity">
                               {hour.toString().padStart(2, "0")}:
                               {min.toString().padStart(2, "0")}
                             </div>
@@ -371,7 +371,7 @@ export function CashierGrid({
                                 </div>
                                 <div
                                   className={cn(
-                                    "w-1.5 h-1.5 rounded-full flex-shrink-0",
+                                    "w-1.5 h-1.5 rounded-full shrink-0",
                                     statusBadge,
                                   )}
                                 ></div>
@@ -380,7 +380,7 @@ export function CashierGrid({
                                 {booking.serviceName}
                               </div>
                               <div className="text-2xs opacity-75 mt-0.5 flex items-center gap-0.5 truncate whitespace-nowrap">
-                                <Clock className="w-2 h-2 flex-shrink-0" />
+                                <Clock className="w-2 h-2 shrink-0" />
                                 {booking.startTime} - {booking.endTime}
                               </div>
                             </div>
@@ -389,7 +389,7 @@ export function CashierGrid({
 
                         {hasOverflow && (
                           <div
-                            className="absolute bg-adminGray-50/40 hover:bg-adminGray-50 cursor-pointer rounded-[3px] border border-adminGray-100 flex items-center justify-center text-2xs font-bold text-adminInk z-10 transition-colors shadow-sm"
+                            className="absolute bg-adminGray-50/40 hover:bg-adminGray-50 cursor-pointer rounded-[3px] border border-adminGray-100 flex items-center justify-center text-2xs font-bold text-adminInk z-10 transition-colors shadow-xs"
                             style={{
                               top: `${(cluster.startMins - 8 * 60) * (80 / 60)}px`,
                               height: `${(cluster.endMins - cluster.startMins) * (80 / 60)}px`,

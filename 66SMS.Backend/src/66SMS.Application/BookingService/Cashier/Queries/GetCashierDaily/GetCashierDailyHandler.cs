@@ -1,5 +1,5 @@
-using _66SMS.Application.DTOs.Cashier;
-using _66SMS.Contracts.Shared;
+using _66SMS.Application.DTOs;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
 
@@ -18,8 +18,8 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
             GetCashierDailyQuery request,
             CancellationToken cancellationToken)
         {
-            var fromDate = request.Date;
-            var toDate = request.EndDate ?? request.Date;
+            var fromDate = request.Date!.Value;
+            var toDate = request.EndDate ?? request.Date!.Value;
 
             var columnRows = await appointmentRepository.GetCashierStaffColumnsAsync(
                 request.SalonId,

@@ -1,5 +1,4 @@
 import axiosInstance from "@/shared/api/axiosInstance";
-import { API } from "@/shared/api/endpoints";
 import type {
   Result,
   PagedResult,
@@ -13,8 +12,6 @@ import type {
   GetAllServiceQuery,
   DeleteServiceMultiplesPayload,
 } from "../types/service.types";
-
-const BASE = API.services;
 
 function toAdminQuery(
   params: PageRequest & { categoryId?: number },
@@ -32,7 +29,7 @@ function toAdminQuery(
 export const serviceApi = {
   getAll: (params: PageRequest & { categoryId?: number }) =>
     axiosInstance
-      .get<Result<PagedResult<ServiceListDto>>>(BASE, {
+      .get<Result<PagedResult<ServiceListDto>>>("/service", {
         params: {
           pageIndex: params.pageIndex,
           pageSize: params.pageSize,
@@ -46,41 +43,41 @@ export const serviceApi = {
 
   getDetail: (id: number) =>
     axiosInstance
-      .get<Result<ServiceDetailDto>>(`${BASE}/${id}`)
+      .get<Result<ServiceDetailDto>>(`/service/${id}`)
       .then((r) => r.data),
 
   create: (payload: CreateServicePayload) =>
-    axiosInstance.post<Result<object>>(BASE, payload).then((r) => r.data),
+    axiosInstance.post<Result<object>>("/service", payload).then((r) => r.data),
 
   update: (id: number, payload: UpdateServicePayload) =>
     axiosInstance
-      .patch<Result<object>>(`${BASE}/${id}`, payload)
+      .patch<Result<object>>(`/service/${id}`, payload)
       .then((r) => r.data),
 
   delete: (id: number) =>
-    axiosInstance.delete<Result<object>>(`${BASE}/${id}`).then((r) => r.data),
+    axiosInstance.delete<Result<object>>(`/service/${id}`).then((r) => r.data),
 
   adminGetAll: (params: PageRequest & { categoryId?: number }) =>
     axiosInstance
-      .get<Result<PagedResult<ServiceListDto>>>(`${BASE}/admin`, {
+      .get<Result<PagedResult<ServiceListDto>>>(`/service/admin`, {
         params: toAdminQuery(params),
       })
       .then((r) => r.data),
 
   deleteMultiples: (payload: DeleteServiceMultiplesPayload) =>
     axiosInstance
-      .delete<Result<object>>(`${BASE}/bulk`, { data: payload })
+      .delete<Result<object>>(`/service/bulk`, { data: payload })
       .then((r) => r.data),
 
   getAllDeleted: (params: PageRequest & { categoryId?: number }) =>
     axiosInstance
-      .get<Result<PagedResult<ServiceListDto>>>(`${BASE}/deleted`, {
+      .get<Result<PagedResult<ServiceListDto>>>(`/service/deleted`, {
         params: toAdminQuery(params),
       })
       .then((r) => r.data),
 
   deleteServiceProduct: (id: number) =>
     axiosInstance
-      .delete<Result<object>>(`${API.serviceProducts}/${id}`)
+      .delete<Result<object>>(`/service-product/${id}`)
       .then((r) => r.data),
 };

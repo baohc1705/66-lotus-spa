@@ -250,7 +250,7 @@ function TierCarousel({
       <div className="relative">
         <button
           onClick={goLeft}
-          className="absolute left-1 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-warm-100 shadow-lg flex items-center justify-center hover:bg-white hover:shadow-xl hover:scale-110 transition-all duration-200"
+          className="absolute left-1 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs border border-warm-100 shadow-lg flex items-center justify-center hover:bg-white hover:shadow-xl hover:scale-110 transition-all duration-200"
           aria-label="Thẻ trước"
         >
           <ChevronLeft className="w-5 h-5 text-lotus-deep" />
@@ -258,7 +258,7 @@ function TierCarousel({
 
         <button
           onClick={goRight}
-          className="absolute right-1 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-warm-100 shadow-lg flex items-center justify-center hover:bg-white hover:shadow-xl hover:scale-110 transition-all duration-200"
+          className="absolute right-1 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs border border-warm-100 shadow-lg flex items-center justify-center hover:bg-white hover:shadow-xl hover:scale-110 transition-all duration-200"
           aria-label="Thẻ sau"
         >
           <ChevronRight className="w-5 h-5 text-lotus-deep" />
@@ -302,7 +302,7 @@ function TierCarousel({
               return (
                 <div
                   key={`${tier.id}-${idx}`}
-                  className="flex-shrink-0 px-3 cursor-pointer select-none"
+                  className="shrink-0 px-3 cursor-pointer select-none"
                   style={{
                     width: `${100 / extendedTiers.length}%`,
                     transition:
@@ -331,7 +331,7 @@ function TierCarousel({
                     />
 
                     <div
-                      className="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm z-[2] transition-all duration-300"
+                      className="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center shadow-xs backdrop-blur-xs z-[2] transition-all duration-300"
                       style={{
                         background: isLocked
                           ? "var(--error-bg)"
@@ -355,7 +355,7 @@ function TierCarousel({
                         HOA SEN SPA
                       </p>
                       <span
-                        className="text-2xs font-bold px-2.5 py-0.5 rounded-full shadow-sm"
+                        className="text-2xs font-bold px-2.5 py-0.5 rounded-full shadow-xs"
                         style={{
                           background: `linear-gradient(135deg, ${style.cardAccent}, ${style.cardBorder})`,
                           color: "#ffffff",
@@ -596,7 +596,7 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
         setActiveIndex={setActiveIndex}
       />
 
-      <div className="bg-white rounded-xl p-5 shadow-sm relative overflow-hidden">
+      <div className="bg-white rounded-xl p-5 shadow-xs relative overflow-hidden">
         <div className="absolute top-0 right-0 w-48 h-48 bg-lotus-rose-light/10 rounded-full blur-3xl -mr-24 -mt-24 pointer-events-none" />
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5 pb-5">

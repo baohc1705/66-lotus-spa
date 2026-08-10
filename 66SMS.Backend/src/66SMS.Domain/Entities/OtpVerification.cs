@@ -1,5 +1,5 @@
 using _66SMS.Domain.Abstractions.Entities;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Domain.Entities
 {
@@ -8,7 +8,7 @@ namespace _66SMS.Domain.Entities
         public int UserId { get; set; }
         public string OtpCode { get; set; } = null!;
         public DateTimeOffset ExpiresAt { get; set; }
-        public bool IsUsed { get; set; }
+        public bool IsUsed { get; set; } = false;
         public DateTimeOffset CreatedAt { get; set; }
 
         public bool IsExpired => ExpiresAt.IsExpired();

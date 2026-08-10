@@ -652,7 +652,7 @@ export function CashierPOS({
           className={cn(
             "px-3 py-1 rounded-full text-xs font-semibold tracking-wide border transition-all duration-200",
             activeCategoryId === null
-              ? "bg-adminGreen-600 text-white border-adminGreen-600 shadow-sm"
+              ? "bg-adminGreen-600 text-white border-adminGreen-600 shadow-xs"
               : "bg-white text-adminGray-600 border-adminGray-100 hover:bg-adminGray-50",
           )}
         >
@@ -665,7 +665,7 @@ export function CashierPOS({
             className={cn(
               "px-3 py-1 rounded-full text-xs font-semibold tracking-wide border transition-all duration-200",
               activeCategoryId === c.id
-                ? "bg-adminGreen-600 text-white border-adminGreen-600 shadow-sm"
+                ? "bg-adminGreen-600 text-white border-adminGreen-600 shadow-xs"
                 : "bg-white text-adminGray-600 border-adminGray-100 hover:bg-adminGray-50",
             )}
           >
@@ -678,7 +678,7 @@ export function CashierPOS({
 
   return (
     <div className="flex-1 flex flex-col min-h-0 min-w-0 w-full bg-adminGray-50 font-sans p-2 gap-2 relative z-10 overflow-hidden">
-      <div className="bg-white border border-adminGray-100 rounded-[3px] p-2 shadow-sm shrink-0 flex items-center justify-between gap-3 relative">
+      <div className="bg-white border border-adminGray-100 rounded-[3px] p-2 shadow-xs shrink-0 flex items-center justify-between gap-3 relative">
         <div className="relative w-96 max-w-full">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
             <Search className="w-4 h-4 text-adminGray-400" />
@@ -692,7 +692,7 @@ export function CashierPOS({
             }}
             onFocus={() => setShowCustomerDropdown(true)}
             placeholder="Tìm khách hàng theo tên hoặc số điện thoại"
-            className="w-full text-xs bg-adminGray-50 border border-adminGray-300 rounded-[3px] py-2 pl-9 pr-4 text-adminInk focus:outline-none focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 transition shadow-inner"
+            className="w-full text-xs bg-adminGray-50 border border-adminGray-300 rounded-[3px] py-2 pl-9 pr-4 text-adminInk focus:outline-hidden focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 transition shadow-inner"
           />
 
           {showCustomerDropdown && customerSearch.trim() && (
@@ -739,7 +739,7 @@ export function CashierPOS({
         <div className="flex items-center gap-2">
           <button
             onClick={handleCreateNewOrder}
-            className="flex items-center gap-1.5 bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white px-3.5 py-1.5 rounded-[3px] text-xs font-bold transition shadow-sm"
+            className="flex items-center gap-1.5 bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white px-3.5 py-1.5 rounded-[3px] text-xs font-bold transition shadow-xs"
           >
             <Plus className="w-4 h-4" />
             <span>Tạo Đơn Hàng</span>
@@ -748,7 +748,7 @@ export function CashierPOS({
       </div>
 
       <div className="flex-1 flex min-h-0 min-w-0 w-full gap-2 relative lg:grid lg:grid-cols-12">
-        <div className="lg:col-span-6 bg-white border border-adminGray-100 rounded-[3px] shadow-sm flex flex-col overflow-hidden h-full">
+        <div className="lg:col-span-6 bg-white border border-adminGray-100 rounded-[3px] shadow-xs flex flex-col overflow-hidden h-full">
           <div className="p-3 bg-white border-b border-adminGray-100 flex items-center justify-between shrink-0 flex-wrap gap-2">
             <span className="font-bold text-sm text-adminGreen-600">
               {activeOrder.code}
@@ -761,7 +761,7 @@ export function CashierPOS({
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                     setActiveOrderId(e.target.value)
                   }
-                  className="appearance-none bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white rounded-[3px] py-1 pl-2.5 pr-8 text-xs font-bold shadow-sm focus:outline-none cursor-pointer max-w-[220px]"
+                  className="appearance-none bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white rounded-[3px] py-1 pl-2.5 pr-8 text-xs font-bold shadow-xs focus:outline-hidden cursor-pointer max-w-[220px]"
                 >
                   {orders.map((o: POSOrder) => (
                     <option key={o.id} value={o.id}>
@@ -827,7 +827,7 @@ export function CashierPOS({
             ) : (
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-adminGray-50/80 border-b border-adminGray-100 text-2xs text-adminGray-600 font-bold uppercase tracking-wider sticky top-0 z-10 backdrop-blur-sm">
+                  <tr className="bg-adminGray-50/80 border-b border-adminGray-100 text-2xs text-adminGray-600 font-bold uppercase tracking-wider sticky top-0 z-10 backdrop-blur-xs">
                     <th className="py-2.5 px-3">Sản phẩm & dịch vụ</th>
                     <th className="py-2.5 px-2 text-center w-24">Số lượng</th>
                     <th className="py-2.5 px-2 text-center w-24">Nhân viên</th>
@@ -889,7 +889,7 @@ export function CashierPOS({
                                   Number(val),
                                 );
                             }}
-                            className="appearance-none bg-adminGray-50 border border-adminGray-100 rounded-[3px] py-1 pl-2 pr-6 text-2xs font-bold text-adminInk shadow-sm cursor-pointer hover:bg-adminGray-100 focus:outline-none"
+                            className="appearance-none bg-adminGray-50 border border-adminGray-100 rounded-[3px] py-1 pl-2 pr-6 text-2xs font-bold text-adminInk shadow-xs cursor-pointer hover:bg-adminGray-100 focus:outline-hidden"
                           >
                             <option value="">Chọn...</option>
                             {staffs.map((s: StaffDto) => (
@@ -1006,7 +1006,7 @@ export function CashierPOS({
             <div className="flex items-center justify-between gap-1.5 pt-3">
               <button
                 onClick={() => handleRemoveOrder(activeOrderId)}
-                className="bg-state-warning-solid hover:bg-state-warning-solid text-white py-2 px-3 rounded-[3px] flex items-center justify-center gap-1 text-xs font-bold shadow-sm"
+                className="bg-state-warning-solid hover:bg-state-warning-solid text-white py-2 px-3 rounded-[3px] flex items-center justify-center gap-1 text-xs font-bold shadow-xs"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>Hủy</span>
@@ -1022,7 +1022,7 @@ export function CashierPOS({
                   setIsCheckoutModalOpen(true);
                 }}
                 disabled={createInvoiceMutation.isPending || isPayingInvoice}
-                className="bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white py-2 px-4 rounded-[3px] flex items-center justify-center gap-1.5 text-xs font-bold shadow-sm disabled:opacity-50"
+                className="bg-adminGreen-600 hover:bg-adminGreen-600/90 text-white py-2 px-4 rounded-[3px] flex items-center justify-center gap-1.5 text-xs font-bold shadow-xs disabled:opacity-50"
               >
                 <span>Thanh toán</span>
               </button>
@@ -1030,7 +1030,7 @@ export function CashierPOS({
           </div>
         </div>
 
-        <div className="lg:col-span-6 bg-white border border-adminGray-100 rounded-[3px] shadow-sm flex flex-col overflow-hidden h-full">
+        <div className="lg:col-span-6 bg-white border border-adminGray-100 rounded-[3px] shadow-xs flex flex-col overflow-hidden h-full">
           <div className="p-3 bg-white border-b border-adminGray-100 flex flex-col gap-3 shrink-0">
             <div className="relative">
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
@@ -1043,18 +1043,18 @@ export function CashierPOS({
                   setSearchQuery(e.target.value)
                 }
                 placeholder="Quét mã hoặc Tìm kiếm theo tên hoặc mã sản phẩm & dịch vụ"
-                className="w-full text-xs bg-adminGray-50 border border-adminGray-300 rounded-[3px] py-2.5 pl-9 pr-4 text-adminInk focus:outline-none focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 transition shadow-inner"
+                className="w-full text-xs bg-adminGray-50 border border-adminGray-300 rounded-[3px] py-2.5 pl-9 pr-4 text-adminInk focus:outline-hidden focus:border-adminGreen-600 focus:ring-1 focus:ring-adminGreen-600 transition shadow-inner"
               />
             </div>
 
-            <div className="flex bg-adminGray-100 p-1 rounded-md border border-adminGray-100/60 shadow-sm">
+            <div className="flex bg-adminGray-100 p-1 rounded-md border border-adminGray-100/60 shadow-xs">
               <button
                 onClick={() => {
                   setActiveTab("services");
                   setActiveCategoryId(null);
                 }}
                 className={cn(
-                  "flex-1 py-2 text-xs font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 focus:outline-none",
+                  "flex-1 py-2 text-xs font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 focus:outline-hidden",
                   activeTab === "services"
                     ? "bg-gradient-to-r from-adminGreen-600 to-adminGreen-700 text-white shadow-md transform scale-[1.02]"
                     : "text-adminGray-600 hover:bg-adminGray-100/50 hover:text-adminInk",
@@ -1075,7 +1075,7 @@ export function CashierPOS({
                   setActiveCategoryId(null);
                 }}
                 className={cn(
-                  "flex-1 py-2 text-xs font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 focus:outline-none",
+                  "flex-1 py-2 text-xs font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 focus:outline-hidden",
                   activeTab === "products"
                     ? "bg-gradient-to-r from-adminGreen-600 to-adminGreen-700 text-white shadow-md transform scale-[1.02]"
                     : "text-adminGray-600 hover:bg-adminGray-100/50 hover:text-adminInk",
@@ -1091,7 +1091,7 @@ export function CashierPOS({
                   setActiveCategoryId(null);
                 }}
                 className={cn(
-                  "flex-1 py-2 text-xs font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 focus:outline-none",
+                  "flex-1 py-2 text-xs font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 focus:outline-hidden",
                   activeTab === "courses"
                     ? "bg-gradient-to-r from-adminGreen-600 to-adminGreen-700 text-white shadow-md transform scale-[1.02]"
                     : "text-adminGray-600 hover:bg-adminGray-100/50 hover:text-adminInk",
@@ -1155,14 +1155,14 @@ export function CashierPOS({
                           })
                         }
                         className={cn(
-                          "bg-white border rounded-[3px] p-2 flex items-start gap-2.5 cursor-pointer hover:shadow-sm transition-all duration-150 select-none relative min-h-[72px]",
+                          "bg-white border rounded-[3px] p-2 flex items-start gap-2.5 cursor-pointer hover:shadow-xs transition-all duration-150 select-none relative min-h-[72px]",
                           cartQty > 0
                             ? "border-adminGreen-600 ring-1 ring-adminGreen-600/40"
                             : "border-adminGray-100",
                         )}
                       >
                         {cartQty > 0 && (
-                          <div className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-adminGreen-600 text-white flex items-center justify-center text-2xs font-bold shadow-sm z-10">
+                          <div className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-adminGreen-600 text-white flex items-center justify-center text-2xs font-bold shadow-xs z-10">
                             {cartQty}
                           </div>
                         )}
@@ -1216,7 +1216,7 @@ export function CashierPOS({
       />
 
       {isCheckoutModalOpen && (
-        <div className="fixed inset-0 bg-adminInk/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-adminInk/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
           <div className="bg-white border border-adminGray-100 rounded-[3px] shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-4 bg-adminGray-50 border-b border-adminGray-100 flex items-center justify-between">
               <span className="font-bold text-xs text-adminInk uppercase tracking-wider">
@@ -1317,7 +1317,7 @@ export function CashierPOS({
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setTempPaidAmount(Number(e.target.value))
                   }
-                  className="w-full text-sm border border-adminGray-300 rounded-[3px] p-2 font-bold text-adminInk focus:outline-none focus:border-adminGreen-600"
+                  className="w-full text-sm border border-adminGray-300 rounded-[3px] p-2 font-bold text-adminInk focus:outline-hidden focus:border-adminGreen-600"
                 />
               </div>
 
@@ -1337,7 +1337,7 @@ export function CashierPOS({
                   }}
                   placeholder="Ghi chú thêm về dịch vụ, yêu cầu khách hàng..."
                   rows={2}
-                  className="w-full text-xs border border-adminGray-300 rounded-[3px] p-2 text-adminInk focus:outline-none focus:border-adminGreen-600 placeholder:text-adminGray-400"
+                  className="w-full text-xs border border-adminGray-300 rounded-[3px] p-2 text-adminInk focus:outline-hidden focus:border-adminGreen-600 placeholder:text-adminGray-400"
                 />
               </div>
 

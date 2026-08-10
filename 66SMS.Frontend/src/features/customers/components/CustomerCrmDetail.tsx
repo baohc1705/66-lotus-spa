@@ -29,7 +29,7 @@ export function CustomerCrmDetail({
 
   if (isLoading) {
     return (
-      <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden p-6 space-y-4 shadow-sm">
+      <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden p-6 space-y-4 shadow-xs">
         <div className="flex items-center justify-between">
           <Skeleton className="h-6 w-48" />
           <div className="flex gap-2">
@@ -51,7 +51,7 @@ export function CustomerCrmDetail({
 
   if (!customerId || !customer) {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-white border border-adminGray-100 rounded shadow-sm p-6 text-center text-adminGray-400">
+      <div className="flex flex-col items-center justify-center h-full bg-white border border-adminGray-100 rounded shadow-xs p-6 text-center text-adminGray-400">
         <User className="w-12 h-12 text-adminGray-300 mb-2 stroke-[1.5]" />
         <p className="text-sm font-medium">
           Chọn một khách hàng để xem chi tiết
@@ -63,7 +63,7 @@ export function CustomerCrmDetail({
   const code = customer.id ? `CS${String(customer.id).padStart(6, "0")}` : "—";
 
   return (
-    <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-sm">
+    <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-xs">
       <div className="p-4 border-b border-adminGray-100 flex items-center justify-between shrink-0">
         <h3 className="text-sm font-bold text-adminInk truncate">
           Thông tin khách hàng -{" "}
@@ -82,7 +82,7 @@ export function CustomerCrmDetail({
           <Button
             size="sm"
             variant="admin"
-            className="h-8 text-xs bg-lotus-primary hover:bg-lotus-primary-600 text-white font-semibold"
+            className="h-8 text-xs bg-lotus-primary hover:bg-lotus-primary/90 text-white font-semibold"
             onClick={() => onEdit(customer)}
           >
             <Pencil className="w-3.5 h-3.5 mr-1" />
@@ -120,7 +120,7 @@ export function CustomerCrmDetail({
               </p>
             </div>
           </div>
-          <div className="flex flex-col items-center justify-center w-14 h-14 rounded-full bg-lotus-secondary text-white shadow-sm shrink-0">
+          <div className="flex flex-col items-center justify-center w-14 h-14 rounded-full bg-lotus-secondary text-white shadow-xs shrink-0">
             <span className="text-base font-black leading-none">
               {customer.loyaltyPoint ?? 0}
             </span>
@@ -148,7 +148,7 @@ export function CustomerCrmDetail({
 
           <TabsContent
             value="personal"
-            className="pt-3 border-0 m-0 outline-none"
+            className="pt-3 border-0 m-0 outline-hidden"
           >
             <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-xs">
               <DetailFieldItem label="Mã khách hàng" value={code} />
@@ -196,7 +196,7 @@ export function CustomerCrmDetail({
 
           <TabsContent
             value="note"
-            className="pt-3 m-0 outline-none text-xs text-adminGray-600"
+            className="pt-3 m-0 outline-hidden text-xs text-adminGray-600"
           >
             <div className="bg-adminGray-50 rounded p-3 min-h-24 border border-adminGray-100 flex items-start gap-2">
               <FileText className="w-4 h-4 text-adminGray-400 shrink-0 mt-0.5" />

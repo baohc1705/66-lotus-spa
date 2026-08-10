@@ -102,7 +102,7 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
             id="fullName"
             type="text"
             placeholder="Họ và tên"
-            className="w-full h-11 pl-11 pr-4 rounded-xl border border-warm-100 bg-white text-warm-600 text-sm outline-none transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
+            className="w-full h-11 pl-11 pr-4 rounded-xl border border-warm-100 bg-white text-warm-600 text-sm outline-hidden transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
             aria-invalid={!!errors.fullName}
             {...register("fullName")}
           />
@@ -119,7 +119,7 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
             id="phone"
             type="tel"
             placeholder="Số điện thoại"
-            className="w-full h-11 pl-11 pr-4 rounded-xl border border-warm-100 bg-white text-warm-600 text-sm outline-none transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
+            className="w-full h-11 pl-11 pr-4 rounded-xl border border-warm-100 bg-white text-warm-600 text-sm outline-hidden transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
             aria-invalid={!!errors.phone}
             {...register("phone")}
           />
@@ -137,7 +137,7 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
             type="text"
             placeholder="Tên đăng nhập"
             autoComplete="username"
-            className="w-full h-11 pl-11 pr-4 rounded-xl border border-warm-100 bg-white text-warm-600 text-sm outline-none transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
+            className="w-full h-11 pl-11 pr-4 rounded-xl border border-warm-100 bg-white text-warm-600 text-sm outline-hidden transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
             aria-invalid={!!errors.userName}
             {...register("userName")}
           />
@@ -155,7 +155,7 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
             type="email"
             placeholder="Email"
             autoComplete="email"
-            className="w-full h-11 pl-11 pr-4 rounded-xl border border-warm-100 bg-white text-warm-600 text-sm outline-none transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
+            className="w-full h-11 pl-11 pr-4 rounded-xl border border-warm-100 bg-white text-warm-600 text-sm outline-hidden transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600"
             aria-invalid={!!errors.email}
             {...register("email")}
           />
@@ -349,7 +349,7 @@ const OtpStep = ({ email }: OtpStepProps) => {
             value={digit}
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
-            className="w-11 h-12 text-center text-lg font-bold rounded-xl border transition-all duration-150 outline-none focus:border-rose-600 focus:ring-1 focus:ring-rose-600 bg-white"
+            className="w-11 h-12 text-center text-lg font-bold rounded-xl border transition-all duration-150 outline-hidden focus:border-rose-600 focus:ring-1 focus:ring-rose-600 bg-white"
             style={{
               borderColor: digit ? 'var(--rose-600)' : 'var(--warm-100)',
               color: 'var(--ink)',
@@ -422,7 +422,7 @@ function PasswordField({
       <Input
         {...inputProps}
         type={show ? "text" : "password"}
-        className={`w-full h-11 pl-11 pr-12 rounded-xl border border-warm-100 bg-white text-warm-600 text-sm outline-none transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600 ${inputProps.className ?? ""}`}
+        className={`w-full h-11 pl-11 pr-12 rounded-xl border border-warm-100 bg-white text-warm-600 text-sm outline-hidden transition-all duration-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600 ${inputProps.className ?? ""}`}
       />
       <button
         type="button"
@@ -454,7 +454,7 @@ function SubmitButton({
     <button
       type="submit"
       disabled={isDisabled}
-      className="w-full h-11 flex items-center justify-center gap-2 rounded-xl text-white bg-rose-600 font-semibold text-sm transition-all duration-200 outline-none hover:bg-rose-500 hover:shadow-lg active:bg-rose-800 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-warm-400 mt-2"
+      className="w-full h-11 flex items-center justify-center gap-2 rounded-xl text-white bg-rose-600 font-semibold text-sm transition-all duration-200 outline-hidden hover:bg-rose-500 hover:shadow-lg active:bg-rose-800 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-warm-400 mt-2"
     >
       {pending ? (
         <>

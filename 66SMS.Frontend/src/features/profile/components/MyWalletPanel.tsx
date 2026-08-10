@@ -122,7 +122,7 @@ export function MyWalletPanel() {
               setAmountInput(digits);
             }}
             placeholder="Ví dụ: 20000"
-            className="flex-1 rounded-lg border border-lotus-cream px-3 py-2 text-sm text-lotus-deep outline-none focus:border-lotus-rose"
+            className="flex-1 rounded-lg border border-lotus-cream px-3 py-2 text-sm text-lotus-deep outline-hidden focus:border-lotus-rose"
             disabled={isToppingUp}
           />
           <button
@@ -174,8 +174,17 @@ export function MyWalletPanel() {
                       </div>
                       <div>
                         <p className="font-medium text-lotus-deep">
-                          {tx.note ||
-                            (isPositive ? "Hoàn tiền ví" : "Thanh toán cọc")}
+                          {tx.note && !tx.note.startsWith("TxnRef:")
+                            ? tx.note
+                            : tx.type === 1
+                              ? "Hoàn tiền"
+                              : tx.type === 2
+                                ? "Thanh toán"
+                                : tx.type === 3
+                                  ? "Nạp tiền"
+                                  : tx.type === 4
+                                    ? "Điều chỉnh"
+                                    : "Giao dịch"}
                         </p>
                         <p className="text-xs text-lotus-stone mt-0.5">
                           {formatDateTimeDisplay(tx.createdAt)}

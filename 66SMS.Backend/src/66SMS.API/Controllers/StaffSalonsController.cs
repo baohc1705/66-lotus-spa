@@ -5,7 +5,7 @@ using _66SMS.Application.SalonService.StaffSalons.Commands.UpdateManagerStatus;
 using _66SMS.Application.SalonService.StaffSalons.Commands.UpdateStaffSalon;
 using _66SMS.Application.SalonService.StaffSalons.Queries.GetAllStaffSalons;
 using _66SMS.Application.SalonService.StaffSalons.Queries.GetDetailStaffSalon;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;

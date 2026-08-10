@@ -48,11 +48,11 @@ export function ShiftDetailExpanded({ shift }: ShiftDetailExpandedProps) {
                 return (
                   <div 
                     key={period.id ?? index} 
-                    className={`relative p-4 rounded-xl border ${isActive ? 'border-adminGreen-600/40 bg-adminGreen-50 shadow-sm' : 'border-adminGray-100/60 bg-white'}`}
+                    className={`relative p-4 rounded-xl border ${isActive ? 'border-adminGreen-600/40 bg-adminGreen-50 shadow-xs' : 'border-adminGray-100/60 bg-white'}`}
                   >
                     {isActive && (
                       <div className="absolute -top-2.5 -right-2.5">
-                        <span className="flex items-center gap-1 bg-adminGreen-600 text-white text-2xs font-medium px-2 py-1 rounded-full shadow-sm">
+                        <span className="flex items-center gap-1 bg-adminGreen-600 text-white text-2xs font-medium px-2 py-1 rounded-full shadow-xs">
                           <CheckCircle2 className="w-3 h-3" />
                           Đang áp dụng
                         </span>

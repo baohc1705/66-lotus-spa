@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace _66SMS.Application.IdentityService.Roles.Commands.DeleteRole
 {

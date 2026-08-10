@@ -6,7 +6,7 @@ using _66SMS.Application.BookingService.Promotions.Queries.GetActivePromotions;
 using _66SMS.Application.BookingService.Promotions.Queries.GetAllPromotions;
 using _66SMS.Application.BookingService.Promotions.Queries.GetDetailPromotion;
 using _66SMS.Application.BookingService.Promotions.Queries.ValidatePromotionCode;
-using _66SMS.Contracts.Abstractions;
+using _66SMS.Contract.Abstractions;
 using _66SMS.Infrastructure.Security;
 using Asp.Versioning;
 using MediatR;
@@ -63,9 +63,6 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-        /// <summary>
-        /// Danh sách khuyến mãi đang hoạt động (còn hiệu lực) — dùng cho màn đặt lịch.
-        /// </summary>
         [HttpGet("active")]
         [AllowAnonymous]
         public async Task<IActionResult> GetActive()

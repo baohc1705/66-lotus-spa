@@ -41,7 +41,7 @@ export function CustomerCrmAppointments({
 
   if (!customerId) {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-white border border-adminGray-100 rounded shadow-sm p-6 text-center text-adminGray-400">
+      <div className="flex flex-col items-center justify-center h-full bg-white border border-adminGray-100 rounded shadow-xs p-6 text-center text-adminGray-400">
         <Calendar className="w-12 h-12 text-adminGray-300 mb-2 stroke-[1.5]" />
         <p className="text-sm font-medium">
           Chọn một khách hàng để xem lịch hẹn
@@ -52,7 +52,7 @@ export function CustomerCrmAppointments({
 
   if (isLoadingCustomer || isLoadingAppointments) {
     return (
-      <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-sm p-4 space-y-3">
+      <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-xs p-4 space-y-3">
         <Skeleton className="h-5 w-32" />
         <Skeleton className="h-20 w-full" />
         <Skeleton className="h-20 w-full" />
@@ -63,7 +63,7 @@ export function CustomerCrmAppointments({
 
   if (!userId) {
     return (
-      <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-sm">
+      <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-xs">
         <Header count={0} />
         <div className="flex-1 flex items-center justify-center p-6 text-center text-adminGray-400 text-xs">
           Khách hàng chưa có tài khoản nên chưa có lịch hẹn trên hệ thống
@@ -73,7 +73,7 @@ export function CustomerCrmAppointments({
   }
 
   return (
-    <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-sm">
+    <div className="flex flex-col h-full bg-white border border-adminGray-100 rounded overflow-hidden shadow-xs">
       <Header count={totalCount} />
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2.5">

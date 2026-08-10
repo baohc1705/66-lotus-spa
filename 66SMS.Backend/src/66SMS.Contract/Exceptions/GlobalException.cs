@@ -1,6 +1,6 @@
-﻿using _66SMS.Contracts.Enumerations;
+using _66SMS.Contract.Enumerations;
 
-namespace _66SMS.Contracts.Exceptions
+namespace _66SMS.Contract.Exceptions
 {
     public class GlobalException : Exception
     {

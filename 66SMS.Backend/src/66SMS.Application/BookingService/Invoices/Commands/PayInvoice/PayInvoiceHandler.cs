@@ -1,7 +1,6 @@
-using _66SMS.Application.Abstractions;
 using _66SMS.Application.BookingService.Helpers;
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
@@ -10,7 +9,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Data;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
+using _66SMS.Application.Abstractions.Services;
 
 namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
 {
@@ -91,7 +91,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
             using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-              
+
                 if (request.PaymentMethod == InvoiceConst.PAYMENT_WALLET)
                 {
                     int? walletUserId = appointment?.CreatedByUserId ?? customer?.UserId;
@@ -112,7 +112,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
 
                     if (wallet.Balance < remainingAmount)
                     {
-                        return Result<object>.BadRequest($"Ví của khách hàng không đủ số dư (Hiện có: {wallet.Balance:N0}đ).", ErrorCodes.ERR_INVOICE_NOT_ENOUGH_POINTS);
+                        return Result<object>.BadRequest(WalletConst.MSG_WALLET_INSUFFICIENT_BALANCE, ErrorCodes.ERR_INVOICE_NOT_ENOUGH_POINTS);
                     }
 
                     wallet.Balance -= remainingAmount;
@@ -124,17 +124,19 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                         Amount = -remainingAmount,
                         BalanceAfter = wallet.Balance,
                         Type = WalletTransactionConst.TYPE_PAYMENT_FOR_APPOINTMENT,
-                        Note = $"Thanh toán phần còn lại cho hóa đơn #{invoice.InvoiceCode}",
                         Status = WalletTransactionConst.STATUS_SUCCESS,
                         CreatedAt = DateTimeHelper.UtcNow(),
-                        CreatedBy = request.CashierId ?? 0
+                        CreatedBy = request.CashierId
                     };
+                    if (!string.IsNullOrWhiteSpace(request.Note))
+                        walletTx.Note = request.Note.Trim();
                     walletTransactionRepository.Add(walletTx);
                 }
 
-             
+
                 invoice.PaidAmount = invoice.TotalAmount;
-                invoice.ChangeAmount = change;
+                if (change != 0)
+                    invoice.ChangeAmount = change;
                 invoice.PaymentMethod = request.PaymentMethod;
                 invoice.Status = InvoiceConst.STATUS_PAID;
                 invoice.Note = request.Note;
@@ -144,7 +146,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                 invoice.UpdatedBy = request.CashierId;
                 invoiceRepository.Update(invoice);
 
-         
+
                 if (appointment != null)
                 {
                     int appointmentMethod = request.PaymentMethod switch
@@ -177,7 +179,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                     appointmentRepository.Update(appointment);
                 }
 
-        
+
                 int earnedPoints = 0;
                 if (customer != null)
                 {
@@ -193,7 +195,7 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
                             await loyaltyPointService.AddPointsAndCheckUpgradeAsync(
                                 customer.UserId.Value,
                                 invoice.TotalAmount,
-                                request.CashierId ?? 0,
+                                request.CashierId ?? customer.UserId.Value,
                                 cancellationToken);
                         }
                         else

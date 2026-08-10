@@ -1,5 +1,4 @@
 import axiosInstance from "@/shared/api/axiosInstance";
-import { API } from "@/shared/api/endpoints";
 import type {
   Result,
   PagedResult,
@@ -16,37 +15,36 @@ import type {
   DeleteStaffServicePayload,
 } from "../types/staff.types";
 
-const BASE = API.staffs.base;
 
 export const staffApi = {
   getAll: (
     params: PageRequest & { salonId?: number | null; role?: string | null },
   ) =>
     axiosInstance
-      .get<Result<PagedResult<StaffDto>>>(BASE, { params })
+      .get<Result<PagedResult<StaffDto>>>("/staffs", { params })
       .then((r) => r.data),
   adminGetAll: (
     params: PageRequest & { salonId?: number | null; role?: string | null },
   ) =>
     axiosInstance
-      .get<Result<PagedResult<StaffDto>>>(`${BASE}/admin`, { params })
+      .get<Result<PagedResult<StaffDto>>>(`/staffs/admin`, { params })
       .then((r) => r.data),
 
   getDetail: (id: number) =>
     axiosInstance
-      .get<Result<StaffFullDto>>(`${BASE}/${id}`)
+      .get<Result<StaffFullDto>>(`/staffs/${id}`)
       .then((r) => r.data),
 
   create: (payload: CreateStaffPayload) =>
-    axiosInstance.post<Result<object>>(BASE, payload).then((r) => r.data),
+    axiosInstance.post<Result<object>>("/staffs", payload).then((r) => r.data),
 
   update: (id: number, payload: UpdateStaffPayload) =>
     axiosInstance
-      .patch<Result<object>>(`${BASE}/${id}`, payload)
+      .patch<Result<object>>(`/staffs/${id}`, payload)
       .then((r) => r.data),
 
   delete: (id: number) =>
-    axiosInstance.delete<Result<object>>(`${BASE}/${id}`).then((r) => r.data),
+    axiosInstance.delete<Result<object>>(`/staffs/${id}`).then((r) => r.data),
 
   getStaffServices: (
     params: PageRequest & {
@@ -55,21 +53,21 @@ export const staffApi = {
     },
   ) =>
     axiosInstance
-      .get<Result<PagedResult<StaffServiceDto>>>(`${BASE}/services`, { params })
+      .get<Result<PagedResult<StaffServiceDto>>>(`/staffs/services`, { params })
       .then((r) => r.data),
 
   createStaffServices: (payload: CreateStaffServicePayload) =>
     axiosInstance
-      .post<Result<number[]>>(`${BASE}/services`, payload)
+      .post<Result<number[]>>(`/staffs/services`, payload)
       .then((r) => r.data),
 
   updateStaffService: (id: number, payload: UpdateStaffServicePayload) =>
     axiosInstance
-      .patch<Result<object>>(`${BASE}/services/${id}`, payload)
+      .patch<Result<object>>(`/staffs/services/${id}`, payload)
       .then((r) => r.data),
 
   deleteStaffServices: (payload: DeleteStaffServicePayload) =>
     axiosInstance
-      .delete<Result<object>>(`${BASE}/services`, { data: payload })
+      .delete<Result<object>>(`/staffs/services`, { data: payload })
       .then((r) => r.data),
 };

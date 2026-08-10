@@ -1,5 +1,4 @@
 import axiosInstance from "@/shared/api/axiosInstance";
-import { API } from "@/shared/api/endpoints";
 import type {
   Result,
   PagedResult,
@@ -13,8 +12,6 @@ import type {
   CreateManualAttendancePayload,
 } from "../types/attendance.types";
 
-const BASE = API.attendances;
-
 export interface AttendanceListParams extends PageRequest {
   staffId?: number | null;
   salonId?: number | null;
@@ -26,21 +23,21 @@ export interface AttendanceListParams extends PageRequest {
 export const attendanceApi = {
   getAll: (params: AttendanceListParams) =>
     axiosInstance
-      .get<Result<PagedResult<AttendanceDto>>>(`${BASE}/admin`, { params })
+      .get<Result<PagedResult<AttendanceDto>>>(`/attendance/admin`, { params })
       .then((r) => r.data),
 
   getDetail: (id: number) =>
-    axiosInstance.get<Result<AttendanceDto>>(`${BASE}/${id}`).then((r) => r.data),
+    axiosInstance.get<Result<AttendanceDto>>(`/attendance/${id}`).then((r) => r.data),
 
   checkIn: (payload: CheckInPayload) =>
-    axiosInstance.post<Result<number>>(`${BASE}/check-in`, payload).then((r) => r.data),
+    axiosInstance.post<Result<number>>(`/attendance/check-in`, payload).then((r) => r.data),
 
   checkOut: (payload: CheckOutPayload) =>
-    axiosInstance.post<Result<number>>(`${BASE}/check-out`, payload).then((r) => r.data),
+    axiosInstance.post<Result<number>>(`/attendance/check-out`, payload).then((r) => r.data),
 
   update: (id: number, payload: UpdateAttendancePayload) =>
-    axiosInstance.put<Result<number>>(`${BASE}/${id}`, payload).then((r) => r.data),
+    axiosInstance.put<Result<number>>(`/attendance/${id}`, payload).then((r) => r.data),
 
   createManual: (payload: CreateManualAttendancePayload) =>
-    axiosInstance.post<Result<number>>(`${BASE}/manual`, payload).then((r) => r.data),
+    axiosInstance.post<Result<number>>(`/attendance/manual`, payload).then((r) => r.data),
 };

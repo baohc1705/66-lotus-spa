@@ -1,14 +1,14 @@
-using _66SMS.Contracts.Constants;
+using _66SMS.Contract.Constants;
 
-namespace _66SMS.Contracts.Abstractions
+namespace _66SMS.Contract.Abstractions
 {
     public interface IVnPayService
     {
         // Khởi tạo URL thanh toán gửi sang VNPAY (đặt cọc / thanh toán còn lại)
-        string CreatePaymentUrl(int appointmentId, decimal amount, string description, string ipAddress, int phase = 2);
+        string CreatePaymentUrl(int appointmentId, decimal amount, string ipAddress, int phase = 2);
 
         // Khởi tạo URL nạp tiền vào ví khách hàng
-        string CreateWalletTopUpUrl(int walletId, decimal amount, string description, string ipAddress);
+        string CreateWalletTopUpUrl(int walletId, decimal amount, string ipAddress);
 
         VnPayPaymentResponseModel PaymentExecute(IDictionary<string, string> collections);
     }

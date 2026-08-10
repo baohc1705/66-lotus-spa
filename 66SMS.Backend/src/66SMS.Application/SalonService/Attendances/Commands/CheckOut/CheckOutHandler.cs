@@ -1,13 +1,13 @@
 using _66SMS.Application.SalonService.Helpers;
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
 
 namespace _66SMS.Application.SalonService.Attendances.Commands.CheckOut
 {
@@ -26,11 +26,6 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CheckOut
 
         public async Task<Result<int>> Handle(CheckOutCommand request, CancellationToken cancellationToken)
         {
-            if (!request.WorkScheduleId.HasValue || request.WorkScheduleId <= 0)
-                return Result<int>.BadRequest(
-                    AttendanceConst.MSG_WORK_SCHEDULE_REQUIRED,
-                    ErrorCodes.ERR_ATTENDANCE_WORK_SCHEDULE_REQUIRED);
-
             var now = DateTimeHelper.UtcNow();
             var today = now.ToDateOnly();
 

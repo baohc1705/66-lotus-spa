@@ -16,7 +16,6 @@ interface AdminStatCardProps {
   label: string;
   value: number | string;
   icon: React.ElementType;
-  /** Icon nổi bật — mặc định gold theo bảng màu admin */
   tone?: AdminStatTone;
   valueClass?: string;
   isLoading?: boolean;
@@ -33,7 +32,7 @@ export function AdminStatCard({
   isCurrency = false,
 }: AdminStatCardProps) {
   return (
-    <div className="bg-white border border-adminGray-100 shadow-sm rounded-admin p-4 flex items-center gap-4">
+    <div className="bg-white border border-adminGray-100 shadow-xs rounded-admin p-4 flex items-center gap-4">
       <div
         className={cn(
           "w-12 h-12 rounded-admin flex items-center justify-center shrink-0",

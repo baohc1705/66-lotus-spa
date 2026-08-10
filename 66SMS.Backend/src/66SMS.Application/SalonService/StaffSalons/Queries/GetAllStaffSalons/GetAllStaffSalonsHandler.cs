@@ -1,5 +1,5 @@
-using _66SMS.Contracts.Extensions;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Extensions;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
 using _66SMS.Application.DTOs;
@@ -9,7 +9,7 @@ namespace _66SMS.Application.SalonService.StaffSalons.Queries.GetAllStaffSalons
     public class GetAllStaffSalonsHandler : IRequestHandler<GetAllStaffSalonsQuery, Result<PagedResult<StaffSalonDto>>>
     {
         private readonly IStaffSalonSqlRepository staffSalonSqlRepository;
-       
+
 
         public GetAllStaffSalonsHandler(IStaffSalonSqlRepository staffSalonSqlRepository)
         {

@@ -3,9 +3,12 @@
 
 :root {
   /* Alias màu theo color.md (giữ tên lotus-* cho Tailwind / component cũ) */
+  --lotus-primary: var(--rose-600);
+  --lotus-secondary: var(--rose-100);
+  --lotus-background: var(--bg-page);
   --lotus-cream: var(--bg-page);
   --lotus-surface: var(--bg-surface);
-  --lotus-inset: var(--warm-50);
+  --lotus-muted: var(--warm-100);
 
   --lotus-rose: var(--rose-600);
   --lotus-rose-dark: var(--rose-500);
@@ -18,25 +21,18 @@
 
   --lotus-deep: var(--ink);
   --lotus-stone: var(--warm-600);
-
   --lotus-error: var(--error-text);
-  --lotus-muted: var(--warm-100);
 
   /* Brand aliases used by shared UI (text-[var(--spa-*)]) */
   --spa-text: var(--ink);
   --spa-text-muted: var(--warm-600);
   --spa-rose: var(--rose-600);
   --spa-rose-hover: var(--rose-500);
-  --spa-rose-light: var(--rose-50);
   --spa-gold: var(--gold-600);
   --spa-gold-light: var(--gold-100);
   --spa-blush: var(--rose-50);
   --spa-border: var(--warm-100);
   --spa-admin-primary: var(--admin-green-600);
-
-  /* VNPay */
-  --lotus-vnpay: #005baa;
-  --lotus-vnpay-red: #ed1b24;
 
   /* Membership tier cards (profile) */
   --membership-bronze-bg: #fffbf5;
@@ -75,50 +71,6 @@
   --font-geist: "Geist Variable", system-ui, sans-serif;
   --landing-radius: 0;
   --transition-panel: 500ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Services hover panel */
-
-.service-panel {
-  flex: 1;
-  overflow: hidden;
-  cursor: pointer;
-  transition: flex var(--transition-panel);
-  position: relative;
-}
-.service-panel:hover,
-.service-panel:focus-within {
-  flex: 2.5;
-}
-
-.service-panel__content {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 24px;
-  background: linear-gradient(
-    to top,
-    rgba(43, 34, 38, 0.9) 0%,
-    transparent 100%
-  );
-  color: white;
-}
-
-.service-panel__detail {
-  opacity: 0;
-  transform: translateY(8px);
-  transition:
-    opacity 300ms ease 100ms,
-    transform 300ms ease 100ms;
-  max-height: 0;
-  overflow: hidden;
-}
-.service-panel:hover .service-panel__detail,
-.service-panel:focus-within .service-panel__detail {
-  opacity: 1;
-  transform: translateY(0);
-  max-height: 200px;
 }
 
 /* Hero */
@@ -187,18 +139,6 @@
   animation: petal-sway 3s ease-in-out infinite;
 }
 
-/* Card glow */
-
-.card-glow {
-  transition:
-    transform 350ms ease,
-    box-shadow 350ms ease;
-}
-.card-glow:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 8px 32px 0 rgba(157, 23, 77, 0.12);
-}
-
 /* Landing page utilities */
 
 .landing-page {
@@ -240,21 +180,13 @@
 
 .landing-container {
   width: 100%;
-  max-width: 80rem; /* max-w-7xl */
+  max-width: 80rem;
   margin-inline: auto;
   padding-inline: clamp(1rem, 3vw, 2rem);
 }
 
-.landing-surface {
-  background: var(--bg-surface, var(--lotus-surface));
-  border: 1px solid var(--border-card, #efefee);
-  border-radius: var(--landing-radius);
-}
-
 .lotus-panel {
   background: var(--bg-surface);
-  /* border: 1px solid var(--border-card); */
-  /* box-shadow: 0 8px 32px rgba(43, 34, 38, 0.05); */
 }
 
 .landing-focus-ring:focus-visible {

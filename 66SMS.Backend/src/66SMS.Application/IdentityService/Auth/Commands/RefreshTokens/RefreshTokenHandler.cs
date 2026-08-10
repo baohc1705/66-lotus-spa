@@ -1,9 +1,8 @@
-using _66SMS.Application.DTOs.Auth;
-using _66SMS.Contracts.Abstractions;
-using _66SMS.Contracts.Constants;
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Settings;
-using _66SMS.Contracts.Shared;
+using _66SMS.Contract.Abstractions;
+using _66SMS.Contract.Constants;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Settings;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
@@ -11,7 +10,8 @@ using _66SMS.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using _66SMS.Contracts.Helpers;
+using _66SMS.Contract.Helpers;
+using _66SMS.Application.DTOs;
 
 namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
 {
@@ -45,7 +45,6 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
 
         public async Task<Result<TokenResponseDTO>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
-            // Token lấy từ body hoặc cookie (controller merge). Rỗng = chưa đăng nhập / cookie mất.
             if (string.IsNullOrWhiteSpace(request.Token))
                 return Result<TokenResponseDTO>.BadRequest(UserConst.MSG_USER_INVALID_TOKEN, ErrorCodes.ERR_AUTH_TOKEN_INVALID);
 
@@ -105,7 +104,7 @@ namespace _66SMS.Application.IdentityService.Auth.Commands.RefreshTokens
                 UserId = user.Id,
                 Token = newRawToken,
                 ExpiresAt = DateTimeHelper.UtcNow().AddDays(jwtOptions.Value.RefreshTokenExpiryDays),
-                CreatedByIp = request.IpAddress ?? "",
+                CreatedByIp = request.IpAddress,
                 CreatedAt = DateTimeHelper.UtcNow(),
             });
 

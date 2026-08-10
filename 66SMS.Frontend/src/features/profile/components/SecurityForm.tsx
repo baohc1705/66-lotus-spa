@@ -47,7 +47,7 @@ export function SecurityForm() {
           <input
             type="password"
             {...register("currentPassword")}
-            className="w-full px-3 py-2.5 border-2 border-lotus-rose rounded-md focus:outline-none transition-all bg-lotus-cream/70 text-lotus-deep"
+            className="w-full px-3 py-2.5 border-2 border-lotus-rose rounded-md focus:outline-hidden transition-all bg-lotus-cream/70 text-lotus-deep"
           />
           {errors.currentPassword && (
             <p className="text-xs text-lotus-error">
@@ -64,7 +64,7 @@ export function SecurityForm() {
             <input
               type="password"
               {...register("newPassword")}
-              className="w-full px-3 py-2.5 border-2 border-lotus-rose rounded-md focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 transition-all bg-lotus-cream/70 text-lotus-deep"
+              className="w-full px-3 py-2.5 border-2 border-lotus-rose rounded-md focus:outline-hidden focus:ring-2 focus:ring-lotus-rose/20 transition-all bg-lotus-cream/70 text-lotus-deep"
             />
             {errors.newPassword && (
               <p className="text-xs text-lotus-error">
@@ -79,7 +79,7 @@ export function SecurityForm() {
             <input
               type="password"
               {...register("confirmPassword")}
-              className="w-full px-3 py-2.5 border-2 border-lotus-rose rounded-md focus:outline-none focus:ring-2 focus:ring-lotus-rose/20 transition-all bg-lotus-cream/70 text-lotus-deep"
+              className="w-full px-3 py-2.5 border-2 border-lotus-rose rounded-md focus:outline-hidden focus:ring-2 focus:ring-lotus-rose/20 transition-all bg-lotus-cream/70 text-lotus-deep"
             />
             {errors.confirmPassword && (
               <p className="text-xs text-lotus-error">
@@ -93,7 +93,7 @@ export function SecurityForm() {
           <Button
             type="submit"
             disabled={isPending}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-md shadow-sm bg-lotus-rose hover:bg-lotus-rose/90 text-white"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-md shadow-xs bg-lotus-rose hover:bg-lotus-rose/90 text-white"
           >
             {isPending ? (
               <span className="flex items-center gap-2">

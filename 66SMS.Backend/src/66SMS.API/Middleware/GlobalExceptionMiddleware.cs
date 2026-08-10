@@ -1,6 +1,5 @@
-using _66SMS.Contracts.Enumerations;
-using _66SMS.Contracts.Shared;
-using _66SMS.Domain.Exceptions;
+using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Shared;
 using FluentValidation;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -37,16 +36,8 @@ namespace _66SMS.API.Middleware
 
             var response = exception switch
             {
-                ValidationException validationEx =>
-                    Result<object>.BadRequest(
-                        string.Join(", ", validationEx.Errors.Select(e => e.ErrorMessage)),
-                        ErrorCodes.ERR_BAD_REQUEST),
-
-                UnauthorizedAccessException =>
-                    Result<object>.Unauthorized("Unauthorized access."),
-                TransactionRollBackException =>
-                   Result<object>.ServerError(),
-
+                ValidationException validationEx => Result<object>.BadRequest(string.Join(", ", validationEx.Errors.Select(e => e.ErrorMessage)), ErrorCodes.ERR_BAD_REQUEST),
+                UnauthorizedAccessException => Result<object>.Unauthorized("Unauthorized access."),
                 _ => Result<object>.ServerError("An internal server error occurred.")
             };
 
