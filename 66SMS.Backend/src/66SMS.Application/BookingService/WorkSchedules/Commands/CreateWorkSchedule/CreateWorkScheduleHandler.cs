@@ -19,7 +19,7 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Commands.CreateWorkSch
             {
                 Schedules = [new CreateWorkScheduleCommand
                 {
-                    ShiftPeriodId = request.ShiftPeriodId,
+                    ShiftId = request.ShiftId,
                     StaffId = request.StaffId,
                     SalonId = request.SalonId,
                     WorkDate = request.WorkDate,

@@ -6,7 +6,7 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Commands.CreateWorkSch
 {
     public class CreateWorkScheduleCommand : IRequest<Result<object>>
     {
-        public int? ShiftPeriodId { get; set; }
+        public int? ShiftId { get; set; }
         public int? StaffId { get; set; }
         public int? SalonId { get; set; }
         public DateOnly? WorkDate { get; set; }

@@ -8,8 +8,12 @@ import { Button } from "@/shared/elements/Button";
 import { FormField } from "@/shared/forms/FormField";
 import { FormSection } from "@/shared/forms/FormSection";
 import { Input } from "@/shared/forms/Input";
+import { Select } from "@/shared/forms/Select";
 import { Textarea } from "@/shared/forms/Textarea";
-import { formatDate } from "@/shared/utils/date.utils";
+import { useAuthStore } from "@/features/auth/stores/authStore";
+import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
+import { useAdminSalons } from "@/features/salons/hooks/useSalons";
+import type { SalonDTO } from "@/features/salons/types/salon.types";
 
 import { useCreateShift, useUpdateShift } from "../hooks/useShifts";
 import type { ShiftDTO } from "../types/shift.types";
@@ -26,26 +30,25 @@ interface ShiftFormDialogProps {
   shift?: ShiftDTO | null;
 }
 
-function getDefaultValues(shift?: ShiftDTO | null): CreateShiftFormValues {
+function getDefaultValues(
+  shift?: ShiftDTO | null,
+  effectiveSalonId?: number | null,
+): CreateShiftFormValues {
   if (shift) {
-    const currentPeriod = shift.shiftPeriodDTOs?.[0];
     return {
+      salonId: shift.salonId ?? 0,
       name: shift.name ?? "",
       description: shift.description ?? "",
-      shiftStart: currentPeriod?.shiftStart?.substring(0, 5) ?? "08:00",
-      shiftEnd: currentPeriod?.shiftEnd?.substring(0, 5) ?? "17:00",
-      effectiveFrom:
-        currentPeriod?.effectiveFrom ?? formatDate().format("YYYY-MM-DD"),
-      effectiveTo: currentPeriod?.effectiveTo ?? "",
+      shiftStart: shift.shiftStart?.substring(0, 5) ?? "08:00",
+      shiftEnd: shift.shiftEnd?.substring(0, 5) ?? "17:00",
     };
   }
   return {
+    salonId: effectiveSalonId ?? 0,
     name: "",
     description: "",
     shiftStart: "08:00",
     shiftEnd: "17:00",
-    effectiveFrom: formatDate().format("YYYY-MM-DD"),
-    effectiveTo: "",
   };
 }
 
@@ -55,60 +58,90 @@ export function ShiftFormDialog({
   shift,
 }: ShiftFormDialogProps) {
   const isEdit = !!shift;
+  const isAdmin = useAuthStore((state) => state.hasRole("Admin"));
+  const selectedSalonId = useAuthStore((state) => state.selectedSalonId);
+  const getEffectiveSalonId = useAuthStore((state) => state.getEffectiveSalonId);
+  const mySalon = useAuthStore((state) => state.mySalon);
+
+  const lockedSalonId = getEffectiveSalonId();
+  const defaultSalonId = isAdmin ? (selectedSalonId ?? lockedSalonId) : lockedSalonId;
+
   const createMutation = useCreateShift();
   const updateMutation = useUpdateShift();
   const isPending = createMutation.isPending || updateMutation.isPending;
+
+  const canPickSalon = isAdmin && !isEdit;
+  const { data: salonsResult } = useAdminSalons(
+    { pageIndex: 1, pageSize: 100 },
+    open && canPickSalon,
+  );
+  const salons = salonsResult?.data?.items ?? [];
+  const { data: activeSalons = [] } = useActiveSalons();
+
+  const salonOptions = salons.map((salon: SalonDTO) => ({
+    value: String(salon.id),
+    label: salon.name ?? "",
+  }));
+
+  let salonPlaceholder = "Chọn chi nhánh...";
+  if (salonsResult === undefined) {
+    salonPlaceholder = "Đang tải chi nhánh...";
+  } else if (salons.length === 0) {
+    salonPlaceholder = "Không có chi nhánh";
+  }
+
+  let lockedSalonName = shift?.salonName ?? mySalon?.salonName ?? "";
+  if (!lockedSalonName && lockedSalonId) {
+    for (let index = 0; index < activeSalons.length; index++) {
+      if (activeSalons[index].id === lockedSalonId) {
+        lockedSalonName = activeSalons[index].name ?? "";
+        break;
+      }
+    }
+  }
+  if (!lockedSalonName && lockedSalonId) {
+    lockedSalonName = `Chi nhánh #${lockedSalonId}`;
+  }
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
+    watch,
   } = useForm<CreateShiftFormValues | UpdateShiftFormValues>({
     resolver: zodResolver(
       isEdit ? updateShiftSchema : createShiftSchema,
     ) as Resolver<CreateShiftFormValues | UpdateShiftFormValues>,
-    defaultValues: getDefaultValues(shift),
+    defaultValues: getDefaultValues(shift, defaultSalonId),
   });
 
+  const salonIdValue = watch("salonId");
+
   useEffect(() => {
-    if (open) reset(getDefaultValues(shift));
-  }, [open, shift, reset]);
+    if (open) reset(getDefaultValues(shift, defaultSalonId));
+  }, [open, shift, defaultSalonId, reset]);
 
   const onSubmit = (data: CreateShiftFormValues | UpdateShiftFormValues) => {
     const shiftStartStr =
       data.shiftStart.length === 5 ? `${data.shiftStart}:00` : data.shiftStart;
     const shiftEndStr =
       data.shiftEnd.length === 5 ? `${data.shiftEnd}:00` : data.shiftEnd;
+      
+    const salonId = isAdmin ? data.salonId : (lockedSalonId ?? data.salonId);
 
     if (isEdit && shift?.id) {
-      const currentPeriod = shift.shiftPeriodDTOs?.[0];
-      const currentShiftStart = currentPeriod?.shiftStart?.substring(0, 5);
-      const currentShiftEnd = currentPeriod?.shiftEnd?.substring(0, 5);
-      const currentEffectiveFrom = currentPeriod?.effectiveFrom;
-      const currentEffectiveTo = currentPeriod?.effectiveTo || "";
-      const formEffectiveTo = data.effectiveTo || "";
-
-      const isTimeChanged =
-        data.shiftStart !== currentShiftStart ||
-        data.shiftEnd !== currentShiftEnd ||
-        data.effectiveFrom !== currentEffectiveFrom ||
-        formEffectiveTo !== currentEffectiveTo;
-
       updateMutation.mutate(
         {
           id: shift.id,
           payload: {
             id: shift.id,
+            salonId: shift.salonId ?? salonId,
             name: data.name,
             description: data.description,
-            shiftPeriod: {
-              id: isTimeChanged ? undefined : currentPeriod?.id,
-              shiftStart: shiftStartStr,
-              shiftEnd: shiftEndStr,
-              effectiveFrom: data.effectiveFrom,
-              effectiveTo: data.effectiveTo || undefined,
-            },
+            shiftStart: shiftStartStr,
+            shiftEnd: shiftEndStr,
           },
         },
         {
@@ -122,14 +155,11 @@ export function ShiftFormDialog({
 
     createMutation.mutate(
       {
+        salonId,
         name: data.name,
         description: data.description,
-        shiftPeriod: {
-          shiftStart: shiftStartStr,
-          shiftEnd: shiftEndStr,
-          effectiveFrom: data.effectiveFrom,
-          effectiveTo: data.effectiveTo || undefined,
-        },
+        shiftStart: shiftStartStr,
+        shiftEnd: shiftEndStr,
       },
       {
         onSuccess: (result) => {
@@ -149,6 +179,33 @@ export function ShiftFormDialog({
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
         <FormSection icon={Info} title="Thông tin cơ bản">
+          {canPickSalon ? (
+            <FormField
+              label="Chi nhánh *"
+              tooltip="Ca làm việc thuộc chi nhánh này"
+              error={errors.salonId?.message}
+            >
+              <Select
+                value={salonIdValue ? String(salonIdValue) : ""}
+                onChange={(event) =>
+                  setValue("salonId", Number(event.target.value), {
+                    shouldValidate: true,
+                  })
+                }
+                options={salonOptions}
+                placeholder={salonPlaceholder}
+                invalid={!!errors.salonId}
+              />
+            </FormField>
+          ) : (
+            <FormField
+              label="Chi nhánh *"
+              tooltip="Quản lý chỉ được tạo ca cho chi nhánh của mình"
+            >
+              <Input value={lockedSalonName || "Chi nhánh của bạn"} disabled />
+            </FormField>
+          )}
+
           <FormField
             label="Tên ca *"
             tooltip="Vui lòng nhập tên ca (VD: Ca Sáng)"
@@ -198,30 +255,6 @@ export function ShiftFormDialog({
                 type="time"
                 {...register("shiftEnd")}
                 invalid={!!errors.shiftEnd}
-              />
-            </FormField>
-
-            <FormField
-              label="Ngày bắt đầu áp dụng *"
-              tooltip="Ngày ca làm việc này bắt đầu có hiệu lực"
-              error={errors.effectiveFrom?.message}
-            >
-              <Input
-                type="date"
-                {...register("effectiveFrom")}
-                invalid={!!errors.effectiveFrom}
-              />
-            </FormField>
-
-            <FormField
-              label="Ngày kết thúc áp dụng"
-              tooltip="Bỏ trống nếu áp dụng vô thời hạn"
-              error={errors.effectiveTo?.message}
-            >
-              <Input
-                type="date"
-                {...register("effectiveTo")}
-                invalid={!!errors.effectiveTo}
               />
             </FormField>
           </div>

@@ -218,9 +218,7 @@ function CashierInvoiceSidebarForm({
     String(booking.staffId ?? ""),
   );
   const [editDate, setEditDate] = useState(() => booking.bookingDate || "");
-  const [editSlotId, setEditSlotId] = useState<number | null>(
-    () => booking.slotId ?? null,
-  );
+  const [editSlotId, setEditSlotId] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   const currentBackendStatus = toBackendStatus(booking.status);
@@ -393,10 +391,12 @@ function CashierInvoiceSidebarForm({
       selectedPositionId !== (booking.positionId ?? null);
 
     const dateChanged = canReschedule && editDate !== (booking.bookingDate || "");
+    const selectedSlotTime = resolvedStartTime || "";
+    const bookingSlotTime = booking.startTime || "";
     const slotChanged =
       canReschedule &&
       editSlotId != null &&
-      editSlotId !== (booking.slotId ?? null);
+      selectedSlotTime !== bookingSlotTime;
     const scheduleChanged = dateChanged || slotChanged;
 
     if (scheduleChanged && !editDate) {
@@ -494,9 +494,10 @@ function CashierInvoiceSidebarForm({
     const status = (slot.status || "").toLowerCase();
     if (status === "available" || status === "trống") return true;
     // Slot hien tai cua lich (cung ngay) van cho chon.
+    const slotTime = slot.startTime || slot.time || "";
     if (
       editDate === (booking.bookingDate || "") &&
-      (slot.slotId === booking.slotId || slot.time === booking.startTime)
+      slotTime === (booking.startTime || "")
     ) {
       return true;
     }
@@ -533,7 +534,11 @@ function CashierInvoiceSidebarForm({
     const list = [];
     for (let index = 0; index < rescheduleSlots.length; index++) {
       const slot = rescheduleSlots[index];
-      const selected = editSlotId === slot.slotId;
+      const slotTime = slot.startTime || slot.time || "";
+      const selected =
+        editSlotId != null
+          ? editSlotId === slot.slotId
+          : slotTime === (booking.startTime || "");
       const available = isSlotSelectable(slot);
 
       let classes =

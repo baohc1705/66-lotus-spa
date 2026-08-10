@@ -11,7 +11,7 @@ GO
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_work_schedules_date_staff' AND object_id = OBJECT_ID(N'dbo.work_schedules'))
     CREATE INDEX IX_work_schedules_date_staff
         ON dbo.work_schedules (work_date, status)
-        INCLUDE (staff_id, shift_period_id);
+        INCLUDE (staff_id, shift_id);
 GO
 
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_staff_services_service_status' AND object_id = OBJECT_ID(N'dbo.staff_services'))

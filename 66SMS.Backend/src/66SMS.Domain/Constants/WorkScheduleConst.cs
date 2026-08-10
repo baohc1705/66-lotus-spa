@@ -6,7 +6,9 @@ namespace _66SMS.Domain.Constants
         public const string TABLE_NAME = "work_schedules";
         public const string FIELD_ID = "id";
         public const string FIELD_SALON_ID = "salon_id";
-        public const string FIELD_SHIFT_PERIOD_ID = "shift_period_id";
+        public const string FIELD_SHIFT_ID = "shift_id";
+        public const string FIELD_SHIFT_START = "shift_start";
+        public const string FIELD_SHIFT_END = "shift_end";
         public const string FIELD_STAFF_ID = "staff_id";
         public const string FIELD_WORK_DATE = "work_date";
         public const string FIELD_STATUS = "status";
@@ -24,6 +26,7 @@ namespace _66SMS.Domain.Constants
         public const string MSG_WORK_SCHEDULE_ID_NOT_FOUND = $"{nameof(Entities.WorkSchedule)} with id not found";
         public const string MSG_WORK_SCHEDULE_NOT_FOUND = "Không tìm thấy ca làm việc.";
         public const string MSG_WORK_SCHEDULE_DUPLICATE = "Nhân viên này đã được xếp vào ca này trong cùng ngày.";
+        public const string MSG_SHIFT_REQUIRED = "Ca làm việc không hợp lệ.";
         #endregion
     }
 }

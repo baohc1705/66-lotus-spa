@@ -6,5 +6,6 @@ namespace _66SMS.Application.BookingService.Shifts.Queries.GetAllShift
 {
     public class GetAllShiftQuery : PageRequest, IRequest<Result<PagedResult<ShiftDTO>>>
     {
+        public int? SalonId { get; set; }
     }
 }

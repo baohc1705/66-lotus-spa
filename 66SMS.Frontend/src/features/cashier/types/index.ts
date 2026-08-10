@@ -20,7 +20,6 @@ export interface CashierBooking {
   serviceId?: number | null
   staffId: string | number
   staffName?: string | null
-  slotId?: number | null
   startTime: string
   endTime: string
   status: BookingStatus

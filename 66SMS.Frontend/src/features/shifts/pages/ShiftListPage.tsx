@@ -1,8 +1,7 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import {
   useReactTable,
   getCoreRowModel,
-  getExpandedRowModel,
 } from "@tanstack/react-table";
 import { Briefcase, Plus } from "lucide-react";
 
@@ -16,8 +15,8 @@ import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
 import { TableEmptyState } from "@/shared/tables/TableEmptyState";
 import { TablePageShell } from "@/shared/tables/TablePageShell";
 import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
+import { useAuthStore } from "@/features/auth/stores/authStore";
 
-import { ShiftDetailExpanded } from "../components/ShiftDetailExpanded";
 import { ShiftFormDialog } from "../components/ShiftFormDialog";
 import {
   SHIFT_COLUMN_LABELS,
@@ -34,6 +33,12 @@ export function ShiftListPage() {
 
   const perm = SHIFT_PERM;
   const listState = useShiftListState();
+  const isAdmin = useAuthStore((state) => state.hasRole("Admin"));
+  const selectedSalonId = useAuthStore((state) => state.selectedSalonId);
+  const getEffectiveSalonId = useAuthStore((state) => state.getEffectiveSalonId);
+
+  // Admin: null = tat ca chi nhanh. Manager/staff: theo salon hieu luc.
+  const branchSalonId = isAdmin ? selectedSalonId : getEffectiveSalonId();
 
   const {
     queryParams,
@@ -53,13 +58,26 @@ export function ShiftListPage() {
     handlePageSizeChange,
     handleSearchChange,
     filter,
+    setPageIndex,
   } = listState;
+
+  useEffect(() => {
+    setPageIndex(1);
+  }, [branchSalonId, setPageIndex]);
+
+  const shiftQueryParams = useMemo(
+    () => ({
+      ...queryParams,
+      salonId: branchSalonId || undefined,
+    }),
+    [queryParams, branchSalonId],
+  );
 
   const {
     data: shiftResult,
     isLoading,
     isFetching,
-  } = useAdminShifts(queryParams);
+  } = useAdminShifts(shiftQueryParams);
   const deleteMutation = useDeleteShift();
 
   const paged = shiftResult?.data;
@@ -87,8 +105,6 @@ export function ShiftListPage() {
     state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
-    getRowCanExpand: () => true,
     manualPagination: true,
     manualSorting: true,
   });
@@ -133,11 +149,6 @@ export function ShiftListPage() {
           table={table}
           isLoading={isLoading}
           loadingRows={DEFAULT_LOADING_ROWS}
-          renderExpandedRow={({ row }) =>
-            row.original.id ? (
-              <ShiftDetailExpanded shift={row.original} />
-            ) : null
-          }
           emptyState={
             <TableEmptyState
               icon={Briefcase}

@@ -55,9 +55,8 @@ namespace _66SMS.Application.SalonService.Attendances.Queries.GetAllAttendances
                     Status = x.Status,
                     Note = x.Note,
                     ShiftName = x.WorkSchedule != null
-                        && x.WorkSchedule.ShiftPeriod != null
-                        && x.WorkSchedule.ShiftPeriod.Shift != null
-                            ? x.WorkSchedule.ShiftPeriod.Shift.Name
+                        && x.WorkSchedule.Shift != null
+                            ? x.WorkSchedule.Shift.Name
                             : null,
                     CreatedAt = x.CreatedAt,
                     UpdatedAt = x.UpdatedAt,

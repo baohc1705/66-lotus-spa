@@ -8,17 +8,25 @@ using AutoMapper;
 using MediatR;
 using System.Data;
 using _66SMS.Contract.Helpers;
+using Microsoft.EntityFrameworkCore;
 
 namespace _66SMS.Application.BookingService.WorkSchedules.Commands.UpdateWorkSchedule
 {
     public class UpdateWorkScheduleHandler : IRequestHandler<UpdateWorkScheduleCommand, Result<object>>
     {
         private readonly IWorkScheduleSqlRepository workScheduleSqlRepository;
+        private readonly IShiftSqlRepository shiftSqlRepository;
         private readonly ISqlUnitOfWork sqlUnitOfWork;
         private readonly IMapper mapper;
-        public UpdateWorkScheduleHandler(IWorkScheduleSqlRepository workScheduleSqlRepository, ISqlUnitOfWork sqlUnitOfWork, IMapper mapper)
+
+        public UpdateWorkScheduleHandler(
+            IWorkScheduleSqlRepository workScheduleSqlRepository,
+            IShiftSqlRepository shiftSqlRepository,
+            ISqlUnitOfWork sqlUnitOfWork,
+            IMapper mapper)
         {
             this.workScheduleSqlRepository = workScheduleSqlRepository;
+            this.shiftSqlRepository = shiftSqlRepository;
             this.sqlUnitOfWork = sqlUnitOfWork;
             this.mapper = mapper;
         }
@@ -28,10 +36,32 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Commands.UpdateWorkSch
             WorkSchedule? workSchedule = await workScheduleSqlRepository.FindByIdAsync((int)request.Id!, false, cancellationToken);
             if (workSchedule == null) return Result<object>.NotFound(WorkScheduleConst.MSG_WORK_SCHEDULE_NOT_FOUND, ErrorCodes.ERR_WORK_SCHEDULE_NOT_FOUND);
 
+            int? previousShiftId = workSchedule.ShiftId;
             mapper.Map(request, workSchedule);
             workSchedule.UpdatedAt = DateTimeHelper.UtcNow();
 
-            bool isDuplicate = await workScheduleSqlRepository.AnyAsync(x => x.Id != request.Id && x.StaffId == workSchedule.StaffId && x.ShiftPeriodId == workSchedule.ShiftPeriodId && x.WorkDate == workSchedule.WorkDate, cancellationToken);
+            if (request.ShiftId.HasValue && request.ShiftId != previousShiftId)
+            {
+                var shiftHours = await shiftSqlRepository.AsQueryable(asNoTracking: true)
+                    .Where(x => x.Id == request.ShiftId.Value)
+                    .Select(x => new { x.ShiftStart, x.ShiftEnd })
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (shiftHours == null || !shiftHours.ShiftStart.HasValue || !shiftHours.ShiftEnd.HasValue)
+                {
+                    return Result<object>.BadRequest(WorkScheduleConst.MSG_SHIFT_REQUIRED);
+                }
+
+                workSchedule.ShiftStart = shiftHours.ShiftStart;
+                workSchedule.ShiftEnd = shiftHours.ShiftEnd;
+            }
+
+            bool isDuplicate = await workScheduleSqlRepository.AnyAsync(
+                x => x.Id != request.Id
+                     && x.StaffId == workSchedule.StaffId
+                     && x.ShiftId == workSchedule.ShiftId
+                     && x.WorkDate == workSchedule.WorkDate,
+                cancellationToken);
             if (isDuplicate)
             {
                 return Result<object>.Conflict(WorkScheduleConst.MSG_WORK_SCHEDULE_DUPLICATE, ErrorCodes.ERR_WORK_SCHEDULE_DUPLICATE);
@@ -47,7 +77,8 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Commands.UpdateWorkSch
             }
             catch
             {
-                transaction.Rollback(); throw;
+                transaction.Rollback();
+                throw;
             }
         }
     }

@@ -54,7 +54,6 @@ BEGIN
         AppointmentDate  DATE           NOT NULL,
         StaffId          INT            NOT NULL,
         StaffName        NVARCHAR(100)  NOT NULL,
-        SlotId           INT            NULL,
         StartTime        TIME(7)        NULL,
         EndTime          TIME(7)        NULL,
         PositionId       INT            NULL,
@@ -74,7 +73,7 @@ BEGIN
 
     INSERT INTO #Appt (
         AppointmentId, AppointmentCode, AppointmentDate, StaffId, StaffName,
-        SlotId, StartTime, EndTime, PositionId, PositionName, PositionStatus,
+        StartTime, EndTime, PositionId, PositionName, PositionStatus,
         StatusCode, Note, TotalAmount, PaidAmount, DepositPercent,
         DepositDeadline, TimeStartService, CompletedAt, SalonId, CreatedByUserId
     )
@@ -84,7 +83,6 @@ BEGIN
         a.appointment_date,
         a.staff_id,
         ISNULL(st.full_name, N'N/A'),
-        CAST(NULL AS INT),
         a.time_appt_start,
         a.time_appt_end,
         a.position_id,
@@ -173,7 +171,6 @@ BEGIN
         svc.ServiceId,
         a.StaffId,
         a.StaffName,
-        a.SlotId,
         CONVERT(varchar(5), a.StartTime, 108) AS StartTime,
         CONVERT(
             varchar(5),

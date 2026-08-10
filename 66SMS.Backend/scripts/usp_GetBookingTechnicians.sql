@@ -121,7 +121,7 @@ BEGIN
       AND EXISTS (
             SELECT 1 FROM dbo.work_schedules ws
             WHERE ws.staff_id = st.id AND ws.work_date = @date
-              AND ws.status = 1 AND ws.shift_period_id IS NOT NULL
+              AND ws.status = 1 AND ws.shift_id IS NOT NULL
           )
       AND (
             @salon_id IS NULL
@@ -153,14 +153,15 @@ BEGIN
         MAX(sl.slot_index)
     FROM dbo.work_schedules ws
     INNER JOIN @staff s ON s.staff_id = ws.staff_id
-    INNER JOIN dbo.shift_periods sp ON sp.id = ws.shift_period_id
     INNER JOIN @slots sl
-        ON sl.start_time >= sp.shift_start
-       AND sl.end_time <= sp.shift_end
+        ON sl.start_time >= ws.shift_start
+       AND sl.end_time <= ws.shift_end
     WHERE ws.work_date = @date
       AND ws.status = 1
-      AND ws.shift_period_id IS NOT NULL
-    GROUP BY ws.staff_id, sp.shift_start, sp.shift_end;
+      AND ws.shift_id IS NOT NULL
+      AND ws.shift_start IS NOT NULL
+      AND ws.shift_end IS NOT NULL
+    GROUP BY ws.staff_id, ws.shift_start, ws.shift_end;
 
     IF NOT EXISTS (SELECT 1 FROM @shift_range)
     BEGIN

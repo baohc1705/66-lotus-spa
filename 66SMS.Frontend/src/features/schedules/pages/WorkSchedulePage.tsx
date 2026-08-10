@@ -91,10 +91,14 @@ export function WorkSchedulePage() {
     salonId,
   ]);
 
-  const { data: shiftsData, isLoading: isLoadingShifts } = useShifts({
-    pageIndex: 1,
-    pageSize: 100,
-  });
+  const { data: shiftsData, isLoading: isLoadingShifts } = useShifts(
+    {
+      pageIndex: 1,
+      pageSize: 100,
+      salonId: salonId || undefined,
+    },
+    !!salonId,
+  );
 
   const { data: staffsData, isLoading: isLoadingStaffs } = useStaffs({
     pageIndex: 1,

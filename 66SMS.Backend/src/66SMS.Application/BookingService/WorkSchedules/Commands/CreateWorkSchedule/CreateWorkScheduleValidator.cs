@@ -1,4 +1,4 @@
-using _66SMS.Contract.Helpers;
+using _66SMS.Domain.Constants;
 using FluentValidation;
 
 namespace _66SMS.Application.BookingService.WorkSchedules.Commands.CreateWorkSchedule
@@ -7,9 +7,9 @@ namespace _66SMS.Application.BookingService.WorkSchedules.Commands.CreateWorkSch
     {
         public CreateWorkScheduleValidator()
         {
-            RuleFor(x => x.ShiftPeriodId).NotNull().GreaterThan(0);
+            RuleFor(x => x.ShiftId).NotNull().GreaterThan(0).WithMessage(WorkScheduleConst.MSG_SHIFT_REQUIRED);
             RuleFor(x => x.StaffId).NotNull().GreaterThan(0);
-            RuleFor(x => x.WorkDate).NotNull().GreaterThanOrEqualTo(DateTimeHelper.UtcNow().ToDateOnly());
+            RuleFor(x => x.WorkDate).NotNull();
         }
     }
 }
