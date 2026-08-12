@@ -12,6 +12,7 @@ import {
 } from "@/shared/tables/Table";
 import { formatDate } from "@/shared/utils/date.utils";
 import { cashierApi } from "../api/cashier.api";
+import { CASHIER_POSITION_AVAILABILITY } from "../cashierQueryKey";
 import type { CashierPosition } from "../types";
 
 interface PositionAvailabilityDialogProps {
@@ -30,7 +31,7 @@ export function PositionAvailabilityDialog({
   const dateStr = formatDate(currentDate).format("YYYY-MM-DD");
 
   const positionsQuery = useQuery({
-    queryKey: ["cashier-position-availability", salonId, dateStr],
+    queryKey: [CASHIER_POSITION_AVAILABILITY, salonId, dateStr],
     queryFn: async () => {
       const res = await cashierApi.getPositions(salonId, dateStr);
       return res.data ?? [];

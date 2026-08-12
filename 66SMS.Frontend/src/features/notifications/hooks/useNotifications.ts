@@ -3,6 +3,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/shared/components/kitToast";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import {
+  CASHIER_DAILY,
+  CASHIER_PENDING_ONLINE,
+  CASHIER_PENDING_ONLINE_COUNT,
+  CASHIER_WEEKLY,
+} from "@/features/cashier/cashierQueryKey";
+import {
   connectNotificationHub,
   disconnectNotificationHub,
   joinSalon,
@@ -18,8 +24,10 @@ function handleNotification(msg: NotificationMessage, queryClient: ReturnType<ty
   queryClient.invalidateQueries({ queryKey: ["notifications"] });
 
   if ((msg.domain || "").toLowerCase() === "booking") {
-    queryClient.invalidateQueries({ queryKey: ["cashier-daily"] });
-    queryClient.invalidateQueries({ queryKey: ["cashier-weekly"] });
+    queryClient.invalidateQueries({ queryKey: [CASHIER_DAILY] });
+    queryClient.invalidateQueries({ queryKey: [CASHIER_WEEKLY] });
+    queryClient.invalidateQueries({ queryKey: [CASHIER_PENDING_ONLINE] });
+    queryClient.invalidateQueries({ queryKey: [CASHIER_PENDING_ONLINE_COUNT] });
     queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
     queryClient.invalidateQueries({ queryKey: ["staff-schedule-daily"] });
     queryClient.invalidateQueries({ queryKey: ["staff-schedule-weekly"] });

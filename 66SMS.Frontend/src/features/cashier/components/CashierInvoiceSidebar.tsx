@@ -29,6 +29,7 @@ import { useTimeSlots } from "@/features/booking/hooks/useBookingData";
 import type { TimeSlotDTO } from "@/features/booking/types/booking.types";
 import { filterSlotsAfterNow } from "@/features/booking/utils/timeSlot.utils";
 import { cashierApi } from "../api/cashier.api";
+import { CASHIER_POSITIONS } from "../cashierQueryKey";
 import { useStaffAvailability } from "../hooks/useStaffAvailability";
 import type {
   BookingStatus,
@@ -302,7 +303,7 @@ function CashierInvoiceSidebarForm({
   );
 
   const positionsQuery = useQuery({
-    queryKey: ["cashier-positions", salonId, editDate || booking.bookingDate],
+    queryKey: [CASHIER_POSITIONS, salonId, editDate || booking.bookingDate],
     queryFn: async () => {
       const res = await cashierApi.getPositions(
         salonId,

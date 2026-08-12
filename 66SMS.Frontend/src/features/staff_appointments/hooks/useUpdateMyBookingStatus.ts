@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
+import { CASHIER_DAILY } from "@/features/cashier/cashierQueryKey";
 import { toast } from "@/shared/components/kitToast";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type { Result } from "@/shared/types/common.types";
@@ -28,7 +29,7 @@ export function useUpdateMyBookingStatus() {
       toast.success(res.message || "Cập nhật trạng thái thành công");
       queryClient.invalidateQueries({ queryKey: ["staff-schedule-daily"] });
       queryClient.invalidateQueries({ queryKey: ["staff-schedule-weekly"] });
-      queryClient.invalidateQueries({ queryKey: ["cashier-daily"] });
+      queryClient.invalidateQueries({ queryKey: [CASHIER_DAILY] });
     },
     onError: (error: AxiosError<Result<unknown>>) => {
       toast.error(getErrorMessage(error, "Cập nhật trạng thái thất bại"));

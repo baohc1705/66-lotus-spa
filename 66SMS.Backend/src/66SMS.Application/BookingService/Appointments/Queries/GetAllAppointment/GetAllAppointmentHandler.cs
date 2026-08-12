@@ -18,10 +18,15 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetAllAppointme
         public async Task<Result<PagedResult<AppointmentDto>>> Handle(GetAllAppointmentQuery request, CancellationToken cancellationToken)
         {
             var query = appointmentSqlRepository.AsQueryable();
+
             if (request.UserId != null && request.UserId > 0)
                 query = query.Where(x => x.CreatedByUserId == request.UserId);
+
             if (request.SalonId.HasValue)
                 query = query.Where(x => x.SalonId == request.SalonId.Value);
+
+            if (request.Status.HasValue)
+                query = query.Where(x => x.Status == request.Status.Value);
 
             var result = await query
                 .OrderByDescending(x => x.CreatedAt)
@@ -30,6 +35,8 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetAllAppointme
                     Id = x.Id,
                     AppointmentCode = x.AppointmentCode,
                     CustomerId = x.CreatedByUser!.Customer!.Id,
+                    CustomerName = x.CreatedByUser!.Customer!.FullName,
+                    CustomerPhone = x.CreatedByUser!.Customer!.Phone,
                     StaffId = x.StaffId,
                     SlotId = null,
                     PositionId = x.PositionId,

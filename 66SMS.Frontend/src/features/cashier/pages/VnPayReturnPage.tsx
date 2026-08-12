@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { Button } from "@/shared/elements/Button";
 import { cashierApi } from "../api/cashier.api";
+import { CASHIER_DAILY } from "../cashierQueryKey";
 
 type PaymentPhase = "deposit" | "balance" | "topup";
 
@@ -30,7 +31,7 @@ export function VnPayReturnPage() {
         const data = await cashierApi.vnPayReturn(queryString);
 
         if (data.isSuccess && data.data) {
-          await queryClient.invalidateQueries({ queryKey: ["cashier-daily"] });
+          await queryClient.invalidateQueries({ queryKey: [CASHIER_DAILY] });
           await queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
           await queryClient.invalidateQueries({ queryKey: ["my-wallet"] });
           await queryClient.invalidateQueries({

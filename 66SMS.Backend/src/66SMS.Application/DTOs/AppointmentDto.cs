@@ -5,6 +5,8 @@ namespace _66SMS.Application.DTOs
         public int? Id { get; set; }
         public string? AppointmentCode { get; set; }
         public int? CustomerId { get; set; }
+        public string? CustomerName { get; set; }
+        public string? CustomerPhone { get; set; }
         public int? StaffId { get; set; }
         public int? SlotId { get; set; }
         public int? PositionId { get; set; }

@@ -1,5 +1,10 @@
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { CashierPromotionModal } from "@/features/cashier/components/CashierPromotionModal";
+import {
+  CASHIER_CUSTOMER_WALLET,
+  CASHIER_DAILY,
+  CASHIER_WEEKLY,
+} from "@/features/cashier/cashierQueryKey";
 import { useCustomers } from "@/features/customers/hooks/useCustomers";
 import type { CustomerDto } from "@/features/customers/types/customer.types";
 import { invoiceApi } from "@/features/invoices/api/invoice.api";
@@ -337,7 +342,7 @@ export function CashierPOS({
     isCheckoutModalOpen && isWalletPayment && customerId != null;
 
   const walletQuery = useQuery({
-    queryKey: ["cashier-customer-wallet", customerId],
+    queryKey: [CASHIER_CUSTOMER_WALLET, customerId],
     queryFn: () =>
       getAdminWallets({
         pageIndex: 1,
@@ -579,8 +584,8 @@ export function CashierPOS({
         );
         if (result.isSuccess) {
           toast.success(result.message || "Thanh toán hóa đơn thành công.");
-          await queryClient.invalidateQueries({ queryKey: ["cashier-daily"] });
-          await queryClient.invalidateQueries({ queryKey: ["cashier-weekly"] });
+          await queryClient.invalidateQueries({ queryKey: [CASHIER_DAILY] });
+          await queryClient.invalidateQueries({ queryKey: [CASHIER_WEEKLY] });
           setIsCheckoutModalOpen(false);
           if (orders.length === 1) {
             setOrders([createEmptyOrder("1", "Đơn Hàng #26070001")]);
@@ -603,8 +608,8 @@ export function CashierPOS({
     createInvoiceMutation.mutate(payload, {
       onSuccess: async (result) => {
         if (result.isSuccess) {
-          await queryClient.invalidateQueries({ queryKey: ["cashier-daily"] });
-          await queryClient.invalidateQueries({ queryKey: ["cashier-weekly"] });
+          await queryClient.invalidateQueries({ queryKey: [CASHIER_DAILY] });
+          await queryClient.invalidateQueries({ queryKey: [CASHIER_WEEKLY] });
           setIsCheckoutModalOpen(false);
           if (orders.length === 1) {
             setOrders([createEmptyOrder("1", "Đơn Hàng #26070001")]);

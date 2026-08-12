@@ -14,7 +14,6 @@ export interface TechnicianDTO {
 export interface TimeSlotDTO {
   slotId: number;
   time: string;
-  /** Dong bo voi time; dung dual-send / cutover theo gio */
   startTime?: string;
   status: string;
 }
@@ -109,6 +108,7 @@ export interface GetTimeSlotsParams {
 export interface GetAllAppointmentParams {
   userId?: number;
   salonId?: number;
+  status?: number;
   pageIndex?: number;
   pageSize?: number;
   filter?: string;
@@ -132,6 +132,8 @@ export interface AppointmentDto {
   id?: number;
   appointmentCode?: string;
   customerId?: number;
+  customerName?: string;
+  customerPhone?: string;
   staffId?: number;
   slotId?: number;
   positionId?: number;
