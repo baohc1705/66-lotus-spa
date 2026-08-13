@@ -21,12 +21,14 @@ export type GetCashierDailyParams = {
 export type GetCashierPositionsParams = {
   salonId?: number | null;
   date?: string | null;
+  excludeAppointmentId?: number | null;
 };
 
 export type GetStaffAvailabilityParams = {
   date?: string;
   startTime?: string;
   serviceId?: number;
+  serviceIds?: number[];
   salonId?: number | null;
 };
 
@@ -73,12 +75,19 @@ export const cashierApi = {
       })
       .then((r) => r.data),
 
-  getPositions: (salonId?: number | null, date?: string | null) =>
+  getPositions: (
+    salonId?: number | null,
+    date?: string | null,
+    excludeAppointmentId?: number | null,
+  ) =>
     axiosInstance
       .get<Result<CashierPosition[]>>("/cashier/positions", {
         params: {
           ...withSalonId(salonId),
           ...(date ? { date } : {}),
+          ...(excludeAppointmentId
+            ? { excludeAppointmentId }
+            : {}),
         } satisfies GetCashierPositionsParams,
       })
       .then((r) => r.data),
@@ -131,7 +140,7 @@ export const cashierApi = {
   getStaffAvailability: (
     date: Date,
     startTime: string,
-    serviceId: number,
+    serviceIds: number[],
     salonId?: number | null,
   ) =>
     axiosInstance
@@ -139,9 +148,13 @@ export const cashierApi = {
         params: {
           date: toDateOnly(date),
           startTime,
-          serviceId,
+          serviceIds,
+          serviceId: serviceIds[0],
           ...withSalonId(salonId),
         } satisfies GetStaffAvailabilityParams,
+        paramsSerializer: {
+          indexes: null,
+        },
       })
       .then((r) => r.data),
 };

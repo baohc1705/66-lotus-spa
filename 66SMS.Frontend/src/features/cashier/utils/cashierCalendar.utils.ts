@@ -1,4 +1,5 @@
-import type { BookingStatus, CashierBooking } from "../types";
+import { APPOINTMENT_STATUS } from "@/features/booking/constants/appointment.constants";
+import type { CashierBooking } from "../types";
 
 export type CashierCalendarStatus =
   | "pending"
@@ -45,16 +46,14 @@ const STATUS_FILTER_ORDER: CashierCalendarStatus[] = [
   "cancelled",
 ];
 
-export function toCalendarStatus(status: BookingStatus): CashierCalendarStatus {
-  if (status === "unpaid" || status === "paid") {
-    return "completed";
-  }
-  if (status === "not-arrived") {
+export function toCalendarStatus(status: number): CashierCalendarStatus {
+  if (status === APPOINTMENT_STATUS.CONFIRMED) return "confirmed";
+  if (status === APPOINTMENT_STATUS.WAITING || status === APPOINTMENT_STATUS.NO_SHOW) {
     return "waiting";
   }
-  if (CASHIER_STATUS_LABELS[status as CashierCalendarStatus]) {
-    return status as CashierCalendarStatus;
-  }
+  if (status === APPOINTMENT_STATUS.IN_SERVICE) return "in-progress";
+  if (status === APPOINTMENT_STATUS.COMPLETED) return "completed";
+  if (status === APPOINTMENT_STATUS.CANCELLED) return "cancelled";
   return "pending";
 }
 

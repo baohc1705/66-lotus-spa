@@ -51,16 +51,29 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.RescheduleAppointme
                 return Result<object>.Success(AppointmentConst.MSG_RESCHEDULE_UNCHANGED);
             }
 
-            var mainServiceId = appointment.Services?.Select(s => s.ServiceId).FirstOrDefault() ?? 0;
-            if (mainServiceId <= 0)
+            var serviceIds = new List<int>();
+            var durationMinutes = 0;
+            if (appointment.Services != null)
+            {
+                foreach (var line in appointment.Services)
+                {
+                    if (line.Status != AppointmentServiceConst.STATUS_ACTIVE)
+                        continue;
+                    if (line.ServiceId <= 0)
+                        continue;
+                    serviceIds.Add(line.ServiceId);
+                    durationMinutes += line.DurationSnapshot * line.Quantity;
+                }
+            }
+
+            if (serviceIds.Count == 0)
                 return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_MIN_ONE_SERVICE, ErrorCodes.ERR_APPOINTMENT_MIN_ONE_SERVICE);
 
             int? preferredStaffId = appointment.StaffId > 0 ? appointment.StaffId : null;
 
             var resolved = await appointmentSqlRepository.ResolveBookingStaffAsync(
                 request.AppointmentDate,
-                mainServiceId,
-                slotId: null,
+                serviceIds,
                 preferredStaffId,
                 appointment.SalonId,
                 appointment.LockId,
@@ -72,8 +85,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.RescheduleAppointme
             {
                 resolved = await appointmentSqlRepository.ResolveBookingStaffAsync(
                     request.AppointmentDate,
-                    mainServiceId,
-                    slotId: null,
+                    serviceIds,
                     null,
                     appointment.SalonId,
                     appointment.LockId,
@@ -83,19 +95,13 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.RescheduleAppointme
             }
 
             if (resolved == null)
-                return Result<object>.Conflict(AppointmentConst.MSG_RESCHEDULE_SLOT_UNAVAILABLE, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
-
-            var durationMinutes = appointment.Services?
-                .Where(s => s.Status == AppointmentServiceConst.STATUS_ACTIVE)
-                .Sum(s => s.DurationSnapshot * s.Quantity) ?? 0;
+                return Result<object>.Conflict(AppointmentConst.MSG_NO_STAFF_FOR_SERVICE_COMBO, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
 
             appointment.AppointmentDate = request.AppointmentDate;
+            appointment.TimeApptStart = slotStart;
+            appointment.TimeApptEnd = slotStart.Value.AddMinutes(durationMinutes);
             appointment.StaffId = resolved.StaffId;
             appointment.ScheduleId = resolved.ScheduleId;
-            appointment.TimeApptStart = slotStart;
-            appointment.TimeApptEnd = durationMinutes > 0
-                ? slotStart.Value.AddMinutes(durationMinutes)
-                : null;
             appointment.UpdatedAt = DateTimeHelper.UtcNow();
             appointment.UpdatedBy = request.UserId;
 

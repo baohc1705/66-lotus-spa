@@ -2,11 +2,12 @@ IF OBJECT_ID(N'dbo.usp_GetBookingTimeSlots', N'P') IS NOT NULL
     DROP PROCEDURE dbo.usp_GetBookingTimeSlots;
 GO
 
+-- @service_ids: csv "1,5,9". Duration = SUM; staff phai lam du tat ca dich vu.
 CREATE PROCEDURE dbo.usp_GetBookingTimeSlots
-    @date       DATE,
-    @service_id INT,
-    @staff_id   INT = NULL,
-    @salon_id   INT = NULL
+    @date         DATE,
+    @service_ids  NVARCHAR(500),
+    @staff_id     INT = NULL,
+    @salon_id     INT = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -16,14 +17,41 @@ BEGIN
     DECLARE @slots_needed  INT;
     DECLARE @slot_count    INT;
     DECLARE @staff_role_id INT;
+    DECLARE @wanted_count  INT;
+    DECLARE @found_count   INT;
     DECLARE @now           DATETIMEOFFSET(7) = SYSDATETIMEOFFSET();
 
-    SELECT @duration_mins = duration_mins
-    FROM dbo.services
-    WHERE id = @service_id AND status = 1;
+    CREATE TABLE #wanted_services (
+        service_id INT NOT NULL PRIMARY KEY
+    );
 
-    IF @duration_mins IS NULL
+    INSERT INTO #wanted_services (service_id)
+    SELECT DISTINCT TRY_CAST(LTRIM(RTRIM(value)) AS INT)
+    FROM STRING_SPLIT(@service_ids, N',')
+    WHERE TRY_CAST(LTRIM(RTRIM(value)) AS INT) IS NOT NULL
+      AND TRY_CAST(LTRIM(RTRIM(value)) AS INT) > 0;
+
+    SET @wanted_count = (SELECT COUNT(*) FROM #wanted_services);
+
+    IF @wanted_count = 0
     BEGIN
+        DROP TABLE #wanted_services;
+        SELECT CAST(NULL AS INT) AS SlotId, CAST(NULL AS VARCHAR(5)) AS [Time],
+               CAST(NULL AS NVARCHAR(20)) AS Status
+        WHERE 1 = 0;
+        RETURN;
+    END;
+
+    SELECT
+        @duration_mins = SUM(s.duration_mins),
+        @found_count = COUNT(*)
+    FROM dbo.services s
+    INNER JOIN #wanted_services w ON w.service_id = s.id
+    WHERE s.status = 1;
+
+    IF @duration_mins IS NULL OR @found_count <> @wanted_count
+    BEGIN
+        DROP TABLE #wanted_services;
         SELECT CAST(NULL AS INT) AS SlotId, CAST(NULL AS VARCHAR(5)) AS [Time],
                CAST(NULL AS NVARCHAR(20)) AS Status
         WHERE 1 = 0;
@@ -60,6 +88,7 @@ BEGIN
 
     IF @cfg_start IS NULL OR @cfg_end IS NULL OR @cfg_slot_mins IS NULL OR @cfg_start >= @cfg_end
     BEGIN
+        DROP TABLE #wanted_services;
         SELECT CAST(NULL AS INT) AS SlotId, CAST(NULL AS VARCHAR(5)) AS [Time],
                CAST(NULL AS NVARCHAR(20)) AS Status
         WHERE 1 = 0;
@@ -83,6 +112,7 @@ BEGIN
     SET @slot_count = (SELECT COUNT(*) FROM @slots);
     IF @slot_count = 0
     BEGIN
+        DROP TABLE #wanted_services;
         SELECT CAST(NULL AS INT) AS SlotId, CAST(NULL AS VARCHAR(5)) AS [Time],
                CAST(NULL AS NVARCHAR(20)) AS Status
         WHERE 1 = 0;
@@ -105,12 +135,16 @@ BEGIN
 
     INSERT INTO @staff (staff_id)
     SELECT st.id
-    FROM dbo.staff_services ss
-    INNER JOIN dbo.staffs st ON st.id = ss.staff_id AND st.status = 1
-    WHERE ss.service_id = @service_id
-      AND ss.status = 1
+    FROM dbo.staffs st
+    WHERE st.status = 1
       AND @staff_role_id IS NOT NULL
       AND (@staff_id IS NULL OR st.id = @staff_id)
+      AND (
+            SELECT COUNT(DISTINCT ss.service_id)
+            FROM dbo.staff_services ss
+            INNER JOIN #wanted_services w ON w.service_id = ss.service_id
+            WHERE ss.staff_id = st.id AND ss.status = 1
+          ) = @wanted_count
       AND EXISTS (
             SELECT 1 FROM dbo.users u
             INNER JOIN dbo.user_roles ur ON ur.user_id = u.id AND ur.role_id = @staff_role_id
@@ -232,6 +266,7 @@ BEGIN
             OR NOT EXISTS (SELECT 1 FROM @in_shift WHERE staff_id = @staff_id)
           )
     BEGIN
+        DROP TABLE #wanted_services;
         SELECT sl.slot_id AS SlotId, CONVERT(varchar(5), sl.start_time, 108) AS [Time],
                CAST(N'outside' AS NVARCHAR(20)) AS Status
         FROM @slots sl ORDER BY sl.slot_index;
@@ -282,5 +317,7 @@ BEGIN
         LEFT JOIN slot_stats st ON st.slot_index = sl.slot_index
         ORDER BY sl.slot_index;
     END;
+
+    DROP TABLE #wanted_services;
 END
 GO

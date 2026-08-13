@@ -50,10 +50,13 @@ export function ActivePromotionList() {
   );
   const membershipPercent = membershipTiers?.discountPercent ?? 0;
 
-  const servicesSubTotal = guests.reduce(
-    (sum, g) => sum + (g.selectedService?.sellingPrice || 0),
-    0,
-  );
+  let servicesSubTotal = 0;
+  for (let guestIndex = 0; guestIndex < guests.length; guestIndex++) {
+    const guestServices = guests[guestIndex].selectedServices ?? [];
+    for (let serviceIndex = 0; serviceIndex < guestServices.length; serviceIndex++) {
+      servicesSubTotal += guestServices[serviceIndex].sellingPrice || 0;
+    }
+  }
   const membershipDiscount =
     membershipPercent > 0 && servicesSubTotal > 0
       ? Math.round((servicesSubTotal * membershipPercent) / 100)

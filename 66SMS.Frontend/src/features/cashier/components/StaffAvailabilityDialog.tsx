@@ -55,16 +55,18 @@ export function StaffAvailabilityDialog({
   currentDate,
   salonId,
 }: StaffAvailabilityDialogProps) {
-  const [serviceId, setServiceId] = useState<number | null>(null);
+  const [selectedServiceIds, setSelectedServiceIds] = useState<number[]>([]);
   const [startTime, setStartTime] = useState<string | null>(null);
 
   const dateStr = formatDate(currentDate).format("YYYY-MM-DD");
+  const hasSelectedServices = selectedServiceIds.length > 0;
 
   const servicesQuery = useServices({ pageIndex: 1, pageSize: 200 });
+  const serviceItems = servicesQuery.data?.data?.items ?? [];
 
   const timeSlotsQuery = useTimeSlots({
-    date: serviceId ? dateStr : undefined,
-    serviceId: serviceId ?? undefined,
+    date: hasSelectedServices ? dateStr : undefined,
+    serviceIds: selectedServiceIds,
     salonId: salonId ?? undefined,
   });
 
@@ -72,21 +74,48 @@ export function StaffAvailabilityDialog({
     open,
     currentDate,
     startTime,
-    serviceId,
+    selectedServiceIds,
     salonId,
   );
 
   const rows = availabilityQuery.data?.data ?? [];
 
   const serviceOptions = useMemo(() => {
-    const items = servicesQuery.data?.data?.items ?? [];
-    return items
-      .filter((s: ServiceDto) => s.id != null)
-      .map((s: ServiceDto) => ({
-        value: String(s.id),
-        label: s.name ?? "",
-      }));
-  }, [servicesQuery.data?.data?.items]);
+    const options: { value: string; label: string }[] = [];
+    for (let index = 0; index < serviceItems.length; index++) {
+      const service = serviceItems[index] as ServiceDto;
+      if (service.id == null) continue;
+      let alreadySelected = false;
+      for (let selectedIndex = 0; selectedIndex < selectedServiceIds.length; selectedIndex++) {
+        if (selectedServiceIds[selectedIndex] === service.id) {
+          alreadySelected = true;
+          break;
+        }
+      }
+      if (alreadySelected) continue;
+      options.push({
+        value: String(service.id),
+        label: service.name ?? "",
+      });
+    }
+    return options;
+  }, [serviceItems, selectedServiceIds]);
+
+  const selectedServiceLabels = useMemo(() => {
+    const labels: { id: number; label: string }[] = [];
+    for (let selectedIndex = 0; selectedIndex < selectedServiceIds.length; selectedIndex++) {
+      const id = selectedServiceIds[selectedIndex];
+      let label = `Dịch vụ #${id}`;
+      for (let index = 0; index < serviceItems.length; index++) {
+        if (serviceItems[index].id === id) {
+          label = serviceItems[index].name ?? label;
+          break;
+        }
+      }
+      labels.push({ id, label });
+    }
+    return labels;
+  }, [selectedServiceIds, serviceItems]);
 
   const slotOptions = useMemo(() => {
     const slots = timeSlotsQuery.data ?? [];
@@ -102,9 +131,29 @@ export function StaffAvailabilityDialog({
     return options;
   }, [timeSlotsQuery.data]);
 
-  const handleServiceChange = (value: string) => {
-    const id = value ? Number(value) : null;
-    setServiceId(id);
+  const handleServiceAdd = (value: string) => {
+    if (!value) return;
+    const id = Number(value);
+    if (!id || Number.isNaN(id)) return;
+    let exists = false;
+    for (let index = 0; index < selectedServiceIds.length; index++) {
+      if (selectedServiceIds[index] === id) {
+        exists = true;
+        break;
+      }
+    }
+    if (exists) return;
+    setSelectedServiceIds([...selectedServiceIds, id]);
+    setStartTime(null);
+  };
+
+  const handleServiceRemove = (id: number) => {
+    const next: number[] = [];
+    for (let index = 0; index < selectedServiceIds.length; index++) {
+      if (selectedServiceIds[index] === id) continue;
+      next.push(selectedServiceIds[index]);
+    }
+    setSelectedServiceIds(next);
     setStartTime(null);
   };
 
@@ -113,14 +162,14 @@ export function StaffAvailabilityDialog({
   };
 
   const handleClose = () => {
-    setServiceId(null);
+    setSelectedServiceIds([]);
     setStartTime(null);
     onOpenChange(false);
   };
 
   const showLoading =
     availabilityQuery.isFetching ||
-    (serviceId != null && timeSlotsQuery.isFetching);
+    (hasSelectedServices && timeSlotsQuery.isFetching);
 
   return (
     <Modal
@@ -131,19 +180,34 @@ export function StaffAvailabilityDialog({
       scrollable
     >
       <p className="text-xs text-kit-muted mb-4">
-        Ngày {currentDate.toLocaleDateString("vi-VN")} — chọn dịch vụ và giờ để
-        xem ai rảnh / bận.
+        Ngày {currentDate.toLocaleDateString("vi-VN")} — chọn dịch vụ (có thể
+        nhiều) và giờ để xem ai rảnh / bận cho combo.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
         <FormField label="Dịch vụ">
           <SearchableSelect
             options={serviceOptions}
-            value={serviceId ? String(serviceId) : ""}
-            onChange={handleServiceChange}
-            placeholder="Chọn dịch vụ..."
+            value=""
+            onChange={handleServiceAdd}
+            placeholder="Thêm dịch vụ..."
             searchPlaceholder="Tìm dịch vụ..."
           />
+          {selectedServiceLabels.length > 0 ? (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {selectedServiceLabels.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => handleServiceRemove(item.id)}
+                  className="rounded-full border border-kit bg-kit-page px-3 py-1 text-xs font-semibold text-kit-ink hover:border-kit-danger hover:text-kit-danger"
+                  title="Bỏ dịch vụ này"
+                >
+                  {item.label} ×
+                </button>
+              ))}
+            </div>
+          ) : null}
         </FormField>
         <FormField label="Giờ">
           <SearchableSelect
@@ -151,15 +215,15 @@ export function StaffAvailabilityDialog({
             value={startTime ?? ""}
             onChange={handleSlotChange}
             placeholder={
-              serviceId ? "Chọn khung giờ..." : "Chọn dịch vụ trước"
+              hasSelectedServices ? "Chọn khung giờ..." : "Chọn dịch vụ trước"
             }
             searchPlaceholder="Tìm giờ..."
-            disabled={!serviceId}
+            disabled={!hasSelectedServices}
           />
         </FormField>
       </div>
 
-      {!serviceId || !startTime ? (
+      {!hasSelectedServices || !startTime ? (
         <p className="text-xs text-kit-muted py-6 text-center">
           Chọn dịch vụ và giờ để xem danh sách nhân viên.
         </p>

@@ -309,18 +309,28 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayReturn
             if (startTime is null)
                 return;
 
-            var serviceName = appointment.Services != null && appointment.Services.Any()
-                ? string.Join(", ", appointment.Services.Where(s => s.Service != null).Select(s => s.Service!.Name))
-                : null;
+            var serviceLines = new List<MailAppointmentServiceLine>();
+            if (appointment.Services != null)
+            {
+                foreach (var appService in appointment.Services)
+                {
+                    serviceLines.Add(new MailAppointmentServiceLine
+                    {
+                        Name = appService.Service != null ? appService.Service.Name : "Dịch vụ",
+                        DurationMins = appService.DurationSnapshot * appService.Quantity,
+                        Price = appService.PriceSnapshot * appService.Quantity,
+                    });
+                }
+            }
 
             var mail = emailTemplateFactory.CreateDepositInvoiceEmail(
                 customerEmail,
                 appointment.CreatedByUser?.Customer?.FullName ?? appointment.CreatedByUser?.Username,
-                serviceName,
                 appointment.AppointmentDate.ToDateTime(startTime.Value),
                 appointment.PaidAmount,
                 appointment.TotalAmount - appointment.PaidAmount,
-                invoice.InvoiceCode);
+                invoice.InvoiceCode,
+                serviceLines);
 
             await domainEventPublisher.PublishAsync(new SendEmailEvent
             {

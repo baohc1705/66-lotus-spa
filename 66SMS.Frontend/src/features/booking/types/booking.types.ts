@@ -40,6 +40,7 @@ export interface SlotLockDto {
   positionId?: number | null;
   appointmentDate?: string;
   serviceId?: number;
+  serviceIds?: number[];
   salonId?: number | null;
 }
 
@@ -95,12 +96,14 @@ export interface GetAvailableBookingDaysParams {
 export interface GetTechniciansParams {
   date?: string;
   serviceId?: number;
+  serviceIds?: number[];
   salonId?: number;
 }
 
 export interface GetTimeSlotsParams {
   date?: string;
   serviceId?: number;
+  serviceIds?: number[];
   staffId?: number;
   salonId?: number;
 }
@@ -121,7 +124,7 @@ export type BookingResponseDto = number[];
 
 export interface GuestBooking {
   id: number;
-  selectedService: ServiceDto | null;
+  selectedServices: ServiceDto[];
   selectedTechnician: TechnicianDTO | null;
   selectedDate: Date | null;
   selectedTimeSlot: TimeSlotDTO | null;
@@ -134,8 +137,8 @@ export interface AppointmentDto {
   customerId?: number;
   customerName?: string;
   customerPhone?: string;
+  customerAvatar?: string;
   staffId?: number;
-  slotId?: number;
   positionId?: number;
   appointmentDate?: string;
   status?: number;
@@ -154,5 +157,12 @@ export interface AppointmentDto {
   timeSlotEndTime?: string;
   positionName?: string;
   positionRoomName?: string;
+  positionStatus?: number;
+  timeStartService?: string;
+  completedAt?: string;
+  customerWalletBalance?: number;
+  invoiceId?: number;
+  invoiceCode?: string;
   serviceNames?: string[];
+  services?: { serviceId?: number; name?: string; durationMins?: number; price?: number }[];
 }

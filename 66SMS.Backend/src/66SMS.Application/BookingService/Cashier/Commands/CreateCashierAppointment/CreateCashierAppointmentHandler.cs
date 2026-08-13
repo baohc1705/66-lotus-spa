@@ -152,7 +152,30 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                             ErrorCodes.ERR_APPOINTMENT_MIN_ONE_SERVICE);
                     }
 
-                    var mainServiceId = services.First(s => (s.ServiceId ?? 0) > 0).ServiceId!.Value;
+                    var guestServiceIds = new List<int>();
+                    var guestServiceSeen = new HashSet<int>();
+                    for (var serviceIndex = 0; serviceIndex < services.Count; serviceIndex++)
+                    {
+                        var serviceId = services[serviceIndex].ServiceId ?? 0;
+                        if (serviceId <= 0)
+                            continue;
+                        if (!guestServiceSeen.Add(serviceId))
+                        {
+                            transaction.Rollback();
+                            return Result<List<int>>.BadRequest(
+                                AppointmentConst.MSG_APPOINTMENT_DUPLICATE_SERVICE,
+                                ErrorCodes.ERR_APPOINTMENT_MIN_ONE_SERVICE);
+                        }
+                        guestServiceIds.Add(serviceId);
+                    }
+
+                    if (guestServiceIds.Count == 0)
+                    {
+                        transaction.Rollback();
+                        return Result<List<int>>.BadRequest(
+                            AppointmentConst.MSG_APPOINTMENT_MIN_ONE_SERVICE,
+                            ErrorCodes.ERR_APPOINTMENT_MIN_ONE_SERVICE);
+                    }
 
                     int staffId;
                     int? scheduleId;
@@ -172,8 +195,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
 
                         var staffInfo = await appointmentSqlRepository.ResolveBookingStaffAsync(
                             slotLock.AppointmentDate,
-                            mainServiceId,
-                            slotId: null,
+                            guestServiceIds,
                             slotLock.StaffId,
                             guest.SalonId,
                             slotLock.Id,
@@ -185,7 +207,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                         {
                             transaction.Rollback();
                             return Result<List<int>>.Conflict(
-                                AppointmentConst.MSG_APPOINTMENT_SLOT_FULL,
+                                AppointmentConst.MSG_NO_STAFF_FOR_SERVICE_COMBO,
                                 ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
                         }
 
@@ -197,8 +219,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                     {
                         var staffInfo = await appointmentSqlRepository.ResolveBookingStaffAsync(
                             (DateOnly)guest.AppointmentDate!,
-                            mainServiceId,
-                            slotId: null,
+                            guestServiceIds,
                             guest.StaffId,
                             guest.SalonId,
                             null,
@@ -210,7 +231,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                         {
                             transaction.Rollback();
                             return Result<List<int>>.Conflict(
-                                AppointmentConst.MSG_APPOINTMENT_SLOT_FULL,
+                                AppointmentConst.MSG_NO_STAFF_FOR_SERVICE_COMBO,
                                 ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
                         }
 

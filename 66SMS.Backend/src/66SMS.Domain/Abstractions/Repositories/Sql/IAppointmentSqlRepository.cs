@@ -14,28 +14,27 @@ namespace _66SMS.Domain.Abstractions.Repositories.Sql
 
         Task<IReadOnlyList<StaffAvailabilityRowDto>> GetStaffAvailabilityAsync(
             DateOnly workDate,
-            int serviceId,
+            IReadOnlyList<int> serviceIds,
             int? salonId,
             TimeOnly startTime,
             CancellationToken cancellationToken = default);
 
         Task<IReadOnlyList<BookingTechnicianRowDto>> GetBookingTechniciansAsync(
             DateOnly date,
-            int serviceId,
+            IReadOnlyList<int> serviceIds,
             int? salonId,
             CancellationToken cancellationToken = default);
 
         Task<IReadOnlyList<BookingTimeSlotRowDto>> GetBookingTimeSlotsAsync(
             DateOnly date,
-            int serviceId,
+            IReadOnlyList<int> serviceIds,
             int? staffId,
             int? salonId,
             CancellationToken cancellationToken = default);
 
         Task<ResolveBookingStaffRowDto?> ResolveBookingStaffAsync(
             DateOnly date,
-            int serviceId,
-            int? slotId,
+            IReadOnlyList<int> serviceIds,
             int? staffId,
             int? salonId,
             int? excludeLockId,

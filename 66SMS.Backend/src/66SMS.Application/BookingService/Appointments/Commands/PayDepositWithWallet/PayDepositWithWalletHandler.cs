@@ -270,18 +270,25 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PayDepositWith
             if (startTime is null)
                 return;
 
-            var serviceName = string.Join(
-                ", ",
-                (appointment.Services ?? []).Where(s => s.Service != null).Select(s => s.Service!.Name));
+            var serviceLines = new List<MailAppointmentServiceLine>();
+            foreach (var appService in appointment.Services ?? [])
+            {
+                serviceLines.Add(new MailAppointmentServiceLine
+                {
+                    Name = appService.Service != null ? appService.Service.Name : "Dịch vụ",
+                    DurationMins = appService.DurationSnapshot * appService.Quantity,
+                    Price = appService.PriceSnapshot * appService.Quantity,
+                });
+            }
 
             var mail = emailTemplateFactory.CreateDepositInvoiceEmail(
                 customerEmail,
                 customer?.FullName ?? appointment.CreatedByUser?.Username,
-                string.IsNullOrWhiteSpace(serviceName) ? null : serviceName,
                 appointment.AppointmentDate.ToDateTime(startTime.Value),
                 appointment.PaidAmount,
                 appointment.TotalAmount - appointment.PaidAmount,
-                invoiceCode);
+                invoiceCode,
+                serviceLines);
 
             await domainEventPublisher.PublishAsync(new SendEmailEvent
             {

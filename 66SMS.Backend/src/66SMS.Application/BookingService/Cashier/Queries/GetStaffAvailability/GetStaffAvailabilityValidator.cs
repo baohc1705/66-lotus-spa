@@ -12,8 +12,9 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetStaffAvailability
                 .Must(t => DateTimeHelper.ParseTimeOnly(t) != null)
                 .WithMessage(AppointmentConst.MSG_STAFF_AVAILABILITY_SLOT_REQUIRED);
 
-            RuleFor(x => x.ServiceId)
-                .GreaterThan(0)
+            RuleFor(x => x)
+                .Must(x => (x.ServiceIds != null && x.ServiceIds.Count > 0)
+                    || (x.ServiceId.HasValue && x.ServiceId.Value > 0))
                 .WithMessage(AppointmentConst.MSG_STAFF_AVAILABILITY_SERVICE_REQUIRED);
         }
     }

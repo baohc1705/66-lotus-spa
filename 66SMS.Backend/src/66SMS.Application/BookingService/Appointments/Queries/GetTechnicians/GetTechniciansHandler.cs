@@ -17,9 +17,19 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetTechnicians
 
         public async Task<Result<IReadOnlyList<BookingTechnicianDto>>> Handle(GetTechniciansQuery request, CancellationToken cancellationToken)
         {
+            var serviceIds = request.ServiceIds;
+            if (serviceIds == null || serviceIds.Count == 0)
+            {
+                serviceIds = new List<int>();
+                if (request.ServiceId.HasValue && request.ServiceId.Value > 0)
+                    serviceIds.Add(request.ServiceId.Value);
+            }
+            if (serviceIds.Count == 0)
+                return Result<IReadOnlyList<BookingTechnicianDto>>.Success([]);
+
             var rows = await appointmentSqlRepository.GetBookingTechniciansAsync(
                 (DateOnly)request.Date!,
-                (int)request.ServiceId!,
+                serviceIds,
                 request.SalonId,
                 cancellationToken);
 
@@ -41,8 +51,9 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetTechnicians
                 }
             };
 
-            foreach (var row in rows)
+            for (var index = 0; index < rows.Count; index++)
             {
+                var row = rows[index];
                 var slotsLeft = row.SlotsLeft ?? 0;
                 result.Add(new BookingTechnicianDto
                 {

@@ -69,6 +69,8 @@ namespace _66SMS.Domain.Constants
         public const string MSG_APPOINTMENT_SLOT_FULL = "Khung giờ này đã kín lịch.";
         public const string MSG_APPOINTMENT_STAFF_NOT_IN_SALON = "Staff không thuộc chi nhánh này.";
         public const string MSG_APPOINTMENT_MIN_ONE_SERVICE = "Phải chọn ít nhất 1 dịch vụ cho mỗi khách.";
+        public const string MSG_APPOINTMENT_DUPLICATE_SERVICE = "Không được chọn trùng dịch vụ trên cùng một lịch.";
+        public const string MSG_NO_STAFF_FOR_SERVICE_COMBO = "Không có kỹ thuật viên nào thực hiện được tất cả dịch vụ đã chọn. Vui lòng bớt dịch vụ hoặc đặt tách thành nhiều lịch.";
         public const string MSG_APPOINTMENT_NOT_WAITING_DEPOSIT = "Lịch hẹn không ở trạng thái chờ đặt cọc.";
         public const string MSG_APPOINTMENT_DEPOSIT_INVALID_AMOUNT = "Số tiền cọc không hợp lệ.";
         public const string MSG_APPOINTMENT_DEPOSIT_ALREADY_PAID = "Lịch hẹn đã được thanh toán cọc.";

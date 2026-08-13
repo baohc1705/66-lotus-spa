@@ -39,14 +39,25 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentSt
             if (appointment.StaffId == request.StaffId)
                 return Result<object>.Success(AppointmentConst.MSG_ASSIGN_STAFF_UNCHANGED);
 
-            var mainServiceId = appointment.Services?.Select(s => s.ServiceId).FirstOrDefault() ?? 0;
-            if (mainServiceId <= 0)
+            var serviceIds = new List<int>();
+            if (appointment.Services != null)
+            {
+                foreach (var line in appointment.Services)
+                {
+                    if (line.Status != AppointmentServiceConst.STATUS_ACTIVE)
+                        continue;
+                    if (line.ServiceId <= 0)
+                        continue;
+                    serviceIds.Add(line.ServiceId);
+                }
+            }
+
+            if (serviceIds.Count == 0)
                 return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_MIN_ONE_SERVICE, ErrorCodes.ERR_APPOINTMENT_MIN_ONE_SERVICE);
 
             var resolved = await appointmentSqlRepository.ResolveBookingStaffAsync(
                 appointment.AppointmentDate,
-                mainServiceId,
-                slotId: null,
+                serviceIds,
                 request.StaffId,
                 appointment.SalonId,
                 appointment.LockId,
@@ -55,7 +66,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentSt
                 cancellationToken: cancellationToken);
 
             if (resolved == null)
-                return Result<object>.Conflict(AppointmentConst.MSG_ASSIGN_STAFF_UNAVAILABLE, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
+                return Result<object>.Conflict(AppointmentConst.MSG_NO_STAFF_FOR_SERVICE_COMBO, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
 
             appointment.StaffId = resolved.StaffId;
             appointment.ScheduleId = resolved.ScheduleId;

@@ -30,9 +30,23 @@ export const bookingApi = {
   getTechnicians: async (
     params: GetTechniciansParams,
   ): Promise<TechnicianDTO[]> => {
+    const query: Record<string, unknown> = {
+      date: params.date,
+      salonId: params.salonId,
+    };
+    if (params.serviceIds && params.serviceIds.length > 0) {
+      query.serviceIds = params.serviceIds;
+    } else if (params.serviceId) {
+      query.serviceId = params.serviceId;
+    }
     const res = await axiosInstance.get<Result<TechnicianDTO[]>>(
       `/appointment/technicians`,
-      { params },
+      {
+        params: query,
+        paramsSerializer: {
+          indexes: null,
+        },
+      },
     );
     return res.data.data || [];
   },
@@ -45,9 +59,24 @@ export const bookingApi = {
   },
 
   getTimeSlots: async (params: GetTimeSlotsParams): Promise<TimeSlotDTO[]> => {
+    const query: Record<string, unknown> = {
+      date: params.date,
+      staffId: params.staffId,
+      salonId: params.salonId,
+    };
+    if (params.serviceIds && params.serviceIds.length > 0) {
+      query.serviceIds = params.serviceIds;
+    } else if (params.serviceId) {
+      query.serviceId = params.serviceId;
+    }
     const res = await axiosInstance.get<Result<TimeSlotDTO[]>>(
       `/appointment/time-slots`,
-      { params },
+      {
+        params: query,
+        paramsSerializer: {
+          indexes: null,
+        },
+      },
     );
     return res.data.data || [];
   },

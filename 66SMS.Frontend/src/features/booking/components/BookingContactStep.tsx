@@ -80,7 +80,10 @@ export function BookingContactStep() {
 
   const onSubmit = async (data: BookingContactFormValues) => {
     const invalidGuests = guests.filter(
-      (g) => !g.selectedService || !g.selectedDate || !g.selectedTimeSlot,
+      (g) =>
+        (g.selectedServices?.length ?? 0) === 0 ||
+        !g.selectedDate ||
+        !g.selectedTimeSlot,
     );
 
     if (invalidGuests.length > 0) {
@@ -102,14 +105,23 @@ export function BookingContactStep() {
       setContactInfo(data);
 
       const lockRes = await createSlotLockMutation({
-        locks: guests.map((g) => ({
-          slotId: g.selectedTimeSlot!.slotId,
-          startTime: g.selectedTimeSlot!.startTime || g.selectedTimeSlot!.time,
-          staffId: g.selectedTechnician?.id ?? null,
-          appointmentDate: formatDate(g.selectedDate!).format("YYYY-MM-DD"),
-          serviceId: g.selectedService!.id ?? 0,
-          salonId: selectedSalon?.id ?? null,
-        })),
+        locks: guests.map((g) => {
+          const serviceIds: number[] = [];
+          for (let index = 0; index < g.selectedServices.length; index++) {
+            const id = g.selectedServices[index].id;
+            if (id == null || id <= 0) continue;
+            serviceIds.push(id);
+          }
+          return {
+            slotId: g.selectedTimeSlot!.slotId,
+            startTime: g.selectedTimeSlot!.startTime || g.selectedTimeSlot!.time,
+            staffId: g.selectedTechnician?.id ?? null,
+            appointmentDate: formatDate(g.selectedDate!).format("YYYY-MM-DD"),
+            serviceId: serviceIds[0],
+            serviceIds,
+            salonId: selectedSalon?.id ?? null,
+          };
+        }),
       });
 
       if (!lockRes.success || !lockRes.lockIds?.length) {
@@ -130,6 +142,12 @@ export function BookingContactStep() {
       const payload: GuestAppointmentDto[] = guests.map((guest, index: number) => {
         const isFirstGuest = index === 0;
         const customerNote = data.note?.trim();
+        const services: { serviceId: number; quantity: number }[] = [];
+        for (let serviceIndex = 0; serviceIndex < guest.selectedServices.length; serviceIndex++) {
+          const id = guest.selectedServices[serviceIndex].id;
+          if (id == null || id <= 0) continue;
+          services.push({ serviceId: id, quantity: 1 });
+        }
 
         return {
           lockId: lockedIds[index],
@@ -140,9 +158,7 @@ export function BookingContactStep() {
           appointmentDate: formatDate(guest.selectedDate!).format("YYYY-MM-DD"),
           salonId: selectedSalon?.id ?? null,
           note: isFirstGuest && customerNote ? customerNote : undefined,
-          services: [
-            { serviceId: guest.selectedService!.id ?? 0, quantity: 1 },
-          ],
+          services,
         };
       });
 
@@ -167,10 +183,13 @@ export function BookingContactStep() {
     }
   };
 
-  const servicesSubTotal = guests.reduce(
-    (sum, g) => sum + (g.selectedService?.sellingPrice || 0),
-    0
-  );
+  let servicesSubTotal = 0;
+  for (let guestIndex = 0; guestIndex < guests.length; guestIndex++) {
+    const guestServices = guests[guestIndex].selectedServices ?? [];
+    for (let serviceIndex = 0; serviceIndex < guestServices.length; serviceIndex++) {
+      servicesSubTotal += guestServices[serviceIndex].sellingPrice || 0;
+    }
+  }
   const membershipDiscount =
     membershipPercent > 0 && servicesSubTotal > 0
       ? Math.round((servicesSubTotal * membershipPercent) / 100)

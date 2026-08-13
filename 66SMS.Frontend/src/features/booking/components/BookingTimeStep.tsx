@@ -26,7 +26,7 @@ export function BookingTimeStep() {
   const selectedDate = activeGuest?.selectedDate;
   const selectedTechnician = activeGuest?.selectedTechnician;
   const selectedTimeSlot = activeGuest?.selectedTimeSlot;
-  const selectedService = activeGuest?.selectedService;
+  const selectedServices = activeGuest?.selectedServices ?? [];
 
   const selectDate = store.selectDate;
   const selectTechnician = store.selectTechnician;
@@ -40,19 +40,24 @@ export function BookingTimeStep() {
     }
   }, [selectedDate, selectDate, days]);
 
-  const serviceId = selectedService?.id;
+  const serviceIds: number[] = [];
+  for (let index = 0; index < selectedServices.length; index++) {
+    const id = selectedServices[index].id;
+    if (id == null || id <= 0) continue;
+    serviceIds.push(id);
+  }
   const dateInput = selectedDate
     ? formatDate(selectedDate).format("YYYY-MM-DD")
     : null;
 
   const { data: technicians = [], isLoading: loadingTechs } = useTechnicians({
     date: dateInput ?? undefined,
-    serviceId,
+    serviceIds,
     salonId: selectedSalon?.id,
   });
   const { data: timeSlots = [], isLoading: loadingSlots } = useTimeSlots({
     date: dateInput ?? undefined,
-    serviceId,
+    serviceIds,
     staffId: selectedTechnician?.id,
     salonId: selectedSalon?.id,
   });
@@ -77,11 +82,17 @@ export function BookingTimeStep() {
   }, [visibleTimeSlots, selectedTimeSlot, selectTimeSlot]);
 
   const hasWorkingTechnicians = technicians.length > 0;
-  const isStep2Valid = !!selectedDate && !!selectedTimeSlot;
+  const noComboStaff =
+    serviceIds.length > 0 && !loadingTechs && !hasWorkingTechnicians;
+  const isStep2Valid =
+    !!selectedDate && !!selectedTimeSlot && hasWorkingTechnicians;
 
   const handleNextStep = () => {
     const validGuests = store.guests.filter(
-      (g) => g.selectedService && g.selectedDate && g.selectedTimeSlot,
+      (g) =>
+        (g.selectedServices?.length ?? 0) > 0 &&
+        g.selectedDate &&
+        g.selectedTimeSlot,
     );
 
     if (validGuests.length === 0) {
@@ -162,7 +173,7 @@ export function BookingTimeStep() {
           2. Chọn kỹ thuật viên
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {!serviceId ? (
+          {serviceIds.length === 0 ? (
             <div className="col-span-full py-4 text-center text-xs text-warm-600">
               Vui lòng chọn dịch vụ ở bước trước
             </div>
@@ -170,9 +181,10 @@ export function BookingTimeStep() {
             <div className="col-span-full py-4 text-center text-xs text-warm-600">
               Đang tải danh sách kỹ thuật viên...
             </div>
-          ) : !hasWorkingTechnicians ? (
-            <div className="col-span-full rounded-sm border border-warm-100 bg-warm-50 py-6 text-center text-sm text-warm-600">
-              Không có kỹ thuật viên làm việc ngày này. Chọn ngày khác.
+          ) : noComboStaff ? (
+            <div className="col-span-full rounded-sm border border-warning-bg bg-warning-bg py-6 px-4 text-center text-sm text-ink">
+              Không có kỹ thuật viên nào thực hiện được tất cả dịch vụ đã chọn.
+              Vui lòng bớt dịch vụ hoặc đặt tách thành nhiều lịch (Thêm khách).
             </div>
           ) : (
             technicians.map((tech) => {
@@ -252,6 +264,10 @@ export function BookingTimeStep() {
           {!dateInput ? (
             <div className="col-span-full py-4 text-center text-xs text-warm-600">
               Vui lòng chọn ngày trước
+            </div>
+          ) : noComboStaff ? (
+            <div className="col-span-full py-4 text-center text-xs text-warm-600">
+              Không thể chọn giờ khi chưa có kỹ thuật viên phù hợp combo dịch vụ
             </div>
           ) : loadingSlots ? (
             <div className="col-span-full py-4 text-center text-xs text-warm-600">

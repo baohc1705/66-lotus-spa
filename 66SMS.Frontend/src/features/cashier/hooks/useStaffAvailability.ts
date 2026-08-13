@@ -6,24 +6,23 @@ export function useStaffAvailability(
   open: boolean,
   date: Date,
   startTime: string | null,
-  serviceId: number | null,
+  serviceIds: number[] | null,
   salonId?: number | null,
 ) {
+  const ids = serviceIds ?? [];
+  const serviceKey = ids.join(",");
+
   return useQuery({
     queryKey: [
       CASHIER_STAFF_AVAILABILITY,
       date.toDateString(),
       startTime,
-      serviceId,
+      serviceKey,
       salonId,
     ],
     queryFn: () =>
-      cashierApi.getStaffAvailability(date, startTime!, serviceId!, salonId),
-    enabled:
-      open &&
-      !!startTime &&
-      serviceId != null &&
-      serviceId > 0,
+      cashierApi.getStaffAvailability(date, startTime!, ids, salonId),
+    enabled: open && !!startTime && ids.length > 0,
     staleTime: 30_000,
   });
 }

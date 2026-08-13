@@ -8,5 +8,6 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierPositions
     {
         public int? SalonId { get; set; }
         public DateOnly? Date { get; set; }
+        public int? ExcludeAppointmentId { get; set; }
     }
 }

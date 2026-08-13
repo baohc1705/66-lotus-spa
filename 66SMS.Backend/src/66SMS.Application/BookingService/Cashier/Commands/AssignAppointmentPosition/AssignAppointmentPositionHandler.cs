@@ -52,9 +52,9 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentPo
                 && newPosition.Room?.SalonId != appointment.SalonId.Value)
                 return Result<object>.BadRequest("Vị trí không thuộc chi nhánh của lịch hẹn.");
 
-            if (newPosition.Status != BookingPositionConst.STATUS_AVAILABLE
-                && newPosition.Status != BookingPositionConst.STATUS_ACTIVED)
-                return Result<object>.Conflict("Vị trí này đang được sử dụng. Vui lòng chọn vị trí khác.");
+            if (newPosition.Status == BookingPositionConst.STATUS_DELETED
+                || newPosition.Status == BookingPositionConst.STATUS_INACTIVED)
+                return Result<object>.Conflict("Vị trí này không khả dụng. Vui lòng chọn vị trí khác.");
 
             var takenByOther = await appointmentSqlRepository.AsQueryable(asNoTracking: true)
                 .AnyAsync(
@@ -64,7 +64,13 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentPo
                         && (a.Status == AppointmentConst.STATUS_WAITING
                             || a.Status == AppointmentConst.STATUS_IN_SERVICE
                             || a.Status == AppointmentConst.STATUS_PENDING
-                            || a.Status == AppointmentConst.STATUS_CONFIRMED),
+                            || a.Status == AppointmentConst.STATUS_CONFIRMED)
+                        && (appointment.TimeApptStart == null
+                            || appointment.TimeApptEnd == null
+                            || a.TimeApptStart == null
+                            || a.TimeApptEnd == null
+                            || (a.TimeApptStart < appointment.TimeApptEnd
+                                && a.TimeApptEnd > appointment.TimeApptStart)),
                     cancellationToken);
 
             if (takenByOther)

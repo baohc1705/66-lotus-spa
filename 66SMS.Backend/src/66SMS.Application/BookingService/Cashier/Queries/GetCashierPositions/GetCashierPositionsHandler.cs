@@ -43,16 +43,51 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierPositions
                 .ToListAsync(cancellationToken);
 
             HashSet<int> bookedPositionIds = [];
-            if (request.Date.HasValue)
+            int? currentPositionId = null;
+            var occupyDate = request.Date;
+            TimeOnly? occupyStart = null;
+            TimeOnly? occupyEnd = null;
+
+            if (request.ExcludeAppointmentId.HasValue)
             {
-                var date = request.Date.Value;
-                bookedPositionIds = (await appointmentSqlRepository.AsQueryable(asNoTracking: true)
+                var current = await appointmentSqlRepository.AsQueryable(asNoTracking: true)
+                    .Where(a => a.Id == request.ExcludeAppointmentId.Value)
+                    .Select(a => new { a.PositionId, a.AppointmentDate, a.TimeApptStart, a.TimeApptEnd })
+                    .FirstOrDefaultAsync(cancellationToken);
+                if (current != null)
+                {
+                    currentPositionId = current.PositionId;
+                    occupyDate ??= current.AppointmentDate;
+                    occupyStart = current.TimeApptStart;
+                    occupyEnd = current.TimeApptEnd;
+                }
+            }
+
+            if (occupyDate.HasValue)
+            {
+                var date = occupyDate.Value;
+                var excludeId = request.ExcludeAppointmentId;
+                var busyQuery = appointmentSqlRepository.AsQueryable(asNoTracking: true)
                     .Where(a => a.AppointmentDate == date
                         && a.PositionId != null
+                        && (excludeId == null || a.Id != excludeId.Value)
                         && (a.Status == AppointmentConst.STATUS_PENDING
                             || a.Status == AppointmentConst.STATUS_CONFIRMED
                             || a.Status == AppointmentConst.STATUS_WAITING
-                            || a.Status == AppointmentConst.STATUS_IN_SERVICE))
+                            || a.Status == AppointmentConst.STATUS_IN_SERVICE));
+
+                if (occupyStart.HasValue && occupyEnd.HasValue)
+                {
+                    var start = occupyStart.Value;
+                    var end = occupyEnd.Value;
+                    busyQuery = busyQuery.Where(a =>
+                        a.TimeApptStart != null
+                        && a.TimeApptEnd != null
+                        && a.TimeApptStart < end
+                        && a.TimeApptEnd > start);
+                }
+
+                bookedPositionIds = (await busyQuery
                     .Select(a => a.PositionId!.Value)
                     .Distinct()
                     .ToListAsync(cancellationToken))
@@ -62,9 +97,8 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierPositions
             var result = positions.Select(p =>
             {
                 var occupiedByAppointment = bookedPositionIds.Contains(p.Id);
-                var isSelectable = (p.Status == BookingPositionConst.STATUS_AVAILABLE
-                        || p.Status == BookingPositionConst.STATUS_ACTIVED)
-                    && !occupiedByAppointment;
+                var isCurrentSeat = currentPositionId.HasValue && p.Id == currentPositionId.Value;
+                var isSelectable = !occupiedByAppointment || isCurrentSeat;
 
                 return new CashierPositionDto
                 {
@@ -72,10 +106,12 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierPositions
                     RoomId = p.RoomId,
                     Name = p.Name,
                     RoomName = p.RoomName,
-                    Status = occupiedByAppointment ? BookingPositionConst.STATUS_IN_SERVICE : p.Status,
-                    StatusLabel = occupiedByAppointment
+                    Status = occupiedByAppointment && !isCurrentSeat
+                        ? BookingPositionConst.STATUS_IN_SERVICE
+                        : p.Status,
+                    StatusLabel = occupiedByAppointment && !isCurrentSeat
                         ? "Đã có lịch"
-                        : BookingPositionConst.GetStatusLabel(p.Status),
+                        : "Trống",
                     IsSelectable = isSelectable,
                 };
             }).ToList();

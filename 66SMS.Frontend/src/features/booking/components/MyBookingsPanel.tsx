@@ -1,4 +1,5 @@
 import { formatCurrency } from "@/shared/utils/currency";
+import { AppointmentServicesTable } from "./AppointmentServicesTable";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/shared/components/kitToast";
@@ -12,7 +13,6 @@ import {
   CheckCircle2,
   Clock3,
   XCircle,
-  Tag,
   DollarSign,
   StickyNote,
   Wallet,
@@ -415,113 +415,70 @@ export function MyBookingsPanel() {
             >
               <div className="overflow-hidden">
                 <div className="p-5 border-t border-warm-100 bg-white space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-ink border-b border-warm-50 pb-2">
-                        Thông tin dịch vụ
-                      </h4>
-
-                      <div className="space-y-3">
-                        <div className="flex items-start gap-3 text-sm">
-                          <Tag className="w-4 h-4 text-warm-600 mt-0.5" />
-                          <div>
-                            <span className="text-warm-600 block mb-1">
-                              Dịch vụ đã chọn:
-                            </span>
-                            {detail.serviceNames &&
-                            detail.serviceNames.length > 0 ? (
-                              <ul className="space-y-1">
-                                {detail.serviceNames.map((srv: string, idx: number) => (
-                                  <li
-                                    key={idx}
-                                    className="text-ink font-medium before:content-['•'] before:mr-2 before:text-gold-600"
-                                  >
-                                    {srv}
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : (
-                              <span className="text-ink">
-                                Không có thông tin
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-3 text-sm">
-                          <DollarSign className="w-4 h-4 text-warm-600" />
-                          <div>
-                            <span className="text-warm-600 mr-2">
-                              Tổng tiền dịch vụ:
-                            </span>
-                            <span className="text-ink font-medium">
-                              {formatCurrency(
-                                detail.servicesSubTotal ?? detail.totalAmount,
-                              )}
-                            </span>
-                          </div>
-                        </div>
-
-                        {detail.membershipDiscountAmount != null &&
-                          detail.membershipDiscountAmount > 0 && (
-                          <div className="flex items-center gap-3 text-sm pl-7">
-                            <span className="text-warm-600 mr-2">
-                              Giảm giá thẻ thành viên:
-                            </span>
-                            <span className="text-success-text font-medium">
-                              -
-                              {formatCurrency(detail.membershipDiscountAmount)}
-                            </span>
-                          </div>
-                        )}
-
-                        {detail.promotionDiscountAmount != null &&
-                          detail.promotionDiscountAmount > 0 && (
-                          <div className="flex items-center gap-3 text-sm pl-7">
-                            <span className="text-warm-600 mr-2">
-                              Giảm giá mã khuyến mãi:
-                            </span>
-                            <span className="text-success-text font-medium">
-                              -{formatCurrency(detail.promotionDiscountAmount)}
-                            </span>
-                          </div>
-                        )}
-
-                        <div className="flex items-center gap-3 text-sm pl-7">
-                          <span className="text-warm-600 mr-2">
-                            Cọc yêu cầu ({detail.depositPercent}%):
-                          </span>
-                          <span className="text-gold-600 font-medium">
-                            {formatCurrency(
-                              ((detail.totalAmount || 0) *
-                                (detail.depositPercent || 0)) /
-                                100,
-                            )}
-                          </span>
-                        </div>
-
-                        {detail.depositDeadlineAt &&
-                          detail.status === APPOINTMENT_STATUS.CONFIRMED && (
-                            <div className="flex items-center gap-3 text-sm pl-7">
-                              <span className="text-warm-600 mr-2">
-                                Hạn chót cọc:
-                              </span>
-                              <span className="text-error-text font-medium">
-                                {new Intl.DateTimeFormat("vi-VN", {
-                                  dateStyle: "short",
-                                  timeStyle: "short",
-                                }).format(new Date(detail.depositDeadlineAt))}
-                              </span>
-                            </div>
-                          )}
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-ink border-b border-warm-50 pb-2">
+                      Thông tin dịch vụ
+                    </h4>
+                    <AppointmentServicesTable
+                      services={detail.services ?? []}
+                      startTime={detail.timeSlotStartTime}
+                    />
+                    {detail.membershipDiscountAmount != null &&
+                      detail.membershipDiscountAmount > 0 && (
+                      <div className="flex items-center gap-3 text-sm">
+                        <span className="text-warm-600 mr-2">
+                          Giảm giá thẻ thành viên:
+                        </span>
+                        <span className="text-success-text font-medium">
+                          -
+                          {formatCurrency(detail.membershipDiscountAmount)}
+                        </span>
                       </div>
+                    )}
+                    {detail.promotionDiscountAmount != null &&
+                      detail.promotionDiscountAmount > 0 && (
+                      <div className="flex items-center gap-3 text-sm">
+                        <span className="text-warm-600 mr-2">
+                          Giảm giá mã khuyến mãi:
+                        </span>
+                        <span className="text-success-text font-medium">
+                          -{formatCurrency(detail.promotionDiscountAmount)}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 text-sm">
+                      <span className="text-warm-600 mr-2">
+                        Cọc yêu cầu ({detail.depositPercent}%):
+                      </span>
+                      <span className="text-gold-600 font-medium">
+                        {formatCurrency(
+                          ((detail.totalAmount || 0) *
+                            (detail.depositPercent || 0)) /
+                            100,
+                        )}
+                      </span>
                     </div>
+                    {detail.depositDeadlineAt &&
+                      detail.status === APPOINTMENT_STATUS.CONFIRMED && (
+                        <div className="flex items-center gap-3 text-sm">
+                          <span className="text-warm-600 mr-2">
+                            Hạn chót cọc:
+                          </span>
+                          <span className="text-error-text font-medium">
+                            {new Intl.DateTimeFormat("vi-VN", {
+                              dateStyle: "short",
+                              timeStyle: "short",
+                            }).format(new Date(detail.depositDeadlineAt))}
+                          </span>
+                        </div>
+                      )}
+                  </div>
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <h4 className="font-medium text-ink border-b border-warm-50 pb-2">
                         Nhân viên & Địa điểm
                       </h4>
-
                       <div className="space-y-3">
                         <div className="flex items-center gap-3 text-sm">
                           <User className="w-4 h-4 text-warm-600" />
