@@ -78,6 +78,7 @@ import {
   BoxesPage,
   RechartsPage,
   DashboardExample1Page,
+  ProductCategoryListPageDemo,
 } from "./lazyPages";
 
 export const router = createBrowserRouter([
@@ -657,4 +658,12 @@ export const router = createBrowserRouter([
     ],
   },
   { path: "*", element: <Navigate to="/" replace /> },
+  {
+    path: "/demo/product-categories",
+    element: (
+      <WithPageSuspense>
+        <ProductCategoryListPageDemo />
+      </WithPageSuspense>
+    ),
+  }
 ]);
