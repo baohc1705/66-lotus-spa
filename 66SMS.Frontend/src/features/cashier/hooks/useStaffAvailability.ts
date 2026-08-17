@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { cashierApi } from "../api/cashier.api";
+import { CASHIER_STAFF_AVAILABILITY } from "../cashierQueryKey";
 
 export function useStaffAvailability(
   open: boolean,
@@ -10,7 +11,7 @@ export function useStaffAvailability(
 ) {
   return useQuery({
     queryKey: [
-      "cashier-staff-availability",
+      CASHIER_STAFF_AVAILABILITY,
       date.toDateString(),
       startTime,
       serviceId,

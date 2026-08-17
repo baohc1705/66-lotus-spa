@@ -20,8 +20,13 @@ import {
   resolveCashierSlotConfig,
   type CashierCalendarView,
 } from "../utils/cashierCalendar.utils";
+import { mapAppointmentToCashierBooking } from "../utils/mapAppointmentToCashierBooking";
+import type { AppointmentDto } from "@/features/booking/types/booking.types";
+import { CashierBookingOnlineModal } from "../components/CashierBookingOnlineModal";
+import { useInvalidatePendingOnline } from "../hooks/usePendingOnlineAppointments";
 
 export function CashierPage() {
+  const { invalidatePendingOnline } = useInvalidatePendingOnline();
   const [activeTab, setActiveTab] = useState<"calendar" | "invoices">(
     "calendar",
   );
@@ -78,6 +83,8 @@ export function CashierPage() {
     }
   }, [isAdmin, isReceptionist]);
 
+  const [onlineModalOpen, setOnlineModalOpen] = useState(false);
+
   if (!isAdmin && !isReceptionist) {
     return null;
   }
@@ -127,9 +134,19 @@ export function CashierPage() {
   const calendarLoading =
     calendarQuery.isLoading || (!!salonId && configQuery.isLoading);
 
+  function handleEditOnlineBooking(item: AppointmentDto) {
+    const booking = mapAppointmentToCashierBooking(item);
+    setSelectedBooking(booking);
+    setIsSidebarOpen(true);
+  }
+
   return (
     <div className="relative flex h-screen w-full flex-col bg-kit-page font-sans text-sm text-kit-body">
-      <CashierHeader activeTab={activeTab} onTabChange={setActiveTab} />
+      <CashierHeader
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onOpenOnlineAppts={() => setOnlineModalOpen(true)}
+      />
 
       <div className="relative z-10 flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-hidden">
         {activeTab === "invoices" ? (
@@ -160,6 +177,12 @@ export function CashierPage() {
               />
             </div>
 
+            <CashierBookingOnlineModal
+              open={onlineModalOpen}
+              onClose={() => setOnlineModalOpen(false)}
+              onEdit={handleEditOnlineBooking}
+            />
+
             <CashierInvoiceSidebar
               booking={selectedBooking}
               isOpen={isSidebarOpen}
@@ -189,6 +212,7 @@ export function CashierPage() {
                 setIsSidebarOpen(false);
                 setSelectedBooking(null);
                 await calendarQuery.refetch();
+                await invalidatePendingOnline();
               }}
             />
 

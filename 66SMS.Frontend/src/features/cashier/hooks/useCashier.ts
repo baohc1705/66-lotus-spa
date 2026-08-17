@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { cashierApi } from "../api/cashier.api";
 import type { CreateCashierAppointmentPayload } from "../api/cashier.api";
+import { CASHIER_DAILY, CASHIER_WEEKLY } from "../cashierQueryKey";
 import type { CashierBooking, CashierDailyDto } from "../types";
 
 function getApiError(error: unknown, fallback: string): string {
@@ -20,7 +21,7 @@ export function useCashierData(
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["cashier-daily", date.toDateString(), salonId],
+    queryKey: [CASHIER_DAILY, date.toDateString(), salonId],
     queryFn: async () => {
       const res = await cashierApi.getDaily(date, salonId);
       if (!res.isSuccess || !res.data) {
@@ -38,7 +39,7 @@ export function useCashierData(
     newStartTime: string,
   ) => {
     queryClient.setQueryData(
-      ["cashier-daily", date.toDateString(), salonId],
+      [CASHIER_DAILY, date.toDateString(), salonId],
       (old: CashierDailyDto | undefined) => {
         if (!old) return old;
         const newBookings = old.bookings.map((b: CashierBooking) => {
@@ -85,7 +86,7 @@ export function useCashierWeekly(
 ) {
   const query = useQuery({
     queryKey: [
-      "cashier-weekly",
+      CASHIER_WEEKLY,
       startDate.toDateString(),
       endDate.toDateString(),
       salonId,

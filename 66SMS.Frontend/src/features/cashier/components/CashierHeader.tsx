@@ -1,11 +1,4 @@
-import {
-  Menu,
-  MapPin,
-  LogOut,
-  User,
-  Settings,
-  Home,
-} from "lucide-react";
+import { Menu, MapPin, LogOut, User, Settings, Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Logo } from "@/shared/components/Logo";
 import { BranchSelector } from "@/shared/components/BranchSelector";
@@ -15,15 +8,20 @@ import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useLogout } from "@/features/auth/hooks/useLogout";
 import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
 import { NotificationBell } from "@/features/notifications";
+import { Button } from "@/shared/elements/Button";
+import { Badge } from "@/shared/elements/Badge";
+import { usePendingOnlineCount } from "../hooks/usePendingOnlineAppointments";
 
 interface CashierHeaderProps {
   activeTab?: "calendar" | "invoices";
   onTabChange?: (tab: "calendar" | "invoices") => void;
+  onOpenOnlineAppts?: () => void;
 }
 
 export function CashierHeader({
   activeTab = "calendar",
   onTabChange,
+  onOpenOnlineAppts,
 }: CashierHeaderProps) {
   const navigate = useNavigate();
   const { user, hasRole, getEffectiveSalonId } = useAuthStore();
@@ -33,6 +31,8 @@ export function CashierHeader({
   const logoutMutation = useLogout();
 
   const salonId = getEffectiveSalonId();
+  const pendingCountQuery = usePendingOnlineCount(true, salonId);
+  const pendingOnlineCount = pendingCountQuery.data ?? 0;
   const { data: salons = [] } = useActiveSalons();
   const activeSalon = salons.find((s) => s.id === salonId);
   const salonLabel = activeSalon
@@ -86,7 +86,12 @@ export function CashierHeader({
     <header className="sticky top-0 z-50 flex h-14 shrink-0 items-center justify-between border-b border-white/10 bg-kit-dark px-4 font-sans text-kit-white shadow-md">
       <div className="flex min-w-0 items-center gap-3">
         <div className="flex shrink-0 items-center">
-          <Logo size="md" variant="light" showTagline taglineText="Cashier POS" />
+          <Logo
+            size="md"
+            variant="light"
+            showTagline
+            taglineText="Cashier POS"
+          />
         </div>
 
         <TabNav
@@ -106,6 +111,19 @@ export function CashierHeader({
       </div>
 
       <div className="flex shrink-0 items-center gap-2 text-xs font-medium">
+        <Button
+          variant="warning"
+          className="mb-0 mr-0"
+          onClick={() => onOpenOnlineAppts?.()}
+        >
+          Lịch Online
+          {pendingOnlineCount > 0 ? (
+            <Badge variant="light" pill className="ml-2 normal-case">
+              {pendingOnlineCount}
+            </Badge>
+          ) : null}
+        </Button>
+
         {isAdmin ? (
           <div className="w-36 min-w-0 shrink-0 border-l border-white/20 pl-2.5 sm:w-40 md:w-44">
             <BranchSelector />

@@ -44,6 +44,7 @@ import { formatDate } from "@/shared/utils/date.utils";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { cashierApi } from "../api/cashier.api";
+import { CASHIER_POSITIONS } from "../cashierQueryKey";
 import type { CashierPosition } from "../types";
 
 interface CashierBookingModalProps {
@@ -123,7 +124,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
   );
 
   const positionsQuery = useQuery({
-    queryKey: ["cashier-positions", salonId, appointmentDate],
+    queryKey: [CASHIER_POSITIONS, salonId, appointmentDate],
     queryFn: async () => {
       const res = await cashierApi.getPositions(salonId, appointmentDate);
       return res.data ?? [];
@@ -310,7 +311,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
         return;
       }
 
-      await queryClient.invalidateQueries({ queryKey: ["cashier-positions"] });
+      await queryClient.invalidateQueries({ queryKey: [CASHIER_POSITIONS] });
       setSuccess(true);
       toast.success("Đặt lịch thành công!");
     } catch (error) {

@@ -8,5 +8,6 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetAllAppointme
     {
         public int? UserId { get; set; }
         public int? SalonId { get; set; }
+        public int? Status { get; set; }
     }
 }
