@@ -16,6 +16,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
         public int? PositionId { get; set; }
         public DateOnly? AppointmentDate { get; set; }
         public int? ServiceId { get; set; }
+        public List<int>? ServiceIds { get; set; }
         public int? SalonId { get; set; }
         public string? StartTime { get; set; }
     }

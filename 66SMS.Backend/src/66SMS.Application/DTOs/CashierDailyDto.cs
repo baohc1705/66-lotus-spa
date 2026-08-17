@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace _66SMS.Application.DTOs
 {
     public class StaffColumnDto
@@ -9,42 +7,21 @@ namespace _66SMS.Application.DTOs
         public string? Avatar { get; set; }
     }
 
-    public class CashierBookingDto
+    public class CashierCalendarBookingDto
     {
         public string Id { get; set; } = null!;
-        public string? AppointmentCode { get; set; }
         public string? CustomerName { get; set; }
-        public string? CustomerPhone { get; set; }
-        public string? CustomerAvatar { get; set; }
         public string? BookingDate { get; set; }
         public string? ServiceName { get; set; }
-        public int? ServiceId { get; set; }
         public int StaffId { get; set; }
-        public string? StaffName { get; set; }
         public string? StartTime { get; set; }
         public string? EndTime { get; set; }
-        public string Status { get; set; } = null!;
-        public decimal TotalAmount { get; set; }
-        public decimal PaidAmount { get; set; }
-        public decimal DepositAmount { get; set; }
-        public decimal RemainingAmount { get; set; }
-        public bool DepositPaid { get; set; }
-        public DateTimeOffset? DepositDeadlineAt { get; set; }
-        public string? Note { get; set; }
-        public decimal CustomerWalletBalance { get; set; }
-        public int? InvoiceId { get; set; }
-        public string? InvoiceCode { get; set; }
-        public decimal DiscountAmount { get; set; }
-        public int? PositionId { get; set; }
-        public string? PositionName { get; set; }
-        public int? PositionStatus { get; set; }
-        public DateTimeOffset? TimeStartService { get; set; }
-        public DateTimeOffset? CompletedAt { get; set; }
+        public int Status { get; set; }
     }
 
     public class CashierDailyDto
     {
         public List<StaffColumnDto> Columns { get; set; } = new();
-        public List<CashierBookingDto> Bookings { get; set; } = new();
+        public List<CashierCalendarBookingDto> Bookings { get; set; } = new();
     }
 }

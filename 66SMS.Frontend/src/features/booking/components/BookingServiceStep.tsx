@@ -19,8 +19,8 @@ import {
 export function BookingServiceStep() {
   const store = useBookingStore();
   const activeGuest = store.guests[store.activeGuestIndex];
-  const selectedService = activeGuest?.selectedService;
-  const selectService = store.selectService;
+  const selectedServices = activeGuest?.selectedServices ?? [];
+  const toggleService = store.toggleService;
   const nextStep = store.nextStep;
   const { data, isLoading, isError } = useServices({
     pageIndex: 1,
@@ -32,36 +32,53 @@ export function BookingServiceStep() {
     const pendingId = getPendingServiceId();
     if (!pendingId || services.length === 0) return;
 
-    if (selectedService?.id === pendingId) {
+    let alreadySelected = false;
+    for (let index = 0; index < selectedServices.length; index++) {
+      if (selectedServices[index].id === pendingId) {
+        alreadySelected = true;
+        break;
+      }
+    }
+    if (alreadySelected) {
       clearPendingServiceId();
       return;
     }
 
-    const found = services.find((s: ServiceListDto) => s.id === pendingId);
+    let found: ServiceListDto | undefined;
+    for (let index = 0; index < services.length; index++) {
+      if (services[index].id === pendingId) {
+        found = services[index];
+        break;
+      }
+    }
     if (found) {
-      selectService(found);
+      toggleService(found);
       clearPendingServiceId();
     }
-  }, [services, selectedService?.id, selectService]);
+  }, [services, selectedServices, toggleService]);
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredServices = services.filter((s) => {
-    const matchesSearch = (s.name || "")
+  const filteredServices: typeof services = [];
+  for (let index = 0; index < services.length; index++) {
+    const service = services[index];
+    const matchesSearch = (service.name || "")
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
-    return matchesSearch;
-  });
+    if (!matchesSearch) continue;
+    filteredServices.push(service);
+  }
 
   const groupedServices = useMemo(() => {
     const groups: { [key: string]: typeof services } = {};
-    filteredServices.forEach((s) => {
-      const cat = s.categoryName || "Dịch vụ khác";
+    for (let index = 0; index < filteredServices.length; index++) {
+      const service = filteredServices[index];
+      const cat = service.categoryName || "Dịch vụ khác";
       if (!groups[cat]) {
         groups[cat] = [];
       }
-      groups[cat].push(s);
-    });
+      groups[cat].push(service);
+    }
     return groups;
   }, [filteredServices]);
 
@@ -78,12 +95,16 @@ export function BookingServiceStep() {
     return `${mins}'`;
   };
 
+  const hasSelectedServices = selectedServices.length > 0;
+
   return (
     <div className="lotus-panel flex flex-col gap-5 p-5 sm:p-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h3 className="flex items-center gap-2 text-lg font-semibold text-ink">
-        <Leaf className="h-5 w-5 text-rose-600" />
-        <span>Chọn dịch vụ</span>
-      </h3>
+      <div className="flex flex-col gap-1">
+        <h3 className="flex items-center gap-2 text-lg font-semibold text-ink">
+          <Leaf className="h-5 w-5 text-rose-600" />
+          <span>Chọn dịch vụ</span>
+        </h3>
+      </div>
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-warm-400" />
@@ -113,11 +134,17 @@ export function BookingServiceStep() {
               </h4>
               <div className="flex flex-col gap-2">
                 {items.map((s) => {
-                  const isSelected = selectedService?.id === s.id;
+                  let isSelected = false;
+                  for (let index = 0; index < selectedServices.length; index++) {
+                    if (selectedServices[index].id === s.id) {
+                      isSelected = true;
+                      break;
+                    }
+                  }
                   return (
                     <div
                       key={s.id}
-                      onClick={() => selectService(s)}
+                      onClick={() => toggleService(s)}
                       className={`flex cursor-pointer items-center justify-between p-3 transition-all border ${
                         isSelected
                           ? "border-2 border-rose-600 bg-rose-50"
@@ -177,15 +204,16 @@ export function BookingServiceStep() {
           Quay lại
         </button>
         <button
-          disabled={!selectedService}
+          disabled={!hasSelectedServices}
           onClick={() => nextStep()}
           className={`flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-full font-bold transition-all ${
-            selectedService
+            hasSelectedServices
               ? "bg-rose-600 text-white hover:bg-rose-500"
               : "bg-warm-50 text-warm-300 cursor-not-allowed"
           }`}
         >
           Tiếp tục: Chọn thời gian
+          {hasSelectedServices ? ` (${selectedServices.length})` : ""}
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>

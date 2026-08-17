@@ -1,14 +1,3 @@
-export type BookingStatus =
-  | 'pending'
-  | 'confirmed'
-  | 'not-arrived'
-  | 'waiting'
-  | 'in-progress'
-  | 'completed'
-  | 'unpaid'
-  | 'paid'
-  | 'cancelled'
-
 export interface CashierBooking {
   id: string
   appointmentCode?: string | null
@@ -18,16 +7,18 @@ export interface CashierBooking {
   bookingDate?: string
   serviceName?: string | null
   serviceId?: number | null
+  serviceIds?: number[]
+  services?: { serviceId?: number; name?: string; durationMins?: number; price?: number }[]
   staffId: string | number
   staffName?: string | null
   startTime: string
   endTime: string
-  status: BookingStatus
-  totalAmount: number
-  paidAmount: number
-  depositAmount: number
-  remainingAmount: number
-  depositPaid: boolean
+  status: number
+  totalAmount?: number
+  paidAmount?: number
+  depositAmount?: number
+  remainingAmount?: number
+  depositPaid?: boolean
   depositDeadlineAt?: string | null
   note?: string
   customerWalletBalance?: number

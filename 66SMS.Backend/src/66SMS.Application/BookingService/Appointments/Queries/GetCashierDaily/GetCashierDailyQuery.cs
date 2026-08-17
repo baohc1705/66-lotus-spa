@@ -2,7 +2,7 @@ using _66SMS.Application.DTOs;
 using _66SMS.Contract.Shared;
 using MediatR;
 
-namespace _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily
+namespace _66SMS.Application.BookingService.Appointments.Queries.GetCashierDaily
 {
     public class GetCashierDailyQuery : IRequest<Result<CashierDailyDto>>
     {

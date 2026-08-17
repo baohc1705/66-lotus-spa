@@ -12,8 +12,6 @@ using _66SMS.Application.BookingService.Appointments.Queries.GetTechnicians;
 using _66SMS.Application.BookingService.Appointments.Queries.GetTimeSlots;
 using _66SMS.Contract.Abstractions;
 using Asp.Versioning;
-using MassTransit.Futures.Contracts;
-using MassTransit.Futures.Contracts;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

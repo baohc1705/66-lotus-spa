@@ -86,6 +86,20 @@ export function formatDisplayDate(val?: string | null): string {
   return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 }
 
+export function addMinutesToTime(time?: string | null, minutes?: number): string {
+  const hm = toLocalTimeOnly(time);
+  if (!hm) return "";
+  const parts = hm.split(":");
+  const hour = Number(parts[0]);
+  const minute = Number(parts[1]);
+  if (Number.isNaN(hour) || Number.isNaN(minute)) return "";
+  let total = hour * 60 + minute + (minutes ?? 0);
+  if (total < 0) total = 0;
+  const resultHour = Math.floor(total / 60) % 24;
+  const resultMinute = total % 60;
+  return `${pad(resultHour)}:${pad(resultMinute)}`;
+}
+
 export function parseToDateInput(val?: string | null): string {
   return toLocalDateOnly(val);
 }

@@ -2,11 +2,11 @@ IF OBJECT_ID(N'dbo.usp_ResolveBookingStaff', N'P') IS NOT NULL
     DROP PROCEDURE dbo.usp_ResolveBookingStaff;
 GO
 
--- Tim 1 staff nhan duoc khung gio. Bat buoc @start_time; @slot_id giu de tuong thich, khong dung.
+-- Tim 1 staff nhan duoc khung gio cho combo dich vu. Bat buoc @start_time.
+-- @service_ids: csv "1,5,9". Staff phai lam du tat ca dich vu; duration = SUM.
 CREATE PROCEDURE dbo.usp_ResolveBookingStaff
     @date                   DATE,
-    @service_id             INT,
-    @slot_id                INT = NULL,
+    @service_ids            NVARCHAR(500),
     @staff_id               INT = NULL,
     @salon_id               INT = NULL,
     @exclude_lock_id        INT = NULL,
@@ -17,23 +17,52 @@ BEGIN
     SET NOCOUNT ON;
 
     DECLARE @duration_mins   INT;
+    DECLARE @wanted_count    INT;
+    DECLARE @found_count     INT;
     DECLARE @window_start    TIME(7);
     DECLARE @window_start_dt DATETIME;
     DECLARE @window_end_dt   DATETIME;
     DECLARE @window_end      TIME(7);
     DECLARE @now             DATETIMEOFFSET(7) = SYSDATETIMEOFFSET();
 
-    SELECT @duration_mins = duration_mins
-    FROM dbo.services
-    WHERE id = @service_id AND status = 1;
+    CREATE TABLE #wanted_services (
+        service_id INT NOT NULL PRIMARY KEY
+    );
 
-    IF @duration_mins IS NULL
+    INSERT INTO #wanted_services (service_id)
+    SELECT DISTINCT TRY_CAST(LTRIM(RTRIM(value)) AS INT)
+    FROM STRING_SPLIT(@service_ids, N',')
+    WHERE TRY_CAST(LTRIM(RTRIM(value)) AS INT) IS NOT NULL
+      AND TRY_CAST(LTRIM(RTRIM(value)) AS INT) > 0;
+
+    SET @wanted_count = (SELECT COUNT(*) FROM #wanted_services);
+
+    IF @wanted_count = 0
+    BEGIN
+        DROP TABLE #wanted_services;
         RETURN;
+    END;
+
+    SELECT
+        @duration_mins = SUM(s.duration_mins),
+        @found_count = COUNT(*)
+    FROM dbo.services s
+    INNER JOIN #wanted_services w ON w.service_id = s.id
+    WHERE s.status = 1;
+
+    IF @duration_mins IS NULL OR @found_count <> @wanted_count
+    BEGIN
+        DROP TABLE #wanted_services;
+        RETURN;
+    END;
 
     SET @window_start = @start_time;
 
     IF @window_start IS NULL
+    BEGIN
+        DROP TABLE #wanted_services;
         RETURN;
+    END;
 
     SET @window_start_dt = CAST(@window_start AS DATETIME);
     SET @window_end_dt   = DATEADD(MINUTE, @duration_mins, @window_start_dt);
@@ -57,12 +86,14 @@ BEGIN
         ON r.id = ur.role_id
        AND r.status = 1
        AND r.code = N'staff'
-    INNER JOIN dbo.staff_services ss
-        ON ss.staff_id = st.id
-       AND ss.service_id = @service_id
-       AND ss.status = 1
     WHERE st.status = 1
       AND (@staff_id IS NULL OR st.id = @staff_id)
+      AND (
+            SELECT COUNT(DISTINCT ss.service_id)
+            FROM dbo.staff_services ss
+            INNER JOIN #wanted_services w ON w.service_id = ss.service_id
+            WHERE ss.staff_id = st.id AND ss.status = 1
+          ) = @wanted_count
       AND (
             @salon_id IS NULL
             OR EXISTS (
@@ -76,6 +107,7 @@ BEGIN
 
     IF NOT EXISTS (SELECT 1 FROM #staff)
     BEGIN
+        DROP TABLE #wanted_services;
         DROP TABLE #staff;
         RETURN;
     END;
@@ -167,5 +199,6 @@ BEGIN
 
     DROP TABLE #appt_mins;
     DROP TABLE #staff;
+    DROP TABLE #wanted_services;
 END
 GO

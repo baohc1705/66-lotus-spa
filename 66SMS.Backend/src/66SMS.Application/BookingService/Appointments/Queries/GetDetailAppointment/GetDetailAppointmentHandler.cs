@@ -12,25 +12,32 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetDetailAppoin
     public class GetDetailAppointmentHandler : IRequestHandler<GetDetailAppointmentQuery, Result<AppointmentDto>>
     {
         private readonly IAppointmentSqlRepository appointmentSqlRepository;
+        private readonly IInvoiceSqlRepository invoiceSqlRepository;
 
-        public GetDetailAppointmentHandler(IAppointmentSqlRepository appointmentSqlRepository)
+        public GetDetailAppointmentHandler(
+            IAppointmentSqlRepository appointmentSqlRepository,
+            IInvoiceSqlRepository invoiceSqlRepository)
         {
             this.appointmentSqlRepository = appointmentSqlRepository;
+            this.invoiceSqlRepository = invoiceSqlRepository;
         }
 
         public async Task<Result<AppointmentDto>> Handle(GetDetailAppointmentQuery request, CancellationToken cancellationToken)
         {
-            var row = await appointmentSqlRepository.AsQueryable()
-                .Where(x => x.Id == (int)request.Id!)
+            var appointmentId = (int)request.Id!;
+            var row = await appointmentSqlRepository.AsQueryable(asNoTracking: true)
+                .Where(x => x.Id == appointmentId)
                 .Select(x => new
                 {
                     Dto = new AppointmentDto
                     {
                         Id = x.Id,
                         AppointmentCode = x.AppointmentCode,
-                        CustomerId = x.CreatedByUser!.Customer!.Id,
+                        CustomerId = x.CreatedByUser!.Customer != null ? x.CreatedByUser.Customer.Id : null,
+                        CustomerName = x.CreatedByUser!.Customer != null ? x.CreatedByUser.Customer.FullName : null,
+                        CustomerPhone = x.CreatedByUser!.Customer != null ? x.CreatedByUser.Customer.Phone : null,
+                        CustomerAvatar = x.CreatedByUser!.Customer != null ? x.CreatedByUser.Customer.AvatarUrl : null,
                         StaffId = x.StaffId,
-                        SlotId = null,
                         PositionId = x.PositionId,
                         AppointmentDate = x.AppointmentDate,
                         Status = x.Status,
@@ -45,19 +52,46 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetDetailAppoin
                         SalonName = x.Salon!.Name,
                         TimeSlotStartTime = x.TimeApptStart,
                         TimeSlotEndTime = x.TimeApptEnd,
-                        PositionName = x.Position!.Name,
-                        PositionRoomName = x.Position!.Room!.Name,
-                        ServiceNames = x.Services!
-                            .Where(s => s.Service != null)
-                            .Select(s => s.Service!.Name)
+                        PositionName = x.Position != null ? x.Position.Name : null,
+                        PositionRoomName = x.Position != null && x.Position.Room != null ? x.Position.Room.Name : null,
+                        PositionStatus = x.Position != null ? x.Position.Status : null,
+                        TimeStartService = x.TimeStartService,
+                        CompletedAt = x.CompletedAt,
+                        CustomerWalletBalance = x.CreatedByUser!.Customer != null && x.CreatedByUser.Customer.Wallet != null
+                            ? x.CreatedByUser.Customer.Wallet.Balance
+                            : null,
+                        Services = x.Services!
+                            .OrderBy(s => s.Id)
+                            .Select(s => new AppointmentServiceItemDto
+                            {
+                                ServiceId = s.ServiceId,
+                                Name = s.Service != null ? s.Service.Name : null,
+                                DurationMins = s.DurationSnapshot * s.Quantity,
+                                Price = s.PriceSnapshot * s.Quantity,
+                            })
                             .ToList(),
                     },
-                    DiscountPercent = x.CreatedByUser!.Customer!.MembershipCard!.Tier!.DiscountPercent ?? 0,
+                    DiscountPercent = x.CreatedByUser!.Customer != null
+                        && x.CreatedByUser.Customer.MembershipCard != null
+                        && x.CreatedByUser.Customer.MembershipCard.Tier != null
+                        ? x.CreatedByUser.Customer.MembershipCard.Tier.DiscountPercent ?? 0
+                        : 0,
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (row == null)
                 return Result<AppointmentDto>.NotFound(AppointmentConst.MSG_APPOINTMENT_NOT_FOUND, ErrorCodes.ERR_APPOINTMENT_NOT_FOUND);
+
+            var invoice = await invoiceSqlRepository.AsQueryable(asNoTracking: true)
+                .Where(x => x.AppointmentId == appointmentId && x.Status != InvoiceConst.STATUS_CANCELLED)
+                .Select(x => new { x.Id, x.InvoiceCode })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (invoice != null)
+            {
+                row.Dto.InvoiceId = invoice.Id;
+                row.Dto.InvoiceCode = invoice.InvoiceCode;
+            }
 
             var (membership, promo, _) = AppointmentInvoiceDiscountHelper.Split(
                 row.Dto.ServicesSubTotal ?? 0m,

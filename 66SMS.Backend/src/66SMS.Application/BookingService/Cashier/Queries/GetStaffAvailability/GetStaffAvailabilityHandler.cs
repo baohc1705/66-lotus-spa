@@ -25,23 +25,42 @@ namespace _66SMS.Application.BookingService.Cashier.Queries.GetStaffAvailability
                     AppointmentConst.MSG_STAFF_AVAILABILITY_SLOT_REQUIRED);
             }
 
+            var serviceIds = request.ServiceIds;
+            if (serviceIds == null || serviceIds.Count == 0)
+            {
+                serviceIds = new List<int>();
+                if (request.ServiceId.HasValue && request.ServiceId.Value > 0)
+                    serviceIds.Add(request.ServiceId.Value);
+            }
+            if (serviceIds.Count == 0)
+            {
+                return Result<IReadOnlyList<StaffAvailabilityDto>>.BadRequest(
+                    AppointmentConst.MSG_STAFF_AVAILABILITY_SERVICE_REQUIRED);
+            }
+
             var rows = await appointmentSqlRepository.GetStaffAvailabilityAsync(
                 request.Date!.Value,
-                request.ServiceId!.Value,
+                serviceIds,
                 request.SalonId,
                 startTime.Value,
                 cancellationToken);
-            var data = rows.Select(r => new StaffAvailabilityDto
+
+            var data = new List<StaffAvailabilityDto>();
+            for (var index = 0; index < rows.Count; index++)
             {
-                StaffId = r.StaffId,
-                StaffName = r.StaffName,
-                Avatar = r.Avatar,
-                Status = r.Status,
-                Reason = r.Reason,
-                ScheduleId = r.ScheduleId,
-                BusyCustomerName = r.BusyCustomerName,
-                BusyTimeRange = r.BusyTimeRange,
-            }).ToList();
+                var row = rows[index];
+                data.Add(new StaffAvailabilityDto
+                {
+                    StaffId = row.StaffId,
+                    StaffName = row.StaffName,
+                    Avatar = row.Avatar,
+                    Status = row.Status,
+                    Reason = row.Reason,
+                    ScheduleId = row.ScheduleId,
+                    BusyCustomerName = row.BusyCustomerName,
+                    BusyTimeRange = row.BusyTimeRange,
+                });
+            }
 
             return Result<IReadOnlyList<StaffAvailabilityDto>>.Success(data);
         }

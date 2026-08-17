@@ -1,11 +1,11 @@
 import {
   ChevronRight,
-  Clock,
   MapPin,
   Plus,
   Trash2,
   User,
 } from "lucide-react";
+import type { ReactNode } from "react";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import {
   useMembershipTiers,
@@ -75,10 +75,13 @@ export function BookingSummarySidebar() {
   );
   const membershipPercent = membershipTier?.discountPercent ?? 0;
 
-  const servicesSubTotal = guests.reduce(
-    (sum, g) => sum + (g.selectedService?.sellingPrice || 0),
-    0,
-  );
+  let servicesSubTotal = 0;
+  for (let guestIndex = 0; guestIndex < guests.length; guestIndex++) {
+    const guestServices = guests[guestIndex].selectedServices ?? [];
+    for (let serviceIndex = 0; serviceIndex < guestServices.length; serviceIndex++) {
+      servicesSubTotal += guestServices[serviceIndex].sellingPrice || 0;
+    }
+  }
 
   const membershipDiscount =
     membershipPercent > 0 && servicesSubTotal > 0
@@ -123,7 +126,27 @@ export function BookingSummarySidebar() {
 
             {guests.map((guest, index) => {
               const isGuestActive = activeGuestIndex === index;
-              const sellingPrice = guest.selectedService?.sellingPrice || 0;
+              let sellingPrice = 0;
+              const guestServices = guest.selectedServices ?? [];
+              const serviceLineNodes: ReactNode[] = [];
+              for (let serviceIndex = 0; serviceIndex < guestServices.length; serviceIndex++) {
+                const service = guestServices[serviceIndex];
+                sellingPrice += service.sellingPrice || 0;
+                const name = service.name || "Dịch vụ";
+                const mins = service.durationMins;
+                let label = name;
+                if (mins) {
+                  label = name + " - " + mins + " phút";
+                }
+                serviceLineNodes.push(
+                  <p
+                    key={String(service.id ?? serviceIndex)}
+                    className="font-semibold text-ink"
+                  >
+                    {label}
+                  </p>,
+                );
+              }
 
               return (
                 <div key={guest.id} className="flex flex-col gap-2">
@@ -201,22 +224,13 @@ export function BookingSummarySidebar() {
                         </div>
                       )}
 
-                      {guest.selectedService ? (
+                      {guestServices.length > 0 ? (
                         <div className="px-2">
                           <p className="text-2xs font-bold tracking-wider text-gold-600 uppercase mb-1">
-                            Dịch vụ
+                            Dịch vụ ({guestServices.length})
                           </p>
-                          <div className="font-bold line-clamp-1">
-                            {guest.selectedService.name}
-                          </div>
-                          <div className="flex justify-between items-center text-ink mt-1">
-                            <span className="flex items-center gap-1 text-warm-600">
-                              <Clock className="w-3.5 h-3.5 text-rose-400" />
-                              {guest.selectedService.durationMins} phút
-                            </span>
-                            <span className="bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full text-2xs uppercase">
-                              {guest.selectedService.categoryName || "Dịch vụ"}
-                            </span>
+                          <div className="flex flex-col gap-0.5">
+                            {serviceLineNodes}
                           </div>
                         </div>
                       ) : (
@@ -225,9 +239,7 @@ export function BookingSummarySidebar() {
                         </div>
                       )}
 
-                      {(guest.selectedDate ||
-                        guest.selectedTimeSlot ||
-                        guest.selectedTechnician) && (
+                      {(guest.selectedDate || guest.selectedTimeSlot) && (
                         <div className="px-2 flex flex-col gap-1.5">
                           {guest.selectedDate && guest.selectedTimeSlot && (
                             <div className="flex justify-between items-center">
@@ -237,16 +249,6 @@ export function BookingSummarySidebar() {
                                 {formatDate(guest.selectedDate).format(
                                   "DD/MM/YYYY",
                                 )}
-                              </span>
-                            </div>
-                          )}
-                          {guest.selectedTechnician && (
-                            <div className="flex justify-between items-center">
-                              <span className="text-warm-600">
-                                Kỹ thuật viên:
-                              </span>
-                              <span className="font-semibold">
-                                {guest.selectedTechnician.name}
                               </span>
                             </div>
                           )}

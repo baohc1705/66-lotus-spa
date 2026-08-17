@@ -44,8 +44,6 @@ namespace _66SMS.Infrastructure.Realtime
             {
                 var booking = notificationEvent.Payload as BookingNotificationPayload;
                 var userIds = await ResolveRecipientUserIdsAsync(booking, cancellationToken);
-                if (userIds.Count == 0)
-                    return;
 
                 var payloadJson = notificationEvent.Payload == null
                     ? null
@@ -88,20 +86,33 @@ namespace _66SMS.Infrastructure.Realtime
                         cancellationToken);
                 }
 
-                foreach (var userId in userIds)
+                object staffBody = new
                 {
-                    var message = customerUserId == userId ? customerMessage : staffMessage;
-                    object body = new
+                    domain = notificationEvent.Domain,
+                    eventType = notificationEvent.EventType,
+                    title = notificationEvent.Title,
+                    message = staffMessage,
+                    payload = notificationEvent.Payload,
+                };
+
+                if (booking?.SalonId != null)
+                {
+                    await hubContext.Clients.Group(NotificationConst.GROUP_SALON_PREFIX + booking.SalonId.Value)
+                        .SendAsync("ReceiveNotification", staffBody, cancellationToken);
+                }
+
+                if (customerUserId != null)
+                {
+                    object customerBody = new
                     {
                         domain = notificationEvent.Domain,
                         eventType = notificationEvent.EventType,
                         title = notificationEvent.Title,
-                        message,
+                        message = customerMessage,
                         payload = notificationEvent.Payload,
                     };
-
-                    await hubContext.Clients.Group(NotificationConst.GROUP_USER_PREFIX + userId)
-                        .SendAsync("ReceiveNotification", body, cancellationToken);
+                    await hubContext.Clients.Group(NotificationConst.GROUP_USER_PREFIX + customerUserId.Value)
+                        .SendAsync("ReceiveNotification", customerBody, cancellationToken);
                 }
 
                 logger.LogInformation(
@@ -117,7 +128,7 @@ namespace _66SMS.Infrastructure.Realtime
             }
         }
 
-        // Chi KTV cua lich + le tan/thu ngan thuoc chi nhanh (+ customer neu co)
+        // Chi KTV cua lich + le tan/thu ngan/admin thuoc chi nhanh (+ customer neu co)
         private async Task<List<int>> ResolveRecipientUserIdsAsync(
             BookingNotificationPayload? booking,
             CancellationToken cancellationToken)
@@ -149,7 +160,8 @@ namespace _66SMS.Infrastructure.Realtime
                             && st.User.UserRoles.Any(ur =>
                                 ur.Role != null
                                 && ur.Role.Status == RoleConst.STATUS_ACTIVED
-                                && ur.Role.Code == RoleConst.CODE_RECEPTIONIST))
+                                && (ur.Role.Code == RoleConst.CODE_RECEPTIONIST
+                                    || ur.Role.Code == RoleConst.CODE_ADMIN)))
                         .Select(st => st.UserId)
                         .ToListAsync(cancellationToken);
 

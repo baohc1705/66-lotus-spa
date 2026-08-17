@@ -29,46 +29,73 @@ namespace _66SMS.Persistence.Repositories.Sql
                 .CountAsync(cancellationToken);
         }
 
+        private static string JoinServiceIds(IReadOnlyList<int> serviceIds)
+        {
+            if (serviceIds == null || serviceIds.Count == 0)
+                return string.Empty;
+            return string.Join(",", serviceIds);
+        }
+
         public async Task<IReadOnlyList<StaffAvailabilityRowDto>> GetStaffAvailabilityAsync(
             DateOnly workDate,
-            int serviceId,
+            IReadOnlyList<int> serviceIds,
             int? salonId,
             TimeOnly startTime,
             CancellationToken cancellationToken = default)
         {
             object salonParam = salonId.HasValue ? salonId.Value : DBNull.Value;
-            object slotParam = DBNull.Value;
             object startTimeParam = startTime.ToTimeSpan();
+            var serviceIdsCsv = JoinServiceIds(serviceIds);
             var rows = await applicationDbContext.ExecuteStoredProcedureAsync<StaffAvailabilityRowDto>(
                 AppointmentConst.SP_GET_STAFF_AVAILABILITY,
                 cancellationToken,
                 workDate,
-                slotParam,
-                serviceId,
+                serviceIdsCsv,
                 salonParam,
                 startTimeParam);
             return rows.ToList();
         }
 
-        public async Task<IReadOnlyList<BookingTechnicianRowDto>> GetBookingTechniciansAsync(DateOnly date, int serviceId, int? salonId, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<BookingTechnicianRowDto>> GetBookingTechniciansAsync(
+            DateOnly date,
+            IReadOnlyList<int> serviceIds,
+            int? salonId,
+            CancellationToken cancellationToken = default)
         {
             object salonParam = salonId.HasValue ? salonId.Value : DBNull.Value;
-            var rows = await applicationDbContext.ExecuteStoredProcedureAsync<BookingTechnicianRowDto>(AppointmentConst.SP_GET_BOOKING_TECHNICIANS, cancellationToken, date, serviceId, salonParam);
+            var serviceIdsCsv = JoinServiceIds(serviceIds);
+            var rows = await applicationDbContext.ExecuteStoredProcedureAsync<BookingTechnicianRowDto>(
+                AppointmentConst.SP_GET_BOOKING_TECHNICIANS,
+                cancellationToken,
+                date,
+                serviceIdsCsv,
+                salonParam);
             return rows.ToList();
         }
 
-        public async Task<IReadOnlyList<BookingTimeSlotRowDto>> GetBookingTimeSlotsAsync(DateOnly date, int serviceId, int? staffId, int? salonId, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<BookingTimeSlotRowDto>> GetBookingTimeSlotsAsync(
+            DateOnly date,
+            IReadOnlyList<int> serviceIds,
+            int? staffId,
+            int? salonId,
+            CancellationToken cancellationToken = default)
         {
             object staffParam = staffId.HasValue ? staffId.Value : DBNull.Value;
             object salonParam = salonId.HasValue ? salonId.Value : DBNull.Value;
-            var rows = await applicationDbContext.ExecuteStoredProcedureAsync<BookingTimeSlotRowDto>(AppointmentConst.SP_GET_BOOKING_TIME_SLOTS, cancellationToken, date, serviceId, staffParam, salonParam);
+            var serviceIdsCsv = JoinServiceIds(serviceIds);
+            var rows = await applicationDbContext.ExecuteStoredProcedureAsync<BookingTimeSlotRowDto>(
+                AppointmentConst.SP_GET_BOOKING_TIME_SLOTS,
+                cancellationToken,
+                date,
+                serviceIdsCsv,
+                staffParam,
+                salonParam);
             return rows.ToList();
         }
 
         public async Task<ResolveBookingStaffRowDto?> ResolveBookingStaffAsync(
             DateOnly date,
-            int serviceId,
-            int? slotId,
+            IReadOnlyList<int> serviceIds,
             int? staffId,
             int? salonId,
             int? excludeLockId,
@@ -80,14 +107,13 @@ namespace _66SMS.Persistence.Repositories.Sql
             object salonParam = salonId.HasValue ? salonId.Value : DBNull.Value;
             object excludeLockParam = excludeLockId.HasValue ? excludeLockId.Value : DBNull.Value;
             object excludeApptParam = excludeAppointmentId.HasValue ? excludeAppointmentId.Value : DBNull.Value;
-            object slotParam = slotId.HasValue ? slotId.Value : DBNull.Value;
             object startTimeParam = startTime.HasValue ? startTime.Value.ToTimeSpan() : DBNull.Value;
+            var serviceIdsCsv = JoinServiceIds(serviceIds);
             var rows = await applicationDbContext.ExecuteStoredProcedureAsync<ResolveBookingStaffRowDto>(
                 AppointmentConst.SP_RESOLVE_BOOKING_STAFF,
                 cancellationToken,
                 date,
-                serviceId,
-                slotParam,
+                serviceIdsCsv,
                 staffParam,
                 salonParam,
                 excludeLockParam,

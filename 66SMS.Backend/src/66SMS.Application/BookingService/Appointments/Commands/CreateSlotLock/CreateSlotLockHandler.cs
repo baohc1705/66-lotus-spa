@@ -40,14 +40,23 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                 using var transaction = await sqlUnitOfWork.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
                 try
                 {
-                    var serviceIds = request.Locks
-                        .Where(x => x.ServiceId.HasValue)
-                        .Select(x => x.ServiceId!.Value)
-                        .Distinct()
-                        .ToList();
+                    var allServiceIds = new List<int>();
+                    for (var lockIndex = 0; lockIndex < request.Locks.Count; lockIndex++)
+                    {
+                        var lockItem = request.Locks[lockIndex];
+                        if (lockItem.ServiceIds != null && lockItem.ServiceIds.Count > 0)
+                        {
+                            for (var serviceIndex = 0; serviceIndex < lockItem.ServiceIds.Count; serviceIndex++)
+                                allServiceIds.Add(lockItem.ServiceIds[serviceIndex]);
+                        }
+                        else if (lockItem.ServiceId.HasValue && lockItem.ServiceId.Value > 0)
+                        {
+                            allServiceIds.Add(lockItem.ServiceId.Value);
+                        }
+                    }
 
                     var durationByServiceId = await serviceSqlRepository.AsQueryable(asNoTracking: true)
-                        .Where(x => serviceIds.Contains(x.Id))
+                        .Where(x => allServiceIds.Contains(x.Id))
                         .Select(x => new
                         {
                             x.Id,
@@ -75,6 +84,17 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                     for (var lockIndex = 0; lockIndex < request.Locks.Count; lockIndex++)
                     {
                         var lockRequest = request.Locks[lockIndex];
+                        var serviceIds = lockRequest.ServiceIds;
+                        if (serviceIds == null || serviceIds.Count == 0)
+                        {
+                            serviceIds = new List<int>();
+                            if (lockRequest.ServiceId.HasValue && lockRequest.ServiceId.Value > 0)
+                                serviceIds.Add(lockRequest.ServiceId.Value);
+                        }
+                        if (serviceIds.Count == 0)
+                        {
+                            return Result<List<int>>.BadRequest(AppointmentConst.MSG_APPOINTMENT_MIN_ONE_SERVICE, ErrorCodes.ERR_APPOINTMENT_MIN_ONE_SERVICE);
+                        }
 
                         var slotStart = DateTimeHelper.ParseTimeOnly(lockRequest.StartTime);
                         if (slotStart == null)
@@ -82,9 +102,14 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                             return Result<List<int>>.BadRequest(TimeSlotConst.MSG_TIME_SLOT_NOT_FOUND, ErrorCodes.ERR_TIME_SLOT_NOT_FOUND);
                         }
 
-                        if (!durationByServiceId.TryGetValue((int)lockRequest.ServiceId!, out var durationMins))
+                        var durationMins = 0;
+                        for (var serviceIndex = 0; serviceIndex < serviceIds.Count; serviceIndex++)
                         {
-                            return Result<List<int>>.BadRequest(ServiceConst.MSG_SERVICE_PRODUCT_NOT_FOUND, ErrorCodes.ERR_SERVICE_NOT_FOUND);
+                            if (!durationByServiceId.TryGetValue(serviceIds[serviceIndex], out var serviceDuration))
+                            {
+                                return Result<List<int>>.BadRequest(ServiceConst.MSG_SERVICE_PRODUCT_NOT_FOUND, ErrorCodes.ERR_SERVICE_NOT_FOUND);
+                            }
+                            durationMins += serviceDuration;
                         }
 
                         var slotMinutes = TimeSlotConst.DEFAULT_SLOT_MINUTES;
@@ -104,8 +129,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
 
                         var resolved = await appointmentSqlRepository.ResolveBookingStaffAsync(
                             (DateOnly)lockRequest.AppointmentDate!,
-                            (int)lockRequest.ServiceId!,
-                            slotId: null,
+                            serviceIds,
                             lockRequest.StaffId,
                             salonId: lockRequest.SalonId,
                             excludeLockId: null,
@@ -115,7 +139,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
 
                         if (resolved == null)
                         {
-                            return Result<List<int>>.Conflict(AppointmentSlotLockConst.MSG_SLOT_LOCK_CONFLICT, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
+                            return Result<List<int>>.Conflict(AppointmentConst.MSG_NO_STAFF_FOR_SERVICE_COMBO, ErrorCodes.ERR_APPOINTMENT_SLOT_FULL);
                         }
 
                         var slotEnd = slotStart.Value.AddMinutes(durationMins);
@@ -135,7 +159,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateSlotLock
                             DurationMins = durationMins,
                             SlotMinutes = slotMinutes,
                             SalonId = lockRequest.SalonId,
-                            ServiceId = lockRequest.ServiceId
+                            ServiceId = serviceIds[0]
                         };
 
                         appointmentSlotLockSqlRepository.Add(slotLock);

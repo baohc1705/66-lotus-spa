@@ -22,6 +22,7 @@ import {
 } from "../utils/cashierCalendar.utils";
 import { mapAppointmentToCashierBooking } from "../utils/mapAppointmentToCashierBooking";
 import type { AppointmentDto } from "@/features/booking/types/booking.types";
+import { bookingApi } from "@/features/booking/api/booking.api";
 import { CashierBookingOnlineModal } from "../components/CashierBookingOnlineModal";
 import { useInvalidatePendingOnline } from "../hooks/usePendingOnlineAppointments";
 
@@ -93,9 +94,21 @@ export function CashierPage() {
     setIsBookingModalOpen(true);
   };
 
-  const handleBookingClick = (booking: CashierBooking) => {
+  const handleBookingClick = async (booking: CashierBooking) => {
     setSelectedBooking(booking);
     setIsSidebarOpen(true);
+
+    const bookingId = booking.id;
+    try {
+      const detail = await bookingApi.getDetail(Number(bookingId));
+      const mapped = mapAppointmentToCashierBooking(detail);
+      setSelectedBooking((current) => {
+        if (!current || current.id !== bookingId) return current;
+        return mapped;
+      });
+    } catch {
+      // Giữ card calendar; sidebar van hien duoc ten KH / gio
+    }
   };
 
   const handlePayInvoice = async (booking: CashierBooking) => {

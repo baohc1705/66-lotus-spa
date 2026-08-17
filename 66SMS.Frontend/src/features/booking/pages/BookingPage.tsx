@@ -26,9 +26,9 @@ const STEP_CONFIG = [
 ];
 
 export function BookingPage() {
-  const { currentStep, guests, activeGuestIndex, selectService } =
+  const { currentStep, guests, activeGuestIndex, toggleService } =
     useBookingStore();
-  const selectedService = guests[activeGuestIndex]?.selectedService;
+  const selectedServices = guests[activeGuestIndex]?.selectedServices ?? [];
 
   const { data } = useServices({ pageIndex: 1, pageSize: 100 });
   const services = useMemo(() => data?.data?.items || [], [data?.data?.items]);
@@ -37,17 +37,30 @@ export function BookingPage() {
     const pendingId = getPendingServiceId();
     if (!pendingId || services.length === 0) return;
 
-    if (selectedService?.id === pendingId) {
+    let alreadySelected = false;
+    for (let index = 0; index < selectedServices.length; index++) {
+      if (selectedServices[index].id === pendingId) {
+        alreadySelected = true;
+        break;
+      }
+    }
+    if (alreadySelected) {
       clearPendingServiceId();
       return;
     }
 
-    const found = services.find((s: ServiceListDto) => s.id === pendingId);
+    let found: ServiceListDto | undefined;
+    for (let index = 0; index < services.length; index++) {
+      if (services[index].id === pendingId) {
+        found = services[index];
+        break;
+      }
+    }
     if (found) {
-      selectService(found);
+      toggleService(found);
       clearPendingServiceId();
     }
-  }, [services, selectedService?.id, selectService]);
+  }, [services, selectedServices, toggleService]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });

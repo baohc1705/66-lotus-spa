@@ -1,4 +1,5 @@
 using _66SMS.API.Abstractions;
+using _66SMS.Application.BookingService.Appointments.Queries.GetCashierDaily;
 using _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentPosition;
 using _66SMS.Application.BookingService.Cashier.Commands.AssignAppointmentStaff;
 using _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppointment;
@@ -7,7 +8,6 @@ using _66SMS.Application.BookingService.Cashier.Commands.RescheduleAppointment;
 using _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentStatus;
 using _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn;
 using _66SMS.Application.BookingService.Cashier.Commands.VnPayReturn;
-using _66SMS.Application.BookingService.Cashier.Queries.GetCashierDaily;
 using _66SMS.Application.BookingService.Cashier.Queries.GetCashierPositions;
 using _66SMS.Application.BookingService.Cashier.Queries.GetCashierVnPayUrl;
 using _66SMS.Application.BookingService.Cashier.Queries.GetStaffAvailability;

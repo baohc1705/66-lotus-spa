@@ -1,4 +1,5 @@
-import type { BookingStatus, CashierBooking } from "../types";
+import { APPOINTMENT_STATUS } from "@/features/booking/constants/appointment.constants";
+import type { CashierBooking } from "../types";
 
 export type CashierCalendarStatus =
   | "pending"
@@ -45,16 +46,14 @@ const STATUS_FILTER_ORDER: CashierCalendarStatus[] = [
   "cancelled",
 ];
 
-export function toCalendarStatus(status: BookingStatus): CashierCalendarStatus {
-  if (status === "unpaid" || status === "paid") {
-    return "completed";
-  }
-  if (status === "not-arrived") {
+export function toCalendarStatus(status: number): CashierCalendarStatus {
+  if (status === APPOINTMENT_STATUS.CONFIRMED) return "confirmed";
+  if (status === APPOINTMENT_STATUS.WAITING || status === APPOINTMENT_STATUS.NO_SHOW) {
     return "waiting";
   }
-  if (CASHIER_STATUS_LABELS[status as CashierCalendarStatus]) {
-    return status as CashierCalendarStatus;
-  }
+  if (status === APPOINTMENT_STATUS.IN_SERVICE) return "in-progress";
+  if (status === APPOINTMENT_STATUS.COMPLETED) return "completed";
+  if (status === APPOINTMENT_STATUS.CANCELLED) return "cancelled";
   return "pending";
 }
 
@@ -269,6 +268,161 @@ export function getBookingContentLines(durationMins: number): 1 | 2 | 3 {
     return 2;
   }
   return 3;
+}
+
+export type DaySlotBookingLayout = {
+  primary: CashierBooking;
+  hidden: CashierBooking[];
+};
+
+function isCancelledCalendarBooking(booking: CashierBooking): boolean {
+  return toCalendarStatus(booking.status) === "cancelled";
+}
+
+function getBookingEndMins(booking: CashierBooking): number {
+  const startMins = timeToMins(booking.startTime);
+  const endMins = timeToMins(booking.endTime);
+  if (endMins <= startMins) {
+    return startMins + DEFAULT_SLOT_STEP_MINS;
+  }
+  return endMins;
+}
+
+export function splitPrimaryAndHiddenBookings(
+  bookings: CashierBooking[],
+): { primary: CashierBooking | null; hidden: CashierBooking[] } {
+  if (bookings.length === 0) {
+    return { primary: null, hidden: [] };
+  }
+
+  let primary = bookings[0];
+  for (let index = 1; index < bookings.length; index++) {
+    const booking = bookings[index];
+    const primaryCancelled = isCancelledCalendarBooking(primary);
+    const bookingCancelled = isCancelledCalendarBooking(booking);
+    if (primaryCancelled && !bookingCancelled) {
+      primary = booking;
+      continue;
+    }
+    if (!primaryCancelled && bookingCancelled) {
+      continue;
+    }
+    if (timeToMins(booking.startTime) < timeToMins(primary.startTime)) {
+      primary = booking;
+    }
+  }
+
+  const hidden: CashierBooking[] = [];
+  for (let index = 0; index < bookings.length; index++) {
+    if (bookings[index].id === primary.id) {
+      continue;
+    }
+    hidden.push(bookings[index]);
+  }
+
+  return { primary: primary, hidden: hidden };
+}
+
+export function groupOverlappingBookings(
+  bookings: CashierBooking[],
+): CashierBooking[][] {
+  if (bookings.length === 0) {
+    return [];
+  }
+
+  const sorted: CashierBooking[] = [];
+  for (let index = 0; index < bookings.length; index++) {
+    sorted.push(bookings[index]);
+  }
+  for (let i = 0; i < sorted.length; i++) {
+    for (let j = i + 1; j < sorted.length; j++) {
+      if (timeToMins(sorted[j].startTime) < timeToMins(sorted[i].startTime)) {
+        const temp = sorted[i];
+        sorted[i] = sorted[j];
+        sorted[j] = temp;
+      }
+    }
+  }
+
+  const groups: CashierBooking[][] = [];
+  let current: CashierBooking[] = [sorted[0]];
+  let currentEnd = getBookingEndMins(sorted[0]);
+
+  for (let index = 1; index < sorted.length; index++) {
+    const booking = sorted[index];
+    const startMins = timeToMins(booking.startTime);
+    const endMins = getBookingEndMins(booking);
+    if (startMins < currentEnd) {
+      current.push(booking);
+      if (endMins > currentEnd) {
+        currentEnd = endMins;
+      }
+    } else {
+      groups.push(current);
+      current = [booking];
+      currentEnd = endMins;
+    }
+  }
+  groups.push(current);
+  return groups;
+}
+
+export function buildDayStaffSlotLayout(
+  dayBookings: CashierBooking[],
+  staffId: string,
+  activeStatusIds: string[],
+  stepMins: number = DEFAULT_SLOT_STEP_MINS,
+): Record<string, DaySlotBookingLayout> {
+  const staffBookings: CashierBooking[] = [];
+  for (let index = 0; index < dayBookings.length; index++) {
+    const booking = dayBookings[index];
+    if (String(booking.staffId) !== staffId) {
+      continue;
+    }
+    const calendarStatus = toCalendarStatus(booking.status);
+    if (activeStatusIds.indexOf(calendarStatus) < 0) {
+      continue;
+    }
+    staffBookings.push(booking);
+  }
+
+  const groups = groupOverlappingBookings(staffBookings);
+  const layout: Record<string, DaySlotBookingLayout> = {};
+
+  for (let groupIndex = 0; groupIndex < groups.length; groupIndex++) {
+    const split = splitPrimaryAndHiddenBookings(groups[groupIndex]);
+    if (!split.primary) {
+      continue;
+    }
+    const slotTime = floorToSlot(split.primary.startTime, stepMins);
+    const existing = layout[slotTime];
+    if (!existing) {
+      layout[slotTime] = {
+        primary: split.primary,
+        hidden: split.hidden,
+      };
+      continue;
+    }
+
+    const merged: CashierBooking[] = [existing.primary];
+    for (let h = 0; h < existing.hidden.length; h++) {
+      merged.push(existing.hidden[h]);
+    }
+    merged.push(split.primary);
+    for (let h = 0; h < split.hidden.length; h++) {
+      merged.push(split.hidden[h]);
+    }
+    const mergedSplit = splitPrimaryAndHiddenBookings(merged);
+    if (!mergedSplit.primary) {
+      continue;
+    }
+    layout[slotTime] = {
+      primary: mergedSplit.primary,
+      hidden: mergedSplit.hidden,
+    };
+  }
+
+  return layout;
 }
 
 export function getBookingsForSlot(

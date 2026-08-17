@@ -144,7 +144,9 @@ export function BookingSuccessTicket() {
                   <div className="flex justify-between">
                     <span className="text-warm-600">Dịch vụ:</span>
                     <span className="font-semibold text-ink text-right max-w-[200px]">
-                      {guest.selectedService?.name || "—"}
+                      {(guest.selectedServices ?? [])
+                        .map((service) => service.name || "Dịch vụ")
+                        .join(", ") || "—"}
                     </span>
                   </div>
                   <div className="flex justify-between">

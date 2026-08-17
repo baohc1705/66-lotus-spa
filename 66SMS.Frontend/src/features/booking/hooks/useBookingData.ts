@@ -11,6 +11,21 @@ import type {
   GetTimeSlotsParams,
 } from "../types/booking.types";
 
+function hasServiceSelection(params: {
+  serviceId?: number;
+  serviceIds?: number[];
+}) {
+  if (params.serviceIds && params.serviceIds.length > 0) return true;
+  return !!params.serviceId;
+}
+
+function serviceKey(params: { serviceId?: number; serviceIds?: number[] }) {
+  if (params.serviceIds && params.serviceIds.length > 0) {
+    return params.serviceIds.join(",");
+  }
+  return params.serviceId ?? "";
+}
+
 export const useAvailableBookingDays = (days = 7) => {
   return useQuery({
     queryKey: ["booking-available-days", days],
@@ -31,11 +46,11 @@ export const useTechnicians = (params: GetTechniciansParams) => {
     queryKey: [
       "booking-technicians",
       params.date,
-      params.serviceId,
+      serviceKey(params),
       params.salonId,
     ],
     queryFn: () => bookingApi.getTechnicians(params),
-    enabled: !!params.date && !!params.serviceId,
+    enabled: !!params.date && hasServiceSelection(params),
   });
 };
 
@@ -51,12 +66,12 @@ export const useTimeSlots = (params: GetTimeSlotsParams) => {
     queryKey: [
       "booking-timeslots",
       params.date,
-      params.serviceId,
+      serviceKey(params),
       params.staffId,
       params.salonId,
     ],
     queryFn: () => bookingApi.getTimeSlots(params),
-    enabled: !!params.date && !!params.serviceId,
+    enabled: !!params.date && hasServiceSelection(params),
   });
 };
 

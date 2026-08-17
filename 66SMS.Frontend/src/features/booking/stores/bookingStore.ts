@@ -30,7 +30,7 @@ interface BookingState {
   setActiveGuest: (index: number) => void;
 
   updateActiveGuest: (updates: Partial<GuestBooking>) => void;
-  selectService: (service: ServiceDto) => void;
+  toggleService: (service: ServiceDto) => void;
   selectTechnician: (technician: TechnicianDTO | null) => void;
   selectDate: (date: Date) => void;
   selectTimeSlot: (timeSlot: TimeSlotDTO | null) => void;
@@ -47,7 +47,7 @@ interface BookingState {
 
 const createNewGuest = (id: number): GuestBooking => ({
   id,
-  selectedService: null,
+  selectedServices: [],
   selectedTechnician: null,
   selectedDate: null,
   selectedTimeSlot: null,
@@ -133,13 +133,27 @@ export const useBookingStore = create<BookingState>((set) => ({
       return { guests: newGuests };
     }),
 
-  selectService: (service) =>
+  toggleService: (service) =>
     set((state) => {
       const newGuests = [...state.guests];
-      newGuests[state.activeGuestIndex].selectedService = service;
-      newGuests[state.activeGuestIndex].selectedTechnician = null;
-      newGuests[state.activeGuestIndex].selectedTimeSlot = null;
-      newGuests[state.activeGuestIndex].lockId = undefined;
+      const guest = newGuests[state.activeGuestIndex];
+      const current = guest.selectedServices ?? [];
+      const nextServices: ServiceDto[] = [];
+      let found = false;
+      for (let index = 0; index < current.length; index++) {
+        if (current[index].id === service.id) {
+          found = true;
+          continue;
+        }
+        nextServices.push(current[index]);
+      }
+      if (!found) {
+        nextServices.push(service);
+      }
+      guest.selectedServices = nextServices;
+      guest.selectedTechnician = null;
+      guest.selectedTimeSlot = null;
+      guest.lockId = undefined;
       return { guests: newGuests, appliedPromotion: null, promotionCode: "" };
     }),
 

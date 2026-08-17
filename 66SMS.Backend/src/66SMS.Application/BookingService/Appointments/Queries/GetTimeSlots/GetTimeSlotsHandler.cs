@@ -16,20 +16,35 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetTimeSlots
 
         public async Task<Result<IReadOnlyList<BookingTimeSlotDto>>> Handle(GetTimeSlotsQuery request, CancellationToken cancellationToken)
         {
+            var serviceIds = request.ServiceIds;
+            if (serviceIds == null || serviceIds.Count == 0)
+            {
+                serviceIds = new List<int>();
+                if (request.ServiceId.HasValue && request.ServiceId.Value > 0)
+                    serviceIds.Add(request.ServiceId.Value);
+            }
+            if (serviceIds.Count == 0)
+                return Result<IReadOnlyList<BookingTimeSlotDto>>.Success([]);
+
             var rows = await appointmentSqlRepository.GetBookingTimeSlotsAsync(
                 (DateOnly)request.Date!,
-                (int)request.ServiceId!,
+                serviceIds,
                 request.StaffId,
                 request.SalonId,
                 cancellationToken);
 
-            var result = rows.Select(r => new BookingTimeSlotDto
+            var result = new List<BookingTimeSlotDto>();
+            for (var index = 0; index < rows.Count; index++)
             {
-                SlotId = r.SlotId,
-                Time = r.Time,
-                StartTime = r.Time,
-                Status = r.Status,
-            }).ToList();
+                var row = rows[index];
+                result.Add(new BookingTimeSlotDto
+                {
+                    SlotId = row.SlotId,
+                    Time = row.Time,
+                    StartTime = row.Time,
+                    Status = row.Status,
+                });
+            }
 
             return Result<IReadOnlyList<BookingTimeSlotDto>>.Success(result);
         }

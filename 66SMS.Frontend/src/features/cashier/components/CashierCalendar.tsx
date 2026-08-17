@@ -35,8 +35,9 @@ import {
   getBookingContentLines,
   getBookingDurationMins,
   getBookingSlotCount,
+  buildDayStaffSlotLayout,
+  type DaySlotBookingLayout,
   getBookingsForDaySlot,
-  getBookingsForSlot,
   getBookingsForStaffDay,
   getDayBookings,
   getFilteredBookingsForDay,
@@ -303,7 +304,7 @@ function BookingCard(props: {
       type="button"
       onClick={handleClick}
       className={
-        "absolute z-[1] box-border flex flex-col overflow-hidden rounded-sm border-0 p-2 text-left text-2xs hover:opacity-90 " +
+        "absolute z-1 box-border flex flex-col overflow-hidden rounded-sm border-0 p-2 text-left text-2xs hover:opacity-90 " +
         cardClass
       }
       style={cardStyle}
@@ -452,8 +453,87 @@ export function CashierCalendar(props: CashierCalendarProps) {
     return headers;
   }
 
+  function renderHiddenMoreButton(
+    cellKey: string,
+    hiddenBookings: CashierBooking[],
+  ) {
+    if (hiddenBookings.length === 0) {
+      return null;
+    }
+
+    const hiddenList = [];
+    for (let h = 0; h < hiddenBookings.length; h++) {
+      const hidden = hiddenBookings[h];
+      const hiddenName = hidden.customerName || "Khách";
+      const hiddenStatus = toCalendarStatus(hidden.status);
+      const hiddenCardClass = CASHIER_STATUS_CARD_CLASS[hiddenStatus];
+      const statusLabel = CASHIER_STATUS_LABELS[hiddenStatus] || "";
+
+      let textClass = "text-kit-white";
+      if (hiddenStatus === "waiting") {
+        textClass = "text-kit-on-warning";
+      }
+
+      hiddenList.push(
+        <button
+          key={hidden.id}
+          type="button"
+          className={
+            "mb-1 block w-full truncate rounded border px-2 py-1.5 text-left text-2xs last:mb-0 hover:opacity-90 " +
+            hiddenCardClass
+          }
+          title={hiddenName + " · " + statusLabel}
+          onClick={(event: { stopPropagation(): void }) => {
+            event.stopPropagation();
+            setHiddenMenuNonce(hiddenMenuNonce + 1);
+            onBookingClick(hidden);
+          }}
+        >
+          <span className={textClass}>
+            {hidden.startTime} ~ {hidden.endTime}{" "}
+            <span className="font-bold">{hiddenName}</span>
+          </span>
+        </button>,
+      );
+    }
+
+    return (
+      <div
+        className="absolute bottom-1 right-1 z-10"
+        onClick={(event: { stopPropagation(): void }) => {
+          event.stopPropagation();
+        }}
+      >
+        <Popover
+          key={"day-slot-more-" + cellKey + "-" + hiddenMenuNonce}
+          placement="top"
+          align="end"
+          title="Lịch ẩn"
+          contentClassName="max-h-64 overflow-y-auto p-1.5"
+          trigger={
+            <span className="rounded bg-kit-primary px-1.5 py-0.5 text-2xs font-bold text-kit-white shadow hover:bg-blue-700">
+              +{hiddenBookings.length}
+            </span>
+          }
+          content={hiddenList}
+        />
+      </div>
+    );
+  }
+
   function renderSlotRows() {
     const rows = [];
+    const staffLayouts: Record<string, Record<string, DaySlotBookingLayout>> =
+      {};
+    for (let colIndex = 0; colIndex < columns.length; colIndex++) {
+      const staffId = String(columns[colIndex].id);
+      staffLayouts[staffId] = buildDayStaffSlotLayout(
+        dayBookings,
+        staffId,
+        activeStatusIds,
+        stepMins,
+      );
+    }
 
     for (let slotIndex = 0; slotIndex < slotRows.length; slotIndex++) {
       const slotTime = slotRows[slotIndex];
@@ -461,46 +541,44 @@ export function CashierCalendar(props: CashierCalendarProps) {
 
       for (let colIndex = 0; colIndex < columns.length; colIndex++) {
         const column = columns[colIndex];
-        const cellBookings = getBookingsForSlot(
-          dayBookings,
-          String(column.id),
-          slotTime,
-          activeStatusIds,
-          stepMins,
-        );
+        const staffId = String(column.id);
+        const cellKey = staffId + "-" + slotTime;
+        const slotLayout = staffLayouts[staffId][slotTime];
 
-        const cards = [];
-        for (let b = 0; b < cellBookings.length; b++) {
-          const booking = cellBookings[b];
-          cards.push(
+        let card = null;
+        let moreButton = null;
+        if (slotLayout) {
+          card = (
             <BookingCard
-              key={booking.id}
-              booking={booking}
+              key={slotLayout.primary.id}
+              booking={slotLayout.primary}
               stepMins={stepMins}
-              onClick={() => onBookingClick(booking)}
-            />,
+              onClick={() => onBookingClick(slotLayout.primary)}
+            />
           );
+          moreButton = renderHiddenMoreButton(cellKey, slotLayout.hidden);
         }
 
         cells.push(
           <TableCell
-            key={String(column.id) + "-" + slotTime}
+            key={cellKey}
             className="relative overflow-visible p-0! align-top"
             style={{ height: SLOT_ROW_HEIGHT_PX + "px" }}
           >
             <div
               className="relative h-full w-full cursor-pointer hover:bg-kit-primary/5"
               onClick={() => {
-                const staffId = Number(column.id);
-                if (Number.isNaN(staffId)) {
+                const parsedStaffId = Number(column.id);
+                if (Number.isNaN(parsedStaffId)) {
                   return;
                 }
                 if (onEmptySlotClick) {
-                  onEmptySlotClick(staffId, slotTime);
+                  onEmptySlotClick(parsedStaffId, slotTime);
                 }
               }}
             >
-              {cards}
+              {card}
+              {moreButton}
             </div>
           </TableCell>,
         );

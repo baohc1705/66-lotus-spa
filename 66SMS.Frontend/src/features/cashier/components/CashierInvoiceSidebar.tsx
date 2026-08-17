@@ -28,11 +28,11 @@ import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { useTimeSlots } from "@/features/booking/hooks/useBookingData";
 import type { TimeSlotDTO } from "@/features/booking/types/booking.types";
 import { filterSlotsAfterNow } from "@/features/booking/utils/timeSlot.utils";
+import { AppointmentServicesTable } from "@/features/booking/components/AppointmentServicesTable";
 import { cashierApi } from "../api/cashier.api";
 import { CASHIER_POSITIONS } from "../cashierQueryKey";
 import { useStaffAvailability } from "../hooks/useStaffAvailability";
 import type {
-  BookingStatus,
   CashierBooking,
   StaffAvailabilityDto,
 } from "../types";
@@ -94,20 +94,6 @@ const STATUS_OPTIONS: StatusOption[] = [
     dotClass: "bg-kit-danger",
   },
 ];
-
-function toBackendStatus(status: BookingStatus): number {
-  if (status === "pending") return APPOINTMENT_STATUS.PENDING;
-  if (status === "confirmed") return APPOINTMENT_STATUS.CONFIRMED;
-  if (status === "not-arrived" || status === "waiting") {
-    return APPOINTMENT_STATUS.WAITING;
-  }
-  if (status === "in-progress") return APPOINTMENT_STATUS.IN_SERVICE;
-  if (status === "completed" || status === "unpaid" || status === "paid") {
-    return APPOINTMENT_STATUS.COMPLETED;
-  }
-  if (status === "cancelled") return APPOINTMENT_STATUS.CANCELLED;
-  return APPOINTMENT_STATUS.PENDING;
-}
 
 function isStatusOptionDisabled(
   currentStatus: number,
@@ -208,13 +194,15 @@ function CashierInvoiceSidebarForm({
   isPaying = false,
   salonId,
 }: FormProps) {
-  const [selectedStatus, setSelectedStatus] = useState(() =>
-    toBackendStatus(booking.status),
-  );
+  const [selectedStatus, setSelectedStatus] = useState(() => booking.status);
   const [note, setNote] = useState(() => booking.note ?? "");
-  const [selectedPositionId, setSelectedPositionId] = useState<number | null>(
-    () => booking.positionId ?? null,
-  );
+  const [positionOverride, setPositionOverride] = useState<
+    number | null | undefined
+  >(undefined);
+  const selectedPositionId =
+    positionOverride !== undefined
+      ? positionOverride
+      : (booking.positionId ?? null);
   const [selectedStaffId, setSelectedStaffId] = useState(() =>
     String(booking.staffId ?? ""),
   );
@@ -222,14 +210,12 @@ function CashierInvoiceSidebarForm({
   const [editSlotId, setEditSlotId] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  const currentBackendStatus = toBackendStatus(booking.status);
-  const canEditAssignment =
-    booking.status === "not-arrived" || booking.status === "waiting";
+  const currentBackendStatus = booking.status;
+  const canEditAssignment = booking.status === APPOINTMENT_STATUS.WAITING;
   const canReschedule =
-    booking.status === "pending" ||
-    booking.status === "confirmed" ||
-    booking.status === "waiting" ||
-    booking.status === "not-arrived";
+    booking.status === APPOINTMENT_STATUS.PENDING ||
+    booking.status === APPOINTMENT_STATUS.CONFIRMED ||
+    booking.status === APPOINTMENT_STATUS.WAITING;
 
   const bookingDateObj = useMemo(() => {
     const source = editDate || booking.bookingDate;
@@ -241,10 +227,24 @@ function CashierInvoiceSidebarForm({
     return new Date(year, month - 1, day);
   }, [editDate, booking.bookingDate]);
 
+  const bookingServiceIds: number[] = [];
+  if (booking.serviceIds && booking.serviceIds.length > 0) {
+    for (let index = 0; index < booking.serviceIds.length; index++) {
+      bookingServiceIds.push(booking.serviceIds[index]);
+    }
+  } else if (booking.services) {
+    for (let index = 0; index < booking.services.length; index++) {
+      const serviceId = booking.services[index].serviceId;
+      if (serviceId) bookingServiceIds.push(serviceId);
+    }
+  } else if (booking.serviceId) {
+    bookingServiceIds.push(booking.serviceId);
+  }
+
   const staffIdForSlots = Number(booking.staffId);
   const rescheduleSlotsQuery = useTimeSlots({
     date: canReschedule ? editDate || undefined : undefined,
-    serviceId: canReschedule ? (booking.serviceId ?? undefined) : undefined,
+    serviceIds: canReschedule ? bookingServiceIds : undefined,
     staffId:
       canReschedule && !Number.isNaN(staffIdForSlots) && staffIdForSlots > 0
         ? staffIdForSlots
@@ -262,7 +262,7 @@ function CashierInvoiceSidebarForm({
       canEditAssignment && !booking.startTime
         ? (booking.bookingDate ?? undefined)
         : undefined,
-    serviceId: booking.serviceId ?? undefined,
+    serviceIds: bookingServiceIds,
     salonId: salonId ?? undefined,
   });
 
@@ -298,16 +298,23 @@ function CashierInvoiceSidebarForm({
     canEditAssignment,
     bookingDateObj,
     resolvedStartTime,
-    booking.serviceId ?? null,
+    bookingServiceIds,
     salonId,
   );
 
   const positionsQuery = useQuery({
-    queryKey: [CASHIER_POSITIONS, salonId, editDate || booking.bookingDate],
+    queryKey: [
+      CASHIER_POSITIONS,
+      salonId,
+      editDate || booking.bookingDate,
+      booking.id,
+    ],
     queryFn: async () => {
+      const appointmentId = Number(booking.id);
       const res = await cashierApi.getPositions(
         salonId,
         editDate || booking.bookingDate,
+        Number.isNaN(appointmentId) ? null : appointmentId,
       );
       return res.data ?? [];
     },
@@ -347,16 +354,30 @@ function CashierInvoiceSidebarForm({
   const positionOptions = useMemo(() => {
     const list = positionsQuery.data ?? [];
     const options: { value: string; label: string }[] = [];
+    const seen = new Set<string>();
+
+    if (booking.positionId != null) {
+      const currentValue = String(booking.positionId);
+      options.push({
+        value: currentValue,
+        label: booking.positionName || "Vị trí #" + booking.positionId,
+      });
+      seen.add(currentValue);
+    }
+
     for (let index = 0; index < list.length; index++) {
       const pos = list[index];
       if (!pos.isSelectable && pos.id !== booking.positionId) continue;
+      const value = String(pos.id);
+      if (seen.has(value)) continue;
+      seen.add(value);
       options.push({
-        value: String(pos.id),
+        value,
         label: pos.roomName + " — " + pos.name + " — " + pos.statusLabel,
       });
     }
     return options;
-  }, [positionsQuery.data, booking.positionId]);
+  }, [positionsQuery.data, booking.positionId, booking.positionName]);
 
   const durationMins = useMemo(
     () => calcDurationMins(booking.startTime, booking.endTime),
@@ -367,8 +388,9 @@ function CashierInvoiceSidebarForm({
   const isCompleted = currentBackendStatus === APPOINTMENT_STATUS.COMPLETED;
   const canPayInvoice =
     !!onPayInvoice &&
+    booking.remainingAmount != null &&
     booking.remainingAmount > 0 &&
-    (booking.status === "unpaid" || booking.status === "completed");
+    booking.status === APPOINTMENT_STATUS.COMPLETED;
 
   const handleSave = async () => {
     if (isSaving) return;
@@ -508,7 +530,7 @@ function CashierInvoiceSidebarForm({
   function renderRescheduleSlots() {
     if (!canReschedule) return null;
 
-    if (!editDate || !booking.serviceId) {
+    if (!editDate || bookingServiceIds.length === 0) {
       return (
         <p className="rounded border border-dashed border-kit py-3 text-center text-xs text-kit-muted">
           Chọn ngày để xem khung giờ trống
@@ -632,7 +654,7 @@ function CashierInvoiceSidebarForm({
       );
     }
 
-    if (!resolvedStartTime || !booking.serviceId) {
+    if (!resolvedStartTime || bookingServiceIds.length === 0) {
       return (
         <p className="text-xs text-kit-muted">
           Thiếu dịch vụ để lọc NV rảnh
@@ -675,7 +697,7 @@ function CashierInvoiceSidebarForm({
       <SearchableSelect
         value={selectedPositionId != null ? String(selectedPositionId) : ""}
         onChange={(value) =>
-          setSelectedPositionId(value ? Number(value) : null)
+          setPositionOverride(value ? Number(value) : null)
         }
         options={positionOptions}
         placeholder="Chọn vị trí..."
@@ -693,7 +715,7 @@ function CashierInvoiceSidebarForm({
   let depositLabel = "Chưa cọc";
   if (booking.depositPaid) {
     depositLabel = formatCurrency(
-      Math.min(booking.paidAmount, booking.depositAmount),
+      Math.min(booking.paidAmount ?? 0, booking.depositAmount ?? 0),
     );
   }
 
@@ -830,10 +852,14 @@ function CashierInvoiceSidebarForm({
               </FormField>
             ) : null}
 
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <FormField label="Dịch vụ">
-                <Input value={booking.serviceName || "—"} readOnly />
-              </FormField>
+            <FormField label="Dịch vụ">
+              <AppointmentServicesTable
+                services={booking.services ?? []}
+                startTime={booking.startTime}
+              />
+            </FormField>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <FormField label="Nhân viên">{renderStaffField()}</FormField>
               <FormField label="Chỗ ngồi">
                 {renderPositionField()}
@@ -842,14 +868,14 @@ function CashierInvoiceSidebarForm({
 
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <FormField label="Tổng tiền">
-                <Input value={formatCurrency(booking.totalAmount)} readOnly />
+                <Input value={formatCurrency(booking.totalAmount ?? 0)} readOnly />
               </FormField>
               <FormField label="Đã thu">
-                <Input value={formatCurrency(booking.paidAmount)} readOnly />
+                <Input value={formatCurrency(booking.paidAmount ?? 0)} readOnly />
               </FormField>
               <FormField label="Còn lại">
                 <Input
-                  value={formatCurrency(booking.remainingAmount)}
+                  value={formatCurrency(booking.remainingAmount ?? 0)}
                   readOnly
                 />
               </FormField>

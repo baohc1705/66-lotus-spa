@@ -29,7 +29,6 @@ import type { CustomerDto } from "@/features/customers/types/customer.types";
 import { useSalons } from "@/features/salons/hooks/useSalons";
 import type { SalonListItem } from "@/features/salons/types/salon.types";
 import { useServices } from "@/features/services/hooks/useServices";
-import type { ServiceDto } from "@/features/services/types/service.types";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/elements/Button";
 import { FormField } from "@/shared/forms/FormField";
@@ -70,7 +69,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
   const [createCustomerOpen, setCreateCustomerOpen] = useState(false);
 
   const [salonId, setSalonId] = useState<number | null>(defaultSalonId);
-  const [serviceId, setServiceId] = useState<number | null>(null);
+  const [selectedServiceIds, setSelectedServiceIds] = useState<number[]>([]);
   const [appointmentDate, setAppointmentDate] = useState(todayInputValue());
   const [selectedTechnician, setSelectedTechnician] =
     useState<TechnicianDTO | null>(null);
@@ -105,16 +104,22 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
       ? selectedTechnician.id
       : undefined;
 
+  const hasSelectedServices = selectedServiceIds.length > 0;
+
   const techniciansQuery = useTechnicians({
     date: appointmentDate ?? undefined,
-    serviceId: serviceId ?? undefined,
+    serviceIds: selectedServiceIds,
     salonId: salonId ?? undefined,
   });
   const technicians = techniciansQuery.data ?? [];
+  const noComboStaff =
+    hasSelectedServices &&
+    !techniciansQuery.isLoading &&
+    technicians.length === 0;
 
   const timeSlotsQuery = useTimeSlots({
     date: appointmentDate ?? undefined,
-    serviceId: serviceId ?? undefined,
+    serviceIds: selectedServiceIds,
     staffId: technicianIdForApi,
     salonId: salonId ?? undefined,
   });
@@ -144,19 +149,43 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
     [salonItems],
   );
 
-  const serviceOptions = useMemo(
-    () =>
-      serviceItems
-        .filter((s: ServiceDto) => s.id != null)
-        .map((s: ServiceDto) => {
-          const parts = [s.name ?? ""];
-          if (s.durationMins) parts.push(`${s.durationMins} phút`);
-          if (s.sellingPrice != null)
-            parts.push(`${s.sellingPrice.toLocaleString("vi-VN")}đ`);
-          return { value: String(s.id), label: parts.join(" · ") };
-        }),
-    [serviceItems],
-  );
+  const serviceOptions = useMemo(() => {
+    const options: { value: string; label: string }[] = [];
+    for (let index = 0; index < serviceItems.length; index++) {
+      const service = serviceItems[index];
+      if (service.id == null) continue;
+      let alreadySelected = false;
+      for (let selectedIndex = 0; selectedIndex < selectedServiceIds.length; selectedIndex++) {
+        if (selectedServiceIds[selectedIndex] === service.id) {
+          alreadySelected = true;
+          break;
+        }
+      }
+      if (alreadySelected) continue;
+      const parts = [service.name ?? ""];
+      if (service.durationMins) parts.push(`${service.durationMins} phút`);
+      if (service.sellingPrice != null)
+        parts.push(`${service.sellingPrice.toLocaleString("vi-VN")}đ`);
+      options.push({ value: String(service.id), label: parts.join(" · ") });
+    }
+    return options;
+  }, [serviceItems, selectedServiceIds]);
+
+  const selectedServiceLabels = useMemo(() => {
+    const labels: { id: number; label: string }[] = [];
+    for (let selectedIndex = 0; selectedIndex < selectedServiceIds.length; selectedIndex++) {
+      const id = selectedServiceIds[selectedIndex];
+      let label = `Dịch vụ #${id}`;
+      for (let index = 0; index < serviceItems.length; index++) {
+        if (serviceItems[index].id === id) {
+          label = serviceItems[index].name ?? label;
+          break;
+        }
+      }
+      labels.push({ id, label });
+    }
+    return labels;
+  }, [selectedServiceIds, serviceItems]);
 
   const positionOptions = useMemo(
     () => [
@@ -216,8 +245,30 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
     setPositionId(null);
   };
 
-  const handleServiceChange = (value: string) => {
-    setServiceId(value ? Number(value) : null);
+  const handleServiceAdd = (value: string) => {
+    if (!value) return;
+    const id = Number(value);
+    if (!id || Number.isNaN(id)) return;
+    let exists = false;
+    for (let index = 0; index < selectedServiceIds.length; index++) {
+      if (selectedServiceIds[index] === id) {
+        exists = true;
+        break;
+      }
+    }
+    if (exists) return;
+    setSelectedServiceIds([...selectedServiceIds, id]);
+    setSelectedTechnician(null);
+    setSlotId(null);
+  };
+
+  const handleServiceRemove = (id: number) => {
+    const next: number[] = [];
+    for (let index = 0; index < selectedServiceIds.length; index++) {
+      if (selectedServiceIds[index] === id) continue;
+      next.push(selectedServiceIds[index]);
+    }
+    setSelectedServiceIds(next);
     setSelectedTechnician(null);
     setSlotId(null);
   };
@@ -229,7 +280,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
 
   const handleCreateAnother = () => {
     setSuccess(false);
-    setServiceId(null);
+    setSelectedServiceIds([]);
     setSelectedTechnician(null);
     setSlotId(null);
     setPositionId(null);
@@ -249,8 +300,14 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
       setFormError("Vui lòng chọn chi nhánh");
       return;
     }
-    if (!serviceId) {
-      setFormError("Vui lòng chọn dịch vụ");
+    if (selectedServiceIds.length === 0) {
+      setFormError("Vui lòng chọn ít nhất 1 dịch vụ");
+      return;
+    }
+    if (noComboStaff) {
+      setFormError(
+        "Không có kỹ thuật viên nào thực hiện được tất cả dịch vụ đã chọn. Vui lòng bớt dịch vụ hoặc đặt tách lịch.",
+      );
       return;
     }
     if (!appointmentDate) {
@@ -265,6 +322,14 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
     const slotStartTime =
       selectedTimeSlot?.startTime || selectedTimeSlot?.time || undefined;
 
+    const servicesPayload: { serviceId: number; quantity: number }[] = [];
+    for (let index = 0; index < selectedServiceIds.length; index++) {
+      servicesPayload.push({
+        serviceId: selectedServiceIds[index],
+        quantity: 1,
+      });
+    }
+
     try {
       const lockResult = await createSlotLockMutation.mutateAsync({
         locks: [
@@ -276,7 +341,8 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
               : (selectedTechnician?.id ?? null),
             positionId: positionId,
             appointmentDate,
-            serviceId,
+            serviceId: selectedServiceIds[0],
+            serviceIds: selectedServiceIds,
             salonId,
           },
         ],
@@ -301,7 +367,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
             salonId,
             positionId: positionId ?? undefined,
             note: note.trim() || undefined,
-            services: [{ serviceId, quantity: 1 }],
+            services: servicesPayload,
           },
         ],
       });
@@ -626,36 +692,54 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                 </FormField>
               </FormRow>
 
-              <FormField label="Dịch vụ" required>
+              <FormField
+                label="Dịch vụ"
+                required
+                help="Có thể chọn nhiều dịch vụ; một kỹ thuật viên sẽ làm hết combo"
+              >
                 <SearchableSelect
-                  value={serviceId ? String(serviceId) : ""}
-                  onChange={handleServiceChange}
+                  value=""
+                  onChange={handleServiceAdd}
                   options={serviceOptions}
-                  placeholder="Chọn dịch vụ"
+                  placeholder="Thêm dịch vụ..."
                   searchPlaceholder="Tìm dịch vụ..."
                   className="w-full"
                 />
+                {selectedServiceLabels.length > 0 ? (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {selectedServiceLabels.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleServiceRemove(item.id)}
+                        className="rounded-full border border-kit bg-kit-page px-3 py-1 text-xs font-semibold text-kit-ink hover:border-kit-danger hover:text-kit-danger"
+                        title="Bỏ dịch vụ này"
+                      >
+                        {item.label} ×
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
               </FormField>
 
               <FormField label="Nhân viên phục vụ">
-                {!serviceId ? (
+                {!hasSelectedServices ? (
                   <p className="rounded border border-dashed border-kit py-3 text-center text-xs text-kit-muted">
                     Chọn dịch vụ để xem kỹ thuật viên phù hợp
                   </p>
                 ) : null}
-                {serviceId && techniciansQuery.isLoading ? (
+                {hasSelectedServices && techniciansQuery.isLoading ? (
                   <p className="py-3 text-center text-xs text-kit-muted">
                     Đang tải kỹ thuật viên...
                   </p>
                 ) : null}
-                {serviceId &&
-                !techniciansQuery.isLoading &&
-                technicians.length === 0 ? (
+                {noComboStaff ? (
                   <p className="rounded border border-kit bg-kit-page py-3 text-center text-xs text-kit-muted">
-                    Không có kỹ thuật viên làm việc trong ngày này
+                    Không có kỹ thuật viên nào thực hiện được tất cả dịch vụ đã
+                    chọn. Vui lòng bớt dịch vụ hoặc đặt tách lịch.
                   </p>
                 ) : null}
-                {serviceId &&
+                {hasSelectedServices &&
                 !techniciansQuery.isLoading &&
                 technicians.length > 0
                   ? renderTechnicianList()
@@ -686,28 +770,36 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                   </span>
                 </div>
 
-                {!serviceId || !appointmentDate ? (
+                {!hasSelectedServices || !appointmentDate ? (
                   <p className="rounded border border-dashed border-kit py-3 text-center text-xs text-kit-muted">
                     Chọn dịch vụ và ngày để xem khung giờ
                   </p>
                 ) : null}
-                {serviceId &&
+                {noComboStaff ? (
+                  <p className="rounded border border-kit bg-kit-page py-3 text-center text-xs text-kit-muted">
+                    Không thể chọn giờ khi chưa có kỹ thuật viên phù hợp combo
+                  </p>
+                ) : null}
+                {hasSelectedServices &&
                 appointmentDate &&
+                !noComboStaff &&
                 timeSlotsQuery.isLoading ? (
                   <p className="py-3 text-center text-xs text-kit-muted">
                     Đang tải khung giờ...
                   </p>
                 ) : null}
-                {serviceId &&
+                {hasSelectedServices &&
                 appointmentDate &&
+                !noComboStaff &&
                 !timeSlotsQuery.isLoading &&
                 timeSlots.length === 0 ? (
                   <p className="rounded border border-kit bg-kit-page py-3 text-center text-xs text-kit-muted">
                     Không có khung giờ trong ngày này
                   </p>
                 ) : null}
-                {serviceId &&
+                {hasSelectedServices &&
                 appointmentDate &&
+                !noComboStaff &&
                 !timeSlotsQuery.isLoading &&
                 timeSlots.length > 0
                   ? renderTimeSlotList()

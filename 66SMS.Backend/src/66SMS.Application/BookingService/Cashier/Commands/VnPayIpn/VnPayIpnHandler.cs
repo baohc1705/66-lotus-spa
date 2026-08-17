@@ -4,6 +4,7 @@ using _66SMS.Contract.Abstractions;
 using _66SMS.Contract.Constants;
 using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Messages;
+using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
 using _66SMS.Domain.Constants;
@@ -307,18 +308,28 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayIpn
             if (startTime is null)
                 return;
 
-            var serviceName = appointment.Services != null && appointment.Services.Any()
-                ? string.Join(", ", appointment.Services.Where(s => s.Service != null).Select(s => s.Service!.Name))
-                : null;
+            var serviceLines = new List<MailAppointmentServiceLine>();
+            if (appointment.Services != null)
+            {
+                foreach (var appService in appointment.Services)
+                {
+                    serviceLines.Add(new MailAppointmentServiceLine
+                    {
+                        Name = appService.Service != null ? appService.Service.Name : "Dịch vụ",
+                        DurationMins = appService.DurationSnapshot * appService.Quantity,
+                        Price = appService.PriceSnapshot * appService.Quantity,
+                    });
+                }
+            }
 
             var mail = emailTemplateFactory.CreateDepositInvoiceEmail(
                 customerEmail,
                 appointment.CreatedByUser?.Customer?.FullName ?? appointment.CreatedByUser?.Username,
-                serviceName,
                 appointment.AppointmentDate.ToDateTime(startTime.Value),
                 appointment.PaidAmount,
                 appointment.TotalAmount - appointment.PaidAmount,
-                invoice.InvoiceCode);
+                invoice.InvoiceCode,
+                serviceLines);
 
             await domainEventPublisher.PublishAsync(new SendEmailEvent
             {
