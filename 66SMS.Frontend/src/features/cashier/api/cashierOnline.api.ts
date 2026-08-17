@@ -6,6 +6,7 @@ import { type PagedResult, type Result } from "@/shared/types/common.types";
 export type GetOnlineAppointmentParams = {
   pageIndex?: number;
   pageSize?: number;
+  salonId?: number | null;
 };
 
 const EMPTY_PAGED: PagedResult<AppointmentDto> = {
@@ -24,6 +25,7 @@ export const cashierOnlineApi = {
   ): Promise<PagedResult<AppointmentDto>> => {
     const pageIndex = params.pageIndex ?? 1;
     const pageSize = params.pageSize ?? 20;
+    const salonId = params.salonId;
     const res = await axiosInstance.get<Result<PagedResult<AppointmentDto>>>(
       "/appointment",
       {
@@ -31,6 +33,7 @@ export const cashierOnlineApi = {
           Status: APPOINTMENT_STATUS.PENDING,
           pageIndex,
           pageSize,
+          ...(salonId !== undefined && salonId !== null ? { salonId } : {}),
         },
       },
     );

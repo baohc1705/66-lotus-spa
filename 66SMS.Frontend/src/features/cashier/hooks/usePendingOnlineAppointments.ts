@@ -36,7 +36,8 @@ export function usePendingOnlineAppointments(
 ) {
   return useQuery({
     queryKey: [CASHIER_PENDING_ONLINE, salonId ?? null, pageIndex, pageSize],
-    queryFn: () => cashierOnlineApi.getPendingList({ pageIndex, pageSize }),
+    queryFn: () =>
+      cashierOnlineApi.getPendingList({ pageIndex, pageSize, salonId }),
     enabled,
     staleTime: 0,
   });
@@ -49,7 +50,7 @@ export function usePendingOnlineCount(
   return useQuery({
     queryKey: [CASHIER_PENDING_ONLINE_COUNT, salonId ?? null],
     queryFn: () =>
-      cashierOnlineApi.getPendingList({ pageIndex: 1, pageSize: 1 }),
+      cashierOnlineApi.getPendingList({ pageIndex: 1, pageSize: 1, salonId }),
     select: (data) => data.totalCount ?? 0,
     enabled,
     staleTime: 0,
