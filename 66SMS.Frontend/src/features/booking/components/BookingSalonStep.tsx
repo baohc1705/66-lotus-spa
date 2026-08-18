@@ -3,8 +3,16 @@ import { FallbackImage } from "@/shared/components/FallbackImage";
 import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
 import { useBookingStore } from "../stores/bookingStore";
 
+// Bước 1: chọn chi nhánh.
+// Làm ở đây vì kỹ thuật viên / khung giờ phụ thuộc salon.
+// Nếu bỏ bước này thì API giờ/KTV thiếu salonId sẽ sai dữ liệu.
 export function BookingSalonStep() {
-  const { selectedSalon, selectSalon, nextStep } = useBookingStore();
+  const selectedSalon = useBookingStore((state) => state.selectedSalon);
+  const selectSalon = useBookingStore((state) => state.selectSalon);
+  const nextStep = useBookingStore((state) => state.nextStep);
+
+  // Hook lấy salon đang hoạt động từ API.
+  // data mặc định [] để khỏi check undefined mỗi lần render.
   const { data: salons = [], isLoading } = useActiveSalons();
 
   return (
@@ -26,6 +34,7 @@ export function BookingSalonStep() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {salons.map((salon) => {
             const isSelected = selectedSalon?.id === salon.id;
+
             return (
               <div
                 key={salon.id}
@@ -43,7 +52,7 @@ export function BookingSalonStep() {
                     alt={salon.name}
                     className="w-full h-36 object-cover"
                   />
-
+                  
                   {isSelected && (
                     <div className="absolute top-2 right-2 w-7 h-7 bg-rose-600 rounded-full flex items-center justify-center shadow-xs">
                       <Check className="w-4 h-4 text-white" />
@@ -89,6 +98,7 @@ export function BookingSalonStep() {
       )}
 
       <div className="flex justify-end">
+        {/* Không chọn salon thì disable. Nếu bỏ disabled, bước sau gọi API thiếu salonId. */}
         <button
           onClick={nextStep}
           disabled={!selectedSalon}

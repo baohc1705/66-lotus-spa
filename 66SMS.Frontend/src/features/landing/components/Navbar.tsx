@@ -10,9 +10,9 @@ const NAV_ITEMS = [
   { label: "Giới thiệu", href: "#about" },
   { label: "Dịch vụ", href: "#services" },
   { label: "Sản phẩm", href: "#products" },
-  { label: "Phòng riêng", href: "#space" },
-  { label: "Đánh giá", href: "#testimonials" },
-  { label: "Câu hỏi", href: "#faq" },
+  // { label: "Phòng riêng", href: "#space" },
+  // { label: "Đánh giá", href: "#testimonials" },
+  // { label: "Câu hỏi", href: "#faq" },
 ];
 
 interface NavbarProps {

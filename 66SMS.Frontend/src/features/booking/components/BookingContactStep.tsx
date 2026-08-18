@@ -22,6 +22,9 @@ import {
 import type { GuestAppointmentDto } from "../types/booking.types";
 import { formatDate } from "@/shared/utils/date.utils";
 
+// Bước 4: nhập liên hệ rồi gọi API đặt lịch.
+// FE chỉ gom input + gọi API. Lock/tính tiền/validate chỗ trống do .NET xử lý.
+// Số cọc/giảm giá hiện trên UI chỉ để xem trước, không phải số chốt.
 export function BookingContactStep() {
   const {
     guests,
@@ -36,6 +39,7 @@ export function BookingContactStep() {
     setGuestLockId,
   } = useBookingStore();
 
+  // Chặn bấm 2 lần khi API đang chạy.
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { mutateAsync: createSlotLockMutation } = useCreateSlotLock();
   const { mutateAsync: releaseSlotLockMutation } = useReleaseSlotLock();
@@ -44,6 +48,8 @@ export function BookingContactStep() {
   const accessToken = useAuthStore((s) => s.accessToken);
   const membershipCardQuery = useMyMembershipCard(!!accessToken);
   const tiersQuery = useMembershipTiers();
+
+  // % cọc lấy từ API config salon để hiện UI. Số thật lúc thanh toán do server quyết.
   const configQuery = useConfigAppointmentBySalon(selectedSalon?.id);
   const depositPercent =
     configQuery.data?.isSuccess === true
@@ -63,6 +69,8 @@ export function BookingContactStep() {
   );
   const membershipPercent = membershipTier?.discountPercent ?? 0;
 
+  // react-hook-form + zod: validate tên/sđt trước khi gọi API.
+  // mode onChange = hiện lỗi ngay khi gõ. Đổi onBlur nếu muốn đỡ spam lỗi.
   const {
     register,
     handleSubmit,
@@ -79,6 +87,7 @@ export function BookingContactStep() {
   });
 
   const onSubmit = async (data: BookingContactFormValues) => {
+    // Mọi khách trong đơn phải đủ dịch vụ + ngày + giờ.
     const invalidGuests = guests.filter(
       (g) =>
         (g.selectedServices?.length ?? 0) === 0 ||
@@ -104,6 +113,8 @@ export function BookingContactStep() {
       setIsSubmitting(true);
       setContactInfo(data);
 
+      // Gọi API lock trước, rồi create booking. Logic giữ chỗ / trùng giờ nằm ở .NET.
+      // Fail thì gọi release. FE không tự tính chỗ trống.
       const lockRes = await createSlotLockMutation({
         locks: guests.map((g) => {
           const serviceIds: number[] = [];
@@ -139,6 +150,8 @@ export function BookingContactStep() {
         }
       });
 
+      // 2) Tạo booking kèm lockId vừa nhận.
+      // Note chỉ gắn khách đầu để khỏi nhân đôi ghi chú.
       const payload: GuestAppointmentDto[] = guests.map((guest, index: number) => {
         const isFirstGuest = index === 0;
         const customerNote = data.note?.trim();
@@ -168,10 +181,12 @@ export function BookingContactStep() {
       });
 
       if (result.success) {
+        // Lưu id để màn success lọc đúng lịch vừa tạo.
         setCreatedBookingIds(result.bookingIds || []);
         toast.success("Đặt lịch thành công!");
         nextStep();
       } else if (lockedIds.length > 0) {
+        // Booking fail: trả lại slot.
         await releaseSlotLockMutation(lockedIds).catch(() => undefined);
       }
     } catch {
