@@ -28,6 +28,7 @@ import {
   Calendar1Icon,
   Home,
   Scissors,
+  TestTube,
 } from "lucide-react";
 
 export interface SubMenuItem {
@@ -94,7 +95,7 @@ export const MENU_GROUPS: MenuGroup[] = [
             allowedRoles: ["Admin", "Manager"],
           },
         ],
-      }
+      },
     ],
   },
   {
@@ -323,6 +324,17 @@ export const MENU_GROUPS: MenuGroup[] = [
         path: "/admin/config-appointments",
         icon: Settings,
         allowedRoles: ["Admin", "Manager"],
+      },
+    ],
+  },
+  {
+    title: "DEMO",
+    items: [
+      {
+        label: "Danh mục sản phẩm v2",
+        path: "/admin/product-categories/v2",
+        icon: Box,
+        allowedRoles: ["Admin"],
       },
     ],
   },
@@ -629,6 +641,24 @@ export const TOP_NAV_TABS: ParentTab[] = [
             path: "/admin/profile",
             icon: User,
             allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Demo",
+    allowedRoles: ["Admin"],
+    icon: TestTube,
+    columns: [
+      {
+        title: "Sản phẩm",
+        items: [
+          {
+            label: "Danh mục sản phẩm",
+            path: "/admin/product-categories/v2",
+            icon: Box,
+            allowedRoles: ["Admin"],
           },
         ],
       },

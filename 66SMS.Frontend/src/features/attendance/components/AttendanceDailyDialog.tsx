@@ -7,7 +7,7 @@ import type { WorkScheduleDTO } from "@/features/schedules/types/schedule.types"
 import { Alert } from "@/shared/components/Alert";
 import { Modal } from "@/shared/components/Modal";
 import { TabNav } from "@/shared/components/Tabs";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import { Badge } from "@/shared/elements/Badge";
 import { Button } from "@/shared/elements/Button";
 import { Checkbox } from "@/shared/forms/Checkbox";

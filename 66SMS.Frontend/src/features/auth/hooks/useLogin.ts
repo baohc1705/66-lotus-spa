@@ -3,7 +3,7 @@ import type { AxiosError } from 'axios';
 import { authApi } from '@/features/auth/api/authApi';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import { getErrorMessage } from '@/shared/utils/errorUtils';
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import { useNavigate } from 'react-router-dom';
 import type { Result } from '@/shared/types/common.types';
 

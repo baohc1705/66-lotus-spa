@@ -1,5 +1,5 @@
 ﻿import { Bell } from "lucide-react";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import type { AxiosError } from "axios";
 import { Popover } from "@/shared/components/Popover";
 import { Badge } from "@/shared/elements/Badge";

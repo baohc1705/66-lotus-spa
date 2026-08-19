@@ -2,7 +2,7 @@ import { formatCurrency } from "@/shared/utils/currency";
 import { AppointmentServicesTable } from "./AppointmentServicesTable";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import {
   ChevronDown,
   ChevronUp,

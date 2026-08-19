@@ -8,7 +8,7 @@ import {
   Search,
   User,
 } from "lucide-react";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import type { AxiosError } from "axios";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import {

@@ -14,7 +14,7 @@ import {
   POINT_VALUE_VND,
   type InvoiceDto,
 } from "@/features/invoices/types/invoice.types";
-import { useProductCategories } from "@/features/product_categories/hooks/useProductCategories";
+import { useProductCategories } from "@/features/product-categories/hooks/useProductCategories";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import type { ProductDto } from "@/features/products/types/product.types";
 import { useServiceCategories } from "@/features/service_categories/hooks/useServiceCategories";
@@ -26,7 +26,7 @@ import { useTreatmentCourses } from "@/features/treatment_courses/hooks/useTreat
 import type { TreatmentCourseDto } from "@/features/treatment_courses/types/treatmentCourse.types";
 import { cn } from "@/lib/utils";
 import { FallbackImage } from "@/shared/components/FallbackImage";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import { Modal } from "@/shared/components/Modal";
 import { TabNav } from "@/shared/components/Tabs";
 import { Button } from "@/shared/elements/Button";
@@ -771,7 +771,7 @@ export function CashierPOS({
                   label: order.customer?.fullName || "Khách vãng lai",
                 }))}
                 inputSize="sm"
-                className="mb-0 max-w-[220px]"
+                className="mb-0 max-w-55"
               />
             )}
           </div>

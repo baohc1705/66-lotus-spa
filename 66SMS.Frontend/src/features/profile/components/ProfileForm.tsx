@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import { useMyMembershipCard } from "../hooks/useMembershipInfo";
 import { useUpdateProfile } from "../hooks/useUpdateProfile";
 import {

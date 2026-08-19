@@ -1,150 +1,146 @@
 import { productApi } from "@/features/products/api/product.api";
-import type { PageRequest, Result } from "@/shared/types/common.types";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/components/kitToast";
-import type { AxiosError } from "axios";
-import { StatusActive } from "@/shared/constants/status.enum";
-import { getErrorMessage } from "@/shared/utils/errorUtils";
-import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
 import type {
-  CreateProductPayload,
-  UpdateProductPayload,
-} from "../types/product.types";
+  CreateProductRequest,
+  GetAllProductQuery,
+  UpdateProductRequest,
+} from "@/features/products/types/product.types";
+import { StatusActive } from "@/shared/constants/status.enum";
+import type { Result } from "@/shared/types/common.types";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
+import { showError, showSuccess } from "@/shared/utils/kitToast";
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
 
-const ENTITY = "sản phẩm";
+// Tạo query keys cho sản phẩm để dùng trong query cache
+export const PRODUCT_QUERY_KEY =
+  createEntityQueryKeys<GetAllProductQuery>("products");
 
-type ProductParams = PageRequest & { categoryId?: number };
-
-export const PRODUCT_KEYS = createEntityQueryKeys<ProductParams>("products");
-
-export function useProducts(params: ProductParams) {
+// Lấy danh sách sản phẩm
+export function useProducts(params: GetAllProductQuery, enabled = true) {
   return useQuery({
-    queryKey: PRODUCT_KEYS.list(params),
+    queryKey: PRODUCT_QUERY_KEY.list(params),
     queryFn: () => productApi.getAll(params),
+    enabled,
   });
 }
 
-export function useAdminProducts(params: ProductParams, enabled = true) {
+// Lấy danh sách sản phẩm admin
+export function useProductsAdmin(params: GetAllProductQuery, enabled = true) {
   return useQuery({
-    queryKey: PRODUCT_KEYS.adminList(params),
+    queryKey: PRODUCT_QUERY_KEY.adminList(params),
     queryFn: () => productApi.adminGetAll(params),
     enabled,
   });
 }
 
-export function useDeletedProducts(params: ProductParams, enabled = true) {
+// Lấy chi tiết sản phẩm
+export function useProductDetail(id?: number | null) {
   return useQuery({
-    queryKey: PRODUCT_KEYS.deletedList(params),
-    queryFn: () => productApi.getAllDeleted(params),
-    enabled,
-  });
-}
-
-export function useProductDetail(id: number | null) {
-  return useQuery({
-    queryKey: PRODUCT_KEYS.detail(id!),
+    queryKey: PRODUCT_QUERY_KEY.detail(id ?? 0),
     queryFn: () => productApi.getDetail(id!),
-    enabled: id !== null && id > 0,
+    enabled: id != null && id > 0,
   });
 }
 
+// Tạo sản phẩm
 export function useCreateProduct() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreateProductPayload) => productApi.create(payload),
+    mutationFn: (data: CreateProductRequest) => productApi.create(data),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: PRODUCT_KEYS.all });
-        toast.success(`Tạo ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({ queryKey: PRODUCT_QUERY_KEY.all });
+      showSuccess("Tạo sản phẩm thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi tạo ${ENTITY}`));
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi tạo sản phẩm"));
     },
   });
 }
 
+// Sửa sản phẩm
 export function useUpdateProduct() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      id,
-      payload,
-    }: {
-      id: number;
-      payload: UpdateProductPayload;
-    }) => productApi.update(id, payload),
+    mutationFn: ({ id, data }: { id: number; data: UpdateProductRequest }) =>
+      productApi.update(id, data),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: PRODUCT_KEYS.all });
-        toast.success(`Cập nhật ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({ queryKey: PRODUCT_QUERY_KEY.all });
+      showSuccess("Sửa sản phẩm thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(
-        getErrorMessage(error, `Có lỗi xảy ra khi cập nhật ${ENTITY}`),
-      );
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi sửa sản phẩm"));
     },
   });
 }
 
+// Xóa sản phẩm
 export function useDeleteProduct() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => productApi.delete(id),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: PRODUCT_KEYS.all });
-        toast.success(`Xóa ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({ queryKey: PRODUCT_QUERY_KEY.all });
+      showSuccess("Xóa sản phẩm thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi xóa ${ENTITY}`));
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi xóa sản phẩm"));
     },
   });
 }
 
-export function useDeleteProductMultiples() {
-  const qc = useQueryClient();
+// Xóa nhiều sản phẩm
+export function useDeleteBulkProducts() {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (ids: number[]) => productApi.deleteMultiples({ ids }),
+    mutationFn: (ids: number[]) => productApi.deleteBulk(ids),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: PRODUCT_KEYS.all });
-        toast.success(`Xóa ${ENTITY} đã chọn thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({ queryKey: PRODUCT_QUERY_KEY.all });
+      showSuccess("Xóa nhiều sản phẩm thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi xóa ${ENTITY}`));
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi xóa nhiều sản phẩm"));
     },
   });
 }
 
+// Khôi phục sản phẩm
 export function useRestoreProduct() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) =>
       productApi.update(id, { status: StatusActive.Active }),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: PRODUCT_KEYS.all });
-        toast.success(`Khôi phục ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({ queryKey: PRODUCT_QUERY_KEY.all });
+      showSuccess("Khôi phục sản phẩm thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(
-        getErrorMessage(error, `Có lỗi xảy ra khi khôi phục ${ENTITY}`),
-      );
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi khôi phục sản phẩm"));
     },
   });
 }

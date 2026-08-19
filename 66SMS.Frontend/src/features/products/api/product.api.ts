@@ -1,83 +1,65 @@
-import axiosInstance from "@/shared/api/axiosInstance";
 import type {
-  Result,
-  PagedResult,
-  PageRequest,
-} from "@/shared/types/common.types";
-import type {
+  CreateProductRequest,
+  GetAllProductQuery,
   ProductDto,
   ProductFullDto,
-  CreateProductPayload,
-  UpdateProductPayload,
-  GetAllProductQuery,
-  DeleteProductMultiplesPayload,
-} from "../types/product.types";
-
-
-function toAdminQuery(
-  params: PageRequest & { categoryId?: number },
-): GetAllProductQuery {
-  return {
-    pageIndex: params.pageIndex,
-    pageSize: params.pageSize,
-    keyword: params.filter || undefined,
-    orderBy: params.orderBy,
-    isDescending: params.isDescending,
-    categoryId: params.categoryId,
-  };
-}
+  UpdateProductRequest,
+} from "@/features/products/types/product.types";
+import axiosInstance from "@/shared/api/axiosInstance";
+import type { PagedResult, Result } from "@/shared/types/common.types";
 
 export const productApi = {
-  getAll: (params: PageRequest & { categoryId?: number }) =>
-    axiosInstance
-      .get<Result<PagedResult<ProductDto>>>("/product", {
-        params: {
-          pageIndex: params.pageIndex,
-          pageSize: params.pageSize,
-          keyword: params.filter || undefined,
-          orderBy: params.orderBy,
-          isDescending: params.isDescending,
-          categoryId: params.categoryId,
-        },
-      })
-      .then((r) => r.data),
+  // Query API
+  getAll: async (
+    params: GetAllProductQuery,
+  ): Promise<Result<PagedResult<ProductDto>>> => {
+    const response = await axiosInstance.get("/product", { params });
+    return response.data;
+  },
 
-  adminGetAll: (params: PageRequest & { categoryId?: number }) =>
-    axiosInstance
-      .get<Result<PagedResult<ProductDto>>>(`/product/admin`, {
-        params: toAdminQuery(params),
-      })
-      .then((r) => r.data),
+  adminGetAll: async (
+    params: GetAllProductQuery,
+  ): Promise<Result<PagedResult<ProductDto>>> => {
+    const response = await axiosInstance.get("/product/admin", { params });
+    return response.data;
+  },
 
-  getAllDeleted: (params: PageRequest & { categoryId?: number }) =>
-    axiosInstance
-      .get<Result<PagedResult<ProductDto>>>(`/product/deleted`, {
-        params: toAdminQuery(params),
-      })
-      .then((r) => r.data),
+  getDetail: async (id: number): Promise<Result<ProductFullDto>> => {
+    const response = await axiosInstance.get(`/product/${id}`);
+    return response.data;
+  },
 
-  getDetail: (id: number) =>
-    axiosInstance
-      .get<Result<ProductFullDto>>(`/product/${id}`)
-      .then((r) => r.data),
+  // Command API
+  create: async (request: CreateProductRequest): Promise<Result<object>> => {
+    const response = await axiosInstance.post<Result<object>>(
+      "/product",
+      request,
+    );
+    return response.data;
+  },
 
-  create: (payload: CreateProductPayload) =>
-    axiosInstance
-      .post<Result<object>>("/product", payload)
-      .then((r) => r.data),
+  update: async (
+    id: number,
+    request: UpdateProductRequest,
+  ): Promise<Result<object>> => {
+    const response = await axiosInstance.patch<Result<object>>(
+      `/product/${id}`,
+      request,
+    );
+    return response.data;
+  },
 
-  update: (id: number, payload: UpdateProductPayload) =>
-    axiosInstance
-      .patch<Result<object>>(`/product/${id}`, payload)
-      .then((r) => r.data),
+  delete: async (id: number): Promise<Result<object>> => {
+    const response = await axiosInstance.delete<Result<object>>(
+      `/product/${id}`,
+    );
+    return response.data;
+  },
 
-  delete: (id: number) =>
-    axiosInstance
-      .delete<Result<object>>(`/product/${id}`)
-      .then((r) => r.data),
-
-  deleteMultiples: (payload: DeleteProductMultiplesPayload) =>
-    axiosInstance
-      .delete<Result<object>>(`/product/bulk`, { data: payload })
-      .then((r) => r.data),
+  deleteBulk: async (ids: number[]): Promise<Result<object>> => {
+    const response = await axiosInstance.delete<Result<object>>("/product/bulk", {
+      data: { ids },
+    });
+    return response.data;
+  },
 };

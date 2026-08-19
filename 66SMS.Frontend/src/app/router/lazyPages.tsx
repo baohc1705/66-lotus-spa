@@ -79,7 +79,7 @@ export const ProductListPage = lazy(() =>
   })),
 );
 export const ProductCategoryListPage = lazy(() =>
-  import("@/features/product_categories/pages/ProductCategoryListPage").then(
+  import("@/features/product-categories/pages/ProductCategoryListPage").then(
     (m) => ({ default: m.ProductCategoryListPage }),
   ),
 );
@@ -338,4 +338,10 @@ export const DashboardExample1Page = lazy(() =>
   import("@/features/setttings/pages/dashboards/DashboardExample1Page").then(
     (m) => ({ default: m.DashboardExample1Page }),
   ),
+);
+
+export const ProductCategoryListPageV2 = lazy(() =>
+  import("@/features/products-v2/pages/ProductCategoryListPage").then((m) => ({
+    default: m.ProductCategoryListPage,
+  })),
 );

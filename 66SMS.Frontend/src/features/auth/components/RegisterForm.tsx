@@ -17,7 +17,7 @@ import {
   type RegisterFormData,
 } from "@/features/auth/schemas/registerSchema";
 import { Input } from "@/shared/forms/Input";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import { useRegister } from "@/features/auth/hooks/useRegister";
 import { useSendOtp } from "@/features/auth/hooks/useSendOtp";
 import { useVerifyOtp } from "@/features/auth/hooks/useVerifyOtp";
@@ -90,7 +90,7 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <div className="text-center mb-6">
         <h3 className="text-2xl font-bold text-ink font-sans">Đăng ký</h3>
-        <div className="w-12 h-[2px] bg-rose-600 mx-auto mt-2" />
+        <div className="w-12 h-0.5 bg-rose-600 mx-auto mt-2" />
       </div>
 
       <div className="space-y-1.5">
@@ -324,7 +324,7 @@ const OtpStep = ({ email }: OtpStepProps) => {
     <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in" noValidate>
       <div className="text-center mb-6">
         <h3 className="text-2xl font-bold text-ink font-sans">Xác thực OTP</h3>
-        <div className="w-12 h-[2px] bg-rose-600 mx-auto mt-2" />
+        <div className="w-12 h-0.5 bg-rose-600 mx-auto mt-2" />
       </div>
 
       <div className="text-center">

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import {
   CASHIER_DAILY,
@@ -19,7 +19,7 @@ import { useNotificationUiStore } from "../stores/notificationUiStore";
 import type { BookingNotificationMessage, NotificationMessage } from "../types/notification.types";
 
 function handleNotification(msg: NotificationMessage, queryClient: ReturnType<typeof useQueryClient>) {
-  toast.info(msg.message || "Thông báo", msg.title || "Thông báo");
+  toast.info(msg.message || "Thông báo");
   useNotificationUiStore.getState().add(msg);
   queryClient.invalidateQueries({ queryKey: ["notifications"] });
 

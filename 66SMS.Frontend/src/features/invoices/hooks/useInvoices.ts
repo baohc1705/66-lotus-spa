@@ -2,7 +2,7 @@ import type { AxiosError } from "axios";
 import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import { invoiceApi } from "../api/invoice.api";
 import type {
   CreateInvoicePayload,
@@ -43,7 +43,7 @@ export function useCreateInvoice() {
     mutationFn: (payload: CreateInvoicePayload) => invoiceApi.create(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: KEYS.lists() });
+        qc.invalidateQueries({ queryKey: KEYS.all });
         toast.success(`Tạo ${ENTITY} thành công`);
       } else {
         toast.error(result.message || "Có lỗi xảy ra");

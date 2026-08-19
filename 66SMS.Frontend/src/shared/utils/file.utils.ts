@@ -1,5 +1,5 @@
 import type { AxiosError } from "axios";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 
 export function getFileNameFromHeader(
   contentDisposition: string | undefined,

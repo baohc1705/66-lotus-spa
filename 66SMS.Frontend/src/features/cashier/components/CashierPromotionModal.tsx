@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { AxiosError } from "axios";
 import { Loader2, Ticket } from "lucide-react";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import { Modal } from "@/shared/components/Modal";
 import { TabNav } from "@/shared/components/Tabs";
 import { Button } from "@/shared/elements/Button";

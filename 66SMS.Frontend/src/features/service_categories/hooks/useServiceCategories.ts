@@ -1,7 +1,7 @@
 import { serviceCategoryApi } from "@/features/service_categories/api/serviceCategory.api";
 import type { PageRequest, Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import type { AxiosError } from "axios";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
@@ -14,7 +14,9 @@ import type {
 const ENTITY = "nhóm dịch vụ";
 
 export const SERVICE_CATEGORY_KEYS =
-  createEntityQueryKeys<PageRequest>("service-categories");
+  createEntityQueryKeys<PageRequest & { isDeleted?: boolean }>(
+    "service-categories",
+  );
 
 export function useServiceCategories(params: PageRequest, enabled = true) {
   return useQuery({
@@ -37,7 +39,7 @@ export function useDeletedServiceCategories(
   enabled = true,
 ) {
   return useQuery({
-    queryKey: SERVICE_CATEGORY_KEYS.deletedList(params),
+    queryKey: SERVICE_CATEGORY_KEYS.adminList({ ...params, isDeleted: true }),
     queryFn: () => serviceCategoryApi.getAllDeleted(params),
     enabled,
   });

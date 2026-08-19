@@ -3,7 +3,7 @@ import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useConfigAppointmentBySalon } from "@/features/config_appointments/hooks/useConfigAppointments";
 import { invoiceApi } from "@/features/invoices/api/invoice.api";
 import type { InvoiceDto } from "@/features/invoices/types/invoice.types";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import { cashierApi } from "../api/cashier.api";
 import { CashierBookingModal } from "../components/CashierBookingModal";
 import { CashierCalendar } from "../components/CashierCalendar";

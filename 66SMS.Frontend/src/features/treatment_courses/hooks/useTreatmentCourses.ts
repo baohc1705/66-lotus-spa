@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import type { AxiosError } from "axios";
 import { treatmentCourseApi } from "../api/treatmentCourse.api";
 import type { PageRequest, Result } from "@/shared/types/common.types";
@@ -14,7 +14,9 @@ import type {
 const ENTITY = "liệu trình";
 
 export const TREATMENT_COURSE_KEYS =
-  createEntityQueryKeys<PageRequest>("treatment-courses");
+  createEntityQueryKeys<PageRequest & { isDeleted?: boolean }>(
+    "treatment-courses",
+  );
 
 export function useTreatmentCourses(params: PageRequest, enabled = true) {
   return useQuery({
@@ -37,7 +39,7 @@ export function useDeletedTreatmentCourses(
   enabled = true,
 ) {
   return useQuery({
-    queryKey: TREATMENT_COURSE_KEYS.deletedList(params),
+    queryKey: TREATMENT_COURSE_KEYS.adminList({ ...params, isDeleted: true }),
     queryFn: () => treatmentCourseApi.getAllDeleted(params),
     enabled,
   });

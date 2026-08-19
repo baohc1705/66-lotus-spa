@@ -98,7 +98,7 @@ export function TableHead({
   className?: string;
 }) {
   return (
-    <thead className={"[&_th]:text-kit-muted " + className}>{children}</thead>
+    <thead className={"text-kit-muted " + className}>{children}</thead>
   );
 }
 

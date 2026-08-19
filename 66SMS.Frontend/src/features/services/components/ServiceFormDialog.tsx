@@ -1,4 +1,4 @@
-import { useAdminProducts } from "@/features/products/hooks/useProducts";
+import { useProductsAdmin } from "@/features/products/hooks/useProducts";
 import type { ProductDto } from "@/features/products/types/product.types";
 import { ServiceCategoryFormDialog } from "@/features/service_categories/components/ServiceCategoryFormDialog";
 import { useServiceCategories } from "@/features/service_categories/hooks/useServiceCategories";
@@ -107,7 +107,7 @@ export function ServiceFormDialog({
     [categoriesResult],
   );
 
-  const { data: productsResult } = useAdminProducts({
+  const { data: productsResult } = useProductsAdmin({
     pageIndex: 1,
     pageSize: 1000,
   });

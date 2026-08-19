@@ -14,3 +14,5 @@ export const STATUS_MAP: Record<string | number, string> = {
   "1": "Hoạt động",
   "2": "Tạm khóa",
 };
+
+export const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];

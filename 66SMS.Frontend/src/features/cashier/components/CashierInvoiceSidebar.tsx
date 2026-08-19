@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Check, CreditCard, Loader2, MapPin, Phone, User } from "lucide-react";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import type { AxiosError } from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { APPOINTMENT_STATUS } from "@/features/booking/constants/appointment.constants";

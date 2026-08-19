@@ -1,7 +1,7 @@
 import { serviceApi } from "@/features/services/api/service.api";
 import type { PageRequest, Result } from "@/shared/types/common.types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import type { AxiosError } from "axios";
 import { StatusActive } from "@/shared/constants/status.enum";
 import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
@@ -14,7 +14,7 @@ import type {
 const ENTITY = "dịch vụ";
 
 export const SERVICE_KEYS = createEntityQueryKeys<
-  PageRequest & { categoryId?: number }
+  PageRequest & { categoryId?: number; isDeleted?: boolean }
 >("services");
 
 export function useServices(
@@ -44,7 +44,7 @@ export function useDeletedServices(
   enabled = true,
 ) {
   return useQuery({
-    queryKey: SERVICE_KEYS.deletedList(params),
+    queryKey: SERVICE_KEYS.adminList({ ...params, isDeleted: true }),
     queryFn: () => serviceApi.getAllDeleted(params),
     enabled,
   });

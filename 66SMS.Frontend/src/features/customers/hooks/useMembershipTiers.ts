@@ -1,7 +1,7 @@
 import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import type { AxiosError } from "axios";
 import { membershipTierApi } from "../api/membershipTier.api";
 import type { Result } from "@/shared/types/common.types";
@@ -38,7 +38,7 @@ export function useCreateMembershipTier() {
       membershipTierApi.create(payload),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: TIER_KEYS.lists() });
+        qc.invalidateQueries({ queryKey: TIER_KEYS.all });
         toast.success(`Tạo ${ENTITY} thành công`);
       } else {
         toast.error(result.message || "Có lỗi xảy ra");
@@ -82,7 +82,7 @@ export function useDeleteMembershipTier() {
     mutationFn: (id: number) => membershipTierApi.delete(id),
     onSuccess: (result) => {
       if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: TIER_KEYS.lists() });
+        qc.invalidateQueries({ queryKey: TIER_KEYS.all });
         toast.success(`Xóa ${ENTITY} thành công`);
       } else {
         toast.error(result.message || "Có lỗi xảy ra");
