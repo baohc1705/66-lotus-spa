@@ -15,8 +15,5 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CreateManualAtten
 
         [JsonIgnore]
         public int? SalonId { get; set; }
-
-        [JsonIgnore]
-        public int? CreatedBy { get; set; }
     }
 }

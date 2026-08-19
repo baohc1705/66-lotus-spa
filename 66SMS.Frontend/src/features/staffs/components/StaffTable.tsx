@@ -47,9 +47,11 @@ import {
   Plus,
   RotateCcw,
   Search,
+  ShieldCheck,
   Trash2,
 } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const STAFF_STATUS_MAP: StatusMap = {
   "0": { label: "Tạm nghỉ", variant: "warning" },
@@ -68,6 +70,7 @@ interface Props {
 
 export function StaffTable({ onEdit, onCreate, onStatsChange }: Props) {
   const perm = STAFF_PERM;
+  const navigate = useNavigate();
 
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
@@ -600,6 +603,20 @@ export function StaffTable({ onEdit, onCreate, onStatsChange }: Props) {
                                   onClick={() => handleToggleExpand(item.id!)}
                                 >
                                   <Eye className="h-3.5 w-3.5" />
+                                </Button>
+                              </Tooltip>
+                            ) : null}
+                            {item.id != null ? (
+                              <Tooltip text="Chứng chỉ">
+                                <Button
+                                  size="icon-sm"
+                                  variant="outline-success"
+                                  className="mb-0 mr-0"
+                                  onClick={() =>
+                                    navigate(`/admin/chung-chi-nhan-vien?staffId=${item.id}`)
+                                  }
+                                >
+                                  <ShieldCheck className="h-3.5 w-3.5" />
                                 </Button>
                               </Tooltip>
                             ) : null}

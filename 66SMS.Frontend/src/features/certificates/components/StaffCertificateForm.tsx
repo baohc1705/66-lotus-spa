@@ -1,11 +1,19 @@
-import { useEffect, useState } from "react";
-import { useForm, type Resolver } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ShieldCheck } from "lucide-react";
-
+import { useCertificateTypes } from "@/features/certificates/hooks/useCertificateTypes";
+import {
+  useCreateMineCertificate,
+  useCreateStaffCertificate,
+  useUpdateStaffCertificate,
+} from "@/features/certificates/hooks/useStaffCertificates";
+import type {
+  CertificateTypeDto,
+  StaffCertificateDto,
+} from "@/features/certificates/types/certificate.types";
+import { useStaffs } from "@/features/staffs/hooks/useStaffs";
+import type { StaffDto } from "@/features/staffs/types/staff.types";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/elements/Button";
 import { FormField } from "@/shared/forms/FormField";
+import { FormRow } from "@/shared/forms/FormRow";
 import { FormSection } from "@/shared/forms/FormSection";
 import { ImageUpload } from "@/shared/forms/ImageUpload";
 import { Input } from "@/shared/forms/Input";
@@ -14,32 +22,27 @@ import { Select } from "@/shared/forms/Select";
 import { Textarea } from "@/shared/forms/Textarea";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { parseToDateInput } from "@/shared/utils/date.utils";
-import type { StaffDto } from "@/features/staffs/types/staff.types";
-import { useStaffs } from "@/features/staffs/hooks/useStaffs";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ShieldCheck } from "lucide-react";
+import { useState } from "react";
+import { useForm, useWatch, type Resolver } from "react-hook-form";
+import { z } from "zod";
 
-import {
-  useCreateMineCertificate,
-  useCreateStaffCertificate,
-  useUpdateStaffCertificate,
-} from "../hooks/useStaffCertificates";
-import { useCertificateTypes } from "../hooks/useCertificateTypes";
-import {
-  createStaffCertificateSchema,
-  type StaffCertificateFormValues,
-} from "../schemas/staffCertificate.schema";
-import type {
-  StaffCertificateDTO,
-  CertificateTypeDTO,
-} from "../types/certificate.types";
+// Validate dữ liệu client side
+const staffCertificateSchema = z.object({
+  staffId: z.coerce.number().min(1, "Vui lòng chọn nhân viên"),
+  certificateTypeId: z.coerce.number().min(1, "Vui lòng chọn loại chứng chỉ"),
+  certificateName: z.string().min(1, "Tên chứng chỉ không được để trống").max(200, "Tối đa 200 ký tự"),
+  certificateNumber: z.string().max(50, "Tối đa 50 ký tự").optional().or(z.literal("")),
+  issuingOrganization: z.string().min(1, "Tổ chức cấp không được để trống").max(200, "Tối đa 200 ký tự"),
+  issuedDate: z.string().min(1, "Ngày cấp không được để trống"),
+  expiryDate: z.string().optional().or(z.literal("")),
+  documentUrl: z.string().optional().or(z.literal("")),
+  note: z.string().max(500, "Tối đa 500 ký tự").optional().or(z.literal("")),
+  status: z.coerce.number().min(0).optional().default(0),
+});
 
-interface Props {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  item?: StaffCertificateDTO | null;
-  staffId?: number;
-  /** Nhân viên tự nộp — ẩn chọn NV / trạng thái, gọi API submit */
-  submitMode?: boolean;
-}
+type StaffCertificateFormData = z.infer<typeof staffCertificateSchema>;
 
 const STATUS_OPTIONS = [
   { value: "0", label: "Chờ xác minh" },
@@ -48,10 +51,18 @@ const STATUS_OPTIONS = [
   { value: "3", label: "Đã thu hồi" },
 ];
 
-function getDefaults(
-  item?: StaffCertificateDTO | null,
+interface Props {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  staffCertificate?: StaffCertificateDto | null;
+  staffId?: number;
+  submitMode?: boolean;
+}
+
+function getDefaultValues(
+  item?: StaffCertificateDto | null,
   staffId?: number,
-): StaffCertificateFormValues {
+): StaffCertificateFormData {
   return {
     staffId: item?.staffId ?? staffId ?? 0,
     certificateTypeId: item?.certificateTypeId ?? 0,
@@ -66,60 +77,78 @@ function getDefaults(
   };
 }
 
-export function StaffCertificateFormDialog({
+export function StaffCertificateForm({
   open,
   onOpenChange,
-  item,
+  staffCertificate,
   staffId,
   submitMode = false,
 }: Props) {
-  const isEdit = !!item;
+  const isEdit = !!staffCertificate;
   const createMutation = useCreateStaffCertificate();
   const createMineMutation = useCreateMineCertificate();
   const updateMutation = useUpdateStaffCertificate();
-  const isPending =
-    createMutation.isPending ||
-    createMineMutation.isPending ||
-    updateMutation.isPending;
+  const isPending = createMutation.isPending || createMineMutation.isPending || updateMutation.isPending;
 
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
+  // Reset form khi mở modal bằng formKey
+  const formKey = !open ? "closed" : isEdit ? `edit-${staffCertificate?.id ?? "loading"}` : "new";
+  const [appliedFormKey, setAppliedFormKey] = useState(formKey);
+
+  // Lấy danh sách loại chứng chỉ
   const typesQuery = useCertificateTypes({ pageIndex: 1, pageSize: 100 });
   const types = typesQuery.data?.data?.items ?? [];
 
+  // Chỉ hiện chọn nhân viên khi tạo mới + không có staffId + không phải submitMode
   const showStaffSelect = !isEdit && !staffId && !submitMode;
-  const staffsQuery = useStaffs(
-    { pageIndex: 1, pageSize: 100 },
-    showStaffSelect,
-  );
+  const staffsQuery = useStaffs({ pageIndex: 1, pageSize: 100 }, showStaffSelect);
   const staffs = staffsQuery.data?.data?.items ?? [];
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
     reset,
     setValue,
-    watch,
     setError,
-  } = useForm<StaffCertificateFormValues>({
-    resolver: zodResolver(
-      createStaffCertificateSchema,
-    ) as Resolver<StaffCertificateFormValues>,
-    defaultValues: getDefaults(item, staffId),
+  } = useForm<StaffCertificateFormData>({
+    resolver: zodResolver(staffCertificateSchema) as Resolver<StaffCertificateFormData>,
+    defaultValues: getDefaultValues(null, staffId),
   });
 
-  useEffect(() => {
-    if (!open) return;
-    reset(getDefaults(item, staffId));
-    setPendingFile(null);
-  }, [open, item, staffId, reset]);
+  const selectedStaffId = useWatch({ control, name: "staffId" });
+  const selectedTypeId = useWatch({ control, name: "certificateTypeId" });
+  const status = useWatch({ control, name: "status" });
+  const documentUrl = useWatch({ control, name: "documentUrl" });
 
-  const selectedStaffId = watch("staffId");
-  const selectedTypeId = watch("certificateTypeId");
+  if (formKey !== appliedFormKey) {
+    setAppliedFormKey(formKey);
+    if (open === true) {
+      reset(getDefaultValues(staffCertificate, staffId));
+      setPendingFile(null);
+    }
+  }
 
-  const onSubmit = async (data: StaffCertificateFormValues) => {
+  // Build options cho select
+  const typeOptions: { value: string; label: string }[] = [];
+  for (let index = 0; index < types.length; index++) {
+    const type: CertificateTypeDto = types[index];
+    if (!type.id) continue;
+    typeOptions.push({ value: String(type.id), label: type.name ?? "" });
+  }
+
+  const staffOptions: { value: string; label: string }[] = [];
+  for (let index = 0; index < staffs.length; index++) {
+    const staff: StaffDto = staffs[index];
+    if (!staff.id) continue;
+    staffOptions.push({ value: String(staff.id), label: staff.fullName ?? "" });
+  }
+
+  // Sửa trước, tạo sau
+  async function onSubmit(data: StaffCertificateFormData) {
     if (!isEdit && showStaffSelect && (!data.staffId || data.staffId <= 0)) {
       setError("staffId", { message: "Vui lòng chọn nhân viên" });
       return;
@@ -140,11 +169,11 @@ export function StaffCertificateFormDialog({
       }
     }
 
-    if (isEdit && item?.id) {
+    if (isEdit && staffCertificate?.id) {
       updateMutation.mutate(
         {
-          id: item.id,
-          payload: {
+          id: staffCertificate.id,
+          data: {
             certificateTypeId: data.certificateTypeId,
             certificateName: data.certificateName,
             certificateNumber: data.certificateNumber || undefined,
@@ -159,7 +188,8 @@ export function StaffCertificateFormDialog({
         },
         {
           onSuccess: (result) => {
-            if (result.isSuccess) onOpenChange(false);
+            if (result.isSuccess !== true) return;
+            onOpenChange(false);
           },
         },
       );
@@ -181,7 +211,8 @@ export function StaffCertificateFormDialog({
         },
         {
           onSuccess: (result) => {
-            if (result.isSuccess) onOpenChange(false);
+            if (result.isSuccess !== true) return;
+            onOpenChange(false);
           },
         },
       );
@@ -204,30 +235,11 @@ export function StaffCertificateFormDialog({
       },
       {
         onSuccess: (result) => {
-          if (result.isSuccess) onOpenChange(false);
+          if (result.isSuccess !== true) return;
+          onOpenChange(false);
         },
       },
     );
-  };
-
-  const typeOptions: { value: string; label: string }[] = [];
-  for (let index = 0; index < types.length; index++) {
-    const type: CertificateTypeDTO = types[index];
-    if (!type.id) continue;
-    typeOptions.push({
-      value: String(type.id),
-      label: type.name ?? "",
-    });
-  }
-
-  const staffOptions: { value: string; label: string }[] = [];
-  for (let index = 0; index < staffs.length; index++) {
-    const staff: StaffDto = staffs[index];
-    if (!staff.id) continue;
-    staffOptions.push({
-      value: String(staff.id),
-      label: staff.fullName ?? "",
-    });
   }
 
   let dialogTitle = "Thêm chứng chỉ nhân viên";
@@ -238,6 +250,8 @@ export function StaffCertificateFormDialog({
   if (isEdit) submitLabel = "Cập nhật";
   else if (submitMode) submitLabel = "Nộp chứng chỉ";
 
+  const saving = isPending || isUploading;
+
   return (
     <Modal
       open={open}
@@ -245,8 +259,32 @@ export function StaffCertificateFormDialog({
       title={dialogTitle}
       size="lg"
       scrollable
+      footer={
+        <>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="mb-0"
+            onClick={() => onOpenChange(false)}
+            disabled={saving}
+          >
+            Hủy
+          </Button>
+          <Button
+            type="submit"
+            form="staff-certificate-form"
+            variant="admin"
+            size="sm"
+            className="mb-0"
+            loading={saving}
+          >
+            {submitLabel}
+          </Button>
+        </>
+      }
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+      <form id="staff-certificate-form" onSubmit={handleSubmit(onSubmit)} className="space-y-3">
         <FormSection icon={ShieldCheck} title="Thông tin chứng chỉ">
           {showStaffSelect ? (
             <FormField label="Nhân viên *" error={errors.staffId?.message}>
@@ -267,11 +305,8 @@ export function StaffCertificateFormDialog({
             </FormField>
           ) : null}
 
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <FormField
-              label="Loại chứng chỉ *"
-              error={errors.certificateTypeId?.message}
-            >
+          <FormRow>
+            <FormField label="Loại chứng chỉ *" error={errors.certificateTypeId?.message}>
               <SearchableSelect
                 value={selectedTypeId ? String(selectedTypeId) : ""}
                 onChange={(value: string) => {
@@ -279,9 +314,7 @@ export function StaffCertificateFormDialog({
                     setValue("certificateTypeId", 0, { shouldValidate: true });
                     return;
                   }
-                  setValue("certificateTypeId", Number(value), {
-                    shouldValidate: true,
-                  });
+                  setValue("certificateTypeId", Number(value), { shouldValidate: true });
                 }}
                 options={typeOptions}
                 placeholder="Chọn loại chứng chỉ"
@@ -293,19 +326,16 @@ export function StaffCertificateFormDialog({
             {!submitMode ? (
               <FormField label="Trạng thái" error={errors.status?.message}>
                 <Select
-                  value={String(watch("status") ?? 0)}
-                  onChange={(e) => setValue("status", Number(e.target.value))}
+                  value={String(status ?? 0)}
+                  onChange={(event) => setValue("status", Number(event.target.value))}
                   options={STATUS_OPTIONS}
                   invalid={!!errors.status}
                 />
               </FormField>
             ) : null}
-          </div>
+          </FormRow>
 
-          <FormField
-            label="Tên chứng chỉ *"
-            error={errors.certificateName?.message}
-          >
+          <FormField label="Tên chứng chỉ *" error={errors.certificateName?.message}>
             <Input
               {...register("certificateName")}
               placeholder="Chứng chỉ Massage Trị liệu Quốc tế"
@@ -313,11 +343,8 @@ export function StaffCertificateFormDialog({
             />
           </FormField>
 
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <FormField
-              label="Số chứng chỉ"
-              error={errors.certificateNumber?.message}
-            >
+          <FormRow>
+            <FormField label="Số chứng chỉ" error={errors.certificateNumber?.message}>
               <Input
                 {...register("certificateNumber")}
                 placeholder="VN-2024-12345"
@@ -325,19 +352,16 @@ export function StaffCertificateFormDialog({
               />
             </FormField>
 
-            <FormField
-              label="Tổ chức cấp *"
-              error={errors.issuingOrganization?.message}
-            >
+            <FormField label="Tổ chức cấp *" error={errors.issuingOrganization?.message}>
               <Input
                 {...register("issuingOrganization")}
                 placeholder="Bộ Y tế / CIDESCO"
                 invalid={!!errors.issuingOrganization}
               />
             </FormField>
-          </div>
+          </FormRow>
 
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <FormRow>
             <FormField label="Ngày cấp *" error={errors.issuedDate?.message}>
               <Input
                 {...register("issuedDate")}
@@ -346,18 +370,14 @@ export function StaffCertificateFormDialog({
               />
             </FormField>
 
-            <FormField
-              label="Ngày hết hạn"
-              help="Để trống nếu không hết hạn"
-              error={errors.expiryDate?.message}
-            >
+            <FormField label="Ngày hết hạn" help="Để trống nếu không hết hạn" error={errors.expiryDate?.message}>
               <Input
                 {...register("expiryDate")}
                 type="date"
                 invalid={!!errors.expiryDate}
               />
             </FormField>
-          </div>
+          </FormRow>
 
           <FormField
             label="Ảnh scan chứng chỉ"
@@ -365,8 +385,8 @@ export function StaffCertificateFormDialog({
             help="Tải ảnh scan/chụp chứng chỉ (JPG, PNG, WEBP)."
           >
             <ImageUpload
-              key={`${open}-${item?.id ?? "new"}`}
-              value={watch("documentUrl") || item?.documentUrl}
+              key={`${open}-${staffCertificate?.id ?? "new"}`}
+              value={documentUrl || staffCertificate?.documentUrl}
               onFileChange={(file: File | null) => {
                 setPendingFile(file);
                 if (!file) setValue("documentUrl", "");
@@ -385,28 +405,6 @@ export function StaffCertificateFormDialog({
             />
           </FormField>
         </FormSection>
-
-        <div className="flex justify-end gap-2 border-t border-kit pt-3">
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            className="mb-0"
-            onClick={() => onOpenChange(false)}
-            disabled={isPending || isUploading}
-          >
-            Hủy
-          </Button>
-          <Button
-            type="submit"
-            variant="admin"
-            size="sm"
-            className="mb-0"
-            loading={isPending || isUploading}
-          >
-            {submitLabel}
-          </Button>
-        </div>
       </form>
     </Modal>
   );
