@@ -7,7 +7,7 @@ import type {
   WardDto,
 } from "@/features/address/types/address.types";
 import {
-  CUSTOMER_KEYS,
+  CUSTOMER_QUERY_KEY,
   useUpdateCustomer,
 } from "@/features/customers/hooks/useCustomers";
 import type { CustomerDto } from "@/features/customers/types/customer.types";
@@ -157,7 +157,7 @@ export function ProfileForm({ initialData, customerDetail }: ProfileFormProps) {
         setPendingAvatarFile(null);
         setLocalAvatarPreview(null);
         qc.invalidateQueries({ queryKey: ["profile"] });
-        qc.invalidateQueries({ queryKey: CUSTOMER_KEYS.all });
+        qc.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEY.all });
       }
     } catch {
       // toast đã xử lý trong hooks

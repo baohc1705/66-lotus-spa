@@ -1,55 +1,58 @@
 import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/utils/kitToast";
+import { showError, showSuccess } from "@/shared/utils/kitToast";
 import type { AxiosError } from "axios";
 import { membershipTierApi } from "../api/membershipTier.api";
 import type { Result } from "@/shared/types/common.types";
 import type {
-  CreateMembershipTierPayload,
-  UpdateMembershipTierPayload,
-  MembershipTierQueryParams,
+  CreateMembershipTierRequest,
+  GetAllMembershipTierQuery,
+  UpdateMembershipTierRequest,
 } from "../types/membershipTier.types";
 
-const ENTITY = "hạng thành viên";
+// Tạo query keys cho dịch vụ để dùng trong query cache
+export const MEMBERSHIP_TIER_QUERY_KEY =
+  createEntityQueryKeys<GetAllMembershipTierQuery>("membership-tiers");
 
-export const TIER_KEYS =
-  createEntityQueryKeys<MembershipTierQueryParams>("tiers");
-
-export function useMembershipTiers(params: MembershipTierQueryParams) {
+// Lấy danh sách hạng thành viên
+export function useMembershipTiers(params: GetAllMembershipTierQuery) {
   return useQuery({
-    queryKey: TIER_KEYS.list(params),
+    queryKey: MEMBERSHIP_TIER_QUERY_KEY.list(params),
     queryFn: () => membershipTierApi.getAll(params),
   });
 }
 
-export function useMembershipTierDetail(id: number | null) {
+// Lấy chi tiết hạng thành viên
+export function useMembershipTierDetail(id: number) {
   return useQuery({
-    queryKey: TIER_KEYS.detail(id!),
-    queryFn: () => membershipTierApi.getDetail(id!),
-    enabled: id !== null && id > 0,
-  });
+    queryKey: MEMBERSHIP_TIER_QUERY_KEY.detail(id),
+    queryFn: () => membershipTierApi.getDetail(id),
+  }); 
 }
 
+// Tạo hạng thành viên
 export function useCreateMembershipTier() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreateMembershipTierPayload) =>
+    mutationFn: (payload: CreateMembershipTierRequest) =>
       membershipTierApi.create(payload),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: TIER_KEYS.all });
-        toast.success(`Tạo ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || `Có lỗi xảy ra khi tạo hạng thành viên`);
+        return;
       }
+
+      qc.invalidateQueries({ queryKey: MEMBERSHIP_TIER_QUERY_KEY.all });
+      showSuccess(`Tạo hạng thành viên thành công`);
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi tạo ${ENTITY}`));
+      showError(getErrorMessage(error, `Có lỗi xảy ra khi tạo hạng thành viên`));
     },
   });
 }
 
+// Cập nhật hạng thành viên
 export function useUpdateMembershipTier() {
   const qc = useQueryClient();
   return useMutation({
@@ -58,38 +61,39 @@ export function useUpdateMembershipTier() {
       payload,
     }: {
       id: number;
-      payload: UpdateMembershipTierPayload;
+      payload: UpdateMembershipTierRequest;
     }) => membershipTierApi.update(id, payload),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: TIER_KEYS.all });
-        toast.success(`Cập nhật ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || `Có lỗi xảy ra khi cập nhật hạng thành viên`);
+        return;
       }
+
+      qc.invalidateQueries({ queryKey: MEMBERSHIP_TIER_QUERY_KEY.all });
+      showSuccess(`Cập nhật hạng thành viên thành công`);
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(
-        getErrorMessage(error, `Có lỗi xảy ra khi cập nhật ${ENTITY}`),
-      );
+      showError(getErrorMessage(error, `Có lỗi xảy ra khi cập nhật hạng thành viên`));
     },
   });
 }
 
+// Xóa hạng thành viên
 export function useDeleteMembershipTier() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => membershipTierApi.delete(id),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: TIER_KEYS.all });
-        toast.success(`Xóa ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || `Có lỗi xảy ra khi xóa hạng thành viên`);
+        return;
       }
+
+      qc.invalidateQueries({ queryKey: MEMBERSHIP_TIER_QUERY_KEY.all });
+      showSuccess(`Xóa hạng thành viên thành công`);
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi xóa ${ENTITY}`));
+      showError(getErrorMessage(error, `Có lỗi xảy ra khi xóa hạng thành viên`));
     },
   });
 }

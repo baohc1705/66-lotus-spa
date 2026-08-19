@@ -1,31 +1,64 @@
-// DTO trả về từ API (match backend CustomerDTO.cs)
+import type { PageRequest } from "@/shared/types/common.types";
+
 export interface CustomerDto {
-  id: number | null;
-  userId: number | null;
-  fullName: string | null;
-  avatarUrl: string | null;
-  dateOfBirth: string | null;
-  gender: number | null;
-  phone: string | null;
-  loyaltyPoint: number | null;
-  firstPurchaseAt: string | null;
-  lastPurchaseAt: string | null;
-  source: string | null;
-  status: number | null;
-  note: string | null;
-  streetAddress: string | null;
-  provinceCode: string | null;
-  wardCode: string | null;
-  fullAddress: string | null;
-  email: string | null;
-  createdAt?: string | null;
-  createdBy?: number | null;
-  updatedAt?: string | null;
-  updatedBy?: number | null;
+  id?: number;
+  userId?: number;
+  fullName?: string;
+  avatarUrl?: string;
+  dateOfBirth?: string;
+  gender?: number;
+  phone?: string;
+  loyaltyPoint?: number;
+  firstPurchaseAt?: string;
+  lastPurchaseAt?: string;
+  source?: string;
+  status?: number;
+  note?: string;
+  streetAddress?: string;
+  provinceCode?: string;
+  wardCode?: string;
+  fullAddress?: string;
+  email?: string;
+  membershipTier?: string;
 }
 
-export type {
-  CreateCustomerPayload,
-  UpdateCustomerPayload,
-  CustomerFormValues,
-} from "../schemas/customer.schema";
+export interface GetAllCustomerQuery extends PageRequest {
+  status?: number;
+  gender?: number;
+  source?: string;
+}
+
+export interface CreateCustomerRequest {
+  fullName: string;
+  phone: string;
+  email: string;
+  avatarUrl?: string;
+  imageBase64?: string;
+  dateOfBirth?: string;
+  gender?: number;
+  loyaltyPoint?: number;
+  source?: string;
+  status?: number;
+  note?: string;
+  streetAddress?: string;
+  provinceCode?: string;
+  wardCode?: string;
+  fullAddress?: string;
+}
+
+export interface UpdateCustomerRequest {
+  fullName?: string;
+  avatarUrl?: string;
+  imageBase64?: string;
+  dateOfBirth?: string;
+  gender?: number;
+  phone?: string;
+  loyaltyPoint?: number;
+  source?: string;
+  status?: number;
+  note?: string;
+  streetAddress?: string;
+  provinceCode?: string;
+  wardCode?: string;
+  fullAddress?: string;
+}

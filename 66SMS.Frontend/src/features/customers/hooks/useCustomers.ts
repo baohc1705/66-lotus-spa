@@ -1,114 +1,135 @@
 import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/utils/kitToast";
+import { showError, showSuccess } from "@/shared/utils/kitToast";
 import type { AxiosError } from "axios";
-import { customerApi } from "../api/customer.api";
-import type { PageRequest, Result } from "@/shared/types/common.types";
+import { customerApi } from "@/features/customers/api/customer.api";
+import type { Result } from "@/shared/types/common.types";
 import { StatusActive } from "@/shared/constants/status.enum";
 import type {
-  CreateCustomerPayload,
-  UpdateCustomerPayload,
-} from "../types/customer.types";
+  CreateCustomerRequest,
+  GetAllCustomerQuery,
+  UpdateCustomerRequest,
+} from "@/features/customers/types/customer.types";
+import { bookingApi } from "@/features/booking/api/booking.api";
+import type { GetAllAppointmentParams } from "@/features/booking/types/booking.types";
 
-const ENTITY = "khách hàng";
+// Tạo query keys cho khách hàng để dùng trong query cache
+export const CUSTOMER_QUERY_KEY =
+  createEntityQueryKeys<GetAllCustomerQuery>("customers");
 
-export const CUSTOMER_KEYS = createEntityQueryKeys<PageRequest>("customers");
-
-export function useCustomers(params: PageRequest) {
+// Lấy danh sách khách hàng
+export function useCustomers(params: GetAllCustomerQuery, enabled = true) {
   return useQuery({
-    queryKey: CUSTOMER_KEYS.list(params),
+    queryKey: CUSTOMER_QUERY_KEY.list(params),
     queryFn: () => customerApi.getAll(params),
+    enabled,
   });
 }
 
-export function useCustomerDetail(id: number | null) {
+// Lấy chi tiết khách hàng
+export function useCustomerDetail(id: number) {
   return useQuery({
-    queryKey: CUSTOMER_KEYS.detail(id!),
-    queryFn: () => customerApi.getDetail(id!),
-    enabled: id !== null && id > 0,
+    queryKey: CUSTOMER_QUERY_KEY.detail(id),
+    queryFn: () => customerApi.getDetail(id),
   });
 }
 
+// Tạo khách hàng
 export function useCreateCustomer() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreateCustomerPayload) => customerApi.create(payload),
+    mutationFn: (payload: CreateCustomerRequest) => customerApi.create(payload),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: CUSTOMER_KEYS.all });
-        toast.success(`Tạo ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (!result.isSuccess) {
+        showError(result.message || `Có lỗi xảy ra khi tạo khách hàng`);
+        return;
       }
+
+      queryClient.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEY.all });
+      showSuccess(`Tạo khách hàng thành công`);
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi tạo ${ENTITY}`));
+      showError(getErrorMessage(error, `Có lỗi xảy ra khi tạo khách hàng`));
     },
   });
 }
 
+// Cập nhật khách hàng
 export function useUpdateCustomer() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
       id,
       payload,
     }: {
       id: number;
-      payload: UpdateCustomerPayload;
+      payload: UpdateCustomerRequest;
     }) => customerApi.update(id, payload),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: CUSTOMER_KEYS.all });
-        toast.success(`Cập nhật ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (!result.isSuccess) {
+        showError(result.message || `Có lỗi xảy ra khi cập nhật khách hàng`);
+        return;
       }
+
+      queryClient.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEY.all });
+      showSuccess(`Cập nhật khách hàng thành công`);
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(
-        getErrorMessage(error, `Có lỗi xảy ra khi cập nhật ${ENTITY}`),
+      showError(
+        getErrorMessage(error, `Có lỗi xảy ra khi cập nhật khách hàng`),
       );
     },
   });
 }
 
+// Xóa khách hàng
 export function useDeleteCustomer() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => customerApi.delete(id),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: CUSTOMER_KEYS.all });
-        toast.success(`Xóa ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (!result.isSuccess) {
+        showError(result.message || `Có lỗi xảy ra khi xóa khách hàng`);
+        return;
       }
+
+      queryClient.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEY.all });
+      showSuccess(`Xóa khách hàng thành công`);
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi xóa ${ENTITY}`));
+      showError(getErrorMessage(error, `Có lỗi xảy ra khi xóa khách hàng`));
     },
   });
 }
 
+// Khôi phục khách hàng
 export function useRestoreCustomer() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) =>
       customerApi.update(id, { status: StatusActive.Active }),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: CUSTOMER_KEYS.all });
-        toast.success(`Khôi phục ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (!result.isSuccess) {
+        showError(result.message || `Có lỗi xảy ra khi khôi phục khách hàng`);
+        return;
       }
+
+      queryClient.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEY.all });
+      showSuccess(`Khôi phục khách hàng thành công`);
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(
-        getErrorMessage(error, `Có lỗi xảy ra khi khôi phục ${ENTITY}`),
+      showError(
+        getErrorMessage(error, `Có lỗi xảy ra khi khôi phục khách hàng`),
       );
     },
+  });
+}
+
+// lấy danh sách lịch hẹn của khách hàng
+export function useCustomerAppointments(params: GetAllAppointmentParams) {
+  return useQuery({
+    queryKey: ["customer-appointments", params],
+    queryFn: () => bookingApi.getByUserId(params),
   });
 }
