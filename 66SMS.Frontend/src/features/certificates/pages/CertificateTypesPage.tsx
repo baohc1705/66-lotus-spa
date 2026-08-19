@@ -1,6 +1,6 @@
 import { CertificateTypeForm } from "@/features/certificates/components/CertificateTypeForm";
 import { CertificateTypeTable } from "@/features/certificates/components/CertificateTypeTable";
-import type { CertificateTypeDto } from "@/features/certificates/types/certificate.types";
+import type { CertificateTypeDto } from "@/features/certificates/types/certificateType.types";
 import { useState } from "react";
 
 export function CertificateTypesPage() {

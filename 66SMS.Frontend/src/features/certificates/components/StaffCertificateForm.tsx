@@ -4,10 +4,7 @@ import {
   useCreateStaffCertificate,
   useUpdateStaffCertificate,
 } from "@/features/certificates/hooks/useStaffCertificates";
-import type {
-  CertificateTypeDto,
-  StaffCertificateDto,
-} from "@/features/certificates/types/certificate.types";
+import type { StaffCertificateDto } from "@/features/certificates/types/certificate.types";
 import { useStaffs } from "@/features/staffs/hooks/useStaffs";
 import type { StaffDto } from "@/features/staffs/types/staff.types";
 import { Modal } from "@/shared/components/Modal";
@@ -27,14 +24,25 @@ import { ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { useForm, useWatch, type Resolver } from "react-hook-form";
 import { z } from "zod";
+import type { CertificateTypeDto } from "../types/certificateType.types";
 
 // Validate dữ liệu client side
 const staffCertificateSchema = z.object({
   staffId: z.coerce.number().min(1, "Vui lòng chọn nhân viên"),
   certificateTypeId: z.coerce.number().min(1, "Vui lòng chọn loại chứng chỉ"),
-  certificateName: z.string().min(1, "Tên chứng chỉ không được để trống").max(200, "Tối đa 200 ký tự"),
-  certificateNumber: z.string().max(50, "Tối đa 50 ký tự").optional().or(z.literal("")),
-  issuingOrganization: z.string().min(1, "Tổ chức cấp không được để trống").max(200, "Tối đa 200 ký tự"),
+  certificateName: z
+    .string()
+    .min(1, "Tên chứng chỉ không được để trống")
+    .max(200, "Tối đa 200 ký tự"),
+  certificateNumber: z
+    .string()
+    .max(50, "Tối đa 50 ký tự")
+    .optional()
+    .or(z.literal("")),
+  issuingOrganization: z
+    .string()
+    .min(1, "Tổ chức cấp không được để trống")
+    .max(200, "Tối đa 200 ký tự"),
   issuedDate: z.string().min(1, "Ngày cấp không được để trống"),
   expiryDate: z.string().optional().or(z.literal("")),
   documentUrl: z.string().optional().or(z.literal("")),
@@ -88,13 +96,20 @@ export function StaffCertificateForm({
   const createMutation = useCreateStaffCertificate();
   const createMineMutation = useCreateMineCertificate();
   const updateMutation = useUpdateStaffCertificate();
-  const isPending = createMutation.isPending || createMineMutation.isPending || updateMutation.isPending;
+  const isPending =
+    createMutation.isPending ||
+    createMineMutation.isPending ||
+    updateMutation.isPending;
 
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   // Reset form khi mở modal bằng formKey
-  const formKey = !open ? "closed" : isEdit ? `edit-${staffCertificate?.id ?? "loading"}` : "new";
+  const formKey = !open
+    ? "closed"
+    : isEdit
+      ? `edit-${staffCertificate?.id ?? "loading"}`
+      : "new";
   const [appliedFormKey, setAppliedFormKey] = useState(formKey);
 
   // Lấy danh sách loại chứng chỉ
@@ -103,7 +118,10 @@ export function StaffCertificateForm({
 
   // Chỉ hiện chọn nhân viên khi tạo mới + không có staffId + không phải submitMode
   const showStaffSelect = !isEdit && !staffId && !submitMode;
-  const staffsQuery = useStaffs({ pageIndex: 1, pageSize: 100 }, showStaffSelect);
+  const staffsQuery = useStaffs(
+    { pageIndex: 1, pageSize: 100 },
+    showStaffSelect,
+  );
   const staffs = staffsQuery.data?.data?.items ?? [];
 
   const {
@@ -115,7 +133,9 @@ export function StaffCertificateForm({
     setValue,
     setError,
   } = useForm<StaffCertificateFormData>({
-    resolver: zodResolver(staffCertificateSchema) as Resolver<StaffCertificateFormData>,
+    resolver: zodResolver(
+      staffCertificateSchema,
+    ) as Resolver<StaffCertificateFormData>,
     defaultValues: getDefaultValues(null, staffId),
   });
 
@@ -155,7 +175,9 @@ export function StaffCertificateForm({
     }
 
     if (!data.certificateTypeId || data.certificateTypeId <= 0) {
-      setError("certificateTypeId", { message: "Vui lòng chọn loại chứng chỉ" });
+      setError("certificateTypeId", {
+        message: "Vui lòng chọn loại chứng chỉ",
+      });
       return;
     }
 
@@ -284,7 +306,11 @@ export function StaffCertificateForm({
         </>
       }
     >
-      <form id="staff-certificate-form" onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+      <form
+        id="staff-certificate-form"
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-3"
+      >
         <FormSection icon={ShieldCheck} title="Thông tin chứng chỉ">
           {showStaffSelect ? (
             <FormField label="Nhân viên *" error={errors.staffId?.message}>
@@ -306,7 +332,10 @@ export function StaffCertificateForm({
           ) : null}
 
           <FormRow>
-            <FormField label="Loại chứng chỉ *" error={errors.certificateTypeId?.message}>
+            <FormField
+              label="Loại chứng chỉ *"
+              error={errors.certificateTypeId?.message}
+            >
               <SearchableSelect
                 value={selectedTypeId ? String(selectedTypeId) : ""}
                 onChange={(value: string) => {
@@ -314,7 +343,9 @@ export function StaffCertificateForm({
                     setValue("certificateTypeId", 0, { shouldValidate: true });
                     return;
                   }
-                  setValue("certificateTypeId", Number(value), { shouldValidate: true });
+                  setValue("certificateTypeId", Number(value), {
+                    shouldValidate: true,
+                  });
                 }}
                 options={typeOptions}
                 placeholder="Chọn loại chứng chỉ"
@@ -327,7 +358,9 @@ export function StaffCertificateForm({
               <FormField label="Trạng thái" error={errors.status?.message}>
                 <Select
                   value={String(status ?? 0)}
-                  onChange={(event) => setValue("status", Number(event.target.value))}
+                  onChange={(event) =>
+                    setValue("status", Number(event.target.value))
+                  }
                   options={STATUS_OPTIONS}
                   invalid={!!errors.status}
                 />
@@ -335,7 +368,10 @@ export function StaffCertificateForm({
             ) : null}
           </FormRow>
 
-          <FormField label="Tên chứng chỉ *" error={errors.certificateName?.message}>
+          <FormField
+            label="Tên chứng chỉ *"
+            error={errors.certificateName?.message}
+          >
             <Input
               {...register("certificateName")}
               placeholder="Chứng chỉ Massage Trị liệu Quốc tế"
@@ -344,7 +380,10 @@ export function StaffCertificateForm({
           </FormField>
 
           <FormRow>
-            <FormField label="Số chứng chỉ" error={errors.certificateNumber?.message}>
+            <FormField
+              label="Số chứng chỉ"
+              error={errors.certificateNumber?.message}
+            >
               <Input
                 {...register("certificateNumber")}
                 placeholder="VN-2024-12345"
@@ -352,7 +391,10 @@ export function StaffCertificateForm({
               />
             </FormField>
 
-            <FormField label="Tổ chức cấp *" error={errors.issuingOrganization?.message}>
+            <FormField
+              label="Tổ chức cấp *"
+              error={errors.issuingOrganization?.message}
+            >
               <Input
                 {...register("issuingOrganization")}
                 placeholder="Bộ Y tế / CIDESCO"
@@ -370,7 +412,11 @@ export function StaffCertificateForm({
               />
             </FormField>
 
-            <FormField label="Ngày hết hạn" help="Để trống nếu không hết hạn" error={errors.expiryDate?.message}>
+            <FormField
+              label="Ngày hết hạn"
+              help="Để trống nếu không hết hạn"
+              error={errors.expiryDate?.message}
+            >
               <Input
                 {...register("expiryDate")}
                 type="date"
