@@ -27,7 +27,7 @@ import { customerApi } from "@/features/customers/api/customer.api";
 import { useCustomers } from "@/features/customers/hooks/useCustomers";
 import type { CustomerDto } from "@/features/customers/types/customer.types";
 import { useSalons } from "@/features/salons/hooks/useSalons";
-import type { SalonListItem } from "@/features/salons/types/salon.types";
+import type { SalonDto } from "@/features/salons/types/salon.types";
 import { useServices } from "@/features/services/hooks/useServices";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/elements/Button";
@@ -141,8 +141,8 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
   const salonOptions = useMemo(
     () =>
       salonItems
-        .filter((s: SalonListItem) => s.id != null)
-        .map((s: SalonListItem) => ({
+        .filter((s: SalonDto) => s.id != null)
+        .map((s: SalonDto) => ({
           value: String(s.id),
           label: s.name ?? "",
         })),
@@ -204,7 +204,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
   );
 
   const selectedSalon = useMemo(() => {
-    return salonItems.find((s: SalonListItem) => s.id === salonId) ?? null;
+    return salonItems.find((s: SalonDto) => s.id === salonId) ?? null;
   }, [salonItems, salonId]);
 
   const selectedTimeSlot = useMemo(() => {

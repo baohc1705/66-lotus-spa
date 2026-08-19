@@ -14,7 +14,7 @@ namespace _66SMS.Application.SalonService.StaffSalons.Commands.CreateStaffSalon
         public int? StaffId { get; set; }
         public int? SalonId { get; set; }
         public bool? IsManager { get; set; }
-        public DateOnly? StartDate { get; set; } = DateTimeHelper.UtcNow().ToDateOnly();
+        public DateOnly? StartDate { get; set; } = DateTimeHelper.VnToday();
         public DateOnly? EndDate { get; set; }
         public int? Status { get; set; } = (int)StatusActiveEnum.ACTIVED;
         [JsonIgnore]

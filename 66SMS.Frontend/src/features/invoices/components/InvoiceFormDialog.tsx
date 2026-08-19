@@ -29,7 +29,7 @@ import type { ProductDto } from "@/features/products/types/product.types";
 import type { TreatmentCourseDto } from "@/features/treatment_courses/types/treatmentCourse.types";
 import type { StaffDto } from "@/features/staffs/types/staff.types";
 import { useSalons } from "@/features/salons/hooks/useSalons";
-import type { SalonDTO } from "@/features/salons/types/salon.types";
+import type { SalonDto } from "@/features/salons/types/salon.types";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import {
   INVOICE_ITEM_TYPE,
@@ -67,7 +67,7 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
 
   const effectiveSalonId = useAuthStore((s) => s.getEffectiveSalonId());
   const { data: salonsResult } = useSalons({ pageIndex: 1, pageSize: 100 });
-  const salons: SalonDTO[] = salonsResult?.data?.items ?? [];
+  const salons: SalonDto[] = salonsResult?.data?.items ?? [];
   const customers: CustomerDto[] =
     useCustomers({ pageIndex: 1, pageSize: 200 }).data?.data?.items ?? [];
   const services: ServiceDto[] =
@@ -153,7 +153,7 @@ export function InvoiceFormDialog({ open, onOpenChange }: Props) {
     value: String(c.id ?? ""),
     label: `${c.fullName ?? ""} — ${c.phone ?? ""}`,
   }));
-  const salonOptions = salons.map((s: SalonDTO) => ({
+  const salonOptions = salons.map((s: SalonDto) => ({
     value: String(s.id ?? ""),
     label: `${s.name ?? ""} — ${s.code ?? ""}`,
   }));

@@ -6,7 +6,7 @@ import { TabNav } from "@/shared/components/Tabs";
 import { Dropdown, type DropdownItem } from "@/shared/elements/Dropdown";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useLogout } from "@/features/auth/hooks/useLogout";
-import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
+import { useActiveSalons } from "@/features/salons/hooks/useSalons";
 import { NotificationBell } from "@/features/notifications";
 import { Button } from "@/shared/elements/Button";
 import { Badge } from "@/shared/elements/Badge";

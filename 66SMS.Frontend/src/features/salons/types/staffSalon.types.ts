@@ -16,7 +16,7 @@ export interface StaffSalonDTO {
   updatedAt?: string;
 }
 
-export interface CreateStaffSalonPayload {
+export interface CreateStaffSalonRequest {
   staffId: number;
   salonId: number;
   isManager?: boolean;
@@ -25,14 +25,13 @@ export interface CreateStaffSalonPayload {
   status?: number;
 }
 
-export interface UpdateStaffSalonPayload {
-  isManager?: boolean;
+export interface UpdateStaffSalonRequest {
   startDate?: string;
   endDate?: string;
   status?: number;
 }
 
-export interface StaffSalonQueryParams extends PageRequest {
+export interface GetAllStaffSalonQuery extends PageRequest {
   salonId?: number;
   staffId?: number;
   status?: number;

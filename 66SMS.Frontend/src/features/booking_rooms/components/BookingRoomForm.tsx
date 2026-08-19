@@ -8,8 +8,8 @@ import type {
   CreateBookingRoomRequest,
   UpdateBookingRoomRequest,
 } from "@/features/booking_rooms/types/bookingRoom.types";
-import { useAdminSalons } from "@/features/salons/hooks/useSalons";
-import type { SalonDTO } from "@/features/salons/types/salon.types";
+import { useSalonsAdmin } from "@/features/salons/hooks/useSalons";
+import type { SalonDto } from "@/features/salons/types/salon.types";
 import { Modal } from "@/shared/components/Modal";
 import { Tabs } from "@/shared/components/Tabs";
 import { StatusActive } from "@/shared/constants/status.enum";
@@ -97,7 +97,7 @@ export function BookingRoomForm({ open, onOpenChange, bookingRoom }: Props) {
   const [isUploading, setIsUploading] = useState(false);
 
   const effectiveSalonId = useAuthStore((state) => state.getEffectiveSalonId());
-  const { data: salonsResult } = useAdminSalons(
+  const { data: salonsResult } = useSalonsAdmin(
     { pageIndex: 1, pageSize: 100 },
     open && !isEdit,
   );
@@ -377,7 +377,7 @@ export function BookingRoomForm({ open, onOpenChange, bookingRoom }: Props) {
                           invalid={!!createForm.formState.errors.salonId}
                         >
                           <option value="">{salonPlaceholder}</option>
-                          {salons.map((salon: SalonDTO) => (
+                          {salons.map((salon: SalonDto) => (
                             <option key={salon.id} value={String(salon.id)}>
                               {salon.name}
                             </option>

@@ -13,8 +13,8 @@ import { Select } from "@/shared/forms/Select";
 import { toLocalTimeOnly } from "@/shared/utils/date.utils";
 
 import { useAuthStore } from "@/features/auth/stores/authStore";
-import { useAdminSalons } from "@/features/salons/hooks/useSalons";
-import type { SalonDTO } from "@/features/salons/types/salon.types";
+import { useSalonsAdmin } from "@/features/salons/hooks/useSalons";
+import type { SalonDto } from "@/features/salons/types/salon.types";
 import {
   useCreateConfigAppointment,
   useUpdateConfigAppointment,
@@ -74,13 +74,13 @@ export function ConfigAppointmentFormDialog({
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   const effectiveSalonId = useAuthStore((state) => state.getEffectiveSalonId());
-  const { data: salonsResult } = useAdminSalons(
+  const { data: salonsResult } = useSalonsAdmin(
     { pageIndex: 1, pageSize: 100 },
     open && !isEdit,
   );
   const salons = salonsResult?.data?.items ?? [];
 
-  const salonOptions = salons.map((salon: SalonDTO) => ({
+  const salonOptions = salons.map((salon: SalonDto) => ({
     value: String(salon.id),
     label: salon.name ?? "",
   }));
