@@ -56,7 +56,7 @@ export function AdminLayout() {
 
   useEffect(() => {
     if (hasAccess && isStaffOrReceptionist && location.pathname === "/admin") {
-      navigate("/admin/staff/appointments", { replace: true });
+      navigate("/admin/nhan-vien/lich-hen", { replace: true });
     }
   }, [hasAccess, isStaffOrReceptionist, location.pathname, navigate]);
 

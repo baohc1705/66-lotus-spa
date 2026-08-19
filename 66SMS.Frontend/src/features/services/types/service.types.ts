@@ -57,6 +57,7 @@ export interface GetAllServiceQuery extends PageRequest {
   maxPrice?: number;
   status?: number;
   isDeleted?: boolean;
+  excludeStaffId?: number | null;
 }
 
 export interface CreateServiceRequest {

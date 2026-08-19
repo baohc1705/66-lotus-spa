@@ -18,7 +18,7 @@ export const useLogout = () => {
     onSettled: () => {
       clearAuth();
       queryClient.clear();
-      navigate('/login');
+      navigate('/dang-nhap');
     },
     onError: (error: AxiosError<Result<unknown>>) =>
       toast.error(getErrorMessage(error, 'Đăng xuất thất bại')),

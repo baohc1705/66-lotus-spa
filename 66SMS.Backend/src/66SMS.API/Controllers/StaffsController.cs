@@ -3,6 +3,7 @@ using _66SMS.Application.DTOs;
 using _66SMS.Application.SalonService.Staffs.Commands.CreateStaff;
 using _66SMS.Application.SalonService.Staffs.Commands.CreateStaffServices;
 using _66SMS.Application.SalonService.Staffs.Commands.DeleteStaff;
+using _66SMS.Application.SalonService.Staffs.Commands.DeleteStaffMultiples;
 using _66SMS.Application.SalonService.Staffs.Commands.DeleteStaffServices;
 using _66SMS.Application.SalonService.Staffs.Commands.UpdateMyBookingStatus;
 using _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff;
@@ -66,6 +67,15 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
+        [HttpDelete("bulk")]
+        [PermissionAuthorize("staffs", "delete", Roles = "admin")]
+        public async Task<IActionResult> DeleteMultiples([FromBody] DeleteStaffMultiplesCommand command)
+        {
+            command.UpdatedBy = jwtService.GetUserId();
+            var result = await mediator.Send(command);
+            return HandleResult(result);
+        }
+
         [HttpPatch("{id}")]
         [PermissionAuthorize("staffs", "update")]
         public async Task<IActionResult> UpdateStaff(int id, [FromBody] UpdateStaffCommand command)
@@ -96,7 +106,8 @@ namespace _66SMS.API.Controllers
             {
                 SalonId = salonId,
                 PageSize = 100,
-                PageIndex = 1
+                PageIndex = 1,
+                IsDeleted = false
             };
             var result = await mediator.Send(query);
             if (!result.IsSuccess)
@@ -111,6 +122,7 @@ namespace _66SMS.API.Controllers
             var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue)
                 query.SalonId = tokenSalonId.Value;
+            query.IsDeleted = false;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

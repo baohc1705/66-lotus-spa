@@ -609,7 +609,7 @@ export function AdminDashboard() {
                 variant="nav-link-header"
               />
               <Link
-                to="/admin/reports/revenue/by-staff"
+                to="/admin/bao-cao/doanh-thu/theo-nhan-vien"
                 className="inline-flex items-center gap-1 text-xs font-semibold text-kit-primary no-underline hover:underline"
               >
                 Xem chi tiết

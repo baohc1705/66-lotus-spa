@@ -8,7 +8,7 @@ import {
 
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useSalons } from "@/features/salons/hooks/useSalons";
-import { useAdminStaffs } from "@/features/staffs/hooks/useStaffs";
+import { useStaffsAdmin } from "@/features/staffs/hooks/useStaffs";
 import type { StaffDto } from "@/features/staffs/types/staff.types";
 import type { SalonListItem } from "@/features/salons/types/salon.types";
 import { Pagination } from "@/shared/components/Pagination";
@@ -68,7 +68,7 @@ export function PayrollListPage() {
     setStaffId(myStaffId);
   }, [canManagePayroll, myStaffId]);
 
-  const { data: staffsResult } = useAdminStaffs(
+  const { data: staffsResult } = useStaffsAdmin(
     {
       pageIndex: 1,
       pageSize: 200,

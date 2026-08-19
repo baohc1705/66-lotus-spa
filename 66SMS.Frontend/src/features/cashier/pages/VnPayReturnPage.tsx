@@ -55,7 +55,7 @@ export function VnPayReturnPage() {
 
   const handleReturn = () => {
     if (phase === "deposit" || phase === "topup") {
-      navigate(phase === "topup" ? "/profile?tab=wallet" : "/profile");
+      navigate(phase === "topup" ? "/ho-so?tab=wallet" : "/ho-so");
     } else {
       navigate("/thu-ngan");
     }

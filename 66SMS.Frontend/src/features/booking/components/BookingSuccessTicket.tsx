@@ -182,7 +182,7 @@ export function BookingSuccessTicket() {
             Về trang chủ
           </button>
           <Link
-            to="/profile?tab=bookings"
+            to="/ho-so?tab=bookings"
             onClick={() => resetBooking()}
             className="text-sm font-semibold text-rose-600 hover:text-rose-400 mt-2"
           >

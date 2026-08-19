@@ -33,6 +33,7 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
                 request.MinPrice,
                 request.MaxPrice,
                 request.IsDeleted,
+                request.ExcludeStaffId,
                 request.PageIndex,
                 request.PageSize,
                 request.OrderBy,
@@ -79,6 +80,13 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
             if (request.MaxPrice.HasValue)
             {
                 query = query.Where(x => x.SellingPrice <= request.MaxPrice);
+            }
+
+            if (request.ExcludeStaffId.HasValue)
+            {
+                var staffId = request.ExcludeStaffId.Value;
+                query = query.Where(x =>
+                    !x.StaffServices!.Any(staffService => staffService.StaffId == staffId));
             }
 
             query = request.OrderBy?.ToLower() switch

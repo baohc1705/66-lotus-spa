@@ -98,7 +98,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
 
             {isLoggedIn ? (
               <a
-                href="/profile"
+                href="/ho-so"
                 className={`flex items-center gap-2 text-xs font-medium transition-colors duration-300 ${isDark ? "text-ink hover:text-rose-600" : "text-white/90 hover:text-white"}`}
               >
                 <div className="w-7 h-7 rounded-full border border-rose-200 bg-rose-50 flex items-center justify-center text-rose-600 overflow-hidden">
@@ -118,7 +118,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
               </a>
             ) : (
               <a
-                href="/login"
+                href="/dang-nhap"
                 className={`flex items-center gap-1.5 font-sans text-xs font-medium transition-colors duration-300 ${isDark ? "text-ink hover:text-rose-600" : "text-white/90 hover:text-white"}`}
               >
                 <UserIcon className="w-3.5 h-3.5" />
@@ -177,7 +177,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
               <div className="pt-4 border-t border-warm-100 flex flex-col gap-2 mt-2">
                 {isLoggedIn ? (
                   <a
-                    href="/profile"
+                    href="/ho-so"
                     onClick={() => setMenuOpen(false)}
                     className="flex items-center gap-2 font-sans text-base font-medium text-ink hover:text-rose-600 py-2 transition-colors"
                   >
@@ -196,7 +196,7 @@ export const Navbar = ({ alwaysDark = false }: NavbarProps) => {
                   </a>
                 ) : (
                   <a
-                    href="/login"
+                    href="/dang-nhap"
                     onClick={() => setMenuOpen(false)}
                     className="flex items-center gap-2 font-sans text-base font-medium text-ink hover:text-rose-600 py-2 transition-colors"
                   >

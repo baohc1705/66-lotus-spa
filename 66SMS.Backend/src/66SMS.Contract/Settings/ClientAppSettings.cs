@@ -5,6 +5,6 @@ namespace _66SMS.Contract.Settings
         public const string SectionName = "ClientAppSettings";
 
         public string BaseUrl { get; set; } = string.Empty;
-        public string ResetPasswordPath { get; set; } = "/reset-password";
+        public string ResetPasswordPath { get; set; } = "/dat-lai-mat-khau";
     }
 }

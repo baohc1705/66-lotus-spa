@@ -70,7 +70,7 @@ export function CashierHeader({
       type: "item",
       label: "Hồ sơ cá nhân",
       icon: <User className="h-3.5 w-3.5" />,
-      onClick: () => navigate("/admin/profile"),
+      onClick: () => navigate("/admin/ho-so"),
     },
     { type: "divider" },
     {

@@ -44,7 +44,7 @@ export const ResetPasswordForm = () => {
           Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.
         </p>
         <Link
-          to="/forgot-password"
+          to="/quen-mat-khau"
           className="inline-block text-sm font-semibold text-rose-600 hover:underline"
         >
           Yêu cầu link mới
@@ -127,7 +127,7 @@ export const ResetPasswordForm = () => {
 
       <div className="text-center text-xs text-warm-600">
         <Link
-          to="/login"
+          to="/dang-nhap"
           className="font-semibold text-rose-600 hover:text-rose-500 hover:underline"
         >
           Quay lại đăng nhập

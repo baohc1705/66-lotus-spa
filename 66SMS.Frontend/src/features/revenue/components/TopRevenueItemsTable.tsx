@@ -106,7 +106,7 @@ export const TopRevenueItemsTable = memo(function TopRevenueItemsTable({
 
       <div className="border-t border-adminGray-100 mt-2 pt-2 shrink-0">
         <Link
-          to="/admin/services"
+          to="/admin/dich-vu"
           className="flex items-center justify-center gap-1 text-xs text-adminGray-400 hover:text-adminGreen-600 font-semibold transition-colors"
         >
           Xem tất cả

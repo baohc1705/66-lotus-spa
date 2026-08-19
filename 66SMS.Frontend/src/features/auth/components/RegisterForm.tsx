@@ -208,7 +208,7 @@ const RegisterStep = ({ onSuccess }: RegisterStepProps) => {
 
       <div className="text-center text-xs text-warm-600">
         Đã có tài khoản?{" "}
-        <Link to="/login" className="font-semibold text-rose-600 hover:text-rose-500 hover:underline transition-colors">
+        <Link to="/dang-nhap" className="font-semibold text-rose-600 hover:text-rose-500 hover:underline transition-colors">
           Đăng nhập ngay
         </Link>
       </div>
@@ -307,7 +307,7 @@ const OtpStep = ({ email }: OtpStepProps) => {
       {
         onSuccess: () => {
           toast.success("Xác minh email thành công! Vui lòng đăng nhập.");
-          navigate("/login");
+          navigate("/dang-nhap");
         },
       },
     );

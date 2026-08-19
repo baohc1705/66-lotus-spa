@@ -30,7 +30,8 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetAllStaffs
             string? cacheKey = null;
             if (request.SalonId.HasValue
                 && string.IsNullOrEmpty(request.Role)
-                && string.IsNullOrEmpty(request.Filter))
+                && string.IsNullOrEmpty(request.Filter)
+                && request.IsDeleted != true)
             {
                 cacheKey = StaffConst.CacheKeyBySalon(request.SalonId.Value);
                 var cached = await cacheService.GetAsync<PagedResult<StaffDto>>(cacheKey, cancellationToken);
@@ -69,7 +70,11 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetAllStaffs
                     || (x.User != null && x.User.Email == filter));
             }
 
-            if (!request.IsDeleted)
+            if (request.IsDeleted)
+            {
+                query = query.Where(x => x.Status == (int)StatusActiveEnum.DELETED);
+            }
+            else
             {
                 query = query.Where(x => x.Status != (int)StatusActiveEnum.DELETED);
             }
@@ -117,6 +122,7 @@ namespace _66SMS.Application.SalonService.Staffs.Queries.GetAllStaffs
                     Status = x.Status,
                     Email = x.User != null ? x.User.Email : null,
                     CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
                 })
                 .ToPagedAsync(request, cancellationToken);
 

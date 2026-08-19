@@ -170,7 +170,7 @@ export function AdminHeader(props: AdminHeaderProps) {
                     </p>
                   </div>
                   <Link
-                    to="/admin/profile"
+                    to="/admin/ho-so"
                     onClick={() => setIsProfileOpen(false)}
                     className="flex items-center gap-2 rounded-md px-3 py-1.5 text-xs text-kit-body no-underline hover:bg-blue-50 hover:text-kit-primary"
                   >
@@ -178,7 +178,7 @@ export function AdminHeader(props: AdminHeaderProps) {
                     <span>Hồ sơ cá nhân</span>
                   </Link>
                   <Link
-                    to="/admin/profile"
+                    to="/admin/ho-so"
                     onClick={() => setIsProfileOpen(false)}
                     className="flex items-center gap-2 rounded-md px-3 py-1.5 text-xs text-kit-body no-underline hover:bg-blue-50 hover:text-kit-primary"
                   >

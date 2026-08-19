@@ -9,7 +9,7 @@ public class StaffServiceDto
     public string? SerCode { get; set; }
     public string? SerName { get; set; }
     public int? SerDurationMins { get; set; }
-    public decimal? SerCostPrice { get; set; }
+    public decimal? SerSellPrice { get; set; }
     public decimal? SerCommissionRate { get; set; }
     public DateTimeOffset? CreatedAt { get; set; }
 }

@@ -14,7 +14,7 @@ export const useResetPassword = () => {
     onSuccess: (result) => {
       if (result.isSuccess) {
         toast.success(result.message || 'Đặt lại mật khẩu thành công')
-        navigate('/login')
+        navigate('/dang-nhap')
       } else {
         toast.error(result.message)
       }

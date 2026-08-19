@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 import { User, Lock, Loader2, Save } from "lucide-react";
 import { useProfile } from "@/features/profile/hooks/useProfile";
 import { useChangePassword } from "@/features/profile/hooks/useChangePassword";
-import { useUpdateStaffMutation } from "@/features/staffs/hooks/useStaffs";
+import { useUpdateStaff } from "@/features/staffs/hooks/useStaffs";
 import {
   profileSchema,
   changePasswordSchema,
@@ -47,7 +47,7 @@ export function AdminProfilePage() {
   const qc = useQueryClient();
   const { data: profile, isLoading, isError } = useProfile();
 
-  const updateStaffMutation = useUpdateStaffMutation();
+  const updateStaffMutation = useUpdateStaff();
   const changePasswordMutation = useChangePassword();
 
   const isProfilePending = updateStaffMutation.isPending;
@@ -138,7 +138,7 @@ export function AdminProfilePage() {
     };
 
     updateStaffMutation.mutate(
-      { id: profile.staffInfo.id, payload },
+      { id: profile.staffInfo.id, data: payload },
       {
         onSuccess: (res) => {
           if (res.isSuccess) {
@@ -172,7 +172,7 @@ export function AdminProfilePage() {
   const avatarUrl = watchProfile("profilePhotoUrl");
 
   if (!isLoading && profile?.profileType === "Customer") {
-    return <Navigate to="/profile" replace />;
+    return <Navigate to="/ho-so" replace />;
   }
 
   if (isLoading) {

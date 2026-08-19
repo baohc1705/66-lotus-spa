@@ -8,8 +8,7 @@ import {
 } from "@/features/auth";
 import { AdminLayout } from "@/features/admin/AdminLayout";
 import { SettingsLayout } from "@/features/setttings/components/SettingsLayout";
-import { ProtectedRoute } from "./ProtectedRoute";
-import { WithPageSuspense } from "./WithPageSuspense";
+import { ProtectedRoute, WithPageSuspense } from "./routeElements";
 import {
   ProfilePage,
   AdminDashboard,
@@ -21,7 +20,7 @@ import {
   AccountListPage,
   UsersPage,
   StaffListPage,
-  MyStaffServicesPage,
+  StaffServiceListPage,
   StaffAppointmentsPage,
   CustomerListPage,
   MembershipCardListPage,
@@ -82,10 +81,10 @@ import {
 
 export const router = createBrowserRouter([
   { path: "/", element: <HomePage /> },
-  { path: "/login", element: <LoginPage /> },
-  { path: "/register", element: <RegisterPage /> },
-  { path: "/forgot-password", element: <ForgotPasswordPage /> },
-  { path: "/reset-password", element: <ResetPasswordPage /> },
+  { path: "/dang-nhap", element: <LoginPage /> },
+  { path: "/dang-ky", element: <RegisterPage /> },
+  { path: "/quen-mat-khau", element: <ForgotPasswordPage /> },
+  { path: "/dat-lai-mat-khau", element: <ResetPasswordPage /> },
   {
     path: "/thanh-toan/vnpay-return",
     element: (
@@ -107,7 +106,7 @@ export const router = createBrowserRouter([
     children: [
       { path: "/dashboard", element: <div className="p-6">Dashboard</div> },
       {
-        path: "/users",
+        path: "/tai-khoan",
         element: (
           <WithPageSuspense>
             <UsersPage />
@@ -115,7 +114,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/profile",
+        path: "/ho-so",
         element: (
           <WithPageSuspense>
             <ProfilePage />
@@ -143,7 +142,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "profile",
+            path: "ho-so",
             element: (
               <WithPageSuspense>
                 <AdminProfilePage />
@@ -151,7 +150,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "staff/list",
+            path: "nhan-vien",
             element: (
               <WithPageSuspense>
                 <StaffListPage />
@@ -159,15 +158,15 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "staff/my-services",
+            path: "nhan-vien/dich-vu",
             element: (
               <WithPageSuspense>
-                <MyStaffServicesPage />
+                <StaffServiceListPage />
               </WithPageSuspense>
             ),
           },
           {
-            path: "staff/appointments",
+            path: "nhan-vien/lich-hen",
             element: (
               <WithPageSuspense>
                 <StaffAppointmentsPage />
@@ -175,7 +174,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "customers/list",
+            path: "khach-hang",
             element: (
               <WithPageSuspense>
                 <CustomerListPage />
@@ -183,7 +182,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "customers/membership-cards",
+            path: "khach-hang/the-thanh-vien",
             element: (
               <WithPageSuspense>
                 <MembershipCardListPage />
@@ -191,7 +190,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "customers/membership-tiers",
+            path: "khach-hang/hang-thanh-vien",
             element: (
               <WithPageSuspense>
                 <MembershipTierListPage />
@@ -199,7 +198,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "products/list",
+            path: "san-pham",
             element: (
               <WithPageSuspense>
                 <ProductListPage />
@@ -207,7 +206,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "products/categories",
+            path: "san-pham/danh-muc",
             element: (
               <WithPageSuspense>
                 <ProductCategoryListPage />
@@ -215,7 +214,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "services",
+            path: "dich-vu",
             element: (
               <WithPageSuspense>
                 <ServiceListPage />
@@ -223,7 +222,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "rooms/list",
+            path: "phong-dich-vu",
             element: (
               <WithPageSuspense>
                 <BookingRoomListPage />
@@ -231,7 +230,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "rooms/positions",
+            path: "phong-dich-vu/vi-tri",
             element: (
               <WithPageSuspense>
                 <BookingPositionListPage />
@@ -239,11 +238,11 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "timeslots",
-            element: <Navigate to="/admin/config-appointments" replace />,
+            path: "khung-gio",
+            element: <Navigate to="/admin/cau-hinh-dat-lich" replace />,
           },
           {
-            path: "config-appointments",
+            path: "cau-hinh-dat-lich",
             element: (
               <WithPageSuspense>
                 <ConfigAppointmentListPage />
@@ -251,7 +250,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "services/categories",
+            path: "dich-vu/danh-muc",
             element: (
               <WithPageSuspense>
                 <ServiceCategoryListPage />
@@ -259,7 +258,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "shifts",
+            path: "ca-lam-viec",
             element: (
               <WithPageSuspense>
                 <ShiftListPage />
@@ -267,7 +266,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "staff/schedule",
+            path: "nhan-vien/lich-lam-viec",
             element: (
               <WithPageSuspense>
                 <WorkSchedulePage />
@@ -275,7 +274,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "customers/wallets",
+            path: "khach-hang/vi",
             element: (
               <WithPageSuspense>
                 <WalletManagementPage />
@@ -283,7 +282,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "salons",
+            path: "chi-nhanh",
             element: (
               <WithPageSuspense>
                 <SalonListPage />
@@ -291,7 +290,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "landing-banners",
+            path: "banner-trang-chu",
             element: (
               <WithPageSuspense>
                 <LandingBannerListPage />
@@ -299,7 +298,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "roles",
+            path: "phan-quyen",
             element: (
               <WithPageSuspense>
                 <RolePermissionPage />
@@ -307,7 +306,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "treatments",
+            path: "lieu-trinh",
             element: (
               <WithPageSuspense>
                 <TreatmentCourseListPage />
@@ -315,7 +314,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "invoices",
+            path: "hoa-don",
             element: (
               <WithPageSuspense>
                 <InvoiceListPage />
@@ -323,7 +322,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "certificate-types",
+            path: "loai-chung-chi",
             element: (
               <WithPageSuspense>
                 <CertificateTypesPage />
@@ -331,7 +330,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "staff-certificates",
+            path: "chung-chi-nhan-vien",
             element: (
               <WithPageSuspense>
                 <StaffCertificatesPage />
@@ -339,7 +338,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "my-certificates",
+            path: "chung-chi-cua-toi",
             element: (
               <WithPageSuspense>
                 <StaffCertificatesPage submitMode />
@@ -347,7 +346,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "attendance",
+            path: "cham-cong",
             element: (
               <WithPageSuspense>
                 <AttendanceListPage />
@@ -355,7 +354,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "payroll",
+            path: "bang-luong",
             element: (
               <WithPageSuspense>
                 <PayrollListPage />
@@ -363,7 +362,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "payroll/stats",
+            path: "bang-luong/thong-ke",
             element: (
               <WithPageSuspense>
                 <PayrollStatsPage />
@@ -371,7 +370,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "marketing/promotions",
+            path: "khuyen-mai",
             element: (
               <WithPageSuspense>
                 <PromotionListPage />
@@ -379,7 +378,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "accounts",
+            path: "tai-khoan",
             element: (
               <WithPageSuspense>
                 <AccountListPage />
@@ -387,7 +386,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "reports/revenue/by-day",
+            path: "bao-cao/doanh-thu/theo-ngay",
             element: (
               <WithPageSuspense>
                 <RevenueByDayPage />
@@ -395,7 +394,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "reports/revenue/by-salon",
+            path: "bao-cao/doanh-thu/theo-chi-nhanh",
             element: (
               <WithPageSuspense>
                 <RevenueBySalonPage />
@@ -403,7 +402,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "reports/revenue/by-staff",
+            path: "bao-cao/doanh-thu/theo-nhan-vien",
             element: (
               <WithPageSuspense>
                 <RevenueByStaffPage />
@@ -411,10 +410,18 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "reports/revenue/by-service",
+            path: "bao-cao/doanh-thu/theo-dich-vu",
             element: (
               <WithPageSuspense>
                 <RevenueByServicePage />
+              </WithPageSuspense>
+            ),
+          },
+          {
+            path: "danh-muc-san-pham-v2",
+            element: (
+              <WithPageSuspense>
+                <ProductCategoryListPage />
               </WithPageSuspense>
             ),
           },

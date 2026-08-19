@@ -72,25 +72,25 @@ export const MENU_GROUPS: MenuGroup[] = [
         children: [
           {
             label: "Theo ngày",
-            path: "/admin/reports/revenue/by-day",
+            path: "/admin/bao-cao/doanh-thu/theo-ngay",
             icon: Calendar1Icon,
             allowedRoles: ["Admin", "Manager"],
           },
           {
             label: "Theo chi nhánh",
-            path: "/admin/reports/revenue/by-salon",
+            path: "/admin/bao-cao/doanh-thu/theo-chi-nhanh",
             icon: Home,
             allowedRoles: ["Admin"],
           },
           {
             label: "Theo nhân viên",
-            path: "/admin/reports/revenue/by-staff",
+            path: "/admin/bao-cao/doanh-thu/theo-nhan-vien",
             icon: Users,
             allowedRoles: ["Admin", "Manager"],
           },
           {
             label: "Theo dịch vụ",
-            path: "/admin/reports/revenue/by-service",
+            path: "/admin/bao-cao/doanh-thu/theo-dich-vu",
             icon: Leaf,
             allowedRoles: ["Admin", "Manager"],
           },
@@ -106,10 +106,10 @@ export const MENU_GROUPS: MenuGroup[] = [
         icon: Armchair,
         allowedRoles: ["Admin", "Manager"],
         children: [
-          { label: "Phòng dịch vụ", path: "/admin/rooms/list", icon: Armchair },
+          { label: "Phòng dịch vụ", path: "/admin/phong-dich-vu", icon: Armchair },
           {
             label: "Vị trí dịch vụ",
-            path: "/admin/rooms/positions",
+            path: "/admin/phong-dich-vu/vi-tri",
             icon: MapPin,
           },
         ],
@@ -119,10 +119,10 @@ export const MENU_GROUPS: MenuGroup[] = [
         icon: Leaf,
         allowedRoles: ["Admin", "Manager"],
         children: [
-          { label: "Dịch vụ", path: "/admin/services", icon: Leaf },
+          { label: "Dịch vụ", path: "/admin/dich-vu", icon: Leaf },
           {
             label: "Nhóm dịch vụ",
-            path: "/admin/services/categories",
+            path: "/admin/dich-vu/danh-muc",
             icon: Box,
           },
         ],
@@ -134,19 +134,19 @@ export const MENU_GROUPS: MenuGroup[] = [
         children: [
           {
             label: "Sản phẩm",
-            path: "/admin/products/list",
+            path: "/admin/san-pham",
             icon: SoapDispenserDroplet,
           },
           {
             label: "Nhóm sản phẩm",
-            path: "/admin/products/categories",
+            path: "/admin/san-pham/danh-muc",
             icon: Box,
           },
         ],
       },
       // {
       //   label: "Liệu trình",
-      //   path: "/admin/treatments",
+      //   path: "/admin/lieu-trinh",
       //   icon: History,
       //   allowedRoles: ["Admin", "Manager"],
       // },
@@ -157,19 +157,19 @@ export const MENU_GROUPS: MenuGroup[] = [
     items: [
       {
         label: "Danh sách nhân viên",
-        path: "/admin/staff/list",
+        path: "/admin/nhan-vien",
         icon: Stethoscope,
         allowedRoles: ["Admin", "Manager"],
       },
       {
         label: "Dịch vụ của tôi",
-        path: "/admin/staff/my-services",
+        path: "/admin/nhan-vien/dich-vu",
         icon: Scissors,
         allowedRoles: ["Staff"],
       },
       {
         label: "Chấm công",
-        path: "/admin/attendance",
+        path: "/admin/cham-cong",
         icon: CalendarCheck,
         allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
       },
@@ -180,13 +180,13 @@ export const MENU_GROUPS: MenuGroup[] = [
         children: [
           {
             label: "Danh sách",
-            path: "/admin/payroll",
+            path: "/admin/bang-luong",
             icon: Wallet,
             allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
           },
           {
             label: "Thống kê lương",
-            path: "/admin/payroll/stats",
+            path: "/admin/bang-luong/thong-ke",
             icon: Receipt,
             allowedRoles: ["Admin", "Manager", "Staff"],
           },
@@ -199,19 +199,19 @@ export const MENU_GROUPS: MenuGroup[] = [
         children: [
           {
             label: "Chứng chỉ nhân viên",
-            path: "/admin/staff-certificates",
+            path: "/admin/chung-chi-nhan-vien",
             icon: ShieldCheck,
             allowedRoles: ["Admin", "Manager"],
           },
           {
             label: "Nộp chứng chỉ",
-            path: "/admin/my-certificates",
+            path: "/admin/chung-chi-cua-toi",
             icon: Award,
             allowedRoles: ["Staff"],
           },
           {
             label: "Loại chứng chỉ",
-            path: "/admin/certificate-types",
+            path: "/admin/loai-chung-chi",
             icon: Award,
             allowedRoles: ["Admin", "Manager"],
           },
@@ -224,13 +224,13 @@ export const MENU_GROUPS: MenuGroup[] = [
         children: [
           {
             label: "Phân ca",
-            path: "/admin/staff/schedule",
+            path: "/admin/nhan-vien/lich-lam-viec",
             icon: Calendar,
             allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
           },
           {
             label: "Quản lý ca",
-            path: "/admin/shifts",
+            path: "/admin/ca-lam-viec",
             icon: Clock,
             allowedRoles: ["Admin", "Manager"],
           },
@@ -238,7 +238,7 @@ export const MENU_GROUPS: MenuGroup[] = [
       },
       {
         label: "Lịch hẹn của tôi",
-        path: "/admin/staff/appointments",
+        path: "/admin/nhan-vien/lich-hen",
         icon: CalendarHeart,
         allowedRoles: ["Staff"],
       },
@@ -254,25 +254,25 @@ export const MENU_GROUPS: MenuGroup[] = [
         children: [
           {
             label: "Khách hàng",
-            path: "/admin/customers/list",
+            path: "/admin/khach-hang",
             icon: Users,
             allowedRoles: ["Admin", "Manager", "Receptionist"],
           },
           {
             label: "Ví khách hàng",
-            path: "/admin/customers/wallets",
+            path: "/admin/khach-hang/vi",
             icon: Wallet,
             allowedRoles: ["Admin"],
           },
           {
             label: "Thẻ thành viên",
-            path: "/admin/customers/membership-cards",
+            path: "/admin/khach-hang/the-thanh-vien",
             icon: CreditCard,
             allowedRoles: ["Admin", "Manager", "Receptionist"],
           },
           {
             label: "Loại thẻ",
-            path: "/admin/customers/membership-tiers",
+            path: "/admin/khach-hang/hang-thanh-vien",
             icon: Crown,
             allowedRoles: ["Admin"],
           },
@@ -280,13 +280,13 @@ export const MENU_GROUPS: MenuGroup[] = [
       },
       {
         label: "Khuyến mãi",
-        path: "/admin/marketing/promotions",
+        path: "/admin/khuyen-mai",
         icon: Tag,
         allowedRoles: ["Admin", "Manager"],
       },
       {
         label: "Hóa đơn",
-        path: "/admin/invoices",
+        path: "/admin/hoa-don",
         icon: Receipt,
         allowedRoles: ["Admin", "Manager", "Receptionist"],
       },
@@ -297,31 +297,31 @@ export const MENU_GROUPS: MenuGroup[] = [
     items: [
       {
         label: "Tài khoản",
-        path: "/admin/accounts",
+        path: "/admin/tai-khoan",
         icon: User,
         allowedRoles: ["Admin"],
       },
       {
         label: "Chi nhánh",
-        path: "/admin/salons",
+        path: "/admin/chi-nhanh",
         icon: Building2,
         allowedRoles: ["Admin"],
       },
       {
         label: "Banner trang chủ",
-        path: "/admin/landing-banners",
+        path: "/admin/banner-trang-chu",
         icon: PanelsTopLeft,
         allowedRoles: ["Admin"],
       },
       {
         label: "Phân quyền",
-        path: "/admin/roles",
+        path: "/admin/phan-quyen",
         icon: ShieldCheck,
         allowedRoles: ["Admin"],
       },
       {
         label: "Cấu hình lịch hẹn",
-        path: "/admin/config-appointments",
+        path: "/admin/cau-hinh-dat-lich",
         icon: Settings,
         allowedRoles: ["Admin", "Manager"],
       },
@@ -332,7 +332,7 @@ export const MENU_GROUPS: MenuGroup[] = [
     items: [
       {
         label: "Danh mục sản phẩm v2",
-        path: "/admin/product-categories/v2",
+        path: "/admin/danh-muc-san-pham-v2",
         icon: Box,
         allowedRoles: ["Admin"],
       },
@@ -380,19 +380,19 @@ export const TOP_NAV_TABS: ParentTab[] = [
         items: [
           {
             label: "Dịch vụ",
-            path: "/admin/services",
+            path: "/admin/dich-vu",
             icon: Leaf,
             allowedRoles: ["Admin", "Manager"],
           },
           {
             label: "Nhóm dịch vụ",
-            path: "/admin/services/categories",
+            path: "/admin/dich-vu/danh-muc",
             icon: Box,
             allowedRoles: ["Admin", "Manager"],
           },
           {
             label: "Liệu trình",
-            path: "/admin/treatments",
+            path: "/admin/lieu-trinh",
             icon: History,
             allowedRoles: ["Admin", "Manager"],
           },
@@ -403,13 +403,13 @@ export const TOP_NAV_TABS: ParentTab[] = [
         items: [
           {
             label: "Sản phẩm",
-            path: "/admin/products/list",
+            path: "/admin/san-pham",
             icon: SoapDispenserDroplet,
             allowedRoles: ["Admin", "Manager"],
           },
           {
             label: "Nhóm sản phẩm",
-            path: "/admin/products/categories",
+            path: "/admin/san-pham/danh-muc",
             icon: Box,
             allowedRoles: ["Admin", "Manager"],
           },
@@ -420,13 +420,13 @@ export const TOP_NAV_TABS: ParentTab[] = [
         items: [
           {
             label: "Phòng dịch vụ",
-            path: "/admin/rooms/list",
+            path: "/admin/phong-dich-vu",
             icon: Armchair,
             allowedRoles: ["Admin", "Manager"],
           },
           {
             label: "Vị trí dịch vụ",
-            path: "/admin/rooms/positions",
+            path: "/admin/phong-dich-vu/vi-tri",
             icon: MapPin,
             allowedRoles: ["Admin", "Manager"],
           },
@@ -444,13 +444,13 @@ export const TOP_NAV_TABS: ParentTab[] = [
         items: [
           {
             label: "Danh sách nhân viên",
-            path: "/admin/staff/list",
+            path: "/admin/nhan-vien",
             icon: User,
             allowedRoles: ["Admin", "Manager"],
           },
           {
             label: "Dịch vụ của tôi",
-            path: "/admin/staff/my-services",
+            path: "/admin/nhan-vien/dich-vu",
             icon: Scissors,
             allowedRoles: ["Staff"],
           },
@@ -461,19 +461,19 @@ export const TOP_NAV_TABS: ParentTab[] = [
         items: [
           {
             label: "Chứng chỉ nhân viên",
-            path: "/admin/staff-certificates",
+            path: "/admin/chung-chi-nhan-vien",
             icon: ShieldCheck,
             allowedRoles: ["Admin", "Manager"],
           },
           {
             label: "Nộp chứng chỉ",
-            path: "/admin/my-certificates",
+            path: "/admin/chung-chi-cua-toi",
             icon: Award,
             allowedRoles: ["Staff"],
           },
           {
             label: "Loại chứng chỉ",
-            path: "/admin/certificate-types",
+            path: "/admin/loai-chung-chi",
             icon: Award,
             allowedRoles: ["Admin", "Manager"],
           },
@@ -484,20 +484,20 @@ export const TOP_NAV_TABS: ParentTab[] = [
         items: [
           {
             label: "Phân ca",
-            path: "/admin/staff/schedule",
+            path: "/admin/nhan-vien/lich-lam-viec",
             icon: Calendar,
             allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
           },
           {
             label: "Quản lý ca",
-            path: "/admin/shifts",
+            path: "/admin/ca-lam-viec",
             icon: Clock,
             allowedRoles: ["Admin", "Manager"],
           },
 
           {
             label: "Lịch hẹn của tôi",
-            path: "/admin/staff/appointments",
+            path: "/admin/nhan-vien/lich-hen",
             icon: CalendarHeart,
             allowedRoles: ["Staff"],
           },
@@ -508,19 +508,19 @@ export const TOP_NAV_TABS: ParentTab[] = [
         items: [
           {
             label: "Chấm công",
-            path: "/admin/attendance",
+            path: "/admin/cham-cong",
             icon: CalendarCheck,
             allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
           },
           {
             label: "Danh sách lương",
-            path: "/admin/payroll",
+            path: "/admin/bang-luong",
             icon: Wallet,
             allowedRoles: ["Admin", "Manager"],
           },
           {
             label: "Thống kê lương",
-            path: "/admin/payroll/stats",
+            path: "/admin/bang-luong/thong-ke",
             icon: Receipt,
             allowedRoles: ["Admin", "Manager", "Staff"],
           },
@@ -538,13 +538,13 @@ export const TOP_NAV_TABS: ParentTab[] = [
         items: [
           {
             label: "Danh sách khách hàng",
-            path: "/admin/customers/list",
+            path: "/admin/khach-hang",
             icon: Users,
             allowedRoles: ["Admin", "Manager", "Receptionist"],
           },
           {
             label: "Ví khách hàng",
-            path: "/admin/customers/wallets",
+            path: "/admin/khach-hang/vi",
             icon: Wallet,
             allowedRoles: ["Admin"],
           },
@@ -555,13 +555,13 @@ export const TOP_NAV_TABS: ParentTab[] = [
         items: [
           {
             label: "Thẻ thành viên",
-            path: "/admin/customers/membership-cards",
+            path: "/admin/khach-hang/the-thanh-vien",
             icon: CreditCard,
             allowedRoles: ["Admin", "Manager", "Receptionist"],
           },
           {
             label: "Loại thẻ",
-            path: "/admin/customers/membership-tiers",
+            path: "/admin/khach-hang/hang-thanh-vien",
             icon: Crown,
             allowedRoles: ["Admin"],
           },
@@ -572,13 +572,13 @@ export const TOP_NAV_TABS: ParentTab[] = [
         items: [
           {
             label: "Hóa đơn",
-            path: "/admin/invoices",
+            path: "/admin/hoa-don",
             icon: Receipt,
             allowedRoles: ["Admin", "Manager", "Receptionist"],
           },
           {
             label: "Khuyến mãi",
-            path: "/admin/marketing/promotions",
+            path: "/admin/khuyen-mai",
             icon: Tag,
             allowedRoles: ["Admin", "Manager"],
           },
@@ -602,26 +602,26 @@ export const TOP_NAV_TABS: ParentTab[] = [
         items: [
           {
             label: "Chi nhánh",
-            path: "/admin/salons",
+            path: "/admin/chi-nhanh",
             icon: Building2,
             allowedRoles: ["Admin"],
           },
           {
             label: "Banner trang chủ",
-            path: "/admin/landing-banners",
+            path: "/admin/banner-trang-chu",
             icon: PanelsTopLeft,
             allowedRoles: ["Admin"],
           },
           {
             label: "Phân quyền",
-            path: "/admin/roles",
+            path: "/admin/phan-quyen",
             icon: ShieldCheck,
             allowedRoles: ["Admin"],
           },
 
           {
             label: "Cấu hình lịch hẹn",
-            path: "/admin/config-appointments",
+            path: "/admin/cau-hinh-dat-lich",
             icon: Settings,
             allowedRoles: ["Admin", "Manager"],
           },
@@ -632,13 +632,13 @@ export const TOP_NAV_TABS: ParentTab[] = [
         items: [
           {
             label: "Danh sách tài khoản",
-            path: "/admin/accounts",
+            path: "/admin/tai-khoan",
             icon: User,
             allowedRoles: ["Admin"],
           },
           {
             label: "Hồ sơ cá nhân",
-            path: "/admin/profile",
+            path: "/admin/ho-so",
             icon: User,
             allowedRoles: ["Admin", "Manager", "Staff", "Receptionist"],
           },
@@ -656,7 +656,7 @@ export const TOP_NAV_TABS: ParentTab[] = [
         items: [
           {
             label: "Danh mục sản phẩm",
-            path: "/admin/product-categories/v2",
+            path: "/admin/danh-muc-san-pham-v2",
             icon: Box,
             allowedRoles: ["Admin"],
           },
