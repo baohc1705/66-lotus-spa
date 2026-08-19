@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Calendar } from "lucide-react";
+import { Calendar, Eye } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import {
   APPOINTMENT_STATUS,
@@ -13,6 +14,7 @@ import {
 
 import { Pagination } from "@/shared/components/Pagination";
 import { Badge, type BadgeVariant } from "@/shared/elements/Badge";
+import { Button } from "@/shared/elements/Button";
 import { Card, CardBody } from "@/shared/elements/Card";
 import { formatDisplayDate, toLocalTimeOnly } from "@/shared/utils/date.utils";
 import { DEFAULT_PAGE_SIZE } from "@/shared/constants/display.const";
@@ -48,6 +50,7 @@ function AppointmentHeader({ count }: { count: number }) {
 export function CustomerAppointments({
   customerId,
 }: CustomerAppointmentsProps) {
+  const navigate = useNavigate();
   // phân trang
   const [pageIndex, setPageIndex] = useState(1);
 
@@ -150,13 +153,29 @@ export function CustomerAppointments({
                         <p className="mb-0 min-w-0 flex-1 truncate font-semibold text-kit-heading">
                           {item.appointmentCode}
                         </p>
-                        <Badge
-                          variant={badgeVariant}
-                          soft
-                          className="shrink-0 normal-case text-xs"
-                        >
-                          {statusLabel}
-                        </Badge>
+                        <div className="flex shrink-0 items-center gap-1">
+                          {item.id ? (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="mb-0 h-7 w-7 p-0"
+                              title="Xem chi tiết tại thu ngân"
+                              onClick={() =>
+                                navigate(`/thu-ngan?appointmentId=${item.id}`)
+                              }
+                            >
+                              <Eye className="h-4 w-4 text-kit-primary" />
+                            </Button>
+                          ) : null}
+                          <Badge
+                            variant={badgeVariant}
+                            soft
+                            className="normal-case text-xs"
+                          >
+                            {statusLabel}
+                          </Badge>
+                        </div>
                       </div>
                       <p className="mb-0 truncate text-xs text-kit-body">
                         {whenLabel}

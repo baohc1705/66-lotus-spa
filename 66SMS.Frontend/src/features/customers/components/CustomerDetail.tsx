@@ -1,8 +1,9 @@
-import { FileText, Mail, Pencil, Trash2, User } from "lucide-react";
+import { FileText, Pencil, Trash2, User } from "lucide-react";
 import { useState } from "react";
 
 import { useCustomerDetail } from "@/features/customers/hooks/useCustomers";
 import type { CustomerDto } from "@/features/customers/types/customer.types";
+import { CustomerSendEmailForm } from "@/features/customers/components/CustomerSendEmailForm";
 
 import { FallbackImage } from "@/shared/components/FallbackImage";
 import { TabNav } from "@/shared/components/Tabs";
@@ -201,11 +202,11 @@ export function CustomerDetail({
         ) : null}
 
         {tab === "mail" ? (
-          <Card className="mb-0 shadow-none">
-            <CardBody className="flex items-start gap-2 p-3">
-              <Mail className="mt-0.5 h-4 w-4 shrink-0 text-kit-muted" />
-            </CardBody>
-          </Card>
+          <CustomerSendEmailForm
+            customerId={customer.id!}
+            customerName={customer.fullName}
+            customerEmail={customer.email}
+          />
         ) : null}
       </div>
     </div>

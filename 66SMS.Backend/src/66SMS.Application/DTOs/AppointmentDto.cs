@@ -15,6 +15,7 @@ namespace _66SMS.Application.DTOs
         public int? CustomerId { get; set; }
         public string? CustomerName { get; set; }
         public string? CustomerPhone { get; set; }
+        public string? CustomerEmail { get; set; }
         public string? CustomerAvatar { get; set; }
         public int? StaffId { get; set; }
         public int? PositionId { get; set; }

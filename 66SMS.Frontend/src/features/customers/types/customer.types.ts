@@ -22,6 +22,12 @@ export interface CustomerDto {
   membershipTier?: string;
 }
 
+export type SendEmailPayload = {
+  toEmail: string;
+  subject: string;
+  htmlBody: string;
+};
+
 export interface GetAllCustomerQuery extends PageRequest {
   status?: number;
   gender?: number;
