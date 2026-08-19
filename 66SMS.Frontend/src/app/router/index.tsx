@@ -28,7 +28,6 @@ import {
   MembershipTierListPage,
   ProductListPage,
   ProductCategoryListPage,
-  ProductCategoryListPageV2,
   ServiceListPage,
   ServiceCategoryListPage,
   ShiftListPage,
@@ -212,14 +211,6 @@ export const router = createBrowserRouter([
             element: (
               <WithPageSuspense>
                 <ProductCategoryListPage />
-              </WithPageSuspense>
-            ),
-          },
-          {
-            path: "product-categories/v2",
-            element: (
-              <WithPageSuspense>
-                <ProductCategoryListPageV2 />
               </WithPageSuspense>
             ),
           },

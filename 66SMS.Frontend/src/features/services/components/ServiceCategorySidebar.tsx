@@ -16,7 +16,7 @@ import { Badge } from "@/shared/elements/Badge";
 import { ListGroup, ListGroupItem } from "@/shared/elements/ListGroup";
 import { Input } from "@/shared/forms/Input";
 import { useServiceCategories } from "@/features/service_categories/hooks/useServiceCategories";
-import { ServiceCategoryFormDialog } from "@/features/service_categories/components/ServiceCategoryFormDialog";
+import { ServiceCategoryForm } from "@/features/service_categories/components/ServiceCategoryForm";
 import { useAdminServices, useDeletedServices } from "../hooks/useServices";
 import type { ServiceCategoryDto } from "@/features/service_categories/types/serviceCategory.types";
 
@@ -163,7 +163,7 @@ export function ServiceCategorySidebar({
         </Button>
       </div>
 
-      <ServiceCategoryFormDialog
+      <ServiceCategoryForm
         open={createCategoryOpen}
         onOpenChange={setCreateCategoryOpen}
       />

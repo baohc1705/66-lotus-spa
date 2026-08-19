@@ -1,3 +1,5 @@
+import type { PageRequest } from "@/shared/types/common.types";
+
 export interface ServiceCategoryDto {
   id?: number;
   name?: string;
@@ -8,12 +10,26 @@ export interface ServiceCategoryDto {
   imageUrl?: string;
 }
 
-export interface DeleteServiceCategoryMultiplesPayload {
-  ids: number[];
+export interface GetAllServiceCategoryQuery extends PageRequest {
+  keyword?: string;
+  status?: number;
+  isDeleted?: boolean;
 }
 
-export type {
-  CreateServiceCategoryPayload,
-  UpdateServiceCategoryPayload,
-  ServiceCategoryFormValues,
-} from "../schemas/serviceCategory.schema";
+export interface CreateServiceCategoryRequest {
+  name: string;
+  description?: string;
+  sortOrder?: number;
+  status?: number;
+  icon?: string;
+  imageUrl?: string;
+}
+
+export interface UpdateServiceCategoryRequest {
+  name?: string;
+  description?: string;
+  sortOrder?: number;
+  status?: number;
+  icon?: string;
+  imageUrl?: string;
+}

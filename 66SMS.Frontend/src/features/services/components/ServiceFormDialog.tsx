@@ -1,6 +1,6 @@
 import { useProductsAdmin } from "@/features/products/hooks/useProducts";
 import type { ProductDto } from "@/features/products/types/product.types";
-import { ServiceCategoryFormDialog } from "@/features/service_categories/components/ServiceCategoryFormDialog";
+import { ServiceCategoryForm } from "@/features/service_categories/components/ServiceCategoryForm";
 import { useServiceCategories } from "@/features/service_categories/hooks/useServiceCategories";
 import type { ServiceCategoryDto } from "@/features/service_categories/types/serviceCategory.types";
 import {
@@ -887,7 +887,7 @@ export function ServiceFormDialog({
         )}
       </Modal>
 
-      <ServiceCategoryFormDialog
+      <ServiceCategoryForm
         open={categoryOpen}
         onOpenChange={setCategoryOpen}
         onSuccess={(cat: ServiceCategoryDto) => {

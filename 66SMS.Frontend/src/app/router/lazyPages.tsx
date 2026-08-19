@@ -339,9 +339,3 @@ export const DashboardExample1Page = lazy(() =>
     (m) => ({ default: m.DashboardExample1Page }),
   ),
 );
-
-export const ProductCategoryListPageV2 = lazy(() =>
-  import("@/features/products-v2/pages/ProductCategoryListPage").then((m) => ({
-    default: m.ProductCategoryListPage,
-  })),
-);
