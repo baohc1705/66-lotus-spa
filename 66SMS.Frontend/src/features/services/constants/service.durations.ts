@@ -3,6 +3,7 @@ export type ServiceDurationOption = {
   label: string;
 };
 
+// Giải thích:
 // Hardcode thời lượng dịch vụ (phút). Thêm/bớt ở đây khi cần.
 export const SERVICE_DURATION_VALUES = [30, 60, 90, 120, 180];
 

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { SectionHeader } from "./SectionHeader";
 import { useServices } from "@/features/services/hooks/useServices";
 import { setPendingServiceId } from "@/features/booking/utils/pendingBookingService";
-import type { ServiceListDto } from "@/features/services/types/service.types";
+import type { ServiceDto } from "@/features/services/types/service.types";
 
 import aboutBgCrane from "@/assets/about_bg_crane.png";
 import aboutBg from "@/assets/backgrounds/about.webp";
@@ -41,7 +41,7 @@ export const ServicesSection = () => {
   });
   const services = data?.data?.items ?? [];
 
-  const handleBook = (service: ServiceListDto) => {
+  const handleBook = (service: ServiceDto) => {
     if (!service.id) return;
     setPendingServiceId(service.id);
     navigate("/dat-lich");
@@ -121,7 +121,7 @@ export const ServicesSection = () => {
           </p>
         ) : (
           <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:pb-0 lg:grid-cols-3">
-            {services.map((service: ServiceListDto, i: number) => (
+            {services.map((service: ServiceDto, i: number) => (
               <motion.button
                 key={service.id}
                 type="button"

@@ -6,8 +6,8 @@ import { Button } from "@/shared/elements/Button";
 import { FormSection } from "@/shared/forms/FormSection";
 import { Input } from "@/shared/forms/Input";
 import { formatCurrency } from "@/shared/utils/currency";
-import { useAdminServices } from "@/features/services/hooks/useServices";
-import type { ServiceListDto } from "@/features/services/types/service.types";
+import { useServicesAdmin } from "@/features/services/hooks/useServices";
+import type { ServiceDto } from "@/features/services/types/service.types";
 
 import type { StaffServiceDto } from "../types/staff.types";
 import {
@@ -48,7 +48,7 @@ export function AssignStaffServiceDialog({
     );
 
   const { data: servicesResult, isLoading: isLoadingServices } =
-    useAdminServices({ pageIndex: 1, pageSize: 500 }, open);
+    useServicesAdmin({ pageIndex: 1, pageSize: 500 }, open);
 
   const createMutation = useCreateStaffServicesMutation();
 
@@ -64,7 +64,7 @@ export function AssignStaffServiceDialog({
   const availableServices = useMemo(() => {
     const items = servicesResult?.data?.items ?? [];
     return items.filter(
-      (s: ServiceListDto) =>
+      (s: ServiceDto) =>
         s.id != null && s.status === 1 && !assignedServiceIds.has(s.id),
     );
   }, [servicesResult?.data?.items, assignedServiceIds]);
@@ -73,7 +73,7 @@ export function AssignStaffServiceDialog({
     const q = searchText.toLowerCase().trim();
     if (!q) return availableServices;
     return availableServices.filter(
-      (s: ServiceListDto) =>
+      (s: ServiceDto) =>
         s.name?.toLowerCase().includes(q) ||
         s.code?.toLowerCase().includes(q) ||
         s.categoryName?.toLowerCase().includes(q),
@@ -101,7 +101,7 @@ export function AssignStaffServiceDialog({
   function toggleAll() {
     setValidationError("");
     const allFilteredIds = filteredServices
-      .map((s: ServiceListDto) => s.id)
+      .map((s: ServiceDto) => s.id)
       .filter((id): id is number => id != null);
     const allSelected = allFilteredIds.every((id) => selectedIds.includes(id));
     if (allSelected) {
@@ -119,7 +119,7 @@ export function AssignStaffServiceDialog({
   const allFilteredSelected =
     filteredServices.length > 0 &&
     filteredServices.every(
-      (s: ServiceListDto) => s.id != null && selectedIds.includes(s.id),
+      (s: ServiceDto) => s.id != null && selectedIds.includes(s.id),
     );
 
   const isLoading = isLoadingAssigned || isLoadingServices;
@@ -194,7 +194,7 @@ export function AssignStaffServiceDialog({
             </div>
           ) : (
             <ul className="max-h-70 divide-y divide-kit overflow-y-auto">
-              {filteredServices.map((service: ServiceListDto) => {
+              {filteredServices.map((service: ServiceDto) => {
                 const id = service.id!;
                 const isSelected = selectedIds.includes(id);
                 return (

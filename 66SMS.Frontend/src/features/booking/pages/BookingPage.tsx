@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { Check } from "lucide-react";
 import { useBookingStore } from "../stores/bookingStore";
 import { useServices } from "@/features/services/hooks/useServices";
-import type { ServiceListDto } from "@/features/services/types/service.types";
+import type { ServiceDto } from "@/features/services/types/service.types";
 import {
   clearPendingServiceId,
   getPendingServiceId,
@@ -49,7 +49,7 @@ export function BookingPage() {
       return;
     }
 
-    let found: ServiceListDto | undefined;
+    let found: ServiceDto | undefined;
     for (let index = 0; index < services.length; index++) {
       if (services[index].id === pendingId) {
         found = services[index];

@@ -1,83 +1,73 @@
-import axiosInstance from "@/shared/api/axiosInstance";
 import type {
-  Result,
-  PagedResult,
-  PageRequest,
-} from "@/shared/types/common.types";
-import type {
-  CreateServicePayload,
-  ServiceListDto,
-  ServiceDetailDto,
-  UpdateServicePayload,
+  CreateServiceRequest,
   GetAllServiceQuery,
-  DeleteServiceMultiplesPayload,
-} from "../types/service.types";
-
-function toAdminQuery(
-  params: PageRequest & { categoryId?: number },
-): GetAllServiceQuery {
-  return {
-    pageIndex: params.pageIndex,
-    pageSize: params.pageSize,
-    keyword: params.filter || undefined,
-    orderBy: params.orderBy,
-    isDescending: params.isDescending,
-    categoryId: params.categoryId,
-  };
-}
+  ServiceDto,
+  ServiceFullDto,
+  UpdateServiceRequest,
+} from "@/features/services/types/service.types";
+import axiosInstance from "@/shared/api/axiosInstance";
+import type { PagedResult, Result } from "@/shared/types/common.types";
 
 export const serviceApi = {
-  getAll: (params: PageRequest & { categoryId?: number }) =>
-    axiosInstance
-      .get<Result<PagedResult<ServiceListDto>>>("/service", {
-        params: {
-          pageIndex: params.pageIndex,
-          pageSize: params.pageSize,
-          keyword: params.filter || undefined,
-          orderBy: params.orderBy,
-          isDescending: params.isDescending,
-          categoryId: params.categoryId,
-        },
-      })
-      .then((r) => r.data),
+  // Query API
+  getAll: async (
+    params: GetAllServiceQuery,
+  ): Promise<Result<PagedResult<ServiceDto>>> => {
+    const response = await axiosInstance.get("/service", { params });
+    return response.data;
+  },
 
-  getDetail: (id: number) =>
-    axiosInstance
-      .get<Result<ServiceDetailDto>>(`/service/${id}`)
-      .then((r) => r.data),
+  adminGetAll: async (
+    params: GetAllServiceQuery,
+  ): Promise<Result<PagedResult<ServiceDto>>> => {
+    const response = await axiosInstance.get("/service/admin", { params });
+    return response.data;
+  },
 
-  create: (payload: CreateServicePayload) =>
-    axiosInstance.post<Result<object>>("/service", payload).then((r) => r.data),
+  getDetail: async (id: number): Promise<Result<ServiceFullDto>> => {
+    const response = await axiosInstance.get(`/service/${id}`);
+    return response.data;
+  },
 
-  update: (id: number, payload: UpdateServicePayload) =>
-    axiosInstance
-      .patch<Result<object>>(`/service/${id}`, payload)
-      .then((r) => r.data),
+  // Command API
+  create: async (request: CreateServiceRequest): Promise<Result<object>> => {
+    const response = await axiosInstance.post<Result<object>>(
+      "/service",
+      request,
+    );
+    return response.data;
+  },
 
-  delete: (id: number) =>
-    axiosInstance.delete<Result<object>>(`/service/${id}`).then((r) => r.data),
+  update: async (
+    id: number,
+    request: UpdateServiceRequest,
+  ): Promise<Result<object>> => {
+    const response = await axiosInstance.patch<Result<object>>(
+      `/service/${id}`,
+      request,
+    );
+    return response.data;
+  },
 
-  adminGetAll: (params: PageRequest & { categoryId?: number }) =>
-    axiosInstance
-      .get<Result<PagedResult<ServiceListDto>>>(`/service/admin`, {
-        params: toAdminQuery(params),
-      })
-      .then((r) => r.data),
+  delete: async (id: number): Promise<Result<object>> => {
+    const response = await axiosInstance.delete<Result<object>>(
+      `/service/${id}`,
+    );
+    return response.data;
+  },
 
-  deleteMultiples: (payload: DeleteServiceMultiplesPayload) =>
-    axiosInstance
-      .delete<Result<object>>(`/service/bulk`, { data: payload })
-      .then((r) => r.data),
+  deleteBulk: async (ids: number[]): Promise<Result<object>> => {
+    const response = await axiosInstance.delete<Result<object>>(
+      "/service/bulk",
+      { data: { ids } },
+    );
+    return response.data;
+  },
 
-  getAllDeleted: (params: PageRequest & { categoryId?: number }) =>
-    axiosInstance
-      .get<Result<PagedResult<ServiceListDto>>>(`/service/deleted`, {
-        params: toAdminQuery(params),
-      })
-      .then((r) => r.data),
-
-  deleteServiceProduct: (id: number) =>
-    axiosInstance
-      .delete<Result<object>>(`/service-product/${id}`)
-      .then((r) => r.data),
+  deleteServiceProduct: async (id: number): Promise<Result<object>> => {
+    const response = await axiosInstance.delete<Result<object>>(
+      `/service-product/${id}`,
+    );
+    return response.data;
+  },
 };
