@@ -28,10 +28,11 @@ export function useCustomers(params: GetAllCustomerQuery, enabled = true) {
 }
 
 // Lấy chi tiết khách hàng
-export function useCustomerDetail(id: number) {
+export function useCustomerDetail(id?: number | null) {
   return useQuery({
-    queryKey: CUSTOMER_QUERY_KEY.detail(id),
-    queryFn: () => customerApi.getDetail(id),
+    queryKey: CUSTOMER_QUERY_KEY.detail(id ?? 0),
+    queryFn: () => customerApi.getDetail(id!),
+    enabled: id != null && id > 0,
   });
 }
 

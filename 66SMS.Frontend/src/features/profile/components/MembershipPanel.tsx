@@ -293,9 +293,10 @@ function TierCarousel({
                     ? 0
                     : idx - 1;
               const isCurrent =
-                tier.name.toLowerCase() === currentTierName.toLowerCase();
+                (tier.name ?? "").toLowerCase() ===
+                currentTierName.toLowerCase();
               const isLocked = originalIdx > currentTierIndex;
-              const style = getTierStyle(tier.name);
+              const style = getTierStyle(tier.name ?? "");
 
               const scale = isActive ? 1.12 : distance === 1 ? 0.88 : 0.72;
 
@@ -443,7 +444,8 @@ function TierCarousel({
             }
             const isActive = idx === displayActiveIdx;
             const isCurrent =
-              tier.name.toLowerCase() === currentTierName.toLowerCase();
+              (tier.name ?? "").toLowerCase() ===
+              currentTierName.toLowerCase();
             return (
               <button
                 key={tier.id}
@@ -479,10 +481,12 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
   const { data: tiers = [], isLoading: isLoadingTiers } = useMembershipTiers();
 
   const currentTierName = card?.tierName || "Thường";
-  const sortedTiers = [...tiers].sort((a, b) => a.minSpending - b.minSpending);
+  const sortedTiers = [...tiers].sort(
+    (a, b) => (a.minSpending ?? 0) - (b.minSpending ?? 0),
+  );
   const currentTier =
     sortedTiers.find(
-      (t) => t.name.toLowerCase() === currentTierName.toLowerCase(),
+      (t) => (t.name ?? "").toLowerCase() === currentTierName.toLowerCase(),
     ) || (sortedTiers.length > 0 ? sortedTiers[0] : null);
   const currentTierIndex = currentTier ? sortedTiers.indexOf(currentTier) : -1;
 
@@ -539,7 +543,8 @@ export function MembershipPanel({ profile }: MembershipPanelProps) {
             <div className="relative z-10 flex justify-between items-center">
               {sortedTiers.map((tier, idx) => {
                 const isCurrent =
-                  tier.name.toLowerCase() === currentTierName.toLowerCase();
+                  (tier.name ?? "").toLowerCase() ===
+                  currentTierName.toLowerCase();
                 const isPassed = idx < currentTierIndex;
 
                 return (

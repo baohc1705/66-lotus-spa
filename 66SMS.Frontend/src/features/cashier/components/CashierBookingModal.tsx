@@ -22,7 +22,7 @@ import type {
   TechnicianDTO,
   TimeSlotDTO,
 } from "@/features/booking/types/booking.types";
-import { CustomerFormDialog } from "@/features/customers/components/CustomerFormDialog";
+import { CustomerForm } from "@/features/customers/components/CutomerForm";
 import { customerApi } from "@/features/customers/api/customer.api";
 import { useCustomers } from "@/features/customers/hooks/useCustomers";
 import type { CustomerDto } from "@/features/customers/types/customer.types";
@@ -846,7 +846,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
         )}
       </Modal>
 
-      <CustomerFormDialog
+      <CustomerForm
         open={createCustomerOpen}
         onOpenChange={setCreateCustomerOpen}
         onCreated={handleCreatedCustomer}

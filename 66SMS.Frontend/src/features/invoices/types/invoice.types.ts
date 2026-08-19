@@ -1,7 +1,4 @@
 import type { PageRequest } from "@/shared/types/common.types";
-import type { InvoiceFormValues as FormValues } from "../schemas/invoice.schema";
-
-export type InvoiceFormValues = FormValues;
 
 export const INVOICE_STATUS = {
   DRAFT: 0,
@@ -75,7 +72,7 @@ export interface InvoiceDto {
   items: InvoiceItemDto[] | null;
 }
 
-export interface CreateInvoiceItemPayload {
+export interface CreateInvoiceItemRequest {
   itemType: number;
   refId: number;
   quantity: number;
@@ -84,7 +81,7 @@ export interface CreateInvoiceItemPayload {
   note?: string;
 }
 
-export interface CreateInvoicePayload {
+export interface CreateInvoiceRequest {
   customerId?: number;
   customerName?: string;
   customerPhone?: string;
@@ -98,17 +95,17 @@ export interface CreateInvoicePayload {
   paidAmount?: number;
   transactionId?: string;
   note?: string;
-  items: CreateInvoiceItemPayload[];
+  items: CreateInvoiceItemRequest[];
 }
 
-export interface UpdateInvoiceItemsPayload {
-  items: CreateInvoiceItemPayload[];
+export interface UpdateInvoiceItemsRequest {
+  items: CreateInvoiceItemRequest[];
   discountAmount?: number;
   applyMembershipDiscount?: boolean;
   note?: string;
 }
 
-export interface GetAllInvoicesQuery extends PageRequest {
+export interface GetAllInvoiceQuery extends PageRequest {
   status?: number;
   customerId?: number;
   salonId?: number;

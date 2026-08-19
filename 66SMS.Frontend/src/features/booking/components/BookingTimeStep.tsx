@@ -260,7 +260,7 @@ export function BookingTimeStep() {
           </div>
         </div>
 
-        <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-[220px] overflow-y-auto scrollbar-thin">
+        <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-55 overflow-y-auto scrollbar-thin">
           {!dateInput ? (
             <div className="col-span-full py-4 text-center text-xs text-warm-600">
               Vui lòng chọn ngày trước

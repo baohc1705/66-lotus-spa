@@ -580,7 +580,7 @@ export function CashierPOS({
           activeOrder.invoiceId,
           activeOrder.paymentMethod,
           payload.paidAmount,
-          payload.note,
+          payload.note ?? "",
         );
         if (result.isSuccess) {
           toast.success(result.message || "Thanh toán hóa đơn thành công.");
