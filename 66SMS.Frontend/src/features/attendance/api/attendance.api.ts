@@ -1,43 +1,68 @@
 import axiosInstance from "@/shared/api/axiosInstance";
-import type {
-  Result,
-  PagedResult,
-  PageRequest,
-} from "@/shared/types/common.types";
+import type { Result, PagedResult } from "@/shared/types/common.types";
 import type {
   AttendanceDto,
-  CheckInPayload,
-  CheckOutPayload,
-  UpdateAttendancePayload,
-  CreateManualAttendancePayload,
-} from "../types/attendance.types";
-
-export interface AttendanceListParams extends PageRequest {
-  staffId?: number | null;
-  salonId?: number | null;
-  status?: number | null;
-  fromDate?: string;
-  toDate?: string;
-}
+  CheckInRequest,
+  CheckOutRequest,
+  UpdateAttendanceRequest,
+  CreateManualAttendanceRequest,
+  GetAllAttendancesQuery,
+} from "@/features/attendance/types/attendance.types";
 
 export const attendanceApi = {
-  getAll: (params: AttendanceListParams) =>
-    axiosInstance
-      .get<Result<PagedResult<AttendanceDto>>>(`/attendance/admin`, { params })
-      .then((r) => r.data),
+  // Query API
+  getAll: async (
+    params: GetAllAttendancesQuery,
+  ): Promise<Result<PagedResult<AttendanceDto>>> => {
+    const response = await axiosInstance.get<
+      Result<PagedResult<AttendanceDto>>
+    >(`/attendance/admin`, { params });
+    return response.data;
+  },
 
-  getDetail: (id: number) =>
-    axiosInstance.get<Result<AttendanceDto>>(`/attendance/${id}`).then((r) => r.data),
+  getDetail: async (id: number): Promise<Result<AttendanceDto>> => {
+    const response = await axiosInstance.get<Result<AttendanceDto>>(
+      `/attendance/${id}`,
+    );
+    return response.data;
+  },
 
-  checkIn: (payload: CheckInPayload) =>
-    axiosInstance.post<Result<number>>(`/attendance/check-in`, payload).then((r) => r.data),
+  // Command API
 
-  checkOut: (payload: CheckOutPayload) =>
-    axiosInstance.post<Result<number>>(`/attendance/check-out`, payload).then((r) => r.data),
+  checkIn: async (payload: CheckInRequest): Promise<Result<number>> => {
+    const response = await axiosInstance.post<Result<number>>(
+      `/attendance/check-in`,
+      payload,
+    );
+    return response.data;
+  },
 
-  update: (id: number, payload: UpdateAttendancePayload) =>
-    axiosInstance.put<Result<number>>(`/attendance/${id}`, payload).then((r) => r.data),
+  checkOut: async (payload: CheckOutRequest): Promise<Result<number>> => {
+    const response = await axiosInstance.post<Result<number>>(
+      `/attendance/check-out`,
+      payload,
+    );
+    return response.data;
+  },
 
-  createManual: (payload: CreateManualAttendancePayload) =>
-    axiosInstance.post<Result<number>>(`/attendance/manual`, payload).then((r) => r.data),
+  update: async (
+    id: number,
+    payload: UpdateAttendanceRequest,
+  ): Promise<Result<number>> => {
+    const response = await axiosInstance.put<Result<number>>(
+      `/attendance/${id}`,
+      payload,
+    );
+    return response.data;
+  },
+
+  createManual: async (
+    payload: CreateManualAttendanceRequest,
+  ): Promise<Result<number>> => {
+    const response = await axiosInstance.post<Result<number>>(
+      `/attendance/manual`,
+      payload,
+    );
+    return response.data;
+  },
 };

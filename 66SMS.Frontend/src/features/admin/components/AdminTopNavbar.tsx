@@ -12,19 +12,19 @@ export function AdminTopNavbar() {
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const timeoutRef = useRef<number | null>(null);
 
-  const handleMouseEnter = (tab: string) => {
+  function handleMouseEnter(tab: string) {
     if (timeoutRef.current) {
       window.clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
     setActiveTab(tab);
-  };
+  }
 
-  const handleMouseLeave = () => {
+  function handleMouseLeave() {
     timeoutRef.current = window.setTimeout(() => {
       setActiveTab(null);
     }, 150);
-  };
+  }
 
   useEffect(() => {
     return () => {
@@ -34,24 +34,34 @@ export function AdminTopNavbar() {
     };
   }, []);
 
-  const checkPermission = (allowedRoles?: string[]): boolean => {
+  function checkPermission(allowedRoles?: string[]): boolean {
     const isAdmin = hasRole("Admin");
     if (isAdmin) return true;
     if (!allowedRoles || allowedRoles.length === 0) return false;
-    return allowedRoles.some((r) => hasRole(r));
-  };
-
-  const tabs: ParentTab[] = TOP_NAV_TABS.filter((t) => checkPermission(t.allowedRoles));
-    
-  const isParentActive = (tab: ParentTab) => {
-    if (tab.path && location.pathname === tab.path) return true;
-    if (tab.columns) {
-      return tab.columns.some((col) =>
-        col.items.some((item) => location.pathname === item.path)
-      );
+    for (let index = 0; index < allowedRoles.length; index++) {
+      if (hasRole(allowedRoles[index])) return true;
     }
     return false;
-  };
+  }
+
+  const tabs: ParentTab[] = [];
+  for (let index = 0; index < TOP_NAV_TABS.length; index++) {
+    if (checkPermission(TOP_NAV_TABS[index].allowedRoles)) {
+      tabs.push(TOP_NAV_TABS[index]);
+    }
+  }
+
+  function isParentActive(tab: ParentTab): boolean {
+    if (tab.path && location.pathname === tab.path) return true;
+    if (!tab.columns) return false;
+    for (let colIndex = 0; colIndex < tab.columns.length; colIndex++) {
+      const col = tab.columns[colIndex];
+      for (let itemIndex = 0; itemIndex < col.items.length; itemIndex++) {
+        if (location.pathname === col.items[itemIndex].path) return true;
+      }
+    }
+    return false;
+  }
 
   return (
     <nav className="hidden lg:flex items-center gap-0.5 h-full">
@@ -130,9 +140,12 @@ export function AdminTopNavbar() {
                   }}
                 >
                   {tab.columns?.map((col) => {
-                    const visibleItems = col.items.filter((item) =>
-                      checkPermission(item.allowedRoles)
-                    );
+                    const visibleItems = [];
+                    for (let itemIndex = 0; itemIndex < col.items.length; itemIndex++) {
+                      if (checkPermission(col.items[itemIndex].allowedRoles)) {
+                        visibleItems.push(col.items[itemIndex]);
+                      }
+                    }
 
                     if (visibleItems.length === 0) return null;
 

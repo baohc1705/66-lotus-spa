@@ -1,6 +1,5 @@
 using _66SMS.Contract.Shared;
 using MediatR;
-using System.Text.Json.Serialization;
 
 namespace _66SMS.Application.SalonService.Attendances.Commands.CheckIn
 {
@@ -10,8 +9,5 @@ namespace _66SMS.Application.SalonService.Attendances.Commands.CheckIn
         public int? SalonId { get; set; }
         public int? WorkScheduleId { get; set; }
         public string? Note { get; set; }
-
-        [JsonIgnore]
-        public int? CreatedBy { get; set; }
     }
 }
