@@ -137,14 +137,14 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.PayAppointment
 
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
-
-                return Result<object>.Success(AppointmentConst.MSG_APPOINTMENT_PAY_SUCCESS);
             }
             catch
             {
                 transaction.Rollback();
                 throw;
             }
+
+            return Result<object>.Success(AppointmentConst.MSG_APPOINTMENT_PAY_SUCCESS);
         }
     }
 }

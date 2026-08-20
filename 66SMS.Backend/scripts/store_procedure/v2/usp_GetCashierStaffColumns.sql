@@ -22,6 +22,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- Truy vấn danh sách thợ đủ điều kiện hiển thị làm cột trên calendar thu ngân
     SELECT
         st.id        AS StaffId,
         st.full_name AS StaffName,

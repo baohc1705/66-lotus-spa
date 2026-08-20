@@ -2,6 +2,29 @@ IF OBJECT_ID(N'dbo.usp_GetReportRevenueByService', N'P') IS NOT NULL
     DROP PROCEDURE dbo.usp_GetReportRevenueByService;
 GO
 
+-- Mục đích: Báo cáo doanh thu theo TỪNG DỊCH VỤ trong khoảng ngày, dùng cho màn hình xem dịch vụ nào bán chạy.
+-- Chỉ tính dòng hóa đơn thuộc loại dịch vụ (item_type = 1), đang active, thuộc hóa đơn đã thanh toán.
+-- issued_at lưu theo UTC nên phải quy đổi về giờ Việt Nam (+07:00) để lọc theo ngày.
+--
+-- Input:
+--   @SalonId    INT = NULL   -- chỉ tính salon này; NULL = tất cả salon
+--   @CategoryId INT = NULL   -- chỉ tính dịch vụ thuộc nhóm này; NULL = tất cả nhóm
+--   @FromDate   DATE         -- từ ngày (theo giờ VN, bao gồm)
+--   @ToDate     DATE         -- đến ngày (theo giờ VN, bao gồm)
+--
+-- Output (sắp xếp giảm dần theo Revenue):
+--   ItemId              INT        -- id dịch vụ (ref_id trong invoice_items)
+--   ItemName            NVARCHAR   -- tên dịch vụ tại thời điểm bán
+--   Quantity            INT        -- tổng số lượng đã bán
+--   AvgCommissionRate   DECIMAL    -- tỷ lệ hoa hồng trung bình
+--   Revenue             DECIMAL    -- tổng line_total, chưa trừ hoa hồng
+--   Commission          DECIMAL    -- tổng hoa hồng
+--   TotalRevenue        DECIMAL    -- Revenue - Commission
+--
+-- Ví dụ EXEC:
+--   EXEC dbo.usp_GetReportRevenueByService @SalonId = NULL, @CategoryId = NULL, @FromDate = '2026-07-01', @ToDate = '2026-07-30';
+--   EXEC dbo.usp_GetReportRevenueByService @SalonId = 1, @CategoryId = 2, @FromDate = '2026-07-01', @ToDate = '2026-07-30';
+--   EXEC dbo.usp_GetReportRevenueByService NULL, NULL, '2026-07-01', '2026-07-30';
 CREATE PROCEDURE dbo.usp_GetReportRevenueByService
     @SalonId    INT = NULL,
     @CategoryId INT = NULL,   -- NULL = tất cả nhóm
@@ -11,6 +34,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- Gom theo dịch vụ (ref_id); LEFT JOIN services chỉ để lọc theo category
     SELECT
         ii.ref_id AS ItemId,
         MAX(ii.item_name) AS ItemName,

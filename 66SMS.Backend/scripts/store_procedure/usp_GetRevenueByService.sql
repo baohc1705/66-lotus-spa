@@ -6,6 +6,23 @@ IF OBJECT_ID(N'dbo.usp_GetRevenueByService', N'P') IS NOT NULL
     DROP PROCEDURE dbo.usp_GetRevenueByService;
 GO
 
+-- Báo cáo doanh thu theo từng dịch vụ trong khoảng ngày, gom từ dòng hóa đơn đã thanh toán.
+-- Dùng cho biểu đồ/bảng top dịch vụ bán chạy theo salon.
+--
+-- Input:
+--   @SalonId  INT   -- salon bắt buộc (không hỗ trợ NULL)
+--   @FromDate DATE  -- ngày bắt đầu (bao gồm, múi giờ +07 trên issued_at)
+--   @ToDate   DATE  -- ngày kết thúc (bao gồm)
+--
+-- Output: nhiều dòng, sắp xếp Revenue giảm dần
+--   ItemId    INT           -- ref_id dịch vụ trên invoice_items
+--   ItemName  NVARCHAR      -- tên dịch vụ (MAX theo ref_id)
+--   Quantity  INT/DECIMAL   -- tổng số lượng bán
+--   Revenue   DECIMAL       -- tổng line_total
+--
+-- Ví dụ EXEC:
+--   EXEC dbo.usp_GetRevenueByService @SalonId = 3, @FromDate = '2026-08-01', @ToDate = '2026-08-31';
+--   EXEC dbo.usp_GetRevenueByService @SalonId = 1, @FromDate = '2026-08-20', @ToDate = '2026-08-20';
 CREATE PROCEDURE dbo.usp_GetRevenueByService
     @SalonId  INT,
     @FromDate DATE,
@@ -14,6 +31,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- gom dòng hóa đơn: chỉ dịch vụ (item_type = 1), hóa đơn paid, dòng còn hiệu lực
     SELECT
         ii.ref_id AS ItemId,
         MAX(ii.item_name) AS ItemName,

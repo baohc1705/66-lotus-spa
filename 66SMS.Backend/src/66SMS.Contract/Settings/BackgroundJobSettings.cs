@@ -16,5 +16,9 @@ namespace _66SMS.Contract.Settings
         {
             IntervalMinutes = 5,
         };
+        public JobScheduleSettings SendOnlineAppointmentReminders { get; set; } = new()
+        {
+            IntervalMinutes = 5,
+        };
     }
 }

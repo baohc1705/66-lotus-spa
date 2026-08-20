@@ -2,6 +2,23 @@ IF OBJECT_ID(N'dbo.usp_GetPayrollCommissionStats', N'P') IS NOT NULL
     DROP PROCEDURE dbo.usp_GetPayrollCommissionStats;
 GO
 
+-- Lấy chi tiết từng dòng hoa hồng (invoice_item) của 1 kỹ thuật viên trong khoảng ngày.
+-- Dùng cho màn payroll xem theo ngày/tuần: mỗi dòng = 1 item trên hóa đơn đã thanh toán.
+-- Kèm thông tin invoice, appointment và duration tổng của lịch hẹn liên quan.
+--
+-- Cách dùng:
+--   -- chi tiết hoa hồng tháng 8/2026, staff id 12
+--   EXEC dbo.usp_GetPayrollCommissionStats @StaffId = 12, @FromDate = '2026-08-01', @ToDate = '2026-08-31';
+--
+-- Input mẫu:
+--   @StaffId  = 12            -- kỹ thuật viên
+--   @FromDate = '2026-08-01'  -- từ ngày (IssuedLocalDate, múi +07:00)
+--   @ToDate   = '2026-08-31'  -- đến ngày
+--
+-- Output mẫu (rút gọn):
+--   StaffId | StaffName | InvoiceCode | ItemName | CommissionAmount | IssuedLocalDate | DurationMins
+--   --------|-----------|-------------|----------|------------------|-----------------|-------------
+--   12      | Nguyễn A  | HD-001      | Cắt tóc  | 50000            | 2026-08-20      | 45
 CREATE PROCEDURE dbo.usp_GetPayrollCommissionStats
     @StaffId  INT,
     @FromDate DATE,
@@ -10,7 +27,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Chi tiet tung dong (view ngay / tuan)
+    -- mỗi invoice_item active của staff = 1 dòng; join invoice + appointment để hiển thị đủ context
     SELECT
         st.id                    AS StaffId,
         st.full_name             AS StaffName,

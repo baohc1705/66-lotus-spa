@@ -25,6 +25,8 @@ namespace _66SMS.Infrastructure.DependencyInjection.Extensions
                     settings.CleanupRevokedRefreshTokens);
                 q.AddJobWithSchedule<CleanupExpiredSlotLocksJob>(
                     settings.CleanupExpiredSlotLocks);
+                q.AddJobWithSchedule<SendOnlineAppointmentReminderJob>(
+                    settings.SendOnlineAppointmentReminders);
             });
 
             services.AddQuartzHostedService(options =>

@@ -277,7 +277,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.VnPayReturn
 
             var invoice = new Invoice
             {
-                InvoiceCode = $"HD-COC-{DateTimeHelper.UtcNow():yyyyMMddHHmmssfff}",
+                InvoiceCode = $"HD-{DateTimeHelper.UtcNow():yyyyMMddHHmmssfff}",
                 CustomerId = customer?.Id,
                 CustomerName = customer?.FullName ?? appointment.CreatedByUser?.Username,
                 CustomerPhone = customer?.Phone,

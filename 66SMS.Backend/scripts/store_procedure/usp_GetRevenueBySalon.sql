@@ -1,3 +1,31 @@
+/*
+================================================================================
+ usp_GetRevenueBySalon
+================================================================================
+ Muc dich:
+   Bao cao doanh thu theo tung salon trong ky hien tai, co the kem ky truoc
+   (cung do dai ngay) de so sanh. Tra ve dong 'current' va 'previous'.
+
+ Input:
+   @FromDate        DATE - Ngay bat dau ky hien tai (gio VN, inclusive).
+   @ToDate          DATE - Ngay ket thuc ky hien tai (gio VN, inclusive).
+   @ComparePrevious BIT  = 0 - 1 = them du lieu ky truoc; 0 = chi ky hien tai.
+
+ Output:
+   PeriodTag         NVARCHAR - 'current' hoac 'previous'.
+   SalonId           INT      - Id salon.
+   SalonCode         NVARCHAR - Ma salon.
+   SalonName         NVARCHAR - Ten salon.
+   CashIn            DECIMAL  - Tong tien thu (paid_amount hoa don da thanh toan).
+   CashOut           DECIMAL  - Tong tien chi = hoan tien + hoa hong nhan vien.
+   GrossRevenue      DECIMAL  - Tong total_amount hoa don da thanh toan.
+   TransactionCount  INT      - So hoa don da thanh toan trong ky.
+
+ Vi du:
+   EXEC dbo.usp_GetRevenueBySalon @FromDate = '2026-08-01', @ToDate = '2026-08-31', @ComparePrevious = 1;
+   EXEC dbo.usp_GetRevenueBySalon @FromDate = '2026-08-01', @ToDate = '2026-08-07', @ComparePrevious = 0;
+================================================================================
+*/
 IF OBJECT_ID(N'dbo.usp_GetRevenueBySalon', N'P') IS NOT NULL
     DROP PROCEDURE dbo.usp_GetRevenueBySalon;
 GO
@@ -10,9 +38,13 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- Tinh do dai ky hien tai de suy ra ky truoc cung so ngay
     DECLARE @Days INT = DATEDIFF(DAY, @FromDate, @ToDate) + 1;
     DECLARE @PrevTo   DATE = DATEADD(DAY, -1, @FromDate);
     DECLARE @PrevFrom DATE = DATEADD(DAY, 1 - @Days, @PrevTo);
+
+    -- Buoc 1: Tong hop hoa don theo salon - ky hien tai
+    -- status 2 = da thanh toan (CashIn, GrossRevenue), status 4 = da hoan tien (RefundOut)
     SELECT
         inv.salon_id AS SalonId,
         SUM(CASE WHEN inv.status = 2 THEN inv.paid_amount ELSE 0 END) AS CashIn,
@@ -25,6 +57,9 @@ BEGIN
       AND inv.salon_id IS NOT NULL
       AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
     GROUP BY inv.salon_id;
+
+    -- Buoc 2: Tong hoa hong nhan vien theo salon - ky hien tai
+    -- Lay tu invoice_items vi commission gan voi tung dong dich vu/san pham
     SELECT
         inv.salon_id AS SalonId,
         SUM(ii.commission_amount) AS CommissionOut
@@ -36,6 +71,8 @@ BEGIN
       AND inv.salon_id IS NOT NULL
       AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
     GROUP BY inv.salon_id;
+
+    -- Buoc 3: Tong hop hoa don theo salon - ky truoc (chi chay khi @ComparePrevious = 1)
     SELECT
         inv.salon_id AS SalonId,
         SUM(CASE WHEN inv.status = 2 THEN inv.paid_amount ELSE 0 END) AS CashIn,
@@ -50,6 +87,7 @@ BEGIN
       AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @PrevFrom AND @PrevTo
     GROUP BY inv.salon_id;
 
+    -- Buoc 4: Tong hoa hong theo salon - ky truoc
     SELECT
         inv.salon_id AS SalonId,
         SUM(ii.commission_amount) AS CommissionOut
@@ -63,6 +101,8 @@ BEGIN
       AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @PrevFrom AND @PrevTo
     GROUP BY inv.salon_id;
 
+    -- Buoc 5: Ghep salon dang hoat dong voi so lieu ky hien tai
+    -- LEFT JOIN de salon khong co giao dich van tra ve 0 thay vi mat dong
     SELECT
         N'current' AS PeriodTag,
         s.id AS SalonId,
@@ -79,6 +119,7 @@ BEGIN
 
     UNION ALL
 
+    -- Buoc 6: Tuong tu ky truoc; chi xuat khi bat so sanh
     SELECT
         N'previous' AS PeriodTag,
         s.id AS SalonId,

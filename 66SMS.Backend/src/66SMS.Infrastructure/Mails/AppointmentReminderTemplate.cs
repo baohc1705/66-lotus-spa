@@ -9,22 +9,22 @@ namespace _66SMS.Infrastructure.Mails
         private readonly string customerName;
         private readonly string serviceName;
         private readonly DateTime appointmentTime;
-        private readonly string? cancelLink;
+        // private readonly string? cancelLink;
 
-        public AppointmentReminderTemplate(string toEmail,string customerName, string serviceName, DateTime appointmentTime,string? cancelLink = null)
+        public AppointmentReminderTemplate(string toEmail,string customerName, string serviceName, DateTime appointmentTime)
         {
             this.toEmail = toEmail;
             this.customerName = customerName;
             this.serviceName = serviceName;
             this.appointmentTime = appointmentTime;
-            this.cancelLink = cancelLink;
+            // this.cancelLink = cancelLink;
         }
 
         public override MailMessage Render()
         {
-            var cancelSection = cancelLink is not null
-                ? BuildButton(cancelLink, "Hủy lịch hẹn", MailConst.Template.DangerColor)
-                : string.Empty;
+            // var cancelSection = cancelLink is not null
+            //     ? BuildButton(cancelLink, "Hủy lịch hẹn", MailConst.Template.DangerColor)
+            //     : string.Empty;
 
             var body = WrapLayout($"""
                 <h2>Xin chào {customerName},</h2>
@@ -39,7 +39,7 @@ namespace _66SMS.Infrastructure.Mails
                         <td style="padding:8px;border:1px solid #eee;">{appointmentTime:HH:mm - dd/MM/yyyy}</td>
                     </tr>
                 </table>
-                {cancelSection}
+                
                 <p>Nếu bạn có thắc mắc, vui lòng liên hệ chúng tôi để được hỗ trợ.</p>
                 """);
 

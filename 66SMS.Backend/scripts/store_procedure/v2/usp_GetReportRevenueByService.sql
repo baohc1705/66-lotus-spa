@@ -41,6 +41,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- Gom theo dịch vụ (ref_id); LEFT JOIN services chỉ để lọc theo category
     SELECT
         ii.ref_id                                    AS ItemId,
         MAX(ii.item_name)                            AS ItemName,   -- tên dịch vụ tại thời điểm bán, có thể khác tên hiện tại trong dbo.services

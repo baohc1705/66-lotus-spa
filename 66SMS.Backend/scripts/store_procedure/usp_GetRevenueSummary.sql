@@ -2,6 +2,27 @@ IF OBJECT_ID(N'dbo.usp_GetRevenueSummary', N'P') IS NOT NULL
     DROP PROCEDURE dbo.usp_GetRevenueSummary;
 GO
 
+-- Tổng hợp dòng tiền và doanh thu trong khoảng ngày, có thể so sánh với kỳ trước cùng độ dài.
+-- Dùng cho báo cáo tài chính dashboard: tiền vào, tiền ra, doanh thu gộp, số giao dịch, AOV.
+--
+-- Input:
+--   @SalonId         INT  = NULL  -- lọc theo salon; NULL = toàn hệ thống (và cộng thêm nạp ví)
+--   @FromDate        DATE         -- ngày bắt đầu kỳ hiện tại (bao gồm)
+--   @ToDate          DATE         -- ngày kết thúc kỳ hiện tại (bao gồm)
+--   @ComparePrevious BIT  = 0     -- 1 = trả thêm 1 dòng kỳ trước (cùng số ngày, ngay trước @FromDate)
+--
+-- Output: 1 hoặc 2 dòng (multi row khi @ComparePrevious = 1)
+--   PeriodTag          NVARCHAR    -- 'current' hoặc 'previous'
+--   CashIn             DECIMAL     -- tiền thu: paid_amount hóa đơn paid + nạp ví (chỉ khi @SalonId NULL)
+--   CashOut            DECIMAL     -- tiền chi: hoa hồng staff + hoàn tiền (invoice refunded)
+--   NetCashFlow        DECIMAL     -- CashIn - CashOut
+--   GrossRevenue       DECIMAL     -- tổng total_amount hóa đơn paid
+--   TransactionCount   INT         -- số hóa đơn paid trong kỳ
+--   AverageOrderValue  DECIMAL     -- GrossRevenue / TransactionCount, làm tròn; 0 nếu không có giao dịch
+--
+-- Ví dụ EXEC:
+--   EXEC dbo.usp_GetRevenueSummary @SalonId = 3, @FromDate = '2026-08-01', @ToDate = '2026-08-31', @ComparePrevious = 0;
+--   EXEC dbo.usp_GetRevenueSummary @SalonId = NULL, @FromDate = '2026-08-01', @ToDate = '2026-08-07', @ComparePrevious = 1;
 CREATE PROCEDURE dbo.usp_GetRevenueSummary
     @SalonId          INT  = NULL,
     @FromDate         DATE,
@@ -11,11 +32,14 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- số ngày kỳ hiện tại để tính kỳ trước cùng độ dài
     DECLARE @Days INT = DATEDIFF(DAY, @FromDate, @ToDate) + 1;
     DECLARE @PrevTo   DATE = DATEADD(DAY, -1, @FromDate);
     DECLARE @PrevFrom DATE = DATEADD(DAY, 1 - @Days, @PrevTo);
 
+    -- gom số liệu kỳ current và (tuỳ chọn) previous bằng UNION ALL
     ;WITH period_raw AS (
+        -- kỳ hiện tại: @FromDate .. @ToDate
         SELECT
             N'current' AS PeriodTag,
             ISNULL((
@@ -25,6 +49,7 @@ BEGIN
                   AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
                   AND (@SalonId IS NULL OR inv.salon_id = @SalonId)
             ), 0)
+            -- nạp ví (wallet type 3) chỉ cộng khi xem toàn hệ thống, không gắn salon cụ thể
             + CASE WHEN @SalonId IS NULL THEN ISNULL((
                 SELECT SUM(wt.amount)
                 FROM dbo.wallet_transactions wt
@@ -68,6 +93,7 @@ BEGIN
 
         UNION ALL
 
+        -- kỳ trước: cùng logic, chỉ chạy khi @ComparePrevious = 1
         SELECT
             N'previous' AS PeriodTag,
             ISNULL((
@@ -119,6 +145,7 @@ BEGIN
             ), 0) AS TransactionCount
         WHERE @ComparePrevious = 1
     )
+    -- tính NetCashFlow và AOV từ các cột đã gom
     SELECT
         PeriodTag,
         CashIn,
