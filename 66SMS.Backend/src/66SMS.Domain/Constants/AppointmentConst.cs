@@ -45,6 +45,7 @@ namespace _66SMS.Domain.Constants
         #region Constraint
         public const int APPOINTMENT_CODE_MAX_LENGTH = 50;
         public const int NOTE_MAX_LENGTH = 1000;
+        public const int DEPOSIT_DEADLINE_HOURS = 24;
         #endregion
 
         #region Source
