@@ -58,7 +58,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.PostponeAppoin
                 AppointmentPaymentCalculator.IsFullyPaid(appointment))
                 return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_CANNOT_POSTPONE_COMPLETED, ErrorCodes.ERR_APPOINTMENT_CANNOT_POSTPONE);
 
-            if (appointment.Status != AppointmentConst.STATUS_WAITING)
+            if (appointment.Status != AppointmentConst.STATUS_WAITING && appointment.Status != AppointmentConst.STATUS_PENDING)
                 return Result<object>.BadRequest(AppointmentConst.MSG_APPOINTMENT_POSTPONE_ONLY_PAID_PENDING, ErrorCodes.ERR_APPOINTMENT_CANNOT_POSTPONE);
 
             using var transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);

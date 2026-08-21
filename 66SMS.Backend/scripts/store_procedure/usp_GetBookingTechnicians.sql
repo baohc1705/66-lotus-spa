@@ -28,7 +28,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    DECLARE @duration_mins INT;
+    DECLARE @duration_mins INT; 
     DECLARE @slot_minutes  INT;
     DECLARE @slots_needed  INT;
     DECLARE @slot_count    INT;

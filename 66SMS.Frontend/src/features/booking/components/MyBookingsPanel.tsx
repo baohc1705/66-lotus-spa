@@ -68,7 +68,7 @@ export function MyBookingsPanel() {
   };
 
   const canPostpone = (booking: AppointmentDto) => {
-    return booking.status === APPOINTMENT_STATUS.WAITING;
+    return booking.status === APPOINTMENT_STATUS.PENDING;
   };
 
   const handlePostpone = async (

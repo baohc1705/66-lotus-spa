@@ -62,6 +62,7 @@ export function BookingTimeStep() {
     salonId: selectedSalon?.id,
   });
 
+  // Filter thời gian sau thời gian hiện tại, nếu thời gian đã qua thì không hiển thị
   const visibleTimeSlots = useMemo(
     () => filterSlotsAfterNow(timeSlots, dateInput),
     [timeSlots, dateInput],
