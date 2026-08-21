@@ -1,109 +1,113 @@
-import type { AxiosError } from "axios";
-import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
-import { getErrorMessage } from "@/shared/utils/errorUtils";
 import { bookingPositionApi } from "@/features/booking_positions/api/bookingPosition.api";
-import type { Result } from "@/shared/types/common.types";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/components/kitToast";
 import type {
-  CreateBookingPositionPayload,
-  UpdateBookingPositionPayload,
-  BookingPositionListParams,
-} from "../types/booking_position.types";
+  CreateBookingPositionRequest,
+  GetAllBookingPositionQuery,
+  UpdateBookingPositionRequest,
+} from "@/features/booking_positions/types/bookingPosition.types";
+import type { Result } from "@/shared/types/common.types";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
+import { showError, showSuccess } from "@/shared/utils/kitToast";
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
 
-const ENTITY = "vị trí dịch vụ";
+// Tạo query keys cho vị trí dịch vụ để dùng trong query cache
+export const BOOKING_POSITION_QUERY_KEY =
+  createEntityQueryKeys<GetAllBookingPositionQuery>("booking-positions");
 
-export const BOOKING_POSITION_KEYS =
-  createEntityQueryKeys<BookingPositionListParams>("booking-positions");
-
-export function useBookingPositions(params: BookingPositionListParams) {
-  return useQuery({
-    queryKey: BOOKING_POSITION_KEYS.list(params),
-    queryFn: () => bookingPositionApi.getAll(params),
-  });
-}
-
-export function useAdminBookingPositions(
-  params: BookingPositionListParams,
+// Lấy danh sách vị trí dịch vụ
+export function useBookingPositions(
+  params: GetAllBookingPositionQuery,
   enabled = true,
 ) {
   return useQuery({
-    queryKey: BOOKING_POSITION_KEYS.adminList(params),
+    queryKey: BOOKING_POSITION_QUERY_KEY.list(params),
     queryFn: () => bookingPositionApi.getAll(params),
     enabled,
   });
 }
 
-export function useBookingPositionDetail(id: number | null) {
+// Lấy chi tiết vị trí dịch vụ
+export function useBookingPositionDetail(id?: number | null) {
   return useQuery({
-    queryKey: BOOKING_POSITION_KEYS.detail(id!),
+    queryKey: BOOKING_POSITION_QUERY_KEY.detail(id ?? 0),
     queryFn: () => bookingPositionApi.getDetail(id!),
-    enabled: id !== null && id > 0,
+    enabled: id != null && id > 0,
   });
 }
 
+// Tạo vị trí dịch vụ
 export function useCreateBookingPosition() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreateBookingPositionPayload) =>
-      bookingPositionApi.create(payload),
+    mutationFn: (data: CreateBookingPositionRequest) =>
+      bookingPositionApi.create(data),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: BOOKING_POSITION_KEYS.all });
-        qc.invalidateQueries({ queryKey: ["booking-rooms"] });
-        toast.success(`Tạo ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({
+        queryKey: BOOKING_POSITION_QUERY_KEY.all,
+      });
+      queryClient.invalidateQueries({ queryKey: ["booking-rooms"] });
+      showSuccess("Tạo vị trí dịch vụ thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi tạo ${ENTITY}`));
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi tạo vị trí dịch vụ"));
     },
   });
 }
 
+// Sửa vị trí dịch vụ
 export function useUpdateBookingPosition() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
       id,
-      payload,
+      data,
     }: {
       id: number;
-      payload: UpdateBookingPositionPayload;
-    }) => bookingPositionApi.update(id, payload),
+      data: UpdateBookingPositionRequest;
+    }) => bookingPositionApi.update(id, data),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: BOOKING_POSITION_KEYS.all });
-        qc.invalidateQueries({ queryKey: ["booking-rooms"] });
-        toast.success(`Cập nhật ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({
+        queryKey: BOOKING_POSITION_QUERY_KEY.all,
+      });
+      queryClient.invalidateQueries({ queryKey: ["booking-rooms"] });
+      showSuccess("Sửa vị trí dịch vụ thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(
-        getErrorMessage(error, `Có lỗi xảy ra khi cập nhật ${ENTITY}`),
-      );
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi sửa vị trí dịch vụ"));
     },
   });
 }
 
+// Xóa vị trí dịch vụ
 export function useDeleteBookingPosition() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => bookingPositionApi.delete(id),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: BOOKING_POSITION_KEYS.all });
-        qc.invalidateQueries({ queryKey: ["booking-rooms"] });
-        toast.success(`Xóa ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({
+        queryKey: BOOKING_POSITION_QUERY_KEY.all,
+      });
+      queryClient.invalidateQueries({ queryKey: ["booking-rooms"] });
+      showSuccess("Xóa vị trí dịch vụ thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi xóa ${ENTITY}`));
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi xóa vị trí dịch vụ"));
     },
   });
 }

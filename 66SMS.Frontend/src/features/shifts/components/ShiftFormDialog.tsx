@@ -11,9 +11,8 @@ import { Input } from "@/shared/forms/Input";
 import { Select } from "@/shared/forms/Select";
 import { Textarea } from "@/shared/forms/Textarea";
 import { useAuthStore } from "@/features/auth/stores/authStore";
-import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
-import { useAdminSalons } from "@/features/salons/hooks/useSalons";
-import type { SalonDTO } from "@/features/salons/types/salon.types";
+import { useActiveSalons, useSalonsAdmin } from "@/features/salons/hooks/useSalons";
+import type { SalonDto } from "@/features/salons/types/salon.types";
 
 import { useCreateShift, useUpdateShift } from "../hooks/useShifts";
 import type { ShiftDTO } from "../types/shift.types";
@@ -71,14 +70,14 @@ export function ShiftFormDialog({
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   const canPickSalon = isAdmin && !isEdit;
-  const { data: salonsResult } = useAdminSalons(
+  const { data: salonsResult } = useSalonsAdmin(
     { pageIndex: 1, pageSize: 100 },
     open && canPickSalon,
   );
   const salons = salonsResult?.data?.items ?? [];
   const { data: activeSalons = [] } = useActiveSalons();
 
-  const salonOptions = salons.map((salon: SalonDTO) => ({
+  const salonOptions = salons.map((salon: SalonDto) => ({
     value: String(salon.id),
     label: salon.name ?? "",
   }));

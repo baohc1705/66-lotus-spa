@@ -48,9 +48,9 @@ export const StaffListPage = lazy(() =>
     default: m.StaffListPage,
   })),
 );
-export const MyStaffServicesPage = lazy(() =>
-  import("@/features/staffs/pages/MyStaffServicesPage").then((m) => ({
-    default: m.MyStaffServicesPage,
+export const StaffServiceListPage = lazy(() =>
+  import("@/features/staffs/pages/StaffServiceListPage").then((m) => ({
+    default: m.StaffServiceListPage,
   })),
 );
 export const StaffAppointmentsPage = lazy(() =>
@@ -79,7 +79,7 @@ export const ProductListPage = lazy(() =>
   })),
 );
 export const ProductCategoryListPage = lazy(() =>
-  import("@/features/product_categories/pages/ProductCategoryListPage").then(
+  import("@/features/product-categories/pages/ProductCategoryListPage").then(
     (m) => ({ default: m.ProductCategoryListPage }),
   ),
 );

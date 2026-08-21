@@ -94,19 +94,89 @@ type RankItem = {
 };
 
 const topAuthors: RankItem[] = [
-  { name: "Ella-Rose Henry", role: "Web Developer", amount: 129, trend: "down", initial: "E", color: "#3f6ad8" },
-  { name: "Ruben Tillman", role: "UI Designer", amount: 54, trend: "up", initial: "R", color: "#3ac47d" },
-  { name: "Vinnie Wagstaff", role: "Java Programmer", amount: 429, trend: "dot", initial: "V", color: "#f7b924" },
-  { name: "Ella-Rose Henry", role: "Web Developer", amount: 129, trend: "down", initial: "E", color: "#d92550" },
-  { name: "Ruben Tillman", role: "UI Designer", amount: 54, trend: "up", initial: "R", color: "#16aaff" },
+  {
+    name: "Ella-Rose Henry",
+    role: "Web Developer",
+    amount: 129,
+    trend: "down",
+    initial: "E",
+    color: "#3f6ad8",
+  },
+  {
+    name: "Ruben Tillman",
+    role: "UI Designer",
+    amount: 54,
+    trend: "up",
+    initial: "R",
+    color: "#3ac47d",
+  },
+  {
+    name: "Vinnie Wagstaff",
+    role: "Java Programmer",
+    amount: 429,
+    trend: "dot",
+    initial: "V",
+    color: "#f7b924",
+  },
+  {
+    name: "Ella-Rose Henry",
+    role: "Web Developer",
+    amount: 129,
+    trend: "down",
+    initial: "E",
+    color: "#d92550",
+  },
+  {
+    name: "Ruben Tillman",
+    role: "UI Designer",
+    amount: 54,
+    trend: "up",
+    initial: "R",
+    color: "#16aaff",
+  },
 ];
 
 const topCategories: RankItem[] = [
-  { name: "Electronics", role: "Tech Products", amount: 842, trend: "up", initial: "E", color: "#3f6ad8" },
-  { name: "Fashion", role: "Clothing & Accessories", amount: 567, trend: "up", initial: "F", color: "#3ac47d" },
-  { name: "Home & Garden", role: "Interior Design", amount: 324, trend: "dot", initial: "H", color: "#f7b924" },
-  { name: "Sports & Outdoors", role: "Fitness Equipment", amount: 289, trend: "down", initial: "S", color: "#d92550" },
-  { name: "Books & Media", role: "Digital Content", amount: 156, trend: "up", initial: "B", color: "#16aaff" },
+  {
+    name: "Electronics",
+    role: "Tech Products",
+    amount: 842,
+    trend: "up",
+    initial: "E",
+    color: "#3f6ad8",
+  },
+  {
+    name: "Fashion",
+    role: "Clothing & Accessories",
+    amount: 567,
+    trend: "up",
+    initial: "F",
+    color: "#3ac47d",
+  },
+  {
+    name: "Home & Garden",
+    role: "Interior Design",
+    amount: 324,
+    trend: "dot",
+    initial: "H",
+    color: "#f7b924",
+  },
+  {
+    name: "Sports & Outdoors",
+    role: "Fitness Equipment",
+    amount: 289,
+    trend: "down",
+    initial: "S",
+    color: "#d92550",
+  },
+  {
+    name: "Books & Media",
+    role: "Digital Content",
+    amount: 156,
+    trend: "up",
+    initial: "B",
+    color: "#16aaff",
+  },
 ];
 
 type MetricItem = {
@@ -140,10 +210,42 @@ type UserRow = {
 };
 
 const users: UserRow[] = [
-  { id: "#345", name: "John Doe", job: "Web Developer", city: "Madrid", status: "Pending", initial: "J", color: "#3f6ad8" },
-  { id: "#347", name: "Ruben Tillman", job: "Etiam sit amet orci eget", city: "Berlin", status: "Completed", initial: "R", color: "#3ac47d" },
-  { id: "#321", name: "Elliot Huber", job: "Lorem ipsum dolor sic", city: "London", status: "In Progress", initial: "E", color: "#d92550" },
-  { id: "#55", name: "Vinnie Wagstaff", job: "UI Designer", city: "Amsterdam", status: "On Hold", initial: "V", color: "#16aaff" },
+  {
+    id: "#345",
+    name: "John Doe",
+    job: "Web Developer",
+    city: "Madrid",
+    status: "Pending",
+    initial: "J",
+    color: "#3f6ad8",
+  },
+  {
+    id: "#347",
+    name: "Ruben Tillman",
+    job: "Etiam sit amet orci eget",
+    city: "Berlin",
+    status: "Completed",
+    initial: "R",
+    color: "#3ac47d",
+  },
+  {
+    id: "#321",
+    name: "Elliot Huber",
+    job: "Lorem ipsum dolor sic",
+    city: "London",
+    status: "In Progress",
+    initial: "E",
+    color: "#d92550",
+  },
+  {
+    id: "#55",
+    name: "Vinnie Wagstaff",
+    job: "UI Designer",
+    city: "Amsterdam",
+    status: "On Hold",
+    initial: "V",
+    color: "#16aaff",
+  },
 ];
 
 function Avatar(props: { initial: string; color: string; size?: number }) {
@@ -165,12 +267,24 @@ function Avatar(props: { initial: string; color: string; size?: number }) {
 
 function TrendIcon(props: { trend: RankItem["trend"] }) {
   if (props.trend === "up") {
-    return <ChevronUp className="inline h-3.5 w-3.5 text-[#3ac47d]" strokeWidth={2.5} />;
+    return (
+      <ChevronUp
+        className="inline h-3.5 w-3.5 text-[#3ac47d]"
+        strokeWidth={2.5}
+      />
+    );
   }
   if (props.trend === "down") {
-    return <ChevronDown className="inline h-3.5 w-3.5 text-[#d92550]" strokeWidth={2.5} />;
+    return (
+      <ChevronDown
+        className="inline h-3.5 w-3.5 text-[#d92550]"
+        strokeWidth={2.5}
+      />
+    );
   }
-  return <CircleDot className="inline h-3 w-3 text-[#f7b924]" strokeWidth={2.5} />;
+  return (
+    <CircleDot className="inline h-3 w-3 text-[#f7b924]" strokeWidth={2.5} />
+  );
 }
 
 function RankList(props: { items: RankItem[] }) {
@@ -178,7 +292,7 @@ function RankList(props: { items: RankItem[] }) {
     <ScrollArea size="sm">
       <ListGroup flush>
         {props.items.map((item: RankItem, index: number) => (
-          <ListGroupItem key={item.name + "-" + index} className="!block">
+          <ListGroupItem key={item.name + "-" + index} className="block!">
             <div className="w-full p-0">
               <WidgetContentWrapper>
                 <WidgetContentLeft className="mr-3 shrink-0">
@@ -221,7 +335,13 @@ function BandwidthMetric(props: MetricItem) {
           </WidgetContentRight>
         </WidgetContentWrapper>
         <div className="mt-1">
-          <Progress value={props.value} tone={props.tone} size="sm" animated className="mb-0" />
+          <Progress
+            value={props.value}
+            tone={props.tone}
+            size="sm"
+            animated
+            className="mb-0"
+          />
         </div>
       </WidgetContentOuter>
     </div>
@@ -243,7 +363,12 @@ function TargetChartBlock(props: {
             </WidgetNumbers>
           </WidgetContentLeft>
           <div className="widget-content-right min-w-0 w-full">
-            <Progress value={props.value} tone={props.tone} size="xs" className="mb-0" />
+            <Progress
+              value={props.value}
+              tone={props.tone}
+              size="xs"
+              className="mb-0"
+            />
           </div>
         </WidgetContentWrapper>
         <WidgetContentLeft className="text-base">
@@ -327,7 +452,12 @@ export function DashboardExample1Page() {
             {salesTab === "last" ? (
               <>
                 <div className="mb-3 opacity-90">
-                  <BarChart data={salesBarData} series={salesBarSeries} height={240} showLegend />
+                  <BarChart
+                    data={salesBarData}
+                    series={salesBarSeries}
+                    height={240}
+                    showLegend
+                  />
                 </div>
                 <h6 className="mb-2 text-sm font-normal uppercase tracking-wide text-[#6c757d] opacity-50">
                   Top Authors
@@ -496,27 +626,41 @@ export function DashboardExample1Page() {
                 <TableHeaderCell className="text-center">#</TableHeaderCell>
                 <TableHeaderCell>Name</TableHeaderCell>
                 <TableHeaderCell className="text-center">City</TableHeaderCell>
-                <TableHeaderCell className="text-center">Status</TableHeaderCell>
-                <TableHeaderCell className="text-center">Actions</TableHeaderCell>
+                <TableHeaderCell className="text-center">
+                  Status
+                </TableHeaderCell>
+                <TableHeaderCell className="text-center">
+                  Actions
+                </TableHeaderCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {users.map((user: UserRow) => (
                 <TableRow key={user.id}>
-                  <TableCell className="text-center text-[#6c757d]">{user.id}</TableCell>
+                  <TableCell className="text-center text-[#6c757d]">
+                    {user.id}
+                  </TableCell>
                   <TableCell>
                     <WidgetContentWrapper>
                       <WidgetContentLeft className="mr-3 shrink-0">
-                        <Avatar initial={user.initial} color={user.color} size={40} />
+                        <Avatar
+                          initial={user.initial}
+                          color={user.color}
+                          size={40}
+                        />
                       </WidgetContentLeft>
                       <WidgetContentLeft>
                         <WidgetHeading>{user.name}</WidgetHeading>
-                        <WidgetSubheading className="opacity-70">{user.job}</WidgetSubheading>
+                        <WidgetSubheading className="opacity-70">
+                          {user.job}
+                        </WidgetSubheading>
                       </WidgetContentLeft>
                     </WidgetContentWrapper>
                   </TableCell>
                   <TableCell className="text-center">{user.city}</TableCell>
-                  <TableCell className="text-center">{statusBadge(user.status)}</TableCell>
+                  <TableCell className="text-center">
+                    {statusBadge(user.status)}
+                  </TableCell>
                   <TableCell className="text-center">
                     <Button size="sm" variant="primary">
                       Details
@@ -528,7 +672,12 @@ export function DashboardExample1Page() {
           </Table>
         </div>
         <CardFooter className="justify-center">
-          <Button size="sm" variant="outline-danger" className="me-2 !px-2" aria-label="Delete">
+          <Button
+            size="sm"
+            variant="outline-danger"
+            className="me-2 px-2!"
+            aria-label="Delete"
+          >
             <Trash2 className="h-4 w-4" />
           </Button>
           <Button size="sm" variant="success" wide>

@@ -58,7 +58,6 @@ export function Badge({
 }: BadgeProps) {
   const badgeClass =
     "inline-flex items-center justify-center px-2.5 py-1 " +
-    "min-w-5 text-xs font-bold uppercase leading-none font-sans " +
     (pill ? "rounded-full " : "rounded ") +
     resolveVariant(variant, soft) +
     " " +

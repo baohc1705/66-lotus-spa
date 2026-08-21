@@ -1,106 +1,120 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
-import { toast } from "@/shared/components/kitToast";
 import type { Result } from "@/shared/types/common.types";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
+import { showError, showSuccess } from "@/shared/utils/kitToast";
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
 
-import { attendanceApi, type AttendanceListParams } from "../api/attendance.api";
+import { attendanceApi } from "@/features/attendance/api/attendance.api";
 import type {
-  CheckInPayload,
-  CheckOutPayload,
-  CreateManualAttendancePayload,
-  UpdateAttendancePayload,
-} from "../types/attendance.types";
+  CheckInRequest,
+  CheckOutRequest,
+  CreateManualAttendanceRequest,
+  GetAllAttendancesQuery,
+  UpdateAttendanceRequest,
+} from "@/features/attendance/types/attendance.types";
 
-const ATTENDANCE_KEYS = {
-  all: ["attendances"] as const,
-  lists: () => [...ATTENDANCE_KEYS.all, "list"] as const,
-  list: (params: AttendanceListParams) =>
-    [...ATTENDANCE_KEYS.lists(), params] as const,
-};
+export const ATTENDANCE_QUERY_KEY =
+  createEntityQueryKeys<GetAllAttendancesQuery>("attendances");
 
-export function useAttendances(params: AttendanceListParams) {
+// Lấy danh sách chấm công
+export function useAttendances(params: GetAllAttendancesQuery, enabled = true) {
   return useQuery({
-    queryKey: ATTENDANCE_KEYS.list(params),
+    queryKey: ATTENDANCE_QUERY_KEY.list(params),
     queryFn: () => attendanceApi.getAll(params),
+    enabled,
   });
 }
 
+// Lấy chi tiết chấm công
+export function useAttendanceDetail(id: number, enabled = true) {
+  return useQuery({
+    queryKey: ATTENDANCE_QUERY_KEY.detail(id),
+    queryFn: () => attendanceApi.getDetail(id),
+    enabled,
+  });
+}
+
+// Check-in chấm công
 export function useCheckIn() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (payload: CheckInPayload) => attendanceApi.checkIn(payload),
+    mutationFn: (payload: CheckInRequest) => attendanceApi.checkIn(payload),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        queryClient.invalidateQueries({ queryKey: ATTENDANCE_KEYS.lists() });
-        toast.success("Check-in thành công");
-      } else {
-        toast.error(result.message || "Không thể check-in");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Không thể check-in");
+        return;
       }
+      queryClient.invalidateQueries({ queryKey: ATTENDANCE_QUERY_KEY.all });
+      showSuccess("Check-in thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, "Không thể check-in"));
+      showError(getErrorMessage(error, "Không thể check-in"));
     },
   });
 }
 
+// Check-out chấm công
 export function useCheckOut() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (payload: CheckOutPayload) => attendanceApi.checkOut(payload),
+    mutationFn: (payload: CheckOutRequest) => attendanceApi.checkOut(payload),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        queryClient.invalidateQueries({ queryKey: ATTENDANCE_KEYS.lists() });
-        toast.success("Check-out thành công");
-      } else {
-        toast.error(result.message || "Không thể check-out");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Không thể check-out");
+        return;
       }
+      queryClient.invalidateQueries({ queryKey: ATTENDANCE_QUERY_KEY.all });
+      showSuccess("Check-out thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, "Không thể check-out"));
+      showError(getErrorMessage(error, "Không thể check-out"));
     },
   });
 }
 
+// Cập nhật chấm công
 export function useUpdateAttendance() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (input: { id: number; payload: UpdateAttendancePayload }) =>
-      attendanceApi.update(input.id, input.payload),
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: number;
+      payload: UpdateAttendanceRequest;
+    }) => attendanceApi.update(id, payload),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        queryClient.invalidateQueries({ queryKey: ATTENDANCE_KEYS.lists() });
-        toast.success("Cập nhật chấm công thành công");
-      } else {
-        toast.error(result.message || "Không thể cập nhật");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Không thể cập nhật chấm công");
+        return;
       }
+      queryClient.invalidateQueries({ queryKey: ATTENDANCE_QUERY_KEY.all });
+      showSuccess("Cập nhật chấm công thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error));
+      showError(getErrorMessage(error, "Không thể cập nhật chấm công"));
     },
   });
 }
 
+// Tạo chấm công thủ công (nghỉ phép)
 export function useCreateManualAttendance() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (payload: CreateManualAttendancePayload) =>
+    mutationFn: (payload: CreateManualAttendanceRequest) =>
       attendanceApi.createManual(payload),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        queryClient.invalidateQueries({ queryKey: ATTENDANCE_KEYS.lists() });
-        toast.success("Tạo bản ghi chấm công thành công");
-      } else {
-        toast.error(result.message || "Không thể tạo bản ghi");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Không thể tạo chấm công");
+        return;
       }
+      queryClient.invalidateQueries({ queryKey: ATTENDANCE_QUERY_KEY.all });
+      showSuccess("Tạo chấm công thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error));
+      showError(getErrorMessage(error, "Không thể tạo chấm công"));
     },
   });
 }

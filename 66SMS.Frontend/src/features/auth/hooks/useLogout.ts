@@ -4,7 +4,7 @@ import { authApi } from '@/features/auth/api/authApi';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import { getErrorMessage } from '@/shared/utils/errorUtils';
 import { useNavigate } from 'react-router-dom';
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import type { Result } from '@/shared/types/common.types';
 
 export const useLogout = () => {
@@ -18,7 +18,7 @@ export const useLogout = () => {
     onSettled: () => {
       clearAuth();
       queryClient.clear();
-      navigate('/login');
+      navigate('/dang-nhap');
     },
     onError: (error: AxiosError<Result<unknown>>) =>
       toast.error(getErrorMessage(error, 'Đăng xuất thất bại')),

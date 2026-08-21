@@ -1,19 +1,6 @@
 import type { PageRequest } from "@/shared/types/common.types";
 
-export interface CertificateTypeDTO {
-  id?: number;
-  code?: string;
-  name?: string;
-  description?: string;
-  sortOrder?: number;
-  status?: number;
-  createdAt?: string;
-  createdBy?: number;
-  updatedAt?: string;
-  updatedBy?: number;
-}
-
-export interface StaffCertificateDTO {
+export interface StaffCertificateDto {
   id?: number;
   staffId?: number;
   staffName?: string;
@@ -33,12 +20,7 @@ export interface StaffCertificateDTO {
   updatedBy?: number;
 }
 
-export interface CertificateTypeQueryParams extends PageRequest {
-  status?: number;
-  filter?: string;
-}
-
-export interface StaffCertificateQueryParams extends PageRequest {
+export interface GetAllStaffCertificateQuery extends PageRequest {
   staffId?: number;
   status?: number;
   expiringInDays?: number;
@@ -46,14 +28,29 @@ export interface StaffCertificateQueryParams extends PageRequest {
   filter?: string;
 }
 
-export type {
-  CreateCertificateTypePayload,
-  UpdateCertificateTypePayload,
-  CertificateTypeFormValues,
-} from "../schemas/certificateType.schema";
+export interface CreateStaffCertificateRequest {
+  staffId: number;
+  certificateTypeId: number;
+  certificateName: string;
+  certificateNumber?: string;
+  issuingOrganization: string;
+  issuedDate: string;
+  expiryDate?: string;
+  documentUrl?: string;
+  imageBase64?: string;
+  note?: string;
+  status?: number;
+}
 
-export type {
-  CreateStaffCertificatePayload,
-  UpdateStaffCertificatePayload,
-  StaffCertificateFormValues,
-} from "../schemas/staffCertificate.schema";
+export interface UpdateStaffCertificateRequest {
+  certificateTypeId?: number;
+  certificateName?: string;
+  certificateNumber?: string;
+  issuingOrganization?: string;
+  issuedDate?: string;
+  expiryDate?: string;
+  documentUrl?: string;
+  imageBase64?: string;
+  note?: string;
+  status?: number;
+}

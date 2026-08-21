@@ -27,6 +27,13 @@ namespace _66SMS.Application.CustomerService.MembershipTiers.Queries.GetAllMembe
                 query = query.Where(x => x.Name.ToLower().Contains(keywordLower));
             }
 
+            query = request.OrderBy?.ToLower() switch
+            {
+                "name" => request.IsDescending ? query.OrderByDescending(x => x.Name) : query.OrderBy(x => x.Name),
+                "minspending" => request.IsDescending ? query.OrderByDescending(x => x.MinSpending) : query.OrderBy(x => x.MinSpending),
+                _ => request.IsDescending ? query.OrderByDescending(x => x.DiscountPercent) : query.OrderBy(x => x.DiscountPercent)
+            };
+
             var result = await query
                 .Select(x => new MembershipTierDto
                 {

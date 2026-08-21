@@ -61,15 +61,25 @@ namespace _66SMS.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAll([FromQuery] GetAllProductCategoryQuery query)
         {
+            query.IsDeleted = false;
             var result = await mediator.Send(query);
             return HandleResult(result);
         }
 
         [HttpGet("deleted")]
-        [PermissionAuthorize("products","read")]
+        [PermissionAuthorize("products", "read")]
         public async Task<IActionResult> GetAllDeleted([FromQuery] GetAllProductCategoryQuery query)
         {
             query.IsDeleted = true;
+            var result = await mediator.Send(query);
+            return HandleResult(result);
+        }
+
+
+        [HttpGet("admin")]
+        [PermissionAuthorize("products", "read")]
+        public async Task<IActionResult> AdminGetAll([FromQuery] GetAllProductCategoryQuery query)
+        {
             var result = await mediator.Send(query);
             return HandleResult(result);
         }

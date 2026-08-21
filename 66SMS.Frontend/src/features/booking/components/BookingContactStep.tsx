@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Phone, Info, ArrowLeft, Loader2, Wallet } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import {
   useMembershipTiers,

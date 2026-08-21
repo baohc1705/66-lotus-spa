@@ -6,7 +6,7 @@ import { TabNav } from "@/shared/components/Tabs";
 import { Dropdown, type DropdownItem } from "@/shared/elements/Dropdown";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useLogout } from "@/features/auth/hooks/useLogout";
-import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
+import { useActiveSalons } from "@/features/salons/hooks/useSalons";
 import { NotificationBell } from "@/features/notifications";
 import { Button } from "@/shared/elements/Button";
 import { Badge } from "@/shared/elements/Badge";
@@ -70,7 +70,7 @@ export function CashierHeader({
       type: "item",
       label: "Hồ sơ cá nhân",
       icon: <User className="h-3.5 w-3.5" />,
-      onClick: () => navigate("/admin/profile"),
+      onClick: () => navigate("/admin/ho-so"),
     },
     { type: "divider" },
     {

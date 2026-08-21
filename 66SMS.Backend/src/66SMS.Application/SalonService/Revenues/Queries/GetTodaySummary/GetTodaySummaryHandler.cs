@@ -1,4 +1,5 @@
 using _66SMS.Application.DTOs;
+using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using MediatR;
@@ -19,8 +20,7 @@ namespace _66SMS.Application.SalonService.Revenues.Queries.GetTodaySummary
             GetTodaySummaryQuery request,
             CancellationToken cancellationToken)
         {
-            var todayVn = DateOnly.FromDateTime(
-                DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(7)).DateTime);
+            var todayVn = DateTimeHelper.VnToday();
 
             var row = await revenueRepository.GetTodaySummaryAsync(
                 request.SalonId,

@@ -1,41 +1,71 @@
-import axiosInstance from "@/shared/api/axiosInstance";
-import type { Result, PagedResult } from "@/shared/types/common.types";
 import type {
-  SalonDTO,
-  SalonListItem,
-  CreateSalonPayload,
-  UpdateSalonPayload,
-  SalonQueryParams,
-} from "../types/salon.types";
-
+  CreateSalonRequest,
+  GetAllSalonQuery,
+  SalonDto,
+  SalonFullDto,
+  UpdateSalonRequest,
+} from "@/features/salons/types/salon.types";
+import axiosInstance from "@/shared/api/axiosInstance";
+import type { PagedResult, Result } from "@/shared/types/common.types";
 
 export const salonApi = {
-  getAll: (params: SalonQueryParams) =>
-    axiosInstance
-      .get<Result<PagedResult<SalonListItem>>>("/salons", { params })
-      .then((r) => r.data),
+  // Query API
+  getAll: async (
+    params: GetAllSalonQuery,
+  ): Promise<Result<PagedResult<SalonDto>>> => {
+    const response = await axiosInstance.get("/salons", { params });
+    return response.data;
+  },
 
-  getAdminAll: (params: SalonQueryParams) =>
-    axiosInstance
-      .get<Result<PagedResult<SalonListItem>>>(`/salons/admin`, { params })
-      .then((r) => r.data),
+  adminGetAll: async (
+    params: GetAllSalonQuery,
+  ): Promise<Result<PagedResult<SalonDto>>> => {
+    const response = await axiosInstance.get("/salons/admin", { params });
+    return response.data;
+  },
 
-  getDetail: (id: number) =>
-    axiosInstance.get<Result<SalonDTO>>(`/salons/${id}`).then((r) => r.data),
+  getDetail: async (id: number): Promise<Result<SalonFullDto>> => {
+    const response = await axiosInstance.get(`/salons/${id}`);
+    return response.data;
+  },
 
-  getPrimary: () =>
-    axiosInstance
-      .get<Result<SalonDTO | null>>(`/salons/primary`)
-      .then((r) => r.data),
+  getPrimary: async (): Promise<Result<SalonFullDto | null>> => {
+    const response = await axiosInstance.get("/salons/primary");
+    return response.data;
+  },
 
-  create: (payload: CreateSalonPayload) =>
-    axiosInstance.post<Result<number>>("/salons", payload).then((r) => r.data),
+  getActiveItems: async (): Promise<SalonDto[]> => {
+    const response = await axiosInstance.get<Result<PagedResult<SalonDto>>>(
+      "/salons",
+      { params: { pageSize: 100, orderBy: "sortorder" } },
+    );
+    return response.data.data?.items ?? [];
+  },
 
-  update: (id: number, payload: UpdateSalonPayload) =>
-    axiosInstance
-      .patch<Result<object>>(`/salons/${id}`, payload)
-      .then((r) => r.data),
+  // Command API
+  create: async (request: CreateSalonRequest): Promise<Result<number>> => {
+    const response = await axiosInstance.post<Result<number>>(
+      "/salons",
+      request,
+    );
+    return response.data;
+  },
 
-  delete: (id: number) =>
-    axiosInstance.delete<Result<object>>(`/salons/${id}`).then((r) => r.data),
+  update: async (
+    id: number,
+    request: UpdateSalonRequest,
+  ): Promise<Result<object>> => {
+    const response = await axiosInstance.patch<Result<object>>(
+      `/salons/${id}`,
+      request,
+    );
+    return response.data;
+  },
+
+  delete: async (id: number): Promise<Result<object>> => {
+    const response = await axiosInstance.delete<Result<object>>(
+      `/salons/${id}`,
+    );
+    return response.data;
+  },
 };

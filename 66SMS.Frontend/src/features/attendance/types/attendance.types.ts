@@ -1,3 +1,5 @@
+import type { PageRequest } from "@/shared/types/common.types";
+
 export interface AttendanceDto {
   id: number | null;
   staffId: number | null;
@@ -17,28 +19,37 @@ export interface AttendanceDto {
   updatedAt: string | null;
 }
 
-export interface CheckInPayload {
+export interface CheckInRequest {
   staffId: number;
-  workScheduleId: number;
+  salonId?: number;
+  workScheduleId?: number;
   note?: string;
 }
 
-export interface CheckOutPayload {
+export interface CheckOutRequest {
   staffId: number;
-  workScheduleId: number;
+  workScheduleId?: number;
 }
 
-export interface UpdateAttendancePayload {
+export interface UpdateAttendanceRequest {
   checkInAt?: string;
   checkOutAt?: string;
   status?: number;
   note?: string;
 }
-  
-export interface CreateManualAttendancePayload {
+
+export interface CreateManualAttendanceRequest {
   staffId: number;
   workScheduleId?: number;
   workDate: string;
   status: number;
   note?: string;
+}
+
+export interface GetAllAttendancesQuery extends PageRequest {
+  staffId?: number | null;
+  salonId?: number | null;
+  status?: number | null;
+  fromDate?: string;
+  toDate?: string;
 }

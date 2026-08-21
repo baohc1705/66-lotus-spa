@@ -20,7 +20,7 @@ namespace _66SMS.Application.CustomerService.Customers.Queries.GetAllCustomer
             var query = customerSqlRepository.AsQueryable();
             if (!string.IsNullOrEmpty(request.Filter))
             {
-                query = query.Where(x => x.FullName.StartsWith(request.Filter) || x.Phone == request.Filter || x.User!.Email == request.Filter);
+                query = query.Where(x => x.FullName.Contains(request.Filter) || x.Phone == request.Filter || x.User!.Email == request.Filter);
             }
 
             if (request.Status != null)
@@ -46,7 +46,7 @@ namespace _66SMS.Application.CustomerService.Customers.Queries.GetAllCustomer
                     UserId = x.UserId,
                     FullName = x.FullName,
                     AvatarUrl = x.AvatarUrl,
-                    DateOfBirth = x.DateOfBirth.ToString(),
+                    DateOfBirth = x.DateOfBirth,
                     Gender = x.Gender,
                     Phone = x.Phone,
                     LoyaltyPoint = x.LoyaltyPoint,

@@ -1,3 +1,5 @@
+using _66SMS.Application.Abstractions.Services;
+using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Contract.Enumerations;
 using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Shared;
@@ -8,7 +10,6 @@ using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using _66SMS.Application.Abstractions.Services;
 
 namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
 {
@@ -47,6 +48,8 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
         {
             if (request.Items == null || request.Items.Count == 0)
                 return Result<int>.BadRequest(InvoiceConst.MSG_NO_ITEMS, ErrorCodes.ERR_INVOICE_NO_ITEMS);
+
+            var createdInvoiceId = 0;
 
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
@@ -240,13 +243,15 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoice
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
 
-                return Result<int>.Created(invoice.Id);
+                createdInvoiceId = invoice.Id;
             }
             catch
             {
                 transaction.Rollback();
                 throw;
             }
+
+            return Result<int>.Created(createdInvoiceId);
         }
     }
 }

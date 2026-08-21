@@ -253,6 +253,7 @@ namespace _66SMS.Application.BookingService.Appointments.Commands.CreateAppointm
                         Status = AppointmentConst.STATUS_PENDING,
                         Note = guest.Note,
                         TotalAmount = totalAmount,
+                        Source = AppointmentConst.SOURCE_ONLINE,
                         Services = appointmentServices,
                         CreatedAt = now,
                         CreatedBy = request.CreatedByUserId,

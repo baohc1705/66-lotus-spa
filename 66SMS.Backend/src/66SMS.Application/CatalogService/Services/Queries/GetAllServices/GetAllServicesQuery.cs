@@ -12,5 +12,6 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
         public decimal? MinPrice { get; set; }
         public decimal? MaxPrice { get; set; }
         public bool IsDeleted { get; set; } = false;
+        public int? ExcludeStaffId { get; set; }
     }
 }

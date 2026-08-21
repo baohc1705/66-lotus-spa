@@ -2,7 +2,24 @@ IF OBJECT_ID(N'dbo.usp_GetBookingTechnicians', N'P') IS NOT NULL
     DROP PROCEDURE dbo.usp_GetBookingTechnicians;
 GO
 
--- @service_ids: csv "1,5,9". Staff phai co staff_services du tat ca dich vu (giao tap).   
+-- Lấy danh sách kỹ thuật viên có thể nhận lịch trong ngày, kèm số slot còn đặt được (SlotsLeft).
+-- Staff phải làm được TẤT CẢ dịch vụ trong @service_ids (giao tập staff_services).
+-- SlotsLeft = số điểm bắt đầu slot liên tiếp còn trống đủ @slots_needed cho combo dịch vụ.
+--
+-- Cách dùng:
+--   -- kỹ thuật viên khả dụng ngày 2026-08-20, dịch vụ 1 và 5, salon 3
+--   EXEC dbo.usp_GetBookingTechnicians @date = '2026-08-20', @service_ids = N'1,5', @salon_id = 3;
+--
+-- Input mẫu:
+--   @date        = '2026-08-20'  -- ngày đặt lịch
+--   @service_ids = N'1,5,9'     -- csv id dịch vụ khách chọn
+--   @salon_id    = 3            -- lọc staff thuộc salon; NULL = không lọc
+--
+-- Output mẫu:
+--   StaffId | StaffName    | Avatar              | SlotsLeft
+--   --------|--------------|---------------------|----------
+--   12      | Nguyễn Văn A | /uploads/a.jpg      | 8
+--   15      | Trần Thị B   | NULL                | 3
 CREATE PROCEDURE dbo.usp_GetBookingTechnicians
     @date         DATE,
     @service_ids  NVARCHAR(500),
@@ -11,7 +28,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    DECLARE @duration_mins INT;
+    DECLARE @duration_mins INT; 
     DECLARE @slot_minutes  INT;
     DECLARE @slots_needed  INT;
     DECLARE @slot_count    INT;
@@ -20,6 +37,7 @@ BEGIN
     DECLARE @found_count   INT;
     DECLARE @now           DATETIMEOFFSET(7) = SYSDATETIMEOFFSET();
 
+    -- parse @service_ids thành danh sách id dịch vụ duy nhất
     CREATE TABLE #wanted_services (
         service_id INT NOT NULL PRIMARY KEY
     );
@@ -41,6 +59,7 @@ BEGIN
         RETURN;
     END;
 
+    -- tổng thời lượng combo dịch vụ; @found_count phải khớp @wanted_count
     SELECT
         @duration_mins = SUM(s.duration_mins),
         @found_count = COUNT(*)
@@ -71,6 +90,7 @@ BEGIN
     DECLARE @slot_index    INT;
     DECLARE @slot_end      TIME(7);
 
+    -- lấy khung giờ và bước slot từ config (ưu tiên config salon cụ thể)
     SELECT TOP (1)
         @cfg_start = start_time,
         @cfg_end = end_time,
@@ -94,6 +114,7 @@ BEGIN
         RETURN;
     END;
 
+    -- sinh toàn bộ slot trong ngày theo config
     SET @slot_index = 0;
     SET @slot_cursor = @cfg_start;
 
@@ -130,6 +151,7 @@ BEGIN
 
     SELECT TOP (1) @staff_role_id = id FROM dbo.roles WHERE code = N'staff' AND status = 1;
 
+    -- lọc staff: đủ skill (giao tập dịch vụ), có ca, có role staff, thuộc salon
     DECLARE @staff TABLE (
         staff_id   INT NOT NULL PRIMARY KEY,
         staff_name NVARCHAR(100) NOT NULL,
@@ -174,6 +196,7 @@ BEGIN
         RETURN;
     END;
 
+    -- phạm vi slot trong ca của mỗi staff (min/max index theo từng ca shift)
     DECLARE @shift_range TABLE (
         staff_id INT NOT NULL,
         min_idx  INT NOT NULL,
@@ -263,6 +286,7 @@ BEGIN
     INNER JOIN @slots n ON n.slot_index < o.needed
     WHERE o.start_index + n.slot_index < @slot_count;
 
+    -- đếm điểm bắt đầu slot còn trống liên tiếp @slots_needed trong phạm vi ca
     ;WITH free_cnt AS (
         SELECT r.staff_id, CAST(COUNT(*) AS INT) AS SlotsLeft
         FROM @shift_range r

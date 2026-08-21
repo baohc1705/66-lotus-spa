@@ -8,7 +8,7 @@ import {
 } from "../hooks/usePendingOnlineAppointments";
 import { cashierApi } from "../api/cashier.api";
 import { APPOINTMENT_STATUS } from "@/features/booking/constants/appointment.constants";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import {
   Table,
   TableBody,

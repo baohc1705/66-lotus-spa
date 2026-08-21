@@ -1,6 +1,5 @@
 using _66SMS.Contract.Shared;
 using MediatR;
-using System;
 
 namespace _66SMS.Application.BookingService.ConfigAppointments.Commands.CreateConfigAppointment
 {

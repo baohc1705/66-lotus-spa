@@ -14,6 +14,7 @@ function toYmdLocal(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
+// Filter thời gian sau thời gian hiện tại, nếu thời gian đã qua thì không hiển thị
 export function filterSlotsAfterNow(
   slots: TimeSlotDTO[],
   appointmentDate: string | null | undefined,
@@ -30,5 +31,6 @@ export function filterSlotsAfterNow(
     const slotMins = timeToMinutes(slot.time);
     if (slotMins == null) return false;
     return slotMins > nowMins;
+    //Demo return slotMins
   });
 }

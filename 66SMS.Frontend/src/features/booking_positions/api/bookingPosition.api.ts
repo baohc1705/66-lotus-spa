@@ -1,32 +1,52 @@
-import axiosInstance from "@/shared/api/axiosInstance";
-import type { Result, PagedResult } from "@/shared/types/common.types";
 import type {
-  CreateBookingPositionPayload,
-  BookingPositionDTO,
-  UpdateBookingPositionPayload,
-  BookingPositionListParams,
-} from "../types/booking_position.types";
-
+  BookingPositionDto,
+  CreateBookingPositionRequest,
+  GetAllBookingPositionQuery,
+  UpdateBookingPositionRequest,
+} from "@/features/booking_positions/types/bookingPosition.types";
+import axiosInstance from "@/shared/api/axiosInstance";
+import type { PagedResult, Result } from "@/shared/types/common.types";
 
 export const bookingPositionApi = {
-  getAll: (params: BookingPositionListParams) =>
-    axiosInstance
-      .get<Result<PagedResult<BookingPositionDTO>>>("/booking-positions", { params })
-      .then((r) => r.data),
+  // Query API
+  getAll: async (
+    params: GetAllBookingPositionQuery,
+  ): Promise<Result<PagedResult<BookingPositionDto>>> => {
+    const response = await axiosInstance.get("/booking-positions", { params });
+    return response.data;
+  },
 
-  getDetail: (id: number) =>
-    axiosInstance
-      .get<Result<BookingPositionDTO>>(`/booking-positions/${id}`)
-      .then((r) => r.data),
+  getDetail: async (id: number): Promise<Result<BookingPositionDto>> => {
+    const response = await axiosInstance.get(`/booking-positions/${id}`);
+    return response.data;
+  },
 
-  create: (payload: CreateBookingPositionPayload) =>
-    axiosInstance.post<Result<object>>("/booking-positions", payload).then((r) => r.data),
+  // Command API
+  create: async (
+    request: CreateBookingPositionRequest,
+  ): Promise<Result<object>> => {
+    const response = await axiosInstance.post<Result<object>>(
+      "/booking-positions",
+      request,
+    );
+    return response.data;
+  },
 
-  update: (id: number, payload: UpdateBookingPositionPayload) =>
-    axiosInstance
-      .patch<Result<object>>(`/booking-positions/${id}`, payload)
-      .then((r) => r.data),
+  update: async (
+    id: number,
+    request: UpdateBookingPositionRequest,
+  ): Promise<Result<object>> => {
+    const response = await axiosInstance.patch<Result<object>>(
+      `/booking-positions/${id}`,
+      request,
+    );
+    return response.data;
+  },
 
-  delete: (id: number) =>
-    axiosInstance.delete<Result<object>>(`/booking-positions/${id}`).then((r) => r.data),
+  delete: async (id: number): Promise<Result<object>> => {
+    const response = await axiosInstance.delete<Result<object>>(
+      `/booking-positions/${id}`,
+    );
+    return response.data;
+  },
 };

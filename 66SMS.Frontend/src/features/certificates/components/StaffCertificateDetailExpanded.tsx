@@ -1,4 +1,10 @@
-import { CheckCircle2, Pencil, ExternalLink, FileText, ShieldCheck } from "lucide-react";
+import {
+  CheckCircle2,
+  Pencil,
+  ExternalLink,
+  FileText,
+  ShieldCheck,
+} from "lucide-react";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Button } from "@/shared/elements/Button";
 import {
@@ -9,14 +15,17 @@ import {
   TableDetailHeader,
 } from "@/shared/tables/TableDetailExpanded";
 import { formatDisplayDate } from "@/shared/utils/date.utils";
-import { CERTIFICATE_PERM } from "../constants/certificate.permissions";
-import type { StaffCertificateDTO } from "../types/certificate.types";
-import { CertificateStatusBadge, ExpiryBadge } from "./CertificateStatusBadge";
+import { CERTIFICATE_PERM } from "@/features/certificates/constants/certificate.permissions";
+import type { StaffCertificateDto } from "@/features/certificates/types/certificate.types";
+import {
+  CertificateStatusBadge,
+  ExpiryBadge,
+} from "@/features/certificates/components/CertificateStatusBadge";
 
 interface Props {
-  cert: StaffCertificateDTO;
+  cert: StaffCertificateDto;
   onEdit: () => void;
-  onApprove?: (cert: StaffCertificateDTO) => void;
+  onApprove?: (cert: StaffCertificateDto) => void;
   isApproving?: boolean;
   submitMode?: boolean;
 }
@@ -34,7 +43,7 @@ export function StaffCertificateDetailExpanded({
   const previewIcon = cert.documentUrl ? (
     <img
       src={cert.documentUrl}
-      alt={cert.certificateName ?? "Chứng chỉ"}
+      alt={cert.certificateName}
       className="h-full w-full object-cover"
     />
   ) : (
@@ -45,8 +54,8 @@ export function StaffCertificateDetailExpanded({
     <TableDetailExpanded>
       <TableDetailHeader
         icon={previewIcon}
-        title={cert.certificateName ?? "—"}
-        subtitle={cert.typeName ?? undefined}
+        title={cert.certificateName}
+        subtitle={cert.typeName}
       />
 
       <TableDetailGrid cols={3}>
@@ -64,7 +73,7 @@ export function StaffCertificateDetailExpanded({
           label="Ngày hết hạn"
           value={
             <span className="flex flex-wrap items-center gap-2">
-              <ExpiryBadge expiryDate={cert.expiryDate ?? undefined} />
+              <ExpiryBadge expiryDate={cert.expiryDate} />
             </span>
           }
         />
@@ -111,12 +120,7 @@ export function StaffCertificateDetailExpanded({
         ) : null}
         {!submitMode ? (
           <PermissionGate resource={perm.resource} action={perm.update}>
-            <Button
-              variant="admin"
-              size="sm"
-              className="mb-0"
-              onClick={onEdit}
-            >
+            <Button variant="admin" size="sm" className="mb-0" onClick={onEdit}>
               <Pencil className="h-3.5 w-3.5" />
               Chỉnh sửa
             </Button>

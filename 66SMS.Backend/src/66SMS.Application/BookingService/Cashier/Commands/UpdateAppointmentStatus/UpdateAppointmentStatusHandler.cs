@@ -78,7 +78,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                 {
                     var now = DateTimeHelper.UtcNow();
                     appointment.DepositRequestedAt = now;
-                    appointment.DepositDeadlineAt = now.AddHours(24);
+                    appointment.DepositDeadlineAt = now.AddHours(AppointmentConst.DEPOSIT_DEADLINE_HOURS);
                     appointment.Status = AppointmentConst.STATUS_CONFIRMED;
                     appointment.ConfirmedAt = now;
                     appointment.UpdatedAt = now;
@@ -96,7 +96,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                         confirmedWaitingDeposit: true,
                         cancellationToken);
 
-                    return Result<object>.Success("Đã xác nhận lịch. Khách có 24 giờ để đặt cọc qua VNPAY.");
+                    return Result<object>.Success($"Đã xác nhận lịch. Khách có {AppointmentConst.DEPOSIT_DEADLINE_HOURS} giờ để đặt cọc qua VNPAY.");
                 }
 
                 var paidBeforeCancel = appointment.PaidAmount;
@@ -132,7 +132,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                     await BookingPositionReleaseService.ReleasePositionIfNeededAsync(
                         appointment, bookingPositionSqlRepository, cancellationToken);
                 }
-
+                // Hủy đơn
                 if (request.Status == AppointmentConst.STATUS_CANCELLED && paidBeforeCancel > 0)
                 {
                     Wallet wallet;
@@ -220,7 +220,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.UpdateAppointmentSt
                 ? $"{actorName} vừa xác nhận lịch hẹn #{appointment.Id} của khách {customerName} vào lúc {at}."
                 : $"{actorName} vừa cập nhật lịch hẹn #{appointment.Id} của khách {customerName} sang \"{statusLabel}\" vào lúc {at}.";
             var customerMessage = confirmedWaitingDeposit
-                ? $"{actorName} vừa xác nhận lịch hẹn #{appointment.Id} của bạn vào lúc {at}. Vui lòng đặt cọc trong 24 giờ."
+                ? $"{actorName} vừa xác nhận lịch hẹn #{appointment.Id} của bạn vào lúc {at}. Vui lòng đặt cọc trong {AppointmentConst.DEPOSIT_DEADLINE_HOURS} giờ."
                 : $"{actorName} vừa cập nhật lịch hẹn #{appointment.Id} của bạn sang \"{statusLabel}\" vào lúc {at}.";
 
             await domainEventPublisher.PublishAsync(new SendNotificationEvent<BookingNotificationPayload>

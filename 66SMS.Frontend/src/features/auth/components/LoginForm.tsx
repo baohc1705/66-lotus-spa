@@ -81,7 +81,7 @@ export const LoginForm = () => {
       </div>
 
       <div className="flex justify-end">
-        <Link to="/forgot-password" className="text-xs font-normal text-rose-600 hover:text-rose-500 hover:underline transition-colors">
+        <Link to="/quen-mat-khau" className="text-xs font-normal text-rose-600 hover:text-rose-500 hover:underline transition-colors">
           Quên mật khẩu?
         </Link>
       </div>
@@ -112,7 +112,7 @@ export const LoginForm = () => {
 
       <div className="text-center text-xs text-warm-600">
         Chưa có tài khoản?{" "}
-        <Link to="/register" className="font-semibold text-rose-600 hover:text-rose-500 hover:underline transition-colors">
+        <Link to="/dang-ky" className="font-semibold text-rose-600 hover:text-rose-500 hover:underline transition-colors">
           Đăng ký ngay
         </Link>
       </div>

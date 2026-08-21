@@ -1,5 +1,5 @@
-import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
-import type { SalonListItem } from "@/features/salons/types/salon.types";
+import { useActiveSalons } from "@/features/salons/hooks/useSalons";
+import type { SalonDto } from "@/features/salons/types/salon.types";
 import { formatCurrency } from "@/shared/utils/currency";
 import {
   ReportDataTable,
@@ -65,8 +65,8 @@ export function RevenueByStaffPage() {
   }));
 
   const salonOptions = salons
-    .filter((s: SalonListItem) => s.id != null)
-    .map((s: SalonListItem) => ({
+    .filter((s: SalonDto) => s.id != null)
+    .map((s: SalonDto) => ({
       id: s.id as number,
       name: s.name ?? "",
     }));

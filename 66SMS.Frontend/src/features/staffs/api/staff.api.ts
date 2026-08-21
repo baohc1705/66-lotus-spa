@@ -1,73 +1,57 @@
-import axiosInstance from "@/shared/api/axiosInstance";
 import type {
-  Result,
-  PagedResult,
-  PageRequest,
-} from "@/shared/types/common.types";
-import type {
+  CreateStaffRequest,
+  GetAllStaffQuery,
   StaffDto,
   StaffFullDto,
-  StaffServiceDto,
-  CreateStaffPayload,
-  UpdateStaffPayload,
-  CreateStaffServicePayload,
-  UpdateStaffServicePayload,
-  DeleteStaffServicePayload,
-} from "../types/staff.types";
-
+  UpdateStaffRequest,
+} from "@/features/staffs/types/staff.types";
+import axiosInstance from "@/shared/api/axiosInstance";
+import type { PagedResult, Result } from "@/shared/types/common.types";
 
 export const staffApi = {
-  getAll: (
-    params: PageRequest & { salonId?: number | null; role?: string | null },
-  ) =>
-    axiosInstance
-      .get<Result<PagedResult<StaffDto>>>("/staffs", { params })
-      .then((r) => r.data),
-  adminGetAll: (
-    params: PageRequest & { salonId?: number | null; role?: string | null },
-  ) =>
-    axiosInstance
-      .get<Result<PagedResult<StaffDto>>>(`/staffs/admin`, { params })
-      .then((r) => r.data),
+  // Query API
+  getAll: async (
+    params: GetAllStaffQuery,
+  ): Promise<Result<PagedResult<StaffDto>>> => {
+    const response = await axiosInstance.get("/staffs", { params });
+    return response.data;
+  },
 
-  getDetail: (id: number) =>
-    axiosInstance
-      .get<Result<StaffFullDto>>(`/staffs/${id}`)
-      .then((r) => r.data),
+  adminGetAll: async (
+    params: GetAllStaffQuery,
+  ): Promise<Result<PagedResult<StaffDto>>> => {
+    const response = await axiosInstance.get("/staffs/admin", { params });
+    return response.data;
+  },
 
-  create: (payload: CreateStaffPayload) =>
-    axiosInstance.post<Result<object>>("/staffs", payload).then((r) => r.data),
+  getDetail: async (id: number): Promise<Result<StaffFullDto>> => {
+    const response = await axiosInstance.get(`/staffs/${id}`);
+    return response.data;
+  },
 
-  update: (id: number, payload: UpdateStaffPayload) =>
-    axiosInstance
-      .patch<Result<object>>(`/staffs/${id}`, payload)
-      .then((r) => r.data),
+  // Command API
+  create: async (request: CreateStaffRequest): Promise<Result<object>> => {
+    const response = await axiosInstance.post("/staffs", request);
+    return response.data;
+  },
 
-  delete: (id: number) =>
-    axiosInstance.delete<Result<object>>(`/staffs/${id}`).then((r) => r.data),
+  update: async (
+    id: number,
+    request: UpdateStaffRequest,
+  ): Promise<Result<object>> => {
+    const response = await axiosInstance.patch(`/staffs/${id}`, request);
+    return response.data;
+  },
 
-  getStaffServices: (
-    params: PageRequest & {
-      staffId?: number | null;
-      serviceId?: number | null;
-    },
-  ) =>
-    axiosInstance
-      .get<Result<PagedResult<StaffServiceDto>>>(`/staffs/services`, { params })
-      .then((r) => r.data),
+  delete: async (id: number): Promise<Result<object>> => {
+    const response = await axiosInstance.delete(`/staffs/${id}`);
+    return response.data;
+  },
 
-  createStaffServices: (payload: CreateStaffServicePayload) =>
-    axiosInstance
-      .post<Result<number[]>>(`/staffs/services`, payload)
-      .then((r) => r.data),
-
-  updateStaffService: (id: number, payload: UpdateStaffServicePayload) =>
-    axiosInstance
-      .patch<Result<object>>(`/staffs/services/${id}`, payload)
-      .then((r) => r.data),
-
-  deleteStaffServices: (payload: DeleteStaffServicePayload) =>
-    axiosInstance
-      .delete<Result<object>>(`/staffs/services`, { data: payload })
-      .then((r) => r.data),
+  deleteBulk: async (ids: number[]): Promise<Result<object>> => {
+    const response = await axiosInstance.delete("/staffs/bulk", {
+      data: { ids },
+    });
+    return response.data;
+  },
 };

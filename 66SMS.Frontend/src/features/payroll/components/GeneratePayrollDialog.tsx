@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Calculator } from "lucide-react";
 
 import { useAuthStore } from "@/features/auth/stores/authStore";
-import { useAdminStaffs } from "@/features/staffs/hooks/useStaffs";
+import { useStaffsAdmin } from "@/features/staffs/hooks/useStaffs";
 import type { StaffDto } from "@/features/staffs/types/staff.types";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/elements/Button";
@@ -33,7 +33,7 @@ export function GeneratePayrollDialog({
 }: GeneratePayrollDialogProps) {
   const generateMutation = useGeneratePayroll();
   const salonId = useAuthStore((s) => s.getEffectiveSalonId());
-  const { data: staffsResult } = useAdminStaffs({
+  const { data: staffsResult } = useStaffsAdmin({
     pageIndex: 1,
     pageSize: 200,
     salonId,

@@ -1,100 +1,110 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/components/kitToast";
-import type { AxiosError } from "axios";
-import { certificateApi } from "../api/certificate.api";
-import type {
-  CertificateTypeQueryParams,
-  CreateCertificateTypePayload,
-  UpdateCertificateTypePayload,
-} from "../types/certificate.types";
+import { certificateTypeApi } from "@/features/certificates/api/certificateType.api";
+
 import type { Result } from "@/shared/types/common.types";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
+import { showError, showSuccess } from "@/shared/utils/kitToast";
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
+import type {
+  CreateCertificateTypeRequest,
+  GetAllCertificateTypeQuery,
+  UpdateCertificateTypeRequest,
+} from "../types/certificateType.types";
 
-const ENTITY = "loại chứng chỉ";
+// Query keys cho loại chứng chỉ
+export const CERTIFICATE_TYPE_QUERY_KEY =
+  createEntityQueryKeys<GetAllCertificateTypeQuery>("certificate-types");
 
-const CERTIFICATE_TYPE_KEYS = {
-  all: ["certificate-types"] as const,
-  lists: () => [...CERTIFICATE_TYPE_KEYS.all, "list"] as const,
-  list: (params: CertificateTypeQueryParams) =>
-    [...CERTIFICATE_TYPE_KEYS.lists(), params] as const,
-  details: () => [...CERTIFICATE_TYPE_KEYS.all, "detail"] as const,
-  detail: (id: number) => [...CERTIFICATE_TYPE_KEYS.details(), id] as const,
-};
-
-export function useCertificateTypes(params: CertificateTypeQueryParams) {
+// Lấy danh sách loại chứng chỉ
+export function useCertificateTypes(
+  params: GetAllCertificateTypeQuery,
+  enabled = true,
+) {
   return useQuery({
-    queryKey: CERTIFICATE_TYPE_KEYS.list(params),
-    queryFn: () => certificateApi.getAllTypes(params),
+    queryKey: CERTIFICATE_TYPE_QUERY_KEY.list(params),
+    queryFn: () => certificateTypeApi.getAllTypes(params),
+    enabled,
   });
 }
 
-export function useCertificateTypeDetail(id: number | null) {
+// Lấy chi tiết loại chứng chỉ
+export function useCertificateTypeDetail(id?: number | null) {
   return useQuery({
-    queryKey: CERTIFICATE_TYPE_KEYS.detail(id!),
-    queryFn: () => certificateApi.getDetailType(id!),
-    enabled: id !== null && id > 0,
+    queryKey: CERTIFICATE_TYPE_QUERY_KEY.detail(id ?? 0),
+    queryFn: () => certificateTypeApi.getDetailType(id!),
+    enabled: id != null && id > 0,
   });
 }
 
+// Tạo loại chứng chỉ
 export function useCreateCertificateType() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreateCertificateTypePayload) =>
-      certificateApi.createType(payload),
+    mutationFn: (data: CreateCertificateTypeRequest) =>
+      certificateTypeApi.createType(data),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: CERTIFICATE_TYPE_KEYS.lists() });
-        toast.success(`Tạo ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+      queryClient.invalidateQueries({
+        queryKey: CERTIFICATE_TYPE_QUERY_KEY.all,
+      });
+      showSuccess("Tạo loại chứng chỉ thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi tạo ${ENTITY}`));
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi tạo loại chứng chỉ"));
     },
   });
 }
 
+// Sửa loại chứng chỉ
 export function useUpdateCertificateType() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
       id,
-      payload,
+      data,
     }: {
       id: number;
-      payload: UpdateCertificateTypePayload;
-    }) => certificateApi.updateType(id, payload),
+      data: UpdateCertificateTypeRequest;
+    }) => certificateTypeApi.updateType(id, data),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: CERTIFICATE_TYPE_KEYS.all });
-        toast.success(`Cập nhật ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+      queryClient.invalidateQueries({
+        queryKey: CERTIFICATE_TYPE_QUERY_KEY.all,
+      });
+      showSuccess("Cập nhật loại chứng chỉ thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(
-        getErrorMessage(error, `Có lỗi xảy ra khi cập nhật ${ENTITY}`),
+      showError(
+        getErrorMessage(error, "Có lỗi xảy ra khi cập nhật loại chứng chỉ"),
       );
     },
   });
 }
 
+// Xóa loại chứng chỉ
 export function useDeleteCertificateType() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: number) => certificateApi.deleteType(id),
+    mutationFn: (id: number) => certificateTypeApi.deleteType(id),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: CERTIFICATE_TYPE_KEYS.all });
-        toast.success(`Xóa ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+      queryClient.invalidateQueries({
+        queryKey: CERTIFICATE_TYPE_QUERY_KEY.all,
+      });
+      showSuccess("Xóa loại chứng chỉ thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi xóa ${ENTITY}`));
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi xóa loại chứng chỉ"));
     },
   });
 }

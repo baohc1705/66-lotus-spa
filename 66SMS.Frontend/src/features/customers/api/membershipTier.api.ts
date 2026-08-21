@@ -2,31 +2,51 @@ import axiosInstance from "@/shared/api/axiosInstance";
 import type { Result, PagedResult } from "@/shared/types/common.types";
 import type {
   MembershipTierDto,
-  CreateMembershipTierPayload,
-  UpdateMembershipTierPayload,
-  MembershipTierQueryParams,
+  CreateMembershipTierRequest,
+  UpdateMembershipTierRequest,
+  GetAllMembershipTierQuery,
 } from "../types/membershipTier.types";
 
-
 export const membershipTierApi = {
-  getAll: (params: MembershipTierQueryParams) =>
-    axiosInstance
-      .get<Result<PagedResult<MembershipTierDto>>>("/membership-tiers", { params })
-      .then((r) => r.data),
+  // Query API
+  getAll: async (
+    params: GetAllMembershipTierQuery,
+  ): Promise<Result<PagedResult<MembershipTierDto>>> => {
+    const response = await axiosInstance.get("/membership-tiers", { params });
+    return response.data;
+  },
 
-  getDetail: (id: number) =>
-    axiosInstance
-      .get<Result<MembershipTierDto>>(`/membership-tiers/${id}`)
-      .then((r) => r.data),
+  getDetail: async (id: number): Promise<Result<MembershipTierDto>> => {
+    const response = await axiosInstance.get(`/membership-tiers/${id}`);
+    return response.data;
+  },
 
-  create: (payload: CreateMembershipTierPayload) =>
-    axiosInstance.post<Result<number>>("/membership-tiers", payload).then((r) => r.data),
+  // Command API
+  create: async (
+    payload: CreateMembershipTierRequest,
+  ): Promise<Result<number>> => {
+    const response = await axiosInstance.post<Result<number>>(
+      "/membership-tiers",
+      payload,
+    );
+    return response.data;
+  },
 
-  update: (id: number, payload: UpdateMembershipTierPayload) =>
-    axiosInstance
-      .patch<Result<object>>(`/membership-tiers/${id}`, payload)
-      .then((r) => r.data),
+  update: async (
+    id: number,
+    payload: UpdateMembershipTierRequest,
+  ): Promise<Result<object>> => {
+    const response = await axiosInstance.patch<Result<object>>(
+      `/membership-tiers/${id}`,
+      payload,
+    );
+    return response.data;
+  },
 
-  delete: (id: number) =>
-    axiosInstance.delete<Result<object>>(`/membership-tiers/${id}`).then((r) => r.data),
+  delete: async (id: number): Promise<Result<object>> => {
+    const response = await axiosInstance.delete<Result<object>>(
+      `/membership-tiers/${id}`,
+    );
+    return response.data;
+  },
 };

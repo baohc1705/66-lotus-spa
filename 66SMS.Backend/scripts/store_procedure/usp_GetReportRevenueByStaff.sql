@@ -2,6 +2,27 @@ IF OBJECT_ID(N'dbo.usp_GetReportRevenueByStaff', N'P') IS NOT NULL
     DROP PROCEDURE dbo.usp_GetReportRevenueByStaff;
 GO
 
+-- Mục đích: Báo cáo doanh thu theo TỪNG THỢ trong khoảng ngày, dùng cho màn hình xem thợ nào phục vụ nhiều/ít.
+-- Chỉ tính dòng hóa đơn thuộc loại dịch vụ (item_type = 1), đang active, thuộc hóa đơn đã thanh toán.
+-- issued_at lưu theo UTC nên phải quy đổi về giờ Việt Nam (+07:00) để lọc theo ngày.
+--
+-- Input:
+--   @SalonId  INT = NULL   -- chỉ tính salon này; NULL = tất cả chi nhánh
+--   @FromDate DATE         -- từ ngày (theo giờ VN, bao gồm)
+--   @ToDate   DATE         -- đến ngày (theo giờ VN, bao gồm)
+--
+-- Output (sắp xếp giảm dần theo TotalRevenue):
+--   StaffId         INT        -- id thợ
+--   StaffName       NVARCHAR   -- tên thợ
+--   ServiceCount    INT        -- tổng số lượt phục vụ dịch vụ (SUM quantity)
+--   ServiceRevenue  DECIMAL    -- tổng tiền dịch vụ (line_total), chưa trừ hoa hồng
+--   Commission      DECIMAL    -- tổng hoa hồng
+--   TotalRevenue    DECIMAL    -- ServiceRevenue - Commission (tiền mang về cho chi nhánh)
+--
+-- Ví dụ EXEC:
+--   EXEC dbo.usp_GetReportRevenueByStaff @SalonId = NULL, @FromDate = '2026-07-01', @ToDate = '2026-07-30';
+--   EXEC dbo.usp_GetReportRevenueByStaff @SalonId = 1, @FromDate = '2026-07-01', @ToDate = '2026-07-30';
+--   EXEC dbo.usp_GetReportRevenueByStaff NULL, '2026-07-01', '2026-07-30';
 CREATE PROCEDURE dbo.usp_GetReportRevenueByStaff
     @SalonId  INT = NULL,   -- NULL = tất cả chi nhánh
     @FromDate DATE,
@@ -10,6 +31,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- Gom theo thợ: chỉ tính dòng dịch vụ (item_type = 1), hóa đơn đã thanh toán
     SELECT
         ii.staff_id AS StaffId,
         MAX(st.full_name) AS StaffName,

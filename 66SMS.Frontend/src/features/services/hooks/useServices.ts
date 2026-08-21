@@ -1,180 +1,166 @@
 import { serviceApi } from "@/features/services/api/service.api";
-import type { PageRequest, Result } from "@/shared/types/common.types";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/components/kitToast";
-import type { AxiosError } from "axios";
-import { StatusActive } from "@/shared/constants/status.enum";
-import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
-import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type {
-  CreateServicePayload,
-  UpdateServicePayload,
-} from "../types/service.types";
+  CreateServiceRequest,
+  GetAllServiceQuery,
+  UpdateServiceRequest,
+} from "@/features/services/types/service.types";
+import { StatusActive } from "@/shared/constants/status.enum";
+import type { Result } from "@/shared/types/common.types";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
+import { showError, showSuccess } from "@/shared/utils/kitToast";
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
 
-const ENTITY = "dịch vụ";
+// Tạo query keys cho dịch vụ để dùng trong query cache
+export const SERVICE_QUERY_KEY =
+  createEntityQueryKeys<GetAllServiceQuery>("services");
 
-export const SERVICE_KEYS = createEntityQueryKeys<
-  PageRequest & { categoryId?: number }
->("services");
-
-export function useServices(
-  params: PageRequest & { categoryId?: number },
-  enabled = true,
-) {
+// Lấy danh sách dịch vụ
+export function useServices(params: GetAllServiceQuery, enabled = true) {
   return useQuery({
-    queryKey: SERVICE_KEYS.list(params),
+    queryKey: SERVICE_QUERY_KEY.list(params),
     queryFn: () => serviceApi.getAll(params),
     enabled,
   });
 }
 
-export function useAdminServices(
-  params: PageRequest & { categoryId?: number },
-  enabled = true,
-) {
+// Lấy danh sách dịch vụ admin
+export function useServicesAdmin(params: GetAllServiceQuery, enabled = true) {
   return useQuery({
-    queryKey: SERVICE_KEYS.adminList(params),
+    queryKey: SERVICE_QUERY_KEY.adminList(params),
     queryFn: () => serviceApi.adminGetAll(params),
     enabled,
   });
 }
 
-export function useDeletedServices(
-  params: PageRequest & { categoryId?: number },
-  enabled = true,
-) {
+// Lấy chi tiết dịch vụ
+export function useServiceDetail(id?: number | null) {
   return useQuery({
-    queryKey: SERVICE_KEYS.deletedList(params),
-    queryFn: () => serviceApi.getAllDeleted(params),
-    enabled,
-  });
-}
-
-export function useServiceDetail(id: number | null) {
-  return useQuery({
-    queryKey: SERVICE_KEYS.detail(id!),
+    queryKey: SERVICE_QUERY_KEY.detail(id ?? 0),
     queryFn: () => serviceApi.getDetail(id!),
-    enabled: id !== null && id > 0,
+    enabled: id != null && id > 0,
   });
 }
 
+// Tạo dịch vụ
 export function useCreateService() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreateServicePayload) => serviceApi.create(payload),
+    mutationFn: (data: CreateServiceRequest) => serviceApi.create(data),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: SERVICE_KEYS.all });
-        toast.success(`Tạo ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({ queryKey: SERVICE_QUERY_KEY.all });
+      showSuccess("Tạo dịch vụ thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi tạo ${ENTITY}`));
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi tạo dịch vụ"));
     },
   });
 }
 
+// Sửa dịch vụ
 export function useUpdateService() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      id,
-      payload,
-    }: {
-      id: number;
-      payload: UpdateServicePayload;
-    }) => serviceApi.update(id, payload),
+    mutationFn: ({ id, data }: { id: number; data: UpdateServiceRequest }) =>
+      serviceApi.update(id, data),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: SERVICE_KEYS.all });
-        toast.success(`Cập nhật ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({ queryKey: SERVICE_QUERY_KEY.all });
+      showSuccess("Sửa dịch vụ thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(
-        getErrorMessage(error, `Có lỗi xảy ra khi cập nhật ${ENTITY}`),
-      );
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi sửa dịch vụ"));
     },
   });
 }
 
+// Xóa dịch vụ
 export function useDeleteService() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => serviceApi.delete(id),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: SERVICE_KEYS.all });
-        toast.success(`Xóa ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({ queryKey: SERVICE_QUERY_KEY.all });
+      showSuccess("Xóa dịch vụ thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi xóa ${ENTITY}`));
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi xóa dịch vụ"));
     },
   });
 }
 
-export function useDeleteServiceMultiples() {
-  const qc = useQueryClient();
+// Xóa nhiều dịch vụ
+export function useDeleteBulkServices() {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (ids: number[]) => serviceApi.deleteMultiples({ ids }),
+    mutationFn: (ids: number[]) => serviceApi.deleteBulk(ids),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: SERVICE_KEYS.all });
-        toast.success(`Xóa ${ENTITY} đã chọn thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({ queryKey: SERVICE_QUERY_KEY.all });
+      showSuccess("Xóa nhiều dịch vụ thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi xóa ${ENTITY}`));
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi xóa nhiều dịch vụ"));
     },
   });
 }
 
+// Khôi phục dịch vụ
 export function useRestoreService() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) =>
       serviceApi.update(id, { status: StatusActive.Active }),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: SERVICE_KEYS.all });
-        toast.success(`Khôi phục ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({ queryKey: SERVICE_QUERY_KEY.all });
+      showSuccess("Khôi phục dịch vụ thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(
-        getErrorMessage(error, `Có lỗi xảy ra khi khôi phục ${ENTITY}`),
-      );
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi khôi phục dịch vụ"));
     },
   });
 }
 
+// Xóa sản phẩm tiêu hao khỏi dịch vụ
 export function useDeleteServiceProduct() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => serviceApi.deleteServiceProduct(id),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: SERVICE_KEYS.all });
-        toast.success("Đã xóa sản phẩm khỏi dịch vụ");
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({ queryKey: SERVICE_QUERY_KEY.all });
+      showSuccess("Đã xóa sản phẩm khỏi dịch vụ");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(
-        getErrorMessage(error, "Không thể xóa sản phẩm khỏi dịch vụ"),
-      );
+      showError(getErrorMessage(error, "Không thể xóa sản phẩm khỏi dịch vụ"));
     },
   });
 }

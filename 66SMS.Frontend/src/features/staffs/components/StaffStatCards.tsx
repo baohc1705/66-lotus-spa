@@ -1,25 +1,25 @@
 import { StatCard } from "@/shared/widgets/StatCard";
 import { formatCurrency } from "@/shared/utils/currency";
 
-interface StaffStatCardsProps {
+export type StaffStatCardsData = {
   totalStaffs: number;
   activeStaffs: number;
   inactiveStaffs: number;
   avgSalary: number;
-  isLoading?: boolean;
-}
+  isLoading: boolean;
+};
 
 export function StaffStatCards({
   totalStaffs,
   activeStaffs,
-  inactiveStaffs,
+  //inactiveStaffs,
   avgSalary,
-  isLoading = false,
-}: StaffStatCardsProps) {
+  isLoading,
+}: StaffStatCardsData) {
   const dash = isLoading ? "—" : undefined;
 
   return (
-    <div className="mb-3 grid grid-cols-2 gap-2 lg:grid-cols-4">
+    <div className="mb-3 grid grid-cols-2 gap-2 lg:grid-cols-3">
       <StatCard
         title="Tổng nhân viên"
         value={dash ?? totalStaffs}
@@ -34,13 +34,13 @@ export function StaffStatCards({
         tone="happy-green"
         valueTone="white"
       />
-      <StatCard
+      {/* <StatCard
         title="Tạm nghỉ"
         value={dash ?? inactiveStaffs}
         description="Tạm ngưng làm việc"
         tone="tempting-azure"
         valueTone="white"
-      />
+      /> */}
       <StatCard
         title="Lương cơ bản TB"
         value={dash ?? (avgSalary > 0 ? formatCurrency(avgSalary) : "—")}

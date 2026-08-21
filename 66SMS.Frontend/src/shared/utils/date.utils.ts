@@ -86,7 +86,10 @@ export function formatDisplayDate(val?: string | null): string {
   return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 }
 
-export function addMinutesToTime(time?: string | null, minutes?: number): string {
+export function addMinutesToTime(
+  time?: string | null,
+  minutes?: number,
+): string {
   const hm = toLocalTimeOnly(time);
   if (!hm) return "";
   const parts = hm.split(":");
@@ -220,4 +223,10 @@ export class DateUtil {
 
 export function formatDate(input?: DateInput) {
   return new DateUtil(input);
+}
+
+export function formatTimeSpan(time?: string) {
+  if (!time) return undefined;
+  if (time.split(":").length === 2) return `${time}:00`;
+  return time;
 }

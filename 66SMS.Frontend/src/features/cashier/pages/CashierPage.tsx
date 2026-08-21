@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useConfigAppointmentBySalon } from "@/features/config_appointments/hooks/useConfigAppointments";
 import { invoiceApi } from "@/features/invoices/api/invoice.api";
 import type { InvoiceDto } from "@/features/invoices/types/invoice.types";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import { cashierApi } from "../api/cashier.api";
 import { CashierBookingModal } from "../components/CashierBookingModal";
 import { CashierCalendar } from "../components/CashierCalendar";
@@ -27,6 +28,7 @@ import { CashierBookingOnlineModal } from "../components/CashierBookingOnlineMod
 import { useInvalidatePendingOnline } from "../hooks/usePendingOnlineAppointments";
 
 export function CashierPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { invalidatePendingOnline } = useInvalidatePendingOnline();
   const [activeTab, setActiveTab] = useState<"calendar" | "invoices">(
     "calendar",
@@ -83,6 +85,58 @@ export function CashierPage() {
       window.location.href = "/";
     }
   }, [isAdmin, isReceptionist]);
+
+  const appointmentIdParam = searchParams.get("appointmentId");
+
+  useEffect(() => {
+    if (!appointmentIdParam) return;
+
+    const appointmentId = Number(appointmentIdParam);
+    if (Number.isNaN(appointmentId) || appointmentId <= 0) {
+      setSearchParams({}, { replace: true });
+      return;
+    }
+
+    let cancelled = false;
+
+    async function openAppointmentFromQuery() {
+      try {
+        const detail = await bookingApi.getDetail(appointmentId);
+        if (cancelled) return;
+
+        const mapped = mapAppointmentToCashierBooking(detail);
+
+        if (mapped.bookingDate) {
+          const parts = mapped.bookingDate.split("-");
+          const year = Number(parts[0]);
+          const month = Number(parts[1]);
+          const day = Number(parts[2]);
+          if (!Number.isNaN(year) && !Number.isNaN(month) && !Number.isNaN(day)) {
+            setCurrentDate(new Date(year, month - 1, day));
+          }
+        }
+
+        setViewMode("day");
+        setActiveTab("calendar");
+        setSelectedBooking(mapped);
+        setIsSidebarOpen(true);
+      } catch {
+        if (!cancelled) {
+          toast.error("Không tải được chi tiết lịch hẹn.");
+        }
+      } finally {
+        if (!cancelled) {
+          setSearchParams({}, { replace: true });
+        }
+      }
+    }
+
+    openAppointmentFromQuery();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [appointmentIdParam, setSearchParams]);
 
   const [onlineModalOpen, setOnlineModalOpen] = useState(false);
 

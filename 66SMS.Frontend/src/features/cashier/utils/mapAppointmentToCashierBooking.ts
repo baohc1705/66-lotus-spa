@@ -79,6 +79,7 @@ export function mapAppointmentToCashierBooking(
     appointmentCode: item.appointmentCode,
     customerName: item.customerName,
     customerPhone: item.customerPhone,
+    customerEmail: item.customerEmail,
     customerAvatar: item.customerAvatar,
     bookingDate: item.appointmentDate,
     serviceName,

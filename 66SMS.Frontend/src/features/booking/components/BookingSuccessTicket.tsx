@@ -61,7 +61,7 @@ export function BookingSuccessTicket() {
                   {(booking.salonName || selectedSalon?.name) && (
                     <div className="flex justify-between">
                       <span className="text-warm-600">Chi nhánh:</span>
-                      <span className="font-semibold text-ink text-right max-w-[200px]">
+                      <span className="font-semibold text-ink text-right max-w-50">
                         {booking.salonName || selectedSalon?.name}
                       </span>
                     </div>
@@ -69,7 +69,7 @@ export function BookingSuccessTicket() {
 
                   <div className="flex justify-between">
                     <span className="text-warm-600">Dịch vụ:</span>
-                    <span className="font-semibold text-ink text-right max-w-[200px]">
+                    <span className="font-semibold text-ink text-right max-w-50">
                       {booking.serviceNames?.length
                         ? booking.serviceNames.join(", ")
                         : "—"}
@@ -136,14 +136,14 @@ export function BookingSuccessTicket() {
                   {selectedSalon && (
                     <div className="flex justify-between">
                       <span className="text-warm-600">Chi nhánh:</span>
-                      <span className="font-semibold text-ink text-right max-w-[200px]">
+                      <span className="font-semibold text-ink text-right max-w-50">
                         {selectedSalon.name}
                       </span>
                     </div>
                   )}
                   <div className="flex justify-between">
                     <span className="text-warm-600">Dịch vụ:</span>
-                    <span className="font-semibold text-ink text-right max-w-[200px]">
+                    <span className="font-semibold text-ink text-right max-w-50">
                       {(guest.selectedServices ?? [])
                         .map((service) => service.name || "Dịch vụ")
                         .join(", ") || "—"}
@@ -182,7 +182,7 @@ export function BookingSuccessTicket() {
             Về trang chủ
           </button>
           <Link
-            to="/profile?tab=bookings"
+            to="/ho-so?tab=bookings"
             onClick={() => resetBooking()}
             className="text-sm font-semibold text-rose-600 hover:text-rose-400 mt-2"
           >

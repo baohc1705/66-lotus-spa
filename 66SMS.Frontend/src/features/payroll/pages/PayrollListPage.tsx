@@ -8,9 +8,9 @@ import {
 
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { useSalons } from "@/features/salons/hooks/useSalons";
-import { useAdminStaffs } from "@/features/staffs/hooks/useStaffs";
+import { useStaffsAdmin } from "@/features/staffs/hooks/useStaffs";
 import type { StaffDto } from "@/features/staffs/types/staff.types";
-import type { SalonListItem } from "@/features/salons/types/salon.types";
+import type { SalonDto } from "@/features/salons/types/salon.types";
 import { Pagination } from "@/shared/components/Pagination";
 import { Badge } from "@/shared/elements/Badge";
 import { Button } from "@/shared/elements/Button";
@@ -68,7 +68,7 @@ export function PayrollListPage() {
     setStaffId(myStaffId);
   }, [canManagePayroll, myStaffId]);
 
-  const { data: staffsResult } = useAdminStaffs(
+  const { data: staffsResult } = useStaffsAdmin(
     {
       pageIndex: 1,
       pageSize: 200,
@@ -135,8 +135,8 @@ export function PayrollListPage() {
     () => [
       { value: "all", label: "Tất cả chi nhánh" },
       ...salons
-        .filter((salon: SalonListItem) => salon.id != null)
-        .map((salon: SalonListItem) => ({
+        .filter((salon: SalonDto) => salon.id != null)
+        .map((salon: SalonDto) => ({
           value: String(salon.id),
           label: salon.name ?? `Chi nhánh #${salon.id}`,
         })),

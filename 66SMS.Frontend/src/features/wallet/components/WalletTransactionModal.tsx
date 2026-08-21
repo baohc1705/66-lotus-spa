@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowDownLeft, ArrowUpRight, Plus } from "lucide-react";
 
 import { Modal } from "@/shared/components/Modal";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import { Badge, type BadgeVariant } from "@/shared/elements/Badge";
 import { Button } from "@/shared/elements/Button";
 import { Card, CardBody } from "@/shared/elements/Card";

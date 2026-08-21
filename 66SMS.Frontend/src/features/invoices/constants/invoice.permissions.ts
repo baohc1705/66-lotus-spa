@@ -4,4 +4,5 @@ export const INVOICE_PERM = {
   update: "update",
   delete: "delete",
   read: "read",
+  role: "admin",
 } as const;

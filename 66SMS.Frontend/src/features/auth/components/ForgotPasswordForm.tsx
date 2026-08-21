@@ -38,7 +38,7 @@ export const ForgotPasswordForm = () => {
           khẩu. Vui lòng kiểm tra hộp thư (và mục spam).
         </p>
         <Link
-          to="/login"
+          to="/dang-nhap"
           className="inline-block text-sm font-semibold text-rose-600 hover:text-rose-500 hover:underline"
         >
           Quay lại đăng nhập
@@ -92,7 +92,7 @@ export const ForgotPasswordForm = () => {
 
       <div className="text-center text-xs text-warm-600">
         <Link
-          to="/login"
+          to="/dang-nhap"
           className="font-semibold text-rose-600 hover:text-rose-500 hover:underline"
         >
           Quay lại đăng nhập

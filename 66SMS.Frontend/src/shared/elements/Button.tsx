@@ -276,8 +276,9 @@ export function Button({
 }: ButtonProps) {
   const isDisabled = disabled || loading;
   let buttonClass =
-    "inline-flex items-center justify-center gap-0 font-medium leading-normal " +
-    "font-sans transition-all disabled:opacity-65 disabled:cursor-not-allowed ";
+    "inline-flex items-center justify-center gap-1.5 leading-none " +
+    "[&_svg]:block [&_svg]:shrink-0 " +
+    "font-medium font-sans transition-all disabled:opacity-65 disabled:cursor-not-allowed ";
 
   if (className.indexOf("mb-") < 0) {
     buttonClass += "mb-2 ";

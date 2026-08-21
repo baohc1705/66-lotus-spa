@@ -137,6 +137,7 @@ export interface AppointmentDto {
   customerId?: number;
   customerName?: string;
   customerPhone?: string;
+  customerEmail?: string;
   customerAvatar?: string;
   staffId?: number;
   positionId?: number;

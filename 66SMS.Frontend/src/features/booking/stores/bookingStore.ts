@@ -7,12 +7,12 @@ import type {
   PromotionValidationDto,
 } from "../types/booking.types";
 import type { ServiceDto } from "@/features/services/types/service.types";
-import type { SalonDTO } from "@/features/salons/types/salon.types";
+import type { SalonDto } from "@/features/salons/types/salon.types";
 import { clearPendingServiceId } from "../utils/pendingBookingService";
 
 interface BookingState {
   currentStep: number;
-  selectedSalon: SalonDTO | null;
+  selectedSalon: SalonDto | null;
   guests: GuestBooking[];
   activeGuestIndex: number;
   contactInfo: BookingContactFormValues | null;
@@ -23,7 +23,7 @@ interface BookingState {
   setStep: (step: number) => void;
   nextStep: () => void;
   prevStep: () => void;
-  selectSalon: (salon: SalonDTO) => void;
+  selectSalon: (salon: SalonDto) => void;
 
   addGuest: () => void;
   removeGuest: (index: number) => void;
@@ -55,7 +55,7 @@ const createNewGuest = (id: number): GuestBooking => ({
 
 const initialState = {
   currentStep: 0,
-  selectedSalon: null as SalonDTO | null,
+  selectedSalon: null as SalonDto | null,
   guests: [createNewGuest(1)],
   activeGuestIndex: 0,
   contactInfo: null,

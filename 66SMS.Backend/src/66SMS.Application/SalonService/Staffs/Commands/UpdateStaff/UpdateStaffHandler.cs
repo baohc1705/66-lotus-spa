@@ -56,6 +56,13 @@ namespace _66SMS.Application.SalonService.Staffs.Commands.UpdateStaff
 
             mapper.Map(request, staff);
 
+            if (request.Status.HasValue && staff.User != null && request.Status.Value == StaffConst.STATUS_ACTIVED)
+            {
+                staff.User.Status = (int)StatusActiveEnum.ACTIVED;
+                staff.User.UpdatedAt = DateTimeHelper.UtcNow();
+                staff.User.UpdatedBy = request.UpdatedBy;
+            }
+
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {

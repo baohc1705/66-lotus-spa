@@ -1,6 +1,6 @@
 import { scheduleApi } from "@/features/schedules/api/schedule.api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import type { AxiosError } from "axios";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type { Result } from "@/shared/types/common.types";

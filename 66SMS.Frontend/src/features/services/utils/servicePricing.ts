@@ -1,103 +1,126 @@
+// Giải thích:
+// Tính giá gợi ý và lãi trên client chỉ để preview. Số chốt do BE.
 
-export function roundVnd(value: number): number {
-  return Math.round(value);
+// Giải thích:
+// Làm tròn tiền VND. Dùng khi cộng chi phí và hiện số trên form.
+export function lamTronVnd(giaTri: number): number {
+  return Math.round(giaTri);
 }
 
-export function calcSuggestedMinPrice(
-  totalCost: number,
-  commissionRate: number,
+// Giải thích:
+// Giá bán tối thiểu để hòa vốn sau hoa hồng: tongGiaVon / (1 - tyLeHoaHong/100).
+// Dùng nút "Áp dụng gợi ý" cho ô giá bán tối thiểu.
+export function tinhGiaBanToiThieu(
+  tongGiaVon: number,
+  tyLeHoaHong: number,
 ): number {
-  const rate = Math.min(Math.max(commissionRate || 0, 0), 99.99);
-  if (rate <= 0) {
-    return roundVnd(totalCost);
+  const tyLe = Math.min(Math.max(tyLeHoaHong || 0, 0), 99.99);
+  if (tyLe <= 0) {
+    return lamTronVnd(tongGiaVon);
   }
-  return roundVnd(totalCost / (1 - rate / 100));
+  return lamTronVnd(tongGiaVon / (1 - tyLe / 100));
 }
 
-export function calcSuggestedSellPrice(
-  totalCost: number,
-  commissionRate: number,
-  desiredProfitPercent: number,
+// Giải thích:
+// Giá bán gợi ý theo % lãi mong muốn: tongGiaVon * (1 + lai/100) / (1 - hoaHong/100).
+// Dùng nút "Áp dụng gợi ý" cho ô giá bán.
+export function tinhGiaBan(
+  tongGiaVon: number,
+  tyLeHoaHong: number,
+  phanTramLaiMongMuon: number,
 ): number {
-  const commission = Math.min(Math.max(commissionRate || 0, 0), 99.99);
-  const profit = Math.max(desiredProfitPercent || 0, 0);
-  const afterCommission = 1 - commission / 100;
+  const hoaHong = Math.min(Math.max(tyLeHoaHong || 0, 0), 99.99);
+  const lai = Math.max(phanTramLaiMongMuon || 0, 0);
+  const sauHoaHong = 1 - hoaHong / 100;
 
-  if (afterCommission <= 0) {
-    return roundVnd(totalCost);
+  if (sauHoaHong <= 0) {
+    return lamTronVnd(tongGiaVon);
   }
 
-  return roundVnd((totalCost * (1 + profit / 100)) / afterCommission);
+  return lamTronVnd((tongGiaVon * (1 + lai / 100)) / sauHoaHong);
 }
 
-export function calcCommissionAmount(
-  sellingPrice: number,
-  commissionRate: number,
+// Giải thích:
+// Tiền hoa hồng = giaBan * tyLeHoaHong / 100. Hiện ở khối "Lãi dự kiến".
+export function tinhHoaHong(giaBan: number, tyLeHoaHong: number): number {
+  return lamTronVnd((giaBan * (tyLeHoaHong || 0)) / 100);
+}
+
+// Giải thích:
+// Lãi gộp = giaBan - tongGiaVon - tienHoaHong. Hiện số lãi ở form và expand.
+export function tinhLai(
+  giaBan: number,
+  tongGiaVon: number,
+  tienHoaHong: number,
 ): number {
-  return roundVnd((sellingPrice * (commissionRate || 0)) / 100);
+  return lamTronVnd(giaBan - tongGiaVon - tienHoaHong);
 }
 
-export function calcGrossProfit(
-  sellingPrice: number,
-  totalCost: number,
-  commissionAmount: number,
-): number {
-  return roundVnd(sellingPrice - totalCost - commissionAmount);
+const PHAN_TRAM_HIEN_THI_TOI_DA = 999;
+
+// Giải thích:
+// Làm tròn % 2 chữ số. Trả null nếu số vô hạn hoặc quá lớn để hiện.
+function sangPhanTramHienThi(giaTri: number): number | null {
+  if (!Number.isFinite(giaTri)) return null;
+  if (Math.abs(giaTri) > PHAN_TRAM_HIEN_THI_TOI_DA) return null;
+  return Math.round(giaTri * 100) / 100;
 }
 
-const MAX_PERCENT_DISPLAY = 999;
-
-function toDisplayPercent(value: number): number | null {
-  if (!Number.isFinite(value)) return null;
-  if (Math.abs(value) > MAX_PERCENT_DISPLAY) return null;
-  return Math.round(value * 100) / 100;
-}
-
-export function calcGrossMarginPercent(
-  sellingPrice: number,
-  grossProfit: number,
+// Giải thích:
+// Biên lãi / giá bán = laiGop / giaBan * 100. Hiện "Biên lãi / giá bán" trên form.
+export function tinhPhanTramBienLoiNhuan(
+  giaBan: number,
+  laiGop: number,
 ): number | null {
-  if (!sellingPrice || sellingPrice <= 0) return null;
-  return toDisplayPercent((grossProfit / sellingPrice) * 100);
+  if (!giaBan || giaBan <= 0) return null;
+  return sangPhanTramHienThi((laiGop / giaBan) * 100);
 }
 
-export function calcMarkupOnCostPercent(
-  totalCost: number,
-  grossProfit: number,
+// Giải thích:
+// % lãi trên giá vốn = laiGop / tongGiaVon * 100. Hiện "% lãi / giá vốn" trên form.
+export function tinhPhanTramLaiTrenVon(
+  tongGiaVon: number,
+  laiGop: number,
 ): number | null {
-  if (!totalCost || totalCost <= 0) return null;
-  return toDisplayPercent((grossProfit / totalCost) * 100);
+  if (!tongGiaVon || tongGiaVon <= 0) return null;
+  return sangPhanTramHienThi((laiGop / tongGiaVon) * 100);
 }
 
-export type ProfitTone = "profit" | "breakEven" | "loss";
+export type MauLai = "lai" | "hoa" | "lo";
 
-export function getProfitTone(
-  grossProfit: number | null | undefined,
-): ProfitTone {
-  if (grossProfit == null) return "breakEven";
-  if (grossProfit > 0) return "profit";
-  if (grossProfit < 0) return "loss";
-  return "breakEven";
+// Giải thích:
+// Phân loại lãi / hòa / lỗ theo lãi gộp. Dùng badge và màu chữ trên form + expand.
+export function layMauLai(laiGop: number | null | undefined): MauLai {
+  if (laiGop == null) return "hoa";
+  if (laiGop > 0) return "lai";
+  if (laiGop < 0) return "lo";
+  return "hoa";
 }
 
-export function getProfitLabel(tone: ProfitTone): string {
-  if (tone === "profit") return "Lãi";
-  if (tone === "loss") return "Lỗ";
+// Giải thích:
+// Chữ trên badge: Lãi / Hòa / Lỗ.
+export function layNhanLai(mauLai: MauLai): string {
+  if (mauLai === "lai") return "Lãi";
+  if (mauLai === "lo") return "Lỗ";
   return "Hòa";
 }
 
-export function getProfitBadgeClass(tone: ProfitTone): string {
-  if (tone === "profit") {
+// Giải thích:
+// Class nền badge theo lãi / lỗ / hòa.
+export function layClassBadgeLai(mauLai: MauLai): string {
+  if (mauLai === "lai") {
     return "bg-state-success-bg text-state-success-text";
   }
-  if (tone === "loss") {
+  if (mauLai === "lo") {
     return "bg-state-danger-bg text-state-danger-text";
   }
   return "bg-kit-page text-kit-muted";
 }
 
-export function getProfitTextClass(tone: ProfitTone): string {
-  if (tone === "profit") return "text-state-success-text";
-  if (tone === "loss") return "text-state-danger-text";
+// Giải thích:
+// Class màu chữ số lãi trên form.
+export function layClassChuLai(mauLai: MauLai): string {
+  if (mauLai === "lai") return "text-state-success-text";
+  if (mauLai === "lo") return "text-state-danger-text";
   return "text-kit-muted";
 }

@@ -11,7 +11,7 @@ namespace _66SMS.Contract.Helpers
             "H:mm",
         };
 
-        public static DateTimeOffset UtcNow() => DateTimeOffset.UtcNow;
+        public static DateTimeOffset UtcNow() => DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(7));
         public static string UtcNowString(string format = "yyyyMMddHHmmss") => UtcNow().ToString(format);
         public static bool IsExpired(this DateTimeOffset utcTime) => utcTime < UtcNow();
         public static DateOnly ToDateOnly(this DateTimeOffset utcTime) => DateOnly.FromDateTime(utcTime.UtcDateTime);
