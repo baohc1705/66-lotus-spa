@@ -5,6 +5,9 @@ import { useMyBookings } from "../hooks/useMyBookings";
 import { formatDate } from "@/shared/utils/date.utils";
 import type { AppointmentDto } from "../types/booking.types";
 
+// Màn hình sau khi đặt OK (currentStep === 4).
+// Lọc myBookings theo createdBookingIds để hiện đúng lịch vừa tạo.
+// Bấm đặt lại phải gọi resetBooking, không thì form còn data cũ.
 export function BookingSuccessTicket() {
   const {
     guests,

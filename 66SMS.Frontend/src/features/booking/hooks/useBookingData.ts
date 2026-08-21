@@ -11,6 +11,10 @@ import type {
   GetTimeSlotsParams,
 } from "../types/booking.types";
 
+// File này chỉ bọc API bằng react-query.
+// Component gọi hook, không gọi axios trực tiếp.
+// enabled: false khi thiếu date/serviceIds để tránh request rỗng.
+
 function hasServiceSelection(params: {
   serviceId?: number;
   serviceIds?: number[];
@@ -19,6 +23,7 @@ function hasServiceSelection(params: {
   return !!params.serviceId;
 }
 
+// queryKey phải đổi khi date/service/salon đổi, không thì cache trả data cũ.
 function serviceKey(params: { serviceId?: number; serviceIds?: number[] }) {
   if (params.serviceIds && params.serviceIds.length > 0) {
     return params.serviceIds.join(",");
@@ -75,6 +80,8 @@ export const useTimeSlots = (params: GetTimeSlotsParams) => {
   });
 };
 
+// Lock khung giờ trước khi tạo booking, tránh 2 người lấy cùng slot.
+// Thành công/thất bại đều invalidate timeslots để UI cập nhật.
 export const useCreateSlotLock = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -85,13 +92,19 @@ export const useCreateSlotLock = () => {
       queryClient.invalidateQueries({ queryKey: ["booking-technicians"] });
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, "Thời lượng dịch vụ vượt quá khung giờ còn lại. Vui lòng chọn giờ sớm hơn."));
+      toast.error(
+        getErrorMessage(
+          error,
+          "Thời lượng dịch vụ vượt quá khung giờ còn lại. Vui lòng chọn giờ sớm hơn.",
+        ),
+      );
       queryClient.invalidateQueries({ queryKey: ["booking-timeslots"] });
       queryClient.invalidateQueries({ queryKey: ["booking-technicians"] });
     },
   });
 };
 
+// Booking fail thì gọi release để trả slot cho người khác.
 export const useReleaseSlotLock = () => {
   const queryClient = useQueryClient();
   return useMutation({

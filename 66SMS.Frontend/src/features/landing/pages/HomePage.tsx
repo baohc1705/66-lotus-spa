@@ -4,9 +4,9 @@ import { TrustedByStrip } from "@/features/landing/components/TrustedByStrip";
 import { AboutSection } from "@/features/landing/components/AboutSection";
 import { ServicesSection } from "@/features/landing/components/ServicesSection";
 import { ProductsSection } from "@/features/landing/components/ProductsSection";
-import { SpaceGallerySection } from "@/features/landing/components/SpaceGallerySection";
-import { TestimonialsSection } from "@/features/landing/components/TestimonialsSection";
-import { FaqSection } from "@/features/landing/components/FaqSection";
+// import { SpaceGallerySection } from "@/features/landing/components/SpaceGallerySection";
+// import { TestimonialsSection } from "@/features/landing/components/TestimonialsSection";
+// import { FaqSection } from "@/features/landing/components/FaqSection";
 import { BookingCtaSection } from "@/features/landing/components/BookingCtaSection";
 import { FooterSection } from "@/features/landing/components/FooterSection";
 import { MotionConfig } from "motion/react";
@@ -26,9 +26,9 @@ export const HomePage = () => (
       <AboutSection />
       <ServicesSection />
       <ProductsSection />
-      <SpaceGallerySection />
-      <TestimonialsSection />
-      <FaqSection />
+      {/* <SpaceGallerySection /> */}
+      {/* <TestimonialsSection /> */}
+      {/* <FaqSection /> */}
       <BookingCtaSection />
       <FooterSection />
     </main>
