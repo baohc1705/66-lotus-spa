@@ -42,9 +42,6 @@ function TicketDivider() {
   return <div className="h-px bg-warm-100" />;
 }
 
-// Cột phải: render tóm tắt đơn + tạm tính tiền để user xem.
-// Cộng trừ trên FE chỉ để hiển thị. Số cuối cùng do server .NET chốt khi đặt/thanh toán.
-// Click "Khách N" đổi activeGuestIndex để form bên trái sửa đúng khách đó.
 export function BookingSummarySidebar() {
   const {
     guests,
@@ -78,7 +75,6 @@ export function BookingSummarySidebar() {
   );
   const membershipPercent = membershipTier?.discountPercent ?? 0;
 
-  // Tạm tính trên FE cho UI. Không dùng làm nguồn sự thật thanh toán.
   let servicesSubTotal = 0;
   for (let guestIndex = 0; guestIndex < guests.length; guestIndex++) {
     const guestServices = guests[guestIndex].selectedServices ?? [];
@@ -97,7 +93,6 @@ export function BookingSummarySidebar() {
     0,
     servicesSubTotal - membershipDiscount - promoDiscount,
   );
-  // Cọc tính trên tổng sau giảm. Nếu tính trên subtotal sẽ thu thừa.
   const deposit = hasDepositConfig
     ? Math.round((finalTotal * depositPercent) / 100)
     : 0;

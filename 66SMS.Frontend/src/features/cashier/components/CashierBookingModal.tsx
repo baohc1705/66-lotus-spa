@@ -5,10 +5,8 @@ import {
   CheckCircle2,
   MapPin,
   NotebookPen,
-  Plus,
   Search,
   User,
-  X,
 } from "lucide-react";
 import { toast } from "@/shared/components/kitToast";
 import type { AxiosError } from "axios";
@@ -156,22 +154,31 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
     for (let index = 0; index < serviceItems.length; index++) {
       const service = serviceItems[index];
       if (service.id == null) continue;
-      if (selectedServiceIds.includes(service.id)) continue;
-      options.push({
-        value: String(service.id),
-        label: service.name ?? "",
-      });
+      let alreadySelected = false;
+      for (let selectedIndex = 0; selectedIndex < selectedServiceIds.length; selectedIndex++) {
+        if (selectedServiceIds[selectedIndex] === service.id) {
+          alreadySelected = true;
+          break;
+        }
+      }
+      if (alreadySelected) continue;
+      const parts = [service.name ?? ""];
+      if (service.durationMins) parts.push(`${service.durationMins} phút`);
+      if (service.sellingPrice != null)
+        parts.push(`${service.sellingPrice.toLocaleString("vi-VN")}đ`);
+      options.push({ value: String(service.id), label: parts.join(" · ") });
     }
     return options;
   }, [serviceItems, selectedServiceIds]);
 
   const selectedServiceLabels = useMemo(() => {
     const labels: { id: number; label: string }[] = [];
-    for (const id of selectedServiceIds) {
+    for (let selectedIndex = 0; selectedIndex < selectedServiceIds.length; selectedIndex++) {
+      const id = selectedServiceIds[selectedIndex];
       let label = `Dịch vụ #${id}`;
-      for (const service of serviceItems) {
-        if (service.id === id) {
-          label = service.name ?? label;
+      for (let index = 0; index < serviceItems.length; index++) {
+        if (serviceItems[index].id === id) {
+          label = serviceItems[index].name ?? label;
           break;
         }
       }
@@ -190,7 +197,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
         )
         .map((position: CashierPosition) => ({
           value: String(position.id),
-          label: `${position.name} - ${position.roomName} - ${position.statusLabel}`,
+          label: `${position.name} · ${position.roomName} — ${position.statusLabel}`,
         })),
     ],
     [positions, positionId],
@@ -453,7 +460,9 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
       );
     }
 
-    return <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">{list}</div>;
+    return (
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">{list}</div>
+    );
   }
 
   function renderTimeSlotList() {
@@ -591,8 +600,8 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
         ) : (
           <div className="space-y-4">
             <FormSection icon={User} title="Khách hàng">
-              <FormField className="flex items-center gap-2">
-                <div className="relative flex-1">
+              <FormField label="Tìm khách hàng">
+                <div className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-kit-muted" />
                   <Input
                     value={customerSearch}
@@ -602,10 +611,11 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                       if (selectedCustomer) setSelectedCustomer(null);
                     }}
                     onFocus={() => setShowCustomerDropdown(true)}
-                    placeholder="Tìm khách hàng theo tên hoặc số điện thoại"
+                    placeholder="Tìm theo tên hoặc số điện thoại"
                     className="pl-9"
                   />
-                  {showCustomerDropdown && customerSearch.trim().length > 0 ? (
+                  {showCustomerDropdown &&
+                  customerSearch.trim().length > 0 ? (
                     <div className="absolute z-20 mt-1 max-h-48 w-full overflow-y-auto rounded border border-kit bg-kit-white shadow-lg">
                       {customerList.length === 0 ? (
                         <p className="px-3 py-2 text-xs text-kit-muted">
@@ -631,35 +641,34 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                     </div>
                   ) : null}
                 </div>
-                <Button
-                  type="button"
-                  variant="outline-primary"
-                  size="sm"
-                  className="mb-0 mr-0"
-                  onClick={() => setCreateCustomerOpen(true)}
-                >
-                  <Plus className="h-4 w-4" /> Thêm khách hàng
-                </Button>
               </FormField>
 
-              {selectedCustomer && (
-                <FormRow>
-                  <FormField label="Họ tên">
-                    <Input
-                      value={selectedCustomer.fullName ?? ""}
-                      readOnly
-                      placeholder="Chọn khách hàng"
-                    />
-                  </FormField>
-                  <FormField label="Điện thoại">
-                    <Input
-                      value={selectedCustomer.phone ?? ""}
-                      readOnly
-                      placeholder="033xxxxxxx"
-                    />
-                  </FormField>
-                </FormRow>
-              )}
+              <FormRow>
+                <FormField label="Họ tên">
+                  <Input
+                    value={selectedCustomer?.fullName ?? ""}
+                    readOnly
+                    placeholder="Chọn khách hàng"
+                  />
+                </FormField>
+                <FormField label="Điện thoại">
+                  <Input
+                    value={selectedCustomer?.phone ?? ""}
+                    readOnly
+                    placeholder="Số điện thoại"
+                  />
+                </FormField>
+              </FormRow>
+
+              <Button
+                type="button"
+                variant="outline-primary"
+                size="sm"
+                className="mb-0 mr-0"
+                onClick={() => setCreateCustomerOpen(true)}
+              >
+                + Thêm khách hàng mới
+              </Button>
             </FormSection>
 
             <FormSection icon={Calendar} title="Thông tin lịch hẹn">
@@ -683,7 +692,11 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                 </FormField>
               </FormRow>
 
-              <FormField label="Dịch vụ" required>
+              <FormField
+                label="Dịch vụ"
+                required
+                help="Có thể chọn nhiều dịch vụ; một kỹ thuật viên sẽ làm hết combo"
+              >
                 <SearchableSelect
                   value=""
                   onChange={handleServiceAdd}
@@ -702,9 +715,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                         className="rounded-full border border-kit bg-kit-page px-3 py-1 text-xs font-semibold text-kit-ink hover:border-kit-danger hover:text-kit-danger"
                         title="Bỏ dịch vụ này"
                       >
-                        <span className="flex items-center gap-1">
-                          {item.label} <X className="h-3 w-3" />
-                        </span>
+                        {item.label} ×
                       </button>
                     ))}
                   </div>
@@ -735,8 +746,12 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                   : null}
               </FormField>
 
-              <FormField label="Khung giờ" required>
-                {/* <div className="mb-2 flex flex-wrap items-center gap-3 text-xs text-kit-muted">
+              <FormField
+                label="Khung giờ"
+                required
+                help="Chọn tham khảo các khung giờ sau"
+              >
+                <div className="mb-2 flex flex-wrap items-center gap-3 text-xs text-kit-muted">
                   <span className="flex items-center gap-1">
                     <span className="inline-block h-2.5 w-2.5 rounded-full border border-kit bg-kit-white" />
                     Trống
@@ -753,7 +768,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
                     <span className="inline-block h-2.5 w-2.5 rounded-full bg-kit-page" />
                     Ngoài giờ
                   </span>
-                </div> */}
+                </div>
 
                 {!hasSelectedServices || !appointmentDate ? (
                   <p className="rounded border border-dashed border-kit py-3 text-center text-xs text-kit-muted">
@@ -792,7 +807,7 @@ function CashierBookingForm({ onClose }: { onClose: () => void }) {
               </FormField>
 
               <FormField
-                label="Giường"
+                label="Phòng / vị trí"
                 help={
                   positionsQuery.isLoading
                     ? "Đang tải trạng thái vị trí..."

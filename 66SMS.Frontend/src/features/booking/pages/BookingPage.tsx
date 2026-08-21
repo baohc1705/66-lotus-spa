@@ -1,6 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Check } from "lucide-react";
 import { useBookingStore } from "../stores/bookingStore";
+import { useServices } from "@/features/services/hooks/useServices";
+import type { ServiceListDto } from "@/features/services/types/service.types";
+import {
+  clearPendingServiceId,
+  getPendingServiceId,
+} from "../utils/pendingBookingService";
 
 import { Navbar } from "@/features/landing/components/Navbar";
 import { FooterSection } from "@/features/landing/components/FooterSection";
@@ -12,26 +18,54 @@ import { BookingContactStep } from "../components/BookingContactStep";
 import { BookingSummarySidebar } from "../components/BookingSummarySidebar";
 import { BookingSuccessTicket } from "../components/BookingSuccessTicket";
 
-// Các bước đặt lịch. Nếu thêm bước mới: thêm vào đây + thêm currentStep tương ứng bên dưới.
-const STEPS = [
-  { step: 0, label: "Chi nhánh" },
-  { step: 1, label: "Dịch vụ" },
-  { step: 2, label: "Thời gian" },
-  { step: 3, label: "Thông tin" },
+const STEP_CONFIG = [
+  { s: 0, label: "Chi nhánh" },
+  { s: 1, label: "Dịch vụ" },
+  { s: 2, label: "Thời gian" },
+  { s: 3, label: "Thông tin" },
 ];
 
 export function BookingPage() {
-  // currentStep lấy từ store (zustand), dùng chung nhiều component.
-  // Nếu sửa số bước mà quên đổi max trong store.nextStep thì bị kẹt.
-  const currentStep = useBookingStore((state) => state.currentStep);
+  const { currentStep, guests, activeGuestIndex, toggleService } =
+    useBookingStore();
+  const selectedServices = guests[activeGuestIndex]?.selectedServices ?? [];
 
-  // Mỗi lần đổi bước thì cuộn lên đầu trang cho dễ nhìn form.
-  // Nếu bỏ effect này, user phải tự scroll sau khi bấm Tiếp tục.
+  const { data } = useServices({ pageIndex: 1, pageSize: 100 });
+  const services = useMemo(() => data?.data?.items || [], [data?.data?.items]);
+  
+  useEffect(() => {
+    const pendingId = getPendingServiceId();
+    if (!pendingId || services.length === 0) return;
+
+    let alreadySelected = false;
+    for (let index = 0; index < selectedServices.length; index++) {
+      if (selectedServices[index].id === pendingId) {
+        alreadySelected = true;
+        break;
+      }
+    }
+    if (alreadySelected) {
+      clearPendingServiceId();
+      return;
+    }
+
+    let found: ServiceListDto | undefined;
+    for (let index = 0; index < services.length; index++) {
+      if (services[index].id === pendingId) {
+        found = services[index];
+        break;
+      }
+    }
+    if (found) {
+      toggleService(found);
+      clearPendingServiceId();
+    }
+  }, [services, selectedServices, toggleService]);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentStep]);
 
-  // Bước 4 = màn hình thành công (sau khi API đặt lịch OK).
   if (currentStep === 4) {
     return (
       <div className="landing-page min-h-screen bg-page flex flex-col">
@@ -51,63 +85,67 @@ export function BookingPage() {
       <main className="flex-1 landing-container pt-28 pb-16">
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:gap-8">
           <div className="flex flex-col gap-6 lg:col-span-8">
-            {/* Thanh tiến trình các bước */}
             <nav aria-label="Các bước đặt lịch" className="w-full px-5 sm:px-6">
               <div className="relative">
-                {/* Đường xám nền */}
                 <div
                   className="absolute left-4 right-4 top-4 h-[2px] -translate-y-1/2 bg-warm-300"
                   aria-hidden
                 />
-                {/* Đường hồng theo bước hiện tại. Công thức dựa vào STEPS.length - 1. */}
                 <div
                   className="absolute left-4 top-4 h-[2px] -translate-y-1/2 bg-rose-600 transition-all duration-300"
                   style={{
-                    width: `calc((100% - 2rem) * ${currentStep / (STEPS.length - 1)})`,
+                    width: `calc((100% - 2rem) * ${currentStep / (STEP_CONFIG.length - 1)})`,
                   }}
                   aria-hidden
                 />
 
                 <ol className="relative z-10 flex w-full justify-between">
-                  {STEPS.map((item, index) => {
-                    const isActive = currentStep === item.step;
-                    const isDone = currentStep > item.step;
-                    const isFirst = index === 0;
-                    const isLast = index === STEPS.length - 1;
-
-                    let alignClass = "items-center";
-                    if (isFirst) alignClass = "items-start";
-                    if (isLast) alignClass = "items-end";
-
-                    let circleClass =
-                      "border border-warm-300 bg-surface text-warm-600";
-                    if (isDone) circleClass = "bg-rose-800 text-white";
-                    if (isActive) circleClass = "bg-rose-600 text-white";
-
-                    let labelClass = "text-warm-600";
-                    if (isDone) labelClass = "font-medium text-ink";
-                    if (isActive) labelClass = "font-semibold text-rose-600";
-
-                    let textAlign = "text-center";
-                    if (isFirst) textAlign = "text-left";
-                    if (isLast) textAlign = "text-right";
+                  {STEP_CONFIG.map((item, idx) => {
+                    const isActive = currentStep === item.s;
+                    const isDone = currentStep > item.s;
+                    const isFirst = idx === 0;
+                    const isLast = idx === STEP_CONFIG.length - 1;
 
                     return (
                       <li
-                        key={item.step}
-                        className={`flex w-8 flex-col ${alignClass}`}
+                        key={item.s}
+                        className={`flex w-8 flex-col ${
+                          isFirst
+                            ? "items-start"
+                            : isLast
+                              ? "items-end"
+                              : "items-center"
+                        }`}
                       >
                         <div
-                          className={`flex h-8 w-8 items-center justify-center rounded-full font-geist text-sm font-bold transition-colors ${circleClass}`}
+                          className={`flex h-8 w-8 items-center justify-center rounded-full font-geist text-sm font-bold transition-colors ${
+                            isDone
+                              ? "bg-rose-800 text-white"
+                              : isActive
+                                ? "bg-rose-600 text-white"
+                                : "border border-warm-300 bg-surface text-warm-600"
+                          }`}
                         >
                           {isDone ? (
                             <Check className="h-4 w-4" strokeWidth={2.5} />
                           ) : (
-                            item.step + 1
+                            item.s + 1
                           )}
                         </div>
                         <span
-                          className={`mt-2 whitespace-nowrap font-geist text-xs leading-tight sm:text-xs ${textAlign} ${labelClass}`}
+                          className={`mt-2 whitespace-nowrap font-geist text-xs leading-tight sm:text-xs ${
+                            isFirst
+                              ? "text-left"
+                              : isLast
+                                ? "text-right"
+                                : "text-center"
+                          } ${
+                            isActive
+                              ? "font-semibold text-rose-600"
+                              : isDone
+                                ? "font-medium text-ink"
+                                : "text-warm-600"
+                          }`}
                         >
                           {item.label}
                         </span>
@@ -118,14 +156,12 @@ export function BookingPage() {
               </div>
             </nav>
 
-            {/* Chỉ hiện 1 bước tại 1 thời điểm. Đổi số ở đây phải khớp STEPS. */}
             {currentStep === 0 && <BookingSalonStep />}
             {currentStep === 1 && <BookingServiceStep />}
             {currentStep === 2 && <BookingTimeStep />}
             {currentStep === 3 && <BookingContactStep />}
           </div>
 
-          {/* Cột phải: tóm tắt + thêm khách + mã KM */}
           <div className="lg:col-span-4 lg:sticky lg:top-24">
             <BookingSummarySidebar />
           </div>

@@ -1,7 +1,6 @@
 ﻿import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import type { ReactNode } from "react";
-import { X } from "lucide-react";
 
 type ModalSize = "sm" | "md" | "lg" | "xl";
 
@@ -186,7 +185,7 @@ export function Modal({
                 className={"btn-close text-lg leading-none " + chrome.close}
                 aria-label="Close"
               >
-                <X className="h-3.5 w-3.5" />
+                ×
               </button>
             </div>
           ) : null}

@@ -5,20 +5,20 @@ import {
   Clock,
   Send,
   CheckCircle,
-  // ArrowUpRight,
+  ArrowUpRight,
 } from "lucide-react";
 import logoUrl from "@/assets/logo-home.png";
 import { usePrimarySalon } from "@/features/salons/hooks/usePrimarySalon";
 
-// const NAV_LINKS = [
-//   { label: "Giới thiệu", href: "#about" },
-//   { label: "Dịch vụ", href: "#services" },
-//   { label: "Sản phẩm", href: "#products" },
-//   { label: "Phòng riêng", href: "#space" },
-//   { label: "Đánh giá", href: "#testimonials" },
-//   { label: "Câu hỏi", href: "#faq" },
-//   { label: "Đặt lịch", href: "/dat-lich" },
-// ];
+const NAV_LINKS = [
+  { label: "Giới thiệu", href: "#about" },
+  { label: "Dịch vụ", href: "#services" },
+  { label: "Sản phẩm", href: "#products" },
+  { label: "Phòng riêng", href: "#space" },
+  { label: "Đánh giá", href: "#testimonials" },
+  { label: "Câu hỏi", href: "#faq" },
+  { label: "Đặt lịch", href: "/dat-lich" },
+];
 
 const FALLBACK = {
   name: "Hoa Sen Spa",
@@ -70,7 +70,7 @@ export const FooterSection = () => {
     <footer id="footer" className="bg-ink pb-6 pt-8 text-white">
       <div className="landing-container">
         <div className="grid gap-8 lg:grid-cols-12 lg:gap-8">
-          <div className="lg:col-span-6">
+          <div className="lg:col-span-5">
             <div className="mb-4 flex items-center gap-3">
               <img
                 src={logoUrl}
@@ -84,7 +84,6 @@ export const FooterSection = () => {
                 {name}
               </span>
             </div>
-
             <p className="mb-5 max-w-sm font-geist text-sm leading-relaxed text-white/55">
               Không gian chăm sóc sức khỏe và sắc đẹp tại Cao Lãnh.
             </p>
@@ -119,7 +118,7 @@ export const FooterSection = () => {
             </div>
           </div>
 
-          {/* <div className="lg:col-span-3">
+          <div className="lg:col-span-3">
             <h2 className="mb-5 font-geist text-xs font-semibold uppercase tracking-[0.14em] text-white/80">
               Điều hướng
             </h2>
@@ -139,9 +138,9 @@ export const FooterSection = () => {
                 </li>
               ))}
             </ul>
-          </div> */}
+          </div>
 
-          <div className="lg:col-span-6">
+          <div className="lg:col-span-4">
             <h2 className="mb-5 font-geist text-xs font-semibold uppercase tracking-[0.14em] text-white/80">
               Nhận ưu đãi
             </h2>

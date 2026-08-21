@@ -177,7 +177,7 @@ export function AdminProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-125 items-center justify-center">
+      <div className="flex min-h-[500px] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-kit-primary" />
       </div>
     );
@@ -185,7 +185,7 @@ export function AdminProfilePage() {
 
   if (isError) {
     return (
-      <div className="flex min-h-125 flex-col items-center justify-center text-center">
+      <div className="flex min-h-[500px] flex-col items-center justify-center text-center">
         <p className="mb-4 font-medium text-kit-danger">
           Không thể tải thông tin tài khoản
         </p>
@@ -210,7 +210,7 @@ export function AdminProfilePage() {
       >
         <motion.div
           variants={itemVariants}
-          className="flex w-full shrink-0 flex-col gap-3 lg:w-65"
+          className="flex w-full shrink-0 flex-col gap-3 lg:w-[260px]"
         >
           <Card className="mb-0">
             <CardBody className="flex flex-col items-center py-6">
@@ -263,7 +263,7 @@ export function AdminProfilePage() {
 
         <motion.div variants={itemVariants} className="min-w-0 grow">
           {activeTab === "profile" ? (
-            <Card className="mb-0 min-h-125">
+            <Card className="mb-0 min-h-[500px]">
               <CardHeader className="justify-between gap-2">
                 <span className="text-sm font-bold text-kit-heading md:text-base">
                   Thông tin tài khoản
@@ -402,7 +402,7 @@ export function AdminProfilePage() {
               </CardBody>
             </Card>
           ) : (
-            <Card className="mb-0 min-h-125">
+            <Card className="mb-0 min-h-[500px]">
               <CardHeader className="justify-between gap-2">
                 <span className="text-sm font-bold text-kit-heading md:text-base">
                   Đổi mật khẩu
