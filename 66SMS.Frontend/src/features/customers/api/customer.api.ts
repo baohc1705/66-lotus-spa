@@ -6,27 +6,53 @@ import type {
 } from "@/shared/types/common.types";
 import type {
   CustomerDto,
-  CreateCustomerPayload,
-  UpdateCustomerPayload,
+  CreateCustomerRequest,
+  UpdateCustomerRequest,
 } from "../types/customer.types";
 
 export const customerApi = {
-  getAll: (params: PageRequest) =>
-    axiosInstance
-      .get<Result<PagedResult<CustomerDto>>>("/customer", { params })
-      .then((r) => r.data),
+  // Query API
+  getAll: async (
+    params: PageRequest,
+  ): Promise<Result<PagedResult<CustomerDto>>> => {
+    const response = await axiosInstance.get<Result<PagedResult<CustomerDto>>>(
+      "/customer",
+      { params },
+    );
+    return response.data;
+  },
 
-  getDetail: (id: number) =>
-    axiosInstance.get<Result<CustomerDto>>(`/customer/${id}`).then((r) => r.data),
+  getDetail: async (id: number): Promise<Result<CustomerDto>> => {
+    const response = await axiosInstance.get<Result<CustomerDto>>(
+      `/customer/${id}`,
+    );
+    return response.data;
+  },
 
-  create: (payload: CreateCustomerPayload) =>
-    axiosInstance.post<Result<object>>("/customer", payload).then((r) => r.data),
+  // Command API
+  create: async (payload: CreateCustomerRequest): Promise<Result<object>> => {
+    const response = await axiosInstance.post<Result<object>>(
+      "/customer",
+      payload,
+    );
+    return response.data;
+  },
 
-  update: (id: number, payload: UpdateCustomerPayload) =>
-    axiosInstance
-      .patch<Result<object>>(`/customer/${id}`, payload)
-      .then((r) => r.data),
+  update: async (
+    id: number,
+    payload: UpdateCustomerRequest,
+  ): Promise<Result<object>> => {
+    const response = await axiosInstance.patch<Result<object>>(
+      `/customer/${id}`,
+      payload,
+    );
+    return response.data;
+  },
 
-  delete: (id: number) =>
-    axiosInstance.delete<Result<object>>(`/customer/${id}`).then((r) => r.data),
+  delete: async (id: number): Promise<Result<object>> => {
+    const response = await axiosInstance.delete<Result<object>>(
+      `/customer/${id}`,
+    );
+    return response.data;
+  },
 };

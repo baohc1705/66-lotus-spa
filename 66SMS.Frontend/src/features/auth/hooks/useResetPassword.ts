@@ -3,7 +3,7 @@ import type { AxiosError } from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { authApi } from '@/features/auth/api/authApi'
 import { getErrorMessage } from '@/shared/utils/errorUtils'
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import type { Result } from '@/shared/types/common.types'
 
 export const useResetPassword = () => {
@@ -14,7 +14,7 @@ export const useResetPassword = () => {
     onSuccess: (result) => {
       if (result.isSuccess) {
         toast.success(result.message || 'Đặt lại mật khẩu thành công')
-        navigate('/login')
+        navigate('/dang-nhap')
       } else {
         toast.error(result.message)
       }

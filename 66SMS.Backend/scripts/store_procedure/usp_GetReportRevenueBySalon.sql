@@ -2,6 +2,27 @@ IF OBJECT_ID(N'dbo.usp_GetReportRevenueBySalon', N'P') IS NOT NULL
     DROP PROCEDURE dbo.usp_GetReportRevenueBySalon;
 GO
 
+-- Mục đích: Báo cáo doanh thu theo TỪNG SALON trong khoảng ngày, dùng cho màn hình so sánh chi nhánh.
+-- Luôn trả về TẤT CẢ salon đang active, kể cả salon không phát sinh doanh thu (số liệu = 0).
+-- issued_at lưu theo UTC nên phải quy đổi về giờ Việt Nam (+07:00) để lọc theo ngày.
+--
+-- Input:
+--   @FromDate DATE   -- từ ngày (theo giờ VN, bao gồm)
+--   @ToDate   DATE   -- đến ngày (theo giờ VN, bao gồm)
+--
+-- Output:
+--   SalonId         INT        -- id salon
+--   SalonName       NVARCHAR   -- tên salon
+--   StaffCount      INT        -- số nhân viên đang gán vào salon (không phụ thuộc khoảng ngày)
+--   OrderCount      INT        -- số hóa đơn đã thanh toán (status = 2)
+--   CashIn          DECIMAL    -- tiền thực thu (paid_amount) hóa đơn đã thanh toán
+--   CommissionOut   DECIMAL    -- tổng hoa hồng đã trả cho thợ
+--   TotalRevenue    DECIMAL    -- CashIn - CommissionOut
+--   Lưu ý: sắp xếp giảm dần theo tổng total_amount (chưa trừ hoa hồng), không phải TotalRevenue.
+--
+-- Ví dụ EXEC:
+--   EXEC dbo.usp_GetReportRevenueBySalon @FromDate = '2026-07-01', @ToDate = '2026-07-30';
+--   EXEC dbo.usp_GetReportRevenueBySalon '2026-07-01', '2026-07-30';
 CREATE PROCEDURE dbo.usp_GetReportRevenueBySalon
     @FromDate DATE,
     @ToDate   DATE
@@ -9,7 +30,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- 1) Doanh thu / đã thu / số đơn theo salon
+    -- Bước 1: Doanh thu / đã thu / số đơn theo salon
     SELECT
         inv.salon_id AS SalonId,
         SUM(CASE WHEN inv.status = 2 THEN inv.paid_amount ELSE 0 END) AS CashIn,
@@ -22,7 +43,7 @@ BEGIN
       AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
     GROUP BY inv.salon_id;
 
-    -- 2) Hoa hồng theo salon
+    -- Bước 2: Hoa hồng theo salon (dòng active, hóa đơn đã thanh toán)
     SELECT
         inv.salon_id AS SalonId,
         SUM(ii.commission_amount) AS CommissionOut
@@ -35,7 +56,7 @@ BEGIN
       AND CAST(SWITCHOFFSET(inv.issued_at, '+07:00') AS DATE) BETWEEN @FromDate AND @ToDate
     GROUP BY inv.salon_id;
 
-    -- 3) Số nhân viên theo salon
+    -- Bước 3: Số nhân viên theo salon (không phụ thuộc khoảng ngày)
     SELECT
         ss.salon_id AS SalonId,
         COUNT(*) AS StaffCount
@@ -44,7 +65,7 @@ BEGIN
     WHERE ss.status = 1
     GROUP BY ss.salon_id;
 
-    -- 4) Ghép: luôn lấy hết salon đang active
+    -- Bước 4: Ghép lại; luôn lấy hết salon đang active, salon không có phát sinh thì số liệu = 0
     SELECT
         s.id AS SalonId,
         s.name AS SalonName,

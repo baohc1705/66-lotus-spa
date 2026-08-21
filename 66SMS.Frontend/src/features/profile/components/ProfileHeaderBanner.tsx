@@ -20,9 +20,11 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
   const loyaltyPoints = profile?.customerInfo?.loyaltyPoint || 0;
   const calculatedSpending = loyaltyPoints * 10000;
 
-  const sortedTiers = [...tiers].sort((a, b) => a.minSpending - b.minSpending);
+  const sortedTiers = [...tiers].sort(
+    (a, b) => (a.minSpending ?? 0) - (b.minSpending ?? 0),
+  );
   const currentTierIndex = sortedTiers.findIndex(
-    (t) => t.name.toLowerCase() === currentTierName.toLowerCase(),
+    (t) => (t.name ?? "").toLowerCase() === currentTierName.toLowerCase(),
   );
 
   const nextTier =
@@ -35,8 +37,10 @@ export function ProfileHeaderBanner({ profile }: ProfileHeaderBannerProps) {
 
   if (nextTier) {
     const minSpendingCurrent =
-      currentTierIndex !== -1 ? sortedTiers[currentTierIndex].minSpending : 0;
-    const minSpendingNext = nextTier.minSpending;
+      currentTierIndex !== -1
+        ? (sortedTiers[currentTierIndex].minSpending ?? 0)
+        : 0;
+    const minSpendingNext = nextTier.minSpending ?? 0;
     const spendingInCurrentTierRange = calculatedSpending - minSpendingCurrent;
     const totalRangeNeeded = minSpendingNext - minSpendingCurrent;
 

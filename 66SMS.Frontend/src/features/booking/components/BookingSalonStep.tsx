@@ -1,6 +1,6 @@
 import { MapPin, Phone, Clock, ChevronRight, Check } from "lucide-react";
 import { FallbackImage } from "@/shared/components/FallbackImage";
-import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
+import { useActiveSalons } from "@/features/salons/hooks/useSalons";
 import { useBookingStore } from "../stores/bookingStore";
 
 export function BookingSalonStep() {

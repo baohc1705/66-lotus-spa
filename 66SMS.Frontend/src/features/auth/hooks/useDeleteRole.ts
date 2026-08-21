@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AxiosError } from 'axios';
 import { authApi } from '@/features/auth/api/authApi';
 import { getErrorMessage } from '@/shared/utils/errorUtils';
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import type { Result } from '@/shared/types/common.types';
 
 export const useDeleteRole = () => {

@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { CalendarHeart, RefreshCw, UserRound } from "lucide-react";
 
 import { useAuthStore } from "@/features/auth/stores/authStore";
-import { useAdminStaffs } from "@/features/staffs/hooks/useStaffs";
+import { useStaffsAdmin } from "@/features/staffs/hooks/useStaffs";
 import type { StaffDto } from "@/features/staffs/types/staff.types";
 import { Button } from "@/shared/elements/Button";
 import { TableEmptyState } from "@/shared/tables/TableEmptyState";
@@ -48,7 +48,7 @@ export function PayrollStatsPage() {
     isAdmin ? queryStaffId : null,
   );
 
-  const staffsQuery = useAdminStaffs({ pageIndex: 1, pageSize: 200 }, isAdmin);
+  const staffsQuery = useStaffsAdmin({ pageIndex: 1, pageSize: 200 }, isAdmin);
   const staffOptions = staffsQuery.data?.data?.items ?? [];
 
   const effectiveStaffId = isAdmin ? adminStaffId : myStaffId;

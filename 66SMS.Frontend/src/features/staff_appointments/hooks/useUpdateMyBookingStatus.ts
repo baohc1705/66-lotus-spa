@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { CASHIER_DAILY } from "@/features/cashier/cashierQueryKey";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type { Result } from "@/shared/types/common.types";
 import { staffScheduleApi } from "../api";

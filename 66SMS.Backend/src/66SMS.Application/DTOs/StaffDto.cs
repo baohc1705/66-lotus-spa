@@ -1,6 +1,5 @@
 namespace _66SMS.Application.DTOs
 {
-    /// <summary>DTO nhẹ cho danh sách (GetAll).</summary>
     public class StaffDto
     {
         public int? Id { get; set; }
@@ -18,9 +17,9 @@ namespace _66SMS.Application.DTOs
         public int? Status { get; set; }
         public string? Email { get; set; }
         public DateTimeOffset? CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
     }
 
-    /// <summary>DTO đầy đủ cho chi tiết / form sửa (GetDetail).</summary>
     public class StaffFullDto
     {
         public int? Id { get; set; }

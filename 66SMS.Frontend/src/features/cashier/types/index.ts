@@ -3,6 +3,7 @@ export interface CashierBooking {
   appointmentCode?: string | null
   customerName?: string | null
   customerPhone?: string
+  customerEmail?: string
   customerAvatar?: string
   bookingDate?: string
   serviceName?: string | null

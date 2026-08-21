@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { ChevronDown, MapPin } from "lucide-react";
 import { useAuthStore } from "@/features/auth/stores/authStore";
-import { useActiveSalons } from "@/features/salons/hooks/useActiveSalons";
+import { useActiveSalons } from "@/features/salons/hooks/useSalons";
 import { useQuery } from "@tanstack/react-query";
-import { staffSalonApi } from "@/features/staff_salons/api/staff-salon.api";
+import { staffSalonApi } from "@/features/salons/api/staffSalon.api";
 import { Dropdown, type DropdownItem } from "@/shared/elements/Dropdown";
 
 type BranchSelectorProps = {
@@ -32,7 +32,13 @@ const singleClassByVariant = {
 
 function getAssignedSalons(
   isAdmin: boolean,
-  staffSalonsResult: { data?: { items?: Array<{ salonId?: number | null; salonName?: string | null }> } } | undefined,
+  staffSalonsResult:
+    | {
+        data?: {
+          items?: Array<{ salonId?: number | null; salonName?: string | null }>;
+        };
+      }
+    | undefined,
   managedSalonId: number | null,
   managedSalonName: string | undefined,
 ): SalonOption[] {
@@ -63,7 +69,10 @@ function getAssignedSalons(
   return list;
 }
 
-function findSalonName(salons: SalonOption[], salonId: number | null): string | null {
+function findSalonName(
+  salons: SalonOption[],
+  salonId: number | null,
+): string | null {
   if (salonId === null) return null;
   for (let index = 0; index < salons.length; index++) {
     if (salons[index].id === salonId) return salons[index].name;
@@ -95,23 +104,26 @@ export function BranchSelector({ variant = "dark" }: BranchSelectorProps) {
     mySalon,
   } = useAuthStore();
   const isAdmin = hasRole("Admin");
-  const dropdownVariant = variant === "dark" ? "outline-light" : "outline-secondary";
+  const dropdownVariant =
+    variant === "dark" ? "outline-light" : "outline-secondary";
 
   const { data: allSalons = [], isLoading: isLoadingAllSalons } =
     useActiveSalons();
 
   const staffId = user?.staffInfo?.id;
-  const { data: staffSalonsResult, isLoading: isLoadingStaffSalons } = useQuery({
-    queryKey: ["staff-salons-assigned", staffId],
-    queryFn: () =>
-      staffSalonApi.getAll({
-        staffId,
-        status: 1,
-        pageIndex: 1,
-        pageSize: 100,
-      }),
-    enabled: !isAdmin && !!staffId,
-  });
+  const { data: staffSalonsResult, isLoading: isLoadingStaffSalons } = useQuery(
+    {
+      queryKey: ["staff-salons-assigned", staffId],
+      queryFn: () =>
+        staffSalonApi.getAll({
+          staffId,
+          status: 1,
+          pageIndex: 1,
+          pageSize: 100,
+        }),
+      enabled: !isAdmin && !!staffId,
+    },
+  );
 
   const assignedSalons = getAssignedSalons(
     isAdmin,

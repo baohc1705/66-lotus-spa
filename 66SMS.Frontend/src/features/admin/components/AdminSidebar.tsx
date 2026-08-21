@@ -14,6 +14,23 @@ type AdminSidebarProps = {
   onNavigate?: () => void;
 };
 
+function collectMenuPaths(groups: MenuGroup[]): string[] {
+  const paths: string[] = [];
+  for (let groupIndex = 0; groupIndex < groups.length; groupIndex++) {
+    const group = groups[groupIndex];
+    for (let itemIndex = 0; itemIndex < group.items.length; itemIndex++) {
+      const item = group.items[itemIndex];
+      if (item.path) paths.push(item.path);
+      if (item.children) {
+        for (let childIndex = 0; childIndex < item.children.length; childIndex++) {
+          paths.push(item.children[childIndex].path);
+        }
+      }
+    }
+  }
+  return paths;
+}
+
 function isPathActive(pathname: string, path?: string) {
   if (!path) return false;
   if (path === "/admin") return pathname === "/admin" || pathname === "/admin/";
@@ -49,6 +66,8 @@ export function AdminSidebar(props: AdminSidebarProps) {
   const location = useLocation();
   const pathname = location.pathname;
   const visibleGroups = useMenuByRole();
+  const menuPaths = collectMenuPaths(visibleGroups);
+  const bestActivePath = findBestMatchingPath(pathname, menuPaths);
   const [openLabel, setOpenLabel] = useState<string | null>(() =>
     findOpenLabel(pathname, visibleGroups),
   );
@@ -111,7 +130,7 @@ export function AdminSidebar(props: AdminSidebarProps) {
                     const isOpen = openLabel === item.label;
                     const parentActive = itemHasActiveChild(pathname, item);
                     const isActiveLeaf = item.path
-                      ? isPathActive(pathname, item.path)
+                      ? bestActivePath === item.path
                       : false;
 
                     const linkBase =

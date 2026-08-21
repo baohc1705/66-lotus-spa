@@ -36,6 +36,7 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetDetailAppoin
                         CustomerId = x.CreatedByUser!.Customer != null ? x.CreatedByUser.Customer.Id : null,
                         CustomerName = x.CreatedByUser!.Customer != null ? x.CreatedByUser.Customer.FullName : null,
                         CustomerPhone = x.CreatedByUser!.Customer != null ? x.CreatedByUser.Customer.Phone : null,
+                        CustomerEmail = x.CreatedByUser!.Email,
                         CustomerAvatar = x.CreatedByUser!.Customer != null ? x.CreatedByUser.Customer.AvatarUrl : null,
                         StaffId = x.StaffId,
                         PositionId = x.PositionId,

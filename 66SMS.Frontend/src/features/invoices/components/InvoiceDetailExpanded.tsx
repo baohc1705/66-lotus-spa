@@ -3,7 +3,7 @@ import { Ban, Printer, Receipt } from "lucide-react";
 
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Button } from "@/shared/elements/Button";
-import { Nav, NavItem, NavLink } from "@/shared/elements/Nav";
+import { Tabs } from "@/shared/components/Tabs";
 import {
   Table,
   TableBody,
@@ -80,123 +80,135 @@ export function InvoiceDetailExpanded({ invoiceId, onCancel }: Props) {
         }
       />
 
-      <Nav pills className="mb-2">
-        <NavItem>
-          <NavLink active={tab === "money"} onClick={() => setTab("money")}>
-            Tiền
-          </NavLink>
-        </NavItem>
-        <NavItem>
-          <NavLink active={tab === "detail"} onClick={() => setTab("detail")}>
-            Chi tiết ({items.length})
-          </NavLink>
-        </NavItem>
-      </Nav>
-
-      {tab === "money" ? (
-        <TableDetailGrid cols={2}>
-          <TableDetailField
-            label="Tạm tính"
-            value={formatCurrency(invoice.subTotal)}
-          />
-          {(invoice.discountAmount ?? 0) > 0 ? (
-            <TableDetailField
-              label="Giảm giá"
-              value={`-${formatCurrency(invoice.discountAmount)}`}
-            />
-          ) : null}
-          {(invoice.membershipDiscountAmount ?? 0) > 0 ? (
-            <TableDetailField
-              label="Giảm hạng TV"
-              value={`-${formatCurrency(invoice.membershipDiscountAmount)}`}
-            />
-          ) : null}
-          {(invoice.loyaltyPointsValue ?? 0) > 0 ? (
-            <TableDetailField
-              label={`Điểm dùng (${invoice.loyaltyPointsUsed ?? 0}đ)`}
-              value={`-${formatCurrency(invoice.loyaltyPointsValue)}`}
-            />
-          ) : null}
-          {(invoice.taxAmount ?? 0) > 0 ? (
-            <TableDetailField
-              label="Thuế"
-              value={`+${formatCurrency(invoice.taxAmount)}`}
-            />
-          ) : null}
-          <TableDetailField
-            label="Tổng"
-            value={formatCurrency(invoice.totalAmount)}
-          />
-          <TableDetailField
-            label="Khách trả"
-            value={formatCurrency(invoice.paidAmount)}
-          />
-          {(invoice.changeAmount ?? 0) > 0 ? (
-            <TableDetailField
-              label="Tiền thối"
-              value={formatCurrency(invoice.changeAmount)}
-            />
-          ) : null}
-          {(invoice.loyaltyPointsEarned ?? 0) > 0 ? (
-            <TableDetailField
-              label="Điểm tích lũy"
-              value={`+${invoice.loyaltyPointsEarned} điểm`}
-            />
-          ) : null}
-          {invoice.note ? (
-            <TableDetailField label="Ghi chú" value={invoice.note} />
-          ) : null}
-        </TableDetailGrid>
-      ) : items.length === 0 ? (
-        <p className="py-4 text-center text-sm text-kit-muted">
-          Không có dòng nào.
-        </p>
-      ) : (
-        <div className="overflow-x-auto rounded border border-kit bg-kit-white">
-          <Table size="sm" hover>
-            <TableHead>
-              <TableRow>
-                <TableHeaderCell>Loại</TableHeaderCell>
-                <TableHeaderCell>Mặt hàng</TableHeaderCell>
-                <TableHeaderCell className="text-right">Đơn giá</TableHeaderCell>
-                <TableHeaderCell className="text-center">SL</TableHeaderCell>
-                <TableHeaderCell className="text-right">Giảm</TableHeaderCell>
-                <TableHeaderCell className="text-right">
-                  Thành tiền
-                </TableHeaderCell>
-                <TableHeaderCell>Kỹ thuật viên</TableHeaderCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {items.map((item: InvoiceItemDto) => (
-                <TableRow key={item.id}>
-                  <TableCell className="text-kit-muted">
-                    {ITEM_TYPE_LABEL[item.itemType ?? 0] ?? "—"}
-                  </TableCell>
-                  <TableCell className="font-medium text-kit-heading">
-                    {item.itemName ?? "—"}
-                  </TableCell>
-                  <TableCell className="text-right text-kit-muted">
-                    {formatCurrency(item.unitPrice)}
-                  </TableCell>
-                  <TableCell className="text-center text-kit-muted">
-                    {item.quantity ?? 1}
-                  </TableCell>
-                  <TableCell className="text-right text-kit-muted">
-                    {formatCurrency(item.discountAmount)}
-                  </TableCell>
-                  <TableCell className="text-right font-semibold text-kit-heading">
-                    {formatCurrency(item.lineTotal)}
-                  </TableCell>
-                  <TableCell className="text-kit-muted">
-                    {item.staffName ?? "—"}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+      <Tabs
+        variant="body"
+        activeId={tab}
+        onChange={(id) => setTab(id as "money" | "detail")}
+        tabs={[
+          {
+            id: "money",
+            label: "Tiền",
+            content: (
+              <TableDetailGrid cols={2}>
+                <TableDetailField
+                  label="Tạm tính"
+                  value={formatCurrency(invoice.subTotal)}
+                />
+                {(invoice.discountAmount ?? 0) > 0 ? (
+                  <TableDetailField
+                    label="Giảm giá"
+                    value={`-${formatCurrency(invoice.discountAmount)}`}
+                  />
+                ) : null}
+                {(invoice.membershipDiscountAmount ?? 0) > 0 ? (
+                  <TableDetailField
+                    label="Giảm hạng TV"
+                    value={`-${formatCurrency(
+                      invoice.membershipDiscountAmount,
+                    )}`}
+                  />
+                ) : null}
+                {(invoice.loyaltyPointsValue ?? 0) > 0 ? (
+                  <TableDetailField
+                    label={`Điểm dùng (${invoice.loyaltyPointsUsed ?? 0}đ)`}
+                    value={`-${formatCurrency(invoice.loyaltyPointsValue)}`}
+                  />
+                ) : null}
+                {(invoice.taxAmount ?? 0) > 0 ? (
+                  <TableDetailField
+                    label="Thuế"
+                    value={`+${formatCurrency(invoice.taxAmount)}`}
+                  />
+                ) : null}
+                <TableDetailField
+                  label="Tổng"
+                  value={formatCurrency(invoice.totalAmount)}
+                />
+                <TableDetailField
+                  label="Khách trả"
+                  value={formatCurrency(invoice.paidAmount)}
+                />
+                {(invoice.changeAmount ?? 0) > 0 ? (
+                  <TableDetailField
+                    label="Tiền thối"
+                    value={formatCurrency(invoice.changeAmount)}
+                  />
+                ) : null}
+                {(invoice.loyaltyPointsEarned ?? 0) > 0 ? (
+                  <TableDetailField
+                    label="Điểm tích lũy"
+                    value={`+${invoice.loyaltyPointsEarned} điểm`}
+                  />
+                ) : null}
+                {invoice.note ? (
+                  <TableDetailField label="Ghi chú" value={invoice.note} />
+                ) : null}
+              </TableDetailGrid>
+            ),
+          },
+          {
+            id: "detail",
+            label: `Chi tiết (${items.length})`,
+            content:
+              items.length === 0 ? (
+                <p className="py-4 text-center text-sm text-kit-muted">
+                  Không có dòng nào.
+                </p>
+              ) : (
+                <div className="overflow-x-auto rounded border border-kit bg-kit-white">
+                  <Table size="sm" hover>
+                    <TableHead>
+                      <TableRow>
+                        <TableHeaderCell>Loại</TableHeaderCell>
+                        <TableHeaderCell>Mặt hàng</TableHeaderCell>
+                        <TableHeaderCell className="text-right">
+                          Đơn giá
+                        </TableHeaderCell>
+                        <TableHeaderCell className="text-center">
+                          SL
+                        </TableHeaderCell>
+                        <TableHeaderCell className="text-right">
+                          Giảm
+                        </TableHeaderCell>
+                        <TableHeaderCell className="text-right">
+                          Thành tiền
+                        </TableHeaderCell>
+                        <TableHeaderCell>Kỹ thuật viên</TableHeaderCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {items.map((item: InvoiceItemDto) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="text-kit-muted">
+                            {ITEM_TYPE_LABEL[item.itemType ?? 0] ?? "—"}
+                          </TableCell>
+                          <TableCell className="font-medium text-kit-heading">
+                            {item.itemName ?? "—"}
+                          </TableCell>
+                          <TableCell className="text-right text-kit-muted">
+                            {formatCurrency(item.unitPrice)}
+                          </TableCell>
+                          <TableCell className="text-center text-kit-muted">
+                            {item.quantity ?? 1}
+                          </TableCell>
+                          <TableCell className="text-right text-kit-muted">
+                            {formatCurrency(item.discountAmount)}
+                          </TableCell>
+                          <TableCell className="text-right font-semibold text-kit-heading">
+                            {formatCurrency(item.lineTotal)}
+                          </TableCell>
+                          <TableCell className="text-kit-muted">
+                            {item.staffName ?? "—"}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              ),
+          },
+        ]}
+      />
 
       <TableDetailActions>
         <Button

@@ -50,14 +50,33 @@ export interface GetAllProductQuery extends PageRequest {
   minPrice?: number;
   maxPrice?: number;
   status?: number;
+  isDeleted?: boolean;
 }
 
-export interface DeleteProductMultiplesPayload {
-  ids: number[];
+export interface CreateProductRequest {
+  categoryId: number;
+  name: string;
+  description?: string;
+  content?: string;
+  unit: string;
+  costPrice: number;
+  sellingPrice: number;
+  stockQuantity: number;
+  minStock: number;
+  status: number;
+  images: ProductImageDto[];
 }
 
-export type {
-  CreateProductPayload,
-  UpdateProductPayload,
-  ProductFormValues,
-} from "../schemas/product.schema";
+export interface UpdateProductRequest {
+  categoryId?: number;
+  name?: string;
+  description?: string;
+  content?: string;
+  unit?: string;
+  costPrice?: number;
+  sellingPrice?: number;
+  stockQuantity?: number;
+  minStock?: number;
+  status?: number;
+  images?: ProductImageDto[];
+}

@@ -1,26 +1,41 @@
 import type { PageRequest } from "@/shared/types/common.types";
 
 export interface MembershipCardDto {
-  id: number;
-  customerId: number;
-  customerName: string | null;
-  membershipTierId: number | null;
-  tierName: string | null;
-  cardCode: string;
-  issuedAt: string | null;
-  expiresAt: string | null;
-  status: number;
-  createdAt?: string | null;
+  id?: number;
+  customerId?: number;
+  customerName?: string;
+  membershipTierId?: number;
+  tierName?: string;
+  cardCode?: string;
+  issuedAt?: string;
+  expiresAt?: string;
+  status?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface MembershipCardQueryParams extends PageRequest {
+export interface GetAllMembershipCardQuery extends PageRequest {
   customerId?: number;
   membershipTierId?: number;
-  keyword?: string;
   status?: number;
 }
 
-export type {
-  UpdateMembershipCardPayload,
-  MembershipCardFormValues,
-} from "../schemas/membershipCard.schema";
+export interface CreateMembershipCardRequest {
+  customerId: number;
+  membershipTierId?: number;
+  membershipTierName?: string;
+  cardCode: string;
+  issuedAt?: string;
+  expiresAt?: string;
+  status?: number;
+  createdAt?: string;
+}
+
+export interface UpdateMembershipCardRequest {
+  customerId?: number;
+  membershipTierId?: number;
+  cardCode?: string;
+  issuedAt?: string;
+  expiresAt?: string;
+  status?: number;
+}

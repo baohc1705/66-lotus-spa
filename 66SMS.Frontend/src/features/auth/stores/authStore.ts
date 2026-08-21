@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { type UserDto } from "@/features/users/types/user.types";
-import type { StaffSalonDTO } from "@/features/staff_salons/types/staff-salon.types";
+import type { StaffSalonDTO } from "@/features/salons/types/staffSalon.types";
 import type { TokenResponseDTO } from "@/features/auth/types/auth.types";
 import { applyTokenResponse } from "@/features/auth/utils/mapTokenProfile";
 

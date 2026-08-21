@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from "react";
+﻿import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 import { User, Lock, Loader2, Save } from "lucide-react";
 import { useProfile } from "@/features/profile/hooks/useProfile";
 import { useChangePassword } from "@/features/profile/hooks/useChangePassword";
-import { useUpdateStaffMutation } from "@/features/staffs/hooks/useStaffs";
+import { useUpdateStaff } from "@/features/staffs/hooks/useStaffs";
 import {
   profileSchema,
   changePasswordSchema,
@@ -17,7 +17,7 @@ import { formatDisplayDate, parseToDateInput } from "@/shared/utils/date.utils";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { fileToBase64 } from "@/shared/lib/fileToBase64";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import { Button } from "@/shared/elements/Button";
 import {
   Card,
@@ -44,10 +44,10 @@ export function AdminProfilePage() {
   const [activeTab, setActiveTab] = useState<"profile" | "security">("profile");
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
   const [avatarKey, setAvatarKey] = useState(0);
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   const { data: profile, isLoading, isError } = useProfile();
 
-  const updateStaffMutation = useUpdateStaffMutation();
+  const updateStaffMutation = useUpdateStaff();
   const changePasswordMutation = useChangePassword();
 
   const isProfilePending = updateStaffMutation.isPending;
@@ -73,7 +73,7 @@ export function AdminProfilePage() {
     },
   });
 
-  const getInitialProfileValues = useCallback(() => {
+  function getInitialProfileValues() {
     return {
       fullName: profile?.fullName ?? "",
       phoneNumber: profile?.phone ?? "",
@@ -84,7 +84,7 @@ export function AdminProfilePage() {
           : null,
       dateOfBirth: parseToDateInput(profile?.dateOfBirth) ?? "",
     };
-  }, [profile]);
+  }
 
   useEffect(() => {
     if (profile) {
@@ -92,7 +92,8 @@ export function AdminProfilePage() {
       setPendingAvatarFile(null);
       setAvatarKey((key) => key + 1);
     }
-  }, [profile, resetProfile, getInitialProfileValues]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile, resetProfile]);
 
   const {
     register: registerSecurity,
@@ -108,7 +109,7 @@ export function AdminProfilePage() {
     },
   });
 
-  const onSubmitProfile = async (data: ProfileFormValues) => {
+  async function onSubmitProfile(data: ProfileFormValues) {
     if (!profile?.staffInfo?.id) {
       toast.error("Không tìm thấy thông tin nhân viên");
       return;
@@ -138,20 +139,20 @@ export function AdminProfilePage() {
     };
 
     updateStaffMutation.mutate(
-      { id: profile.staffInfo.id, payload },
+      { id: profile.staffInfo.id, data: payload },
       {
         onSuccess: (res) => {
           if (res.isSuccess) {
             setPendingAvatarFile(null);
             setAvatarKey((key) => key + 1);
-            qc.invalidateQueries({ queryKey: ["profile"] });
+            queryClient.invalidateQueries({ queryKey: ["profile"] });
           }
         },
       },
     );
-  };
+  }
 
-  const onSubmitSecurity = (data: ChangePasswordFormValues) => {
+  function onSubmitSecurity(data: ChangePasswordFormValues) {
     changePasswordMutation.mutate(data, {
       onSuccess: (result) => {
         if (result.isSuccess) {
@@ -159,25 +160,25 @@ export function AdminProfilePage() {
         }
       },
     });
-  };
+  }
 
-  const handleAvatarFileChange = (file: File | null) => {
+  function handleAvatarFileChange(file: File | null) {
     setPendingAvatarFile(file);
     if (file) {
       toast.success("Đã chọn ảnh mới. Đừng quên bấm Lưu thông tin!");
     }
-  };
+  }
 
   const genderValue = watchProfile("gender");
   const avatarUrl = watchProfile("profilePhotoUrl");
 
   if (!isLoading && profile?.profileType === "Customer") {
-    return <Navigate to="/profile" replace />;
+    return <Navigate to="/ho-so" replace />;
   }
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[500px] items-center justify-center">
+      <div className="flex min-h-125 items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-kit-primary" />
       </div>
     );
@@ -185,7 +186,7 @@ export function AdminProfilePage() {
 
   if (isError) {
     return (
-      <div className="flex min-h-[500px] flex-col items-center justify-center text-center">
+      <div className="flex min-h-125 flex-col items-center justify-center text-center">
         <p className="mb-4 font-medium text-kit-danger">
           Không thể tải thông tin tài khoản
         </p>
@@ -210,7 +211,7 @@ export function AdminProfilePage() {
       >
         <motion.div
           variants={itemVariants}
-          className="flex w-full shrink-0 flex-col gap-3 lg:w-[260px]"
+          className="flex w-full shrink-0 flex-col gap-3 lg:w-65"
         >
           <Card className="mb-0">
             <CardBody className="flex flex-col items-center py-6">
@@ -263,7 +264,7 @@ export function AdminProfilePage() {
 
         <motion.div variants={itemVariants} className="min-w-0 grow">
           {activeTab === "profile" ? (
-            <Card className="mb-0 min-h-[500px]">
+            <Card className="mb-0 min-h-125">
               <CardHeader className="justify-between gap-2">
                 <span className="text-sm font-bold text-kit-heading md:text-base">
                   Thông tin tài khoản
@@ -402,7 +403,7 @@ export function AdminProfilePage() {
               </CardBody>
             </Card>
           ) : (
-            <Card className="mb-0 min-h-[500px]">
+            <Card className="mb-0 min-h-125">
               <CardHeader className="justify-between gap-2">
                 <span className="text-sm font-bold text-kit-heading md:text-base">
                   Đổi mật khẩu

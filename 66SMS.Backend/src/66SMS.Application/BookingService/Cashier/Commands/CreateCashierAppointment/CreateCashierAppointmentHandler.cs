@@ -299,6 +299,7 @@ namespace _66SMS.Application.BookingService.Cashier.Commands.CreateCashierAppoin
                         Status = AppointmentConst.STATUS_WAITING,
                         Note = guest.Note,
                         TotalAmount = totalAmount,
+                        Source = AppointmentConst.SOURCE_CASHIER,
                         Services = appointmentServices,
                         CreatedAt = now,
                         CreatedBy = request.ActorUserId,

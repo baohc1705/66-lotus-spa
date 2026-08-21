@@ -2,8 +2,26 @@ IF OBJECT_ID(N'dbo.usp_ResolveBookingStaff', N'P') IS NOT NULL
     DROP PROCEDURE dbo.usp_ResolveBookingStaff;
 GO
 
--- Tim 1 staff nhan duoc khung gio cho combo dich vu. Bat buoc @start_time.
--- @service_ids: csv "1,5,9". Staff phai lam du tat ca dich vu; duration = SUM.
+-- Tự chọn 1 nhân viên khả dụng cho combo dịch vụ tại khung giờ cố định (đặt lịch "bất kỳ KTV").
+-- Staff phải làm được tất cả dịch vụ trong @service_ids, trong ca làm việc và không trùng lịch/lock.
+-- Trả về tối đa 1 dòng (staff_id nhỏ nhất thỏa điều kiện); không có kết quả nếu không tìm được.
+--
+-- Input:
+--   @date                   DATE           -- ngày hẹn
+--   @service_ids            NVARCHAR(500)  -- danh sách id dịch vụ CSV, vd "1,5,9"
+--   @staff_id               INT = NULL     -- nếu truyền: chỉ xét staff này; NULL = mọi staff đủ điều kiện
+--   @salon_id               INT = NULL     -- lọc staff thuộc salon; NULL = không lọc salon
+--   @exclude_lock_id        INT = NULL     -- bỏ qua lock này (khi user đang giữ slot)
+--   @exclude_appointment_id INT = NULL     -- bỏ qua lịch này (khi đổi giờ/reschedule)
+--   @start_time             TIME(7) = NULL -- giờ bắt đầu khung hẹn; bắt buộc, NULL thì RETURN
+--
+-- Output: 0 hoặc 1 dòng
+--   StaffId     INT  -- id staff được chọn
+--   ScheduleId  INT  -- work_schedules.id của ca làm việc trong ngày
+--
+-- Ví dụ EXEC:
+--   EXEC dbo.usp_ResolveBookingStaff @date = '2026-08-20', @service_ids = N'1,5', @salon_id = 3, @start_time = '09:00';
+--   EXEC dbo.usp_ResolveBookingStaff @date = '2026-08-20', @service_ids = N'2', @staff_id = 10, @salon_id = 3, @start_time = '14:30', @exclude_lock_id = 55;
 CREATE PROCEDURE dbo.usp_ResolveBookingStaff
     @date                   DATE,
     @service_ids            NVARCHAR(500),
@@ -25,6 +43,7 @@ BEGIN
     DECLARE @window_end      TIME(7);
     DECLARE @now             DATETIMEOFFSET(7) = SYSDATETIMEOFFSET();
 
+    -- parse CSV service id, loại giá trị không hợp lệ
     CREATE TABLE #wanted_services (
         service_id INT NOT NULL PRIMARY KEY
     );
@@ -43,6 +62,7 @@ BEGIN
         RETURN;
     END;
 
+    -- tổng thời lượng combo = SUM duration; tất cả service phải tồn tại và active
     SELECT
         @duration_mins = SUM(s.duration_mins),
         @found_count = COUNT(*)
@@ -64,10 +84,12 @@ BEGIN
         RETURN;
     END;
 
+    -- tính cửa sổ thời gian [start, end) cần trống cho combo dịch vụ
     SET @window_start_dt = CAST(@window_start AS DATETIME);
     SET @window_end_dt   = DATEADD(MINUTE, @duration_mins, @window_start_dt);
     SET @window_end      = CAST(@window_end_dt AS TIME(7));
 
+    -- danh sách staff ứng viên: role staff, active, làm đủ mọi dịch vụ, thuộc salon (nếu có)
     CREATE TABLE #staff (
         staff_id    INT NOT NULL PRIMARY KEY,
         schedule_id INT NULL,
@@ -112,6 +134,7 @@ BEGIN
         RETURN;
     END;
 
+    -- đánh dấu staff có ca làm việc bao trùm cả cửa sổ [@window_start, @window_end]
     UPDATE s
     SET
         s.in_shift = 1,
@@ -126,6 +149,7 @@ BEGIN
       AND ws.shift_start <= @window_start
       AND ws.shift_end >= @window_end;
 
+    -- cache tổng phút từng lịch trong ngày (dùng khi appointment chưa có time_appt_end)
     CREATE TABLE #appt_mins (
         appointment_id INT NOT NULL PRIMARY KEY,
         mins           INT NOT NULL
@@ -143,6 +167,7 @@ BEGIN
       AND aps.status = 1
     GROUP BY aps.appointment_id;
 
+    -- đánh dấu busy nếu trùng khung giờ với lịch đang active (completed/cancelled/no-show bỏ qua)
     UPDATE s
     SET s.is_busy = 1
     FROM #staff s
@@ -162,6 +187,7 @@ BEGIN
               ) > @window_start_dt
     );
 
+    -- đánh dấu busy nếu trùng khung giờ với slot lock còn hiệu lực
     UPDATE s
     SET s.is_busy = 1
     FROM #staff s
@@ -189,6 +215,7 @@ BEGIN
               ) > @window_start_dt
     );
 
+    -- chọn 1 staff: trong ca, không busy, ưu tiên staff_id nhỏ nhất
     SELECT TOP (1)
         s.staff_id AS StaffId,
         s.schedule_id AS ScheduleId

@@ -32,6 +32,7 @@ namespace _66SMS.Domain.Constants
         public const string FIELD_CREATED_BY = "created_by";
         public const string FIELD_UPDATED_AT = "updated_at";
         public const string FIELD_UPDATED_BY = "updated_by";
+        public const string FIELD_REMINDER_SENT_AT = "reminder_sent_at";
 
         public const string SP_GET_STAFF_AVAILABILITY = "dbo.usp_GetStaffAvailability";
         public const string SP_GET_BOOKING_TECHNICIANS = "dbo.usp_GetBookingTechnicians";
@@ -44,6 +45,12 @@ namespace _66SMS.Domain.Constants
         #region Constraint
         public const int APPOINTMENT_CODE_MAX_LENGTH = 50;
         public const int NOTE_MAX_LENGTH = 1000;
+        public const int DEPOSIT_DEADLINE_HOURS = 24;
+        #endregion
+
+        #region Source
+        public const int SOURCE_ONLINE = 1;
+        public const int SOURCE_CASHIER = 2;
         #endregion
 
         #region Status

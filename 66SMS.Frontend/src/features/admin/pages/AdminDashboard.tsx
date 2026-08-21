@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowDownRight,
@@ -8,7 +8,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import {
@@ -195,10 +195,7 @@ export function AdminDashboard() {
   const canExportBranch =
     (isManager || isAdmin) && branchSalonId != null && branchSalonId > 0;
 
-  const queryParams = useMemo(
-    () => ({ from, to, salonId: selectedSalonId }),
-    [from, to, selectedSalonId],
-  );
+  const queryParams = { from, to, salonId: selectedSalonId };
 
   const summaryQuery = useRevenueSummary(queryParams);
   const trendQuery = useRevenueTrend(queryParams);
@@ -221,28 +218,30 @@ export function AdminDashboard() {
     todayQuery.isFetching ||
     topStaffQuery.isFetching;
 
-  const trendData = useMemo(() => {
-    const rows = trendQuery.data?.data ?? [];
-    return rows.map((row) => ({
+  const trendRows = trendQuery.data?.data ?? [];
+  const trendData: { name: string; cashIn: number; cashOut: number }[] = [];
+  for (let index = 0; index < trendRows.length; index++) {
+    const row = trendRows[index];
+    trendData.push({
       name: formatDate(row.date).format("DD/MM"),
       cashIn: row.cashIn,
       cashOut: row.cashOut,
-    }));
-  }, [trendQuery.data?.data]);
+    });
+  }
 
   const cashFlowSeries = [
     { dataKey: "cashIn", name: "Tiền vào", color: chartColors.green },
     { dataKey: "cashOut", name: "Tiền ra", color: chartColors.red },
   ];
 
-  const structurePie = useMemo(() => {
-    const rows = breakdownQuery.data?.data?.byItemType ?? [];
-    return rows.map((row) => ({ name: row.label, value: row.amount }));
-  }, [breakdownQuery.data?.data?.byItemType]);
+  const structureRows = breakdownQuery.data?.data?.byItemType ?? [];
+  const structurePie: { name: string; value: number }[] = [];
+  for (let index = 0; index < structureRows.length; index++) {
+    const row = structureRows[index];
+    structurePie.push({ name: row.label, value: row.amount });
+  }
 
-  const structureBar = useMemo(() => {
-    return structurePie.map((row) => ({ name: row.name, value: row.value }));
-  }, [structurePie]);
+  const structureBar = structurePie;
 
   const topServices = topServicesQuery.data?.data ?? [];
   const topProducts = topProductsQuery.data?.data ?? [];
@@ -250,21 +249,25 @@ export function AdminDashboard() {
   const topLoading =
     topGroup === "service" ? topServicesQuery.isLoading : topProductsQuery.isLoading;
 
-  const topBarData = useMemo(() => {
-    return activeTopItems.map((row: TopRevenueItemDto) => ({
+  const topBarData: { name: string; value: number }[] = [];
+  for (let index = 0; index < activeTopItems.length; index++) {
+    const row = activeTopItems[index];
+    topBarData.push({
       name: row.itemName.length > 16 ? row.itemName.slice(0, 16) + "…" : row.itemName,
       value: row.revenue,
-    }));
-  }, [activeTopItems]);
+    });
+  }
 
   const topStaff = topStaffQuery.data?.data ?? [];
 
-  const staffBarData = useMemo(() => {
-    return topStaff.map((s: TopStaffDto) => ({
-      name: s.staffName.length > 12 ? s.staffName.slice(0, 12) + "…" : s.staffName,
-      value: s.revenue,
-    }));
-  }, [topStaff]);
+  const staffBarData: { name: string; value: number }[] = [];
+  for (let index = 0; index < topStaff.length; index++) {
+    const staff = topStaff[index];
+    staffBarData.push({
+      name: staff.staffName.length > 12 ? staff.staffName.slice(0, 12) + "…" : staff.staffName,
+      value: staff.revenue,
+    });
+  }
 
   const appointmentRate = today?.appointments.completionRate ?? 0;
 
@@ -389,7 +392,6 @@ export function AdminDashboard() {
         </div>
       </div>
 
-      {/* 4 stats kỳ — tone theo BoxesPage */}
       <div className="mb-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
           tone="midnight-bloom"
@@ -419,7 +421,6 @@ export function AdminDashboard() {
         />
       </div>
 
-      {/* 4 stats hôm nay — thanh tiến độ lấy từ BE */}
       <div className="mb-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title="Khách hôm nay"
@@ -544,7 +545,6 @@ export function AdminDashboard() {
         </Card>
       </div>
 
-      {/* Top bán chạy + nhân viên */}
       <div className="grid gap-3 lg:grid-cols-2">
         <Card className="main-card overflow-hidden">
           <CardHeader className="flex-wrap justify-between gap-2">
@@ -609,7 +609,7 @@ export function AdminDashboard() {
                 variant="nav-link-header"
               />
               <Link
-                to="/admin/reports/revenue/by-staff"
+                to="/admin/bao-cao/doanh-thu/theo-nhan-vien"
                 className="inline-flex items-center gap-1 text-xs font-semibold text-kit-primary no-underline hover:underline"
               >
                 Xem chi tiết

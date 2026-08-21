@@ -46,7 +46,7 @@ namespace _66SMS.Application.CatalogService.ServiceCategories.Queries.GetAllServ
 
             if (!string.IsNullOrEmpty(request.Keyword))
             {
-                query = query.Where(x => x.Name.StartsWith(request.Keyword));
+                query = query.Where(x => x.Name.Contains(request.Keyword));
             }
 
             if (request.IsDeleted)

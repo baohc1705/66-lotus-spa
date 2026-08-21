@@ -33,6 +33,7 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
                 request.MinPrice,
                 request.MaxPrice,
                 request.IsDeleted,
+                request.ExcludeStaffId,
                 request.PageIndex,
                 request.PageSize,
                 request.OrderBy,
@@ -54,7 +55,7 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
 
             if (!string.IsNullOrEmpty(request.Keyword))
             {
-                query = query.Where(x => x.Name.StartsWith(request.Keyword) || x.Code == request.Keyword);
+                query = query.Where(x => x.Name.Contains(request.Keyword) || x.Code == request.Keyword);
             }
 
             if (request.IsDeleted)
@@ -81,12 +82,20 @@ namespace _66SMS.Application.CatalogService.Services.Queries.GetAllServices
                 query = query.Where(x => x.SellingPrice <= request.MaxPrice);
             }
 
+            if (request.ExcludeStaffId.HasValue)
+            {
+                var staffId = request.ExcludeStaffId.Value;
+                query = query.Where(x =>
+                    !x.StaffServices!.Any(staffService => staffService.StaffId == staffId));
+            }
+
             query = request.OrderBy?.ToLower() switch
             {
                 "code" => request.IsDescending ? query.OrderByDescending(x => x.Code) : query.OrderBy(x => x.Code),
                 "name" => request.IsDescending ? query.OrderByDescending(x => x.Name) : query.OrderBy(x => x.Name),
                 "category" => request.IsDescending ? query.OrderByDescending(x => x.CategoryId) : query.OrderBy(x => x.CategoryId),
-                "sortorder" => request.IsDescending ? query.OrderByDescending(x => x.SortOrder) : query.OrderBy(x => x.SortOrder),
+                "sellingprice" => request.IsDescending ? query.OrderByDescending(x => x.SellingPrice) : query.OrderBy(x => x.SellingPrice),
+                "durationmins" => request.IsDescending ? query.OrderByDescending(x => x.DurationMins) : query.OrderBy(x => x.DurationMins),
                 _ => request.IsDescending ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt),
             };
 

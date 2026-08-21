@@ -8,7 +8,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import logoUrl from "@/assets/logo-home.png";
-import { usePrimarySalon } from "@/features/salons/hooks/usePrimarySalon";
+import { usePrimarySalon } from "@/features/salons/hooks/useSalons";
 
 const NAV_LINKS = [
   { label: "Giới thiệu", href: "#about" },

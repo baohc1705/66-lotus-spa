@@ -1,237 +1,36 @@
-import { useMemo } from "react";
-import { useReactTable, getCoreRowModel } from "@tanstack/react-table";
-import { Plus } from "lucide-react";
-
-import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { Pagination } from "@/shared/components/Pagination";
-import { PermissionGate } from "@/shared/components/security/PermissionGate";
-import { Button } from "@/shared/elements/Button";
-import { DataTable } from "@/shared/tables/DataTable";
-import { DataTableToolbar } from "@/shared/tables/DataTableToolbar";
-import { DataTableViewOptions } from "@/shared/tables/DataTableViewOptions";
-import { TablePageShell } from "@/shared/tables/TablePageShell";
-import { DEFAULT_LOADING_ROWS } from "@/shared/constants/display.const";
-
-import { BookingPositionFormDialog } from "../components/BookingPositionFormDialog";
-import { BookingRoomSidebar } from "../components/BookingRoomSidebar";
-import { BookingPositionStatCards } from "../components/BookingPositionStatCards";
-import { useBookingPositionListState } from "../hooks/useBookingPositionListState";
-import {
-  BOOKING_POSITION_COLUMN_LABELS,
-  useActiveBookingPositionColumns,
-} from "../components/useActiveBookingPositionColumns";
-import { BOOKING_POSITION_PERM } from "../constants/booking_position.permissions";
-import {
-  useAdminBookingPositions,
-  useDeleteBookingPosition,
-  useUpdateBookingPosition,
-} from "../hooks/useBookingPositions";
-import type { BookingPositionDTO } from "../types/booking_position.types";
-
-const ENTITY = "vị trí dịch vụ";
+import { BookingPositionForm } from "@/features/booking_positions/components/BookingPositionForm";
+import { BookingPositionTable } from "@/features/booking_positions/components/BookingPositionTable";
+import type { BookingPositionDto } from "@/features/booking_positions/types/bookingPosition.types";
+import { useState } from "react";
 
 export function BookingPositionListPage() {
-  const perm = BOOKING_POSITION_PERM;
-  const listState = useBookingPositionListState();
-
-  const {
-    queryParams,
-    createOpen,
-    setCreateOpen,
-    editTarget,
-    setEditTarget,
-    deleteTarget,
-    setDeleteTarget,
-    selectedRoomId,
-    handleSelectRoom,
-    pageIndex,
-    pageSize,
-    columnVisibility,
-    setColumnVisibility,
-    orderBy,
-    isDescending,
-    handleSort,
-    handlePageSizeChange,
-    handleSearchChange,
-    filter,
-  } = listState;
-
-  const {
-    data: positionResult,
-    isLoading,
-    isFetching,
-  } = useAdminBookingPositions(queryParams);
-
-  const { data: allPositionsResult } = useAdminBookingPositions({
-    pageIndex: 1,
-    pageSize: 10000,
-  });
-
-  const deleteMutation = useDeleteBookingPosition();
-  const updateMutation = useUpdateBookingPosition();
-
-  const paged = positionResult?.data;
-  const positions = useMemo(() => paged?.items ?? [], [paged?.items]);
-  const totalPages = Math.max(1, paged?.totalPages ?? 0);
-  const safePage = Math.min(pageIndex, totalPages);
-
-  const allPositions = useMemo(
-    () => allPositionsResult?.data?.items ?? [],
-    [allPositionsResult],
-  );
-
-  const totalPositionsCount =
-    allPositionsResult?.data?.totalCount ?? allPositions.length;
-  const activePositionsCount = useMemo(
-    () =>
-      allPositions.filter((p: BookingPositionDTO) => p.status === 1).length,
-    [allPositions],
-  );
-  const maintenancePositionsCount = useMemo(
-    () =>
-      allPositions.filter((p: BookingPositionDTO) => p.status === 0).length,
-    [allPositions],
-  );
-
-  const activeColumns = useActiveBookingPositionColumns({
-    orderBy,
-    isDescending,
-    onSort: handleSort,
-    onEdit: setEditTarget,
-    onDelete: setDeleteTarget,
-    updateMutation,
-  });
-
-  const table = useReactTable({
-    data: positions,
-    columns: activeColumns,
-    state: {
-      columnVisibility,
-    },
-    onColumnVisibilityChange: setColumnVisibility,
-    getCoreRowModel: getCoreRowModel(),
-    manualPagination: true,
-    manualSorting: true,
-  });
-
-  const columnLabels = useMemo(
-    () => ({ ...BOOKING_POSITION_COLUMN_LABELS }),
-    [],
-  );
-
-  const handleDelete = () => {
-    if (deleteTarget?.id) {
-      deleteMutation.mutate(deleteTarget.id, {
-        onSuccess: (result) => {
-          if (result.isSuccess) setDeleteTarget(null);
-        },
-      });
-    }
-  };
+  const [createOpen, setCreateOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<BookingPositionDto | null>(null);
+  const [createRoomId, setCreateRoomId] = useState<number | null>(null);
 
   return (
-    <div className="space-y-0 pb-6 font-sans text-sm text-kit-body">
-      <BookingPositionStatCards
-        totalPositions={totalPositionsCount}
-        activePositions={activePositionsCount}
-        maintenancePositions={maintenancePositionsCount}
-        isLoading={isLoading && allPositions.length === 0}
+    <>
+      <BookingPositionTable
+        onEdit={setEditTarget}
+        onCreate={(roomId) => {
+          setCreateRoomId(roomId);
+          setCreateOpen(true);
+        }}
       />
 
-      <div className="flex flex-col items-start gap-4 md:flex-row">
-        <BookingRoomSidebar
-          selectedRoomId={selectedRoomId}
-          onSelectRoom={handleSelectRoom}
-        />
-
-        <div className="w-full min-w-0 flex-1">
-          <TablePageShell isFetching={isFetching} isLoading={isLoading}>
-            <div className="border-b border-kit px-4 pt-4">
-              <DataTableToolbar
-                searchPlaceholder="Tìm kiếm vị trí..."
-                searchValue={filter}
-                onSearchChange={handleSearchChange}
-              >
-                <DataTableViewOptions
-                  table={table}
-                  columnLabels={columnLabels}
-                />
-                <PermissionGate resource={perm.resource} action={perm.create}>
-                  <Button
-                    variant="admin"
-                    size="sm"
-                    className="mb-0"
-                    onClick={() => setCreateOpen(true)}
-                  >
-                    <Plus className="h-4 w-4" />
-                    Thêm vị trí
-                  </Button>
-                </PermissionGate>
-              </DataTableToolbar>
-            </div>
-
-            <DataTable
-              table={table}
-              isLoading={isLoading}
-              loadingRows={DEFAULT_LOADING_ROWS}
-              pagination={
-                <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
-                  <select
-                    value={pageSize}
-                    onChange={(e) =>
-                      handlePageSizeChange(Number(e.target.value))
-                    }
-                    className="h-8 cursor-pointer rounded border border-kit bg-kit-white px-2 text-xs text-kit-heading outline-none focus:border-kit-primary"
-                  >
-                    {[5, 10, 20].map((size: number) => (
-                      <option key={size} value={size}>
-                        {size} / trang
-                      </option>
-                    ))}
-                  </select>
-                  <Pagination
-                    page={safePage}
-                    pageCount={totalPages}
-                    onPageChange={listState.setPageIndex}
-                    size="sm"
-                  />
-                </div>
-              }
-            />
-          </TablePageShell>
-        </div>
-      </div>
-
-      <BookingPositionFormDialog
+      <BookingPositionForm
         open={createOpen}
         onOpenChange={setCreateOpen}
-        bookingPosition={null}
-        defaultRoomId={selectedRoomId}
+        defaultRoomId={createRoomId}
       />
 
-      {editTarget && (
-        <BookingPositionFormDialog
-          open={!!editTarget}
-          onOpenChange={(open) => {
-            if (!open) setEditTarget(null);
-          }}
-          bookingPosition={editTarget}
-        />
-      )}
-
-      {deleteTarget && (
-        <ConfirmDialog
-          open={!!deleteTarget}
-          onOpenChange={(open) => {
-            if (!open) setDeleteTarget(null);
-          }}
-          title={`Xóa ${ENTITY}`}
-          description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget.name ?? ""}"? Hành động này không thể hoàn tác.`}
-          onConfirm={handleDelete}
-          confirmLabel="Xóa"
-          loading={deleteMutation.isPending}
-        />
-      )}
-    </div>
+      <BookingPositionForm
+        open={!!editTarget}
+        onOpenChange={(open) => {
+          if (!open) setEditTarget(null);
+        }}
+        bookingPosition={editTarget}
+      />
+    </>
   );
 }

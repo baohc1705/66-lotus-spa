@@ -1,66 +1,71 @@
-import axiosInstance from "@/shared/api/axiosInstance";
 import type {
-  Result,
-  PagedResult,
-  PageRequest,
-} from "@/shared/types/common.types";
-import type {
-  CreateServiceCategoryPayload,
-  DeleteServiceCategoryMultiplesPayload,
+  CreateServiceCategoryRequest,
+  GetAllServiceCategoryQuery,
   ServiceCategoryDto,
-  UpdateServiceCategoryPayload,
-} from "../types/serviceCategory.types";
-
-function toQuery(params: PageRequest) {
-  return {
-    pageIndex: params.pageIndex,
-    pageSize: params.pageSize,
-    keyword: params.filter || undefined,
-    orderBy: params.orderBy,
-    isDescending: params.isDescending,
-  };
-}
+  UpdateServiceCategoryRequest,
+} from "@/features/service_categories/types/serviceCategory.types";
+import axiosInstance from "@/shared/api/axiosInstance";
+import type { PagedResult, Result } from "@/shared/types/common.types";
 
 export const serviceCategoryApi = {
-  getAll: (params: PageRequest) =>
-    axiosInstance
-      .get<Result<PagedResult<ServiceCategoryDto>>>("/service-category", {
-        params: toQuery(params),
-      })
-      .then((r) => r.data),
+  // Query API
+  getAll: async (
+    params: GetAllServiceCategoryQuery,
+  ): Promise<Result<PagedResult<ServiceCategoryDto>>> => {
+    const response = await axiosInstance.get("/service-category", { params });
+    return response.data;
+  },
 
-  adminGetAll: (params: PageRequest) =>
-    axiosInstance
-      .get<Result<PagedResult<ServiceCategoryDto>>>(`/service-category/admin`, {
-        params: toQuery(params),
-      })
-      .then((r) => r.data),
+  adminGetAll: async (
+    params: GetAllServiceCategoryQuery,
+  ): Promise<Result<PagedResult<ServiceCategoryDto>>> => {
+    const response = await axiosInstance.get("/service-category/admin", {
+      params,
+    });
+    return response.data;
+  },
 
-  getDetail: (id: number) =>
-    axiosInstance
-      .get<Result<ServiceCategoryDto>>(`/service-category/${id}`)
-      .then((r) => r.data),
+  getDetail: async (id: number): Promise<Result<ServiceCategoryDto>> => {
+    const response = await axiosInstance.get(`/service-category/${id}`);
+    return response.data;
+  },
 
-  create: (payload: CreateServiceCategoryPayload) =>
-    axiosInstance.post<Result<object>>("/service-category", payload).then((r) => r.data),
+  // Command API
+  create: async (
+    request: CreateServiceCategoryRequest,
+  ): Promise<Result<object>> => {
+    const response = await axiosInstance.post<Result<object>>(
+      "/service-category",
+      request,
+    );
+    return response.data;
+  },
 
-  update: (id: number, payload: UpdateServiceCategoryPayload) =>
-    axiosInstance
-      .patch<Result<object>>(`/service-category/${id}`, payload)
-      .then((r) => r.data),
+  update: async (
+    id: number,
+    request: UpdateServiceCategoryRequest,
+  ): Promise<Result<object>> => {
+    const response = await axiosInstance.patch<Result<object>>(
+      `/service-category/${id}`,
+      request,
+    );
+    return response.data;
+  },
 
-  delete: (id: number) =>
-    axiosInstance.delete<Result<object>>(`/service-category/${id}`).then((r) => r.data),
+  delete: async (id: number): Promise<Result<object>> => {
+    const response = await axiosInstance.delete<Result<object>>(
+      `/service-category/${id}`,
+    );
+    return response.data;
+  },
 
-  deleteMultiples: (payload: DeleteServiceCategoryMultiplesPayload) =>
-    axiosInstance
-      .delete<Result<object>>(`/service-category/bulk`, { data: payload })
-      .then((r) => r.data),
-
-  getAllDeleted: (params: PageRequest) =>
-    axiosInstance
-      .get<Result<PagedResult<ServiceCategoryDto>>>(`/service-category/deleted`, {
-        params: toQuery(params),
-      })
-      .then((r) => r.data),
+  deleteBulk: async (ids: number[]): Promise<Result<object>> => {
+    const response = await axiosInstance.delete<Result<object>>(
+      "/service-category/bulk",
+      {
+        data: { ids },
+      },
+    );
+    return response.data;
+  },
 };

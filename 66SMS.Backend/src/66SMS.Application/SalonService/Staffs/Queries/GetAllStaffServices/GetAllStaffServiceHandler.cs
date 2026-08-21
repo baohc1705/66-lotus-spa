@@ -46,7 +46,7 @@ public class GetAllStaffServiceHandler : IRequestHandler<GetAllStaffServiceQuery
                 SerCode = x.Service!.Code,
                 SerName = x.Service!.Name,
                 SerDurationMins = x.Service!.DurationMins,
-                SerCostPrice = x.Service!.CostPrice,
+                SerSellPrice = x.Service!.SellingPrice,
                 SerCommissionRate = x.Service!.CommissionRate
             })
             .ToPagedAsync(request, cancellationToken);

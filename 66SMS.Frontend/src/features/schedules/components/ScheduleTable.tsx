@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Plus, Check, Trash2, Clock } from "lucide-react";
 
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import {
   Table,
   TableBody,

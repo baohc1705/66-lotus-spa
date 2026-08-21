@@ -1,6 +1,6 @@
 import type { PageRequest } from "@/shared/types/common.types";
 
-export interface SalonListItem {
+export interface SalonDto {
   id?: number;
   code?: string;
   name?: string;
@@ -21,12 +21,16 @@ export interface SalonListItem {
   createdAt?: string;
 }
 
-export interface SalonDTO extends SalonListItem {
+export interface SalonFullDto extends SalonDto {
   description?: string;
-  updatedAt?: string;
 }
 
-export interface CreateSalonPayload {
+export interface GetAllSalonQuery extends PageRequest {
+  status?: number;
+  isDeleted?: boolean;
+}
+
+export interface CreateSalonRequest {
   name: string;
   phone: string;
   email?: string;
@@ -46,9 +50,22 @@ export interface CreateSalonPayload {
   status?: number;
 }
 
-export type UpdateSalonPayload = Partial<CreateSalonPayload>;
-
-export interface SalonQueryParams extends PageRequest {
-  keyword?: string;
+export interface UpdateSalonRequest {
+  name?: string;
+  phone?: string;
+  email?: string;
+  streetAddress?: string;
+  provinceCode?: string;
+  wardCode?: string;
+  fullAddress?: string;
+  latitude?: number;
+  longitude?: number;
+  workingDays?: string;
+  taxCode?: string;
+  imageUrl?: string;
+  imageBase64?: string;
+  description?: string;
+  sortOrder?: number;
+  isPrimary?: boolean;
   status?: number;
 }

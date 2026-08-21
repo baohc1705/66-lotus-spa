@@ -1,23 +1,38 @@
 import type { PageRequest } from "@/shared/types/common.types";
 
 export interface MembershipTierDto {
-  id: number;
-  code?: string | null;
-  name: string;
-  minSpending: number;
-  discountPercent: number;
-  pointMultiplier: number;
-  benefits: string | null;
-  status: number;
-  createdAt?: string | null;
+  id?: number;
+  code?: string;
+  name?: string;
+  minSpending?: number;
+  discountPercent?: number;
+  pointMultiplier?: number;
+  benefits?: string;
+  status?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface MembershipTierQueryParams extends PageRequest {
+export interface GetAllMembershipTierQuery extends PageRequest {
   keyword?: string;
 }
 
-export type {
-  CreateMembershipTierPayload,
-  UpdateMembershipTierPayload,
-  MembershipTierFormValues,
-} from "../schemas/membershipTier.schema";
+export interface CreateMembershipTierRequest {
+  code?: string;
+  name: string;
+  minSpending: number;
+  discountPercent?: number;
+  pointMultiplier: number;
+  benefits?: string;
+  status: number;
+}
+
+export interface UpdateMembershipTierRequest {
+  code?: string;
+  name?: string;
+  minSpending?: number;
+  discountPercent?: number;
+  pointMultiplier?: number;
+  benefits?: string;
+  status?: number;
+}

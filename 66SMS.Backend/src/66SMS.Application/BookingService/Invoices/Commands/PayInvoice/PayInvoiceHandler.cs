@@ -1,5 +1,7 @@
+using _66SMS.Application.Abstractions.Services;
 using _66SMS.Application.BookingService.Helpers;
 using _66SMS.Contract.Enumerations;
+using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Shared;
 using _66SMS.Domain.Abstractions.Repositories.Sql;
 using _66SMS.Domain.Abstractions.Repositories.Sql.Base;
@@ -7,10 +9,7 @@ using _66SMS.Domain.Constants;
 using _66SMS.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Data;
-using _66SMS.Contract.Helpers;
-using _66SMS.Application.Abstractions.Services;
 
 namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
 {
@@ -212,14 +211,14 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.PayInvoice
 
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
-
-                return Result<object>.Success("Thanh toán thành công.");
             }
             catch
             {
                 transaction.Rollback();
                 throw;
             }
+
+            return Result<object>.Success("Thanh toán thành công.");
         }
     }
 }

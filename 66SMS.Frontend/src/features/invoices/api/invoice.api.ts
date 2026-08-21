@@ -1,48 +1,74 @@
-import axiosInstance from "@/shared/api/axiosInstance";
-import type { Result, PagedResult } from "@/shared/types/common.types";
 import type {
+  CreateInvoiceRequest,
+  GetAllInvoiceQuery,
   InvoiceDto,
-  CreateInvoicePayload,
-  UpdateInvoiceItemsPayload,
-  GetAllInvoicesQuery,
-} from "../types/invoice.types";
+  UpdateInvoiceItemsRequest,
+} from "@/features/invoices/types/invoice.types";
+import axiosInstance from "@/shared/api/axiosInstance";
+import type { PagedResult, Result } from "@/shared/types/common.types";
 
 export const invoiceApi = {
-  getAll: (params: GetAllInvoicesQuery) =>
-    axiosInstance
-      .get<Result<PagedResult<InvoiceDto>>>(`/invoice/admin`, { params })
-      .then((r) => r.data),
+  // Query API
+  getAll: async (
+    params: GetAllInvoiceQuery,
+  ): Promise<Result<PagedResult<InvoiceDto>>> => {
+    const response = await axiosInstance.get<Result<PagedResult<InvoiceDto>>>(
+      "/invoice/admin",
+      { params },
+    );
+    return response.data;
+  },
 
-  getDetail: (id: number) =>
-    axiosInstance.get<Result<InvoiceDto>>(`/invoice/${id}`).then((r) => r.data),
+  getDetail: async (id: number): Promise<Result<InvoiceDto>> => {
+    const response = await axiosInstance.get<Result<InvoiceDto>>(`/invoice/${id}`);
+    return response.data;
+  },
 
-  create: (payload: CreateInvoicePayload) =>
-    axiosInstance.post<Result<number>>("/invoice", payload).then((r) => r.data),
+  // Command API
+  create: async (
+    payload: CreateInvoiceRequest,
+  ): Promise<Result<number>> => {
+    const response = await axiosInstance.post<Result<number>>("/invoice", payload);
+    return response.data;
+  },
 
-  cancel: (id: number) =>
-    axiosInstance
-      .patch<Result<object>>(`/invoice/${id}/cancel`)
-      .then((r) => r.data),
+  cancel: async (id: number): Promise<Result<object>> => {
+    const response = await axiosInstance.patch<Result<object>>(
+      `/invoice/${id}/cancel`,
+    );
+    return response.data;
+  },
 
-  createFromAppointment: (appointmentId: number | string) =>
-    axiosInstance
-      .post<Result<number>>(`/invoice/from-appointment/${appointmentId}`)
-      .then((r) => r.data),
+  createFromAppointment: async (
+    appointmentId: number | string,
+  ): Promise<Result<number>> => {
+    const response = await axiosInstance.post<Result<number>>(
+      `/invoice/from-appointment/${appointmentId}`,
+    );
+    return response.data;
+  },
 
-  updateItems: (id: number | string, payload: UpdateInvoiceItemsPayload) =>
-    axiosInstance
-      .put<Result<object>>(`/invoice/${id}/items`, payload)
-      .then((r) => r.data),
+  updateItems: async (
+    id: number | string,
+    payload: UpdateInvoiceItemsRequest,
+  ): Promise<Result<object>> => {
+    const response = await axiosInstance.put<Result<object>>(
+      `/invoice/${id}/items`,
+      payload,
+    );
+    return response.data;
+  },
 
-  payInvoice: (
+  payInvoice: async (
     id: number | string,
     paymentMethod: number,
     paidAmount: number,
-    note?: string,
-  ) =>
-    axiosInstance
-      .post<
-        Result<object>
-      >(`/invoice/${id}/pay`, { paymentMethod, paidAmount, note })
-      .then((r) => r.data),
+    note: string,
+  ): Promise<Result<object>> => {
+    const response = await axiosInstance.post<Result<object>>(
+      `/invoice/${id}/pay`,
+      { paymentMethod, paidAmount, note },
+    );
+    return response.data;
+  },
 };

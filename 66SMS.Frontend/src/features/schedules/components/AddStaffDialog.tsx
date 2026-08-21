@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { User, Search, CheckSquare, Square } from "lucide-react";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/elements/Button";
 import { FormSection } from "@/shared/forms/FormSection";

@@ -28,7 +28,7 @@ namespace _66SMS.Application.CustomerService.Customers.Queries.GetDetailCustomer
                     UserId = x.UserId,
                     FullName = x.FullName,
                     AvatarUrl = x.AvatarUrl,
-                    DateOfBirth = x.DateOfBirth.ToString(),
+                    DateOfBirth = x.DateOfBirth,
                     Gender = x.Gender,
                     Phone = x.Phone,
                     LoyaltyPoint = x.LoyaltyPoint,
@@ -41,7 +41,8 @@ namespace _66SMS.Application.CustomerService.Customers.Queries.GetDetailCustomer
                     StreetAddress = x.StreetAddress,
                     ProvinceCode = x.ProvinceCode,
                     WardCode = x.WardCode,
-                    Email = x.User.Email
+                    Email = x.User.Email,
+                    MembershipTier = x.MembershipCard!.Tier!.Name
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

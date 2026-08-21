@@ -1,7 +1,6 @@
 import type { PageRequest } from "@/shared/types/common.types";
-import { SERVICE_DURATION_OPTIONS } from "../constants/service.durations";
 
-export interface ServiceProductResponse {
+export interface ServiceProductDto {
   id?: number;
   productId?: number;
   productName?: string;
@@ -11,7 +10,7 @@ export interface ServiceProductResponse {
   status?: number;
 }
 
-export interface ServiceListDto {
+export interface ServiceDto {
   id?: number;
   categoryId?: number;
   categoryName?: string;
@@ -25,7 +24,7 @@ export interface ServiceListDto {
   updatedAt?: string;
 }
 
-export interface ServiceDetailDto {
+export interface ServiceFullDto {
   id?: number;
   categoryId?: number;
   categoryName?: string;
@@ -43,21 +42,12 @@ export interface ServiceDetailDto {
   imageUrl?: string;
   createdAt?: string;
   updatedAt?: string;
-  serviceProducts?: ServiceProductResponse[];
+  serviceProducts?: ServiceProductDto[];
   productCost?: number;
   totalCost?: number;
   commissionAmount?: number;
   grossProfit?: number;
   grossMarginPercent?: number;
-}
-
-export type ServiceDto = ServiceListDto;
-
-export interface ServiceProductPayload {
-  productId?: number;
-  quantityUsed?: number;
-  unitCost?: number;
-  note?: string;
 }
 
 export interface GetAllServiceQuery extends PageRequest {
@@ -66,16 +56,38 @@ export interface GetAllServiceQuery extends PageRequest {
   minPrice?: number;
   maxPrice?: number;
   status?: number;
+  isDeleted?: boolean;
+  excludeStaffId?: number | null;
 }
 
-export interface DeleteServiceMultiplesPayload {
-  ids: number[];
+export interface CreateServiceRequest {
+  categoryId: number;
+  name: string;
+  description?: string;
+  content?: string;
+  durationMins: number;
+  costPrice: number;
+  sellingPrice: number;
+  minSellingPrice?: number;
+  commissionRate?: number;
+  sortOrder?: number;
+  status?: number;
+  imageUrl?: string;
+  serviceProducts?: ServiceProductDto[];
 }
 
-export { SERVICE_DURATION_OPTIONS };
-
-export type {
-  CreateServicePayload,
-  UpdateServicePayload,
-  ServiceFormValues,
-} from "../schemas/service.schema";
+export interface UpdateServiceRequest {
+  categoryId?: number;
+  name?: string;
+  description?: string;
+  content?: string;
+  durationMins?: number;
+  costPrice?: number;
+  sellingPrice?: number;
+  minSellingPrice?: number;
+  commissionRate?: number;
+  sortOrder?: number;
+  status?: number;
+  imageUrl?: string;
+  serviceProducts?: ServiceProductDto[];
+}

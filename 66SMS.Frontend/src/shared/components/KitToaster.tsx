@@ -8,7 +8,7 @@ import {
   dismissKitToast,
   subscribeKitToast,
   type KitToastItem,
-} from "@/shared/components/kitToast";
+} from "@/shared/utils/kitToast";
 
 export function KitToaster() {
   const [items, setItems] = useState<KitToastItem[]>([]);
@@ -22,7 +22,6 @@ export function KitToaster() {
       {items.map((item: KitToastItem) => (
         <Toast
           key={item.id}
-          title={item.title}
           message={item.message}
           variant={item.variant as ToastVariant}
           duration={item.duration}

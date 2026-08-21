@@ -1,4 +1,5 @@
 using _66SMS.Application.DTOs;
+using _66SMS.Contract.Helpers;
 using _66SMS.Contract.Shared;
 using MediatR;
 
@@ -16,7 +17,7 @@ namespace _66SMS.Application.BookingService.Appointments.Queries.GetAvailableBoo
         {
             var daysCount = request.Days <= 0 ? 7 : Math.Min(request.Days, 31);
 
-            var todayVn = DateOnly.FromDateTime(DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(7)).DateTime);
+            var todayVn = DateTimeHelper.VnToday();
 
             var result = new List<BookingDayDto>(daysCount);
 

@@ -1,6 +1,8 @@
 import { StatCard } from "@/shared/widgets/StatCard";
 
-interface ServiceStatCardsProps {
+// Giải thích:
+// 4 thẻ thống kê phía trên bảng dịch vụ
+interface Props {
   totalServices: number;
   activeServices: number;
   servicesWithImage: number;
@@ -11,14 +13,14 @@ interface ServiceStatCardsProps {
 export function ServiceStatCards({
   totalServices,
   activeServices,
-  servicesWithImage,
+  //servicesWithImage,
   avgDurationMins,
   isLoading = false,
-}: ServiceStatCardsProps) {
+}: Props) {
   const dash = isLoading ? "—" : undefined;
 
   return (
-    <div className="mb-3 grid grid-cols-2 gap-2 lg:grid-cols-4">
+    <div className="mb-3 grid grid-cols-2 gap-2 lg:grid-cols-3">
       <StatCard
         title="Tổng dịch vụ"
         value={dash ?? totalServices}
@@ -33,13 +35,13 @@ export function ServiceStatCards({
         tone="happy-green"
         valueTone="white"
       />
-      <StatCard
+      {/* <StatCard
         title="Có hình ảnh"
         value={dash ?? servicesWithImage}
         description="Đã gắn ảnh"
         tone="tempting-azure"
         valueTone="white"
-      />
+      /> */}
       <StatCard
         title="Thời lượng TB"
         value={dash ?? avgDurationMins}

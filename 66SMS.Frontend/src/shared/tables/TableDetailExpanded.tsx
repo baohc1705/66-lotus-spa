@@ -85,12 +85,14 @@ export function TableDetailGrid({
 export function TableDetailField({
   label,
   value,
+  className = "",
 }: {
   label: string;
   value?: ReactNode;
+  className?: string;
 }) {
   return (
-    <div className="border-b border-kit py-1 last:border-b-0">
+    <div className={"border-b border-kit py-1 last:border-b-0 " + className}>
       <p className="mb-0.5 text-xs text-kit-muted">{label}</p>
       <div className="truncate text-sm font-medium text-kit-heading">
         {value == null || value === "" ? "—" : value}

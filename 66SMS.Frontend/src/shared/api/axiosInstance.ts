@@ -85,8 +85,8 @@ axiosInstance.interceptors.response.use(
     } catch (refreshError) {
       processQueue(refreshError, null);
       useAuthStore.getState().clearAuth();
-      if (!window.location.pathname.startsWith("/login")) {
-        window.location.href = "/login";
+      if (!window.location.pathname.startsWith("/dang-nhap")) {
+        window.location.href = "/dang-nhap";
       }
       return Promise.reject(refreshError);
     } finally {

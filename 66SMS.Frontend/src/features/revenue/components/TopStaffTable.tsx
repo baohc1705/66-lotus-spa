@@ -136,7 +136,7 @@ export const TopStaffTable = memo(function TopStaffTable({
 
       <div className="border-t border-adminGray-100 mt-2 pt-2 shrink-0">
         <Link
-          to="/admin/staff"
+          to="/admin/nhan-vien"
           className="flex items-center justify-center gap-1 text-xs text-adminGray-400 hover:text-adminGreen-600 font-semibold transition-colors"
         >
           Xem tất cả

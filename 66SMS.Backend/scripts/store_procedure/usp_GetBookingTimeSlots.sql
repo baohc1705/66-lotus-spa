@@ -2,7 +2,34 @@ IF OBJECT_ID(N'dbo.usp_GetBookingTimeSlots', N'P') IS NOT NULL
     DROP PROCEDURE dbo.usp_GetBookingTimeSlots;
 GO
 
--- @service_ids: csv "1,5,9". Duration = SUM; staff phai lam du tat ca dich vu.
+-- Lấy danh sách khung giờ đặt lịch trong ngày cho màn booking online/cashier.
+-- Tính tổng thời lượng từ @service_ids (csv), sinh slot theo config_appointments,
+-- lọc staff làm được TẤT CẢ dịch vụ, rồi đánh trạng thái từng slot:
+--   available = có thể bắt đầu đủ @slots_needed slot liên tiếp
+--   booked    = slot đang bị lịch hẹn hoặc lock giữ chỗ
+--   short     = trong ca nhưng không đủ slot liên tiếp còn trống
+--   outside   = ngoài ca làm việc (hoặc staff không hợp lệ khi truyền @staff_id)
+--
+-- Cách dùng:
+--   -- xem slot ngày 2026-08-20, dịch vụ 1 và 5, bất kỳ staff nào
+--   EXEC dbo.usp_GetBookingTimeSlots @date = '2026-08-20', @service_ids = N'1,5', @staff_id = NULL, @salon_id = 3;
+--
+--   -- xem slot của 1 kỹ thuật viên cụ thể
+--   EXEC dbo.usp_GetBookingTimeSlots @date = '2026-08-20', @service_ids = N'1,5', @staff_id = 12, @salon_id = 3;
+--
+-- Input mẫu:
+--   @date        = '2026-08-20'  -- ngày cần xem slot
+--   @service_ids = N'1,5,9'     -- danh sách id dịch vụ, cách nhau bằng dấu phẩy
+--   @staff_id    = NULL         -- NULL = gom theo tất cả staff đủ điều kiện; truyền id = xem riêng 1 người
+--   @salon_id    = 3            -- lọc config + staff thuộc salon; NULL = không lọc salon
+--
+-- Output mẫu:
+--   SlotId | Time  | Status
+--   -------|-------|----------
+--   1      | 08:00 | available
+--   2      | 08:30 | booked
+--   3      | 09:00 | short
+--   4      | 09:30 | outside
 CREATE PROCEDURE dbo.usp_GetBookingTimeSlots
     @date         DATE,
     @service_ids  NVARCHAR(500),
@@ -21,10 +48,12 @@ BEGIN
     DECLARE @found_count   INT;
     DECLARE @now           DATETIMEOFFSET(7) = SYSDATETIMEOFFSET();
 
+    -- bảng tạm chứa id dịch vụ khách chọn, loại trùng và id không hợp lệ
     CREATE TABLE #wanted_services (
         service_id INT NOT NULL PRIMARY KEY
     );
 
+    -- tách chuỗi csv @service_ids thành từng id dịch vụ
     INSERT INTO #wanted_services (service_id)
     SELECT DISTINCT TRY_CAST(LTRIM(RTRIM(value)) AS INT)
     FROM STRING_SPLIT(@service_ids, N',')
@@ -33,6 +62,7 @@ BEGIN
 
     SET @wanted_count = (SELECT COUNT(*) FROM #wanted_services);
 
+    -- không có dịch vụ hợp lệ thì trả result rỗng, không cần tính tiếp
     IF @wanted_count = 0
     BEGIN
         DROP TABLE #wanted_services;
@@ -42,6 +72,7 @@ BEGIN
         RETURN;
     END;
 
+    -- cộng duration_mins và kiểm tra đủ cả @wanted_count dịch vụ đang active
     SELECT
         @duration_mins = SUM(s.duration_mins),
         @found_count = COUNT(*)
@@ -49,6 +80,7 @@ BEGIN
     INNER JOIN #wanted_services w ON w.service_id = s.id
     WHERE s.status = 1;
 
+    -- thiếu dịch vụ hoặc duration null -> không đặt được, trả rỗng
     IF @duration_mins IS NULL OR @found_count <> @wanted_count
     BEGIN
         DROP TABLE #wanted_services;
@@ -58,6 +90,7 @@ BEGIN
         RETURN;
     END;
 
+    -- bảng slot trong ngày: index 0-based để tính liên tiếp, slot_id 1-based cho UI
     DECLARE @slots TABLE (
         slot_index INT NOT NULL PRIMARY KEY,
         slot_id    INT NOT NULL UNIQUE,
@@ -72,6 +105,7 @@ BEGIN
     DECLARE @slot_index    INT;
     DECLARE @slot_end      TIME(7);
 
+    -- ưu tiên config của đúng @salon_id, fallback config salon_id NULL (global)
     SELECT TOP (1)
         @cfg_start = start_time,
         @cfg_end = end_time,
@@ -86,6 +120,7 @@ BEGIN
         CASE WHEN salon_id = @salon_id THEN 0 ELSE 1 END,
         id;
 
+    -- config không hợp lệ thì không sinh được slot
     IF @cfg_start IS NULL OR @cfg_end IS NULL OR @cfg_slot_mins IS NULL OR @cfg_start >= @cfg_end
     BEGIN
         DROP TABLE #wanted_services;
@@ -95,6 +130,7 @@ BEGIN
         RETURN;
     END;
 
+    -- sinh từng slot cách nhau @cfg_slot_mins phút, từ @cfg_start đến @cfg_end
     SET @slot_index = 0;
     SET @slot_cursor = @cfg_start;
 
@@ -119,18 +155,22 @@ BEGIN
         RETURN;
     END;
 
+    -- độ dài 1 slot thực tế (thường bằng @cfg_slot_mins), fallback 30 nếu diff = 0
     SELECT TOP (1) @slot_minutes = CASE
         WHEN DATEDIFF(MINUTE, start_time, end_time) > 0 THEN DATEDIFF(MINUTE, start_time, end_time)
         ELSE 30 END
     FROM @slots ORDER BY slot_index;
 
+    -- số slot liên tiếp cần để làm hết combo dịch vụ (làm tròn lên)
     SET @slots_needed = CASE
         WHEN CEILING(@duration_mins * 1.0 / @slot_minutes) < 1 THEN 1
         ELSE CAST(CEILING(@duration_mins * 1.0 / @slot_minutes) AS INT)
     END;
 
+    -- role staff dùng để lọc user có quyền kỹ thuật viên
     SELECT TOP (1) @staff_role_id = id FROM dbo.roles WHERE code = N'staff' AND status = 1;
 
+    -- staff đủ điều kiện: active, có role staff, làm được TẤT CẢ dịch vụ, có ca ngày @date, thuộc salon
     DECLARE @staff TABLE (staff_id INT NOT NULL PRIMARY KEY);
 
     INSERT INTO @staff (staff_id)
@@ -163,6 +203,7 @@ BEGIN
             )
           );
 
+    -- slot nào nằm trong ca làm việc (shift_start..shift_end) của từng staff
     DECLARE @in_shift TABLE (
         staff_id   INT NOT NULL,
         slot_index INT NOT NULL,
@@ -182,6 +223,7 @@ BEGIN
       AND ws.shift_start IS NOT NULL
       AND ws.shift_end IS NOT NULL;
 
+    -- slot đã bị chiếm: lịch hẹn (status không hủy/hoàn) + lock giữ chỗ còn hạn
     DECLARE @booked TABLE (
         staff_id   INT NOT NULL,
         slot_index INT NOT NULL,
@@ -189,6 +231,7 @@ BEGIN
     );
 
     ;WITH appt_dur AS (
+        -- tổng phút thực tế mỗi appointment từ snapshot dịch vụ
         SELECT aps.appointment_id, SUM(aps.duration_snapshot * aps.quantity) AS mins
         FROM dbo.appointments ax
         INNER JOIN @staff sx ON sx.staff_id = ax.staff_id
@@ -197,6 +240,7 @@ BEGIN
         GROUP BY aps.appointment_id
     ),
     occupied AS (
+        -- appointment: map time_appt_start -> slot_index, tính số slot cần chiếm
         SELECT
             a.staff_id,
             fs.slot_index AS start_index,
@@ -213,6 +257,7 @@ BEGIN
 
         UNION ALL
 
+        -- lock tạm khi khách đang chọn slot (chưa tạo appointment), chỉ tính lock chưa hết hạn
         SELECT
             l.staff_id,
             fs.slot_index,
@@ -232,12 +277,14 @@ BEGIN
         WHERE l.appointment_date = @date AND l.status = 1 AND l.expires_at > @now
           AND l.start_time IS NOT NULL
     )
+    -- bung mỗi occupied thành từng slot_index liên tiếp (start_index .. start_index + needed - 1)
     INSERT INTO @booked (staff_id, slot_index)
     SELECT DISTINCT o.staff_id, o.start_index + n.slot_index
     FROM occupied o
     INNER JOIN @slots n ON n.slot_index < o.needed
     WHERE o.start_index + n.slot_index < @slot_count;
 
+    -- điểm bắt đầu hợp lệ: đủ @slots_needed slot liên tiếp trong ca và không trùng @booked
     DECLARE @can_start TABLE (
         staff_id  INT NOT NULL,
         start_idx INT NOT NULL,
@@ -260,6 +307,7 @@ BEGIN
               AND b.slot_index < sh.slot_index + @slots_needed
           );
 
+    -- staff chỉ định nhưng không đủ điều kiện hoặc không có ca -> trả hết slot status outside
     IF @staff_id IS NOT NULL
        AND (
             NOT EXISTS (SELECT 1 FROM @staff WHERE staff_id = @staff_id)
@@ -273,6 +321,7 @@ BEGIN
         RETURN;
     END;
 
+    -- chế độ 1 staff: đánh status từng slot theo ca / booked / can_start
     IF @staff_id IS NOT NULL
     BEGIN
         SELECT
@@ -292,6 +341,7 @@ BEGIN
     END
     ELSE
     BEGIN
+        -- chế độ không chọn staff: gom theo slot, ưu tiên available > short > booked > outside
         ;WITH slot_stats AS (
             SELECT
                 sl.slot_index,

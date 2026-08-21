@@ -1,175 +1,87 @@
-import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import { StatusActive } from "@/shared/constants/status.enum";
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
+import { Calendar, User } from "lucide-react";
 
-import { CustomerFormDialog } from "../components/CustomerFormDialog";
-import { CustomerStatCards } from "../components/CustomerStatCards";
-import { useCustomerListState } from "../hooks/useCustomerListState";
-import {
-  useCustomers,
-  useDeleteCustomer,
-  useRestoreCustomer,
-} from "../hooks/useCustomers";
+import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
+
 import type { CustomerDto } from "../types/customer.types";
 
-import { CustomerCrmAppointments } from "../components/CustomerCrmAppointments";
-import { CustomerCrmDetail } from "../components/CustomerCrmDetail";
-import { CustomerCrmList } from "../components/CustomerCrmList";
+import { CustomerAppointments } from "../components/CustomerAppointments";
+import { CustomerDetail } from "../components/CustomerDetail";
+import { CustomerList } from "../components/CustomerList";
 
-const ENTITY = "khách hàng";
-const ENTITY_SUBJECT = "Khách hàng";
+import { useDeleteCustomer } from "../hooks/useCustomers";
+import { CustomerForm } from "../components/CutomerForm";
 
 export function CustomerListPage() {
-  const listState = useCustomerListState();
-  const {
-    queryParams,
-    showDeleted,
-    createOpen,
-    setCreateOpen,
-    editTarget,
-    setEditTarget,
-    deleteTarget,
-    setDeleteTarget,
-    restoreTarget,
-    setRestoreTarget,
-    handleToggleView,
-    pageIndex,
-    setPageIndex,
-    filter,
-    selectedGender,
-    setSelectedGender,
-    selectedSource,
-    setSelectedSource,
-    handleSearchChange,
-  } = listState;
+  const [createOpen, setCreateOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<CustomerDto | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<CustomerDto | null>(null);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(
+    null,
+  );
 
-  const { data: customersResult, isLoading } = useCustomers(queryParams);
   const deleteMutation = useDeleteCustomer();
-  const restoreMutation = useRestoreCustomer();
 
-  const paged = customersResult?.data;
-  const customers = useMemo(() => paged?.items ?? [], [paged?.items]);
-  const totalCount = paged?.totalCount ?? 0;
-  const totalPages = paged?.totalPages ?? 1;
-  const pageSize = paged?.pageSize ?? 10;
-
-  const [selectedCustomerIdState, setSelectedCustomerId] = useState<
-    number | null
-  >(null);
-
-  const selectedCustomerId = useMemo(() => {
-    if (
-      selectedCustomerIdState !== null &&
-      customers.some((c: CustomerDto) => c.id === selectedCustomerIdState)
-    ) {
-      return selectedCustomerIdState;
-    }
-    return customers[0]?.id ?? null;
-  }, [customers, selectedCustomerIdState]);
-
-  const activeCustomerCount = useMemo(
-    () =>
-      customers.filter((c: CustomerDto) => c.status === StatusActive.Active)
-        .length,
-    [customers],
-  );
-
-  const totalPoints = useMemo(
-    () =>
-      customers.reduce(
-        (sum: number, c: CustomerDto) => sum + (c.loyaltyPoint ?? 0),
-        0,
-      ),
-    [customers],
-  );
-
-  const walkInCustomerCount = useMemo(
-    () =>
-      customers.filter(
-        (c: CustomerDto) =>
-          c.source === "Walk-in" || c.source === "Đến trực tiếp",
-      ).length,
-    [customers],
-  );
-
-  const handleDelete = useCallback(() => {
+  // Xử lý khi nhấn vào nút xóa khách hàng
+  function handleDelete() {
     if (!deleteTarget?.id) return;
     deleteMutation.mutate(deleteTarget.id, {
       onSuccess: (result) => {
-        if (result.isSuccess) {
-          setDeleteTarget(null);    
-          if (selectedCustomerId === deleteTarget.id) {
-            setSelectedCustomerId(null);
-          }
-        }
+        if (result.isSuccess === true) setDeleteTarget(null);
       },
     });
-  }, [deleteTarget, deleteMutation, selectedCustomerId, setDeleteTarget]);
-
-  const handleRestore = useCallback(() => {
-    if (!restoreTarget?.id) return;
-    restoreMutation.mutate(restoreTarget.id, {
-      onSuccess: (result) => {
-        if (result.isSuccess) setRestoreTarget(null);
-      },
-    });
-  }, [restoreTarget, restoreMutation, setRestoreTarget]);
+  }
 
   return (
-    <div className="flex h-full flex-col gap-2 overflow-hidden font-sans text-sm text-kit-body">
-      <div className="shrink-0">
-        <CustomerStatCards
-          totalCustomers={totalCount}
-          activeCustomers={activeCustomerCount}
-          totalPoints={totalPoints}
-          walkInCustomers={walkInCustomerCount}
-          isLoading={isLoading}
-        />
-      </div>
-
-      <div className="grid min-h-0 flex-1 grid-cols-12 gap-2 overflow-hidden">
-        <div className="col-span-3 h-full overflow-hidden">
-          <CustomerCrmList
-            customers={customers}
+    <div className="flex h-dvh min-h-dvh max-h-dvh flex-col gap-2 overflow-hidden font-sans text-sm text-kit-body">
+      <div className="grid h-full min-h-0 flex-1 grid-cols-12 gap-2 overflow-hidden">
+        {/* Customer List */}
+        <div className="col-span-3 h-full min-h-0 max-h-full overflow-y-auto">
+          <CustomerList
+            onCreate={() => setCreateOpen(true)}
             selectedId={selectedCustomerId}
-            onSelect={setSelectedCustomerId}
-            isLoading={isLoading}
-            totalCustomers={totalCount}
-            pageIndex={pageIndex}
-            pageSize={pageSize}
-            totalPages={totalPages}
-            onPageChange={setPageIndex}
-            filter={filter}
-            onFilterChange={handleSearchChange}
-            selectedGender={selectedGender}
-            onSelectGender={setSelectedGender}
-            selectedSource={selectedSource}
-            onSelectSource={setSelectedSource}
-            onAdd={() => setCreateOpen(true)}
-            showDeleted={showDeleted}
-            onToggleDeleted={() => handleToggleView(() => {})}
+            onSelect={(id) => setSelectedCustomerId(id)}
           />
         </div>
 
-        <div className="col-span-6 h-full overflow-hidden">
-          <CustomerCrmDetail
-            customerId={selectedCustomerId}
-            onEdit={setEditTarget}
-            onDelete={setDeleteTarget}
-          />
+        {/* Customer Detail */}
+        <div className="col-span-6 h-full min-h-0 max-h-full overflow-y-auto">
+          {selectedCustomerId ? (
+            <CustomerDetail
+              customerId={selectedCustomerId}
+              onEdit={setEditTarget}
+              onDelete={setDeleteTarget}
+            />
+          ) : (
+            <div className="flex h-full min-h-full flex-col items-center justify-center rounded border border-kit bg-kit-white p-6 text-center text-kit-muted shadow-kit-card">
+              <User className="mb-2 h-12 w-12 stroke-[1.5] text-kit-muted/60" />
+
+              <p className="text-sm font-medium">
+                Chọn một khách hàng để xem chi tiết
+              </p>
+            </div>
+          )}
         </div>
 
-        <div className="col-span-3 h-full overflow-hidden">
-          <CustomerCrmAppointments
-            key={selectedCustomerId}
-            customerId={selectedCustomerId}
-          />
+        {/* Customer Appointments */}
+        <div className="col-span-3 h-full min-h-0 max-h-full overflow-y-auto">
+          {selectedCustomerId ? (
+            <CustomerAppointments customerId={selectedCustomerId} />
+          ) : (
+            <div className="flex h-full min-h-full flex-col items-center justify-center rounded border border-kit bg-kit-white p-6 text-center text-kit-muted shadow-kit-card">
+              <Calendar className="mb-2 h-12 w-12 stroke-[1.5] text-kit-muted/60" />
+
+              <p className="text-sm font-medium">
+                Chọn một khách hàng để xem lịch hẹn
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
-      <CustomerFormDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <CustomerForm open={createOpen} onOpenChange={setCreateOpen} />
 
-      <CustomerFormDialog
+      <CustomerForm
         open={!!editTarget}
         onOpenChange={(open) => {
           if (!open) setEditTarget(null);
@@ -183,24 +95,11 @@ export function CustomerListPage() {
           if (!open) setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
-        title={`Xóa ${ENTITY}`}
-        description={`Bạn có chắc muốn xóa ${ENTITY} "${deleteTarget?.fullName ?? ""}"? Hành động này không thể hoàn tác.`}
+        title={`Xóa khách hàng`}
+        description={`Bạn có chắc muốn xóa khách hàng "${deleteTarget?.fullName ?? ""}"? Hành động này không thể hoàn tác.`}
         confirmLabel="Xóa"
         loading={deleteMutation.isPending}
         variant="danger"
-      />
-
-      <ConfirmDialog
-        open={!!restoreTarget}
-        onOpenChange={(open) => {
-          if (!open) setRestoreTarget(null);
-        }}
-        onConfirm={handleRestore}
-        title={`Khôi phục ${ENTITY_SUBJECT}`}
-        description={`Bạn có chắc muốn khôi phục ${ENTITY_SUBJECT} "${restoreTarget?.fullName ?? ""}"? ${ENTITY_SUBJECT} sẽ hiển thị lại trong danh sách chính.`}
-        confirmLabel="Khôi phục"
-        loading={restoreMutation.isPending}
-        variant="default"
       />
     </div>
   );

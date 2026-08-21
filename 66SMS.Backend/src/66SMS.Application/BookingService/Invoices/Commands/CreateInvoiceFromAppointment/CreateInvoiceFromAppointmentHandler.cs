@@ -60,6 +60,8 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
                 return Result<int>.Conflict("Hóa đơn đã được tạo cho lịch hẹn này.", ErrorCodes.ERR_INVOICE_ALREADY_PAID);
             }
 
+            var createdInvoiceId = 0;
+
             using IDbTransaction transaction = await sqlUnitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
@@ -151,13 +153,15 @@ namespace _66SMS.Application.BookingService.Invoices.Commands.CreateInvoiceFromA
                 await sqlUnitOfWork.SaveChangeAsync(cancellationToken);
                 transaction.Commit();
 
-                return Result<int>.Created(invoice.Id);
+                createdInvoiceId = invoice.Id;
             }
             catch
             {
                 transaction.Rollback();
                 throw;
             }
+
+            return Result<int>.Created(createdInvoiceId);
         }
     }
 }

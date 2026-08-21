@@ -6,7 +6,7 @@ import {
   getFileNameFromHeader,
   handleExportError,
 } from "@/shared/utils/file.utils";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 
 export function useExportReportByPeriod() {
   return useMutation({

@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { profileApi } from "../api/profile.api";
-import { toast } from "@/shared/components/kitToast";
+import { toast } from "@/shared/utils/kitToast";
 import type { AxiosError } from "axios";
 import type { Result } from "@/shared/types/common.types";
 

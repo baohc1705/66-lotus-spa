@@ -1,153 +1,170 @@
 import { serviceCategoryApi } from "@/features/service_categories/api/serviceCategory.api";
-import type { PageRequest, Result } from "@/shared/types/common.types";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/shared/components/kitToast";
-import type { AxiosError } from "axios";
-import { StatusActive } from "@/shared/constants/status.enum";
-import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
-import { getErrorMessage } from "@/shared/utils/errorUtils";
 import type {
-  CreateServiceCategoryPayload,
-  UpdateServiceCategoryPayload,
-} from "../types/serviceCategory.types";
+  CreateServiceCategoryRequest,
+  GetAllServiceCategoryQuery,
+  UpdateServiceCategoryRequest,
+} from "@/features/service_categories/types/serviceCategory.types";
+import { StatusActive } from "@/shared/constants/status.enum";
+import type { Result } from "@/shared/types/common.types";
+import { getErrorMessage } from "@/shared/utils/errorUtils";
+import { showError, showSuccess } from "@/shared/utils/kitToast";
+import { createEntityQueryKeys } from "@/shared/utils/queryKeys";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
 
-const ENTITY = "nhóm dịch vụ";
+// Tạo query keys cho nhóm dịch vụ để dùng trong query cache
+export const SERVICE_CATEGORY_QUERY_KEY =
+  createEntityQueryKeys<GetAllServiceCategoryQuery>("service-categories");
 
-export const SERVICE_CATEGORY_KEYS =
-  createEntityQueryKeys<PageRequest>("service-categories");
-
-export function useServiceCategories(params: PageRequest, enabled = true) {
+// Lấy danh sách nhóm dịch vụ
+export function useServiceCategories(
+  params: GetAllServiceCategoryQuery,
+  enabled = true,
+) {
   return useQuery({
-    queryKey: SERVICE_CATEGORY_KEYS.list(params),
+    queryKey: SERVICE_CATEGORY_QUERY_KEY.list(params),
     queryFn: () => serviceCategoryApi.getAll(params),
     enabled,
   });
 }
 
-export function useAdminServiceCategories(params: PageRequest, enabled = true) {
+// Lấy danh sách nhóm dịch vụ admin
+export function useServiceCategoriesAdmin(
+  params: GetAllServiceCategoryQuery,
+  enabled = true,
+) {
   return useQuery({
-    queryKey: SERVICE_CATEGORY_KEYS.adminList(params),
+    queryKey: SERVICE_CATEGORY_QUERY_KEY.adminList(params),
     queryFn: () => serviceCategoryApi.adminGetAll(params),
     enabled,
   });
 }
 
-export function useDeletedServiceCategories(
-  params: PageRequest,
-  enabled = true,
-) {
+// Lấy chi tiết nhóm dịch vụ
+export function useServiceCategoryDetail(id: number) {
   return useQuery({
-    queryKey: SERVICE_CATEGORY_KEYS.deletedList(params),
-    queryFn: () => serviceCategoryApi.getAllDeleted(params),
-    enabled,
+    queryKey: SERVICE_CATEGORY_QUERY_KEY.detail(id),
+    queryFn: () => serviceCategoryApi.getDetail(id),
   });
 }
 
-export function useServiceCategoryDetail(id: number | null) {
-  return useQuery({
-    queryKey: SERVICE_CATEGORY_KEYS.detail(id!),
-    queryFn: () => serviceCategoryApi.getDetail(id!),
-    enabled: id !== null && id > 0,
-  });
-}
-
+// Tạo nhóm dịch vụ
 export function useCreateServiceCategory() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreateServiceCategoryPayload) =>
-      serviceCategoryApi.create(payload),
+    mutationFn: (data: CreateServiceCategoryRequest) =>
+      serviceCategoryApi.create(data),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: SERVICE_CATEGORY_KEYS.all });
-        toast.success(`Tạo ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({
+        queryKey: SERVICE_CATEGORY_QUERY_KEY.all,
+      });
+      showSuccess("Tạo nhóm dịch vụ thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi tạo ${ENTITY}`));
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi tạo nhóm dịch vụ"));
     },
   });
 }
 
+// Sửa nhóm dịch vụ
 export function useUpdateServiceCategory() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
       id,
-      payload,
+      data,
     }: {
       id: number;
-      payload: UpdateServiceCategoryPayload;
-    }) => serviceCategoryApi.update(id, payload),
+      data: UpdateServiceCategoryRequest;
+    }) => serviceCategoryApi.update(id, data),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: SERVICE_CATEGORY_KEYS.all });
-        toast.success(`Cập nhật ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({
+        queryKey: SERVICE_CATEGORY_QUERY_KEY.all,
+      });
+      showSuccess("Sửa nhóm dịch vụ thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(
-        getErrorMessage(error, `Có lỗi xảy ra khi cập nhật ${ENTITY}`),
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi sửa nhóm dịch vụ"));
+    },
+  });
+}
+
+// Xóa nhóm dịch vụ
+export function useDeleteServiceCategory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => serviceCategoryApi.delete(id),
+    onSuccess: (result) => {
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
+      }
+
+      queryClient.invalidateQueries({
+        queryKey: SERVICE_CATEGORY_QUERY_KEY.all,
+      });
+      showSuccess("Xóa nhóm dịch vụ thành công");
+    },
+    onError: (error: AxiosError<Result<unknown>>) => {
+      showError(getErrorMessage(error, "Có lỗi xảy ra khi xóa nhóm dịch vụ"));
+    },
+  });
+}
+
+// Xóa nhiều nhóm dịch vụ
+export function useDeleteBulkServiceCategories() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (ids: number[]) => serviceCategoryApi.deleteBulk(ids),
+    onSuccess: (result) => {
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
+      }
+
+      queryClient.invalidateQueries({
+        queryKey: SERVICE_CATEGORY_QUERY_KEY.all,
+      });
+      showSuccess("Xóa nhiều nhóm dịch vụ thành công");
+    },
+    onError: (error: AxiosError<Result<unknown>>) => {
+      showError(
+        getErrorMessage(error, "Có lỗi xảy ra khi xóa nhiều nhóm dịch vụ"),
       );
     },
   });
 }
 
-export function useDeleteServiceCategory() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (id: number) => serviceCategoryApi.delete(id),
-    onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: SERVICE_CATEGORY_KEYS.all });
-        toast.success(`Xóa ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
-      }
-    },
-    onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi xóa ${ENTITY}`));
-    },
-  });
-}
-
-export function useDeleteServiceCategoryMultiples() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (ids: number[]) => serviceCategoryApi.deleteMultiples({ ids }),
-    onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: SERVICE_CATEGORY_KEYS.all });
-        toast.success(`Xóa ${ENTITY} đã chọn thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
-      }
-    },
-    onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(getErrorMessage(error, `Có lỗi xảy ra khi xóa ${ENTITY}`));
-    },
-  });
-}
-
+// Khôi phục nhóm dịch vụ
 export function useRestoreServiceCategory() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) =>
       serviceCategoryApi.update(id, { status: StatusActive.Active }),
     onSuccess: (result) => {
-      if (result.isSuccess) {
-        qc.invalidateQueries({ queryKey: SERVICE_CATEGORY_KEYS.all });
-        toast.success(`Khôi phục ${ENTITY} thành công`);
-      } else {
-        toast.error(result.message || "Có lỗi xảy ra");
+      if (result.isSuccess !== true) {
+        showError(result.message || "Có lỗi xảy ra");
+        return;
       }
+
+      queryClient.invalidateQueries({
+        queryKey: SERVICE_CATEGORY_QUERY_KEY.all,
+      });
+      showSuccess("Khôi phục nhóm dịch vụ thành công");
     },
     onError: (error: AxiosError<Result<unknown>>) => {
-      toast.error(
-        getErrorMessage(error, `Có lỗi xảy ra khi khôi phục ${ENTITY}`),
+      showError(
+        getErrorMessage(error, "Có lỗi xảy ra khi khôi phục nhóm dịch vụ"),
       );
     },
   });

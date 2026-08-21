@@ -37,7 +37,7 @@ export function ProfilePage() {
     useCustomerDetail(customerId);
 
   if (!isLoading && profile && !isCustomer) {
-    return <Navigate to="/admin/profile" replace />;
+    return <Navigate to="/admin/ho-so" replace />;
   }
 
   const activeTab = (() => {

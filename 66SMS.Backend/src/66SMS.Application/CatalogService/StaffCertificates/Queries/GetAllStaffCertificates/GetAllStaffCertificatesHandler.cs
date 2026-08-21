@@ -48,7 +48,7 @@ namespace _66SMS.Application.CatalogService.StaffCertificates.Queries.GetAllStaf
 
             if (!string.IsNullOrEmpty(request.Filter))
             {
-                query = query.Where(x => x.CertificateName.Contains(request.Filter) || x.IssuingOrganization.Contains(request.Filter));
+                query = query.Where(x => x.CertificateName.Contains(request.Filter) || x.IssuingOrganization.Contains(request.Filter) || x.Staff!.FullName.Contains(request.Filter));
             }
 
             if (request.ExpiringInDays.HasValue)

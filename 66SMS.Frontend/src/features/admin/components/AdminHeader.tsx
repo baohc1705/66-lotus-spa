@@ -16,30 +16,34 @@ type AdminHeaderProps = {
 };
 
 function getPageTitle(pathname: string): string {
-  let currentTitle = "Tổng quan";
-
-  const allLinks = MENU_ITEMS.flatMap((item) =>
-    item.children
-      ? item.children.map((c) => ({ path: c.path, label: c.label }))
-      : [{ path: item.path!, label: item.label }],
-  );
+  const allLinks: { path: string; label: string }[] = [];
+  for (let index = 0; index < MENU_ITEMS.length; index++) {
+    const item = MENU_ITEMS[index];
+    if (item.children) {
+      for (let childIndex = 0; childIndex < item.children.length; childIndex++) {
+        const child = item.children[childIndex];
+        allLinks.push({ path: child.path, label: child.label });
+      }
+    } else if (item.path) {
+      allLinks.push({ path: item.path, label: item.label });
+    }
+  }
 
   allLinks.sort((a, b) => b.path.length - a.path.length);
 
-  for (const link of allLinks) {
-    if (pathname.startsWith(link.path)) {
-      currentTitle = link.label;
-      if (currentTitle === "Danh sách nhân viên")
-        currentTitle = "Quản lý nhân viên";
-      if (currentTitle === "Nhân viên") currentTitle = "Quản lý nhân viên";
-      if (currentTitle === "Khách hàng") currentTitle = "Quản lý khách hàng";
-      if (currentTitle === "Sản phẩm") currentTitle = "Quản lý sản phẩm";
-      if (currentTitle === "Danh mục sản phẩm")
-        currentTitle = "Quản lý danh mục sản phẩm";
-      if (currentTitle === "Phân ca") currentTitle = "Phân ca làm việc";
-      if (currentTitle === "Quản lý ca") currentTitle = "Quản lý ca làm việc";
-      break;
-    }
+  let currentTitle = "Tổng quan";
+  for (let index = 0; index < allLinks.length; index++) {
+    const link = allLinks[index];
+    if (!pathname.startsWith(link.path)) continue;
+    currentTitle = link.label;
+    if (currentTitle === "Danh sách nhân viên") currentTitle = "Quản lý nhân viên";
+    if (currentTitle === "Nhân viên") currentTitle = "Quản lý nhân viên";
+    if (currentTitle === "Khách hàng") currentTitle = "Quản lý khách hàng";
+    if (currentTitle === "Sản phẩm") currentTitle = "Quản lý sản phẩm";
+    if (currentTitle === "Danh mục sản phẩm") currentTitle = "Quản lý danh mục sản phẩm";
+    if (currentTitle === "Phân ca") currentTitle = "Phân ca làm việc";
+    if (currentTitle === "Quản lý ca") currentTitle = "Quản lý ca làm việc";
+    break;
   }
 
   return currentTitle;
@@ -61,9 +65,9 @@ export function AdminHeader(props: AdminHeaderProps) {
   const logoutMutation = useLogout();
   const pageTitle = getPageTitle(location.pathname);
 
-  const handleLogout = () => {
+  function handleLogout() {
     logoutMutation.mutate();
-  };
+  }
 
   return (
     <header className="app-header z-30 flex h-15 shrink-0 items-center bg-white shadow-sm">
@@ -170,7 +174,7 @@ export function AdminHeader(props: AdminHeaderProps) {
                     </p>
                   </div>
                   <Link
-                    to="/admin/profile"
+                    to="/admin/ho-so"
                     onClick={() => setIsProfileOpen(false)}
                     className="flex items-center gap-2 rounded-md px-3 py-1.5 text-xs text-kit-body no-underline hover:bg-blue-50 hover:text-kit-primary"
                   >
@@ -178,7 +182,7 @@ export function AdminHeader(props: AdminHeaderProps) {
                     <span>Hồ sơ cá nhân</span>
                   </Link>
                   <Link
-                    to="/admin/profile"
+                    to="/admin/ho-so"
                     onClick={() => setIsProfileOpen(false)}
                     className="flex items-center gap-2 rounded-md px-3 py-1.5 text-xs text-kit-body no-underline hover:bg-blue-50 hover:text-kit-primary"
                   >

@@ -1,71 +1,63 @@
-import axiosInstance from "@/shared/api/axiosInstance";
-import type { Result, PagedResult } from "@/shared/types/common.types";
 import type {
-  CertificateTypeDTO,
-  StaffCertificateDTO,
-  CreateCertificateTypePayload,
-  UpdateCertificateTypePayload,
-  CreateStaffCertificatePayload,
-  UpdateStaffCertificatePayload,
-  CertificateTypeQueryParams,
-  StaffCertificateQueryParams,
-} from "../types/certificate.types";
+  StaffCertificateDto,
+  GetAllStaffCertificateQuery,
+  CreateStaffCertificateRequest,
+  UpdateStaffCertificateRequest,
+} from "@/features/certificates/types/certificate.types";
+import axiosInstance from "@/shared/api/axiosInstance";
+import type { PagedResult, Result } from "@/shared/types/common.types";
 
 export const certificateApi = {
-  getAllTypes: (params: CertificateTypeQueryParams) =>
-    axiosInstance
-      .get<Result<PagedResult<CertificateTypeDTO>>>("/certificate-type", { params })
-      .then((r) => r.data),
+  // Query API
+  getAll: async (
+    params: GetAllStaffCertificateQuery,
+  ): Promise<Result<PagedResult<StaffCertificateDto>>> => {
+    const response = await axiosInstance.get("/staff-certificate", { params });
+    return response.data;
+  },
 
-  getDetailType: (id: number) =>
-    axiosInstance
-      .get<Result<CertificateTypeDTO>>(`/certificate-type/${id}`)
-      .then((r) => r.data),
+  getDetail: async (id: number): Promise<Result<StaffCertificateDto>> => {
+    const response = await axiosInstance.get(`/staff-certificate/${id}`);
+    return response.data;
+  },
 
-  createType: (payload: CreateCertificateTypePayload) =>
-    axiosInstance
-      .post<Result<number>>("/certificate-type", payload)
-      .then((r) => r.data),
+  // Command API
 
-  updateType: (id: number, payload: UpdateCertificateTypePayload) =>
-    axiosInstance
-      .patch<Result<object>>(`/certificate-type/${id}`, payload)
-      .then((r) => r.data),
+  create: async (
+    request: CreateStaffCertificateRequest,
+  ): Promise<Result<number>> => {
+    const response = await axiosInstance.post<Result<number>>(
+      "/staff-certificate",
+      request,
+    );
+    return response.data;
+  },
 
-  deleteType: (id: number) =>
-    axiosInstance
-      .delete<Result<object>>(`/certificate-type/${id}`)
-      .then((r) => r.data),
+  createMine: async (
+    request: Omit<CreateStaffCertificateRequest, "staffId" | "status">,
+  ): Promise<Result<number>> => {
+    const response = await axiosInstance.post<Result<number>>(
+      "/staff-certificate/mine",
+      request,
+    );
+    return response.data;
+  },
 
-  getAll: (params: StaffCertificateQueryParams) =>
-    axiosInstance
-      .get<Result<PagedResult<StaffCertificateDTO>>>("/staff-certificate", { params })
-      .then((r) => r.data),
+  update: async (
+    id: number,
+    request: UpdateStaffCertificateRequest,
+  ): Promise<Result<object>> => {
+    const response = await axiosInstance.patch<Result<object>>(
+      `/staff-certificate/${id}`,
+      request,
+    );
+    return response.data;
+  },
 
-  getDetail: (id: number) =>
-    axiosInstance
-      .get<Result<StaffCertificateDTO>>(`/staff-certificate/${id}`)
-      .then((r) => r.data),
-
-  create: (payload: CreateStaffCertificatePayload) =>
-    axiosInstance
-      .post<Result<number>>("/staff-certificate", payload)
-      .then((r) => r.data),
-
-  createMine: (
-    payload: Omit<CreateStaffCertificatePayload, "staffId" | "status">,
-  ) =>
-    axiosInstance
-      .post<Result<number>>("/staff-certificate/mine", payload)
-      .then((r) => r.data),
-
-  update: (id: number, payload: UpdateStaffCertificatePayload) =>
-    axiosInstance
-      .patch<Result<object>>(`/staff-certificate/${id}`, payload)
-      .then((r) => r.data),
-
-  delete: (id: number) =>
-    axiosInstance
-      .delete<Result<object>>(`/staff-certificate/${id}`)
-      .then((r) => r.data),
+  delete: async (id: number): Promise<Result<object>> => {
+    const response = await axiosInstance.delete<Result<object>>(
+      `/staff-certificate/${id}`,
+    );
+    return response.data;
+  },
 };

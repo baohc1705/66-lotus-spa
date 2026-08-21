@@ -32,14 +32,15 @@ namespace _66SMS.API.Controllers
             return HandleResult(result);
         }
 
-        [HttpGet("deleted")]
-        [PermissionAuthorize("services", "read")]
-        public async Task<IActionResult> AdminGetAllDeleted([FromQuery] GetAllServicesQuery query)
-        {
-            query.IsDeleted = true;
-            var result = await mediator.Send(query);
-            return HandleResult(result);
-        }
+        // Không dùng
+        //[HttpGet("deleted")]
+        //[PermissionAuthorize("services", "read")]
+        //public async Task<IActionResult> AdminGetAllDeleted([FromQuery] GetAllServicesQuery query)
+        //{
+        //    query.IsDeleted = true;
+        //    var result = await mediator.Send(query);
+        //    return HandleResult(result);
+        //}
 
         [HttpGet]
         [AllowAnonymous]

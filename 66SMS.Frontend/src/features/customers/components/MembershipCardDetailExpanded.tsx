@@ -1,4 +1,6 @@
-import { CreditCard, Pencil } from "lucide-react";
+import { CUSTOMER_PERM } from "@/features/customers/constants/customer.permissions";
+import { useMembershipCardDetail } from "@/features/customers/hooks/useMembershipCards";
+import type { MembershipCardDto } from "@/features/customers/types/membershipCard.types";
 import { PermissionGate } from "@/shared/components/security/PermissionGate";
 import { Badge } from "@/shared/elements/Badge";
 import { Button } from "@/shared/elements/Button";
@@ -9,24 +11,22 @@ import {
   TableDetailGrid,
   TableDetailHeader,
 } from "@/shared/tables/TableDetailExpanded";
-import { formatDisplayDate } from "@/shared/utils/date.utils";
-import { CUSTOMER_PERM } from "../constants/customer.permissions";
-import { useMembershipCardDetail } from "../hooks/useMembershipCards";
-import type { MembershipCardDto } from "../types/membershipCard.types";
+import { formatDateTimeDisplay } from "@/shared/utils/date.utils";
+import { CreditCard, Pencil } from "lucide-react";
 
-interface MembershipCardDetailExpandedProps {
+interface Props {
   cardId: number;
   onEdit?: (card: MembershipCardDto) => void;
 }
 
-function cardStatusLabel(status: number) {
+function cardStatusLabel(status?: number) {
   if (status === 1) return "Hoạt động";
   if (status === 2) return "Hết hạn";
   if (status === 3) return "Đã thu hồi";
   return "Không rõ";
 }
 
-function cardStatusBadge(status: number) {
+function cardStatusBadge(status?: number) {
   if (status === 1) {
     return (
       <Badge variant="success" soft>
@@ -55,73 +55,94 @@ function cardStatusBadge(status: number) {
   );
 }
 
-export function MembershipCardDetailExpanded({
-  cardId,
-  onEdit,
-}: MembershipCardDetailExpandedProps) {
+export function MembershipCardDetailExpanded({ cardId, onEdit }: Props) {
   const { data: result, isLoading } = useMembershipCardDetail(cardId);
   const card = result?.data;
   const perm = CUSTOMER_PERM;
 
   if (isLoading) {
     return (
-      <TableDetailExpanded>
-        <p className="text-sm text-kit-muted">
-          Đang tải chi tiết thẻ thành viên...
-        </p>
+      <TableDetailExpanded className="bg-kit-white">
+        <div className="flex items-center gap-3 pb-2">
+          <div className="h-11 w-11 animate-pulse rounded-lg bg-kit-page" />
+          <div className="space-y-2">
+            <div className="h-4 w-48 animate-pulse rounded bg-kit-page" />
+            <div className="h-3 w-32 animate-pulse rounded bg-kit-page" />
+          </div>
+        </div>
+        <div className="mt-2 grid grid-cols-2 gap-4">
+          <div className="h-24 animate-pulse rounded bg-kit-page" />
+          <div className="h-24 animate-pulse rounded bg-kit-page" />
+        </div>
       </TableDetailExpanded>
     );
   }
 
   if (!card) {
     return (
-      <TableDetailExpanded>
-        <p className="text-sm text-kit-muted">
+      <TableDetailExpanded className="bg-kit-white">
+        <p className="py-4 text-center text-sm text-kit-muted">
           Không tìm thấy thông tin thẻ thành viên
         </p>
       </TableDetailExpanded>
     );
   }
 
+  let expiresAtValue = "Vĩnh viễn";
+  if (card.expiresAt) {
+    expiresAtValue = formatDateTimeDisplay(card.expiresAt);
+  }
+
   return (
-    <TableDetailExpanded>
+    <TableDetailExpanded className="bg-kit-white" maxHeightClass="max-h-100">
       <TableDetailHeader
         icon={<CreditCard className="h-5 w-5 text-kit-primary" />}
-        title={`Mã thẻ: ${card.cardCode}`}
-        subtitle={cardStatusBadge(card.status)}
+        title={
+          <span className="flex flex-wrap items-center gap-2">
+            <span>{card.cardCode ?? "-"}</span>
+            {cardStatusBadge(card.status)}
+          </span>
+        }
+        subtitle={`Khách hàng: ${card.customerName || "-"}`}
       />
 
-      <TableDetailGrid cols={4}>
+      <TableDetailGrid cols={3}>
+        <TableDetailField label="Khách hàng" value={card.customerName} />
+        <TableDetailField label="Loại thẻ" value={card.tierName} />
         <TableDetailField
-          label="Khách hàng"
-          value={card.customerName ?? "—"}
+          label="Trạng thái"
+          value={cardStatusLabel(card.status)}
         />
-        <TableDetailField label="Loại thẻ" value={card.tierName ?? "—"} />
         <TableDetailField
           label="Ngày cấp"
-          value={card.issuedAt ? formatDisplayDate(card.issuedAt) : "—"}
+          value={formatDateTimeDisplay(card.issuedAt)}
+        />
+        <TableDetailField label="Ngày hết hạn" value={expiresAtValue} />
+        <TableDetailField
+          label="Ngày tạo"
+          value={formatDateTimeDisplay(card.createdAt)}
         />
         <TableDetailField
-          label="Ngày hết hạn"
-          value={
-            card.expiresAt ? formatDisplayDate(card.expiresAt) : "Vĩnh viễn"
-          }
+          label="Ngày cập nhật"
+          value={formatDateTimeDisplay(card.updatedAt)}
         />
       </TableDetailGrid>
 
-      <TableDetailActions>
-        <PermissionGate resource={perm.resource} action={perm.update}>
-          <Button
-            variant="admin"
-            size="sm"
-            className="mb-0"
-            onClick={() => onEdit?.(card)}
-          >
-            <Pencil className="h-3.5 w-3.5" />
-            Chỉnh sửa
-          </Button>
-        </PermissionGate>
-      </TableDetailActions>
+      {onEdit ? (
+        <TableDetailActions>
+          <PermissionGate resource={perm.resource} action={perm.update}>
+            <Button
+              variant="admin"
+              size="sm"
+              className="mb-0"
+              onClick={() => onEdit(card)}
+            >
+              <Pencil className="h-3.5 w-3.5" />
+              Cập nhật
+            </Button>
+          </PermissionGate>
+        </TableDetailActions>
+      ) : null}
     </TableDetailExpanded>
   );
 }

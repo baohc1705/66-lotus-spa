@@ -78,7 +78,8 @@ export function Select({
   );
   const [open, setOpen] = useState(false);
   const [menuBox, setMenuBox] = useState<{
-    top: number;
+    top?: number;
+    bottom?: number;
     left: number;
     width: number;
   } | null>(null);
@@ -112,8 +113,20 @@ export function Select({
       const el = rootRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
+      const gap = 4;
+      const menuMaxHeight = 224;
+      const spaceBelow = window.innerHeight - rect.bottom - gap;
+      const openUp = spaceBelow < menuMaxHeight && rect.top > spaceBelow;
+      if (openUp) {
+        setMenuBox({
+          bottom: window.innerHeight - rect.top + gap,
+          left: rect.left,
+          width: rect.width,
+        });
+        return;
+      }
       setMenuBox({
-        top: rect.bottom + 4,
+        top: rect.bottom + gap,
         left: rect.left,
         width: rect.width,
       });
@@ -209,6 +222,7 @@ export function Select({
               role="listbox"
               style={{
                 top: menuBox.top,
+                bottom: menuBox.bottom,
                 left: menuBox.left,
                 width: menuBox.width,
               }}

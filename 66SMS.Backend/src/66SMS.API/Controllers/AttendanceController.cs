@@ -29,7 +29,7 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("attendances", "create")]
         public async Task<IActionResult> CheckIn([FromBody] CheckInCommand command)
         {
-            command.CreatedBy = jwtService.GetUserId();
+
 
             var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue)
@@ -43,7 +43,6 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("attendances", "update")]
         public async Task<IActionResult> CheckOut([FromBody] CheckOutCommand command)
         {
-            command.UpdatedBy = jwtService.GetUserId();
             var result = await mediator.Send(command);
             return HandleResult(result);
         }
@@ -52,7 +51,6 @@ namespace _66SMS.API.Controllers
         [PermissionAuthorize("attendances", "create")]
         public async Task<IActionResult> CreateManual([FromBody] CreateManualAttendanceCommand command)
         {
-            command.CreatedBy = jwtService.GetUserId();
 
             var tokenSalonId = jwtService.GetSalonId();
             if (tokenSalonId.HasValue)

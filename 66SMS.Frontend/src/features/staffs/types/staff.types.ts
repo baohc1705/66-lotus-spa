@@ -1,3 +1,5 @@
+import type { PageRequest } from "@/shared/types/common.types";
+
 export interface StaffDto {
   id?: number | null;
   userId?: number | null;
@@ -14,6 +16,7 @@ export interface StaffDto {
   status?: number | null;
   email?: string | null;
   createdAt?: string | null;
+  updatedAt?: string | null;
 }
 
 export interface StaffFullDto {
@@ -44,37 +47,50 @@ export interface StaffFullDto {
   updatedAt?: string | null;
 }
 
-export interface StaffServiceDto {
-  id?: number | null;
-  staffId?: number | null;
-  serviceId?: number | null;
+export interface GetAllStaffQuery extends PageRequest {
+  salonId?: number | null;
+  isDeleted?: boolean;
+  role?: string | null;
+}
+
+export interface CreateStaffRequest {
+  salonId?: number | null;
+  fullName?: string | null;
+  avatarUrl?: string | null;
+  dateOfBirth?: string | null;
+  gender?: number | null;
+  nationalId?: string | null;
+  phone?: string | null;
+  hireDate?: string | null;
+  contractType?: string | null;
+  basicSalary?: number | null;
+  salaryType?: number | null;
   status?: number | null;
-  serCode?: string | null;
-  serName?: string | null;
-  serDurationMins?: number | null;
-  serCostPrice?: number | null;
-  serCommissionRate?: number | null;
-  createdAt?: string | null;
+  streetAddress?: string | null;
+  provinceCode?: string | null;
+  wardCode?: string | null;
+  fullAddress?: string | null;
+  role?: string | null;
+  email?: string | null;
 }
 
-export interface CreateStaffServicePayload {
-  staffId: number;
-  serviceIds: number[];
-  status?: number;
+export interface UpdateStaffRequest {
+  salonId?: number | null;
+  fullName?: string | null;
+  avatarUrl?: string | null;
+  dateOfBirth?: string | null;
+  gender?: number | null;
+  nationalId?: string | null;
+  phone?: string | null;
+  hireDate?: string | null;
+  contractType?: string | null;
+  basicSalary?: number | null;
+  salaryType?: number | null;
+  status?: number | null;
+  streetAddress?: string | null;
+  provinceCode?: string | null;
+  wardCode?: string | null;
+  fullAddress?: string | null;
+  email?: string | null;
+  role?: string | null;
 }
-
-export interface UpdateStaffServicePayload {
-  staffId?: number;
-  serviceId?: number;
-  status?: number;
-}
-
-export interface DeleteStaffServicePayload {
-  ids: number[];
-}
-
-export type {
-  CreateStaffPayload,
-  UpdateStaffPayload,
-  StaffFormValues,
-} from "../schemas/staff.schema";

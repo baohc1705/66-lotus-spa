@@ -2,8 +2,28 @@ IF OBJECT_ID(N'dbo.usp_GetStaffAvailability', N'P') IS NOT NULL
     DROP PROCEDURE dbo.usp_GetStaffAvailability;
 GO
 
--- Bat buoc @start_time.
--- @ServiceIds: csv "1,5,9". Staff phai lam du tat ca; duration = SUM.
+-- Liệt kê trạng thái khả dụng của mọi nhân viên làm được combo dịch vụ tại khung giờ cố định.
+-- Dùng màn chọn KTV khi đặt lịch: available / busy / off, kèm lý do và khung giờ bận (nếu có).
+--
+-- Input:
+--   @WorkDate   DATE           -- ngày làm việc cần kiểm tra
+--   @ServiceIds NVARCHAR(500)  -- danh sách id dịch vụ CSV, vd "1,5,9"; staff phải làm đủ tất cả
+--   @SalonId    INT = NULL     -- lọc staff và lịch theo salon; NULL = không lọc salon
+--   @start_time TIME(7) = NULL -- giờ bắt đầu khung hẹn; bắt buộc, NULL thì RETURN
+--
+-- Output: nhiều dòng, sắp xếp available trước, rồi busy, cuối cùng off; trong nhóm theo tên
+--   StaffId           INT
+--   StaffName         NVARCHAR
+--   Avatar            NVARCHAR       -- avatar_url
+--   ScheduleId        INT            -- ca làm việc nếu in_shift
+--   Status            NVARCHAR       -- 'available' | 'busy' | 'off'
+--   Reason            NVARCHAR       -- mô tả tiếng Việt (Ngoài giờ làm / Đang có lịch / Đang bị giữ chỗ)
+--   BusyCustomerName  NVARCHAR       -- tên khách đang chiếm slot (chỉ khi busy)
+--   BusyTimeRange     NVARCHAR       -- vd "09:00-10:30" (chỉ khi busy)
+--
+-- Ví dụ EXEC:
+--   EXEC dbo.usp_GetStaffAvailability @WorkDate = '2026-08-20', @ServiceIds = N'1,5', @SalonId = 3, @start_time = '09:00';
+--   EXEC dbo.usp_GetStaffAvailability @WorkDate = '2026-08-20', @ServiceIds = N'2', @SalonId = NULL, @start_time = '14:00';
 CREATE PROCEDURE dbo.usp_GetStaffAvailability
     @WorkDate    DATE,
     @ServiceIds  NVARCHAR(500),
@@ -22,6 +42,7 @@ BEGIN
     DECLARE @window_end      TIME(7);
     DECLARE @now             DATETIMEOFFSET(7) = SYSDATETIMEOFFSET();
 
+    -- parse CSV service id
     CREATE TABLE #wanted_services (
         service_id INT NOT NULL PRIMARY KEY
     );
@@ -40,6 +61,7 @@ BEGIN
         RETURN;
     END;
 
+    -- xác nhận mọi dịch vụ tồn tại và lấy tổng duration combo
     SELECT
         @duration_mins = SUM(s.duration_mins),
         @found_count = COUNT(*)
@@ -61,10 +83,12 @@ BEGIN
         RETURN;
     END;
 
+    -- cửa sổ thời gian cần kiểm tra trống
     SET @window_start_dt = CAST(@window_start AS DATETIME);
     SET @window_end_dt   = DATEADD(MINUTE, @duration_mins, @window_start_dt);
     SET @window_end      = CAST(@window_end_dt AS TIME(7));
 
+    -- bảng kết quả: mọi staff đủ skill combo dịch vụ
     CREATE TABLE #result (
         staff_id           INT            NOT NULL PRIMARY KEY,
         staff_name         NVARCHAR(100)  NOT NULL,
@@ -108,6 +132,7 @@ BEGIN
             )
           );
 
+    -- staff có ca bao trùm cửa sổ hẹn (lọc thêm salon trên work_schedules nếu có @SalonId)
     UPDATE r
     SET
         r.in_shift = 1,
@@ -127,6 +152,7 @@ BEGIN
             OR ws.salon_id IS NULL
           );
 
+    -- cache duration từng appointment trong ngày (fallback khi thiếu time_appt_end)
     CREATE TABLE #appt_dur (
         appointment_id INT NOT NULL PRIMARY KEY,
         total_mins     INT NOT NULL
@@ -145,6 +171,7 @@ BEGIN
       AND (@SalonId IS NULL OR a.salon_id = @SalonId)
     GROUP BY aps.appointment_id;
 
+    -- gom thông tin busy từ lịch trùng khung giờ: tên khách và range HH:mm-HH:mm
     CREATE TABLE #busy (
         staff_id           INT            NOT NULL PRIMARY KEY,
         busy_customer_name NVARCHAR(100)  NULL,
@@ -197,6 +224,7 @@ BEGIN
     FROM #result r
     INNER JOIN #busy b ON b.staff_id = r.staff_id;
 
+    -- busy thêm nếu trùng slot lock còn hạn (không ghi tên khách, Reason sẽ là "Đang bị giữ chỗ")
     UPDATE r
     SET r.is_busy = 1
     FROM #result r
@@ -216,6 +244,7 @@ BEGIN
             )
           ) > @window_start_dt;
 
+    -- map trạng thái hiển thị và sắp xếp: available -> busy -> off
     SELECT
         r.staff_id AS StaffId,
         r.staff_name AS StaffName,
